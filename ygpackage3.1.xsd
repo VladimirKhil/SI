@@ -1,11 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="ygpackage" targetNamespace="http://ur-quan1986.narod.ru/ygpackage3.0.xsd" elementFormDefault="qualified" xmlns="http://ur-quan1986.narod.ru/ygpackage3.0.xsd" xmlns:mstns="http://ur-quan1986.narod.ru/ygpackage3.0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema id="ygpackage" targetNamespace="http://vladimirkhil.com/ygpackage3.0.xsd" elementFormDefault="qualified" xmlns="http://vladimirkhil.com/ygpackage3.0.xsd" xmlns:mstns="http://vladimirkhil.com/ygpackage3.0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="package">
     <xs:annotation>
-      <xs:documentation>Пакет вопросов для "Своей игры"</xs:documentation>
+      <xs:documentation>Пакет вопросов для SIGame</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="tags" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="tag" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>Тег пакета</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="info" type="infoType" minOccurs="1" maxOccurs="1">
           <xs:annotation>
             <xs:documentation>Информация о пакете</xs:documentation>
@@ -64,13 +75,13 @@
                                             </xs:element>
                                             <xs:element name="type" minOccurs="1" maxOccurs="1">
                                               <xs:annotation>
-                                                <xs:documentation>Тип вопроса. Возможные типы вопросов см. в реестре типов: http://ur-quan1986.narod.ru/ygquesttypes.htm</xs:documentation>
+                                                <xs:documentation>Тип вопроса. Возможные типы вопросов см. в реестре типов: http://vladimirkhil.com/si/qtypes</xs:documentation>
                                               </xs:annotation>
                                               <xs:complexType>
                                                 <xs:sequence>
                                                   <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
                                                     <xs:annotation>
-                                                      <xs:documentation>Параметр типа (например, цена Кота в мешке)</xs:documentation>
+                                                      <xs:documentation>Параметр типа (например, цена Вопроса с секретом)</xs:documentation>
                                                     </xs:annotation>
                                                     <xs:complexType>
                                                       <xs:simpleContent>
@@ -78,10 +89,7 @@
                                                           <xs:attribute name="name" type="xs:string" use="required">
                                                             <xs:annotation>
                                                               <xs:documentation>
-                                                                Имя параметра (для удобства).
-                                                                Недопустимые имена параметров: price, type, text, right, wrong, auth, sour, comm.
-                                                                Это связано с тем, что данные имена уже используются в файлах для IRC-скриптов.
-                                                                Каждый новый тип вопроса желательно зарегистрировать
+                                                                Имя параметра
                                                               </xs:documentation>
                                                             </xs:annotation>
                                                           </xs:attribute>
@@ -139,6 +147,11 @@
                                                                 <xs:enumeration value="video">
                                                                   <xs:annotation>
                                                                     <xs:documentation>Видео</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="marker">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Маркер, отделяющий атомы вопроса от атомов ответа</xs:documentation>
                                                                   </xs:annotation>
                                                                 </xs:enumeration>
                                                               </xs:restriction>
@@ -237,6 +250,11 @@
           </xs:complexType>
         </xs:element>
       </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Уникальный идентификатор пакета</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="name" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>Имя пакета</xs:documentation>
@@ -246,8 +264,38 @@
         <xs:annotation>
           <xs:documentation>
             Версия поддерживаемого стандарта.
-            Для данного стандарта версия должна быть равна 3.0
+            Для данного стандарта версия должна быть равна 4
           </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="restriction" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Ограничения пакета (например, "18+")</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="date" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Дата создания пакета в свободной форме</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="publisher" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Издатель пакета</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="difficulty" type="xs:unsignedInt" use="optional">
+        <xs:annotation>
+          <xs:documentation>Сложность пакета (от 0 до 10)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="logo" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Ссылка на изображение-логотип пакета</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="language" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Язык пакета</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
