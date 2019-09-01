@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{78C96549-6EA8-4236-B026-6ECA55D9EC3A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SIUI</RootNamespace>
+    <AssemblyName>SIUI</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Behaviors\MediaController.cs" />
+    <Compile Include="Behaviors\HyperlinkBehavior.cs" />
+    <Compile Include="Behaviors\QuestionReading.cs" />
+    <Compile Include="Converters\Adder.cs" />
+    <Compile Include="Converters\ColorConverter.cs" />
+    <Compile Include="Converters\FontConverter.cs" />
+    <Compile Include="Converters\HeightToThicknessConverter.cs" />
+    <Compile Include="Converters\LengthToDurationConverter.cs" />
+    <Compile Include="Converters\LogoConverter.cs" />
+    <Compile Include="Converters\Multiplier.cs" />
+    <Compile Include="Converters\PressedBottomRowHeightConverter.cs" />
+    <Compile Include="Converters\PressedTopRowHeightConverter.cs" />
+    <Compile Include="Converters\UriToImageSourceConverter.cs" />
+    <Compile Include="Converters\RoundTabloConverter.cs" />
+    <Compile Include="Converters\TemplateConverter.cs" />
+    <Compile Include="Converters\ZoomConverter.cs" />
+    <Compile Include="Utils\UrlMatcher.cs" />
+    <None Include="Enums.cs" />
+    <None Include="app.config" />
+    <Resource Include="Fonts\FuturaC.ttf" />
+    <Resource Include="Fonts\Clefs.ttf" />
+    <Resource Include="Fonts\DINCondensedC.ttf" />
+    <None Include="key.snk" />
+    <Compile Include="Behaviors\FillManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoundThemesView.xaml.cs">
+      <DependentUpon>RoundThemesView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Behaviors\SelectionBehavior.cs" />
+    <Compile Include="Selectors\QuestionTemplateSelector.cs" />
+    <Compile Include="SettingsHelper.cs" />
+    <Compile Include="Table.xaml.cs">
+      <DependentUpon>Table.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Behaviors\TableUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="RoundThemesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Table.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SIUI.Model\SIUI.Model.csproj">
+      <Project>{d4f7536f-4220-46b3-b6f4-5fd43a2c51f8}</Project>
+      <Name>SIUI.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SIUI.ViewModel\SIUI.ViewModel.csproj">
+      <Project>{71806a3f-d7f6-4ed3-bfde-e7e22c134a19}</Project>
+      <Name>SIUI.ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

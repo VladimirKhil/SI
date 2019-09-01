@@ -1,0 +1,618 @@
+﻿<UserControl x:Class="SIUI.Table"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SIUI"
+             xmlns:lb="clr-namespace:SIUI.Behaviors"
+             xmlns:localc="clr-namespace:SIUI.Converters"
+             xmlns:locals="clr-namespace:SIUI.Selectors"
+             xmlns:vm="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" DataContextChanged="UserControl_DataContextChanged"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Foreground="{Binding Settings.Model.TableColorString}"
+             Name="root">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes\generic.xaml" />
+                <ResourceDictionary>
+                    <localc:HeightToThicknessConverter x:Key="HeightToThickness" />
+                    <localc:RoundTabloConverter x:Key="RTConverter" />
+                    <localc:UriToImageSourceConverter x:Key="UriConverter" />
+                    <localc:LengthToDurationConverter x:Key="dur" />
+                    <localc:ColorConverter x:Key="ColorConverter" />
+                    <localc:FontConverter x:Key="FontConverter" />
+                    <localc:PressedBottomRowHeightConverter x:Key="PressedBottomRowHeightConverter"/>
+                    <localc:PressedTopRowHeightConverter x:Key="PressedTopRowHeightConverter"/>
+
+                    <Storyboard x:Key="QSelection">
+                        <ColorAnimation Storyboard.TargetProperty="(Control.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Duration="0:0:0.05" From="Transparent" To="Cyan" AutoReverse="True" RepeatBehavior="12x" />
+                    </Storyboard>
+
+                    <Storyboard x:Key="TSelection">
+                        <ColorAnimation Storyboard.TargetProperty="(Control.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Duration="0:0:0.3" From="Transparent" To="Cyan" AutoReverse="True" />
+                    </Storyboard>
+
+                    <Style x:Key="SIMarginedBorder" TargetType="{x:Type Border}" BasedOn="{StaticResource SIBorder}">
+                        <Setter Property="Margin" Value="-1,-1,0,0" />
+                    </Style>
+
+                    <Style x:Key="SIQuestionText" BasedOn="{StaticResource SIText}" TargetType="{x:Type TextBlock}">
+                        <Setter Property="Text" Value="{Binding Price}" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+                        <Setter Property="lb:FillManager.MaxFontSize" Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=30}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Price}" Value="-1">
+                                <Setter Property="Text" Value="" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIThemeText" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIText}">
+                        <Setter Property="Text" Value="{Binding Name}" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="4" />
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+                        <Setter Property="lb:FillManager.MaxFontSize" Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=35}" />
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                    </Style>
+
+                    <DataTemplate x:Key="SIQuestionTemplate" DataType="{x:Type sys:String}">
+                        <TextBlock Style="{StaticResource SIQuestionText}" />
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="SIThemeTemplate" DataType="{x:Type sys:String}">
+                        <TextBlock Style="{StaticResource SIThemeText}" />
+                    </DataTemplate>
+
+                    <Style x:Key="SIItemButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButtonBase}">
+                        <Setter Property="Content" Value="{Binding}" />
+                        <Setter Property="Background" Value="{StaticResource TransparentSIButtonBackground}" />
+                        <Setter Property="Margin" Value="-1,-1,0,0" />
+                        <Style.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="lb:SelectionBehavior.IsSelectable" Value="True" />
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Background" Value="{StaticResource SelectedSIButtonBackground}" />
+                            </MultiTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIQuestButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIItemButton}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource SIQuestionTemplate}" />
+                        <Setter Property="Command" Value="{Binding DataContext.SelectQuestion, RelativeSource={RelativeSource AncestorType=ItemsControl,AncestorLevel=2}}" />
+                        <Setter Property="CommandParameter" Value="{Binding}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Price}" Value="-1">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding State}" Value="Blinking">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard Storyboard="{StaticResource QSelection}" />
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIThemeButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIItemButton}">
+                        <Setter Property="ContentTemplate" Value="{StaticResource SIThemeTemplate}" />
+                        <Setter Property="Command" Value="{Binding DataContext.SelectTheme, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                        <Setter Property="CommandParameter" Value="{Binding}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}" Value="Blinking">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard Storyboard="{StaticResource TSelection}" />
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIThemeExtended" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIThemeText}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Empty}" Value="True">
+                                <Setter Property="Text" Value="" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIThemeExtended2" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIThemeText}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Active}" Value="False">
+                                <Setter Property="Text" Value="" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Active}" Value="True">
+                                <Setter Property="Foreground" Value="DarkBlue" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="SIThemeBorder2" TargetType="{x:Type Border}" BasedOn="{StaticResource SIMarginedBorder}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Active}" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <RadialGradientBrush RadiusX="1" RadiusY="1">
+                                            <GradientStop Color="Cyan" Offset="0" />
+                                            <GradientStop Color="Transparent" Offset="1.1" />
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="QuestionText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+                        <Setter Property="lb:FillManager.Interlinyage" Value="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}" />
+                        <Setter Property="lb:FillManager.MaxFontSize" Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}" />
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="Margin" Value="10" />
+                    </Style>
+
+                    <Style x:Key="RoundText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
+                        <Setter Property="Margin" Value="10" />
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+                        <Setter Property="lb:FillManager.MaxFontSize" Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=100}" />
+                    </Style>
+
+                    <DropShadowEffect x:Key="SoftShadow" BlurRadius="2" Opacity="1" ShadowDepth="1" />
+
+                    <Style x:Key="RotatingText" TargetType="{x:Type TextBlock}">
+                        <Setter Property="Text" Value="{Binding Text}" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Background" Value="Transparent" />
+                        <Setter Property="Margin" Value="3,10" />
+                        <Setter Property="Effect" Value="{StaticResource SoftShadow}" />
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+                        <Setter Property="lb:FillManager.MaxFontSize" Value="200" />
+                    </Style>
+
+                    <Style x:Key="GameThemeText" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIText}">
+                        <Setter Property="FontSize" Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=24}" />
+                        <Setter Property="TextWrapping" Value="NoWrap" />
+                        <Setter Property="TextAlignment" Value="Center" />
+                    </Style>
+
+                    <ControlTemplate x:Key="Rotator3D" TargetType="{x:Type ContentControl}">
+                        <Viewport3D>
+                            <Viewport3D.Camera>
+                                <PerspectiveCamera x:Name="camera" FieldOfView="45" FarPlaneDistance="20168.481594728742" LookDirection="0,-1,0" NearPlaneDistance="0.1" UpDirection="0,0,-1" Position="500,1800,500"  />
+                            </Viewport3D.Camera>
+                            <ContainerUIElement3D x:Name="World">
+                                <ModelUIElement3D x:Name="AmbientLightContainer">
+                                    <AmbientLight x:Name="AmbientLight" Color="#FF494842" />
+                                </ModelUIElement3D>
+                                <ModelUIElement3D x:Name="DirectionalLightContainer">
+                                    <PointLight x:Name="DirectionalLight" Color="#FFBABAA0" ConstantAttenuation="1" LinearAttenuation="0" Position="434,769,85" QuadraticAttenuation="0" Range="4189" />
+                                </ModelUIElement3D>
+                            </ContainerUIElement3D>
+                            <Viewport2DVisual3D>
+                                <Viewport2DVisual3D.CacheMode>
+                                    <BitmapCache RenderAtScale="10" EnableClearType="True" />
+                                </Viewport2DVisual3D.CacheMode>
+                                <Viewport2DVisual3D.Visual>
+                                    <ContentPresenter Width="80" Height="80" />
+                                </Viewport2DVisual3D.Visual>
+                                <Viewport2DVisual3D.Geometry>
+                                    <MeshGeometry3D Positions="0,0,1000 1000,0,1000 1000,0,0 0,0,0" TriangleIndices="0 1 2 0 2 3" TextureCoordinates="0,1  1,1  1,0  0,0" />
+                                </Viewport2DVisual3D.Geometry>
+
+                                <Viewport2DVisual3D.Material>
+                                    <DiffuseMaterial Viewport2DVisual3D.IsVisualHostMaterial="True" Brush="#FFF11C1C"/>
+                                </Viewport2DVisual3D.Material>
+
+                                <Viewport2DVisual3D.Transform>
+                                    <RotateTransform3D CenterX="500" CenterY="0" CenterZ="500">
+                                        <RotateTransform3D.Rotation>
+                                            <AxisAngleRotation3D x:Name="rot" Axis="0,0,1" Angle="90" />
+                                        </RotateTransform3D.Rotation>
+                                    </RotateTransform3D>
+                                </Viewport2DVisual3D.Transform>
+                            </Viewport2DVisual3D>
+                            <Viewport3D.Triggers>
+                                <EventTrigger RoutedEvent="Viewport3D.Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="rot" Storyboard.TargetProperty="Angle" To="-90" Duration="0:0:2" RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Viewport3D.Triggers>
+                        </Viewport3D>
+                    </ControlTemplate>
+
+                    <ControlTemplate x:Key="RotatorSimple" TargetType="{x:Type ContentControl}">
+                        <ContentPresenter Margin="15" />
+                    </ControlTemplate>
+
+                    <Style x:Key="Rotator" TargetType="ContentControl">
+                        <Setter Property="Template" Value="{StaticResource Rotator3D}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Settings.Model.Animate3D}" Value="False">
+                                <Setter Property="Template" Value="{StaticResource RotatorSimple}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <BitmapCache x:Key="cache" RenderAtScale="3" />
+
+                    <locals:QuestionTemplateSelector x:Key="QuestionTextSelector">
+                        <locals:QuestionTemplateSelector.Simple>
+                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" />
+                            </DataTemplate>
+                        </locals:QuestionTemplateSelector.Simple>
+                        <locals:QuestionTemplateSelector.Animated>
+                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" TextOptions.TextFormattingMode="Ideal" lb:QuestionReading.IsAttached="True">
+                                    <TextBlock.CacheMode>
+                                        <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                    </TextBlock.CacheMode>
+                                    <TextBlock.TextEffects>
+                                        <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                    </TextBlock.TextEffects>
+                                </TextBlock>
+                            </DataTemplate>
+                        </locals:QuestionTemplateSelector.Animated>
+                        <locals:QuestionTemplateSelector.Partial>
+                            <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" Foreground="Transparent" Margin="10" TextWrapping="Wrap" HorizontalAlignment="Left" TextAlignment="Left" lb:QuestionReading.IsAttachedPartial="True">
+                                    <TextBlock.CacheMode>
+                                        <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                    </TextBlock.CacheMode>
+                                    <TextBlock.TextEffects>
+                                        <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                    </TextBlock.TextEffects>
+                                </TextBlock>
+                            </DataTemplate>
+                        </locals:QuestionTemplateSelector.Partial>
+                    </locals:QuestionTemplateSelector>
+
+                    <localc:TemplateConverter x:Key="QuestionContentSelector">
+                        <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.None}">
+                                <ContentControl Style="{StaticResource Rotator}">
+                                    <TextBlock Text="&amp;" Style="{StaticResource RotatingText}" FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                </ContentControl>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Text}">
+                                <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource QuestionTextSelector}" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Image}">
+                                <Image Name="image" Stretch="Uniform" Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">
+                                <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.IsAttached="True" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.SpecialText}">
+                                <TextBlock Text="{Binding Text}" lb:HyperlinkBehavior.Source="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" />
+                            </DataTemplate>
+                        </localc:TemplateConverter.Templates>
+                    </localc:TemplateConverter>
+
+                    <localc:TemplateConverter x:Key="DecoratorSelector">
+                        <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:QuestionStyle.Normal}" />
+                            <DataTemplate x:Key="{x:Static vm:QuestionStyle.WaitingForPress}">
+                                <Grid>
+                                    <Grid.Resources>
+                                        <ScaleTransform x:Key="X" ScaleX="{Binding TimeLeft}" />
+                                        <ScaleTransform x:Key="Y" ScaleY="{Binding TimeLeft}" />
+                                    </Grid.Resources>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="58*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="58*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.ColumnSpan="3" Stretch="Fill" RenderTransform="{StaticResource X}" RenderTransformOrigin="0.5,0.5" />
+                                    <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.Row="2" Grid.ColumnSpan="3" Stretch="Fill" RenderTransform="{StaticResource X}" RenderTransformOrigin="0.5,0.5" />
+                                    <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.RowSpan="3" Stretch="Fill" RenderTransform="{StaticResource Y}" RenderTransformOrigin="0.5,0.5" />
+                                    <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.Column="2" Grid.RowSpan="3" Stretch="Fill" RenderTransform="{StaticResource Y}" RenderTransformOrigin="0.5,0.5" />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:QuestionStyle.Pressed}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedTopRowHeightConverter}}" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="1" Background="#DD1D1F77" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                        <ContentControl>
+                                            <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding ActivePlayer}" />
+                                        </ContentControl>
+                                    </Border>
+                                    <ItemsControl ItemsSource="{Binding LostButtonPlayers}" Grid.Row="2">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#DD1D1F77" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                                    <ContentControl>
+                                                        <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding}" />
+                                                    </ContentControl>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </DataTemplate>
+                        </localc:TemplateConverter.Templates>
+                    </localc:TemplateConverter>
+
+                    <localc:LogoConverter x:Key="LogoConverter" />
+
+                    <localc:TemplateConverter x:Key="TableSelector">
+                        <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Void}" />
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Sign}">
+                                <Image Source="{Binding Settings.Model.LogoUri, Converter={StaticResource LogoConverter}}" Stretch="Uniform" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.GameThemes}">
+                                <StackPanel Orientation="Vertical" ClipToBounds="True">
+                                    <ItemsControl Name="list" ItemsSource="{Binding GameThemes}" lb:TableUtilities.GameThemesStoryboard="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type local:Table},AncestorLevel=1}}">
+                                        <ItemsControl.CacheMode>
+                                            <BitmapCache RenderAtScale="3" />
+                                        </ItemsControl.CacheMode>
+                                        <ItemsControl.RenderTransform>
+                                            <TranslateTransform Y="{Binding Path=ActualHeight, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        </ItemsControl.RenderTransform>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Style="{StaticResource GameThemeText}" Text="{Binding}" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Round}">
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource RoundText}" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Theme}">
+                                <TextBlock Text="{Binding Text}" Tag="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}" Style="{StaticResource QuestionText}" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.QuestionPrice}">
+                                <TextBlock Text="{Binding Text}" Style="{StaticResource RoundText}" />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.RoundThemes}">
+                                <local:RoundThemesView />
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.RoundTable}">
+                                <Grid ClipToBounds="True" Name="mainGrid" lb:TableUtilities.Offset="{Binding RelativeSource={RelativeSource Self},Path=ActualWidth,Mode=OneWay}">
+                                    <Grid.Resources>
+                                        <TranslateTransform x:Key="Even" X="{Binding ElementName=mainGrid,Path=(lb:TableUtilities.Offset),Converter={StaticResource RTConverter},ConverterParameter=True}" />
+                                        <TranslateTransform x:Key="Odd" X="{Binding ElementName=mainGrid,Path=(lb:TableUtilities.Offset),Converter={StaticResource RTConverter},ConverterParameter=False}" />
+                                    </Grid.Resources>
+                                    <Grid.Triggers>
+                                        <EventTrigger RoutedEvent="Control.Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="(lb:TableUtilities.Offset)" To="0" Duration="0:0:0.5" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Grid.Triggers>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="1.2*" />
+                                        <RowDefinition Height="5*" />
+                                    </Grid.RowDefinitions>
+                                    <ItemsControl Name="PART_Table" Grid.RowSpan="2" ItemsSource="{Binding RoundInfo}" AlternationCount="2" lb:SelectionBehavior.IsSelectable="{Binding Selectable}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="1" Margin="0,0,-1,-1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Name="grid" CacheMode="{StaticResource cache}">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1*" />
+                                                        <ColumnDefinition Width="2*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border Style="{StaticResource SIMarginedBorder}">
+                                                        <TextBlock Style="{StaticResource SIThemeExtended}" />
+                                                    </Border>
+                                                    <ItemsControl ItemsSource="{Binding Questions}" Grid.Column="1">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <UniformGrid Rows="1" />
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Style="{StaticResource SIQuestButton}" />
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Grid>
+                                                <DataTemplate.Triggers>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="0">
+                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Even}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Odd}"/>
+                                                    </Trigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ContentControl Name="PART_Bottom" Grid.Row="0" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.Model.ShowScore}" Value="True">
+                                        <Setter TargetName="PART_Table" Property="Grid.RowSpan" Value="1" />
+                                        <Setter TargetName="PART_Table" Property="Grid.Row" Value="1" />
+                                        <Setter TargetName="PART_Bottom" Property="Content">
+                                            <Setter.Value>
+                                                <ItemsControl ItemsSource="{Binding Players}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <UniformGrid Rows="1" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate DataType="local:SimplePlayerInfo">
+                                                            <UniformGrid Rows="2" Columns="1">
+                                                                <ContentControl>
+                                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" />
+                                                                </ContentControl>
+                                                                <ContentControl>
+                                                                    <TextBlock Text="{Binding Sum}" Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" />
+                                                                </ContentControl>
+                                                            </UniformGrid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Score}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="2*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <ItemsControl Grid.Row="1" ItemsSource="{Binding Players}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="local:SimplePlayerInfo">
+                                                <UniformGrid Rows="2" Columns="1">
+                                                    <ContentControl>
+                                                        <TextBlock Text="{Binding Name}" Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" />
+                                                    </ContentControl>
+                                                    <ContentControl>
+                                                        <TextBlock Text="{Binding Sum}" Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" />
+                                                    </ContentControl>
+                                                </UniformGrid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
+                                <Grid>
+                                    <!--Основной контент вопроса (текст, изображение, видео, скрипичный ключ)-->
+                                    <ContentControl Content="{Binding}" ContentTemplate="{Binding QuestionContentType, Converter={StaticResource QuestionContentSelector}}" Margin="10" />
+                                    <!--Рамка для нажатия / имя нажавшего-->
+                                    <ContentControl Content="{Binding}" ContentTemplate="{Binding QuestionStyle, Converter={StaticResource DecoratorSelector}}" />
+                                    <!--Фоновый звук-->
+                                    <ContentControl Content="{Binding}">
+                                        <ContentControl.Style>
+                                            <Style TargetType="ContentControl">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate />
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Sound}" Value="True">
+                                                        <Setter Property="ContentTemplate">
+                                                            <Setter.Value>
+                                                                <DataTemplate>
+                                                                    <MediaElement Source="{Binding SoundSource.Uri}" lb:MediaController.IsAttached="True" />
+                                                                </DataTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ContentControl.Style>
+                                    </ContentControl>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Answer}">
+                                <Border Background="#55000000" Margin="0,40">
+                                    <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" />
+                                </Border>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Special}">
+                                <Grid ClipToBounds="True" Width="{Binding RelativeSource={RelativeSource TemplatedParent},Path=ActualWidth}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="33*" />
+                                        <ColumnDefinition Width="67*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ItemsControl ItemsSource="{Binding RoundInfo}" Grid.Column="0" Margin="-1,0,0,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="1" Margin="0,0,-1,-1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource SIThemeBorder2}">
+                                                    <TextBlock Style="{StaticResource SIThemeExtended2}" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ContentControl Style="{StaticResource Rotator}" Grid.Column="1">
+                                        <TextBlock Style="{StaticResource RotatingText}" />
+                                    </ContentControl>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="{x:Static vm:TableStage.Final}">
+                                <ItemsControl ItemsSource="{Binding RoundInfo}" Margin="20" lb:SelectionBehavior.IsSelectable="{Binding Selectable}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="1" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Name="But" Style="{StaticResource SIThemeButton}" />
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
+                                                    <Setter TargetName="But" Property="IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DataTemplate>
+                        </localc:TemplateConverter.Templates>
+                    </localc:TemplateConverter>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Background>
+        <RadialGradientBrush>
+            <GradientStop Color="{Binding Settings.Model.TableBackColorString, Converter={StaticResource ColorConverter}}" Offset="0" />
+            <GradientStop Color="{Binding Settings.Model.TableBackColorString}" Offset="1" />
+        </RadialGradientBrush>
+    </UserControl.Background>
+    <ContentControl FontFamily="{Binding Settings.TableFontFamily, Converter={StaticResource FontConverter}}" Name="main"
+                    Content="{Binding}" IsEnabled="{Binding Enabled}"
+                    ContentTemplate="{Binding TStage, Converter={StaticResource TableSelector}}" />
+</UserControl>
