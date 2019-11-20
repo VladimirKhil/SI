@@ -93,7 +93,7 @@ namespace SImulator.Implementation.ButtonManagers
                         }
 
                         _joystick = new SharpDX.DirectInput.Joystick(_directInput, devices[0].InstanceGuid);
-                        _joystick.SetCooperativeLevel(_form, SharpDX.DirectInput.CooperativeLevel.Background | SharpDX.DirectInput.CooperativeLevel.NonExclusive);
+                        _joystick.SetCooperativeLevel(_form.Handle, SharpDX.DirectInput.CooperativeLevel.Background | SharpDX.DirectInput.CooperativeLevel.NonExclusive);
                         _joystick.Properties.BufferSize = 128;
                     }
 
