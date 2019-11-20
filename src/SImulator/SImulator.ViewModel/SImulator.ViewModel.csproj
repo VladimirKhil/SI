@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <Authors>Vladimir Khil</Authors>
+    <Product>SImulator.ViewModel</Product>
+    <Description>SImulator view model</Description>
+    <Company>Svoyak-soft</Company>
+    <Version>2.6.1</Version>
+    <Copyright>Copyright © Svoyak-soft 2010 - 2019</Copyright>
+    <AssemblyVersion>2.6.1.0</AssemblyVersion>
+    <FileVersion>2.6.1.0</FileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
+    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.3.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.3.0" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.3.0" />
+  </ItemGroup>
+  <Import Project="..\..\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
+  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
+</Project>

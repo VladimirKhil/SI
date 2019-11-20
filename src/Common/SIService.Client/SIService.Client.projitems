@@ -9,15 +9,12 @@
     <Import_RootNamespace>SIService.Client</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\AnswerInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\Enums.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\GameResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\NamedObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\NewServerInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\Package.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PersonResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\SIStorageService.cs" />
   </ItemGroup>
 </Project>

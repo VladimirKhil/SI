@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>СИмулятор</title>
+
+    <link href="style.css?v=2" rel="stylesheet" />
+    <script src="Scripts/jquery-3.1.0.min.js"></script>
+    <script src="Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="host/hubs"></script>
+    <script src="logic.js?v=2"></script>
+</head>
+<body>
+    <h1 id="header">СИмулятор</h1>
+    <div class="main">
+        <div class="content">
+            <input id="press" type="button" onclick="buttonClick();" disabled />
+            <p id="info">Загрузка…</p>
+        </div>
+    </div>
+    <p id="error"></p>
+</body>
+</html>

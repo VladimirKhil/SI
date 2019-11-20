@@ -77,7 +77,7 @@ namespace Services.SI.ViewModel
 			}
 		}
 
-		internal async Task<Uri> LoadSelectedPackageUriAsync()
+		public async Task<Uri> LoadSelectedPackageUriAsync()
 		{
 			if (_siService == null || CurrentPackage == null)
 				return null;
