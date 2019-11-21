@@ -36,7 +36,7 @@ namespace SIEngine
         protected SIDocument _document;
 
         protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0, _atomIndex = 0;
-		protected bool _isMedia;
+        protected bool _isMedia;
 
         protected Round _activeRound;
         protected Theme _activeTheme;
@@ -243,122 +243,122 @@ namespace SIEngine
 
         protected void OnQuestionText(string text, IMedia sound)
         {
-			QuestionText?.Invoke(text, sound);
-		}
+            QuestionText?.Invoke(text, sound);
+        }
 
         protected void OnQuestionOral(string oralText)
         {
-			QuestionOral?.Invoke(oralText);
-		}
+            QuestionOral?.Invoke(oralText);
+        }
 
         protected void OnQuestionImage(IMedia image, IMedia sound)
         {
-			QuestionImage?.Invoke(image, sound);
-		}
+            QuestionImage?.Invoke(image, sound);
+        }
 
         protected void OnQuestionSound(IMedia sound)
         {
-			QuestionSound?.Invoke(sound);
-		}
+            QuestionSound?.Invoke(sound);
+        }
 
         protected void OnQuestionVideo(IMedia video)
         {
-			QuestionVideo?.Invoke(video);
-		}
+            QuestionVideo?.Invoke(video);
+        }
 
         protected void OnQuestionOther(Atom atom)
         {
-			QuestionOther?.Invoke(atom);
-		}
+            QuestionOther?.Invoke(atom);
+        }
 
         protected void OnQuestionProcessed(Question question, bool finished, bool pressMode)
         {
-			QuestionProcessed?.Invoke(question, finished, pressMode);
-		}
+            QuestionProcessed?.Invoke(question, finished, pressMode);
+        }
 
         protected void OnWaitTry(Question question, bool final = false)
         {
-			WaitTry?.Invoke(question, final);
-		}
+            WaitTry?.Invoke(question, final);
+        }
 
         protected void OnSimpleAnswer(string answer)
         {
-			SimpleAnswer?.Invoke(answer);
-		}
+            SimpleAnswer?.Invoke(answer);
+        }
 
         protected void OnRightAnswer()
         {
-			RightAnswer?.Invoke();
-		}
+            RightAnswer?.Invoke();
+        }
 
         protected void OnShowScore()
         {
-			ShowScore?.Invoke();
-		}
+            ShowScore?.Invoke();
+        }
 
         protected void OnLogScore()
         {
-			LogScore?.Invoke();
-		}
+            LogScore?.Invoke();
+        }
 
         protected void OnEndQuestion(int themeIndex, int questionIndex)
         {
-			EndQuestion?.Invoke(themeIndex, questionIndex);
-		}
+            EndQuestion?.Invoke(themeIndex, questionIndex);
+        }
 
         protected void OnRoundEmpty()
         {
-			RoundEmpty?.Invoke();
-		}
+            RoundEmpty?.Invoke();
+        }
 
         protected void OnNextQuestion()
         {
-			NextQuestion?.Invoke();
-		}
+            NextQuestion?.Invoke();
+        }
 
         protected void OnRoundTimeout()
         {
-			RoundTimeout?.Invoke();
-		}
+            RoundTimeout?.Invoke();
+        }
 
         protected void OnFinalThemes(Theme[] finalThemes)
         {
-			FinalThemes?.Invoke(finalThemes);
-		}
+            FinalThemes?.Invoke(finalThemes);
+        }
 
         protected void OnWaitDelete()
         {
-			WaitDelete?.Invoke();
-		}
+            WaitDelete?.Invoke();
+        }
 
         protected void OnThemeSelected(int themeIndex)
         {
-			ThemeSelected?.Invoke(themeIndex);
-		}
+            ThemeSelected?.Invoke(themeIndex);
+        }
 
         protected void OnPrepareFinalQuestion(Theme theme, Question question)
         {
-			PrepareFinalQuestion?.Invoke(theme, question);
-		}
+            PrepareFinalQuestion?.Invoke(theme, question);
+        }
 
         protected void OnSound(string name = "")
         {
-			Sound?.Invoke(name);
-		}
+            Sound?.Invoke(name);
+        }
 
         protected void OnError(string error)
         {
-			Error?.Invoke(error);
-		}
+            Error?.Invoke(error);
+        }
 
         protected void OnEndGame()
         {
-			EndGame?.Invoke();
-		}
+            EndGame?.Invoke();
+        }
 
-		#endregion
+        #endregion
 
-		public object SyncRoot { get; } = new object();
+        public object SyncRoot { get; } = new object();
 
         /// <summary>
         /// Автоматический шаг дальше
@@ -484,16 +484,16 @@ namespace SIEngine
                 return QuestionPlayMode.AlreadyFinished;
 
             var activeAtom = ActiveAtom;
-			_isMedia = false;
-			switch (activeAtom.Type)
+            _isMedia = false;
+            switch (activeAtom.Type)
             {
                 case AtomTypes.Text:
                     {
                         var text = CollectText();
                         var sound = GetBackgroundSound();
-						_isMedia = sound != null;
+                        _isMedia = sound != null;
 
-						OnQuestionText(text, sound);
+                        OnQuestionText(text, sound);
 
                         _atomIndex++;
                         break;
@@ -522,32 +522,32 @@ namespace SIEngine
                         if (isImage)
                         {
                             var sound = GetBackgroundSound();
-							_isMedia = sound != null;
+                            _isMedia = sound != null;
 
-							OnQuestionImage(media, sound);
+                            OnQuestionImage(media, sound);
                         }
                         else
                         {
-							if (isSound)
-							{
-								var backItem = GetBackgroundImageOrText();
-								if (backItem != null)
-								{
-									if (backItem.Item1 != null)
-										OnQuestionImage(backItem.Item1, media);
-									else
-										OnQuestionText(backItem.Item2, media);
-								}
-								else
-									OnQuestionSound(media);
-							}
-							else
-							{
-								OnQuestionVideo(media);
-							}
+                            if (isSound)
+                            {
+                                var backItem = GetBackgroundImageOrText();
+                                if (backItem != null)
+                                {
+                                    if (backItem.Item1 != null)
+                                        OnQuestionImage(backItem.Item1, media);
+                                    else
+                                        OnQuestionText(backItem.Item2, media);
+                                }
+                                else
+                                    OnQuestionSound(media);
+                            }
+                            else
+                            {
+                                OnQuestionVideo(media);
+                            }
 
-							_isMedia = true;
-						}
+                            _isMedia = true;
+                        }
 
                         _atomIndex++;
                         break;
@@ -577,10 +577,10 @@ namespace SIEngine
                     _useAnswerMarker = true;
 
                 return QuestionPlayMode.JustFinished;
-			}
+            }
 
             return QuestionPlayMode.InProcess;
-		}
+        }
 
         /// <summary>
         /// Собрать текст последовательно расположенных элементов вопроса
@@ -686,8 +686,8 @@ namespace SIEngine
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

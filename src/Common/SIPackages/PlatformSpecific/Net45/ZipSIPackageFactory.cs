@@ -9,12 +9,12 @@ namespace SIPackages.PlatformSpecific.Net45
             return ZipSIPackage.Create(stream);
         }
 
-		public override ISIPackage CreatePackage(string folder)
-		{
-			return FolderSIPackage.Create(folder);
-		}
+        public override ISIPackage CreatePackage(string folder)
+        {
+            return FolderSIPackage.Create(folder);
+        }
 
-		public override ISIPackage GetPackage(string folder, bool read = true)
+        public override ISIPackage GetPackage(string folder, bool read = true)
         {
             return FolderSIPackage.Open(folder);
         }

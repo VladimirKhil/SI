@@ -58,64 +58,64 @@ namespace SIPackages
             }
         }
 
-		private string _publisher = "";
+        private string _publisher = "";
 
-		/// <summary>
-		/// Издатель пакета
-		/// </summary>
-		public string Publisher
-		{
-			get { return _publisher; }
-			set
-			{
-				var oldValue = _publisher;
-				if (_publisher != value)
-				{
-					_publisher = value;
-					OnPropertyChanged(oldValue);
-				}
-			}
-		}
+        /// <summary>
+        /// Издатель пакета
+        /// </summary>
+        public string Publisher
+        {
+            get { return _publisher; }
+            set
+            {
+                var oldValue = _publisher;
+                if (_publisher != value)
+                {
+                    _publisher = value;
+                    OnPropertyChanged(oldValue);
+                }
+            }
+        }
 
-		private int _difficulty = 5;
+        private int _difficulty = 5;
 
-		/// <summary>
-		/// Сложность пакета
-		/// </summary>
-		public int Difficulty
-		{
-			get { return _difficulty; }
-			set
-			{
-				var oldValue = _difficulty;
-				if (_difficulty != value)
-				{
-					_difficulty = value;
-					OnPropertyChanged(oldValue);
-				}
-			}
-		}
+        /// <summary>
+        /// Сложность пакета
+        /// </summary>
+        public int Difficulty
+        {
+            get { return _difficulty; }
+            set
+            {
+                var oldValue = _difficulty;
+                if (_difficulty != value)
+                {
+                    _difficulty = value;
+                    OnPropertyChanged(oldValue);
+                }
+            }
+        }
 
-		private string _logo = "";
+        private string _logo = "";
 
-		/// <summary>
-		/// Адрес логотипа пакета
-		/// </summary>
-		public string Logo
-		{
-			get { return _logo; }
-			set
-			{
-				var oldValue = _logo;
-				if (_logo != value)
-				{
-					_logo = value;
-					OnPropertyChanged(oldValue);
-				}
-			}
-		}
+        /// <summary>
+        /// Адрес логотипа пакета
+        /// </summary>
+        public string Logo
+        {
+            get { return _logo; }
+            set
+            {
+                var oldValue = _logo;
+                if (_logo != value)
+                {
+                    _logo = value;
+                    OnPropertyChanged(oldValue);
+                }
+            }
+        }
 
-		private string _date = "";
+        private string _date = "";
 
         /// <summary>
         /// Дата создания пакета (задана произвольным образом - 2005 год, 31.12.2014, осень 2008 и проч.)
@@ -132,31 +132,31 @@ namespace SIPackages
                     OnPropertyChanged(oldValue);
                 }
             }
-		}
+        }
 
-		private string _language = "";
+        private string _language = "";
 
-		/// <summary>
-		/// Язык пакета
-		/// </summary>
-		public string Language
-		{
-			get { return _language; }
-			set
-			{
-				var oldValue = _language;
-				if (_language != value)
-				{
-					_language = value;
-					OnPropertyChanged(oldValue);
-				}
-			}
-		}
+        /// <summary>
+        /// Язык пакета
+        /// </summary>
+        public string Language
+        {
+            get { return _language; }
+            set
+            {
+                var oldValue = _language;
+                if (_language != value)
+                {
+                    _language = value;
+                    OnPropertyChanged(oldValue);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Тематики пакета
-		/// </summary>
-		public List<string> Tags { get; } = new List<string>();
+        /// <summary>
+        /// Тематики пакета
+        /// </summary>
+        public List<string> Tags { get; } = new List<string>();
 
         /// <summary>
         /// Раунды пакета
@@ -202,17 +202,17 @@ namespace SIPackages
             if (reader.MoveToAttribute("date"))
                 _date = reader.Value;
 
-			if (reader.MoveToAttribute("publisher"))
-				_publisher = reader.Value;
+            if (reader.MoveToAttribute("publisher"))
+                _publisher = reader.Value;
 
-			if (reader.MoveToAttribute("difficulty"))
-				int.TryParse(reader.Value, out _difficulty);
+            if (reader.MoveToAttribute("difficulty"))
+                int.TryParse(reader.Value, out _difficulty);
 
-			if (reader.MoveToAttribute("logo"))
-				_logo = reader.Value;
+            if (reader.MoveToAttribute("logo"))
+                _logo = reader.Value;
 
-			if (reader.MoveToAttribute("language"))
-				_language = reader.Value;
+            if (reader.MoveToAttribute("language"))
+                _language = reader.Value;
 
             if (reader.IsEmptyElement)
             {
@@ -267,19 +267,19 @@ namespace SIPackages
             if (!string.IsNullOrEmpty(_date))
                 writer.WriteAttributeString("date", _date);
 
-			if (!string.IsNullOrEmpty(_publisher))
-				writer.WriteAttributeString("publisher", _publisher);
+            if (!string.IsNullOrEmpty(_publisher))
+                writer.WriteAttributeString("publisher", _publisher);
 
-			if (_difficulty > 0)
-				writer.WriteAttributeString("difficulty", _difficulty.ToString());
+            if (_difficulty > 0)
+                writer.WriteAttributeString("difficulty", _difficulty.ToString());
 
-			if (!string.IsNullOrEmpty(_logo))
-				writer.WriteAttributeString("logo", _logo);
+            if (!string.IsNullOrEmpty(_logo))
+                writer.WriteAttributeString("logo", _logo);
 
-			if (!string.IsNullOrEmpty(_language))
-				writer.WriteAttributeString("language", _language);
+            if (!string.IsNullOrEmpty(_language))
+                writer.WriteAttributeString("language", _language);
 
-			if (Tags.Count > 0)
+            if (Tags.Count > 0)
             {
                 writer.WriteStartElement("tags");
 
@@ -313,12 +313,12 @@ namespace SIPackages
                 _name = _name,
                 _date = _date,
                 _restriction = _restriction,
-				_publisher = _publisher,
-				_difficulty = _difficulty,
-				_logo = _logo
+                _publisher = _publisher,
+                _difficulty = _difficulty,
+                _logo = _logo
             };
 
-			package.Tags.AddRange(Tags);
+            package.Tags.AddRange(Tags);
 
             FillInfo(package);
 

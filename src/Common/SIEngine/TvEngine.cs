@@ -84,19 +84,19 @@ namespace SIEngine
                     #endregion
 
                 case GameStage.RoundThemes:
-					#region RoundThemes
-					OnSound("cathegories.mp3");
+                    #region RoundThemes
+                    OnSound("cathegories.mp3");
 
-					_questionsTable.Clear();
-					for (int i = 0; i < _activeRound.Themes.Count; i++)
-					{
-						for (int j = 0; j < _activeRound.Themes[i].Questions.Count; j++)
-						{
-							_questionsTable.Add(Tuple.Create(i, j));
-						}
-					}
+                    _questionsTable.Clear();
+                    for (int i = 0; i < _activeRound.Themes.Count; i++)
+                    {
+                        for (int j = 0; j < _activeRound.Themes[i].Questions.Count; j++)
+                        {
+                            _questionsTable.Add(Tuple.Create(i, j));
+                        }
+                    }
 
-					OnRoundThemes(_activeRound.Themes.ToArray());
+                    OnRoundThemes(_activeRound.Themes.ToArray());
 
                     Stage = GameStage.RoundTable;
                     UpdateCanNext();
@@ -399,8 +399,8 @@ namespace SIEngine
             OnQuestionSelected(_themeIndex, _questionIndex, _activeTheme, _activeQuestion);
 
             _atomIndex = 0;
-			_isMedia = false;
-			_useAnswerMarker = false;
+            _isMedia = false;
+            _useAnswerMarker = false;
             Stage = GameStage.Question;
 
             UpdateCanNext();
@@ -411,8 +411,8 @@ namespace SIEngine
         private void DoPrepareFinalQuestion()
         {
             _atomIndex = 0;
-			_isMedia = false;
-			_themeIndex = _themesTable.First();
+            _isMedia = false;
+            _themeIndex = _themesTable.First();
             _questionIndex = 0;
 
             SetActiveThemeQuestion();

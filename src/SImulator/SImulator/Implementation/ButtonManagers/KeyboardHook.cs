@@ -25,7 +25,7 @@ namespace SImulator.Implementation.ButtonManagers
 
             if (_hookPtr == IntPtr.Zero)
             {
-				MessageBox.Show("Ошибка прослушивания клавиатуры", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка прослушивания клавиатуры", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             return true;

@@ -103,64 +103,64 @@ namespace SIPackages
         }
 
         public static SIDocument Create(string name, string author, Stream stream = null)
-		{
-			var document = new SIDocument();
+        {
+            var document = new SIDocument();
 
-			var ms = stream ?? new MemoryStream();
-			document.CreateInternal(ms, name, author);
+            var ms = stream ?? new MemoryStream();
+            document.CreateInternal(ms, name, author);
 
-			Init(document);
+            Init(document);
 
-			return document;
-		}
+            return document;
+        }
 
-		public static SIDocument Create(string name, string author, string folder)
-		{
-			var document = new SIDocument();
+        public static SIDocument Create(string name, string author, string folder)
+        {
+            var document = new SIDocument();
 
-			document.CreateInternal(folder, name, author);
+            document.CreateInternal(folder, name, author);
 
-			Init(document);
+            Init(document);
 
-			return document;
-		}
+            return document;
+        }
 
-		private static void Init(SIDocument document)
-		{
-			document._package.ID = Guid.NewGuid().ToString();
-			document._package.Date = DateTime.Now.ToString("dd.MM.yyyy");
-		}
+        private static void Init(SIDocument document)
+        {
+            document._package.ID = Guid.NewGuid().ToString();
+            document._package.Date = DateTime.Now.ToString("dd.MM.yyyy");
+        }
 
-		private void CreateInternal(Stream stream, string name, string author)
-		{
-			_source = SIPackageFactory.Instance.CreatePackage(stream);
+        private void CreateInternal(Stream stream, string name, string author)
+        {
+            _source = SIPackageFactory.Instance.CreatePackage(stream);
 
-			CreateCore(name, author);
-		}
+            CreateCore(name, author);
+        }
 
-		private void CreateInternal(string folder, string name, string author)
-		{
-			_source = SIPackageFactory.Instance.CreatePackage(folder);
+        private void CreateInternal(string folder, string name, string author)
+        {
+            _source = SIPackageFactory.Instance.CreatePackage(folder);
 
-			CreateCore(name, author);
-		}
+            CreateCore(name, author);
+        }
 
-		private void CreateCore(string name, string author)
-		{
-			_source.CreateStream(ContentFileName, "si/xml");
-			_source.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
-			_source.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
+        private void CreateCore(string name, string author)
+        {
+            _source.CreateStream(ContentFileName, "si/xml");
+            _source.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
+            _source.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
 
-			InitializeStorages();
+            InitializeStorages();
 
-			_package = new Package { Name = name };
-			_package.Info.Authors.Add(author);
+            _package = new Package { Name = name };
+            _package.Info.Authors.Add(author);
 
-			_authors = new AuthorInfoList();
-			_sources = new SourceInfoList();
-		}
+            _authors = new AuthorInfoList();
+            _sources = new SourceInfoList();
+        }
 
-		public static SIDocument Load(Stream stream, bool read = true)
+        public static SIDocument Load(Stream stream, bool read = true)
         {
             var document = new SIDocument();
             document.LoadInternal(stream, read);
@@ -355,15 +355,15 @@ namespace SIPackages
 
         public SIDocument SaveAs(Stream stream, bool switchTo)
         {
-			var newSource = _source.CopyTo(stream, switchTo, out bool isNew);
+            var newSource = _source.CopyTo(stream, switchTo, out bool isNew);
 
-			if (isNew)
+            if (isNew)
             {
                 newSource.CreateStream(ContentFileName, "si/xml");
                 newSource.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
                 newSource.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
             }
-			
+            
             if (switchTo)
             {
                 _source.Dispose();

@@ -73,7 +73,7 @@ namespace SIPackages
                 {
                     case System.Xml.XmlNodeType.Element:
                         switch (reader.LocalName)
-	                    {
+                        {
                             case "author":
                                 Info.Authors.Add(reader.ReadElementContentAsString());
                                 read = false;
@@ -88,7 +88,7 @@ namespace SIPackages
                                 Info.Comments.Text = reader.ReadElementContentAsString();
                                 read = false;
                                 break;
-	                    }
+                        }
 
                         break;
 

@@ -65,7 +65,7 @@ namespace SIUI.ViewModel
 
         private void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
- 	        switch (e.Action)
+             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (QuestionInfoViewModel item in e.NewItems)
