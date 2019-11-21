@@ -25,8 +25,8 @@ namespace SImulator.ViewModel
     /// </summary>
     public sealed class GameEngine: INotifyPropertyChanged, IDisposable
     {
-		#region Fields
-		private readonly bool _isRemoteControlling;
+        #region Fields
+        private readonly bool _isRemoteControlling;
 
         internal event Action<string> Error;
         internal event Action RequestStop;
@@ -35,10 +35,10 @@ namespace SImulator.ViewModel
 
         private readonly EngineBase _engine;
 
-		/// <summary>
-		/// Менеджер игровых кнопок
-		/// </summary>
-		private IButtonManager _buttonManager;
+        /// <summary>
+        /// Менеджер игровых кнопок
+        /// </summary>
+        private IButtonManager _buttonManager;
 
         /// <summary>
         /// Менеджер записи лога
@@ -55,11 +55,11 @@ namespace SImulator.ViewModel
         private readonly List<PlayerInfo> _selectedPlayers = new List<PlayerInfo>();
         private readonly Dictionary<Guid, PlayerInfo> _playersTable = new Dictionary<Guid, PlayerInfo>();
 
-		#endregion
+        #endregion
 
-		#region Commands
+        #region Commands
 
-		private readonly SimpleCommand _stop;
+        private readonly SimpleCommand _stop;
         private readonly SimpleUICommand _next;
         private readonly SimpleCommand _back;
 
@@ -116,21 +116,21 @@ namespace SImulator.ViewModel
             set { if (_activeMediaCommand != value) { _activeMediaCommand = value; OnPropertyChanged(); } }
         }
 
-		#endregion
+        #endregion
 
-		#region Properties
+        #region Properties
 
-		public AppSettingsViewModel Settings { get; }
+        public AppSettingsViewModel Settings { get; }
 
-		/// <summary>
-		/// Ссылка на интерфейсную часть. Может находиться в текущем процессе или на удалённом компьютере
-		/// </summary>
-		public IRemoteGameUI UserInterface { get; } = null;
+        /// <summary>
+        /// Ссылка на интерфейсную часть. Может находиться в текущем процессе или на удалённом компьютере
+        /// </summary>
+        public IRemoteGameUI UserInterface { get; } = null;
 
-		/// <summary>
-		/// Список игроков, отображаемых на табло в особом режиме игры
-		/// </summary>
-		public TableInfoViewModel LocalInfo { get; set; }
+        /// <summary>
+        /// Список игроков, отображаемых на табло в особом режиме игры
+        /// </summary>
+        public TableInfoViewModel LocalInfo { get; set; }
 
         private bool _showingRoundThemes = false;
 
@@ -239,16 +239,16 @@ namespace SImulator.ViewModel
             }
         }
 
-		private readonly IExtendedGameHost _gameHost;
+        private readonly IExtendedGameHost _gameHost;
 
         #endregion
         
         public GameEngine(AppSettingsViewModel settings, EngineBase engine, IExtendedGameHost gameHost, IRemoteGameUI ui, IList<SimplePlayerInfo> players, bool isRemoteControlling)
         {
             Settings = settings;
-			_engine = engine;
-			_gameHost = gameHost;
-			UserInterface = ui;
+            _engine = engine;
+            _gameHost = gameHost;
+            UserInterface = ui;
             _isRemoteControlling = isRemoteControlling;
 
             LocalInfo = new TableInfoViewModel(players);
@@ -256,8 +256,8 @@ namespace SImulator.ViewModel
             foreach (PlayerInfo item in LocalInfo.Players)
             {
                 item.IsRegistered = false;
-				item.PropertyChanged += Info_PropertyChanged;
-			}
+                item.PropertyChanged += Info_PropertyChanged;
+            }
 
             LocalInfo.QuestionSelected += QuestionInfo_Selected;
             LocalInfo.ThemeSelected += ThemeInfo_Selected;
@@ -296,95 +296,95 @@ namespace SImulator.ViewModel
             settings.Model.SIUISettings.PropertyChanged += Default_PropertyChanged;
             settings.SIUISettings.PropertyChanged += Default_PropertyChanged;
 
-			_engine.Package += Engine_Package;
-			_engine.GameThemes += Engine_GameThemes;
-			_engine.NextRound += Engine_NextRound;
-			_engine.Round += Engine_Round;
-			_engine.RoundThemes += Engine_RoundThemes;
-			_engine.Theme += Engine_Theme;
-			_engine.Question += Engine_Question;
-			_engine.QuestionSelected += Engine_QuestionSelected;
+            _engine.Package += Engine_Package;
+            _engine.GameThemes += Engine_GameThemes;
+            _engine.NextRound += Engine_NextRound;
+            _engine.Round += Engine_Round;
+            _engine.RoundThemes += Engine_RoundThemes;
+            _engine.Theme += Engine_Theme;
+            _engine.Question += Engine_Question;
+            _engine.QuestionSelected += Engine_QuestionSelected;
 
-			_engine.QuestionAtom += Engine_QuestionAtom;
-			_engine.QuestionText += Engine_QuestionText;
-			_engine.QuestionOral += Engine_QuestionOral;
-			_engine.QuestionImage += Engine_QuestionImage;
-			_engine.QuestionSound += Engine_QuestionSound;
-			_engine.QuestionVideo += Engine_QuestionVideo;
-			_engine.QuestionOther += Engine_QuestionOther;
-			_engine.QuestionProcessed += Engine_QuestionProcessed;
-			_engine.WaitTry += Engine_WaitTry;
+            _engine.QuestionAtom += Engine_QuestionAtom;
+            _engine.QuestionText += Engine_QuestionText;
+            _engine.QuestionOral += Engine_QuestionOral;
+            _engine.QuestionImage += Engine_QuestionImage;
+            _engine.QuestionSound += Engine_QuestionSound;
+            _engine.QuestionVideo += Engine_QuestionVideo;
+            _engine.QuestionOther += Engine_QuestionOther;
+            _engine.QuestionProcessed += Engine_QuestionProcessed;
+            _engine.WaitTry += Engine_WaitTry;
 
-			_engine.SimpleAnswer += Engine_SimpleAnswer;
-			_engine.RightAnswer += Engine_RightAnswer;
-			_engine.ShowScore += Engine_ShowScore;
-			_engine.LogScore += LogScore;
-			_engine.EndQuestion += Engine_EndQuestion;
-			_engine.RoundTimeout += Engine_RoundTimeout;
-			_engine.NextQuestion += Engine_NextQuestion;
-			_engine.RoundEmpty += Engine_RoundEmpty;
-			_engine.FinalThemes += Engine_FinalThemes;
-			_engine.ThemeSelected += Engine_Theme;
-			_engine.PrepareFinalQuestion += Engine_PrepareFinalQuestion;
-			_engine.Sound += Engine_Sound;
-			_engine.Error += OnError;
-			_engine.EndGame += Engine_EndGame;
+            _engine.SimpleAnswer += Engine_SimpleAnswer;
+            _engine.RightAnswer += Engine_RightAnswer;
+            _engine.ShowScore += Engine_ShowScore;
+            _engine.LogScore += LogScore;
+            _engine.EndQuestion += Engine_EndQuestion;
+            _engine.RoundTimeout += Engine_RoundTimeout;
+            _engine.NextQuestion += Engine_NextQuestion;
+            _engine.RoundEmpty += Engine_RoundEmpty;
+            _engine.FinalThemes += Engine_FinalThemes;
+            _engine.ThemeSelected += Engine_Theme;
+            _engine.PrepareFinalQuestion += Engine_PrepareFinalQuestion;
+            _engine.Sound += Engine_Sound;
+            _engine.Error += OnError;
+            _engine.EndGame += Engine_EndGame;
 
-			_engine.PropertyChanged += engine_PropertyChanged;
+            _engine.PropertyChanged += engine_PropertyChanged;
 
-			_gameHost.MediaStart += GameHost_MediaStart;
-			_gameHost.MediaProgress += GameHost_MediaProgress;
-			_gameHost.MediaEnd += GameHost_MediaEnd;
-			_gameHost.RoundThemesFinished += GameHost_RoundThemesFinished;
-			_gameHost.ThemeDeleted += GameHost_ThemeDeleted;
-		}
+            _gameHost.MediaStart += GameHost_MediaStart;
+            _gameHost.MediaProgress += GameHost_MediaProgress;
+            _gameHost.MediaEnd += GameHost_MediaEnd;
+            _gameHost.RoundThemesFinished += GameHost_RoundThemesFinished;
+            _gameHost.ThemeDeleted += GameHost_ThemeDeleted;
+        }
 
-		private void GameHost_ThemeDeleted(int themeIndex)
-		{
-			LocalInfo.RoundInfo[themeIndex].Name = null;
-		}
+        private void GameHost_ThemeDeleted(int themeIndex)
+        {
+            LocalInfo.RoundInfo[themeIndex].Name = null;
+        }
 
-		private void GameHost_RoundThemesFinished()
-		{
-			ShowingRoundThemes = false;
-			UserInterface.SetStage(TableStage.RoundTable);
-		}
+        private void GameHost_RoundThemesFinished()
+        {
+            ShowingRoundThemes = false;
+            UserInterface.SetStage(TableStage.RoundTable);
+        }
 
-		private void GameHost_MediaEnd()
-		{
-			ActiveMediaCommand = RunMediaTimer;
+        private void GameHost_MediaEnd()
+        {
+            ActiveMediaCommand = RunMediaTimer;
 
-			if ((!Settings.Model.FalseStart || !Settings.Model.FalseStartMultimedia || Settings.Model.UsePlayersKeys == PlayerKeysModes.None) && _engine.IsQuestionFinished())
-			{
-				if (Settings.Model.ThinkingTime > 0)
-				{
-					// Запуск таймера при игре на мультимедиа без фальстартов
-					// С фальстартами - по дополнительному нажатию кнопки
-					QuestionTimeMax = Settings.Model.ThinkingTime;
-					RunQuestionTimer_Executed(0);
-				}
-			}
-		}
+            if ((!Settings.Model.FalseStart || !Settings.Model.FalseStartMultimedia || Settings.Model.UsePlayersKeys == PlayerKeysModes.None) && _engine.IsQuestionFinished())
+            {
+                if (Settings.Model.ThinkingTime > 0)
+                {
+                    // Запуск таймера при игре на мультимедиа без фальстартов
+                    // С фальстартами - по дополнительному нажатию кнопки
+                    QuestionTimeMax = Settings.Model.ThinkingTime;
+                    RunQuestionTimer_Executed(0);
+                }
+            }
+        }
 
-		private void GameHost_MediaProgress(double progress)
-		{
-			_mediaProgressBlock = true;
-			try
-			{
-				MediaProgress = (int)(progress * 100);
-			}
-			finally
-			{
-				_mediaProgressBlock = false;
-			}
-		}
+        private void GameHost_MediaProgress(double progress)
+        {
+            _mediaProgressBlock = true;
+            try
+            {
+                MediaProgress = (int)(progress * 100);
+            }
+            finally
+            {
+                _mediaProgressBlock = false;
+            }
+        }
 
-		private void GameHost_MediaStart()
-		{
-			IsMediaControlled = true;
-		}
+        private void GameHost_MediaStart()
+        {
+            IsMediaControlled = true;
+        }
 
-		#region Event handlers
+        #region Event handlers
 
         private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -400,12 +400,12 @@ namespace SImulator.ViewModel
             catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-			}
-			catch (ObjectDisposedException exc)
-			{
-				PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-			}
-		}
+            }
+            catch (ObjectDisposedException exc)
+            {
+                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+            }
+        }
 
         private void Info_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -711,10 +711,10 @@ namespace SImulator.ViewModel
 
         private void AddRight_Executed(object arg)
         {
-			if (!(arg is PlayerInfo player))
-				return;
+            if (!(arg is PlayerInfo player))
+                return;
 
-			player.Right++;
+            player.Right++;
             player.Sum += Price;
 
             _logger.Write("{0} +{1}", player.Name, Price);
@@ -733,10 +733,10 @@ namespace SImulator.ViewModel
 
         private void AddWrong_Executed(object arg)
         {
-			if (!(arg is PlayerInfo player))
-				return;
+            if (!(arg is PlayerInfo player))
+                return;
 
-			player.Wrong++;
+            player.Wrong++;
 
             var substract = Settings.Model.SubstractOnWrong ? Price : 0;
             player.Sum -= substract;
@@ -813,9 +813,9 @@ namespace SImulator.ViewModel
             _logger.Write("Пакет: {0}", _engine.PackageName);
 
             _selectedPlayers.Clear();
-			UserInterface.ClearLostButtonPlayers();
+            UserInterface.ClearLostButtonPlayers();
 
-			if (Settings.Model.AutomaticGame)
+            if (Settings.Model.AutomaticGame)
                 Next_Executed();
         }
 
@@ -1061,7 +1061,7 @@ namespace SImulator.ViewModel
             UnselectPlayer();
             _selectedPlayers.Clear();
 
-			foreach (var player in LocalInfo.Players)
+            foreach (var player in LocalInfo.Players)
             {
                 ((PlayerInfo)player).BlockedTime = null;
             }
@@ -1134,7 +1134,7 @@ namespace SImulator.ViewModel
             UnselectPlayer();
             _selectedPlayers.Clear();
 
-			foreach (var player in LocalInfo.Players)
+            foreach (var player in LocalInfo.Players)
             {
                 ((PlayerInfo)player).BlockedTime = null;
             }
@@ -1231,10 +1231,10 @@ namespace SImulator.ViewModel
             {
                 lock (_engine.SyncRoot)
                 {
-					_engine.PropertyChanged -= engine_PropertyChanged;
-					_engine.Dispose();
+                    _engine.PropertyChanged -= engine_PropertyChanged;
+                    _engine.Dispose();
 
-					if (_buttonManager != null)
+                    if (_buttonManager != null)
                     {
                         _buttonManager.Stop();
                         _buttonManager.Dispose();
@@ -1405,7 +1405,7 @@ namespace SImulator.ViewModel
                 ActiveMediaCommand = null;
         }
 
-		private void Engine_QuestionOral(string oralText)
+        private void Engine_QuestionOral(string oralText)
         {
             UserInterface.SetText("");
             UserInterface.SetQuestionSound(false);
@@ -1467,8 +1467,8 @@ namespace SImulator.ViewModel
 
         private void OnError(string error)
         {
-			Error?.Invoke(error);
-		}
+            Error?.Invoke(error);
+        }
 
         internal PlayerInfo OnGetPlayerByGuid(Guid guid, bool strict)
         {
@@ -1476,10 +1476,10 @@ namespace SImulator.ViewModel
             {
                 lock (_playersTable)
                 {
-					if (_playersTable.TryGetValue(guid, out PlayerInfo player))
-						return player;
+                    if (_playersTable.TryGetValue(guid, out PlayerInfo player))
+                        return player;
 
-					if (!strict)
+                    if (!strict)
                     {
                         foreach (PlayerInfo item in LocalInfo.Players)
                         {
@@ -1505,22 +1505,22 @@ namespace SImulator.ViewModel
             if (!_engine.IsWaitingForPress())
                 return false;
 
-			var index = Settings.Model.PlayerKeys2.IndexOf(key);
-			if (index == -1 || index >= LocalInfo.Players.Count)
-				return false;
+            var index = Settings.Model.PlayerKeys2.IndexOf(key);
+            if (index == -1 || index >= LocalInfo.Players.Count)
+                return false;
 
-			var player = (PlayerInfo)LocalInfo.Players[index];
+            var player = (PlayerInfo)LocalInfo.Players[index];
 
-			// Уже кто-то отвечает
-			if (_selectedPlayer != null)
-			{
-				if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
-				{
-					UserInterface.AddLostButtonPlayer(player.Name);
-				}
+            // Уже кто-то отвечает
+            if (_selectedPlayer != null)
+            {
+                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
+                {
+                    UserInterface.AddLostButtonPlayer(player.Name);
+                }
 
-				return false;
-			}
+                return false;
+            }
 
             return ProcessPlayerPress(index, player);
         }
@@ -1530,16 +1530,16 @@ namespace SImulator.ViewModel
             if (!_engine.IsWaitingForPress())
                 return false;
 
-			// Уже кто-то отвечает
-			if (_selectedPlayer != null)
-			{
-				if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
-				{
-					UserInterface.AddLostButtonPlayer(player.Name);
-				}
+            // Уже кто-то отвечает
+            if (_selectedPlayer != null)
+            {
+                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
+                {
+                    UserInterface.AddLostButtonPlayer(player.Name);
+                }
 
-				return false;
-			}
+                return false;
+            }
 
             // Нет такого игрока
             var index = LocalInfo.Players.IndexOf(player);
@@ -1605,11 +1605,11 @@ namespace SImulator.ViewModel
                 _selectedPlayer = null;
             }
 
-			if (Settings.Model.ShowLostButtonPlayers)
-			{
-				UserInterface.ClearLostButtonPlayers();
-			}			
-		}
+            if (Settings.Model.ShowLostButtonPlayers)
+            {
+                UserInterface.ClearLostButtonPlayers();
+            }            
+        }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

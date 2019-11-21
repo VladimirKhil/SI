@@ -92,13 +92,13 @@ namespace SIPackages.PlatformSpecific.Net45
 
         private void AddContentTypeInfo(string name, string contentType)
         {
-			var extension = Path.GetExtension(name);
-			if (extension.StartsWith("."))
-			{
-				extension = extension.Substring(1);
-			}
+            var extension = Path.GetExtension(name);
+            if (extension.StartsWith("."))
+            {
+                extension = extension.Substring(1);
+            }
 
-			var ext = extension.ToLower();
+            var ext = extension.ToLower();
             if (!_contentTypes.ContainsKey(ext))
                 _contentTypes[ext] = contentType;
         }
@@ -114,7 +114,7 @@ namespace SIPackages.PlatformSpecific.Net45
             var entry = _zipArchive.CreateEntry(category + "/" + Uri.EscapeUriString(name), CompressionLevel.Optimal);
             using (var writeStream = entry.Open())
             {
-				await stream.CopyToAsync(writeStream);
+                await stream.CopyToAsync(writeStream);
             }
 
             AddContentTypeInfo(name, contentType);
@@ -140,8 +140,8 @@ namespace SIPackages.PlatformSpecific.Net45
             
             isNew = false;
 
-			_stream.Position = 0; // обязательно нужно
-			_stream.CopyTo(stream);
+            _stream.Position = 0; // обязательно нужно
+            _stream.CopyTo(stream);
             stream.Position = 0;
 
             // Переоткрываем

@@ -46,116 +46,116 @@ namespace Services.SI
             return await Call<Uri>("Package?packageID=" + packageID);
         }
 
-		public async Task<Uri> GetPackageByGuidAsync(string packageGuid)
-		{
-			return await Call<Uri>("PackageByGuid?packageGuid=" + packageGuid);
-		}
+        public async Task<Uri> GetPackageByGuidAsync(string packageGuid)
+        {
+            return await Call<Uri>("PackageByGuid?packageGuid=" + packageGuid);
+        }
 
-		public async Task<string[]> GetPackagesByTagAsync(int? tagId = null)
-		{
-			var queryString = new StringBuilder();
+        public async Task<string[]> GetPackagesByTagAsync(int? tagId = null)
+        {
+            var queryString = new StringBuilder();
 
-			if (tagId.HasValue)
-			{
-				queryString.Append("tagId=").Append(tagId.Value);
-			}
+            if (tagId.HasValue)
+            {
+                queryString.Append("tagId=").Append(tagId.Value);
+            }
 
-			return await Call<string[]>("PackagesByTag" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
-		}
+            return await Call<string[]>("PackagesByTag" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+        }
 
-		public async Task<NewServerInfo[]> GetGameServersUrisAsync()
-		{
-			return await Call<NewServerInfo[]>("GetGameServersUrisNew");
-		}
+        public async Task<NewServerInfo[]> GetGameServersUrisAsync()
+        {
+            return await Call<NewServerInfo[]>("GetGameServersUrisNew");
+        }
 
-		public async Task<NamedObject[]> GetAuthorsAsync()
-		{
-			return await Call<NamedObject[]>("Authors");
-		}
+        public async Task<NamedObject[]> GetAuthorsAsync()
+        {
+            return await Call<NamedObject[]>("Authors");
+        }
 
-		public async Task<NamedObject[]> GetPublishersAsync()
-		{
-			return await Call<NamedObject[]>("Publishers");
-		}
+        public async Task<NamedObject[]> GetPublishersAsync()
+        {
+            return await Call<NamedObject[]>("Publishers");
+        }
 
-		public async Task<NamedObject[]> GetTagsAsync()
-		{
-			return await Call<NamedObject[]>("Tags");
-		}
+        public async Task<NamedObject[]> GetTagsAsync()
+        {
+            return await Call<NamedObject[]>("Tags");
+        }
 
-		public async Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1, int? publisherId = null, int? authorId = null,
-			string restriction = null, PackageSortMode sortMode = PackageSortMode.Name, bool sortAscending = true)
-		{
-			var queryString = new StringBuilder();
+        public async Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1, int? publisherId = null, int? authorId = null,
+            string restriction = null, PackageSortMode sortMode = PackageSortMode.Name, bool sortAscending = true)
+        {
+            var queryString = new StringBuilder();
 
-			if (tagId.HasValue)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (tagId.HasValue)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("tagId=").Append(tagId.Value);
-			}
+                queryString.Append("tagId=").Append(tagId.Value);
+            }
 
-			if (difficultyRelation > 0)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (difficultyRelation > 0)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("difficultyRelation=").Append(difficultyRelation);
-			}
+                queryString.Append("difficultyRelation=").Append(difficultyRelation);
+            }
 
-			if (difficulty > 1)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (difficulty > 1)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("difficulty=").Append(difficulty);
-			}
+                queryString.Append("difficulty=").Append(difficulty);
+            }
 
-			if (publisherId.HasValue)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (publisherId.HasValue)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("publisherId=").Append(publisherId.Value);
-			}
+                queryString.Append("publisherId=").Append(publisherId.Value);
+            }
 
-			if (authorId.HasValue)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (authorId.HasValue)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("authorId=").Append(authorId.Value);
-			}
+                queryString.Append("authorId=").Append(authorId.Value);
+            }
 
-			if (restriction != null)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (restriction != null)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("restriction=").Append(restriction);
-			}
+                queryString.Append("restriction=").Append(restriction);
+            }
 
-			if (sortMode != PackageSortMode.Name)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (sortMode != PackageSortMode.Name)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("sortMode=").Append((int)sortMode);
-			}
+                queryString.Append("sortMode=").Append((int)sortMode);
+            }
 
-			if (!sortAscending)
-			{
-				if (queryString.Length > 0)
-					queryString.Append('&');
+            if (!sortAscending)
+            {
+                if (queryString.Length > 0)
+                    queryString.Append('&');
 
-				queryString.Append("sortAscending=false");
-			}
+                queryString.Append("sortAscending=false");
+            }
 
-			return await Call<PackageInfo[]>("FilteredPackages" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
-		}
+            return await Call<PackageInfo[]>("FilteredPackages" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+        }
 
-		private async Task<T> Call<T>(string request)
+        private async Task<T> Call<T>(string request)
         {
             using (var stream = await Client.GetStreamAsync(_address + "/" + request))
             {

@@ -348,21 +348,21 @@ namespace SImulator.Implementation
             if (streamInfo == null)
                 return null;
 
-			try
-			{
-				using (streamInfo.Stream)
-				{
-					using (var fs = File.Create(fileName))
-					{
-						await streamInfo.Stream.CopyToAsync(fs);
-					}
-				}
-			}
-			catch (IOException exc)
-			{
-				ShowMessage(exc.Message);
-				return null;
-			}
+            try
+            {
+                using (streamInfo.Stream)
+                {
+                    using (var fs = File.Create(fileName))
+                    {
+                        await streamInfo.Stream.CopyToAsync(fs);
+                    }
+                }
+            }
+            catch (IOException exc)
+            {
+                ShowMessage(exc.Message);
+                return null;
+            }
 
             _mediaFiles.Add(fileName);
 

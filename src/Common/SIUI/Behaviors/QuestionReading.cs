@@ -38,83 +38,83 @@ namespace SIUI.Behaviors
                 };
         }
 
-		public static bool GetIsAttachedPartial(DependencyObject obj)
-		{
-			return (bool)obj.GetValue(IsAttachedPartialProperty);
-		}
+        public static bool GetIsAttachedPartial(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsAttachedPartialProperty);
+        }
 
-		public static void SetIsAttachedPartial(DependencyObject obj, bool value)
-		{
-			obj.SetValue(IsAttachedPartialProperty, value);
-		}
+        public static void SetIsAttachedPartial(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsAttachedPartialProperty, value);
+        }
 
-		// Using a DependencyProperty as the backing store for IsAttachedPartial.  This enables animation, styling, binding, etc...
-		public static readonly DependencyProperty IsAttachedPartialProperty =
-			DependencyProperty.RegisterAttached("IsAttachedPartial", typeof(bool), typeof(QuestionReading), new PropertyMetadata(false, OnIsAttachedPartialChanged));
+        // Using a DependencyProperty as the backing store for IsAttachedPartial.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsAttachedPartialProperty =
+            DependencyProperty.RegisterAttached("IsAttachedPartial", typeof(bool), typeof(QuestionReading), new PropertyMetadata(false, OnIsAttachedPartialChanged));
 
-		// Пока сделано синглтоном
-		public static int CurrentTarget;
+        // Пока сделано синглтоном
+        public static int CurrentTarget;
 
-		public static void OnIsAttachedPartialChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{
-			var textBlock = (TextBlock)d;
-			var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+        public static void OnIsAttachedPartialChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var textBlock = (TextBlock)d;
+            var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
 
-			PropertyChangedEventHandler handler = (sender, e2) =>
-			{
-				if (e2.PropertyName == nameof(TableInfoViewModel.TextLength))
-				{
-					UpdateAnimation(textBlock, tableInfoViewModel);
-				}
-			};
+            PropertyChangedEventHandler handler = (sender, e2) =>
+            {
+                if (e2.PropertyName == nameof(TableInfoViewModel.TextLength))
+                {
+                    UpdateAnimation(textBlock, tableInfoViewModel);
+                }
+            };
 
-			if (!(bool)e.NewValue)
-			{
-				return;
-			}
+            if (!(bool)e.NewValue)
+            {
+                return;
+            }
 
-			tableInfoViewModel.PropertyChanged += handler;
+            tableInfoViewModel.PropertyChanged += handler;
 
-			textBlock.Loaded += (sender, e2) =>
-			{
-				var animation = new Int32Animation
-				{
-					To = tableInfoViewModel.TextLength,
-					Duration = new Duration(TimeSpan.FromSeconds((tableInfoViewModel.TextLength - CurrentTarget) * tableInfoViewModel.TextSpeed))
-				};
+            textBlock.Loaded += (sender, e2) =>
+            {
+                var animation = new Int32Animation
+                {
+                    To = tableInfoViewModel.TextLength,
+                    Duration = new Duration(TimeSpan.FromSeconds((tableInfoViewModel.TextLength - CurrentTarget) * tableInfoViewModel.TextSpeed))
+                };
 
-				textBlock.TextEffects[0].BeginAnimation(TextEffect.PositionCountProperty, animation);
-				CurrentTarget = tableInfoViewModel.TextLength;
-			};
+                textBlock.TextEffects[0].BeginAnimation(TextEffect.PositionCountProperty, animation);
+                CurrentTarget = tableInfoViewModel.TextLength;
+            };
 
-			textBlock.Unloaded += (sender, e2) =>
-			{
-				tableInfoViewModel.PropertyChanged -= handler;
-			};
+            textBlock.Unloaded += (sender, e2) =>
+            {
+                tableInfoViewModel.PropertyChanged -= handler;
+            };
 
-			CurrentTarget = 0;
-		}
+            CurrentTarget = 0;
+        }
 
-		private static void UpdateAnimation(TextBlock textBlock, TableInfoViewModel tableInfoViewModel)
-		{
-			if (System.Windows.Threading.Dispatcher.CurrentDispatcher != textBlock.Dispatcher)
-			{
-				textBlock.Dispatcher.Invoke((Action<TextBlock, TableInfoViewModel>)UpdateAnimation, textBlock, tableInfoViewModel);
-				return;
-			}
+        private static void UpdateAnimation(TextBlock textBlock, TableInfoViewModel tableInfoViewModel)
+        {
+            if (System.Windows.Threading.Dispatcher.CurrentDispatcher != textBlock.Dispatcher)
+            {
+                textBlock.Dispatcher.Invoke((Action<TextBlock, TableInfoViewModel>)UpdateAnimation, textBlock, tableInfoViewModel);
+                return;
+            }
 
-			if (tableInfoViewModel.TextLength > CurrentTarget)
-			{
-				var animation = new Int32Animation
-				{
-					To = tableInfoViewModel.TextLength,
-					Duration = new Duration(TimeSpan.FromSeconds((tableInfoViewModel.TextLength - CurrentTarget) * tableInfoViewModel.TextSpeed))
-				};
+            if (tableInfoViewModel.TextLength > CurrentTarget)
+            {
+                var animation = new Int32Animation
+                {
+                    To = tableInfoViewModel.TextLength,
+                    Duration = new Duration(TimeSpan.FromSeconds((tableInfoViewModel.TextLength - CurrentTarget) * tableInfoViewModel.TextSpeed))
+                };
 
-				textBlock.TextEffects[0].BeginAnimation(TextEffect.PositionCountProperty, animation);
+                textBlock.TextEffects[0].BeginAnimation(TextEffect.PositionCountProperty, animation);
 
-				CurrentTarget = tableInfoViewModel.TextLength;
-			}
-		}
-	}
+                CurrentTarget = tableInfoViewModel.TextLength;
+            }
+        }
+    }
 }

@@ -39,9 +39,9 @@ namespace SImulator
 
         private void Button_LostKeyboardFocus_1(object sender, KeyboardFocusChangedEventArgs e)
         {
-			if (DataContext is MainViewModel gameEngine)
-				gameEngine.OnButtonsLeft();
-		}
+            if (DataContext is MainViewModel gameEngine)
+                gameEngine.OnButtonsLeft();
+        }
 
         private void DemonstrationScreens_Filter(object sender, FilterEventArgs e)
         {

@@ -86,13 +86,13 @@ namespace SImulator.ViewModel.Core
         [OperationContract]
         void SetPlayer(int playerIndex);
 
-		[OperationContract]
-		void AddLostButtonPlayer(string name);
+        [OperationContract]
+        void AddLostButtonPlayer(string name);
 
-		[OperationContract]
-		void ClearLostButtonPlayers();
+        [OperationContract]
+        void ClearLostButtonPlayers();
 
-		[OperationContract]
+        [OperationContract]
         void SeekMedia(int position);
 
         [OperationContract]

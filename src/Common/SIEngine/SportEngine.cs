@@ -77,7 +77,7 @@ namespace SIEngine
                     _questionIndex++;
                     CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
                     _atomIndex = 0;
-					_isMedia = false;
+                    _isMedia = false;
                     _useAnswerMarker = false;
                     SetActiveQuestion();
                     OnQuestion(_activeQuestion);
@@ -200,8 +200,8 @@ namespace SIEngine
             CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
 
             _atomIndex = 0;
-			_isMedia = false;
-			_useAnswerMarker = false;
+            _isMedia = false;
+            _useAnswerMarker = false;
             SetActiveQuestion();
 
             _stage = GameStage.Question;

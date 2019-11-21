@@ -75,8 +75,8 @@ namespace Services.SI.ViewModel
             {
                 if (_restriction != value)
                 {
-					if (value == "(не исключать)")
-						value = " ";
+                    if (value == "(не исключать)")
+                        value = " ";
 
                     _restriction = value;
                     OnPropertyChanged();
