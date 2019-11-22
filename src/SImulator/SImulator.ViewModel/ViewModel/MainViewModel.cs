@@ -358,34 +358,34 @@ namespace SImulator.ViewModel
             {
                 var packageStream = await _packageSource.GetPackageAsync();
 
-				var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
-				EngineBase engine;
+                var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
+                EngineBase engine;
 
-				try
-				{
-					var document = SIDocument.Load(packageStream);
-					engine = SettingsViewModel.Model.GameMode == GameModes.Tv ? (EngineBase)new TvEngine(document, engineSettingsProvider) : new SportEngine(document, engineSettingsProvider);
-				}
-				catch (Exception exc)
-				{
-					throw new Exception(string.Format("Ошибка при загрузке игрового пакета: {0}", exc.Message));
-				}
+                try
+                {
+                    var document = SIDocument.Load(packageStream);
+                    engine = SettingsViewModel.Model.GameMode == GameModes.Tv ? (EngineBase)new TvEngine(document, engineSettingsProvider) : new SportEngine(document, engineSettingsProvider);
+                }
+                catch (Exception exc)
+                {
+                    throw new Exception(string.Format("Ошибка при загрузке игрового пакета: {0}", exc.Message));
+                }
 
-				var gameHost = PlatformManager.Instance.CreateGameHost(engine);
+                var gameHost = PlatformManager.Instance.CreateGameHost(engine);
 
-				IRemoteGameUI ui;
-				if (_isRemoteControlling)
-				{
-					if (!Connect(gameHost, out ui))
-						return;
-				}
-				else
-				{
-					ui = new RemoteGameUI { GameHost = gameHost, ScreenIndex = SettingsViewModel.Model.ScreenNumber };
-					ui.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-				}
+                IRemoteGameUI ui;
+                if (_isRemoteControlling)
+                {
+                    if (!Connect(gameHost, out ui))
+                        return;
+                }
+                else
+                {
+                    ui = new RemoteGameUI { GameHost = gameHost, ScreenIndex = SettingsViewModel.Model.ScreenNumber };
+                    ui.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+                }
 
-				var game = new GameEngine(SettingsViewModel, engine, gameHost, ui, Players, _isRemoteControlling);
+                var game = new GameEngine(SettingsViewModel, engine, gameHost, ui, Players, _isRemoteControlling);
 
                 game.Start();
 
@@ -410,66 +410,66 @@ namespace SImulator.ViewModel
             }
         }
 
-		public static Binding GetBinding()
-		{
-			var binding = new NetTcpBinding();
-			binding.Security.Mode = SecurityMode.None;
-			return binding;
-		}
+        public static Binding GetBinding()
+        {
+            var binding = new NetTcpBinding();
+            binding.Security.Mode = SecurityMode.None;
+            return binding;
+        }
 
-		private DuplexChannelFactory<IRemoteGameUI> factory = null;
+        private DuplexChannelFactory<IRemoteGameUI> factory = null;
 
-		internal bool Connect(IGameHost gameHost, out IRemoteGameUI ui)
-		{
-			try
-			{
-				factory = new DuplexChannelFactory<IRemoteGameUI>(new InstanceContext(gameHost), GetBinding(), new EndpointAddress(string.Format("net.tcp://{1}:{0}/simulator", SettingsViewModel.Model.HttpPort, SettingsViewModel.Model.RemotePCName)));
-				factory.Open();
-				ui = factory.CreateChannel();
+        internal bool Connect(IGameHost gameHost, out IRemoteGameUI ui)
+        {
+            try
+            {
+                factory = new DuplexChannelFactory<IRemoteGameUI>(new InstanceContext(gameHost), GetBinding(), new EndpointAddress(string.Format("net.tcp://{1}:{0}/simulator", SettingsViewModel.Model.HttpPort, SettingsViewModel.Model.RemotePCName)));
+                factory.Open();
+                ui = factory.CreateChannel();
 
-				ui.UpdateSettings(SettingsViewModel.SIUISettings.Model); // Проверим соединение заодно
+                ui.UpdateSettings(SettingsViewModel.SIUISettings.Model); // Проверим соединение заодно
 
-				((IChannel)ui).Closed += GameEngine_Closed;
-				((IChannel)ui).Faulted += GameEngine_Closed;
+                ((IChannel)ui).Closed += GameEngine_Closed;
+                ((IChannel)ui).Faulted += GameEngine_Closed;
 
-				return true;
-			}
-			catch (Exception exc)
-			{
-				ui = null;
-				ShowError(exc.Message);
-				return false;
-			}
-		}
+                return true;
+            }
+            catch (Exception exc)
+            {
+                ui = null;
+                ShowError(exc.Message);
+                return false;
+            }
+        }
 
-		private void GameEngine_Closed(object sender, EventArgs e)
-		{
-			Task.Factory.StartNew(() =>
-			{
-				EndGame();
+        private void GameEngine_Closed(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                EndGame();
 
-				PlatformManager.Instance.ShowMessage("Соединение с демонстрационным компьютером было разорвано. Игра прекращена.", false);
-			}, System.Threading.CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
-		}
+                PlatformManager.Instance.ShowMessage("Соединение с демонстрационным компьютером было разорвано. Игра прекращена.", false);
+            }, System.Threading.CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+        }
 
-		private void Disconnect()
-		{
-			if (factory != null)
-			{
-				try
-				{
-					factory.Close(TimeSpan.FromSeconds(2.0));
-				}
-				catch (TimeoutException)
-				{
-					factory.Abort();
-				}
-			}
+        private void Disconnect()
+        {
+            if (factory != null)
+            {
+                try
+                {
+                    factory.Close(TimeSpan.FromSeconds(2.0));
+                }
+                catch (TimeoutException)
+                {
+                    factory.Abort();
+                }
+            }
 
-			factory = null;
-		}
+            factory = null;
+        }
 
-		async void Game_RequestStop()
+        async void Game_RequestStop()
         {
             await RaiseStop();
         }
@@ -487,8 +487,8 @@ namespace SImulator.ViewModel
             if (_game != null)
                 _game.CloseMainView();
 
-			Disconnect();
-			EndGame();
+            Disconnect();
+            EndGame();
             return true;
         }
 
@@ -751,11 +751,11 @@ namespace SImulator.ViewModel
             }
         }
 
-		private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
-		public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

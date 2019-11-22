@@ -579,30 +579,30 @@ namespace SImulator.Model
                     OnPropertyChanged();
                 }
             }
-		}
+        }
 
-		private bool _showLostButtonPlayers = false;
+        private bool _showLostButtonPlayers = false;
 
-		/// <summary>
-		/// Показывать игроков, проигравших кнопку
-		/// </summary>
-		[DefaultValue(false)]
-		public bool ShowLostButtonPlayers
-		{
-			get { return _showLostButtonPlayers; }
-			set
-			{
-				if (_showLostButtonPlayers != value)
-				{
-					_showLostButtonPlayers = value;
-					OnPropertyChanged();
-				}
-			}
-		}
+        /// <summary>
+        /// Показывать игроков, проигравших кнопку
+        /// </summary>
+        [DefaultValue(false)]
+        public bool ShowLostButtonPlayers
+        {
+            get { return _showLostButtonPlayers; }
+            set
+            {
+                if (_showLostButtonPlayers != value)
+                {
+                    _showLostButtonPlayers = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-		#endregion
+        #endregion
 
-		public void Save(Stream stream, XmlSerializer serializer = null)
+        public void Save(Stream stream, XmlSerializer serializer = null)
         {
             _playerKeysPublic = new List<int>(_playerKeys2.Cast<int>());
             if (serializer == null)

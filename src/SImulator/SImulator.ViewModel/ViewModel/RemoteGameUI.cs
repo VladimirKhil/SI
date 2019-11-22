@@ -288,12 +288,12 @@ namespace SImulator.ViewModel
 
         public void UpdatePlayerInfo(int index, PlayerInfo player)
         {
-			if (index > -1 && index < TInfo.Players.Count)
-			{
-				var p = TInfo.Players[index];
-				p.Sum = player.Sum;
-				p.Name = player.Name;
-			}
+            if (index > -1 && index < TInfo.Players.Count)
+            {
+                var p = TInfo.Players[index];
+                p.Sum = player.Sum;
+                p.Name = player.Name;
+            }
         }
 
         public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
@@ -439,26 +439,26 @@ namespace SImulator.ViewModel
             TInfo.QuestionStyle = QuestionStyle.Pressed;
         }
 
-		public void AddLostButtonPlayer(string name)
-		{
-			lock (TInfo.LostButtonPlayers)
-			{
-				if (!TInfo.LostButtonPlayers.Contains(name))
-				{
-					TInfo.LostButtonPlayers.Add(name);
-				}
-			}
-		}
+        public void AddLostButtonPlayer(string name)
+        {
+            lock (TInfo.LostButtonPlayers)
+            {
+                if (!TInfo.LostButtonPlayers.Contains(name))
+                {
+                    TInfo.LostButtonPlayers.Add(name);
+                }
+            }
+        }
 
-		public void ClearLostButtonPlayers()
-		{
-			lock (TInfo.LostButtonPlayers)
-			{
-				TInfo.LostButtonPlayers.Clear();
-			}
-		}
+        public void ClearLostButtonPlayers()
+        {
+            lock (TInfo.LostButtonPlayers)
+            {
+                TInfo.LostButtonPlayers.Clear();
+            }
+        }
 
-		public void SeekMedia(int position)
+        public void SeekMedia(int position)
         {
             TInfo.OnMediaSeek(position);
         }

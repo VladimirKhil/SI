@@ -27,11 +27,11 @@ namespace SIUI.Behaviors
         [DllImport("winmm.dll")]
         public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
 
-		[DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-		public static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
+        [DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        public static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
 
-		private static readonly DependencyPropertyDescriptor SourceDescriptor = 
-			DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));
+        private static readonly DependencyPropertyDescriptor SourceDescriptor = 
+            DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));
 
         public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -60,36 +60,36 @@ namespace SIUI.Behaviors
 
             mediaElement.Loaded += (sender, e2) =>
                 {
-					try
-					{
-						mediaElement.Play();
-					}
-					catch (Exception exc)
-					{
-						MessageBox.Show(exc.Message);
-					}
+                    try
+                    {
+                        mediaElement.Play();
+                    }
+                    catch (Exception exc)
+                    {
+                        MessageBox.Show(exc.Message);
+                    }
                 };
 
-			SourceDescriptor.AddValueChanged(mediaElement, loaded);
+            SourceDescriptor.AddValueChanged(mediaElement, loaded);
 
-			mediaElement.MediaFailed += (sender, e2) =>
+            mediaElement.MediaFailed += (sender, e2) =>
                 {
                     Trace.TraceError(e2.ErrorException.ToString());
                 };
 
-			System.Timers.Timer timer = null;
-			if (tableInfo.HasMediaProgress())
-			{
-				timer = new System.Timers.Timer(1000);
-				timer.Elapsed += (sender, e2) =>
-					{
-						mediaElement.Dispatcher.BeginInvoke((Action)(() =>
-							{
-								if (mediaElement.NaturalDuration.HasTimeSpan)
-									tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
-							}));
-					};
-			}
+            System.Timers.Timer timer = null;
+            if (tableInfo.HasMediaProgress())
+            {
+                timer = new System.Timers.Timer(1000);
+                timer.Elapsed += (sender, e2) =>
+                    {
+                        mediaElement.Dispatcher.BeginInvoke((Action)(() =>
+                            {
+                                if (mediaElement.NaturalDuration.HasTimeSpan)
+                                    tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
+                            }));
+                    };
+            }
 
             mediaElement.MediaOpened += (sender, e2) =>
             {
@@ -125,7 +125,7 @@ namespace SIUI.Behaviors
             tableInfo.MediaSeek += seekHandler;
             tableInfo.MediaPause += pauseHandler;
             tableInfo.MediaResume += resumeHandler;
-			tableInfo.VolumeChanged += volumeChangedHandler;
+            tableInfo.VolumeChanged += volumeChangedHandler;
 
             void ended(object sender, RoutedEventArgs e2)
             {

@@ -46,19 +46,19 @@ namespace SIUI.ViewModel
             set { if (_text != value) { _text = value; OnPropertyChanged(); } }
         }
 
-		private int _textLength;
+        private int _textLength;
 
-		/// <summary>
-		/// Длина текста (при использовании частичного текста свойство Text содержит не только частичный текст, но и форму остального текста вопроса.
-		/// Её отображать не надо
-		/// </summary>
-		public int TextLength
-		{
-			get { return _textLength; }
-			set { if (_textLength != value) { _textLength = value; OnPropertyChanged(); } }
-		}
-		
-		private int _playerIndex = -1;
+        /// <summary>
+        /// Длина текста (при использовании частичного текста свойство Text содержит не только частичный текст, но и форму остального текста вопроса.
+        /// Её отображать не надо
+        /// </summary>
+        public int TextLength
+        {
+            get { return _textLength; }
+            set { if (_textLength != value) { _textLength = value; OnPropertyChanged(); } }
+        }
+        
+        private int _playerIndex = -1;
 
         /// <summary>
         /// Номер выигравшего кнопку игрока
@@ -80,12 +80,12 @@ namespace SIUI.ViewModel
             }
         }
 
-		/// <summary>
-		/// Игроки, проигравшие кнопку
-		/// </summary>
-		public ObservableCollection<string> LostButtonPlayers { get; } = new ObservableCollection<string>();
+        /// <summary>
+        /// Игроки, проигравшие кнопку
+        /// </summary>
+        public ObservableCollection<string> LostButtonPlayers { get; } = new ObservableCollection<string>();
 
-		private bool _animateText = false;
+        private bool _animateText = false;
 
         /// <summary>
         /// Анимировать ли текст вопроса
@@ -107,18 +107,18 @@ namespace SIUI.ViewModel
             set { _textSpeed = value; OnPropertyChanged(); }
         }
 
-		private double _timeLeft = 1.0;
+        private double _timeLeft = 1.0;
 
-		/// <summary>
-		/// Оставшаяся доля времени на нажатие кнопки (от 0.0 до 1.0)
-		/// </summary>
-		public double TimeLeft
-		{
-			get { return _timeLeft; }
-			set { if (_timeLeft != value) { _timeLeft = value; OnPropertyChanged(); } }
-		}
+        /// <summary>
+        /// Оставшаяся доля времени на нажатие кнопки (от 0.0 до 1.0)
+        /// </summary>
+        public double TimeLeft
+        {
+            get { return _timeLeft; }
+            set { if (_timeLeft != value) { _timeLeft = value; OnPropertyChanged(); } }
+        }
 
-		private bool _selectable = false;
+        private bool _selectable = false;
 
         /// <summary>
         /// Можно ли выбирать на табло тему/вопрос
@@ -178,8 +178,8 @@ namespace SIUI.ViewModel
                 }
             }
 
-			Ready?.Invoke(this, EventArgs.Empty);
-		}
+            Ready?.Invoke(this, EventArgs.Empty);
+        }
 
         private MediaSource _mediaSource;
 
@@ -242,31 +242,31 @@ namespace SIUI.ViewModel
             set { _enabled = value; OnPropertyChanged(); }
         }
 
-		private double _volume = 0.5;
+        private double _volume = 0.5;
 
-		/// <summary>
-		/// Громкость звука
-		/// </summary>
-		public double Volume
-		{
-			get { return _volume; }
-			set
-			{
-				if (_volume != value)
-				{
-					var oldValue = _volume;
-					_volume = value;
-					VolumeChanged?.Invoke(_volume / oldValue);
-				}
-			}
-		}
+        /// <summary>
+        /// Громкость звука
+        /// </summary>
+        public double Volume
+        {
+            get { return _volume; }
+            set
+            {
+                if (_volume != value)
+                {
+                    var oldValue = _volume;
+                    _volume = value;
+                    VolumeChanged?.Invoke(_volume / oldValue);
+                }
+            }
+        }
 
-		public event Action<double> VolumeChanged;
+        public event Action<double> VolumeChanged;
 
-		/// <summary>
-		/// Стоимости вопросов в раунде
-		/// </summary>
-		public IList<ThemeInfoViewModel> RoundInfo { get; } = new ObservableCollection<ThemeInfoViewModel>();
+        /// <summary>
+        /// Стоимости вопросов в раунде
+        /// </summary>
+        public IList<ThemeInfoViewModel> RoundInfo { get; } = new ObservableCollection<ThemeInfoViewModel>();
 
         public object RoundInfoLock { get; } = new object();
 
@@ -279,9 +279,9 @@ namespace SIUI.ViewModel
 
         public SettingsViewModel Settings { get { return _settings; } set { _settings = value; OnPropertyChanged(); } }
 
-		public bool PartialText { get; set; }
+        public bool PartialText { get; set; }
 
-		public TableInfoViewModel()
+        public TableInfoViewModel()
         {
             _settings = new SettingsViewModel();
 
@@ -360,23 +360,23 @@ namespace SIUI.ViewModel
 
         public void OnMediaStart()
         {
-			MediaStart?.Invoke();
-		}
+            MediaStart?.Invoke();
+        }
 
         public void OnMediaEnd()
         {
-			MediaEnd?.Invoke();
-		}
+            MediaEnd?.Invoke();
+        }
 
-		public bool HasMediaProgress()
-		{
-			return MediaProgress != null;
-		}
+        public bool HasMediaProgress()
+        {
+            return MediaProgress != null;
+        }
 
         public void OnMediaProgress(double? progress)
         {
-			MediaProgress?.Invoke(progress.Value);
-		}
+            MediaProgress?.Invoke(progress.Value);
+        }
 
         public void OnMediaSeek(int position)
         {

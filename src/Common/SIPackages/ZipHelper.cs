@@ -22,29 +22,29 @@ namespace SIPackages
                 {
                     foreach (var entry in archive.Entries)
                     {
-						ExtractEntryToDirectory(entry, destinationDirectoryName, unescape);
+                        ExtractEntryToDirectory(entry, destinationDirectoryName, unescape);
                     }
                 }
             }
         }
 
-		public static string PrepareForExtraction(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape)
-		{
-			var name = unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
-			if (name.Length > MaxFileNameLength)
-				name = CalculateHash(name);
+        public static string PrepareForExtraction(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape)
+        {
+            var name = unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
+            if (name.Length > MaxFileNameLength)
+                name = CalculateHash(name);
 
-			var index = entry.FullName.IndexOf('/');
+            var index = entry.FullName.IndexOf('/');
 
-			var targetDir = index > -1 ? Path.Combine(destinationDirectoryName, entry.FullName.Substring(0, index)) : destinationDirectoryName;
-			Directory.CreateDirectory(targetDir);
+            var targetDir = index > -1 ? Path.Combine(destinationDirectoryName, entry.FullName.Substring(0, index)) : destinationDirectoryName;
+            Directory.CreateDirectory(targetDir);
 
-			return Path.Combine(targetDir, name);
-		}
+            return Path.Combine(targetDir, name);
+        }
 
-		public static void ExtractEntryToDirectory(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape = false)
-		{
-			var targetFile = PrepareForExtraction(entry, destinationDirectoryName, unescape);
+        public static void ExtractEntryToDirectory(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape = false)
+        {
+            var targetFile = PrepareForExtraction(entry, destinationDirectoryName, unescape);
 
             if (Path.GetFileName(targetFile).Length > MaxFileNameLength)
             {
@@ -55,7 +55,7 @@ namespace SIPackages
             {
                 entry.ExtractToFile(targetFile, true);
             }
-		}
+        }
 
         internal static string CalculateHash(string value)
         {

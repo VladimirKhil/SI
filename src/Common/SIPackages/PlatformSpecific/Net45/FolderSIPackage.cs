@@ -22,30 +22,30 @@ namespace SIPackages.PlatformSpecific.Net45
             return new FolderSIPackage { _folder = folder };
         }
 
-		internal static ISIPackage Open(string folder)
-		{
-			return new FolderSIPackage { _folder = folder };
-		}
-
-		public void CreateStream(string name, string contentType)
+        internal static ISIPackage Open(string folder)
         {
-			using (File.Create(Path.Combine(_folder, name))) { }
+            return new FolderSIPackage { _folder = folder };
+        }
+
+        public void CreateStream(string name, string contentType)
+        {
+            using (File.Create(Path.Combine(_folder, name))) { }
         }
 
         public void CreateStream(string category, string name, string contentType)
         {
-			Directory.CreateDirectory(Path.Combine(_folder, category));
-			using (File.Create(Path.Combine(_folder, category, name))) { }
-		}
+            Directory.CreateDirectory(Path.Combine(_folder, category));
+            using (File.Create(Path.Combine(_folder, category, name))) { }
+        }
 
         public async Task CreateStream(string category, string name, string contentType, Stream stream)
         {
-			Directory.CreateDirectory(Path.Combine(_folder, category));
-			using (var fs = File.Create(Path.Combine(_folder, category, name)))
-			{
-				await stream.CopyToAsync(fs);
-			}
-		}
+            Directory.CreateDirectory(Path.Combine(_folder, category));
+            using (var fs = File.Create(Path.Combine(_folder, category, name)))
+            {
+                await stream.CopyToAsync(fs);
+            }
+        }
 
         public void DeleteStream(string category, string name)
         {
