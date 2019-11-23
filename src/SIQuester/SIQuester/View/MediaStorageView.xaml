@@ -1,0 +1,158 @@
+﻿<UserControl x:Class="SIQuester.MediaStorageView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
+    xmlns:lb="clr-namespace:SIQuester.Behaviors"
+    xmlns:ls="clr-namespace:SIQuester.Selectors"
+    Name="root">
+    <UserControl.Resources>
+        <Style x:Key="Editor" TargetType="{x:Type TextBox}">
+            <Setter Property="Control.BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="Control.IsMouseOver" Value="True">
+                    <Setter Property="Control.BorderThickness" Value="1" />
+                </Trigger>
+                <Trigger Property="UIElement.IsFocused" Value="True">
+                    <Setter Property="Control.BorderThickness" Value="1" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <ls:AtomTypeSelector x:Key="TypeSelector">
+            <ls:AtomTypeSelector.ImageTemplate>
+                <DataTemplate>
+                    <Image Margin="0,0,0,5" Source="{Binding MediaSource.Uri,Converter={StaticResource ImageConverter}}" />
+                </DataTemplate>
+            </ls:AtomTypeSelector.ImageTemplate>
+            <ls:AtomTypeSelector.AudioTemplate>
+                <DataTemplate>
+                    <DockPanel VerticalAlignment="Center" Margin="4">
+                        <MediaElement Name="mediaElement1" lb:MediaController.Source="{Binding}" LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+                        <ToggleButton Style="{StaticResource playButton}" Name="play" DockPanel.Dock="Left" />
+                        <Slider Style="{StaticResource playSlider}" Name="progress" Width="Auto" VerticalAlignment="Center" />
+                    </DockPanel>
+                </DataTemplate>
+            </ls:AtomTypeSelector.AudioTemplate>
+            <ls:AtomTypeSelector.VideoTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <MediaElement Grid.ColumnSpan="2" Name="mediaElement1" lb:MediaController.Source="{Binding}" LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            ScrubbingEnabled="True"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+                        <ToggleButton Style="{StaticResource playButton}" Name="play" Grid.Row="1" Margin="0,10,0,0" />
+                        <Slider Style="{StaticResource playSlider}" Name="progress" Width="Auto" Grid.Row="1" Grid.Column="1" Margin="20,10,0,0" VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ls:AtomTypeSelector.VideoTemplate>
+        </ls:AtomTypeSelector>
+    </UserControl.Resources>
+    <DockPanel Margin="6">
+        <StackPanel Orientation="Horizontal" Background="Lavender" DockPanel.Dock="Top">
+            <Button Height="25" HorizontalAlignment="Left" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Name="bAdd" Command="{Binding AddItem}" ToolTip="Добавить">
+                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
+            </Button>
+        </StackPanel>
+        <ListBox Margin="0,5,0,0" Name="listView1" ItemsSource="{Binding Files}" IsSynchronizedWithCurrentItem="True" SelectionMode="Single" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#FFD2DCFF">
+                                    <ContentPresenter />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="#FFADBCFF" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="#FF8AA0FF" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <EventTrigger RoutedEvent="GotFocus">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="IsSelected">
+                                        <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
+                                    </BooleanAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeSelector}" />
+                        <Button Grid.Column="1" VerticalAlignment="Top" Name="bDel" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Margin="5,0,0,0" Command="{Binding ElementName=root,Path=DataContext.DeleteItem}" CommandParameter="{Binding}" Width="25" Height="25" ToolTip="Удалить">
+                            <Path Stretch="Uniform" Stroke="#FF555555" StrokeThickness="2" Margin="3" Data="{Binding Source={StaticResource app_delete},Path=Data}" />
+                        </Button>
+                        <ToggleButton Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Name="bEdit" Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}" Margin="5,0,0,0" Width="25" ToolTip="Редактировать">
+                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                        </ToggleButton>
+                        <ContentControl Grid.Row="1" Name="main" Content="{Binding}">
+                            <ContentControl.ContentTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Model.Name}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                </DataTemplate>
+                            </ContentControl.ContentTemplate>
+                        </ContentControl>
+                    </Grid>
+                    <DataTemplate.Triggers>
+                        <Trigger SourceName="bEdit" Property="IsChecked" Value="True">
+                            <Setter TargetName="main" Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <TextBox Height="25" Margin="5,0,0,0" Text="{Binding Model.Name, UpdateSourceTrigger=Explicit}"
+                                                 VerticalAlignment="Center"
+                                                 HorizontalAlignment="Left" VerticalContentAlignment="Center"
+                                                 lb:LostFocusBehavior.AttachedButton="{Binding ElementName=bEdit}" />
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <DataTrigger Binding="{Binding Type}" Value="Audio">
+                            <Setter Property="Width" Value="250" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Type}" Value="Video">
+                            <Setter Property="Width" Value="250" />
+                            <Setter Property="Height" Value="200" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

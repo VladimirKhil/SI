@@ -1,0 +1,43 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+
+namespace SIQuester.Behaviors
+{
+    public static class PlacementManager
+    {
+        public static FrameworkElement GetPlacementTarget(DependencyObject obj)
+        {
+            return (FrameworkElement)obj.GetValue(PlacementTargetProperty);
+        }
+
+        public static void SetPlacementTarget(DependencyObject obj, FrameworkElement value)
+        {
+            obj.SetValue(PlacementTargetProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for PlacementTarget.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PlacementTargetProperty =
+            DependencyProperty.RegisterAttached("PlacementTarget", typeof(FrameworkElement), typeof(PlacementManager), new PropertyMetadata(null, OnPlacementTargetChanged));
+
+        public static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var grid = (FrameworkElement)VisualTreeHelper.GetParent(d);
+            var margin = ((UIElement)e.NewValue).TranslatePoint(new Point(0, 0), grid);
+
+            var newX = Math.Min(margin.X + (margin.Y == 0 ? 400 : 100), grid.ActualWidth - 300);
+            var newY = Math.Max(0, margin.Y - 90);
+
+            var sb = new Storyboard();
+            Storyboard.SetTarget(sb, d);
+            Storyboard.SetTargetProperty(sb, new PropertyPath("Margin"));
+            sb.Children.Add(new ThicknessAnimation(new Thickness(newX, newY, 0, 0), new Duration(TimeSpan.FromSeconds(0.1))));
+            sb.Begin();
+        }
+    }
+}

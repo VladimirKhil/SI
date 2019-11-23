@@ -1,0 +1,104 @@
+﻿<UserControl x:Class="SIQuester.ExportHtmlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:l="clr-namespace:SIQuester"
+             xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
+             xmlns:lc="clr-namespace:SIQuester.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="473" d:DesignWidth="788" FontSize="14">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5,5,5,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="5,5,5,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5,5,5,0" />
+        </Style>
+
+        <ObjectDataProvider x:Key="Orientations" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:TypeExtension TypeName="m:Orientation" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <lc:EnumConverter x:Key="OrientationDescription" EnumType="m:Orientation" />
+        
+        <DataTemplate x:Key="OrientationTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource OrientationDescription}}" />
+        </DataTemplate>
+        
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="5,5,5,0" />
+            <Setter Property="ItemsSource" Value="{Binding Source={StaticResource Orientations}}" />
+            <Setter Property="ItemTemplate" Value="{StaticResource OrientationTemplate}" />
+        </Style>
+    </UserControl.Resources>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid Margin="5" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.ColumnSpan="3" Text="Настройте параметры выходного документа и нажмите кнопку &quot;Экспорт&quot;" TextWrapping="Wrap" />
+            <TextBlock Grid.Row="1" Text="Шрифт документа" />
+            <TextBlock Grid.Row="2" Name="textBlock1" Text="Подсказка про метасиволы в ответах" />
+            <TextBlock Grid.Row="3" Name="textBlock2" Text="Заголовок документа" />
+            <TextBlock Grid.Row="4" Name="textBlock3" Text="Размер шрифта в имени пакета" />
+            <TextBlock Grid.Row="5" Name="textBlock4" Text="Размер шрифта в названии раунда" />
+            <TextBlock Grid.Row="6" Name="textBlock5" Text="Размер шрифта в названии темы" />
+            <TextBlock Grid.Row="7" Name="textBlock6" Text="Текст перед темой" />
+            <TextBlock Grid.Row="8" Name="textBlock7" Text="Нужна ли пустая строка после темы" />
+            <TextBlock Grid.Row="9" Name="textBlock8" Text="Размер шрифта в вопросе" />
+            <TextBlock Grid.Row="10" Name="textBlock9" Text="Цена пишется в той же строке, что и вопрос" />
+            <TextBlock Grid.Row="11" Name="textBlock10" Text="Ответы пишутся" />
+            <TextBlock Grid.Row="12" Name="textBlock11" Text="Авторы пишутся" />
+            <TextBlock Grid.Row="13" Name="textBlock12" Text="Источники пишутся" />
+            <TextBlock Grid.Row="14" Name="textBlock13" Text="Нумеровать темы" />
+            <TextBox Grid.Column="1" Grid.Row="1" Name="textBox1" Text="{Binding DocumentFontFamily}" />
+            <CheckBox Grid.Column="1" Grid.Row="2" Name="checkBox1" IsChecked="{Binding ShowMetaTips}" />
+            <TextBox Grid.Column="1" Grid.Row="3" Name="textBox2" Text="{Binding DocHeader}" />
+            <TextBox Grid.Column="1" Grid.Row="4" Name="textBox3" Text="{Binding PackageFontSize}" />
+            <TextBlock Grid.Column="2" Grid.Row="4" Text="pt" />
+            <TextBox Grid.Column="1" Grid.Row="5" Name="textBox4" Text="{Binding RoundFontSize}" />
+            <TextBlock Grid.Column="2" Grid.Row="5" Text="pt" />
+            <TextBox Grid.Column="1" Grid.Row="6" Name="textBox5" Text="{Binding ThemeFontSize}" />
+            <TextBlock Grid.Column="2" Grid.Row="6" Text="pt" />
+            <TextBox Grid.Column="1" Grid.Row="7" Name="textBox6" Text="{Binding ThemeHeader}" />
+            <CheckBox Content="" Grid.Column="1" Grid.Row="8" Name="checkBox2" IsChecked="{Binding EmptyStringAfterThemeName}" />
+            <TextBox Grid.Column="1" Grid.Row="9" Name="textBox7" Text="{Binding QuestionFontSize}" />
+            <TextBlock Grid.Column="2" Grid.Row="9" Text="pt" />
+            <CheckBox Grid.Column="1" Grid.Row="10" Name="checkBox3" IsChecked="{Binding PriceNearText}" />
+            <ComboBox Grid.Column="1" Grid.Row="11" Name="comboBox1" SelectedItem="{Binding AnswerOrientation}" />
+            <ComboBox Grid.Column="1" Grid.Row="12" Name="comboBox2" SelectedItem="{Binding AuthorsOrientation}"  />
+            <ComboBox Grid.Column="1" Grid.Row="13" Name="comboBox3" SelectedItem="{Binding SourcesOrientation}" />
+            <CheckBox Grid.Column="1" Grid.Row="14" Name="checkBox4" IsChecked="{Binding ThemeNumbers}" />
+            <Button Grid.Row="15" Grid.ColumnSpan="3" HorizontalAlignment="Right" Width="100" Margin="0,5,0,0" Command="{Binding Export}">Экспорт</Button>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

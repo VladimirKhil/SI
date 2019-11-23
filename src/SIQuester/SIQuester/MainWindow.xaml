@@ -1,0 +1,278 @@
+﻿<metro:MetroWindow x:Class="SIQuester.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:siq="clr-namespace:SIQuester"
+    xmlns:siqcv="clr-namespace:SIQuester.Converters"
+    xmlns:vm1="clr-namespace:SIQuester.ViewModel"
+    xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    Title="SIQuester" Height="450" Width="746"
+    EnableDWMDropShadow="True"
+    Name="main" WindowState="Maximized" Icon="Resources/logo.png" Closed="Main_Closed" Closing="Main_Closing"
+    Loaded="Main_Loaded"
+    SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
+    SizeChanged="Main_SizeChanged" TitleCaps="False" TitlebarHeight="25"
+    WindowMinButtonStyle="{StaticResource TitleButton}"
+    WindowMaxButtonStyle="{StaticResource TitleButton}"
+    WindowCloseButtonStyle="{StaticResource TitleButton}"
+    PreviewKeyDown="Main_PreviewKeyDown">
+    <Window.Resources>
+        <siqcv:UnionConverter x:Key="UnionConverter" />
+        <siqcv:DirectoryConverter x:Key="DirectoryConverter" />
+        <siqcv:FileNameConverter x:Key="FileNameConverter" />
+        
+        <DataTemplate x:Key="TabItemHeaderTemplate">
+            <DockPanel AllowDrop="True" Height="25" Background="Transparent">
+                <Button Name="cb" Visibility="Hidden" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,2,0" Padding="0" Width="20" Height="20" Command="{Binding Close}" ToolTip="Закрыть" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                    <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L12,12M0,12L12,0" />
+                </Button>
+                <TextBlock MinWidth="80" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Header}" ToolTip="{Binding Path}" Margin="2,0,0,0" />
+            </DockPanel>
+            <DataTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="cb" Property="Visibility" Value="Visible" />
+                </Trigger>
+                <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
+                    <Setter TargetName="cb" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+        
+        <Style x:Key="TabControlStyle1" TargetType="{x:Type TabControl}">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="Background" Value="{StaticResource MainBack}" />
+            <Setter Property="BorderBrush" Value="#FFACACAC" />
+            <Setter Property="BorderThickness" Value="0,1,0,0" />
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabControl}">
+                        <Grid x:Name="templateRoot" ClipToBounds="True" SnapsToDevicePixels="True" KeyboardNavigation.TabNavigation="Local">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="ColumnDefinition0"/>
+                                <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
+                                <RowDefinition x:Name="RowDefinition1" Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TabPanel x:Name="HeaderPanel" Background="Transparent" Grid.Column="0" IsItemsHost="True" Margin="0" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"/>
+                            <Border x:Name="ContentPanel" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentTemplate="{TemplateBinding SelectedContentTemplate}" Content="{TemplateBinding SelectedContent}" ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="TabStripPlacement" Value="Bottom">
+                                <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="1"/>
+                                <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
+                                <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
+                                <Setter Property="Margin" TargetName="HeaderPanel" Value="2,0,2,2"/>
+                            </Trigger>
+                            <Trigger Property="TabStripPlacement" Value="Left">
+                                <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
+                                <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
+                                <Setter Property="Grid.Column" TargetName="HeaderPanel" Value="0"/>
+                                <Setter Property="Grid.Column" TargetName="ContentPanel" Value="1"/>
+                                <Setter Property="Width" TargetName="ColumnDefinition0" Value="Auto"/>
+                                <Setter Property="Width" TargetName="ColumnDefinition1" Value="*"/>
+                                <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+                                <Setter Property="Margin" TargetName="HeaderPanel" Value="2,2,0,2"/>
+                            </Trigger>
+                            <Trigger Property="TabStripPlacement" Value="Right">
+                                <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
+                                <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
+                                <Setter Property="Grid.Column" TargetName="HeaderPanel" Value="1"/>
+                                <Setter Property="Grid.Column" TargetName="ContentPanel" Value="0"/>
+                                <Setter Property="Width" TargetName="ColumnDefinition0" Value="*"/>
+                                <Setter Property="Width" TargetName="ColumnDefinition1" Value="Auto"/>
+                                <Setter Property="Height" TargetName="RowDefinition0" Value="*"/>
+                                <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
+                                <Setter Property="Margin" TargetName="HeaderPanel" Value="0,2,2,2"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self},Path=Items.Count}" Value="0">
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabControl">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <Grid DataContext="{Binding Settings.History.Files}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock FontSize="24" HorizontalAlignment="Center">Последние файлы</TextBlock>
+                                        <ItemsControl Grid.Row="1" ItemsSource="{Binding}" Margin="0,20,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
+                                                            CommandParameter="{Binding}" ToolTip="{Binding}"
+                                                            Padding="30,7" MaxWidth="600" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
+                                                            <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" /><LineBreak />
+                                                            <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
+                                                        </TextBlock>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
+                                    </Grid>
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="WindowCommandsItemStyle" TargetType="metro:WindowCommandsItem">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+    </Window.Resources>
+    <vm1:CommandBindingsManager.RegisterCommandBindings>
+        <MultiBinding Converter="{StaticResource UnionConverter}">
+            <Binding Path="CommandBindings" />
+            <Binding Path="ActiveDocument.CommandBindings" />
+        </MultiBinding>
+    </vm1:CommandBindingsManager.RegisterCommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Gesture="CTRL+N" Command="ApplicationCommands.New" />
+        <KeyBinding Gesture="CTRL+S" Command="{Binding ActiveDocument.Save}" />
+        <KeyBinding Gesture="SHIFT+CTRL+S" Command="{Binding SaveAllCommand}" />
+        <KeyBinding Gesture="CTRL+Z" Command="{Binding ActiveDocument.Undo}" />
+        <KeyBinding Gesture="CTRL+Y" Command="{Binding ActiveDocument.Redo}" />
+        <KeyBinding Gesture="CTRL+X" Command="{Binding ActiveDocument.Cut}" />
+        <KeyBinding Gesture="CTRL+C" Command="{Binding ActiveDocument.Copy}" />
+        <KeyBinding Gesture="CTRL+V" Command="{Binding ActiveDocument.Paste}" />
+        <KeyBinding Key="Delete" Command="{Binding ActiveDocument.Delete}" />
+    </Window.InputBindings>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo Description="Редактор вопросов СИ" />
+    </Window.TaskbarItemInfo>
+    <metro:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <Grid Width="{TemplateBinding Width}"
+                 Height="{TemplateBinding Height}"
+                 Margin="4"
+                 Background="Transparent"
+                 RenderOptions.EdgeMode="Aliased"
+                 RenderOptions.BitmapScalingMode="HighQuality">
+                <Image Source="Resources/logo.png" />
+            </Grid>
+        </DataTemplate>
+    </metro:MetroWindow.IconTemplate>
+    <metro:MetroWindow.LeftWindowCommands>
+        <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
+            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Новый… (Ctrl+N)" Command="ApplicationCommands.New">
+                <Path Stretch="Uniform" Fill="White" Margin="4,2" Data="{Binding Source={StaticResource app_new},Path=Data}" />
+            </Button>
+            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Открыть… (Ctrl+O)"
+                    Command="ApplicationCommands.Open">
+                <Path Stretch="Uniform" Fill="#FFCD58" Margin="2" Data="{Binding Source={StaticResource app_open},Path=Data}" />
+                <Button.LayoutTransform>
+                    <ScaleTransform ScaleX="0.75" />
+                </Button.LayoutTransform>
+            </Button>
+            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Открыть недавние"
+                                DataContext="{Binding}"
+                                IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Path Data="M0,0L8,0L4,4z" Fill="White" />
+                <siq:DropDownButton.DropDown>
+                    <ContextMenu ItemsSource="{Binding Settings.History.Files}">
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                <Setter Property="HeaderedItemsControl.Header" Value="{Binding}" />
+                                <Setter Property="MenuItem.Command" Value="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=DataContext.OpenRecent}" />
+                                <Setter Property="MenuItem.CommandParameter" Value="{Binding}" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                    </ContextMenu>
+                </siq:DropDownButton.DropDown>
+            </siq:DropDownButton>
+            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Импорт">
+                <Path Stretch="Uniform" Fill="White" Margin="3,2,4,2" Data="{Binding Source={StaticResource app_import},Path=Data}" />
+                <siq:DropDownButton.DropDown>
+                    <ContextMenu>
+                        <MenuItem Header="Текст…" ToolTip="Преобразование текстового файла в SIQ формат" Command="{Binding ImportTxt}">
+                            <MenuItem.Icon>
+                                <Path Stretch="Uniform" Fill="Gray" Margin="3,0,0,0" Data="{Binding Source={StaticResource app_text},Path=Data}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Текст из буфера обмена…" Command="{Binding ImportClipboardTxt}" />
+                        <MenuItem Header="XML-файл…" Command="{Binding ImportXml}" />
+                        <MenuItem Header="База вопросов…" ToolTip="http://db.chgk.info" Command="{Binding ImportBase}" />
+                        <MenuItem Header="Библиотека вопросов…" Command="{Binding ImportFromSIStore}" />
+                    </ContextMenu>
+                </siq:DropDownButton.DropDown>
+            </siq:DropDownButton>
+            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Сохранить всё (Shift+Ctrl+S)" Command="{Binding SaveAll}">
+                <Button.ContentTemplate>
+                    <DataTemplate>
+                        <Grid Width="20" Height="20">
+                            <Path Name="p1" Stretch="Uniform" Fill="#FF5000C3" Margin="5" Data="{Binding Source={StaticResource app_save},Path=Data}">
+                                <Path.RenderTransform>
+                                    <TranslateTransform X="-4" Y="4" />
+                                </Path.RenderTransform>
+                            </Path>
+                            <Path Name="p2" Stretch="Uniform" Fill="#FF5000C3" Margin="5" Data="{Binding Source={StaticResource app_save},Path=Data}">
+                                <Path.RenderTransform>
+                                    <TranslateTransform X="4" Y="-4" />
+                                </Path.RenderTransform>
+                            </Path>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="p1" Property="Fill" Value="LightGray" />
+                                <Setter TargetName="p2" Property="Fill" Value="LightGray" />
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </Button.ContentTemplate>
+            </Button>
+            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Поиск файлов" Command="{Binding SearchFolder}">
+                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_search},Path=Data}" />
+            </Button>
+        </metro:WindowCommands>
+    </metro:MetroWindow.LeftWindowCommands>
+    <metro:MetroWindow.RightWindowCommands>
+        <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
+            <Button VerticalAlignment="Stretch" Width="25" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Настройки" Command="{Binding SetSettings}">
+                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+            </Button>
+            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Помощь">
+                <TextBlock Text="?" FontSize="14" FontWeight="Bold" Foreground="White" Width="20" TextAlignment="Center" />
+                <siq:DropDownButton.DropDown>
+                    <ContextMenu>
+                        <MenuItem Header="Написать замечания автору…" ToolTip="Сообщить автору о багах или что-нибудь предложить" Command="{Binding Feedback}"/>
+                        <MenuItem Header="Поблагодарить автора…" Command="{Binding Donate}" />
+                        <MenuItem Header="Как использовать программу…" Command="ApplicationCommands.Help" />
+                        <MenuItem Header="О программе…" Command="{Binding About}" />
+                    </ContextMenu>
+                </siq:DropDownButton.DropDown>
+            </siq:DropDownButton>
+        </metro:WindowCommands>
+    </metro:MetroWindow.RightWindowCommands>
+    <TabControl Name="tabControl1" SelectionChanged="TabControl1_SelectionChanged" Style="{StaticResource TabControlStyle1}"
+                ItemContainerStyle="{StaticResource TabItemStyle1}" />
+</metro:MetroWindow>

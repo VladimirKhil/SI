@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8B3640F3-9547-4B76-874D-7FA2E75AD679}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SIQuester.ViewModel</RootNamespace>
+    <AssemblyName>SIQuester.ViewModel</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
+    <PackageReference Include="MahApps.Metro" Version="1.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AnswersViewModel.cs" />
+    <Compile Include="AtomViewModel.cs" />
+    <Compile Include="AuthorsViewModel.cs" />
+    <Compile Include="BindHelper.cs" />
+    <Compile Include="Changes\ChangeGroup.cs" />
+    <Compile Include="Changes\CollectionChange.cs" />
+    <None Include="app.config" />
+    <Compile Include="Changes\CustomChange.cs" />
+    <Compile Include="Changes\IChange.cs" />
+    <Compile Include="Changes\SimplePropertyValueChange.cs" />
+    <Compile Include="Commands\AsyncCommand.cs" />
+    <Compile Include="Commands\IAsyncCommand.cs" />
+    <Compile Include="Core\UI.cs" />
+    <Compile Include="DBNode.cs" />
+    <Compile Include="Commands\IChangeableCommand.cs" />
+    <Compile Include="IItemsViewModel.cs" />
+    <Compile Include="IMediaOwner.cs" />
+    <Compile Include="InfoViewModel.cs" />
+    <Compile Include="ItemsViewModel.cs" />
+    <Compile Include="Items\IItemViewModel.cs" />
+    <Compile Include="Items\ItemViewModel.cs" />
+    <Compile Include="Items\PackageViewModel.cs" />
+    <Compile Include="Items\QuestionViewModel.cs" />
+    <Compile Include="Items\RoundViewModel.cs" />
+    <Compile Include="Items\ThemeViewModel.cs" />
+    <Compile Include="LinksViewModel.cs" />
+    <Compile Include="LinkViewModel.cs" />
+    <Compile Include="MediaItemViewModel.cs" />
+    <Compile Include="Model\AppSettings.cs" />
+    <Compile Include="Model\EditAlias.cs" />
+    <Compile Include="Model\InfoOwnerData.cs" />
+    <Compile Include="Model\NonStandartPackageParams.cs" />
+    <Compile Include="Model\QuestionTypesNames.cs" />
+    <Compile Include="Model\SearchResult.cs" />
+    <Compile Include="Model\SearchResults.cs" />
+    <Compile Include="Model\StreamProxy.cs" />
+    <Compile Include="Model\Utils.cs" />
+    <Compile Include="PlatformSpecific\IFlowDocumentWrapper.cs" />
+    <Compile Include="PlatformSpecific\IXpsDocumentWrapper.cs" />
+    <Compile Include="PlatformSpecific\PlatformManager.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="QuestionTypeParamViewModel.cs" />
+    <Compile Include="QuestionTypeViewModel.cs" />
+    <Compile Include="ScenarioViewModel.cs" />
+    <Compile Include="SelectableTheme.cs" />
+    <Compile Include="SourcesViewModel.cs" />
+    <Compile Include="StorageContextViewModel.cs" />
+    <Compile Include="TagsViewModel.cs" />
+    <Compile Include="Workspaces\Dialogs\SendToGameDialogViewModel.cs" />
+    <Compile Include="Workspaces\Dialogs\WaitDialogViewModel.cs" />
+    <Compile Include="Workspaces\DocumentLoaderViewModel.cs" />
+    <Compile Include="Workspaces\SpardTemplateViewModel.cs" />
+    <Compile Include="Workspaces\MainViewModel.cs" />
+    <Compile Include="ModelViewBase.cs" />
+    <Compile Include="Model\CostSetterList.cs" />
+    <Compile Include="Model\FileHistory.cs" />
+    <Compile Include="Model\CostSetter.cs" />
+    <Compile Include="Model\Enums.cs" />
+    <Compile Include="Model\ErrorInfo.cs" />
+    <Compile Include="Model\PackageTypeNameAttribute.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Commands\SimpleCommand.cs" />
+    <Compile Include="Workspaces\AboutViewModel.cs" />
+    <Compile Include="Workspaces\Dialogs\ExportHtmlViewModel.cs" />
+    <Compile Include="Workspaces\Dialogs\ExportViewModel.cs" />
+    <Compile Include="Workspaces\HowToViewModel.cs" />
+    <Compile Include="Workspaces\ImportDBStorageViewModel.cs" />
+    <Compile Include="Workspaces\ImportSIStorageViewModel.cs" />
+    <Compile Include="Workspaces\ImportTextViewModel.cs" />
+    <Compile Include="Workspaces\Sidebar\MediaStorageViewModel.cs" />
+    <Compile Include="Workspaces\NewViewModel.cs" />
+    <Compile Include="Workspaces\QDocument.cs" />
+    <Compile Include="Workspaces\SearchFolderViewModel.cs" />
+    <Compile Include="Workspaces\Dialogs\SelectThemesViewModel.cs" />
+    <Compile Include="Workspaces\SettingsViewModel.cs" />
+    <Compile Include="Workspaces\Sidebar\StatisticsViewModel.cs" />
+    <Compile Include="Workspaces\Sidebar\TextsStorageViewModel.cs" />
+    <Compile Include="Workspaces\WorkspaceViewModel.cs" />
+    <None Include="Properties\DataSources\System.Uri.datasource" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj">
+      <Project>{7f28fda6-4250-4154-93b0-d1ce9b838bfb}</Project>
+      <Name>SIPackages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj">
+      <Project>{63f7dde1-3041-4a56-bde5-d82f9af68c85}</Project>
+      <Name>Notions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj">
+      <Project>{00d18fe2-2e27-40e2-9efc-4482069a2f2d}</Project>
+      <Name>QTxtConverter</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <Import Project="..\..\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
+  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

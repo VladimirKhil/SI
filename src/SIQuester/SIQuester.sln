@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29201.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D8DC2EF3-36A3-475B-A88F-861AB1E112F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{B812C629-7DBF-4094-AA34-059C9094A226}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "..\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "..\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester.ViewModel", "SIQuester.ViewModel\SIQuester.ViewModel.csproj", "{8B3640F3-9547-4B76-874D-7FA2E75AD679}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester", "SIQuester\SIQuester.csproj", "{D689345A-26EB-432D-8442-67E1DE287FE9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTxtConverter", "QTxtConverter\QTxtConverter.csproj", "{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notions", "..\Common\Notions\Notions.csproj", "{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages", "..\Common\SIPackages\SIPackages.csproj", "{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
+		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
+		..\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
+		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B3640F3-9547-4B76-874D-7FA2E75AD679}.Release|x86.Build.0 = Release|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Debug|x86.Build.0 = Debug|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Release|x86.ActiveCfg = Release|Any CPU
+		{D689345A-26EB-432D-8442-67E1DE287FE9}.Release|x86.Build.0 = Release|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Debug|x86.Build.0 = Debug|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}.Release|x86.Build.0 = Release|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Debug|x86.Build.0 = Debug|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Release|x86.ActiveCfg = Release|Any CPU
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}.Release|x86.Build.0 = Release|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A4CEB981-DED1-4ADB-9058-3869F6A44C8D} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
+		{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
+		{D689345A-26EB-432D-8442-67E1DE287FE9} = {B812C629-7DBF-4094-AA34-059C9094A226}
+		{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
+		{7F28FDA6-4250-4154-93B0-D1CE9B838BFB} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {080C13E0-0C5D-41FE-9CBB-EE7ED6CB69F3}
+	EndGlobalSection
+EndGlobal
