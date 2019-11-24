@@ -67,12 +67,12 @@ namespace SIQuester.ViewModel
             CurrentItem = (T)item;
         }
 
-        public ItemsViewModel()
+        protected ItemsViewModel()
         {
             Init();
         }
 
-        public ItemsViewModel(IEnumerable<T> collection)
+        protected ItemsViewModel(IEnumerable<T> collection)
             : base(collection)
         {
             Init();

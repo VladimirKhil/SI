@@ -13,24 +13,24 @@ namespace SIQuester.ViewModel
 {
     public sealed class MediaStorageViewModel: WorkspaceViewModel
     {
-        private QDocument _document = null;
+        private readonly QDocument _document = null;
 
         /// <summary>
         /// Добавленные файлы
         /// </summary>
-        private List<MediaItemViewModel> _added = new List<MediaItemViewModel>();
+        private readonly List<MediaItemViewModel> _added = new List<MediaItemViewModel>();
         /// <summary>
         /// Удалённые файлы
         /// </summary>
-        private List<MediaItemViewModel> _removed = new List<MediaItemViewModel>();
+        private readonly List<MediaItemViewModel> _removed = new List<MediaItemViewModel>();
         /// <summary>
         /// Переименованные файлы
         /// </summary>
-        private List<Tuple<string, string>> _renamed = new List<Tuple<string, string>>();
+        private readonly List<Tuple<string, string>> _renamed = new List<Tuple<string, string>>();
         /// <summary>
         /// Пути для файлов, ещё не загруженных в коллекцию (не закоммиченных)
         /// </summary>
-        private Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _streams = new Dictionary<MediaItemViewModel, Tuple<string, FileStream>>();
+        private readonly Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _streams = new Dictionary<MediaItemViewModel, Tuple<string, FileStream>>();
 
         private bool _blockFlag = false;
 

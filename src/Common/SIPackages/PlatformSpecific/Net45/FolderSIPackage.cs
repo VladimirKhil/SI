@@ -64,16 +64,16 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public string[] GetEntries(string category)
         {
-            var directoryInfo = new DirectoryInfo(Path.Combine(this._folder, category));
+            var directoryInfo = new DirectoryInfo(Path.Combine(_folder, category));
             if (!directoryInfo.Exists)
-                return new string[0];
+                return Array.Empty<string>();
 
             return directoryInfo.GetFiles().Select(file => file.Name).ToArray();
         }
 
         public StreamInfo GetStream(string name, bool read = true)
         {
-            var file = new FileInfo(Path.Combine(this._folder, name));
+            var file = new FileInfo(Path.Combine(_folder, name));
             if (!file.Exists)
                 return null;
 

@@ -15,8 +15,8 @@ namespace SIQuester.Behaviors
     /// </summary>
     public static class SmartTipBehavior
     {
-        private static DependencyPropertyDescriptor TextDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
-        private static DependencyPropertyDescriptor WidthDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.ActualWidthProperty, typeof(TextBlock));
+        private static readonly DependencyPropertyDescriptor TextDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
+        private static readonly DependencyPropertyDescriptor WidthDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.ActualWidthProperty, typeof(TextBlock));
         
         public static bool GetIsAttached(DependencyObject obj)
         {
@@ -34,9 +34,7 @@ namespace SIQuester.Behaviors
 
         public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var textBlock = d as TextBlock;
-
-            if (textBlock == null)
+            if (!(d is TextBlock textBlock))
                 return;
 
             if ((bool)e.NewValue)

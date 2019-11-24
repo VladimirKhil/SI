@@ -31,7 +31,7 @@ namespace Notions
 
             var maxscore = 0;
             for (int j = L - 1, i = l - 1; j >= 0; j--)
-                if (Char.IsLetterOrDigit(s2[j]))
+                if (char.IsLetterOrDigit(s2[j]))
                 {
                     c++;
                     cost[i] = c;

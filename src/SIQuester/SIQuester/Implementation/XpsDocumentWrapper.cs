@@ -10,7 +10,7 @@ namespace SIQuester.Implementation
 {
     public sealed class XpsDocumentWrapper : IXpsDocumentWrapper
     {
-        private XpsDocument _document;
+        private readonly XpsDocument _document;
 
         public XpsDocumentWrapper(XpsDocument document)
         {

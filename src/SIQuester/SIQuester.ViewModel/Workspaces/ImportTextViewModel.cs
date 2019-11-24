@@ -780,9 +780,8 @@ namespace SIQuester.ViewModel
 
             if (expression is Set set)
             {
-                EditAlias alias = null;
                 var name = ((StringValue)((Polynomial)set.Operand).OperandsArray[0]).Value;
-                Aliases.TryGetValue(name, out alias);
+                Aliases.TryGetValue(name, out EditAlias alias);
 
                 return alias == null ? (name == "Line" ? "\n" : name) : alias.VisibleName;
             }

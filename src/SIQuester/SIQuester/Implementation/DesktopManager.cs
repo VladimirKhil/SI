@@ -524,7 +524,7 @@ namespace SIQuester.Implementation
                                     text.AppendLine(qLine.ToString().EndWithPoint());
                                 }
 
-                                Func<Question, bool> qHasSource = quest => quest.Info.Sources.Count > 0 && quest.Info.Sources[0].Length > 3;
+                                bool qHasSource(Question quest) => quest.Info.Sources.Count > 0 && quest.Info.Sources[0].Length > 3;
                                 if (theme.Questions.Any(qHasSource))
                                 {
                                     text.AppendLine();

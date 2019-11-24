@@ -22,14 +22,9 @@ namespace QTxtConverter
         public event EventHandler<ReadErrorEventArgs> ReadError;
         public event Action<int> Progress;
 
-        private static readonly int MaxSize = 1500;
-        private static readonly string LineTemplate = "<Line>";
-        private static readonly string LineDefinition = "<SP>*[lazy](<BR><SP>*)+";
-
-#if DEBUG
-        private static int[] LastNumbers = new int[] { 4, 0, 1, 2, 3 };
-        private static int LastUse = 0;
-#endif
+        private const int MaxSize = 1500;
+        private const string LineTemplate = "<Line>";
+        private const string LineDefinition = "<SP>*[lazy](<BR><SP>*)+";
 
         private const int TemplateQCount = 10;
 
@@ -265,9 +260,6 @@ namespace QTxtConverter
             }
 
             var numbers = Shuffle<int>(numList);
-#if DEBUG
-            LastNumbers = numbers;
-#endif
 
             var s = oper.CreateCombination(numbers).ToString();
             string sa = null;
@@ -289,10 +281,6 @@ namespace QTxtConverter
             }
 
             var use = new Random().Next(quests.Length - 1); // Без последнего
-
-#if DEBUG
-            LastUse = use;
-#endif
 
             var match = StringManager.BestCommonMatch(s, quests[use].Value, StringManager.TemplateSearchingNorm, true);
 
@@ -1039,7 +1027,7 @@ namespace QTxtConverter
             switch (decision)
             {
                 case Decision.Go:
-                    Match<char> match = null;
+                    Match<char> match;
                     if (matches.TryGetValue("PName", out match))
                         document.Package.Info.Comments.Text += match.Value.ToString().Trim();
 

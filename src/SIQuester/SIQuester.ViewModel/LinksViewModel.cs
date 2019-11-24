@@ -27,7 +27,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        public LinksViewModel(IEnumerable<string> model, InfoViewModel owner)
+        protected LinksViewModel(IEnumerable<string> model, InfoViewModel owner)
             : base(model)
         {
             Owner = owner;

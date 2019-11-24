@@ -10,8 +10,12 @@ namespace QTxtConverter
     /// </summary>
     public sealed class CombinedString
     {
-        string content;
-        List<int> sources = new List<int>();
+        private string _content;
+
+        /// <summary>
+        /// Получить список номеров строк-источников
+        /// </summary>
+        public List<int> Sources { get; } = new List<int>();
 
         /// <summary>
         /// Создание комбинированной строки
@@ -20,9 +24,9 @@ namespace QTxtConverter
         /// <param name="num">Список номеров строк-источников</param>
         public CombinedString(string s, params int[] num)
         {
-            content = s;
+            _content = s;
             foreach (int n in num)
-                sources.Add(n);
+                Sources.Add(n);
         }
 
         /// <summary>
@@ -36,9 +40,9 @@ namespace QTxtConverter
             {
                 if (r == 0)
                 {
-                    content = str.ToString();
+                    _content = str.ToString();
                     foreach (int n in str.Sources)
-                        sources.Add(n);
+                        Sources.Add(n);
                 }
                 else
                     CombineWith(str);
@@ -48,15 +52,15 @@ namespace QTxtConverter
 
         private void CombineWith(CombinedString str)
         {
-            int len = content.Length;
+            int len = _content.Length;
             if (len > 0)
-                content = StringManager.BestCommonSubString(this.content, str.content, new StringManager.StringNorm(StringManager.TemplateSearchingNorm), true);
+                _content = StringManager.BestCommonSubString(this._content, str._content, new StringManager.StringNorm(StringManager.TemplateSearchingNorm), true);
             else
-                content = "";
+                _content = "";
 
             foreach (int n in str.Sources)
-                if (!sources.Contains(n))
-                    sources.Add(n);
+                if (!Sources.Contains(n))
+                    Sources.Add(n);
         }
 
         /// <summary>
@@ -65,18 +69,7 @@ namespace QTxtConverter
         /// <returns>Содержание строки</returns>
         override public string ToString()
         {
-            return content;
-        }
-
-        /// <summary>
-        /// Получить список номеров строк-источников
-        /// </summary>
-        public List<int> Sources
-        {
-            get
-            {
-                return sources;
-            }
+            return _content;
         }
     }
 }

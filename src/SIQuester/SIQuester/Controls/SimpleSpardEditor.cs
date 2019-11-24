@@ -93,7 +93,7 @@ namespace SIQuester
 
             IsUndoEnabled = false;
 
-            _rootExpression = new Sequence(new Expression[0]);
+            _rootExpression = new Sequence(Array.Empty<Expression>());
         }
 
         private void SimpleSpardEditor_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
@@ -125,7 +125,7 @@ namespace SIQuester
 
         private void SpardViewModel_OptionalInserted()
         {
-            InsertOptional(new Optional(new Sequence(new Expression[0])));
+            InsertOptional(new Optional(new Sequence(Array.Empty<Expression>())));
         }
 
         private Expression[] GetTopExpressions(Inline[] inlines)
@@ -200,7 +200,7 @@ namespace SIQuester
             {
                 _paragraph.Inlines.Clear();
                 _paragraph.Inlines.Add(new Run());
-                _rootExpression = new Sequence(new Expression[0]);
+                _rootExpression = new Sequence(Array.Empty<Expression>());
             }
         }
 
@@ -628,7 +628,7 @@ namespace SIQuester
                 }
                 else
                 {
-                    GetSetDisplayData((Set)instruct.Argument, out string text, out SolidColorBrush color, out bool isReadOnly);
+                    GetSetDisplayData((Set)instruct.Argument, out string text, out SolidColorBrush color, out _);
 
                     var run = new Run(text) { Background = color };
                     toInsert = new InlineUIContainer(new TextBlock(run), pointer);
@@ -636,7 +636,7 @@ namespace SIQuester
             }
             else if (child is Set) // <Line>
             {
-                GetSetDisplayData((Set)child, out string text, out SolidColorBrush color, out bool isReadOnly);
+                GetSetDisplayData((Set)child, out string text, out SolidColorBrush color, out _);
 
                 if (text == "\n")
                     toInsert = new LineBreak(pointer);

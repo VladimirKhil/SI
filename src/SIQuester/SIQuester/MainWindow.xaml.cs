@@ -226,9 +226,7 @@ namespace SIQuester
 
                 if (preview != null && (preview == thumbnail || thumbnail == null))
                 {
-                    var element = tabItem.Content as FrameworkElement;
-
-                    if (element == null || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
+                    if (!(tabItem.Content is FrameworkElement element) || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
                         return false;
 
                     var image = new RenderTargetBitmap((int)element.ActualWidth, (int)element.ActualHeight, 96, 96, PixelFormats.Default);

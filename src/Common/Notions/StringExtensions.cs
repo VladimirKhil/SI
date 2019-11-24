@@ -285,7 +285,7 @@ namespace Notions
             if (s.Length == 0)
                 return "";
 
-            if (Uri.IsWellFormedUriString(s, UriKind.RelativeOrAbsolute) || s.Length >= 5 && s.Substring(0, 5) == "http:")
+            if (Uri.TryCreate(s, UriKind.Absolute, out Uri uri) && uri.IsWellFormedOriginalString())
                 return s;
 
             var i = 0;

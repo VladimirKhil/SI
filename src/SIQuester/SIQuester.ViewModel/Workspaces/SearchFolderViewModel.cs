@@ -33,7 +33,7 @@ namespace SIQuester.ViewModel
         }
 
         private CancellationTokenSource _searchLink = null;
-        private object _searchSync = new object();
+        private readonly object _searchSync = new object();
 
         private async void StartSearch()
         {

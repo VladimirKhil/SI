@@ -89,7 +89,7 @@ namespace SIQuester.ViewModel
 
         private readonly string[] _args = null;
 
-        private StorageContextViewModel _storageContextViewModel;
+        private readonly StorageContextViewModel _storageContextViewModel;
         
         public MainViewModel(string[] args)
         {

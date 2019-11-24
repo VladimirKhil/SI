@@ -22,7 +22,7 @@ namespace SIQuester
         /// <summary>
         /// Имя конфигурационного файла пользовательских настроек
         /// </summary>
-        private static readonly string ConfigFileName = "user.config";
+        private const string ConfigFileName = "user.config";
 
         private readonly Implementation.DesktopManager _manager = new Implementation.DesktopManager();
 
@@ -153,26 +153,28 @@ namespace SIQuester
                     return -1;
                 }
 
-                var model = new MainViewModel(new string[0]);
-                foreach (var file in directoryInfo.EnumerateFiles("*.siq"))
+                using (var model = new MainViewModel(Array.Empty<string>()))
                 {
-                    model.Open.Execute(file.FullName);
-
-                    var doc = (QDocument)model.DocList.Last();
-                    doc.ConvertToCompTvSISimple.Execute(null);
-
-                    if (publisher != null)
-                        doc.Document.Package.Publisher = publisher;
-
-                    var validationResult = doc.Validate();
-
-                    if (!string.IsNullOrEmpty(validationResult))
+                    foreach (var file in directoryInfo.EnumerateFiles("*.siq"))
                     {
-                        Console.Write($"{file.FullName} validation:\r\n${validationResult}");
-                    }
+                        model.Open.Execute(file.FullName);
 
-                    doc.Save.Execute(null);
-                    doc.Close.Execute(null);
+                        var doc = (QDocument)model.DocList.Last();
+                        doc.ConvertToCompTvSISimple.Execute(null);
+
+                        if (publisher != null)
+                            doc.Document.Package.Publisher = publisher;
+
+                        var validationResult = doc.Validate();
+
+                        if (!string.IsNullOrEmpty(validationResult))
+                        {
+                            Console.Write($"{file.FullName} validation:\r\n${validationResult}");
+                        }
+
+                        doc.Save.Execute(null);
+                        doc.Close.Execute(null);
+                    }
                 }
 
                 return 0;
