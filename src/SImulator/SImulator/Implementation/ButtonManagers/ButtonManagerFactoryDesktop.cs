@@ -1,5 +1,5 @@
 ﻿using SImulator.Implementation.ButtonManagers.Web;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
 

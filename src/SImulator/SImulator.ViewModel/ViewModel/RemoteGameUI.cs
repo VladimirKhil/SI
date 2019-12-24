@@ -9,9 +9,9 @@ using SIUI.ViewModel.Core;
 using System.Threading.Tasks;
 using System.Threading;
 using SImulator.ViewModel.Core;
-using SImulator.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
+using SImulator.ViewModel.Model;
 
 namespace SImulator.ViewModel
 {
@@ -82,11 +82,11 @@ namespace SImulator.ViewModel
         public ICommand BackRound { get; private set; }
         public ICommand Stop { get; private set; }
 
-        private string _sound;
-
         private bool _stageCallbackBlock = false;
 
         public int ScreenIndex { get; set; }
+
+        public event Action<Exception> OnError;
 
         public RemoteGameUI()
         {
@@ -126,22 +126,7 @@ namespace SImulator.ViewModel
                 GameHost.OnReady();
         }
 
-        public void SetSound(string sound = "")
-        {
-            _sound = sound;
-            Play();
-        }
-
-        private void Play()
-        {
-            if (TaskScheduler.Current != UI.Scheduler)
-            {
-                Task.Factory.StartNew(Play, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
-                return;
-            }
-
-            PlatformManager.Instance.PlaySound(_sound, SoundFinished);
-        }
+        public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound, SoundFinished), OnError);
 
         private void SoundFinished()
         {
@@ -310,7 +295,7 @@ namespace SImulator.ViewModel
             }
         }
 
-        void ThemeInfo_Selected(ThemeInfoViewModel theme)
+        private void ThemeInfo_Selected(ThemeInfoViewModel theme)
         {
             int themeIndex;
             for (themeIndex = 0; themeIndex < TInfo.RoundInfo.Count; themeIndex++)
@@ -322,7 +307,7 @@ namespace SImulator.ViewModel
             GameHost.OnThemeSelected(themeIndex);
         }
 
-        void QuestionInfo_Selected(QuestionInfoViewModel question)
+        private void QuestionInfo_Selected(QuestionInfoViewModel question)
         {
             lock (TInfo.TStageLock)
             {

@@ -1,7 +1,7 @@
 ﻿using System.ServiceModel;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 
 namespace SImulator.ViewModel.Core
 {

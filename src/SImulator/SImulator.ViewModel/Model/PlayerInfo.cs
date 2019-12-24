@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using SIUI.ViewModel;
 
-namespace SImulator.Model
+namespace SImulator.ViewModel.Model
 {
     /// <summary>
     /// Информация об игроке

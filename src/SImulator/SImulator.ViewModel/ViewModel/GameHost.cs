@@ -1,6 +1,7 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.PlatformSpecific;
+using SImulator.ViewModel.Properties;
 using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
@@ -42,13 +43,9 @@ namespace SImulator.ViewModel
             {
                 ((TvEngine)_engine).SelectQuestion(theme, question);
             }
-            catch (TimeoutException exc)
+            catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
             }
         }
 

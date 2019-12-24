@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
              xmlns:lb="clr-namespace:SImulator.Behaviors"
-             xmlns:m="clr-namespace:SImulator.Model;assembly=SImulator.ViewModel"
+             xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
              DispatcherUnhandledException="Application_DispatcherUnhandledException" ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 

@@ -1,9 +1,6 @@
 ﻿using SIEngine;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SImulator.ViewModel.ViewModel
 {

@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="SavingSettingsError" xml:space="preserve">
-    <value>Ошибка при сохранении настроек программы</value>
+  <data name="ConnectionError" xml:space="preserve">
+    <value>Ошибка связи</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Ошибка</value>
   </data>
 </root>

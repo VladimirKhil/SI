@@ -1,4 +1,4 @@
-﻿using SImulator.Model;
+﻿using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Core;
 
 namespace SImulator.ViewModel.ButtonManagers

@@ -1,9 +1,8 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using SIPackages.Core;
-using SIUI.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SImulator.ViewModel.PlatformSpecific
@@ -58,6 +57,6 @@ namespace SImulator.ViewModel.PlatformSpecific
 
         public abstract T GetCallback<T>();
 
-        public abstract void InitSettings(Model.AppSettings defaultSettings);
+        public abstract void InitSettings(AppSettings defaultSettings);
     }
 }

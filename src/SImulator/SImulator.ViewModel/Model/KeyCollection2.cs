@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using SImulator.ViewModel.Core;
 
-namespace SImulator.Model
+namespace SImulator.ViewModel.Model
 {
     public sealed class KeyCollection2: ObservableCollection<GameKey>
     {

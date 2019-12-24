@@ -1,8 +1,9 @@
 ﻿using SIEngine;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.PlatformSpecific;
+using SImulator.ViewModel.Properties;
 using SImulator.ViewModel.ViewModel;
 using SIPackages;
 using SIUI.ViewModel;
@@ -225,8 +226,6 @@ namespace SImulator.ViewModel
 
         public MainViewModel(AppSettings settings)
         {
-            UI.Initialize();
-
             Settings = settings;
             SettingsViewModel = new AppSettingsViewModel(Settings);
 
@@ -381,8 +380,10 @@ namespace SImulator.ViewModel
                 }
                 else
                 {
-                    ui = new RemoteGameUI { GameHost = gameHost, ScreenIndex = SettingsViewModel.Model.ScreenNumber };
+                    var remoteGameUI = new RemoteGameUI { GameHost = gameHost, ScreenIndex = SettingsViewModel.Model.ScreenNumber };
+                    ui = remoteGameUI;
                     ui.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+                    remoteGameUI.OnError += ShowError;
                 }
 
                 var game = new GameEngine(SettingsViewModel, engine, gameHost, ui, Players, _isRemoteControlling);
@@ -720,7 +721,7 @@ namespace SImulator.ViewModel
         /// <param name="exc"></param>
         private void ShowError(Exception exc)
         {
-            ShowError(string.Format("Ошибка: {0}", exc.Message));
+            ShowError($"{Resources.Error}: {exc.Message}");
         }
 
         private void UpdateStartCommand()

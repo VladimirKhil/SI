@@ -1,8 +1,9 @@
 ﻿using SIEngine;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.PlatformSpecific;
+using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -456,7 +457,7 @@ namespace SImulator.ViewModel
                         QuestionTime++;
                         if (QuestionTime >= QuestionTimeMax)
                         {
-                            UserInterface.SetSound("noanswer.mp3");
+                            UserInterface.SetSound(Sounds.NoAnswer);
                             StopQuestionTimer_Executed(null);
                             ActiveQuestionCommand = null;
 
@@ -466,22 +467,22 @@ namespace SImulator.ViewModel
                     }
                     catch (TimeoutException exc)
                     {
-                        PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                        PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
                     }
                     catch (CommunicationException exc)
                     {
-                        PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                        PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
                     }
                     catch (Exception exc)
                     {
-                        PlatformManager.Instance.ShowMessage(string.Format("Ошибка: {0}", exc.Message));
+                        PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
                     }
                 }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
         }
 
         private void RoundTimer_Elapsed(object state)
         {
-            Task.Factory.StartNew(() =>
+            UI.Execute(() =>
                 {
                     RoundTime++;
                     if (RoundTime >= Settings.Model.RoundTime)
@@ -489,12 +490,12 @@ namespace SImulator.ViewModel
                         _engine.SetTimeout();
                         StopRoundTimer_Executed(null);
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                }, exc => OnError(exc.ToString()));
         }
 
         private void ThemeInfo_Selected(ThemeInfoViewModel theme)
         {
-            var themeIndex = -1;
+            int themeIndex;
             for (themeIndex = 0; themeIndex < LocalInfo.RoundInfo.Count; themeIndex++)
             {
                 if (LocalInfo.RoundInfo[themeIndex] == theme)
@@ -918,7 +919,7 @@ namespace SImulator.ViewModel
                 UserInterface.SetQuestionContentType(QuestionContentType.Video);
             }
             else
-                UserInterface.SetSound("begingame.mp3");
+                UserInterface.SetSound(Sounds.BeginGame);
 
             LocalInfo.TStage = TableStage.Sign;
         }
@@ -1435,27 +1436,33 @@ namespace SImulator.ViewModel
             else
             {
                 var setActive = true;
-                if (question.Type.Name == QuestionTypes.Cat || question.Type.Name == QuestionTypes.BagCat)
+                switch (question.Type.Name)
                 {
-                    UserInterface.SetSound("catinbag.wav");
-                    UserInterface.SetText("ВОПРОС С СЕКРЕТОМ");
-                    _logger.Write("ВОПРОС С СЕКРЕТОМ");
-                    setActive = false;
+                    case QuestionTypes.Cat:
+                    case QuestionTypes.BagCat:
+                        UserInterface.SetSound(Sounds.SecretQuestion);
+                        UserInterface.SetText("ВОПРОС С СЕКРЕТОМ");
+                        _logger.Write("ВОПРОС С СЕКРЕТОМ");
+                        setActive = false;
+                        break;
+
+                    case QuestionTypes.Auction:
+                        UserInterface.SetSound(Sounds.StakeQuestion);
+                        UserInterface.SetText("ВОПРОС СО СТАВКОЙ");
+                        _logger.Write("ВОПРОС СО СТАВКОЙ");
+                        break;
+
+                    case QuestionTypes.Sponsored:
+                        // UserInterface.SetSound(Sounds.NoRiskQuestion); // TODO
+                        UserInterface.SetText("ВОПРОС БЕЗ РИСКА");
+                        _logger.Write("ВОПРОС БЕЗ РИСКА");
+                        setActive = false;
+                        break;
+
+                    default:
+                        UserInterface.SetText(question.Type.Name);
+                        break;
                 }
-                else if (question.Type.Name == QuestionTypes.Auction)
-                {
-                    UserInterface.SetSound("auction.wav");
-                    UserInterface.SetText("ВОПРОС СО СТАВКОЙ");
-                    _logger.Write("ВОПРОС СО СТАВКОЙ");
-                }
-                else if (question.Type.Name == QuestionTypes.Sponsored)
-                {
-                    UserInterface.SetText("ВОПРОС БЕЗ РИСКА");
-                    _logger.Write("ВОПРОС БЕЗ РИСКА");
-                    setActive = false;
-                }
-                else
-                    UserInterface.SetText(question.Type.Name);
 
                 LocalInfo.TStage = TableStage.Special;
                 UserInterface.PlayComplexSelection(themeIndex, questionIndex, setActive);
@@ -1502,48 +1509,20 @@ namespace SImulator.ViewModel
 
         internal bool OnPlayerKeyPressed(GameKey key)
         {
-            if (!_engine.IsWaitingForPress())
-                return false;
-
             var index = Settings.Model.PlayerKeys2.IndexOf(key);
             if (index == -1 || index >= LocalInfo.Players.Count)
                 return false;
 
             var player = (PlayerInfo)LocalInfo.Players[index];
 
-            // Уже кто-то отвечает
-            if (_selectedPlayer != null)
-            {
-                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
-                {
-                    UserInterface.AddLostButtonPlayer(player.Name);
-                }
-
-                return false;
-            }
-
             return ProcessPlayerPress(index, player);
         }
 
         internal bool OnPlayerPressed(PlayerInfo player)
         {
-            if (!_engine.IsWaitingForPress())
-                return false;
-
-            // Уже кто-то отвечает
-            if (_selectedPlayer != null)
-            {
-                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
-                {
-                    UserInterface.AddLostButtonPlayer(player.Name);
-                }
-
-                return false;
-            }
-
             // Нет такого игрока
             var index = LocalInfo.Players.IndexOf(player);
-            if (index == -1 || index >= LocalInfo.Players.Count)
+            if (index == -1)
                 return false;
 
             return ProcessPlayerPress(index, player);
@@ -1551,6 +1530,20 @@ namespace SImulator.ViewModel
 
         private bool ProcessPlayerPress(int index, PlayerInfo player)
         {
+            if (!_engine.IsWaitingForPress())
+                return false;
+
+            // Уже кто-то отвечает
+            if (_selectedPlayer != null)
+            {
+                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
+                {
+                    UserInterface.AddLostButtonPlayer(player.Name);
+                }
+
+                return false;
+            }
+
             // Уже нажимал
             if (_selectedPlayers.Contains(player))
                 return false;
@@ -1566,22 +1559,21 @@ namespace SImulator.ViewModel
             if (player.BlockedTime.HasValue && DateTime.Now.Subtract(player.BlockedTime.Value).TotalSeconds < Settings.Model.BlockingTime)
                 return false;
 
+            // Все проверки пройдены, фиксируем нажатие
             player.IsSelected = true;
             _selectedPlayer = player;
             _selectedPlayers.Add(_selectedPlayer);
 
             try
             {
+                UserInterface.SetSound(Sounds.PlayerPressed);
                 UserInterface.SetPlayer(index);
             }
-            catch (TimeoutException exc)
+            catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
+
             _timerStopped = ActiveQuestionCommand == StopQuestionTimer;
             if (_timerStopped)
             {

@@ -2,13 +2,11 @@
 using Services.SI.ViewModel;
 using SIEngine;
 using SImulator.Implementation.ButtonManagers;
-using SImulator.Implementation.WinAPI;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
-using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -284,7 +282,7 @@ namespace SImulator.Implementation
 
         public override void PlaySound(string name, Action onFinish)
         {
-            if (name == null)
+            if (string.IsNullOrEmpty(name))
             {
                 if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
                     _mediaClock.Controller.Stop();
@@ -292,7 +290,7 @@ namespace SImulator.Implementation
                 return;
             }
 
-            var source = Path.Combine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds"), name);
+            var source = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds", name);
 
             if (_mediaTimeline == null)
             {
@@ -400,7 +398,7 @@ namespace SImulator.Implementation
             return OperationContext.Current.GetCallbackChannel<T>();
         }
 
-        public override void InitSettings(Model.AppSettings defaultSettings)
+        public override void InitSettings(AppSettings defaultSettings)
         {
             
         }

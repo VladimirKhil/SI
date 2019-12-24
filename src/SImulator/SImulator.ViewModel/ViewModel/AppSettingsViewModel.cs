@@ -1,5 +1,5 @@
 ﻿using SIEngine;
-using SImulator.Model;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;

@@ -1,5 +1,5 @@
-﻿using SImulator.Model;
-using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using System;
 
 namespace SImulator.ViewModel.ButtonManagers

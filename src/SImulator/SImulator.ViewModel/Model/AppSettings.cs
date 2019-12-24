@@ -10,7 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
-namespace SImulator.Model
+namespace SImulator.ViewModel.Model
 {
     public sealed class AppSettings : INotifyPropertyChanged 
     {

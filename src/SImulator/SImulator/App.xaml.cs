@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Windows;
 using System.Deployment.Application;
-using Settings = SImulator.Model.AppSettings;
+using Settings = SImulator.ViewModel.Model.AppSettings;
 using System.Reflection;
 using SImulator.ViewModel;
 using SImulator.Implementation;
 using System.Threading;
 using System.IO.IsolatedStorage;
 using System.IO;
+using SIUI.ViewModel.Core;
 
 namespace SImulator
 {
@@ -21,7 +22,7 @@ namespace SImulator
         /// <summary>
         /// Имя конфигурационного файла пользовательских настроек
         /// </summary>
-        private static readonly string ConfigFileName = "user.config";
+        private const string ConfigFileName = "user.config";
 
         internal Settings Settings { get; } = LoadSettings();
 
@@ -38,19 +39,22 @@ namespace SImulator
                     return;
             }
 #endif
+            UI.Initialize();
+
             var main = new MainViewModel(Settings);
 
             if (e.Args.Length > 0)
                 main.PackageSource = new FilePackageSource(e.Args[0]);
 
 #if DEBUG
-            main.PackageSource = new SIStoragePackageSource(new Services.SI.PackageInfo { Description = "Пакет микс 1" }, new Uri("http://vladimirkhil.com/content/sistorage/Для эрудитов/2.1.siq"));// new FilePackageSource(@"C:\ProgramData\Svoyak-soft\SIGame\Data\1.siq");
+            main.PackageSource = new SIStoragePackageSource(new Services.SI.PackageInfo { Description = "Пакет тест" }, new Uri("http://vladimirkhil.com/sistorage/Основные/1.siq"));
 #endif
 
-            MainWindow = new CommandWindow() { DataContext = main };
+            MainWindow = new CommandWindow { DataContext = main };
             MainWindow.Show();
         }
 
+ #if !DEBUG
         private static bool CheckUpdate()
         {
             try
@@ -113,6 +117,7 @@ namespace SImulator
 
             return false;
         }
+#endif
 
         protected override void OnExit(ExitEventArgs e)
         {            
@@ -145,7 +150,7 @@ namespace SImulator
             }
             catch (Exception exc)
             {
-                MessageBox.Show("Ошибка при сохранении настроек программы: " + exc.Message, MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show($"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 
@@ -181,6 +186,7 @@ namespace SImulator
             return Settings.Create();
         }
 
+#if !DEBUG
         private void ProcessAsync()
         {
             var isFirstAppRun = Settings.IsFirstRun;
@@ -194,6 +200,7 @@ namespace SImulator
                 }
             }
         }
+#endif
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
