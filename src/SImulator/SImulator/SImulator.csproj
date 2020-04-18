@@ -35,6 +35,7 @@
     <ProductName>SImulator</ProductName>
     <PublisherName>Svoyak-soft</PublisherName>
     <SuiteName>SImulator</SuiteName>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.htm</WebPage>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>2.6.2.0</ApplicationVersion>
@@ -83,6 +84,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero" />

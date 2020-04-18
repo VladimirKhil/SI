@@ -94,7 +94,7 @@
             <TabControl Background="White" ItemsSource="{Binding Publishers}" SelectedItem="{Binding CurrentPublisher}" TabStripPlacement="Left" Padding="0" Margin="-2,1,0,0" BorderThickness="0,1,1,1" Style="{DynamicResource TabControlStyle1}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name, Converter={StaticResource NameConverter}}" />
+                        <TextBlock Text="{Binding Converter={StaticResource NameConverter}}" />
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
