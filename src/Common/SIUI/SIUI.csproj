@@ -57,6 +57,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviors\ImageController.cs" />
     <Compile Include="Behaviors\MediaController.cs" />
     <Compile Include="Behaviors\HyperlinkBehavior.cs" />
     <Compile Include="Behaviors\QuestionReading.cs" />

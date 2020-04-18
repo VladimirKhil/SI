@@ -9,9 +9,9 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Description>SIGame packages processor</Description>
     <Company>Svoyak-soft</Company>
-    <Version>7.2.2</Version>
+    <Version>7.3.1</Version>
     <Authors>Vladimir Khil</Authors>
-    <Copyright>Copyright © Svoyak-soft 2007 - 2019</Copyright>
+    <Copyright>Copyright © Svoyak-soft 2007 - 2020</Copyright>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>

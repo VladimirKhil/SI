@@ -37,7 +37,7 @@
     <SuiteName>SImulator</SuiteName>
     <WebPage>index.htm</WebPage>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>2.6.1.0</ApplicationVersion>
+    <ApplicationVersion>2.6.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -284,7 +284,7 @@
   <ItemGroup>
     <FileAssociation Include=".siq">
       <Visible>False</Visible>
-      <Description>Вопросы SIGame</Description>
+      <Description>SIGame questions</Description>
       <Progid>SI.Questions</Progid>
       <DefaultIcon>Images\SIQIcon.ico</DefaultIcon>
     </FileAssociation>

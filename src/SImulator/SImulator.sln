@@ -27,10 +27,12 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "..\C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F7CE4B38-4286-47BA-B5BA-0E4FA77E594E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SImulator.ViewModel.Tests", "..\..\test\SImulator\SImulator.ViewModel.Tests\SImulator.ViewModel.Tests.csproj", "{CB2B8CE7-876C-4D16-BFA4-E1F67F949280}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel.Tests", "..\..\test\SImulator\SImulator.ViewModel.Tests\SImulator.ViewModel.Tests.csproj", "{CB2B8CE7-876C-4D16-BFA4-E1F67F949280}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\Common\SIService.Client\SIService.Client.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
+		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
 		..\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection

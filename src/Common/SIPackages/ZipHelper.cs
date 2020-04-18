@@ -11,7 +11,7 @@ namespace SIPackages
 {
     public static class ZipHelper
     {
-        internal static int MaxFileNameLength = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // /2 из-за кириллических символов
+        internal static int MaxFileNameLength = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // / 2 из-за кириллических символов
 
         public static void ExtractToDirectory(string sourceArchiveFileName, string destinationDirectoryName, bool unescape = false)
         {

@@ -39,12 +39,16 @@ namespace SIUI.Behaviors
             var tableInfo = (TableInfoViewModel)mediaElement?.DataContext;
 
             if (tableInfo == null)
+            {
                 return;
+            }
 
             mediaElement.LoadedBehavior = MediaState.Manual;
 
             if (waveOutGetVolume(IntPtr.Zero, out uint dwVolume) == 0)
+            {
                 mediaElement.Volume = ((double)Math.Max(dwVolume >> 16, dwVolume & 0x0000FFFF)) / 0xFFFF / 2; // Зададим уровень звука из микшера (делим пополам, т.к. громкость по умолчанию - 0.5)
+            }
 
             void loaded(object sender, EventArgs e2)
             {
@@ -59,21 +63,22 @@ namespace SIUI.Behaviors
             }
 
             mediaElement.Loaded += (sender, e2) =>
+            {
+                try
                 {
-                    try
-                    {
-                        mediaElement.Play();
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show(exc.Message);
-                    }
-                };
+                    mediaElement.Play();
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            };
 
             SourceDescriptor.AddValueChanged(mediaElement, loaded);
 
             mediaElement.MediaFailed += (sender, e2) =>
                 {
+                    tableInfo.OnMediaLoadError(e2.ErrorException);
                     Trace.TraceError(e2.ErrorException.ToString());
                 };
 
@@ -82,13 +87,13 @@ namespace SIUI.Behaviors
             {
                 timer = new System.Timers.Timer(1000);
                 timer.Elapsed += (sender, e2) =>
+                {
+                    mediaElement.Dispatcher.BeginInvoke((Action)(() =>
                     {
-                        mediaElement.Dispatcher.BeginInvoke((Action)(() =>
-                            {
-                                if (mediaElement.NaturalDuration.HasTimeSpan)
-                                    tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
-                            }));
-                    };
+                        if (mediaElement.NaturalDuration.HasTimeSpan)
+                            tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
+                    }));
+                };
             }
 
             mediaElement.MediaOpened += (sender, e2) =>

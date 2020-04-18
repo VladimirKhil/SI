@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Svoyak-soft")]
 [assembly: AssemblyProduct("SIUI")]
-[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2010 - 2019")]
+[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2010 - 2020")]
 [assembly: AssemblyTrademark("Vladimir Khil")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номер построения и номер редакции по умолчанию, 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("7.2.2.0")]
-[assembly: AssemblyFileVersion("7.2.2.0")]
+[assembly: AssemblyVersion("7.3.1.0")]
+[assembly: AssemblyFileVersion("7.3.1.0")]

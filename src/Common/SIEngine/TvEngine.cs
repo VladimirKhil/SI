@@ -73,10 +73,7 @@ namespace SIEngine
 
                     OnRound(_activeRound);
 
-                    if (_activeRound.Type != RoundTypes.Final)
-                        Stage = GameStage.RoundThemes;
-                    else
-                        Stage = GameStage.FinalThemes;
+                    Stage = _activeRound.Type != RoundTypes.Final ? GameStage.RoundThemes : GameStage.FinalThemes;
 
                     _timeout = false;
                     AutoNext(7000);
@@ -360,7 +357,7 @@ namespace SIEngine
             OnQuestionSelected();
         }
 
-        public void SelectTheme(int themeIndex)
+        public void SelectTheme(int publicThemeIndex)
         {
             if (_stage == GameStage.FinalQuestion)
             {
@@ -372,7 +369,7 @@ namespace SIEngine
                 return;
 
             Stage = GameStage.AfterDelete;
-            _themeIndex = _finalMap[themeIndex];
+            _themeIndex = _finalMap[publicThemeIndex];
             _questionIndex = 0;
 
             SetActiveThemeQuestion();

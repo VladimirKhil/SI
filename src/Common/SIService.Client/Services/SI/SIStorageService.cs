@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Services.SI
@@ -20,36 +22,22 @@ namespace Services.SI
         {
             Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
         }
-        
+
         public SIStorageService(string address = "http://vladimirkhil.com/api/si")
         {
             _address = address;
         }
 
-        public async Task<Package[]> GetAllPackagesAsync()
-        {
-            return await Call<Package[]>("Packages");
-        }
+        public async Task<Package[]> GetAllPackagesAsync() => await GetAsync<Package[]>("Packages");
 
-        public async Task<PackageCategory[]> GetCategoriesAsync()
-        {
-            return await Call<PackageCategory[]>("Categories");
-        }
+        public async Task<PackageCategory[]> GetCategoriesAsync() => await GetAsync<PackageCategory[]>("Categories");
 
-        public async Task<Package[]> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction)
-        {
-            return await Call<Package[]>("Packages?categoryID=" + categoryID + "&restriction=" + Uri.EscapeDataString(restriction));
-        }
+        public async Task<Package[]> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction) =>
+            await GetAsync<Package[]>("Packages?categoryID=" + categoryID + "&restriction=" + Uri.EscapeDataString(restriction));
 
-        public async Task<Uri> GetPackageByIDAsync(int packageID)
-        {
-            return await Call<Uri>("Package?packageID=" + packageID);
-        }
+        public async Task<Uri> GetPackageByIDAsync(int packageID) => await GetAsync<Uri>("Package?packageID=" + packageID);
 
-        public async Task<Uri> GetPackageByGuidAsync(string packageGuid)
-        {
-            return await Call<Uri>("PackageByGuid?packageGuid=" + packageGuid);
-        }
+        public async Task<Uri> GetPackageByGuidAsync(string packageGuid) => await GetAsync<Uri>("PackageByGuid?packageGuid=" + packageGuid);
 
         public async Task<string[]> GetPackagesByTagAsync(int? tagId = null)
         {
@@ -60,28 +48,17 @@ namespace Services.SI
                 queryString.Append("tagId=").Append(tagId.Value);
             }
 
-            return await Call<string[]>("PackagesByTag" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+            return await GetAsync<string[]>("PackagesByTag" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
         }
 
-        public async Task<NewServerInfo[]> GetGameServersUrisAsync()
-        {
-            return await Call<NewServerInfo[]>("GetGameServersUrisNew");
-        }
+        public async Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
+            await GetAsync<NewServerInfo[]>("GetGameServersUrisNew", cancellationToken);
 
-        public async Task<NamedObject[]> GetAuthorsAsync()
-        {
-            return await Call<NamedObject[]>("Authors");
-        }
+        public async Task<NamedObject[]> GetAuthorsAsync() => await GetAsync<NamedObject[]>("Authors");
 
-        public async Task<NamedObject[]> GetPublishersAsync()
-        {
-            return await Call<NamedObject[]>("Publishers");
-        }
+        public async Task<NamedObject[]> GetPublishersAsync() => await GetAsync<NamedObject[]>("Publishers");
 
-        public async Task<NamedObject[]> GetTagsAsync()
-        {
-            return await Call<NamedObject[]>("Tags");
-        }
+        public async Task<NamedObject[]> GetTagsAsync() => await GetAsync<NamedObject[]>("Tags");
 
         public async Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1, int? publisherId = null, int? authorId = null,
             string restriction = null, PackageSortMode sortMode = PackageSortMode.Name, bool sortAscending = true)
@@ -133,7 +110,7 @@ namespace Services.SI
                 if (queryString.Length > 0)
                     queryString.Append('&');
 
-                queryString.Append("restriction=").Append(restriction);
+                queryString.Append("restriction=").Append(Uri.EscapeDataString(restriction));
             }
 
             if (sortMode != PackageSortMode.Name)
@@ -152,14 +129,20 @@ namespace Services.SI
                 queryString.Append("sortAscending=false");
             }
 
-            return await Call<PackageInfo[]>("FilteredPackages" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+            return await GetAsync<PackageInfo[]>("FilteredPackages" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
         }
 
-        private async Task<T> Call<T>(string request)
+        private async Task<T> GetAsync<T>(string request, CancellationToken cancellationToken = default)
         {
-            using (var stream = await Client.GetStreamAsync(_address + "/" + request))
+            using (var responseMessage = await Client.GetAsync(_address + "/" + request, cancellationToken))
             {
-                using (var reader = new StreamReader(stream))
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    throw new Exception("GetAsync error: " + responseMessage.Content.ReadAsStringAsync());
+                }
+
+                using (var responseStream = await responseMessage.Content.ReadAsStreamAsync())
+                using (var reader = new StreamReader(responseStream))
                 {
                     return (T)Serializer.Deserialize(reader, typeof(T));
                 }

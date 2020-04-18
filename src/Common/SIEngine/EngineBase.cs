@@ -196,165 +196,69 @@ namespace SIEngine
 
         #region Fire events
 
-        protected void OnPackage(Package package)
-        {
-            Package?.Invoke(package);
-        }
+        protected void OnPackage(Package package) => Package?.Invoke(package);
 
-        protected void OnGameThemes(string[] gameThemes)
-        {
-            GameThemes?.Invoke(gameThemes);
-        }
+        protected void OnGameThemes(string[] gameThemes) => GameThemes?.Invoke(gameThemes);
 
-        protected void OnNextRound(bool showSign = true)
-        {
-            NextRound?.Invoke(showSign);
-        }
+        protected void OnNextRound(bool showSign = true) => NextRound?.Invoke(showSign);
 
-        protected void OnRound(Round round)
-        {
-            Round?.Invoke(round);
-        }
+        protected void OnRound(Round round) => Round?.Invoke(round);
 
-        protected void OnRoundThemes(Theme[] roundThemes)
-        {
-            RoundThemes?.Invoke(roundThemes);
-        }
+        protected void OnRoundThemes(Theme[] roundThemes) => RoundThemes?.Invoke(roundThemes);
 
-        protected void OnTheme(Theme theme)
-        {
-            Theme?.Invoke(theme);
-        }
+        protected void OnTheme(Theme theme) => Theme?.Invoke(theme);
 
-        protected void OnQuestion(Question question)
-        {
-            Question?.Invoke(question);
-        }
+        protected void OnQuestion(Question question) => Question?.Invoke(question);
 
-        protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
-        {
-            QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
-        }
+        protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question) => QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
 
-        protected void OnQuestionAtom(Atom atom)
-        {
-            QuestionAtom?.Invoke(atom);
-        }
+        protected void OnQuestionAtom(Atom atom) => QuestionAtom?.Invoke(atom);
 
-        protected void OnQuestionText(string text, IMedia sound)
-        {
-            QuestionText?.Invoke(text, sound);
-        }
+        protected void OnQuestionText(string text, IMedia sound) => QuestionText?.Invoke(text, sound);
 
-        protected void OnQuestionOral(string oralText)
-        {
-            QuestionOral?.Invoke(oralText);
-        }
+        protected void OnQuestionOral(string oralText) => QuestionOral?.Invoke(oralText);
 
-        protected void OnQuestionImage(IMedia image, IMedia sound)
-        {
-            QuestionImage?.Invoke(image, sound);
-        }
+        protected void OnQuestionImage(IMedia image, IMedia sound) => QuestionImage?.Invoke(image, sound);
 
-        protected void OnQuestionSound(IMedia sound)
-        {
-            QuestionSound?.Invoke(sound);
-        }
+        protected void OnQuestionSound(IMedia sound) => QuestionSound?.Invoke(sound);
 
-        protected void OnQuestionVideo(IMedia video)
-        {
-            QuestionVideo?.Invoke(video);
-        }
+        protected void OnQuestionVideo(IMedia video) => QuestionVideo?.Invoke(video);
 
-        protected void OnQuestionOther(Atom atom)
-        {
-            QuestionOther?.Invoke(atom);
-        }
+        protected void OnQuestionOther(Atom atom) => QuestionOther?.Invoke(atom);
 
-        protected void OnQuestionProcessed(Question question, bool finished, bool pressMode)
-        {
-            QuestionProcessed?.Invoke(question, finished, pressMode);
-        }
+        protected void OnQuestionProcessed(Question question, bool finished, bool pressMode) => QuestionProcessed?.Invoke(question, finished, pressMode);
 
-        protected void OnWaitTry(Question question, bool final = false)
-        {
-            WaitTry?.Invoke(question, final);
-        }
+        protected void OnWaitTry(Question question, bool final = false) => WaitTry?.Invoke(question, final);
 
-        protected void OnSimpleAnswer(string answer)
-        {
-            SimpleAnswer?.Invoke(answer);
-        }
+        protected void OnSimpleAnswer(string answer) => SimpleAnswer?.Invoke(answer);
 
-        protected void OnRightAnswer()
-        {
-            RightAnswer?.Invoke();
-        }
+        protected void OnRightAnswer() => RightAnswer?.Invoke();
 
-        protected void OnShowScore()
-        {
-            ShowScore?.Invoke();
-        }
+        protected void OnShowScore() => ShowScore?.Invoke();
 
-        protected void OnLogScore()
-        {
-            LogScore?.Invoke();
-        }
+        protected void OnLogScore() => LogScore?.Invoke();
 
-        protected void OnEndQuestion(int themeIndex, int questionIndex)
-        {
-            EndQuestion?.Invoke(themeIndex, questionIndex);
-        }
+        protected void OnEndQuestion(int themeIndex, int questionIndex) => EndQuestion?.Invoke(themeIndex, questionIndex);
 
-        protected void OnRoundEmpty()
-        {
-            RoundEmpty?.Invoke();
-        }
+        protected void OnRoundEmpty() => RoundEmpty?.Invoke();
 
-        protected void OnNextQuestion()
-        {
-            NextQuestion?.Invoke();
-        }
+        protected void OnNextQuestion() => NextQuestion?.Invoke();
 
-        protected void OnRoundTimeout()
-        {
-            RoundTimeout?.Invoke();
-        }
+        protected void OnRoundTimeout() => RoundTimeout?.Invoke();
 
-        protected void OnFinalThemes(Theme[] finalThemes)
-        {
-            FinalThemes?.Invoke(finalThemes);
-        }
+        protected void OnFinalThemes(Theme[] finalThemes) => FinalThemes?.Invoke(finalThemes);
 
-        protected void OnWaitDelete()
-        {
-            WaitDelete?.Invoke();
-        }
+        protected void OnWaitDelete() => WaitDelete?.Invoke();
 
-        protected void OnThemeSelected(int themeIndex)
-        {
-            ThemeSelected?.Invoke(themeIndex);
-        }
+        protected void OnThemeSelected(int themeIndex) => ThemeSelected?.Invoke(themeIndex);
 
-        protected void OnPrepareFinalQuestion(Theme theme, Question question)
-        {
-            PrepareFinalQuestion?.Invoke(theme, question);
-        }
+        protected void OnPrepareFinalQuestion(Theme theme, Question question) => PrepareFinalQuestion?.Invoke(theme, question);
 
-        protected void OnSound(string name = "")
-        {
-            Sound?.Invoke(name);
-        }
+        protected void OnSound(string name = "") => Sound?.Invoke(name);
 
-        protected void OnError(string error)
-        {
-            Error?.Invoke(error);
-        }
+        protected void OnError(string error) => Error?.Invoke(error);
 
-        protected void OnEndGame()
-        {
-            EndGame?.Invoke();
-        }
+        protected void OnEndGame() => EndGame?.Invoke();
 
         #endregion
 
@@ -452,25 +356,13 @@ namespace SIEngine
 
         public abstract bool CanNext();
 
-        public void UpdateCanNext()
-        {
-            CanMoveNext = CanNext();
-        }
+        public void UpdateCanNext() => CanMoveNext = CanNext();
 
-        protected void SetActiveRound()
-        {
-            _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
-        }
+        protected void SetActiveRound() => _activeRound = _roundIndex < _document.Package.Rounds.Count ? _document.Package.Rounds[_roundIndex] : null;
 
-        public void SetTimeout()
-        {
-            _timeout = true;
-        }
+        public void SetTimeout() => _timeout = true;
 
-        public void SkipQuestion()
-        {
-            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-        }
+        public void SkipQuestion() => Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
 
         /// <summary>
         /// Отобразить вопрос (его часть)

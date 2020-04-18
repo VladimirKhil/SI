@@ -8,11 +8,11 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("SImulator")]
-[assembly: AssemblyDescription("Эмулятор SIGame")]
+[assembly: AssemblyDescription("SIGame emulator")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Svoyak-soft")]
 [assembly: AssemblyProduct("SImulator")]
-[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2010 - 2019")]
+[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2010 - 2020")]
 [assembly: AssemblyTrademark("Vladimir Khil")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.6.1.0")]
-[assembly: AssemblyFileVersion("2.6.1.0")]
+[assembly: AssemblyVersion("2.6.2.0")]
+[assembly: AssemblyFileVersion("2.6.2.0")]

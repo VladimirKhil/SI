@@ -70,19 +70,21 @@ namespace SIPackages.PlatformSpecific.Net45
         {
             var entry = _zipArchive.GetEntry(name);
             if (entry == null)
+            {
                 return null;
+            }
             
             var stream = entry.Open();
             if (!read)
+            {
                 stream.SetLength(0);
+            }
 
             return new StreamInfo { Stream = stream, Length = _zipArchive.Mode == ZipArchiveMode.Read ? entry.Length : 0 };
         }
 
-        public StreamInfo GetStream(string category, string name, bool read = true)
-        {
-            return GetStream(category + "/" + Uri.EscapeUriString(name), read);
-        }
+        public StreamInfo GetStream(string category, string name, bool read = true) =>
+            GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
 
         public void CreateStream(string name, string contentType)
         {

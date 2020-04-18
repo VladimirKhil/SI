@@ -11,10 +11,8 @@
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Company>Svoyak-soft</Company>
-    <Version>2.6.1</Version>
-    <Copyright>Copyright © Svoyak-soft 2010 - 2019</Copyright>
-    <AssemblyVersion>2.6.1.0</AssemblyVersion>
-    <FileVersion>2.6.1.0</FileVersion>
+    <Version>2.6.2</Version>
+    <Copyright>Copyright © Svoyak-soft 2010 - 2020</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

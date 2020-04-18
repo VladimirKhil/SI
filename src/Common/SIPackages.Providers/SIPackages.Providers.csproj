@@ -1,26 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <Product>SIEngine</Product>
-    <Description>SIGame engine</Description>
+    <Description>SIGame packages helper classes</Description>
     <Company>Svoyak-soft</Company>
-    <Version>2.10.1</Version>
+    <Version>7.3.1</Version>
+    <Authors>Vladimir Khil</Authors>
     <Copyright>Copyright © Svoyak-soft 2007 - 2020</Copyright>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SIPackages\SIPackages.csproj" />
   </ItemGroup>
+
+  <Import Project="..\SIService.Client\SIService.Client.projitems" Label="Shared" />
+
 </Project>

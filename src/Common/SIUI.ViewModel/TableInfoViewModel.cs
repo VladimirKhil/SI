@@ -356,41 +356,24 @@ namespace SIUI.ViewModel
         public event Action MediaPause;
         public event Action MediaResume;
 
+        public event Action<Exception> MediaLoadError;
+
         private bool _isComplex;
 
-        public void OnMediaStart()
-        {
-            MediaStart?.Invoke();
-        }
+        public void OnMediaStart() => MediaStart?.Invoke();
 
-        public void OnMediaEnd()
-        {
-            MediaEnd?.Invoke();
-        }
+        public void OnMediaEnd() => MediaEnd?.Invoke();
 
-        public bool HasMediaProgress()
-        {
-            return MediaProgress != null;
-        }
+        public bool HasMediaProgress() => MediaProgress != null;
 
-        public void OnMediaProgress(double? progress)
-        {
-            MediaProgress?.Invoke(progress.Value);
-        }
+        public void OnMediaProgress(double? progress) => MediaProgress?.Invoke(progress.Value);
 
-        public void OnMediaSeek(int position)
-        {
-            MediaSeek?.Invoke(position);
-        }
+        public void OnMediaSeek(int position) => MediaSeek?.Invoke(position);
 
-        public void OnMediaResume()
-        {
-            MediaResume?.Invoke();
-        }
+        public void OnMediaResume() => MediaResume?.Invoke();
 
-        public void OnMediaPause()
-        {
-            MediaPause?.Invoke();
-        }
+        public void OnMediaPause() => MediaPause?.Invoke();
+
+        public void OnMediaLoadError(Exception exc) => MediaLoadError?.Invoke(exc);
     }
 }

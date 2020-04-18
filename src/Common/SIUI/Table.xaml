@@ -290,7 +290,8 @@
                                 <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource QuestionTextSelector}" />
                             </DataTemplate>
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Image}">
-                                <Image Name="image" Stretch="Uniform" Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}" />
+                                <Image Name="image" Stretch="Uniform" Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}"
+                                       lb:ImageController.IsAttached="True" />
                             </DataTemplate>
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">
                                 <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.IsAttached="True" />
