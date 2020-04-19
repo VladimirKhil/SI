@@ -713,4 +713,25 @@
   <data name="ExternalLink" xml:space="preserve">
     <value>Внешняя ссылка: {0} . Включить автоматическую загрузку внешних ссылок можно в настройках игры</value>
   </data>
+  <data name="ApellatedAnswers" xml:space="preserve">
+    <value>Апеллированные ответы</value>
+  </data>
+  <data name="Apellation" xml:space="preserve">
+    <value>Апелляция</value>
+  </data>
+  <data name="ErrorMessages" xml:space="preserve">
+    <value>Сообщения об ошибках</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Имя пакета</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
+  <data name="WrongAns" xml:space="preserve">
+    <value>Неверный ответ</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Неверные ответы</value>
+  </data>
 </root>

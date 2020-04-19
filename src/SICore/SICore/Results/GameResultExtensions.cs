@@ -1,67 +1,80 @@
-﻿using SIPackages;
+﻿using SICore.BusinessLogic;
+using SIPackages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using R = SICore.Properties.Resources;
 
 namespace SICore.Results
 {
     /// <summary>
-    /// TODO: перевод
+    /// Класс, позволяющий вывести результат игры в виде текстового отчёта
     /// </summary>
     public static class GameResultExtensions
     {
+        private const string DescriptionFormat = "{0}: {1}";
+
         /// <summary>
         /// Получить строковое представление результатов игры
         /// </summary>
+        /// <param name="gameResult">Результаты игры</param>
         /// <param name="doc">Игровой пакет, используемый для извлечения текстов вопросов и ответов</param>
+        /// <param name="localizer">Локализатор</param>
         /// <returns>Строковое представление результатов игры</returns>
-        public static string ToString(this GameResult gameResult, SIDocument doc)
+        public static string ToString(this GameResult gameResult, SIDocument doc, ILocalizer localizer)
         {
             var result = new StringBuilder();
-            result.AppendFormat("Имя пакета: {0}", gameResult.PackageName).AppendLine().AppendLine();
-            result.AppendLine("Результаты игры:");
+            result.AppendFormat(DescriptionFormat, localizer[R.PackageName], gameResult.PackageName).AppendLine().AppendLine();
+            result.Append(localizer[R.GameResults]).AppendLine(":");
 
             foreach (var item in gameResult.Results)
             {
-                result.AppendFormat("{0}: {1}", item.Name, item.Sum).AppendLine();
+                result.AppendFormat(DescriptionFormat, item.Name, item.Sum).AppendLine();
             }
 
-            result.AppendLine().AppendLine("Апеллированные ответы:");
-            PrintCollection(doc, gameResult.ApellatedQuestions, result, "Апелляция");
+            result.AppendLine().Append(localizer[R.ApellatedAnswers]).AppendLine(":");
+            PrintCollection(doc, gameResult.ApellatedQuestions, result, localizer[R.Apellation], localizer);
 
-            result.AppendLine().AppendLine("Неверные ответы:");
-            PrintCollection(doc, gameResult.WrongVersions, result, "Неверный ответ");
+            result.AppendLine().Append(localizer[R.WrongAnswers]).AppendLine(":");
+            PrintCollection(doc, gameResult.WrongVersions, result, localizer[R.WrongAns], localizer);
 
-            result.AppendLine().AppendLine("Сообщения об ошибках:");
+            result.AppendLine().Append(localizer[R.ErrorMessages]).AppendLine(":");
             result.AppendLine(gameResult.ErrorLog);
 
             return result.ToString().Replace(Environment.NewLine, "\r");
         }
 
-        private static void PrintCollection(SIDocument doc, IEnumerable<AnswerInfo> collection, StringBuilder result, string text)
+        private static void PrintCollection(SIDocument doc, IEnumerable<AnswerInfo> collection,
+            StringBuilder result, string answerTitle, ILocalizer localizer)
         {
-            foreach (var item in collection)
+            foreach (var answerInfo in collection)
             {
-                if (item.Round < 0 || item.Round >= doc.Package.Rounds.Count)
+                if (answerInfo.Round < 0 || answerInfo.Round >= doc.Package.Rounds.Count)
+                {
                     continue;
+                }
 
-                var round = doc.Package.Rounds[item.Round];
+                var round = doc.Package.Rounds[answerInfo.Round];
 
-                if (item.Theme < 0 || item.Theme >= round.Themes.Count)
+                if (answerInfo.Theme < 0 || answerInfo.Theme >= round.Themes.Count)
+                {
                     continue;
+                }
 
-                var theme = round.Themes[item.Theme];
+                var theme = round.Themes[answerInfo.Theme];
 
-                if (item.Question < 0 || item.Question >= theme.Questions.Count)
+                if (answerInfo.Question < 0 || answerInfo.Question >= theme.Questions.Count)
+                {
                     continue;
+                }
 
-                var quest = theme.Questions[item.Question];
+                var quest = theme.Questions[answerInfo.Question];
 
-                result.AppendFormat("Вопрос: {0}", quest.Scenario.ToString()).AppendLine();
+                result.AppendFormat(DescriptionFormat, localizer[R.Question], quest.Scenario.ToString()).AppendLine();
                 var right = quest.GetRightAnswers();
-                result.AppendFormat("Ответ: {0}", right.FirstOrDefault()).AppendLine();
-                result.AppendFormat("{1}: {0}", item.Answer, text).AppendLine();
+                result.AppendFormat(DescriptionFormat, localizer[R.Answer], right.FirstOrDefault()).AppendLine();
+                result.AppendFormat(DescriptionFormat, answerTitle, answerInfo.Answer).AppendLine();
 
                 result.AppendLine();
             }

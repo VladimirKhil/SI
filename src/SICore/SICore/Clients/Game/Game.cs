@@ -1660,7 +1660,7 @@ namespace SICore
                     Logic.AddHistory($"Player removed at {index}");
                     ClientData.Players.RemoveAt(index);
 
-                    UpdateGameIndicies(index);
+                    DropPlayerIndex(index);
 
                     if (isOnline && account.IsHuman)
                     {
@@ -1703,36 +1703,49 @@ namespace SICore
             OnPersonsChanged();
         }
 
-        private void UpdateGameIndicies(int index)
+        private void DropPlayerIndex(int playerIndex)
         {
-            if (ClientData.ChooserIndex > index)
+            if (ClientData.ChooserIndex > playerIndex)
             {
                 ClientData.ChooserIndex--;
             }
-            else if (ClientData.ChooserIndex == index)
+            else if (ClientData.ChooserIndex == playerIndex)
             {
                 // Передадим право выбора игроку с наименьшей суммой
                 var minSum = ClientData.Players.Min(p => p.Sum);
                 ClientData.ChooserIndex = ClientData.Players.TakeWhile(p => p.Sum != minSum).Count();
             }
 
-            if (ClientData.AnswererIndex > index)
+            if (ClientData.AnswererIndex > playerIndex)
             {
                 ClientData.AnswererIndex--;
             }
-            else if (ClientData.AnswererIndex == index)
+            else if (ClientData.AnswererIndex == playerIndex)
             {
                 // Сбросим индекс отвечающего
                 ClientData.AnswererIndex = -1;
-                // TODO: корректно выйти из ситуации в момент ожидания ответа
+
                 Logic.AddHistory($"AnswererIndex dropped");
+
+                if (ClientData.Decision == DecisionType.Answering && !Logic.IsFinalRound())
+                {
+                    // Отвечающего удалили. Нужно продвинуть игру дальше
+                    Logic.StopWaiting();
+
+                    if (ClientData.IsOralNow)
+                    {
+                        SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    }
+
+                    Logic.ContinueQuestion();
+                }
             }
 
-            if (ClientData.AppelaerIndex > index)
+            if (ClientData.AppelaerIndex > playerIndex)
             {
                 ClientData.AppelaerIndex--;
             }
-            else if (ClientData.AppelaerIndex == index)
+            else if (ClientData.AppelaerIndex == playerIndex)
             {
                 ClientData.AppelaerIndex = -1;
                 Logic.AddHistory($"AppelaerIndex dropped");
@@ -1741,16 +1754,16 @@ namespace SICore
             var currentOrder = ClientData.Order;
             if (currentOrder != null)
             {
-                ClientData.OrderHistory.Append("Before ").Append(index).Append(' ')
+                ClientData.OrderHistory.Append("Before ").Append(playerIndex).Append(' ')
                     .Append(string.Join(",", ClientData.Order)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
 
                 var newOrder = new int[ClientData.Players.Count];
 
                 for (int i = 0, j = 0; i < currentOrder.Length; i++)
                 {
-                    if (currentOrder[i] != index)
+                    if (currentOrder[i] != playerIndex)
                     {
-                        newOrder[j++] = currentOrder[i] - (currentOrder[i] > index ? 1 : 0);
+                        newOrder[j++] = currentOrder[i] - (currentOrder[i] > playerIndex ? 1 : 0);
                         if (j == newOrder.Length)
                         {
                             break;
@@ -1770,7 +1783,7 @@ namespace SICore
 
             if (ClientData.ThemeDeleters != null)
             {
-                ClientData.ThemeDeleters.RemoveAt(index);
+                ClientData.ThemeDeleters.RemoveAt(playerIndex);
             }
 
             if (!ClientData.IsWaiting)

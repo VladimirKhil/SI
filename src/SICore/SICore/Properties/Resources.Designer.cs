@@ -19,7 +19,7 @@ namespace SICore.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -120,6 +120,24 @@ namespace SICore.Properties {
         public static string AnswerNotSet {
             get {
                 return ResourceManager.GetString("AnswerNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Апеллированные ответы.
+        /// </summary>
+        public static string ApellatedAnswers {
+            get {
+                return ResourceManager.GetString("ApellatedAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Апелляция.
+        /// </summary>
+        public static string Apellation {
+            get {
+                return ResourceManager.GetString("Apellation", resourceCulture);
             }
         }
         
@@ -381,6 +399,15 @@ namespace SICore.Properties {
         public static string EasyCat {
             get {
                 return ResourceManager.GetString("EasyCat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сообщения об ошибках.
+        /// </summary>
+        public static string ErrorMessages {
+            get {
+                return ResourceManager.GetString("ErrorMessages", resourceCulture);
             }
         }
         
@@ -1100,6 +1127,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Имя пакета.
+        /// </summary>
+        public static string PackageName {
+            get {
+                return ResourceManager.GetString("PackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пас.
         /// </summary>
         public static string Pass {
@@ -1231,6 +1267,15 @@ namespace SICore.Properties {
         public static string PSources {
             get {
                 return ResourceManager.GetString("PSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос.
+        /// </summary>
+        public static string Question {
+            get {
+                return ResourceManager.GetString("Question", resourceCulture);
             }
         }
         
@@ -1730,11 +1775,29 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Неверный ответ.
+        /// </summary>
+        public static string WrongAns {
+            get {
+                return ResourceManager.GetString("WrongAns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пушкин;Ой, забыл;Э-э-э....
         /// </summary>
         public static string WrongAnswer {
             get {
                 return ResourceManager.GetString("WrongAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Неверные ответы.
+        /// </summary>
+        public static string WrongAnswers {
+            get {
+                return ResourceManager.GetString("WrongAnswers", resourceCulture);
             }
         }
         

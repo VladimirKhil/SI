@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Vladimir Khil</Authors>
+    <Company>Svoyak-soft</Company>
+    <Version>1.0.0</Version>
+    <Description>SICore tests</Description>
+    <Copyright>Copyright © Svoyak-soft 2017 - 2020</Copyright>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\SICore\SICore\SICore.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\..\src\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
+
+</Project>

@@ -28,7 +28,7 @@ namespace SICore
         string GetPhotoUri(string name);
 
         void SendError(Exception exc, bool isWarning = false);
-        void SaveReport(GameResult result);
+        void SaveReport(Results.GameResult result);
         void OnPictureError(string remoteUri);
 
         void SaveBestPlayers(IEnumerable<PlayerAccount> players);

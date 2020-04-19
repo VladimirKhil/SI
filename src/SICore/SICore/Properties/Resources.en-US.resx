@@ -711,4 +711,25 @@
   <data name="ExternalLink" xml:space="preserve">
     <value>External link: {0} . You can enable automatic loading of external links in game settings</value>
   </data>
+  <data name="ApellatedAnswers" xml:space="preserve">
+    <value>Apellated answers</value>
+  </data>
+  <data name="Apellation" xml:space="preserve">
+    <value>Apellation</value>
+  </data>
+  <data name="ErrorMessages" xml:space="preserve">
+    <value>Error messages</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Package name</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="WrongAns" xml:space="preserve">
+    <value>Wrong answer</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Wrong answers</value>
+  </data>
 </root>

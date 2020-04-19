@@ -10,36 +10,49 @@ namespace SICore.Clients.Game
 	/// </summary>
 	public sealed class ThemeDeletersEnumerator
     {
+		// TODO: move outside (nested classes are bad)
+		/// <summary>
+		/// Информация об индексе игрока в очереди на удаление тем. Если игрок пока не определён, объект содержит допустимый набор индексов
+		/// В очереди имеются несколько экземпляров IndexInfo, разделяющих общий допустимый набор индексов
+		/// </summary>
 		public sealed class IndexInfo
 		{
 			public int PlayerIndex { get; set; }
-			public List<int> PossibleIndicies { get; private set; }
+			public HashSet<int> PossibleIndicies { get; private set; }
 
 			public IndexInfo(int index)
 			{
 				if (index < 0)
+				{
 					throw new ArgumentException("Недопустимый индекс", nameof(index));
+				}
 
 				PlayerIndex = index;
 			}
 
-			public IndexInfo(List<int> indicies)
+			public IndexInfo(HashSet<int> indicies)
 			{
 				PlayerIndex = -1;
-				PossibleIndicies = indicies; // Разделяют общий список
+				PossibleIndicies = indicies; // Разделяют общий набор
 			}
 
 			public void SetIndex(int index)
 			{
 				if (PlayerIndex != -1)
+				{
 					throw new InvalidOperationException("Индекс уже задан!");
+				}
 
 				if (!PossibleIndicies.Contains(index))
+				{
 					throw new InvalidOperationException("Недопустимый индекс!");
+				}
 
 				PlayerIndex = index;
 				PossibleIndicies.Remove(index);
 			}
+
+			public override string ToString() => PlayerIndex == -1 ? string.Join("|", PossibleIndicies) : PlayerIndex.ToString();
 		}
 
 		/// <summary>
@@ -94,7 +107,7 @@ namespace SICore.Clients.Game
 				}
 				else
 				{
-					var indicies = new List<int>();
+					var indicies = new HashSet<int>();
 					foreach (var item in level)
 					{
 						indicies.Add(players.IndexOf(item));
@@ -118,14 +131,48 @@ namespace SICore.Clients.Game
 
 			_removeLog.Add("Before: " + removeLog.ToString());
 
+			var processedPossibleIndicies = new HashSet<HashSet<int>>();
+
+			void updatePossibleIndices(IndexInfo indexInfo)
+			{
+				var possibleIndices = indexInfo.PossibleIndicies;
+				if (processedPossibleIndicies.Contains(possibleIndices))
+				{
+					return;
+				}
+
+				var allIndices = possibleIndices.ToArray();
+				possibleIndices.Clear();
+				foreach (var ind in allIndices)
+				{
+					if (ind == index)
+					{
+						continue;
+					}
+
+					possibleIndices.Add(ind - (ind > index ? 1 : 0));
+				}
+
+				processedPossibleIndicies.Add(possibleIndices);
+			}
+
 			if (!_order.Any(o => o.PlayerIndex == index))
 			{
 				for (var i = 0; i < _order.Length; i++)
 				{
-					if (_order[i].PlayerIndex > index)
+					var playerIndex = _order[i].PlayerIndex;
+					if (playerIndex > index)
 					{
 						_order[i].PlayerIndex--;
+						continue;
 					}
+
+					if (playerIndex != -1)
+					{
+						continue;
+					}
+
+					updatePossibleIndices(_order[i]);
 				}
 
 				return;
@@ -137,20 +184,27 @@ namespace SICore.Clients.Game
 
 				for (int i = 0, j = 0; i < _order.Length; i++)
 				{
-					if (_order[i].PlayerIndex != index)
+					if (_order[i].PlayerIndex == index)
 					{
-						newOrder[j] = _order[i];
+						continue;
+					}
 
-						if (_order[i].PlayerIndex > index)
-						{
-							newOrder[j].PlayerIndex--;
-						}
+					newOrder[j] = _order[i];
 
-						j++;
-						if (j == newOrder.Length)
-						{
-							break;
-						}
+					if (_order[i].PlayerIndex > index)
+					{
+						newOrder[j].PlayerIndex--;
+					}
+
+					if (_order[i].PlayerIndex == -1)
+					{
+						updatePossibleIndices(_order[i]);
+					}					
+
+					j++;
+					if (j == newOrder.Length)
+					{
+						break;
 					}
 				}
 
@@ -193,7 +247,7 @@ namespace SICore.Clients.Game
 
 		public void MoveBack() => _orderIndex--;
 
-		public override string ToString() => new StringBuilder(string.Join(",", _order.Select(o => o.PlayerIndex)))
+		public override string ToString() => new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
 				.Append(' ').Append(_orderIndex).Append(' ').Append(_cycle).ToString();
 	}
 }

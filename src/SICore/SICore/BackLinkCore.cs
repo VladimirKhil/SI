@@ -34,7 +34,7 @@ namespace SICore.PlatformSpecific
 
         public abstract void SendError(Exception exc, bool isWarning = false);
 
-        public abstract void SaveReport(GameResult result);
+        public abstract void SaveReport(Results.GameResult result);
 
         public abstract void OnPictureError(string remoteUri);
 

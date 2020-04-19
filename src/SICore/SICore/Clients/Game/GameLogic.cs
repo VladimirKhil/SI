@@ -674,162 +674,7 @@ namespace SICore
                     return OnDecisionAnswering();
 
                 case DecisionType.AnswerValidating:
-
-                    #region AnswerValidating
-
-                    if (_data.ShowmanDecision)
-                    {
-                        StopWaiting();
-                        var answerResult = new AnswerResult { PlayerIndex = _data.AnswererIndex };
-                        _data.QuestionHistory.Add(answerResult);
-
-                        if (_data.Answerer.AnswerIsRight)
-                        {
-                            answerResult.IsRight = true;
-                            var s = new StringBuilder();
-                            if (_data.Round.Type == RoundTypes.Final || _data.Question.Type.Name == QuestionTypes.Auction)
-                                s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.Bravo)]));
-                            else
-                                s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.Right)]));
-
-                            if (_data.Round.Type != RoundTypes.Final)
-                            {
-                                var first = _data.Question.GetRightAnswers().FirstOrDefault();
-                                if (first != null && !_data.Answerer.Answer.Simplify().Contains(first.Simplify()))
-                                    s.AppendFormat(" [{0}]", first);
-
-                                s.AppendFormat(" (+{0})", _data.CurPriceRight.ToString().FormatNumber());
-                                _actor.ShowmanReplic(s.ToString());
-
-                                s = new StringBuilder(Messages.Person)
-                                    .Append("\n+\n")
-                                    .Append(_data.AnswererIndex)
-                                    .Append(Message.ArgsSeparatorChar).Append(_data.CurPriceRight);
-                                _actor.SendMessage(s.ToString());
-
-                                _data.Answerer.Sum += _data.CurPriceRight;
-                                _data.ChooserIndex = _data.AnswererIndex;
-								_actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-								_actor.InformSums();
-
-                                _data.isQuestionPlaying = false;
-                                _data.AnnounceAnswer = false;
-
-								_data.IsThinking = false;
-								_actor.SendMessageWithArgs(Messages.Timer, 1, "STOP");
-
-                                Execute(Tasks.MoveNext, 1, force: true);
-                            }
-                            else
-                            {
-                                _actor.ShowmanReplic(s.ToString());
-                                var answer = _data.Question.GetRightAnswers().FirstOrDefault();
-                                if (answer != null && _data.Answerer.Answer.Contains(answer))
-                                    _data.AnnounceAnswer = false;
-
-                                _data.PlayerIsRight = true;
-                                Execute(Tasks.AnnounceStake, 15);
-                            }
-                        }
-                        else
-                        {
-                            var s = new StringBuilder();
-                            if (_data.Answerer.Answer != _actor.LO[nameof(R.IDontKnow)])
-                                s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.Wrong)]));
-
-                            if (_data.Settings.AppSettings.IgnoreWrong)
-                                _data.CurPriceWrong = 0;
-
-                            if (_data.Round.Type != RoundTypes.Final)
-                            {
-                                s.AppendFormat(" (-{0})", Notion.FormatNumber(_data.CurPriceWrong));
-                                _actor.ShowmanReplic(s.ToString());
-
-                                s = new StringBuilder(Messages.Person).Append("\n-\n");
-                                s.Append(_data.AnswererIndex);
-                                s.Append('\n').Append(_data.CurPriceWrong);
-                                _actor.SendMessage(s.ToString());
-
-                                _data.Answerer.Sum -= _data.CurPriceWrong;
-                                _data.Answerer.CanPress = false;
-                                _actor.InformSums();
-
-                                if (_data.Answerer.IsHuman)
-                                {
-                                    _data.GameResultInfo.WrongVersions.Add(new AnswerInfo
-                                    {
-                                        Round = Engine.RoundIndex,
-                                        Theme = _data.ThemeIndex,
-                                        Question = _data.QuestionIndex,
-                                        Answer = _data.Answerer.Answer
-                                    });
-                                }
-
-                                if (_data.Question.Type.Name == QuestionTypes.Cat
-                                    || _data.Question.Type.Name == QuestionTypes.BagCat
-                                    || _data.Question.Type.Name == QuestionTypes.Auction
-                                    || _data.Question.Type.Name == QuestionTypes.Sponsored)
-                                {
-                                    Execute(Tasks.WaitTry, 20);
-                                }
-                                else
-                                {
-                                    var canAnybodyPress = _data.Players.Any(player => player.CanPress);
-
-                                    if (canAnybodyPress)
-                                    {
-										//this.data.timego[1] = true;
-
-										if (!ClientData.Settings.AppSettings.FalseStart)
-										{
-											_actor.SendMessageWithArgs(Messages.Try, "NF");
-										}
-										
-										if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
-                                        {
-											// Возобновить чтение вопроса
-											if (_data.IsPartial && _data.AtomType == AtomTypes.Text)
-											{
-												Execute(Tasks.PrintPartial, 5, force: true);
-											}
-											else
-											{
-												_actor.SendMessage(Messages.Resume);
-												Execute(Tasks.MoveNext, _data.AtomTime, force: true);
-											}
-
-                                            for (var i = 0; i < _data.Players.Count; i++)
-                                            {
-                                                if (_data.Players[i].CanPress)
-                                                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
-                                            }
-
-                                            _data.Decision = DecisionType.Pressing;
-                                        }
-                                        else
-                                            Execute(Tasks.AskToTry, 10, force: true);
-                                    }
-                                    else
-                                    {
-                                        Execute(Tasks.WaitTry, 20, force: true);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                _actor.ShowmanReplic(s.ToString());
-                                _data.PlayerIsRight = false;
-
-                                Execute(Tasks.AnnounceStake, 15);
-                            }
-                        }
-
-                        return true;
-                    }
-
-                    break;
-
-                    #endregion
+                    return OnDecisionAnswerValidating();
 
                 case DecisionType.CatGiving:
 
@@ -1008,6 +853,191 @@ namespace SICore
             return false;
         }
 
+        private bool OnDecisionAnswerValidating()
+        {
+            if (!_data.ShowmanDecision)
+            {
+                return false;
+            }
+
+            StopWaiting();
+
+            var answerResult = new AnswerResult { PlayerIndex = _data.AnswererIndex };
+            _data.QuestionHistory.Add(answerResult);
+
+            if (_data.Answerer.AnswerIsRight)
+            {
+                answerResult.IsRight = true;
+                var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Auction ? nameof(R.Bravo) : nameof(R.Right);
+                
+                var s = new StringBuilder(ResourceHelper.GetString(_actor.LO[showmanReplic]));
+
+                var canonicalAnswer = _data.Question.GetRightAnswers().FirstOrDefault();
+                var isAnswerCanonical = canonicalAnswer != null && _data.Answerer.Answer.Simplify().Contains(canonicalAnswer.Simplify());
+
+                if (!IsFinalRound())
+                {
+                    if (canonicalAnswer != null && !isAnswerCanonical)
+                    {
+                        s.AppendFormat(" [{0}]", canonicalAnswer);
+                    }
+
+                    s.AppendFormat(" (+{0})", _data.CurPriceRight.ToString().FormatNumber());
+                    _actor.ShowmanReplic(s.ToString());
+
+                    s = new StringBuilder(Messages.Person)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append('+')
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.AnswererIndex)
+                        .Append(Message.ArgsSeparatorChar).Append(_data.CurPriceRight);
+
+                    _actor.SendMessage(s.ToString());
+
+                    _data.Answerer.Sum += _data.CurPriceRight;
+                    _data.ChooserIndex = _data.AnswererIndex;
+                    _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                    _actor.InformSums();
+
+                    _data.isQuestionPlaying = false;
+                    _data.AnnounceAnswer = false;
+
+                    _data.IsThinking = false;
+                    _actor.SendMessageWithArgs(Messages.Timer, 1, "STOP");
+
+                    Execute(Tasks.MoveNext, 1, force: true);
+                }
+                else
+                {
+                    _actor.ShowmanReplic(s.ToString());
+
+                    if (isAnswerCanonical)
+                    {
+                        _data.AnnounceAnswer = false;
+                    }
+
+                    _data.PlayerIsRight = true;
+                    Execute(Tasks.AnnounceStake, 15);
+                }
+            }
+            else
+            {
+                var s = new StringBuilder();
+                if (_data.Answerer.Answer != _actor.LO[nameof(R.IDontKnow)])
+                {
+                    s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.Wrong)]));
+                }
+
+                if (_data.Settings.AppSettings.IgnoreWrong)
+                {
+                    _data.CurPriceWrong = 0;
+                }
+
+                if (!IsFinalRound())
+                {
+                    s.AppendFormat(" (-{0})", Notion.FormatNumber(_data.CurPriceWrong));
+                    _actor.ShowmanReplic(s.ToString());
+
+                    s = new StringBuilder(Messages.Person)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append('-')
+                        .Append(Message.ArgsSeparatorChar);
+
+                    s.Append(_data.AnswererIndex);
+                    s.Append(Message.ArgsSeparatorChar).Append(_data.CurPriceWrong);
+
+                    _actor.SendMessage(s.ToString());
+
+                    _data.Answerer.Sum -= _data.CurPriceWrong;
+                    _data.Answerer.CanPress = false;
+                    _actor.InformSums();
+
+                    if (_data.Answerer.IsHuman)
+                    {
+                        _data.GameResultInfo.WrongVersions.Add(new AnswerInfo
+                        {
+                            Round = Engine.RoundIndex,
+                            Theme = _data.ThemeIndex,
+                            Question = _data.QuestionIndex,
+                            Answer = _data.Answerer.Answer
+                        });
+                    }
+
+                    ContinueQuestion();
+                }
+                else
+                {
+                    _actor.ShowmanReplic(s.ToString());
+                    _data.PlayerIsRight = false;
+
+                    Execute(Tasks.AnnounceStake, 15);
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Продолжить отыгрыш вопроса
+        /// </summary>
+        public void ContinueQuestion()
+        {
+            if (IsSpecialQuestion())
+            {
+                Execute(Tasks.WaitTry, 20);
+                return;
+            }
+
+            var canAnybodyPress = _data.Players.Any(player => player.CanPress);
+
+            if (!canAnybodyPress)
+            {
+                Execute(Tasks.WaitTry, 20, force: true);
+                return;
+            }
+
+            if (!ClientData.Settings.AppSettings.FalseStart)
+            {
+                _actor.SendMessageWithArgs(Messages.Try, "NF");
+            }
+
+            if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
+            {
+                Execute(Tasks.AskToTry, 10, force: true);
+                return;
+            }
+
+            // Возобновить чтение вопроса
+            if (_data.IsPartial && _data.AtomType == AtomTypes.Text)
+            {
+                Execute(Tasks.PrintPartial, 5, force: true);
+            }
+            else
+            {
+                _actor.SendMessage(Messages.Resume);
+                Execute(Tasks.MoveNext, _data.AtomTime, force: true);
+            }
+
+            for (var i = 0; i < _data.Players.Count; i++)
+            {
+                if (_data.Players[i].CanPress)
+                {
+                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
+                }
+            }
+
+            _data.Decision = DecisionType.Pressing;
+        }
+
+        private bool IsSpecialQuestion()
+        {
+            var questTypeName = _data.Question.Type.Name;
+            return questTypeName == QuestionTypes.Cat
+                || questTypeName == QuestionTypes.BagCat
+                || questTypeName == QuestionTypes.Auction
+                || questTypeName == QuestionTypes.Sponsored;
+        }
+
         private bool OnDecisionNextPersonStakeMaking()
         {
             var playerIndex = _data.Order[_data.OrderIndex];
@@ -1094,7 +1124,7 @@ namespace SICore
             return false;
         }
 
-        private bool IsFinalRound() => _data.Round.Type == RoundTypes.Final;
+        public bool IsFinalRound() => _data.Round.Type == RoundTypes.Final;
 
         public void StopWaiting()
         {
@@ -1503,7 +1533,7 @@ namespace SICore
 
                             _data.AcceptedReports = 0;
 
-                            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc);
+                            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, _actor.LO);
 
                             foreach (var item in _data.Players)
                             {
@@ -1638,7 +1668,7 @@ namespace SICore
                 throw new ArgumentNullException(nameof(_data.Round));
             }
 
-            if (_data.Round.Type != RoundTypes.Final)
+            if (!IsFinalRound())
             {
                 if (_data.Answerer == null)
                 {
@@ -1661,10 +1691,6 @@ namespace SICore
                         _data.Players[i].AnswerIsWrong = true;
 
                         _actor.SendMessage(Messages.Cancel, _data.Players[i].Name);
-                        if (_data.IsOralNow)
-                        {
-                            _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
-                        }
                     }
                 }
 
@@ -2283,7 +2309,7 @@ namespace SICore
 
 			if (currentDeleter.PlayerIndex == -1)
 			{
-				currentDeleter.SetIndex(currentDeleter.PossibleIndicies[0]);
+				currentDeleter.SetIndex(currentDeleter.PossibleIndicies.First());
 			}
 
             var playerIndex = currentDeleter.PlayerIndex;
@@ -2733,7 +2759,7 @@ namespace SICore
                         throw new Exception("indicies.Count == 0");
                     }
 
-					currentDeleter.SetIndex(indicies[0]);
+					currentDeleter.SetIndex(indicies.First());
 				}
 
                 playerIndex = currentDeleter.PlayerIndex;
@@ -2777,7 +2803,7 @@ namespace SICore
 			WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
 		}
 
-		private void RequestForCurrentDeleter(List<int> indicies)
+		private void RequestForCurrentDeleter(ICollection<int> indicies)
 		{
 			var msg = new StringBuilder(Messages.FirstDelete);
 			for (var i = 0; i < _data.Players.Count; i++)
