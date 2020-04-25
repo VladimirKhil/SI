@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SICore
 {
@@ -21,14 +17,8 @@ namespace SICore
             return Name == other.Name && ID == other.ID;
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode() * (ID == null ? -1 : ID.GetHashCode());
-        }
+        public override int GetHashCode() => base.GetHashCode() * (ID == null ? -1 : ID.GetHashCode());
 
-        public override string ToString()
-        {
-            return $"{Name}_{BitConverter.ToString(Hash)}_{ID}";
-        }
+        public override string ToString() => $"{Name}_{BitConverter.ToString(Hash ?? Array.Empty<byte>())}_{ID}";
     }
 }

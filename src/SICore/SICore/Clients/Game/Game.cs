@@ -80,6 +80,8 @@ namespace SICore
             ClientData.Share = share;
             ClientData.Share.Error += Share_Error;
 
+            Client.CurrentServer.SerializationError += CurrentServer_SerializationError;
+
 			LO = new Localizer(settings.AppSettings.Culture);
 
             var isHost = createHost && ClientData.HostName == settings.Showman.Name;
@@ -97,7 +99,9 @@ namespace SICore
                     showmanClient.ConnectTo(_client.Server);
 
                     if (isHost)
+                    {
                         result = showman;
+                    }
                 }
 
                 for (int i = 0; i < settings.Players.Length; i++)
@@ -114,7 +118,9 @@ namespace SICore
                         playerClient.ConnectTo(_client.Server);
 
                         if (isHost)
+                        {
                             result = player;
+                        }
                     }
                 }
 
@@ -141,7 +147,7 @@ namespace SICore
             _logic.Run(document);
             foreach (var item in _client.Server.AllClients)
             {
-                if (item == Constants.GameName)
+                if (item == NetworkConstants.GameName)
                     continue;
 
                 Inform(item);
@@ -151,16 +157,36 @@ namespace SICore
             return result;
         }
 
-        private void Share_Error(Exception obj)
+        private void CurrentServer_SerializationError(Message message)
         {
-            _client.Server.OnError(obj, true);
+            // Это случается при выводе частичного текста. Пытаемся поймать
+            try
+            {
+                var fullText = ClientData.Text ?? "";
+                var errorMessage = new StringBuilder(Convert.ToBase64String(Encoding.UTF8.GetBytes(fullText)))
+                    .Append('\n')
+                    .Append(ClientData.TextLength)
+                    .Append('\n')
+                    .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Text)))
+                    .Append('\n')
+                    .Append((message.Text ?? "").Length)
+                    .Append(' ').Append(ClientData.Settings.AppSettings.ReadingSpeed);
+
+                _client.Server.OnError(new Exception(errorMessage.ToString()), true);
+            }
+            catch (Exception exc)
+            {
+                _client.Server.OnError(exc, true);
+            }
         }
+
+        private void Share_Error(Exception exc) => _client.Server.OnError(exc, true);
 
         /// <summary>
         /// Отправка данных об игре
         /// </summary>
         /// <param name="person">Тот, кого надо проинформировать</param>
-        private void Inform(string person = Constants.Everybody, bool update = false, bool extended = false)
+        private void Inform(string person = NetworkConstants.Everybody, bool update = false, bool extended = false)
         {
             var appender = extended ? (Action<Account, StringBuilder>)AppendAccountExt : AppendAccount;
 
@@ -188,7 +214,7 @@ namespace SICore
                 return;
 
             // Сообщим об адресах картинок
-            if (person != Constants.Everybody)
+            if (person != NetworkConstants.Everybody)
             {
                 InformPicture(ClientData.ShowMan, person);
                 foreach (var item in ClientData.Players)
@@ -240,7 +266,7 @@ namespace SICore
         /// Выдача информации о счёте
         /// </summary>
         /// <param name="person">Кому выдаётся</param>
-        public void InformSums(string person = Constants.Everybody)
+        public void InformSums(string person = NetworkConstants.Everybody)
         {
             var message = new StringBuilder(Messages.Sums);
             for (int i = 0; i < ClientData.Players.Count; i++)
@@ -286,12 +312,12 @@ namespace SICore
         /// <summary>
         /// Выдача информации о состоянии игры
         /// </summary>
-        public void InformStage(string person = Constants.Everybody, string name = null)
+        public void InformStage(string person = NetworkConstants.Everybody, string name = null)
         {
             SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, ClientData.Stage.ToString(), name ?? ""), person);
         }
 
-        internal void InformRoundThemes(string person = Constants.Everybody, bool play = true)
+        internal void InformRoundThemes(string person = NetworkConstants.Everybody, bool play = true)
         {
             var msg = new StringBuilder(Messages.RoundThemes).Append(Message.ArgsSeparatorChar).Append(play ? '+' : '-').Append(Message.ArgsSeparatorChar).Append(string.Join(Message.ArgsSeparator, ClientData.TInfo.RoundInfo.Select(info => info.Name)));
             SendMessage(msg.ToString(), person);
@@ -300,7 +326,7 @@ namespace SICore
         /// <summary>
         /// Информация о табло
         /// </summary>
-        public void InformTablo(string receiver = Constants.Everybody)
+        public void InformTablo(string receiver = NetworkConstants.Everybody)
         {
             //var message = new StringBuilder(Messages.Tablo); // Для обратной совместимости
             var message2 = new StringBuilder(Messages.Table);
@@ -1610,6 +1636,7 @@ namespace SICore
             try
             {
                 ClientData.Players.Add(new GamePlayerAccount(newAccount));
+                Logic.AddHistory($"Player added (total: {ClientData.Players.Count})");
             }
             finally
             {
@@ -1657,8 +1684,8 @@ namespace SICore
 
                 try
                 {
-                    Logic.AddHistory($"Player removed at {index}");
                     ClientData.Players.RemoveAt(index);
+                    Logic.AddHistory($"Player removed at {index}");
 
                     DropPlayerIndex(index);
 
@@ -1751,11 +1778,21 @@ namespace SICore
                 Logic.AddHistory($"AppelaerIndex dropped");
             }
 
+            if (ClientData.StakerIndex > playerIndex)
+            {
+                ClientData.StakerIndex--;
+            }
+            else if (ClientData.StakerIndex == playerIndex)
+            {
+                ClientData.StakerIndex = -1;
+                Logic.AddHistory($"StakerIndex dropped");
+            }
+
             var currentOrder = ClientData.Order;
             if (currentOrder != null)
             {
                 ClientData.OrderHistory.Append("Before ").Append(playerIndex).Append(' ')
-                    .Append(string.Join(",", ClientData.Order)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
+                    .Append(string.Join(",", currentOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
 
                 var newOrder = new int[ClientData.Players.Count];
 
@@ -1785,6 +1822,25 @@ namespace SICore
             {
                 ClientData.ThemeDeleters.RemoveAt(playerIndex);
             }
+
+            var newHistory = new List<AnswerResult>();
+            for (var i = 0; i < ClientData.QuestionHistory.Count; i++)
+            {
+                var answerResult = ClientData.QuestionHistory[i];
+                if (answerResult.PlayerIndex == playerIndex)
+                {
+                    continue;
+                }
+
+                newHistory.Add(new AnswerResult
+                {
+                    IsRight = answerResult.IsRight,
+                    PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
+                });
+            }
+
+            ClientData.QuestionHistory.Clear();
+            ClientData.QuestionHistory.AddRange(newHistory);
 
             if (!ClientData.IsWaiting)
             {
@@ -2314,7 +2370,7 @@ namespace SICore
             {
                 foreach (var item in _client.Server.AllClients)
                 {
-                    if (account.Name != item && item != Constants.GameName)
+                    if (account.Name != item && item != NetworkConstants.GameName)
                     {
                         InformPicture(account, item);
                     }
@@ -2434,7 +2490,7 @@ namespace SICore
             }
         }
 
-        public void SendMessage(string text, string receiver = Constants.Everybody) => _client.SendMessage(text, true, receiver);
+        public void SendMessage(string text, string receiver = NetworkConstants.Everybody) => _client.SendMessage(text, true, receiver);
 
         public void SendMessageWithArgs(params object[] args) => SendMessage(string.Join(Message.ArgsSeparator, args));
 

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace SICore.Network
+﻿namespace SICore
 {
     /// <summary>
     /// Игровые константы (не путать с ресурсами, переводить нельзя)
@@ -11,21 +9,12 @@ namespace SICore.Network
         /// Обозначение имени игрового хоста в Uri
         /// </summary>
         public const string GameHost = "<GAMEHOST>";
-		public const string ServerHost = "<SERVERHOST>";
-
-		/// <summary>
-		/// Свободный (пустой аккаунт)
-		/// </summary>
-		public const string FreePlace = " ";
+        public const string ServerHost = "<SERVERHOST>";
 
         /// <summary>
-        /// Имя игры как отдельного клиента
+        /// Свободный (пустой аккаунт)
         /// </summary>
-        public const string GameName = "@";
-        /// <summary>
-        /// Мильтикаст-адрес
-        /// </summary>
-        public const string Everybody = "*";
+        public const string FreePlace = " ";
 
         /// <summary>
         /// Частичный текст вопроса
@@ -35,8 +24,6 @@ namespace SICore.Network
         /// <summary>
         /// Максимальное количество игроков в игре
         /// </summary>
-        public const int MaxPlayers = 9;
-
-        public static readonly Regex AddressRegex = new Regex(@"^(?<host>(\d{1,3}\.){3}\d{1,3})\:(?<port>\d+)$");
+        public const int MaxPlayers = 12;
     }
 }

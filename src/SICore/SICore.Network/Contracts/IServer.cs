@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SICore.Connections;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -24,5 +25,7 @@ namespace SICore.Network.Contracts
 
         void OnError(Exception exc, bool isWarning);
         void ReplaceInfo(string name, IAccountInfo computerAccount);
+
+        event Action<Message> SerializationError;
     }
 }

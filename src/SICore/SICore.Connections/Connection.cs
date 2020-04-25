@@ -72,7 +72,9 @@ namespace SICore.Connections
             try
             {
                 if (IsClosed)
+                {
                     return;
+                }
 
                 var data = message.Serialize();
 
@@ -99,6 +101,10 @@ namespace SICore.Connections
             {
                 // Соединение было закрыто
                 CloseCore(true, true);
+            }
+            catch (ArgumentException e) when (e.Message.Contains("surrogate"))
+            {
+                OnSerializationError(message);
             }
             catch (Exception e)
             {

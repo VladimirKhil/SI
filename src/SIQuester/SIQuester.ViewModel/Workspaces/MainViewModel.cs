@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using SIQuester.ViewModel.Core;
 using SIQuester.ViewModel.PlatformSpecific;
 using System.Threading.Tasks;
+using SIPackages.Core;
 
 namespace SIQuester.ViewModel
 {
@@ -441,16 +442,11 @@ namespace SIQuester.ViewModel
             {
                 using (var stream = File.OpenRead(file))
                 {
-                    var doc = await SIDocument.LoadXml(stream, link =>
-                    {
-                        var resFileName = Path.Combine(Path.GetDirectoryName(file), link);
-                        if (!File.Exists(resFileName))
-                            return null;
-
-                        return File.OpenRead(resFileName);
-                    });
+                    var doc = await SIDocument.LoadXml(stream);
 
                     var docViewModel = new QDocument(doc, _storageContextViewModel) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
+
+                    LoadMediaFromFolder(docViewModel, Path.GetDirectoryName(file));
 
                     DocList.Add(docViewModel);
                 }
@@ -458,6 +454,50 @@ namespace SIQuester.ViewModel
             catch (Exception exc)
             {
                 ShowError(exc);
+            }
+        }
+
+        private void LoadMediaFromFolder(QDocument document, string folder)
+        {
+            // Загрузим файлы контента при наличии ссылок на них
+            foreach (var round in document.Package.Rounds)
+            {
+                foreach (var theme in round.Themes)
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        foreach (var atom in question.Scenario)
+                        {
+                            if (atom.Model.IsLink)
+                            {
+                                var link = document.Document.GetLink(atom.Model);
+
+                                var collection = document.Images;
+                                switch (atom.Model.Type)
+                                {
+                                    case AtomTypes.Audio:
+                                        collection = document.Audio;
+                                        break;
+
+                                    case AtomTypes.Video:
+                                        collection = document.Video;
+                                        break;
+                                }
+
+                                if (collection.Files.Any(f => f.Model.Name == link.Uri))
+                                    continue;
+
+                                var resFileName = Path.Combine(folder, link.Uri);
+                                if (!File.Exists(resFileName))
+                                {
+                                    continue;
+                                }
+
+                                collection.AddFile(resFileName);
+                            }
+                        }
+                    }
+                }
             }
         }
 

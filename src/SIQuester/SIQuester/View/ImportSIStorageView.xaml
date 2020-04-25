@@ -51,7 +51,7 @@
                   BorderThickness="0" Width="200">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name, Converter={StaticResource NameConverter}}" />
+                    <TextBlock Text="{Binding Converter={StaticResource NameConverter}}" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

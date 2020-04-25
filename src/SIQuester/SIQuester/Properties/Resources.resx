@@ -157,6 +157,12 @@
   <data name="No" xml:space="preserve">
     <value>Нет</value>
   </data>
+  <data name="PublishersAll" xml:space="preserve">
+    <value>(все)</value>
+  </data>
+  <data name="PublishersNotSet" xml:space="preserve">
+    <value>(не задано)</value>
+  </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
   </data>

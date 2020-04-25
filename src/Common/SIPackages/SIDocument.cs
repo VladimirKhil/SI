@@ -179,7 +179,7 @@ namespace SIPackages
             return document;
         }
 
-        public static async Task<SIDocument> LoadXml(Stream stream, Func<string, Stream> mediaExtractor = null)
+        public static async Task<SIDocument> LoadXml(Stream stream)
         {
             var document = new SIDocument();
 
@@ -195,51 +195,6 @@ namespace SIPackages
                         document._package = new Package();
                         document._package.ReadXml(reader);
                         break;
-                    }
-                }
-            }
-
-            if (mediaExtractor != null)
-            {
-                // Загрузим файлы контента при наличии ссылок на них
-                foreach (var round in document.Package.Rounds)
-                {
-                    foreach (var theme in round.Themes)
-                    {
-                        foreach (var question in theme.Questions)
-                        {
-                            foreach (var atom in question.Scenario)
-                            {
-                                if (atom.IsLink)
-                                {
-                                    var link = atom.Text.ExtractLink(false);
-
-                                    var collection = document.Images;
-                                    switch (atom.Type)
-                                    {
-                                        case AtomTypes.Audio:
-                                            collection = document.Audio;
-                                            break;
-
-                                        case AtomTypes.Video:
-                                            collection = document.Video;
-                                            break;
-                                    }
-
-                                    if (collection.Contains(link))
-                                        continue;
-
-                                    var mediaStream = mediaExtractor(link);
-                                    if (mediaStream == null)
-                                        continue;
-
-                                    using (mediaStream)
-                                    {
-                                        await collection.AddFile(link, mediaStream);
-                                    }
-                                }
-                            }
-                        }
                     }
                 }
             }

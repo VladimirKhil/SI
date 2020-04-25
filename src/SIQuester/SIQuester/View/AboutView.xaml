@@ -27,6 +27,8 @@
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Иконки: <Hyperlink Command="{Binding OpenIcons2}">http://modernuiicons.com</Hyperlink></TextBlock>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Официальный сайт: <Hyperlink Command="{Binding OpenSite}">http://vladimirkhil.com/si/siquester</Hyperlink></TextBlock>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Для добавления пакетов в основной набор для игры SIGame используйте пункт меню "Отправить в компьютерную игру".</TextBlock>
+            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap"><Bold>Лицензии:</Bold></TextBlock>
+            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap" Text="{Binding Licenses}" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

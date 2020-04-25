@@ -1,11 +1,12 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
+﻿#if !DEBUG
+using Microsoft.WindowsAPICodePack.Dialogs;
+#endif
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -52,7 +53,7 @@ namespace SIQuester
         /// <summary>
         /// Необходимый заголовок для WebRequest'ов и WebClient'ов
         /// </summary>
-        public static string UserAgentHeader => $"{ProductName} {Assembly.GetExecutingAssembly().GetName().Version.ToString()} ({Environment.OSVersion.VersionString})";
+        public static string UserAgentHeader => $"{ProductName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";
         
         private bool _hasError = false;
 
@@ -69,17 +70,6 @@ namespace SIQuester
 
                 if (e.Args.Length > 0)
                 {
-                    if (e.Args[0] == "process")
-                    {
-                        // Обработка в режиме консольного приложения
-                        var folder = e.Args[1];
-                        var publisher = e.Args.Length > 2 ? e.Args[2] : null;
-
-                        var code = ProcessBatch(folder, publisher);
-                        Environment.Exit(code);
-                        return;
-                    }
-
                     if (e.Args[0] == "backup")
                     {
                         // Бэкап хранилища вопросов
@@ -140,50 +130,6 @@ namespace SIQuester
             finally
             {
                 Environment.Exit(code);
-            }
-        }
-
-        private int ProcessBatch(string folder, string publisher)
-        {
-            try
-            {
-                var directoryInfo = new DirectoryInfo(folder);
-                if (!directoryInfo.Exists)
-                {
-                    Console.Write($"Directory {folder} does not exists.");
-                    return -1;
-                }
-
-                using (var model = new MainViewModel(Array.Empty<string>()))
-                {
-                    foreach (var file in directoryInfo.EnumerateFiles("*.siq"))
-                    {
-                        model.Open.Execute(file.FullName);
-
-                        var doc = (QDocument)model.DocList.Last();
-                        doc.ConvertToCompTvSISimple.Execute(null);
-
-                        if (publisher != null)
-                            doc.Document.Package.Publisher = publisher;
-
-                        var validationResult = doc.Validate();
-
-                        if (!string.IsNullOrEmpty(validationResult))
-                        {
-                            Console.Write($"{file.FullName} validation:\r\n${validationResult}");
-                        }
-
-                        doc.Save.Execute(null);
-                        doc.Close.Execute(null);
-                    }
-                }
-
-                return 0;
-            }
-            catch (Exception exc)
-            {
-                Console.Write(exc.ToString());
-                return 1;
             }
         }
 
@@ -261,7 +207,10 @@ namespace SIQuester
         {
             try
             {
-                SaveSettings(AppSettings.Default);
+                if (AppSettings.Default != null)
+                {
+                    SaveSettings(AppSettings.Default);
+                }
                 _manager.Dispose();
             }
             catch (Exception exc)

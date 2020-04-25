@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Svoyak-soft")]
 [assembly: AssemblyProduct("SIQuester")]
-[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2005 - 2019")]
+[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2005 - 2020")]
 [assembly: AssemblyTrademark("Svoyak-soft")]
 [assembly: AssemblyCulture("")]
 
@@ -51,6 +51,6 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("5.6.0.0")]
-[assembly: AssemblyFileVersion("5.6.0.0")]
+[assembly: AssemblyVersion("5.6.1.0")]
+[assembly: AssemblyFileVersion("5.6.1.0")]
 [assembly: NeutralResourcesLanguageAttribute("")]

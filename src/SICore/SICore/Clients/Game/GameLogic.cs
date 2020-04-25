@@ -1048,7 +1048,7 @@ namespace SICore
 
             if (playerIndex >= _data.Players.Count)
             {
-                throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0;{_data.Players.Count}]");
+                throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0;{_data.Players.Count - 1}]");
             }
 
             StopWaiting();
@@ -1335,24 +1335,7 @@ namespace SICore
                             break;
 
                         case Tasks.PrintAuctPlayer:
-                            #region PrintAuctPlayer
-
-                            _data.ChooserIndex = _data.StakerIndex;
-                            _data.AnswererIndex = _data.StakerIndex;
-                            _data.CurPriceRight = _data.Stake;
-                            _data.CurPriceWrong = _data.Stake;
-
-                            if (_data.AnswererIndex == -1)
-                                _data.BackLink.SendError(new Exception("2: this.data.AnswererIndex == -1"), true);
-
-							_actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-
-							msg.AppendFormat("{0} {1} {2} {3}", Notion.RandomString(_actor.LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, _actor.LO[nameof(R.With)], Notions.Notion.FormatNumber(_data.Stake));
-                            _actor.ShowmanReplic(msg.ToString());
-
-                            Execute(Tasks.PrintQue, 15 + Data.Rand.Next(10));
-
-                            #endregion
+                            PrintAuctPlayer();
                             break;
 
                         case Tasks.PrintCat:
@@ -1556,6 +1539,27 @@ namespace SICore
                     _actor.SystemReplic("Game ERROR");
                 }
             }
+        }
+
+        private void PrintAuctPlayer()
+        {
+            _data.ChooserIndex = _data.StakerIndex;
+            _data.AnswererIndex = _data.StakerIndex;
+            _data.CurPriceRight = _data.Stake;
+            _data.CurPriceWrong = _data.Stake;
+
+            if (_data.AnswererIndex == -1)
+            {
+                _data.BackLink.SendError(new Exception($"{nameof(PrintAuctPlayer)}: {nameof(_data.AnswererIndex)} == -1"), true);
+            }
+
+            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+
+            var msg = new StringBuilder()
+                .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(_actor.LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, _actor.LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
+            _actor.ShowmanReplic(msg.ToString());
+
+            Execute(Tasks.PrintQue, 15 + Data.Rand.Next(10));
         }
 
         private void WaitNext(Tasks task)

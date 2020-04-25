@@ -52,7 +52,7 @@ namespace SICore.Network.Servers
                 connection.SendMessage(
 					new Message(
 						$"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{(date == DateTime.MaxValue ? "" : ($" {_localizer[nameof(R.Until)]} " + date.ToString(_localizer.Culture)))}\r\n",
-						Constants.GameName
+						NetworkConstants.GameName
 					)
 				);
 

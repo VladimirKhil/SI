@@ -116,10 +116,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="MahApps.Metro" Version="1.5.0" />
-    <PackageReference Include="MahApps.Metro.Resources" Version="0.6.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -219,6 +218,15 @@
       <DependentUpon>StatisticsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\TextImportManager.cs" />
+    <None Include="licenses\MahApps.Metro.LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\MahApps.Metro.LICENSE+">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\Newtonsoft.Json.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\DataSources\System.Uri.datasource" />
     <Compile Include="View\Dialogs\ExportView.xaml.cs">
       <DependentUpon>ExportView.xaml</DependentUpon>

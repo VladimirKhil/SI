@@ -34,6 +34,8 @@ namespace SICore.Network.Servers
 
         public event Action<Exception, bool> Error;
 
+        public event Action<Message> SerializationError;
+
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
         protected abstract IEnumerable<IConnection> Connections { get; }
@@ -43,6 +45,7 @@ namespace SICore.Network.Servers
             connection.MessageReceived += Connection_MessageReceived;
             connection.ConnectionClose += Connection_ConnectionClosed;
             connection.Error += OnError;
+            connection.SerializationError += Connection_SerializationError;
 
             return true;
         }
@@ -60,7 +63,8 @@ namespace SICore.Network.Servers
 			connection.MessageReceived -= Connection_MessageReceived;
 			connection.ConnectionClose -= Connection_ConnectionClosed;
 			connection.Error -= OnError;
-		}
+            connection.SerializationError -= Connection_SerializationError;
+        }
 
 		protected readonly INetworkLocalizer _localizer;
 
@@ -95,7 +99,7 @@ namespace SICore.Network.Servers
 
 				if (clientName != null)
 				{
-                    var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, (withError ? "+" : "-")), "", Constants.GameName);
+                    var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, (withError ? "+" : "-")), "", NetworkConstants.GameName);
                     ProcessOutgoingMessage(m);
 				}
             }
@@ -128,7 +132,7 @@ namespace SICore.Network.Servers
                 
                 string sender = m.Sender, receiver = m.Receiver;
                 if (string.IsNullOrEmpty(receiver))
-                    receiver = IsMain ? Constants.GameName : Constants.Everybody;
+                    receiver = IsMain ? NetworkConstants.GameName : NetworkConstants.Everybody;
 
                 var emptySender = string.IsNullOrEmpty(sender);
 
@@ -146,7 +150,7 @@ namespace SICore.Network.Servers
                 {
                     lock (connection.ClientsSync)
                     {
-                        if (sender != Constants.GameName && !connection.Clients.Contains(sender))
+                        if (sender != NetworkConstants.GameName && !connection.Clients.Contains(sender))
                         {
                             return; // Защита от подлога
                         }
@@ -172,7 +176,7 @@ namespace SICore.Network.Servers
             {
                 foreach (var client in _clients)
                 {
-                    if (message.Receiver == client.Name || message.Receiver == Constants.Everybody || client.Name == "" || !message.IsSystem && !message.IsPrivate)
+                    if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || client.Name == "" || !message.IsSystem && !message.IsPrivate)
                     {
                         client.AddIncomingMessage(message);
                     }
@@ -191,14 +195,14 @@ namespace SICore.Network.Servers
                         if (IsMain)
                         {
                             send = (connection.UserName != message.Sender)
-                                && ((connection.UserName == message.Receiver) || message.Receiver == Constants.Everybody && connection.IsAuthenticated);
+                                && ((connection.UserName == message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
                         }
                         else
                         {
                             lock (connection.ClientsSync)
                             {
                                 send = !connection.Clients.Contains(message.Sender)
-                                    && (connection.Clients.Contains(message.Receiver) || message.Receiver == Constants.Everybody && connection.IsAuthenticated);
+                                    && (connection.Clients.Contains(message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
                             }
                         }
 
@@ -217,7 +221,7 @@ namespace SICore.Network.Servers
             {
                 foreach (var client in _clients)
                 {
-                    if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == Constants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
+                    if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
                         client.AddIncomingMessage(message);
                 }
             }
@@ -231,14 +235,14 @@ namespace SICore.Network.Servers
                     if (IsMain)
                     {
                         send = (connection.UserName != message.Sender)
-                            && (message.Receiver == Constants.Everybody && connection.IsAuthenticated || (connection.UserName == message.Receiver));
+                            && (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated || (connection.UserName == message.Receiver));
                     }
                     else
                     {
                         lock (connection.ClientsSync)
                         {
                             send = !connection.Clients.Contains(message.Sender) &&
-                                (message.Receiver == Constants.Everybody && connection.IsAuthenticated || connection.Clients.Contains(message.Receiver));
+                                (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated || connection.Clients.Contains(message.Receiver));
                         }
                     }
 
@@ -266,17 +270,23 @@ namespace SICore.Network.Servers
         {
 			lock (_clientsSync)
 			{
-				if (_clients.Contains(client))
-					return;
+                if (_clients.Contains(client))
+                {
+                    return;
+                }
 
-				if (_clients.Any(c => c.Name == client.Name))
-					throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
+                if (_clients.Any(c => c.Name == client.Name))
+                {
+                    throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
+                }
 
 				_clients.Add(client);
 			}
 
 			client.SendingMessage += Client_SendingMessage;
-		}
+        }
+
+        private void Connection_SerializationError(Message message) => SerializationError?.Invoke(message);
 
         public void DeleteClient(string name)
         {
@@ -345,7 +355,7 @@ namespace SICore.Network.Servers
 
                 if (connection != null)
                 {
-                    connection.SendMessage(new Message(m.Text, m.Sender, Constants.Everybody, m.IsSystem, m.IsPrivate));
+                    connection.SendMessage(new Message(m.Text, m.Sender, NetworkConstants.Everybody, m.IsSystem, m.IsPrivate));
                 }
             }
             else

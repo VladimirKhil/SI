@@ -17,6 +17,7 @@ namespace SICore.Connections
         event Action<IConnection, Message> MessageReceived;
         event Action<IConnection, bool> ConnectionClose;
         event Action<Exception, bool> Error;
+        event Action<Message> SerializationError;
 
         void SendMessage(Message m);
         void Close();

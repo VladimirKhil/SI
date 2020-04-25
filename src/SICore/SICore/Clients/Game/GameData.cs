@@ -223,10 +223,24 @@ namespace SICore
 
         public StringBuilder OrderHistory { get; set; }
 
-		/// <summary>
-		/// Делающий ставку
-		/// </summary>
-		internal int StakerIndex = -1;
+		private int _stakerIndex = -1;
+
+        /// <summary>
+        /// Делающий ставку
+        /// </summary>
+        public int StakerIndex
+        {
+            get { return _stakerIndex; }
+            set
+            {
+                if (value < -1 && value >= Players.Count)
+                {
+                    throw new ArgumentException($"{nameof(value)} {value} must be greater or equal to -1 and less than {Players.Count}!");
+                }
+
+                _stakerIndex = value;
+            }
+        }
 
         /// <summary>
         /// Текущая ставка
@@ -288,7 +302,7 @@ namespace SICore
         /// <summary>
         /// История ответов на вопрос (применяется при апелляции)
         /// </summary>
-        internal List<AnswerResult> QuestionHistory = new List<AnswerResult>();
+        internal List<AnswerResult> QuestionHistory { get; private set; } = new List<AnswerResult>();
 
 		/// <summary>
 		/// Количество полученных ответов на апелляцию

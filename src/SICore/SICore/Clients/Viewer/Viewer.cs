@@ -1518,7 +1518,7 @@ namespace SICore
             {
                 foreach (var item in ClientData.AllPersons)
                 {
-                    if (item != ClientData.Me && item.Name != Constants.GameName && item.Connected)
+                    if (item != ClientData.Me && item.Name != NetworkConstants.GameName && item.Connected)
                     {
                         lock (_client.Server.ConnectionsSync)
                         {
@@ -1717,13 +1717,13 @@ namespace SICore
         /// <param name="text">Текст сообщения</param>
         /// <param name="whom">Кому</param>
         /// <param name="isPrivate">Приватно ли</param>
-        internal void Say(string text, string whom = Constants.Everybody, bool isPrivate = false)
+        internal void Say(string text, string whom = NetworkConstants.Everybody, bool isPrivate = false)
         {
-            if (whom != Constants.Everybody)
+            if (whom != NetworkConstants.Everybody)
                 text = string.Format("{0}, {1}", whom, text);
 
             if (!isPrivate)
-                whom = Constants.Everybody;
+                whom = NetworkConstants.Everybody;
             else
                 text = string.Format("({0}) {1}", LO[nameof(R.Private)], text);
 
@@ -1737,17 +1737,17 @@ namespace SICore
         /// <param name="text">Текст сообщения</param>
         public void SendMessage(string text)
         {
-            _client.SendMessage(text, receiver: Constants.GameName);
+            _client.SendMessage(text, receiver: NetworkConstants.GameName);
         }
 
         public void SendMessage(params string[] args)
         {
-            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: Constants.GameName);
+            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
         }
 
         public void SendMessageWithArgs(params object[] args)
         {
-            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: Constants.GameName);
+            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
         }
 
         public void Pause()
@@ -1775,7 +1775,7 @@ namespace SICore
 				if (!uri.IsAbsoluteUri)
                     return;
 
-                if (uri.Scheme == "file" && !_client.Server.Contains(Constants.GameName)) // Нужно передать локальный файл по сети
+                if (uri.Scheme == "file" && !_client.Server.Contains(NetworkConstants.GameName)) // Нужно передать локальный файл по сети
                 {
                     byte[] data = null;
                     try
