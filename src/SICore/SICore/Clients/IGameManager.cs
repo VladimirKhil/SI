@@ -22,7 +22,7 @@ namespace SICore
         bool AreAnswersShown { get; set; }
 
         string PhotoUri { get; }
-		bool ShowBorderOnFalseStart { get; }
+        bool ShowBorderOnFalseStart { get; }
         bool LoadExternalMedia { get; }
 
         string GetPhotoUri(string name);
@@ -35,7 +35,7 @@ namespace SICore
 
         SettingsViewModel GetSettings();
 
-		void OnGameFinished(string packageId);
+        void OnGameFinished(string packageId);
 
         /// <summary>
         /// Получить рекламное сообщение

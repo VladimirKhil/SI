@@ -58,9 +58,9 @@ namespace SICore
         }
 
         internal int _difficulty;
-		/// <summary>
-		/// Можно ли думать над вопросом до истечения времени
-		/// </summary>
+        /// <summary>
+        /// Можно ли думать над вопросом до истечения времени
+        /// </summary>
         internal bool _longThink;
         internal bool _canAnswer;
 
@@ -86,16 +86,16 @@ namespace SICore
 
         internal int DeltaBrave = 0;
 
-		/// <summary>
-		/// Текущая скорость реакции
-		/// </summary>
+        /// <summary>
+        /// Текущая скорость реакции
+        /// </summary>
         internal int _realSpeed = 0;
 
         internal int _bestBrave = 0;
 
-		/// <summary>
-		/// Продолжается ли чтение вопроса
-		/// </summary>
+        /// <summary>
+        /// Продолжается ли чтение вопроса
+        /// </summary>
         internal bool IsQuestionInProgress { get; set; }
 
         /// <summary>
@@ -113,9 +113,9 @@ namespace SICore
 
         private bool myTry;
 
-		/// <summary>
-		/// Можно жать на кнопку
-		/// </summary>
+        /// <summary>
+        /// Можно жать на кнопку
+        /// </summary>
         public bool MyTry
         {
             get { return myTry; }

@@ -52,64 +52,64 @@ namespace SICore.Network.Servers
 
         public virtual void RemoveConnection(IConnection connection, bool withError)
         {
-			ClearListeners(connection);
+            ClearListeners(connection);
             connection.Dispose();
 
-			ConnectionClosed?.Invoke(withError);
-		}
+            ConnectionClosed?.Invoke(withError);
+        }
 
-		protected void ClearListeners(IConnection connection)
-		{
-			connection.MessageReceived -= Connection_MessageReceived;
-			connection.ConnectionClose -= Connection_ConnectionClosed;
-			connection.Error -= OnError;
+        protected void ClearListeners(IConnection connection)
+        {
+            connection.MessageReceived -= Connection_MessageReceived;
+            connection.ConnectionClose -= Connection_ConnectionClosed;
+            connection.Error -= OnError;
             connection.SerializationError -= Connection_SerializationError;
         }
 
-		protected readonly INetworkLocalizer _localizer;
+        protected readonly INetworkLocalizer _localizer;
 
         public Server(INetworkLocalizer localizer)
         {
-			_localizer = localizer;
+            _localizer = localizer;
         }
 
         public event Action<bool> ConnectionClosed;
 
         protected void Connection_ConnectionClosed(IConnection connection, bool withError)
         {
-			try
-			{
-				RemoveConnection(connection, withError);
-			}
-			catch (Exception exc)
-			{
-				OnError(exc, false);
-			}
-
-			if (IsMain)
+            try
             {
-				string clientName = null;
-				lock (connection.ClientsSync)
-				{
-					if (connection.Clients.Count > 0)
-					{
-						clientName = connection.Clients[0];
-					}
-				}
+                RemoveConnection(connection, withError);
+            }
+            catch (Exception exc)
+            {
+                OnError(exc, false);
+            }
 
-				if (clientName != null)
-				{
+            if (IsMain)
+            {
+                string clientName = null;
+                lock (connection.ClientsSync)
+                {
+                    if (connection.Clients.Count > 0)
+                    {
+                        clientName = connection.Clients[0];
+                    }
+                }
+
+                if (clientName != null)
+                {
                     var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, (withError ? "+" : "-")), "", NetworkConstants.GameName);
                     ProcessOutgoingMessage(m);
-				}
+                }
             }
             else
             {
-				lock (_clientsSync)
+                lock (_clientsSync)
                 {
-					foreach (var client in _clients)
-					{
-						var m = new Message(SystemMessages.Disconnect, "", client.Name);
+                    foreach (var client in _clients)
+                    {
+                        var m = new Message(SystemMessages.Disconnect, "", client.Name);
                         ProcessOutgoingMessage(m);
                     }
                 }
@@ -268,8 +268,8 @@ namespace SICore.Network.Servers
         /// <param name="client">Добавляемый клиент</param>
         public void AddClient(IClient client)
         {
-			lock (_clientsSync)
-			{
+            lock (_clientsSync)
+            {
                 if (_clients.Contains(client))
                 {
                     return;
@@ -280,47 +280,47 @@ namespace SICore.Network.Servers
                     throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
                 }
 
-				_clients.Add(client);
-			}
+                _clients.Add(client);
+            }
 
-			client.SendingMessage += Client_SendingMessage;
+            client.SendingMessage += Client_SendingMessage;
         }
 
         private void Connection_SerializationError(Message message) => SerializationError?.Invoke(message);
 
         public void DeleteClient(string name)
         {
-			lock (_clientsSync)
-			{
-				foreach (var client in _clients)
-				{
-					if (client.Name == name)
-					{
-						_clients.Remove(client);
-						client.SendingMessage -= Client_SendingMessage;
-						client.Dispose();
-						break;
-					}
-				}
-			}
-		}
+            lock (_clientsSync)
+            {
+                foreach (var client in _clients)
+                {
+                    if (client.Name == name)
+                    {
+                        _clients.Remove(client);
+                        client.SendingMessage -= Client_SendingMessage;
+                        client.Dispose();
+                        break;
+                    }
+                }
+            }
+        }
 
-		public Task DeleteClientAsync(string name)
-		{
-			return Task.Run(() =>
-			{
-				try
-				{
-					DeleteClient(name);
-				}
-				catch (Exception exc)
-				{
-					OnError(exc, false);
-				}
-			});
-		}
+        public Task DeleteClientAsync(string name)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    DeleteClient(name);
+                }
+                catch (Exception exc)
+                {
+                    OnError(exc, false);
+                }
+            });
+        }
 
-		public void ReplaceInfo(string name, IAccountInfo computerAccount)
+        public void ReplaceInfo(string name, IAccountInfo computerAccount)
         {
             lock (_clientsSync)
             {
@@ -374,22 +374,22 @@ namespace SICore.Network.Servers
             return AllClients.Contains(name);
         }
 
-		public bool IsOnlineInternal(string name)
-		{
+        public bool IsOnlineInternal(string name)
+        {
             foreach (var item in _clients)
-			{
+            {
                 if (item.Name == name)
                 {
                     return true;
                 }
-			}
+            }
 
-			lock (_connectionsSync)
-			{
-				foreach (var connection in Connections)
-				{
-					lock (connection.ClientsSync)
-					{
+            lock (_connectionsSync)
+            {
+                foreach (var connection in Connections)
+                {
+                    lock (connection.ClientsSync)
+                    {
                         foreach (var str in connection.Clients)
                         {
                             if (str == name)
@@ -397,12 +397,12 @@ namespace SICore.Network.Servers
                                 return true;
                             }
                         }
-					}
-				}
-			}
+                    }
+                }
+            }
 
-			return false;
-		}
+            return false;
+        }
 
         /// <summary>
         /// Находится ли клиент с данным именем онлайн
@@ -418,13 +418,13 @@ namespace SICore.Network.Servers
         {
             get
             {
-				// yield return тут не годится из-за большого числа блокировок
-				var result = new List<string>();
+                // yield return тут не годится из-за большого числа блокировок
+                var result = new List<string>();
                 lock (_clientsSync)
                 {
                     foreach (var item in _clients)
                     {
-						result.Add(item.Name);
+                        result.Add(item.Name);
                     }
                 }
 
@@ -442,7 +442,7 @@ namespace SICore.Network.Servers
                     }
                 }
 
-				return result;
+                return result;
             }
         }
 

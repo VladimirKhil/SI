@@ -232,8 +232,8 @@ namespace SICore
 
                             ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
                             ClientData.DialogMode = DialogModes.AnswerValidation;
-							((PersonAccount)ClientData.Me).IsDeciding = false;
-							break;
+                            ((PersonAccount)ClientData.Me).IsDeciding = false;
+                            break;
 
                             #endregion
                         }

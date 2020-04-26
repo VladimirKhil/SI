@@ -22,66 +22,66 @@ namespace SICore.Network.Servers
         /// <param name="port">Имя порта для подключения</param>
         /// <param name="serverAddress">Адрес сервера</param>
         public TcpSlaveServer(int port, string serverAddress, INetworkLocalizer localizer)
-			: base(localizer)
+            : base(localizer)
         {
             _serverAddress = serverAddress;
             _port = port;
         }
 
         public async override Task Connect(bool upgrade)
-		{
-			var tcp = new TcpClient
-			{
-				SendTimeout = 5000
-			};
+        {
+            var tcp = new TcpClient
+            {
+                SendTimeout = 5000
+            };
 
-			var task = tcp.ConnectAsync(_serverAddress, _port);
+            var task = tcp.ConnectAsync(_serverAddress, _port);
 
-			var result = await Task.WhenAny(task, Task.Delay(15000));
+            var result = await Task.WhenAny(task, Task.Delay(15000));
             if (result != task)
             {
                 throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
             }
 
             if (upgrade)
-			{
+            {
                 _connectionId = await Upgrade(tcp, _connectionId);
-			}
+            }
 
-			var extServer = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
-			AddConnection(extServer);
+            var extServer = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
+            AddConnection(extServer);
 
-			try
-			{
-				extServer.StartRead(false);
-			}
-			catch (Exception exc)
-			{
-				RemoveConnection(extServer, true);
-				throw exc;
-			}
+            try
+            {
+                extServer.StartRead(false);
+            }
+            catch (Exception exc)
+            {
+                RemoveConnection(extServer, true);
+                throw exc;
+            }
         }
 
-		private async Task<string> Upgrade(TcpClient tcp, string connectionId = null)
-		{
+        private async Task<string> Upgrade(TcpClient tcp, string connectionId = null)
+        {
             var connectionIdHeader = connectionId != null ? $"\nConnectionId: {connectionId}" : "";
 
             var upgradeText = $"GET / HTTP/1.1\nHost: {_serverAddress}\nConnection: Upgrade{connectionIdHeader}\nUpgrade: sigame\n\n";
-			var bytes = Encoding.UTF8.GetBytes(upgradeText);
-			await tcp.GetStream().WriteAsync(bytes, 0, bytes.Length);
+            var bytes = Encoding.UTF8.GetBytes(upgradeText);
+            await tcp.GetStream().WriteAsync(bytes, 0, bytes.Length);
 
-			var buffer = new byte[5000];
+            var buffer = new byte[5000];
 
             var upgradeMessage = new StringBuilder();
             do
-			{
-				var bytesRead = await tcp.GetStream().ReadAsync(buffer, 0, buffer.Length);
-				if (bytesRead < 1)
-				{
-					// Нормальное закрытие соединения
-					tcp.Close();
-					throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!");
-				}
+            {
+                var bytesRead = await tcp.GetStream().ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead < 1)
+                {
+                    // Нормальное закрытие соединения
+                    tcp.Close();
+                    throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!");
+                }
 
                 upgradeMessage.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
             } while (!upgradeMessage.ToString().EndsWith("\n\n") && !upgradeMessage.ToString().EndsWith("\r\n\r\n"));
@@ -104,5 +104,5 @@ namespace SICore.Network.Servers
 
             return connectionIdFromServer;
         }
-	}
+    }
 }

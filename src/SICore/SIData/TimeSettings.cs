@@ -11,14 +11,14 @@ namespace SIData
     [DataContract]
     public sealed class TimeSettings
     {
-		[XmlIgnore]
+        [XmlIgnore]
         [IgnoreDataMember]
-		public Dictionary<TimeSettingsTypes, int> All { get; private set; } = new Dictionary<TimeSettingsTypes, int>();
+        public Dictionary<TimeSettingsTypes, int> All { get; private set; } = new Dictionary<TimeSettingsTypes, int>();
 
-		/// <summary>
-		/// Время для выбора игроком вопроса
-		/// </summary>
-		[XmlAttribute]
+        /// <summary>
+        /// Время для выбора игроком вопроса
+        /// </summary>
+        [XmlAttribute]
         [DefaultValue(30)]
         [DataMember]
         public int TimeForChoosingQuestion
@@ -87,7 +87,7 @@ namespace SIData
             set { All[TimeSettingsTypes.ThinkingOnSpecial] = value; }
         }
 
-		public const int DefaultTimeOfRound = 3600;
+        public const int DefaultTimeOfRound = 3600;
 
         /// <summary>
         /// Время раунда
@@ -135,10 +135,10 @@ namespace SIData
         {
             get 
             {
-				if (All.TryGetValue(TimeSettingsTypes.ShowmanDecisions, out int value))
-					return value;
+                if (All.TryGetValue(TimeSettingsTypes.ShowmanDecisions, out int value))
+                    return value;
 
-				return 30;
+                return 30;
             }
             set { All[TimeSettingsTypes.ShowmanDecisions] = value; }
         }

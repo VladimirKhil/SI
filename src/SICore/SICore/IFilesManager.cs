@@ -2,8 +2,8 @@
 
 namespace SICore
 {
-	public interface IFilesManager
-	{
-		StreamInfo GetFile(string file);
-	}
+    public interface IFilesManager
+    {
+        StreamInfo GetFile(string file);
+    }
 }

@@ -73,11 +73,11 @@ namespace SIData
         [DataMember]
         public T AppSettings { get; set; } = new T();
 
-		/// <summary>
-		/// Является ли игра автоматической
-		/// </summary>
-		[DefaultValue(false)]
+        /// <summary>
+        /// Является ли игра автоматической
+        /// </summary>
+        [DefaultValue(false)]
         [DataMember]
         public bool IsAutomatic { get; set; }
-	}
+    }
 }

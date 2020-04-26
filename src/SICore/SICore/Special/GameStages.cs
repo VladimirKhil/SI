@@ -4,12 +4,12 @@ using System.Text;
 
 namespace SICore
 {
-	public enum GameStages
-	{
-		Created,
-		Started,
-		Round,
-		Final,
-		Finished
-	}
+    public enum GameStages
+    {
+        Created,
+        Started,
+        Round,
+        Final,
+        Finished
+    }
 }

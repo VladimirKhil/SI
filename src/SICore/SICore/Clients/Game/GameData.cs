@@ -204,10 +204,10 @@ namespace SICore
         /// </summary>
         internal GameResult GameResultInfo { get; } = new GameResult();
 
-		/// <summary>
-		/// Можно ли пометить вопрос
-		/// </summary>
-		internal bool CanMarkQuestion { get; set; }
+        /// <summary>
+        /// Можно ли пометить вопрос
+        /// </summary>
+        internal bool CanMarkQuestion { get; set; }
 
         internal int HaveViewedAtom { get; set; }
 
@@ -223,7 +223,7 @@ namespace SICore
 
         public StringBuilder OrderHistory { get; set; }
 
-		private int _stakerIndex = -1;
+        private int _stakerIndex = -1;
 
         /// <summary>
         /// Делающий ставку
@@ -304,13 +304,13 @@ namespace SICore
         /// </summary>
         internal List<AnswerResult> QuestionHistory { get; private set; } = new List<AnswerResult>();
 
-		/// <summary>
-		/// Количество полученных ответов на апелляцию
-		/// </summary>
+        /// <summary>
+        /// Количество полученных ответов на апелляцию
+        /// </summary>
         public int ApelAnswersReceivedCount { get; set; }
         /// <summary>
-		/// Количество полученных положительных ответов на апелляцию
-		/// </summary>
+        /// Количество полученных положительных ответов на апелляцию
+        /// </summary>
         public int ApelAnswersRightReceivedCount { get; set; }
 
         internal bool IsAnswer { get; set; }
@@ -413,14 +413,14 @@ namespace SICore
 
         public IShare Share { get; set; }
 
-		/// <summary>
-		/// Дочитан ли вопрос
-		/// </summary>
+        /// <summary>
+        /// Дочитан ли вопрос
+        /// </summary>
         public bool IsQuestionFinished { get; set; }
 
         public int AtomTime { get; set; }
 
-		public string AtomType { get; set; }
+        public string AtomType { get; set; }
 
         public DateTime AtomStart { get; set; }
 
@@ -431,24 +431,24 @@ namespace SICore
         public bool IsOral { get; set; }
 
         public bool IsOralNow { get; set; }
-		public int Penalty { get; internal set; }
-		public DateTime PenaltyStartTime { get; internal set; }
+        public int Penalty { get; internal set; }
+        public DateTime PenaltyStartTime { get; internal set; }
 
-		public bool IsDeferringAnswer { get; internal set; }
+        public bool IsDeferringAnswer { get; internal set; }
 
-		public ThemeDeletersEnumerator ThemeDeleters { get; internal set; }
-		public string Text { get; internal set; }
-		/// <summary>
-		/// Выводится ли текст вопроса по частям
-		/// </summary>
-		public bool IsPartial { get; internal set; }
-		public int TextLength { get; internal set; }
+        public ThemeDeletersEnumerator ThemeDeleters { get; internal set; }
+        public string Text { get; internal set; }
+        /// <summary>
+        /// Выводится ли текст вопроса по частям
+        /// </summary>
+        public bool IsPartial { get; internal set; }
+        public int TextLength { get; internal set; }
 
-		public bool IsThinking { get; internal set; }
-		public double TimeThinking { get; internal set; }
+        public bool IsThinking { get; internal set; }
+        public double TimeThinking { get; internal set; }
         [Obsolete]
-		public DateTime StartTryTime { get; internal set; }
+        public DateTime StartTryTime { get; internal set; }
 
-		public bool MoveNextBlocked { get; set; }
-	}
+        public bool MoveNextBlocked { get; set; }
+    }
 }

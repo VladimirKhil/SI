@@ -68,7 +68,7 @@ namespace SICore
         /// Выяснение ответа игрока
         /// </summary>
         AskAnswer,
-		AskAnswerDeferred,
+        AskAnswerDeferred,
         /// <summary>
         /// Ожидание ответа игрока
         /// </summary>
@@ -85,10 +85,10 @@ namespace SICore
         /// Вывод вопроса
         /// </summary>
         PrintQue,
-		/// <summary>
-		/// Вывод частичного текста вопроса
-		/// </summary>
-		PrintPartial,
+        /// <summary>
+        /// Вывод частичного текста вопроса
+        /// </summary>
+        PrintPartial,
         /// <summary>
         /// Объявление Кота в мешке
         /// </summary>
@@ -197,10 +197,10 @@ namespace SICore
         /// Ожидаем, пока игроки напишут отчёт
         /// </summary>
         WaitReport,
-		/// <summary>
-		/// Автоматическая игра
-		/// </summary>
-		AutoGame
+        /// <summary>
+        /// Автоматическая игра
+        /// </summary>
+        AutoGame
     }
 
     /// <summary>
@@ -347,15 +347,15 @@ namespace SICore
         /// Ответил неверно
         /// </summary>
         Wrong,
-		/// <summary>
-		/// Дал ответ в финале
-		/// </summary>
-		HasAnswered,
+        /// <summary>
+        /// Дал ответ в финале
+        /// </summary>
+        HasAnswered,
         /// <summary>
         /// Спасовал
         /// </summary>
         Pass
-	}
+    }
 
     /// <summary>
     /// Виды ставок
@@ -388,7 +388,7 @@ namespace SICore
         Answer,
         Appellation,
         Move,
-		Wait
+        Wait
     }
 
     /// <summary>
@@ -413,16 +413,16 @@ namespace SICore
         Showman
     }
 
-	[Flags]
-	public enum GamesFilter
-	{
-		NoFilter = 0,
-		New = 1,
-		Sport = 2,
-		Tv = 4,
-		NoPassword = 8,
-		All = 15
-	}
+    [Flags]
+    public enum GamesFilter
+    {
+        NoFilter = 0,
+        New = 1,
+        Sport = 2,
+        Tv = 4,
+        NoPassword = 8,
+        All = 15
+    }
 
     public enum MessageTypes
     {

@@ -2,13 +2,13 @@
 
 namespace SICore.Tests
 {
-	[TestFixture]
-	public sealed class ServerTests
+    [TestFixture]
+    public sealed class ServerTests
     {
-		[Test]
-		public void TestMessaging()
-		{
-			
-		}
+        [Test]
+        public void TestMessaging()
+        {
+            
+        }
     }
 }

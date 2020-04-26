@@ -33,12 +33,12 @@ namespace SICore.Results
         /// Неправильные ответы
         /// </summary>
         public List<AnswerInfo> WrongAnswers { get; set; }
-		/// <summary>
-		/// Помеченные вопросы
-		/// </summary>
-		public List<AnswerInfo> MarkedQuestions { get; } = new List<AnswerInfo>();
+        /// <summary>
+        /// Помеченные вопросы
+        /// </summary>
+        public List<AnswerInfo> MarkedQuestions { get; } = new List<AnswerInfo>();
 
-		public SIGameResult()
+        public SIGameResult()
         {
             PersonResults = new List<PersonResult>();
             RightAnswers = new List<AnswerInfo>();
@@ -56,7 +56,7 @@ namespace SICore.Results
                 Results = PersonResults,
                 ApellatedQuestions = RightAnswers,
                 WrongVersions = WrongAnswers,
-				MarkedQuestions = MarkedQuestions,
+                MarkedQuestions = MarkedQuestions,
                 ErrorLog = ErrorLog,
                 Comments = Comments
             };

@@ -261,8 +261,8 @@ namespace SICore
                     case Messages.Answer:
                         ClientData.PersonDataExtensions.Answer = "";
                         ClientData.DialogMode = DialogModes.Answer;
-						((PlayerAccount)ClientData.Me).IsDeciding = false;
-						_logic.Answer();
+                        ((PlayerAccount)ClientData.Me).IsDeciding = false;
+                        _logic.Answer();
                         break;
 
                     case Messages.Cat:
@@ -320,9 +320,9 @@ namespace SICore
 
                         ClientData.Hint = LO[nameof(R.HintMakeAStake)];
                         ClientData.DialogMode = DialogModes.FinalStake;
-						((PlayerAccount)ClientData.Me).IsDeciding = false;
+                        ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
-						_logic.FinalStake();
+                        _logic.FinalStake();
                         break;
 
                     case Messages.IsRight:
@@ -353,8 +353,8 @@ namespace SICore
 
                             ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
                             ClientData.DialogMode = DialogModes.AnswerValidation;
-							((PlayerAccount)ClientData.Me).IsDeciding = false;
-						}
+                            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+                        }
                         break;
 
                     case Messages.Connected:
@@ -396,8 +396,8 @@ namespace SICore
 
                         ClientData.PlayerDataExtensions.Report.Report = report.ToString();
                         ClientData.DialogMode = DialogModes.Report;
-						((PlayerAccount)ClientData.Me).IsDeciding = false;
-						_logic.Report();
+                        ((PlayerAccount)ClientData.Me).IsDeciding = false;
+                        _logic.Report();
                         break;
                 }
             }

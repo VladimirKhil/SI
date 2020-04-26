@@ -4,9 +4,9 @@ using System.Text;
 
 namespace SICore
 {
-	public class StoredPersons
-	{
-		public StoredComputerAccount[] Players { get; set; }
-		public StoredComputerAccount[] Showmans { get; set; }
-	}
+    public class StoredPersons
+    {
+        public StoredComputerAccount[] Players { get; set; }
+        public StoredComputerAccount[] Showmans { get; set; }
+    }
 }

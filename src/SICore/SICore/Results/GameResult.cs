@@ -27,14 +27,14 @@ namespace SICore.Results
         /// Полученные неверные ответы
         /// </summary>
         public List<AnswerInfo> WrongVersions { get; set; } = new List<AnswerInfo>();
-		/// <summary>
-		/// Помеченные вопросы
-		/// </summary>
-		public List<AnswerInfo> MarkedQuestions { get; set; } = new List<AnswerInfo>();
-		/// <summary>
-		/// Лог ошибок
-		/// </summary>
-		public string ErrorLog { get; set; } = "";
+        /// <summary>
+        /// Помеченные вопросы
+        /// </summary>
+        public List<AnswerInfo> MarkedQuestions { get; set; } = new List<AnswerInfo>();
+        /// <summary>
+        /// Лог ошибок
+        /// </summary>
+        public string ErrorLog { get; set; } = "";
         /// <summary>
         /// Комментарии участника
         /// </summary>

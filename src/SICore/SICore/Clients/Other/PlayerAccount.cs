@@ -42,18 +42,18 @@ namespace SICore
             set { if (_stake != value) { _stake = value; OnPropertyChanged(); } }
         }
 
-		private bool _safeStake;
+        private bool _safeStake;
 
-		public bool SafeStake
-		{
-			get { return _safeStake; }
-			set { if (_safeStake != value) { _safeStake = value; OnPropertyChanged(); } }
-		}
+        public bool SafeStake
+        {
+            get { return _safeStake; }
+            set { if (_safeStake != value) { _safeStake = value; OnPropertyChanged(); } }
+        }
 
-		/// <summary>
-		/// Может ли жать на кнопку
-		/// </summary>
-		internal bool Pass
+        /// <summary>
+        /// Может ли жать на кнопку
+        /// </summary>
+        internal bool Pass
         {
             get { return _pass; }
             set { if (_pass != value) { _pass = value; OnPropertyChanged(); } }

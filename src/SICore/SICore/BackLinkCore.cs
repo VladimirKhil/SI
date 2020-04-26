@@ -82,14 +82,14 @@ namespace SICore.PlatformSpecific
 
         public virtual string GetAd(string localization, out int adId)
         {
-			adId = -1;
-			return null;
+            adId = -1;
+            return null;
         }
 
-		public abstract void OnGameFinished(string packageId);
+        public abstract void OnGameFinished(string packageId);
 
-		public abstract bool AreAnswersShown { get; set; }
-		public abstract bool ShowBorderOnFalseStart { get; }
+        public abstract bool AreAnswersShown { get; set; }
+        public abstract bool ShowBorderOnFalseStart { get; }
 
         public abstract bool LoadExternalMedia { get; }
     }

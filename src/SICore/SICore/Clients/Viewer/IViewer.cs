@@ -127,13 +127,13 @@ namespace SICore
         void TableLoaded();
 
         void PrintGreeting();
-		void TextShape(string[] mparams);
-		void OnTimeChanged();
-		void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
-		void OnPersonFinalStake(int playerIndex);
-		void OnPersonFinalAnswer(int playerIndex);
-		void OnPackageLogo(string v);
-		void OnPersonApellated(int playerIndex);
+        void TextShape(string[] mparams);
+        void OnTimeChanged();
+        void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
+        void OnPersonFinalStake(int playerIndex);
+        void OnPersonFinalAnswer(int playerIndex);
+        void OnPackageLogo(string v);
+        void OnPersonApellated(int playerIndex);
         void OnPersonPass(int playerIndex);
     }
 }

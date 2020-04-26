@@ -25,7 +25,7 @@ namespace SICore
 
         public TableInfoViewModel TInfo { get; }
 
-		public ViewerHumanLogic(P client, ViewerData data)
+        public ViewerHumanLogic(P client, ViewerData data)
             : base(client, data)
         {
             TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
@@ -44,7 +44,7 @@ namespace SICore
             if (TInfo.TStage == TableStage.RoundTable || TInfo.TStage == TableStage.Special || TInfo.TStage == TableStage.Question)
             {
                 lock (_data.ChoiceLock)
-				lock (_data.TInfoLock)
+                lock (_data.TInfoLock)
                 lock (TInfo.RoundInfoLock)
                 {
                     if (_data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count && _data.QuestionIndex > -1 && _data.QuestionIndex < _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
@@ -54,8 +54,8 @@ namespace SICore
             else
             {
                 lock (_data.ChoiceLock)
-				lock (_data.TInfoLock)
-				lock (TInfo.RoundInfoLock)
+                lock (_data.TInfoLock)
+                lock (TInfo.RoundInfoLock)
                 {
                     if (_data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count)
                         TInfo.RoundInfo[_data.ThemeIndex].Name = null;
@@ -307,8 +307,8 @@ namespace SICore
                         item.State = PlayerState.None;
                         item.Stake = 0;
 
-						item.SafeStake = false;
-					}
+                        item.SafeStake = false;
+                    }
                     break;
 
                 case GameStage.After:
@@ -342,7 +342,7 @@ namespace SICore
 
         private void RoundThemesUI(bool print)
         {
-			lock (_data.TInfoLock)
+            lock (_data.TInfoLock)
             lock (TInfo.RoundInfoLock)
             {
                 TInfo.RoundInfo.Clear();
@@ -367,19 +367,19 @@ namespace SICore
 
         private Task ExecuteInUIThread(Action action)
         {
-			if (UI.Scheduler == null)
-			{
-				try
-				{
-					action();
-				}
-				catch (Exception exc)
-				{
-					_data.BackLink.SendError(exc);
-				}
+            if (UI.Scheduler == null)
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception exc)
+                {
+                    _data.BackLink.SendError(exc);
+                }
 
-				return Task.CompletedTask;
-			}
+                return Task.CompletedTask;
+            }
 
             return Task.Factory.StartNew(
                 () =>
@@ -398,11 +398,11 @@ namespace SICore
         virtual public void Choice()
         {
             TInfo.Text = "";
-			TInfo.MediaSource = null;
-			TInfo.QuestionContentType = QuestionContentType.Text;
-			TInfo.Sound = false;
+            TInfo.MediaSource = null;
+            TInfo.QuestionContentType = QuestionContentType.Text;
+            TInfo.Sound = false;
 
-			foreach (var item in _data.Players)
+            foreach (var item in _data.Players)
             {
                 item.State = PlayerState.None;
             }
@@ -416,24 +416,24 @@ namespace SICore
             }
         }
 
-		public void TextShape(string[] mparams)
-		{
-			var text = new StringBuilder();
-			for (var i = 1; i < mparams.Length; i++)
-			{
-				text.Append(mparams[i]);
+        public void TextShape(string[] mparams)
+        {
+            var text = new StringBuilder();
+            for (var i = 1; i < mparams.Length; i++)
+            {
+                text.Append(mparams[i]);
                 if (i < mparams.Length - 1)
                 {
                     text.Append('\n');
                 }
-			}
+            }
 
-			TInfo.TextLength = 0;
-			TInfo.PartialText = true;
-			TInfo.Text = text.ToString();
-		}
+            TInfo.TextLength = 0;
+            TInfo.PartialText = true;
+            TInfo.Text = text.ToString();
+        }
 
-		virtual public void SetAtom(string[] mparams)
+        virtual public void SetAtom(string[] mparams)
         {
             _data._atomType = mparams[1];
 
@@ -644,13 +644,13 @@ namespace SICore
             if (_data._atomType == AtomTypes.Audio || _data._atomType == AtomTypes.Video)
                 TInfo.OnMediaPause();
 
-			if (!int.TryParse(text, out int number))
-			{
-				_data.Sound = "noanswer";
-				return;
-			}
+            if (!int.TryParse(text, out int number))
+            {
+                _data.Sound = "noanswer";
+                return;
+            }
 
-			if (number < 0 || number >= _data.Players.Count)
+            if (number < 0 || number >= _data.Players.Count)
                 return;
 
             _data.Players[number].State = PlayerState.Press;
@@ -682,33 +682,33 @@ namespace SICore
             }
         }
 
-		public void OnPersonFinalStake(int playerIndex)
-		{
-			if (playerIndex < 0 || playerIndex >= _data.Players.Count)
-				return;
-
-			_data.Players[playerIndex].Stake = -4;
-		}
-
-		public void OnPersonFinalAnswer(int playerIndex)
-		{
-			if (playerIndex < 0 || playerIndex >= _data.Players.Count)
-				return;
-
-			_data.Players[playerIndex].State = PlayerState.HasAnswered;
-		}
-
-		public void OnPersonApellated(int playerIndex)
-		{
-			if (playerIndex < 0 || playerIndex >= _data.Players.Count)
-				return;
-
-			_data.Players[playerIndex].State = PlayerState.HasAnswered;
-		}
-
-		public void QType()
+        public void OnPersonFinalStake(int playerIndex)
         {
-			if (_data._qtype == QuestionTypes.Auction)
+            if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+                return;
+
+            _data.Players[playerIndex].Stake = -4;
+        }
+
+        public void OnPersonFinalAnswer(int playerIndex)
+        {
+            if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+                return;
+
+            _data.Players[playerIndex].State = PlayerState.HasAnswered;
+        }
+
+        public void OnPersonApellated(int playerIndex)
+        {
+            if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+                return;
+
+            _data.Players[playerIndex].State = PlayerState.HasAnswered;
+        }
+
+        public void QType()
+        {
+            if (_data._qtype == QuestionTypes.Auction)
             {
                 TInfo.Text = _actor.LO[nameof(R.Label_Auction)];
 
@@ -758,10 +758,10 @@ namespace SICore
                     item.Active = false;
                 }
             }
-			else
-			{
-				TInfo.TimeLeft = 1.0;
-			}
+            else
+            {
+                TInfo.TimeLeft = 1.0;
+            }
         }
 
         public void StopRound()
@@ -877,11 +877,11 @@ namespace SICore
 
                 if (!string.IsNullOrEmpty(connector.Error))
                 {
-					if (connector.CanRetry)
-						AnotherTry(connector);
-					else
-						Print(ReplicManager.Special(connector.Error));
-				}
+                    if (connector.CanRetry)
+                        AnotherTry(connector);
+                    else
+                        Print(ReplicManager.Special(connector.Error));
+                }
                 else
                     Print(ReplicManager.Special(_actor.LO[nameof(R.ReconnectEntered)]));
             }
@@ -937,8 +937,8 @@ namespace SICore
             {
                 for (int i = 0; i < _data.TInfo.RoundInfo.Count; i++)
                 {
-					if (TInfo.RoundInfo.Count <= i)
-						break;
+                    if (TInfo.RoundInfo.Count <= i)
+                        break;
 
                     TInfo.RoundInfo[i].Questions.Clear();
 
@@ -961,89 +961,89 @@ namespace SICore
             _data.OnAddString(null, _actor.LO[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
         }
 
-		public void OnTimeChanged()
-		{
-			
-		}
+        public void OnTimeChanged()
+        {
+            
+        }
 
-		public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person)
-		{
-			if (timerIndex == 1 && timerCommand == "RESUME")
-			{
-				TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
-			}
+        public void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person)
+        {
+            if (timerIndex == 1 && timerCommand == "RESUME")
+            {
+                TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
+            }
 
-			if (timerIndex == 2)
-			{
-				if (timerCommand == "GO")
-				{
-					if (person != null && int.TryParse(person, out int personIndex))
-					{
-						if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
-							|| _data.DialogMode == DialogModes.None)
-						{
-							if (personIndex == -1)
-							{
-								_data.ShowMan.IsDeciding = true;
-							}
-							else if (personIndex > -1 && personIndex < _data.Players.Count)
-							{
-								_data.Players[personIndex].IsDeciding = true;
-							}
-						}
+            if (timerIndex == 2)
+            {
+                if (timerCommand == "GO")
+                {
+                    if (person != null && int.TryParse(person, out int personIndex))
+                    {
+                        if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
+                            || _data.DialogMode == DialogModes.None)
+                        {
+                            if (personIndex == -1)
+                            {
+                                _data.ShowMan.IsDeciding = true;
+                            }
+                            else if (personIndex > -1 && personIndex < _data.Players.Count)
+                            {
+                                _data.Players[personIndex].IsDeciding = true;
+                            }
+                        }
 
-						if (personIndex == -2)
-						{
-							_data.ShowMainTimer = true;
-						}
-					}
-				}
-				else if (timerCommand == "STOP")
-				{
-					_data.ShowMan.IsDeciding = false;
-					foreach (var player in _data.Players)
-					{
-						player.IsDeciding = false;
-					}
+                        if (personIndex == -2)
+                        {
+                            _data.ShowMainTimer = true;
+                        }
+                    }
+                }
+                else if (timerCommand == "STOP")
+                {
+                    _data.ShowMan.IsDeciding = false;
+                    foreach (var player in _data.Players)
+                    {
+                        player.IsDeciding = false;
+                    }
 
-					_data.ShowMainTimer = false;
-				}
-			}
-		}
+                    _data.ShowMainTimer = false;
+                }
+            }
+        }
 
-		public void OnPackageLogo(string uri)
-		{
-			TInfo.TStage = TableStage.Question;
+        public void OnPackageLogo(string uri)
+        {
+            TInfo.TStage = TableStage.Question;
 
-			if (uri.Contains(Constants.GameHost))
-			{
-				var address = _actor.Connector.ServerAddress;
-				if (!string.IsNullOrWhiteSpace(address))
-				{
-					if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
-						uri = uri.Replace(Constants.GameHost, hostUri.Host);
-				}
-			}
-			else if (uri.Contains(Constants.ServerHost))
-			{
-				uri = uri.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
-			}
+            if (uri.Contains(Constants.GameHost))
+            {
+                var address = _actor.Connector.ServerAddress;
+                if (!string.IsNullOrWhiteSpace(address))
+                {
+                    if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                        uri = uri.Replace(Constants.GameHost, hostUri.Host);
+                }
+            }
+            else if (uri.Contains(Constants.ServerHost))
+            {
+                uri = uri.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
+            }
 
             if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out Uri mediaUri))
             {
                 return;
             }
 
-			if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
-			{
-				Print(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)]);
-				return;
-			}
+            if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
+            {
+                Print(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                return;
+            }
 
-			TInfo.MediaSource = new MediaSource(uri);
-			TInfo.QuestionContentType = QuestionContentType.Image;
-			TInfo.Sound = false;
-		}
+            TInfo.MediaSource = new MediaSource(uri);
+            TInfo.QuestionContentType = QuestionContentType.Image;
+            TInfo.Sound = false;
+        }
 
         public void OnPersonPass(int playerIndex)
         {

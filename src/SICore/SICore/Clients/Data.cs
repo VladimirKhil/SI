@@ -23,7 +23,7 @@ namespace SICore
         /// Информация, используемая табло
         /// </summary>
         public TableInfo TInfo { get; } = new TableInfo();
-		public object TInfoLock { get; } = new object();
+        public object TInfoLock { get; } = new object();
 
         public int PrevoiusTheme = -1, PreviousQuest = -1;
         /// <summary>

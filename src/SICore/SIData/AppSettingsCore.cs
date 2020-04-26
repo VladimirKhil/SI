@@ -14,10 +14,10 @@ namespace SIData
         public const int DefaultReadingSpeed = 20;
         public const bool DefaultFalseStart = true;
         public const bool DefaultHintShowman = false;
-		public const bool DefaultPartialText = false;
-		public const bool DefaultOral = false;
-		public const bool DefaultManaged = false;
-		public const bool DefaultIgnoreWrong = false;
+        public const bool DefaultPartialText = false;
+        public const bool DefaultOral = false;
+        public const bool DefaultManaged = false;
+        public const bool DefaultIgnoreWrong = false;
         public const GameModes DefaultGameMode = GameModes.Tv;
         public const int DefaultRandomRoundsCount = 3;
         public const int DefaultRandomThemesCount = 6;
@@ -92,25 +92,25 @@ namespace SIData
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _partialText = DefaultPartialText;
 
-		/// <summary>
-		/// Частичный текст
-		/// </summary>
-		[XmlAttribute]
-		[DefaultValue(DefaultPartialText)]
-		[DataMember]
-		public bool PartialText
-		{
-			get { return _partialText; }
-			set { _partialText = value; OnPropertyChanged(); }
-		}
+        /// <summary>
+        /// Частичный текст
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(DefaultPartialText)]
+        [DataMember]
+        public bool PartialText
+        {
+            get { return _partialText; }
+            set { _partialText = value; OnPropertyChanged(); }
+        }
 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool _oral = DefaultOral;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _oral = DefaultOral;
 
-		/// <summary>
-		/// Устная игра
-		/// </summary>
-		[XmlAttribute]
+        /// <summary>
+        /// Устная игра
+        /// </summary>
+        [XmlAttribute]
         [DefaultValue(DefaultOral)]
         [DataMember]
         public bool Oral
@@ -119,22 +119,22 @@ namespace SIData
             set { _oral = value; OnPropertyChanged(); }
         }
 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool _managed = DefaultManaged;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _managed = DefaultManaged;
 
-		/// <summary>
-		/// Управляемая игра
-		/// </summary>
-		[XmlAttribute]
-		[DefaultValue(DefaultManaged)]
-		[DataMember]
-		public bool Managed
-		{
-			get { return _managed; }
-			set { _managed = value; OnPropertyChanged(); }
-		}
+        /// <summary>
+        /// Управляемая игра
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(DefaultManaged)]
+        [DataMember]
+        public bool Managed
+        {
+            get { return _managed; }
+            set { _managed = value; OnPropertyChanged(); }
+        }
 
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _ignoreWrong = DefaultIgnoreWrong;
 
         /// <summary>
@@ -223,13 +223,13 @@ namespace SIData
             set { _randomQuestionsBasePrice = value; OnPropertyChanged(); }
         }
 
-		/// <summary>
-		/// Язык игры
-		/// </summary>
-		[XmlAttribute]
-		[DataMember]
-		[DefaultValue("ru-RU")]
-		public string Culture { get; set; }
+        /// <summary>
+        /// Язык игры
+        /// </summary>
+        [XmlAttribute]
+        [DataMember]
+        [DefaultValue("ru-RU")]
+        public string Culture { get; set; }
 
         public AppSettingsCore()
         {
@@ -253,7 +253,7 @@ namespace SIData
             _randomThemesCount = origin._randomThemesCount;
             _randomQuestionsBasePrice = origin._randomQuestionsBasePrice;
 
-			Culture = origin.Culture;
+            Culture = origin.Culture;
         }
 
         public void Set(AppSettingsCore settings)
@@ -262,8 +262,8 @@ namespace SIData
             ReadingSpeed = settings._readingSpeed;
             TimeSettings = settings.TimeSettings;
             FalseStart = settings._falseStart;
-			PartialText = settings.PartialText;
-			Managed = settings.Managed;
+            PartialText = settings.PartialText;
+            Managed = settings.Managed;
             HintShowman = settings._hintShowman;
             Oral = settings._oral;
             _ignoreWrong = settings._ignoreWrong;
@@ -273,7 +273,7 @@ namespace SIData
             _randomRoundsCount = settings._randomRoundsCount;
             _randomThemesCount = settings._randomThemesCount;
             _randomQuestionsBasePrice = settings._randomQuestionsBasePrice;
-			Culture = settings.Culture;
+            Culture = settings.Culture;
         }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

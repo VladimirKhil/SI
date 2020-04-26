@@ -32,8 +32,8 @@ namespace SICore
         protected Timer _taskTimer = null;
         protected Action _task = null;
         private readonly Stack<Tuple<Action, int>> _oldTasks = new Stack<Tuple<Action, int>>();
-		protected object _taskTimerLock = new object();
-		protected DateTime _finishingTime;
+        protected object _taskTimerLock = new object();
+        protected DateTime _finishingTime;
 
         internal Logic(A actor, D data)
         {

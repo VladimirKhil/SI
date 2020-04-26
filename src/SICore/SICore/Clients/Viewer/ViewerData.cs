@@ -162,7 +162,7 @@ namespace SICore
         /// </summary>
         public string _qtype;
 
-		public bool IsPartial { get; set; }
+        public bool IsPartial { get; set; }
 
         public string _atomType = "";
         /// <summary>
@@ -174,38 +174,38 @@ namespace SICore
 
         internal int _lastStakerNum = -1;
 
-		private ViewerAccount _me = null;
+        private ViewerAccount _me = null;
 
         public ViewerAccount Me
-		{
-			get { return _me; }
-			internal set
-			{
-				if (_me != value)
-				{
-					if (_me is PersonAccount oldPersonAccount)
-					{
-						oldPersonAccount.IsMe = false;
-					}
+        {
+            get { return _me; }
+            internal set
+            {
+                if (_me != value)
+                {
+                    if (_me is PersonAccount oldPersonAccount)
+                    {
+                        oldPersonAccount.IsMe = false;
+                    }
 
-					_me = value;
+                    _me = value;
 
-					if (_me is PersonAccount personAccount)
-					{
-						personAccount.IsMe = true;
-					}
+                    if (_me is PersonAccount personAccount)
+                    {
+                        personAccount.IsMe = true;
+                    }
 
-					OnPropertyChanged();
-				}
-			}
-		}
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-		public bool IsChatOpened { get; set; } = true;
+        public bool IsChatOpened { get; set; } = true;
 
-		/// <summary>
-		/// Адрес изображения участника
-		/// </summary>
-		internal string Picture { get; set; }
+        /// <summary>
+        /// Адрес изображения участника
+        /// </summary>
+        internal string Picture { get; set; }
 
         private bool _isPlayer;
 
@@ -242,7 +242,7 @@ namespace SICore
 
         public CustomCommand SendMessageCommand { get; set; }
 
-		public PersonData PersonDataExtensions { get; private set; } = new PersonData();
+        public PersonData PersonDataExtensions { get; private set; } = new PersonData();
         public PlayerData PlayerDataExtensions { get; private set; } = new PlayerData();
         public ShowmanData ShowmanDataExtensions { get; private set; } = new ShowmanData();
 
@@ -250,7 +250,7 @@ namespace SICore
         /// Делегат, организующий отправку сообщения
         /// </summary>
         public Action<string> MessageSending { get; set; }
-		public event Action<string, string, LogMode> StringAdding;
+        public event Action<string, string, LogMode> StringAdding;
 
         private List<PlayerAccount> _players = new List<PlayerAccount>();
 
@@ -290,22 +290,22 @@ namespace SICore
             }
         }
 
-		private bool _showMainTimer;
+        private bool _showMainTimer;
 
-		public bool ShowMainTimer
-		{
-			get { return _showMainTimer; }
-			set
-			{
-				if (_showMainTimer != value)
-				{
-					_showMainTimer = value;
-					OnPropertyChanged();
-				}
-			}
-		}
-		
-		public void OnAllPersonsChanged()
+        public bool ShowMainTimer
+        {
+            get { return _showMainTimer; }
+            set
+            {
+                if (_showMainTimer != value)
+                {
+                    _showMainTimer = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+        public void OnAllPersonsChanged()
         {
             var accounts = new List<ViewerAccount>();
             if (_showMan != null)
@@ -428,8 +428,8 @@ namespace SICore
 
         public override void OnAddString(string person, string text, LogMode mode)
         {
-			StringAdding?.Invoke(person, text, mode);
-		}
+            StringAdding?.Invoke(person, text, mode);
+        }
 
         private bool _autoReady = false;
 
@@ -443,13 +443,13 @@ namespace SICore
             }
         }
 
-		public string PackageId { get; internal set; }
+        public string PackageId { get; internal set; }
 
-		internal event Action AutoReadyChanged;
+        internal event Action AutoReadyChanged;
 
         private void OnAutoReadyChanged()
         {
-			AutoReadyChanged?.Invoke();
-		}
+            AutoReadyChanged?.Invoke();
+        }
     }
 }
