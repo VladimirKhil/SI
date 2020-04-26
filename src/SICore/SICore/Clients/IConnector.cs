@@ -8,9 +8,9 @@ namespace SICore
         string ServerAddress { get; }
         string Error { get; }
 
-		bool CanRetry { get; }
+        bool CanRetry { get; }
 
-		bool IsReconnecting { get; }
+        bool IsReconnecting { get; }
 
         int GameId { get; }
 

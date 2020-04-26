@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace SICore.Connections
 {
-	/// <summary>
-	/// Ссылка на внешнее подключение
-	/// </summary>
+    /// <summary>
+    /// Ссылка на внешнее подключение
+    /// </summary>
     public interface IConnection: IDisposable
     {
         object ClientsSync { get; }
@@ -24,7 +24,7 @@ namespace SICore.Connections
 
         string RemoteAddress { get; }
         bool IsAuthenticated { get; set; }
-		int GameId { get; set; }
-		string UserName { get; set; }
-	}
+        int GameId { get; set; }
+        string UserName { get; set; }
+    }
 }

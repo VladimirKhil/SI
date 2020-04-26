@@ -91,24 +91,24 @@ namespace SICore
                         playerData._readyToPress = true;
                 }
 
-				if (playerData._longThink && ((double)playerData._bestBrave / _account.F <= 1.3 || GetTimePercentage(2) > 95))
-				{
-					playerData._isSure = false;
-					var ran = Data.Rand.Next(100);
-					if (ran < (int)(Math.Exp(1 - ((double)playerData._bestBrave) / _account.F) * 100))
-						playerData._knowsAnswer = true;
-					else
-						playerData._knowsAnswer = false;
+                if (playerData._longThink && ((double)playerData._bestBrave / _account.F <= 1.3 || GetTimePercentage(2) > 95))
+                {
+                    playerData._isSure = false;
+                    var ran = Data.Rand.Next(100);
+                    if (ran < (int)(Math.Exp(1 - ((double)playerData._bestBrave) / _account.F) * 100))
+                        playerData._knowsAnswer = true;
+                    else
+                        playerData._knowsAnswer = false;
 
-					Execute(AnswerTask, 1);
-					_thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
-				}
-				else if (playerData.MyTry && playerData._readyToPress && !_data.TInfo.Pause)
-				{
-					var delay = Data.Rand.Next(4);
-					await Task.Delay(delay * 100); // Дадим возможность обжать
-					_actor.PressGameButton();
-				}
+                    Execute(AnswerTask, 1);
+                    _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                }
+                else if (playerData.MyTry && playerData._readyToPress && !_data.TInfo.Pause)
+                {
+                    var delay = Data.Rand.Next(4);
+                    await Task.Delay(delay * 100); // Дадим возможность обжать
+                    _actor.PressGameButton();
+                }
             }
             catch (Exception exc)
             {
@@ -158,11 +158,11 @@ namespace SICore
         {
             try
             {
-				lock (_data.TInfoLock)
-				{
-					var choice = SelectRandom(_data.TInfo.RoundInfo, theme => theme.Name != null);
-					_actor.SendMessageWithArgs(Messages.Delete, choice);
-				}
+                lock (_data.TInfoLock)
+                {
+                    var choice = SelectRandom(_data.TInfo.RoundInfo, theme => theme.Name != null);
+                    _actor.SendMessageWithArgs(Messages.Delete, choice);
+                }
             }
             catch (Exception exc)
             {
@@ -420,18 +420,18 @@ namespace SICore
                                 theme = _data.ThemeIndex;
                             else if (r < myInfo.V2 + myInfo.V3)
                             {
-								// Выбор темы согласно приоритету
-								for (int k = 0; k < myInfo.P1.Length; k++)
-								{
-									var index = (myInfo.P1[k] - '0') - 1;
-									if (index < canSelectTheme.Length && canSelectTheme[index])
-									{
-										theme = index;
-										break;
-									}
-								}
+                                // Выбор темы согласно приоритету
+                                for (int k = 0; k < myInfo.P1.Length; k++)
+                                {
+                                    var index = (myInfo.P1[k] - '0') - 1;
+                                    if (index < canSelectTheme.Length && canSelectTheme[index])
+                                    {
+                                        theme = index;
+                                        break;
+                                    }
+                                }
 
-								if (theme == -1)
+                                if (theme == -1)
                                 {
                                     var k = Data.Rand.Next(numOfThemes);
                                     theme = -1;
@@ -496,16 +496,16 @@ namespace SICore
                             quest = _data.QuestionIndex;
                         else if (r < nv4 + nv5 + nv6 + nv7)
                         {
-							// Выбор вопроса согласно приоритету
-							for (int k = 0; k < np2.Length; k++)
-							{
-								var index = (np2[k] - '0') - 1;
-								if (index < canSelectQuestion.Length && canSelectQuestion[index])
-								{
-									quest = index;
-									break;
-								}
-							}
+                            // Выбор вопроса согласно приоритету
+                            for (int k = 0; k < np2.Length; k++)
+                            {
+                                var index = (np2[k] - '0') - 1;
+                                if (index < canSelectQuestion.Length && canSelectQuestion[index])
+                                {
+                                    quest = index;
+                                    break;
+                                }
+                            }
 
                             if (quest == -1)
                             {
@@ -792,16 +792,16 @@ namespace SICore
         /// <returns></returns>
         private bool IsCritical()
         {
-			int numQu = 0;
-			lock (_data.TInfoLock)
-			{
-				for (int i = 0; i < _data.TInfo.RoundInfo.Count; i++)
-					for (int j = 0; j < _data.TInfo.RoundInfo[i].Questions.Count; j++)
-						if (_data.TInfo.RoundInfo[i].Questions[j].IsActive())
-							numQu++;
-			}
-			
-			if ((numQu <= _account.Nq || GetTimePercentage(0) < 100 - 10 * _account.Nq / 3) && _actor.MySum < _account.Part * _actor.BigSum / 100)
+            int numQu = 0;
+            lock (_data.TInfoLock)
+            {
+                for (int i = 0; i < _data.TInfo.RoundInfo.Count; i++)
+                    for (int j = 0; j < _data.TInfo.RoundInfo[i].Questions.Count; j++)
+                        if (_data.TInfo.RoundInfo[i].Questions[j].IsActive())
+                            numQu++;
+            }
+            
+            if ((numQu <= _account.Nq || GetTimePercentage(0) < 100 - 10 * _account.Nq / 3) && _actor.MySum < _account.Part * _actor.BigSum / 100)
                 return true;
 
             return false;
@@ -1439,11 +1439,11 @@ namespace SICore
         {
             try
             {
-				lock (_data.TInfoLock)
-				{
-					SelectQuestion(out int i, out int j);
-					_actor.SendMessageWithArgs(Messages.Choice, i, j);
-				}
+                lock (_data.TInfoLock)
+                {
+                    SelectQuestion(out int i, out int j);
+                    _actor.SendMessageWithArgs(Messages.Choice, i, j);
+                }
             }
             catch (Exception exc)
             {

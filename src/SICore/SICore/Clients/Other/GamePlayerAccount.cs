@@ -65,10 +65,10 @@ namespace SICore
         /// </summary>
         internal bool StakeMaking { get; set; }
 
-		/// <summary>
-		/// Штраф за пинг (для выравнивания шансов)
-		/// </summary>
-		internal int PingPenalty { get; set; }
+        /// <summary>
+        /// Штраф за пинг (для выравнивания шансов)
+        /// </summary>
+        internal int PingPenalty { get; set; }
         public GamePlayerAccount(Account account)
             : base(account)
         {

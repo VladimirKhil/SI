@@ -14,10 +14,10 @@ namespace SICore
 
         public override bool Equals(object obj)
         {
-			if (!(obj is FileKey other))
-				return base.Equals(obj);
+            if (!(obj is FileKey other))
+                return base.Equals(obj);
 
-			return Name == other.Name && (Hash == null && other.Hash == null || Hash.SequenceEqual(other.Hash));
+            return Name == other.Name && (Hash == null && other.Hash == null || Hash.SequenceEqual(other.Hash));
         }
 
         public override int GetHashCode()
@@ -28,12 +28,12 @@ namespace SICore
         public override string ToString() => $"{Convert.ToBase64String(Hash)}_{Name}";
 
         public static FileKey Parse(string s)
-		{
-			var index = s.IndexOf('_');
-			if (index == -1)
-				throw new InvalidCastException();
+        {
+            var index = s.IndexOf('_');
+            if (index == -1)
+                throw new InvalidCastException();
 
-			return new FileKey { Name = s.Substring(index + 1), Hash = Convert.FromBase64String(s.Substring(0, index)) };
-		}
+            return new FileKey { Name = s.Substring(index + 1), Hash = Convert.FromBase64String(s.Substring(0, index)) };
+        }
     }
 }

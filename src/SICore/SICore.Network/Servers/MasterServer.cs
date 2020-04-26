@@ -33,10 +33,10 @@ namespace SICore.Network.Servers
         protected override IEnumerable<IConnection> Connections => _connections;
 
         public MasterServer(INetworkLocalizer localizer)
-			: base(localizer)
-		{
+            : base(localizer)
+        {
 
-		}
+        }
 
         public override bool AddConnection(IConnection connection)
         {
@@ -50,23 +50,23 @@ namespace SICore.Network.Servers
             if (_banned.TryGetValue(address, out DateTime date) && date > DateTime.Now)
             {
                 connection.SendMessage(
-					new Message(
-						$"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{(date == DateTime.MaxValue ? "" : ($" {_localizer[nameof(R.Until)]} " + date.ToString(_localizer.Culture)))}\r\n",
-						NetworkConstants.GameName
-					)
-				);
+                    new Message(
+                        $"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{(date == DateTime.MaxValue ? "" : ($" {_localizer[nameof(R.Until)]} " + date.ToString(_localizer.Culture)))}\r\n",
+                        NetworkConstants.GameName
+                    )
+                );
 
-				Task.Run(async () =>
+                Task.Run(async () =>
                 {
-					try
-					{
-						await Task.Delay(4000);
-						connection.Dispose();
-					}
-					catch (Exception exc)
-					{
-						OnError(exc, true);
-					}
+                    try
+                    {
+                        await Task.Delay(4000);
+                        connection.Dispose();
+                    }
+                    catch (Exception exc)
+                    {
+                        OnError(exc, true);
+                    }
                 });
 
                 return false;
@@ -97,7 +97,7 @@ namespace SICore.Network.Servers
 
         public void Kick(string name, bool ban = false)
         {
-			IConnection connectionToClose = null;
+            IConnection connectionToClose = null;
             lock (_connectionsSync)
             {
                 foreach (var connection in _connections)
@@ -116,11 +116,11 @@ namespace SICore.Network.Servers
                 }
             }
 
-			if (connectionToClose != null)
-			{
-				Connection_ConnectionClosed(connectionToClose, false);
-			}
-		}
+            if (connectionToClose != null)
+            {
+                Connection_ConnectionClosed(connectionToClose, false);
+            }
+        }
 
         protected override void Dispose(bool disposing)
         {

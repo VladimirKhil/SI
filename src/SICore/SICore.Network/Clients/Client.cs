@@ -31,11 +31,11 @@ namespace SICore.Network.Clients
         /// </summary>
         public IServer Server { get; private set; }
 
-		/// <summary>
-		/// Создание клиента
-		/// </summary>
-		/// <param name="name">Имя клиента</param>
-		public Client(string name)
+        /// <summary>
+        /// Создание клиента
+        /// </summary>
+        /// <param name="name">Имя клиента</param>
+        public Client(string name)
         {
             Name = name;
             WaitForMessages();
@@ -86,20 +86,20 @@ namespace SICore.Network.Clients
             Server = server;
         }
 
-		public Task ConnectToAsync(IServer server)
-		{
-			return Task.Run(() =>
-			{
-				try
-				{
-					ConnectTo(server);
-				}
-				catch (Exception exc)
-				{
-					Server.OnError(exc, false);
-				}
-			});
-		}
+        public Task ConnectToAsync(IServer server)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    ConnectTo(server);
+                }
+                catch (Exception exc)
+                {
+                    Server.OnError(exc, false);
+                }
+            });
+        }
 
         /// <summary>
         /// Отправка сообщения
@@ -119,7 +119,7 @@ namespace SICore.Network.Clients
         public event Action<Message> MessageReceived;
         public event Action Disposed;
 
-		public void Dispose()
+        public void Dispose()
         {
             if (_isDisposed)
             {
@@ -137,7 +137,7 @@ namespace SICore.Network.Clients
 
             _isDisposed = true;
 
-			Disposed?.Invoke();
+            Disposed?.Invoke();
         }
 
         public event Action<IAccountInfo> InfoReplaced;

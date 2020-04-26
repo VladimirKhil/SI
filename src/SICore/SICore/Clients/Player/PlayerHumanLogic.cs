@@ -93,8 +93,8 @@ namespace SICore
         {
             _data.DialogMode = DialogModes.Stake;
             _data.Hint = _actor.LO[nameof(R.HintMakeAStake)];
-			((PlayerAccount)ClientData.Me).IsDeciding = false;
-			_data.BackLink.OnFlash();
+            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+            _data.BackLink.OnFlash();
         }
 
         public void ChooseFinalTheme()
@@ -116,9 +116,9 @@ namespace SICore
         {
             _data.Hint = _actor.LO[nameof(R.HintChooseCatPrice)];
             _data.DialogMode = DialogModes.CatCost;
-			((PlayerAccount)ClientData.Me).IsDeciding = false;
+            ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
-			_data.BackLink.OnFlash();
+            _data.BackLink.OnFlash();
         }
 
         public void IsRight(bool voteForRight)

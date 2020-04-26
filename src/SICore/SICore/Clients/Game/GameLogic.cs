@@ -30,7 +30,7 @@ namespace SICore
 
         public SIEngine.EngineBase Engine { get; private set; }
 
-		public GameLogic(Game client, GameData data)
+        public GameLogic(Game client, GameData data)
             : base(client, data)
         {
 
@@ -77,29 +77,29 @@ namespace SICore
             _data.GameResultInfo.PackageName = Engine.PackageName;
             _data.GameResultInfo.PackageID = document.Package.ID;
 
-			if (_data.Settings.IsAutomatic)
-			{
-				// Необходимо запустить игру автоматически
-				Execute(Tasks.AutoGame, 300);
+            if (_data.Settings.IsAutomatic)
+            {
+                // Необходимо запустить игру автоматически
+                Execute(Tasks.AutoGame, 300);
                 _data.TimerStartTime[2] = DateTime.Now;
 
                 _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", 300, -2);
-			}
+            }
         }
 
-		private void Engine_Package(Package package)
+        private void Engine_Package(Package package)
         {
             _data.Package = package;
 
             if (_data.Package.Info.Comments.Text.StartsWith("{random}"))
                 _data.GameResultInfo.PackageName += Environment.NewLine + _data.Package.Info.Comments.Text.Substring(8);
 
-			_actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
+            _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
 
-			ProcessPackage(package, 1);
+            ProcessPackage(package, 1);
         }
 
-		private void Engine_GameThemes(string[] gameThemes)
+        private void Engine_GameThemes(string[] gameThemes)
         {
             _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.GameThemes)]));
 
@@ -111,7 +111,7 @@ namespace SICore
             Execute(Tasks.MoveNext, 11 + 150 * gameThemes.Length / 18);
         }
 
-		private void Engine_Round(Round round)
+        private void Engine_Round(Round round)
         {
             _data.AllowApellation = false;
             _data.Round = round;
@@ -186,7 +186,7 @@ namespace SICore
             ProcessTheme(theme, -1);
         }
 
-		private void Engine_Question(Question question)
+        private void Engine_Question(Question question)
         {
             _data.Question = question;
             _data.isQuestionPlaying = true;
@@ -205,16 +205,16 @@ namespace SICore
             Execute(Tasks.QuestionType, 10, 1, force: true);
         }
 
-		private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
+        private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
         {
             _actor.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
 
-			if (_data.Settings.AppSettings.HintShowman)
-			{
-				var rightAnswers = question.GetRightAnswers();
-				var rightAnswer = rightAnswers.FirstOrDefault() ?? _actor.LO[nameof(R.NotSet)];
-				_actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
-			}
+            if (_data.Settings.AppSettings.HintShowman)
+            {
+                var rightAnswers = question.GetRightAnswers();
+                var rightAnswer = rightAnswers.FirstOrDefault() ?? _actor.LO[nameof(R.NotSet)];
+                _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
+            }
 
             var s = new StringBuilder(theme.Name).Append(", ").Append(question.Price);
             _actor.PlayerReplic(_data.ChooserIndex, s.ToString());
@@ -240,25 +240,25 @@ namespace SICore
             }
         }
 
-		private void Engine_QuestionText(string text, IMedia sound)
-		{
-			_data.QLength = text.Length;
+        private void Engine_QuestionText(string text, IMedia sound)
+        {
+            _data.QLength = text.Length;
 
-			_data.IsPartial = IsPartial();
+            _data.IsPartial = IsPartial();
 
-			if (_data.IsPartial)
-			{
-				_actor.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
+            if (_data.IsPartial)
+            {
+                _actor.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
 
-				_data.Text = text;
-				_data.TextLength = 0;
-				ExecuteTask(Tasks.PrintPartial, 0);
-			}
-			else
-			{
-				_actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
-				_actor.SystemReplic(text);
-			}
+                _data.Text = text;
+                _data.TextLength = 0;
+                ExecuteTask(Tasks.PrintPartial, 0);
+            }
+            else
+            {
+                _actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
+                _actor.SystemReplic(text);
+            }
 
             if (sound != null)
             {
@@ -266,23 +266,23 @@ namespace SICore
             }
         }
 
-		/// <summary>
-		/// Будет ли вопрос выводиться по частям
-		/// </summary>
-		/// <returns></returns>
-		private bool IsPartial()
-		{
-			return _data.Round.Type != RoundTypes.Final
-				&& _data.Type.Name == QuestionTypes.Simple
-				&& !_data.Settings.AppSettings.FalseStart
-				&& _data.Settings.AppSettings.PartialText
-				&& !_data.IsAnswer;
-		}
-
-		private void Engine_QuestionOral(string oralText)
+        /// <summary>
+        /// Будет ли вопрос выводиться по частям
+        /// </summary>
+        /// <returns></returns>
+        private bool IsPartial()
         {
-			_data.IsPartial = false;
-			_actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, oralText);
+            return _data.Round.Type != RoundTypes.Final
+                && _data.Type.Name == QuestionTypes.Simple
+                && !_data.Settings.AppSettings.FalseStart
+                && _data.Settings.AppSettings.PartialText
+                && !_data.IsAnswer;
+        }
+
+        private void Engine_QuestionOral(string oralText)
+        {
+            _data.IsPartial = false;
+            _actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, oralText);
             _actor.ShowmanReplic(oralText);
             _data.QLength = oralText.Length;
         }
@@ -316,9 +316,9 @@ namespace SICore
                 {
                     var filename = link.Uri;
 
-					var mediaCategory = atomType == AtomTypes.Image ? SIDocument.ImagesStorageName
-						: (atomType == AtomTypes.Audio ? SIDocument.AudioStorageName
-						: (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+                    var mediaCategory = atomType == AtomTypes.Image ? SIDocument.ImagesStorageName
+                        : (atomType == AtomTypes.Audio ? SIDocument.AudioStorageName
+                        : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
 
                     var uri = _data.Share.CreateURI(filename, link.GetStream, mediaCategory);
 
@@ -346,34 +346,34 @@ namespace SICore
             }
         }
 
-		private void Engine_QuestionImage(IMedia image, IMedia sound)
+        private void Engine_QuestionImage(IMedia image, IMedia sound)
         {
-			_data.IsPartial = false;
-			ShareMedia(image, AtomTypes.Image);
+            _data.IsPartial = false;
+            ShareMedia(image, AtomTypes.Image);
             if (sound != null)
             {
                 ShareMedia(sound, AtomTypes.Audio, true);
             }
         }
 
-		private void Engine_QuestionSound(IMedia sound)
+        private void Engine_QuestionSound(IMedia sound)
         {
-			_data.IsPartial = false;
-			ShareMedia(sound, AtomTypes.Audio);
+            _data.IsPartial = false;
+            ShareMedia(sound, AtomTypes.Audio);
         }
 
-		private void Engine_QuestionVideo(IMedia video)
+        private void Engine_QuestionVideo(IMedia video)
         {
-			_data.IsPartial = false;
-			ShareMedia(video, AtomTypes.Video);
+            _data.IsPartial = false;
+            ShareMedia(video, AtomTypes.Video);
         }
 
-		private void Engine_QuestionOther(Atom atom)
+        private void Engine_QuestionOther(Atom atom)
         {
             // Не поддерживается
         }
 
-		private void Engine_QuestionAtom(Atom atom)
+        private void Engine_QuestionAtom(Atom atom)
         {
             if (_data.IsAnswer)
             {
@@ -437,7 +437,7 @@ namespace SICore
         {
             if (!final)
             {
-				_data.IsQuestionFinished = true;
+                _data.IsQuestionFinished = true;
 
                 if (!_data.isQuestionPlaying)
                     Execute(Tasks.MoveNext, 1, force: true);
@@ -453,14 +453,14 @@ namespace SICore
             }
         }
 
-		private const int MaxAnswerLength = 250;
+        private const int MaxAnswerLength = 250;
 
-		private void Engine_SimpleAnswer(string answer)
+        private void Engine_SimpleAnswer(string answer)
         {
-			if (answer == null)
-				answer = _actor.LO[nameof(R.AnswerNotSet)];
+            if (answer == null)
+                answer = _actor.LO[nameof(R.AnswerNotSet)];
 
-			answer = answer.LeaveFirst(MaxAnswerLength);
+            answer = answer.LeaveFirst(MaxAnswerLength);
 
             if (_data.AnnounceAnswer)
             {
@@ -475,7 +475,7 @@ namespace SICore
             Execute(Tasks.QuestSourComm, (answerTime == 0 ? 2 : answerTime) * 10, 1);
         }
 
-		private void Engine_RightAnswer()
+        private void Engine_RightAnswer()
         {
             _data.IsAnswer = true;
 
@@ -493,7 +493,7 @@ namespace SICore
             }
         }
 
-		private void Engine_NextQuestion()
+        private void Engine_NextQuestion()
         {
             if (_data.OpenedFiles.Count > 0)
             {
@@ -506,17 +506,17 @@ namespace SICore
             else
                 Execute(Tasks.MoveNext, 10, force: true);
 
-			foreach (var player in _data.Players)
-			{
-				if (player.PingPenalty > 0)
-					player.PingPenalty--;
-			}
+            foreach (var player in _data.Players)
+            {
+                if (player.PingPenalty > 0)
+                    player.PingPenalty--;
+            }
 
-			_data.CanMarkQuestion = false;
-			_data.AnswererIndex = -1;
-		}
+            _data.CanMarkQuestion = false;
+            _data.AnswererIndex = -1;
+        }
 
-		private void Engine_EndQuestion(int themeIndex, int questionIndex)
+        private void Engine_EndQuestion(int themeIndex, int questionIndex)
         {
             _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = QuestionHelper.InvalidQuestionPrice;
         }
@@ -533,9 +533,9 @@ namespace SICore
 
             _actor.InformSums();
             _actor.AnnounceSums();
-			_actor.SendMessage(Messages.Stop); // Timers STOP
+            _actor.SendMessage(Messages.Stop); // Timers STOP
 
-			_data.IsThinking = false;
+            _data.IsThinking = false;
 
             _data.IsWaiting = false;
             _data.Decision = DecisionType.None;
@@ -558,11 +558,11 @@ namespace SICore
             FinishRound();
         }
 
-		private void Engine_FinalThemes(Theme[] themes)
+        private void Engine_FinalThemes(Theme[] themes)
         {
             InitThemes(themes);
 
-			_data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
+            _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
             _data.ThemeDeleters.Reset(true);
 
             Execute(Tasks.MoveNext, 20 + Data.Rand.Next(10));
@@ -584,7 +584,7 @@ namespace SICore
             _actor.PlayerReplic(playerIndex, themeName);
         }
 
-		private async void Engine_PrepareFinalQuestion(Theme theme, Question question)
+        private async void Engine_PrepareFinalQuestion(Theme theme, Question question)
         {
             await Task.Delay(1500);
             _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
@@ -597,10 +597,10 @@ namespace SICore
             Execute(Tasks.Theme, 10, 1);
         }
 
-		private void Engine_EndGame()
+        private void Engine_EndGame()
         {
-			// Очищаем табло
-			_actor.SendMessage(Messages.Stop);
+            // Очищаем табло
+            _actor.SendMessage(Messages.Stop);
             _actor.SystemReplic($"{_actor.LO[nameof(R.GameResults)]}: ");
 
             for (var i = 0; i < _data.Players.Count; i++)
@@ -685,12 +685,12 @@ namespace SICore
                         StopWaiting();
 
                         var s = _data.ChooserIndex == _data.AnswererIndex ?
-							_actor.LO[nameof(R.ToMyself)] : _data.Answerer.Name;
+                            _actor.LO[nameof(R.ToMyself)] : _data.Answerer.Name;
                         _actor.PlayerReplic(_data.ChooserIndex, s);
 
                         _data.ChooserIndex = _data.AnswererIndex;
-						_actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-						Execute(Tasks.CatInfo, 10);
+                        _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                        Execute(Tasks.CatInfo, 10);
                         return true;
                     }
 
@@ -754,9 +754,9 @@ namespace SICore
                             _data.AllIn = true;
                         }
 
-						var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
+                        var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
 
-						var s = new StringBuilder(Messages.PersonStake);
+                        var s = new StringBuilder(Messages.PersonStake);
                         s.Append(Message.ArgsSeparatorChar).Append(playerIndex);
                         s.Append(Message.ArgsSeparatorChar).Append((int)printedStakeType);
                         if (printedStakeType == StakeMode.Sum)
@@ -781,9 +781,9 @@ namespace SICore
 
                         _actor.ShowmanReplic(_actor.LO[nameof(R.ThemeDeletes)] + " " + _data.Players[_data.ThemeDeleters.Current.PlayerIndex].Name);
 
-						_data.ThemeDeleters.MoveBack();
+                        _data.ThemeDeleters.MoveBack();
 
-						Execute(Tasks.AskToDelete, 1);
+                        Execute(Tasks.AskToDelete, 1);
                         return true;
                     }
                     break;
@@ -799,8 +799,8 @@ namespace SICore
                         StopWaiting();
                         ((SIEngine.TvEngine)Engine).SelectTheme(_data.ThemeIndex);
 
-						var innerThemeIndex = ((SIEngine.TvEngine)Engine).OnReady(out bool more);
-						if (innerThemeIndex > -1)
+                        var innerThemeIndex = ((SIEngine.TvEngine)Engine).OnReady(out bool more);
+                        if (innerThemeIndex > -1)
                         {
                             // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
                             _data.TInfo.RoundInfo[_data.ThemeIndex].Name = null;
@@ -842,10 +842,10 @@ namespace SICore
 
                     #region ApellationDecision
 
-					StopWaiting();
-					Execute(Tasks.CheckApellation, 20);
+                    StopWaiting();
+                    Execute(Tasks.CheckApellation, 20);
 
-					return true;
+                    return true;
 
                     #endregion
             }
@@ -1136,33 +1136,33 @@ namespace SICore
 
         private readonly Queue<string> _tasksHistory = new Queue<string>();
 
-		public bool IsRunning { get; set; }
+        public bool IsRunning { get; set; }
 
-		internal void Execute(Tasks task, double taskTime, int arg = 0, bool force = false)
-		{
-			_task = () => ExecuteTask(task, arg);
-			if (_data.Settings.AppSettings.Managed && !force && _actor.Client.CurrentServer.IsOnline(_data.HostName))
-			{
-				IsRunning = false;
-				return;
-			}
+        internal void Execute(Tasks task, double taskTime, int arg = 0, bool force = false)
+        {
+            _task = () => ExecuteTask(task, arg);
+            if (_data.Settings.AppSettings.Managed && !force && _actor.Client.CurrentServer.IsOnline(_data.HostName))
+            {
+                IsRunning = false;
+                return;
+            }
 
-			IsRunning = true;
+            IsRunning = true;
 
-			lock (_taskTimerLock)
-			{
-				if (_taskTimer != null && taskTime > 0)
-				{
-					_taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-					_finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);
-				}
-			}
-		}
+            lock (_taskTimerLock)
+            {
+                if (_taskTimer != null && taskTime > 0)
+                {
+                    _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
+                    _finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);
+                }
+            }
+        }
 
-		/// <summary>
-		/// Выполнение текущей задачи
-		/// </summary>
-		override protected void ExecuteTask(Tasks task, int arg)
+        /// <summary>
+        /// Выполнение текущей задачи
+        /// </summary>
+        override protected void ExecuteTask(Tasks task, int arg)
         {
             lock (ClientData.TaskLock)
             {
@@ -1215,22 +1215,22 @@ namespace SICore
 
                                         break;
 
-									case -1:
-										if (Engine.CanMoveBack)
-											Engine.MoveBack();
-										else
-											stop = false;
-										break;
+                                    case -1:
+                                        if (Engine.CanMoveBack)
+                                            Engine.MoveBack();
+                                        else
+                                            stop = false;
+                                        break;
 
-									case 1:
-										// Просто выполняем текущую задачу, дополнительной обработки делать не надо
-										//if (this.engine.CanMoveNext)
-										//	this.engine.MoveNext();
-										//else
-											stop = false;
-										break;
+                                    case 1:
+                                        // Просто выполняем текущую задачу, дополнительной обработки делать не надо
+                                        //if (this.engine.CanMoveNext)
+                                        //    this.engine.MoveNext();
+                                        //else
+                                            stop = false;
+                                        break;
 
-									case 2:
+                                    case 2:
                                         if (Engine.CanMoveNextRound)
                                         {
                                             FinishRound(false);
@@ -1257,9 +1257,9 @@ namespace SICore
 
                                 break;
 
-							case StopReason.Wait:
-								Execute(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
-								break;
+                            case StopReason.Wait:
+                                Execute(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
+                                break;
                         }
 
                         _stopReason = StopReason.None;
@@ -1275,11 +1275,11 @@ namespace SICore
                     switch (task)
                     {
                         case Tasks.MoveNext:
-							if (Engine != null)
-								Engine.MoveNext();
+                            if (Engine != null)
+                                Engine.MoveNext();
 
-							ClientData.MoveNextBlocked = false;
-							break;
+                            ClientData.MoveNextBlocked = false;
+                            break;
 
                         case Tasks.StartGame:
                             StartGame(arg);
@@ -1314,8 +1314,8 @@ namespace SICore
                             break;
 
                         case Tasks.QuestionType:
-							OnQuestionType(arg);
-							break;
+                            OnQuestionType(arg);
+                            break;
 
                         case Tasks.PrintAuct:
                             PrintAuct();
@@ -1382,8 +1382,8 @@ namespace SICore
                             break;
 
                         case Tasks.PrintPartial:
-							PrintPartial();
-							break;
+                            PrintPartial();
+                            break;
 
                         case Tasks.AskToTry:
                             AskToTry();
@@ -1397,9 +1397,9 @@ namespace SICore
                             AskAnswer();
                             break;
 
-						case Tasks.AskAnswerDeferred:
-							AskAnswerDeferred();
-							break;
+                        case Tasks.AskAnswerDeferred:
+                            AskAnswerDeferred();
+                            break;
 
                         case Tasks.WaitAnswer:
                             WaitAnswer();
@@ -1439,11 +1439,11 @@ namespace SICore
                             #endregion
                             break;
 
-						case Tasks.QuestSourComm:
-							QuestionSourcesAndComments(task, arg);
-							break;
+                        case Tasks.QuestSourComm:
+                            QuestionSourcesAndComments(task, arg);
+                            break;
 
-						case Tasks.PrintApellation:
+                        case Tasks.PrintApellation:
                             PrintAppellation();
                             break;
 
@@ -1486,7 +1486,7 @@ namespace SICore
                             break;
 
                         case Tasks.Announce:
-							Announce();
+                            Announce();
                             break;
 
                         case Tasks.AnnounceStake:
@@ -1526,9 +1526,9 @@ namespace SICore
                             #endregion
                             break;
 
-						case Tasks.AutoGame:
-							AutoGame();
-							break;
+                        case Tasks.AutoGame:
+                            AutoGame();
+                            break;
                     }
                 }
                 catch (Exception exc)
@@ -2113,208 +2113,208 @@ namespace SICore
         }
 
         private void OnQuestionType(int arg)
-		{
-			if (arg == 1)
-			{
-				if (_data.Question == null)
-					throw new Exception(string.Format(_actor.LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round.Type, _data.Settings.AppSettings.GameMode));
+        {
+            if (arg == 1)
+            {
+                if (_data.Question == null)
+                    throw new Exception(string.Format(_actor.LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round.Type, _data.Settings.AppSettings.GameMode));
 
-				var authors = _data.PackageDoc.GetRealAuthors(_data.Question.Info.Authors);
-				if (authors.Length > 0)
-				{
-					var res = new StringBuilder();
-					res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", authors));
+                var authors = _data.PackageDoc.GetRealAuthors(_data.Question.Info.Authors);
+                if (authors.Length > 0)
+                {
+                    var res = new StringBuilder();
+                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", authors));
                     _actor.ShowmanReplic(res.ToString());
-				}
-				else
-					arg++;
-			}
+                }
+                else
+                    arg++;
+            }
 
-			if (arg == 2)
-			{
-				if (_data.Round.Type == RoundTypes.Final)
-				{
-					Execute(Tasks.PrintQue, 1, force: true);
-					return;
-				}
+            if (arg == 2)
+            {
+                if (_data.Round.Type == RoundTypes.Final)
+                {
+                    Execute(Tasks.PrintQue, 1, force: true);
+                    return;
+                }
 
-				_data.Type = _data.Question.Type;
-				if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
-				{
-					var themeChanged = false;
-					string catTheme = null;
+                _data.Type = _data.Question.Type;
+                if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+                {
+                    var themeChanged = false;
+                    string catTheme = null;
 
-					var isCat = _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat;
-					if (isCat)
-					{
-						var currentTheme = _data.Theme.Name;
-						catTheme = _data.Type[QuestionTypeParams.Cat_Theme];
+                    var isCat = _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat;
+                    if (isCat)
+                    {
+                        var currentTheme = _data.Theme.Name;
+                        catTheme = _data.Type[QuestionTypeParams.Cat_Theme];
 
-						themeChanged = currentTheme != catTheme;
-					}
+                        themeChanged = currentTheme != catTheme;
+                    }
 
-					_data.Type.Name = QuestionTypes.Simple;
+                    _data.Type.Name = QuestionTypes.Simple;
 
-					if (themeChanged)
-					{
+                    if (themeChanged)
+                    {
                         // Нужно сказать, что тема будет другой
                         _actor.ShowmanReplic(_actor.LO[nameof(R.QuestionWithSpecialTheme)] + ": " + catTheme);
-						Execute(Tasks.PrintQue, 20, force: true);
-						return;
-					}
-				}
+                        Execute(Tasks.PrintQue, 20, force: true);
+                        return;
+                    }
+                }
 
-				var s = new StringBuilder(Messages.QType).Append(Message.ArgsSeparatorChar);
-				if (_data.Type.Name == QuestionTypes.Auction || _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat || _data.Type.Name == QuestionTypes.Sponsored)
-					s.Append(_data.Type.Name);
-				else
-					s.Append(QuestionTypes.Simple);
+                var s = new StringBuilder(Messages.QType).Append(Message.ArgsSeparatorChar);
+                if (_data.Type.Name == QuestionTypes.Auction || _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat || _data.Type.Name == QuestionTypes.Sponsored)
+                    s.Append(_data.Type.Name);
+                else
+                    s.Append(QuestionTypes.Simple);
 
-				_actor.SendMessage(s.ToString());
+                _actor.SendMessage(s.ToString());
 
-				// Реакция согласно типу вопроса
-				if (_data.Type.Name == QuestionTypes.Auction)
-				{
-					Execute(Tasks.PrintAuct, 8 + Data.Rand.Next(10), force: true);
-				}
-				else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
-				{
-					Execute(Tasks.PrintCat, 8 + Data.Rand.Next(10), 1, force: true);
-				}
-				else if (_data.Type.Name == QuestionTypes.Sponsored)
-				{
-					// Вопрос от спонсора
-					Execute(Tasks.PrintSponsored, 8 + Data.Rand.Next(10), 1, force: true);
-				}
-				else if (_data.Type.Name == QuestionTypes.Simple)
-				{
-					Execute(Tasks.PrintQue, 1, force: true);
-				}
-				else // Неподдерживаемый игрой тип
-				{
-					var sp = new StringBuilder(_actor.LO[nameof(R.UnknownType)]).Append(' ');
-					sp.Append(_data.Type.Name);
-					if (_data.Type.Params.Count > 0)
-					{
-						sp.Append(' ').Append(_actor.LO[nameof(R.WithParams)]);
-						foreach (var p in _data.Type.Params)
-							sp.Append(' ').Append(p);
-					}
+                // Реакция согласно типу вопроса
+                if (_data.Type.Name == QuestionTypes.Auction)
+                {
+                    Execute(Tasks.PrintAuct, 8 + Data.Rand.Next(10), force: true);
+                }
+                else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
+                {
+                    Execute(Tasks.PrintCat, 8 + Data.Rand.Next(10), 1, force: true);
+                }
+                else if (_data.Type.Name == QuestionTypes.Sponsored)
+                {
+                    // Вопрос от спонсора
+                    Execute(Tasks.PrintSponsored, 8 + Data.Rand.Next(10), 1, force: true);
+                }
+                else if (_data.Type.Name == QuestionTypes.Simple)
+                {
+                    Execute(Tasks.PrintQue, 1, force: true);
+                }
+                else // Неподдерживаемый игрой тип
+                {
+                    var sp = new StringBuilder(_actor.LO[nameof(R.UnknownType)]).Append(' ');
+                    sp.Append(_data.Type.Name);
+                    if (_data.Type.Params.Count > 0)
+                    {
+                        sp.Append(' ').Append(_actor.LO[nameof(R.WithParams)]);
+                        foreach (var p in _data.Type.Params)
+                            sp.Append(' ').Append(p);
+                    }
 
-					_actor.SpecialReplic(sp.ToString());
-					_actor.SpecialReplic(_actor.LO[nameof(R.GameWillResume)]);
+                    _actor.SpecialReplic(sp.ToString());
+                    _actor.SpecialReplic(_actor.LO[nameof(R.GameWillResume)]);
 
                     _actor.ShowmanReplic(_actor.LO[nameof(R.ManuallyPlayedQuestion)]);
 
-					Engine.SkipQuestion();
-					Execute(Tasks.MoveNext, 150, 1);
-				}
-				return;
-			}
+                    Engine.SkipQuestion();
+                    Execute(Tasks.MoveNext, 150, 1);
+                }
+                return;
+            }
 
-			Execute(Tasks.QuestionType, 20, arg + 1);
-		}
+            Execute(Tasks.QuestionType, 20, arg + 1);
+        }
 
-		private void PrintPartial()
-		{
-			var text = _data.Text;
+        private void PrintPartial()
+        {
+            var text = _data.Text;
 
-			var printingLength = Math.Min(text.Length - _data.TextLength, _data.Settings.AppSettings.ReadingSpeed / 2); // Число символов в секунду
-			var subText = text.Substring(_data.TextLength, printingLength);
+            var printingLength = Math.Min(text.Length - _data.TextLength, _data.Settings.AppSettings.ReadingSpeed / 2); // Число символов в секунду
+            var subText = text.Substring(_data.TextLength, printingLength);
 
-			_actor.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
-			_actor.SystemReplic(subText);
+            _actor.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+            _actor.SystemReplic(subText);
 
-			_data.TextLength += printingLength;
-			if (_data.TextLength < text.Length)
-			{
-				Execute(Tasks.PrintPartial, 5, force: true);
-			}
-			else
-			{
-				Execute(Tasks.MoveNext, 10, force: true);
-				_data.TimeThinking = 0.0;
-			}
-		}
+            _data.TextLength += printingLength;
+            if (_data.TextLength < text.Length)
+            {
+                Execute(Tasks.PrintPartial, 5, force: true);
+            }
+            else
+            {
+                Execute(Tasks.MoveNext, 10, force: true);
+                _data.TimeThinking = 0.0;
+            }
+        }
 
-		private void QuestionSourcesAndComments(Tasks task, int arg)
-		{
-			var informed = false;
-			if (arg == 1)
-			{
-				var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
-				if (sources.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
-					res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", sources));
+        private void QuestionSourcesAndComments(Tasks task, int arg)
+        {
+            var informed = false;
+            if (arg == 1)
+            {
+                var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
+                if (sources.Length > 0)
+                {
+                    informed = true;
+                    var res = new StringBuilder();
+                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                     _actor.ShowmanReplic(res.ToString());
-				}
-				else
-					arg++;
-			}
+                }
+                else
+                    arg++;
+            }
 
-			if (arg == 2)
-			{
-				if (_data.Question.Info.Comments.Text.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
-					res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
+            if (arg == 2)
+            {
+                if (_data.Question.Info.Comments.Text.Length > 0)
+                {
+                    informed = true;
+                    var res = new StringBuilder();
+                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
                     _actor.ShowmanReplic(res.ToString());
-				}
-				else
-					arg++;
-			}
+                }
+                else
+                    arg++;
+            }
 
-			if (arg < 3)
-			{
-				Execute(task, 20, arg + 1);
-			}
-			else if (informed)
-			{
-				Execute(Tasks.MoveNext, 1);
-			}
-			else
-			{
-				ExecuteTask(Tasks.MoveNext, 0);
-			}
-		}
+            if (arg < 3)
+            {
+                Execute(task, 20, arg + 1);
+            }
+            else if (informed)
+            {
+                Execute(Tasks.MoveNext, 1);
+            }
+            else
+            {
+                ExecuteTask(Tasks.MoveNext, 0);
+            }
+        }
 
-		/// <summary>
-		/// Начать игру даже при отсутствии участников (заполнив пустые слоты ботами)
-		/// </summary>
-		internal void AutoGame()
-		{
-			// Заполняем пустые слоты ботами
-			for (int i = 0; i < _data.Players.Count; i++)
-			{
-				if (!_actor.Client.CurrentServer.IsOnlineInternal(_data.Players[i].Name))
-					_actor.ChangePersonType("player", i.ToString());
-			}
+        /// <summary>
+        /// Начать игру даже при отсутствии участников (заполнив пустые слоты ботами)
+        /// </summary>
+        internal void AutoGame()
+        {
+            // Заполняем пустые слоты ботами
+            for (int i = 0; i < _data.Players.Count; i++)
+            {
+                if (!_actor.Client.CurrentServer.IsOnlineInternal(_data.Players[i].Name))
+                    _actor.ChangePersonType("player", i.ToString());
+            }
 
-			_actor.StartGame();
-		}
+            _actor.StartGame();
+        }
 
-		internal void Announce()
-		{
-			if (!_data.ThemeDeleters.MoveNext())
-			{
-				Execute(Tasks.MoveNext, 15, 1, true);
-				return;
-			}
+        internal void Announce()
+        {
+            if (!_data.ThemeDeleters.MoveNext())
+            {
+                Execute(Tasks.MoveNext, 15, 1, true);
+                return;
+            }
 
-			var currentDeleter = _data.ThemeDeleters.Current;
+            var currentDeleter = _data.ThemeDeleters.Current;
 
             if (currentDeleter == null)
             {
                 throw new Exception("currentDeleter == null");
             }
 
-			if (currentDeleter.PlayerIndex == -1)
-			{
-				currentDeleter.SetIndex(currentDeleter.PossibleIndicies.First());
-			}
+            if (currentDeleter.PlayerIndex == -1)
+            {
+                currentDeleter.SetIndex(currentDeleter.PossibleIndicies.First());
+            }
 
             var playerIndex = currentDeleter.PlayerIndex;
             if (playerIndex < -1 || playerIndex >= _data.Players.Count)
@@ -2336,40 +2336,40 @@ namespace SICore
 
             _actor.ShowmanReplic(msg.ToString());
 
-			Execute(Tasks.AskRight, 20, force: true);
-		}
+            Execute(Tasks.AskRight, 20, force: true);
+        }
 
-		internal void AskAnswerDeferred()
-		{
-			if (!ClientData.Settings.AppSettings.FalseStart)
-			{
-				// Прервать чтение вопроса
-				if (!ClientData.IsQuestionFinished)
-				{
-					var timeDiff = (int)DateTime.Now.Subtract(ClientData.AtomStart).TotalSeconds * 10;
-					ClientData.AtomTime = Math.Max(1, ClientData.AtomTime - timeDiff);
-				}
-			}
+        internal void AskAnswerDeferred()
+        {
+            if (!ClientData.Settings.AppSettings.FalseStart)
+            {
+                // Прервать чтение вопроса
+                if (!ClientData.IsQuestionFinished)
+                {
+                    var timeDiff = (int)DateTime.Now.Subtract(ClientData.AtomStart).TotalSeconds * 10;
+                    ClientData.AtomTime = Math.Max(1, ClientData.AtomTime - timeDiff);
+                }
+            }
 
-			if (_data.IsThinking)
-			{
-				var startTime = _data.TimerStartTime[1];
-				var currentTime = DateTime.Now;
-				ClientData.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
-			}
+            if (_data.IsThinking)
+            {
+                var startTime = _data.TimerStartTime[1];
+                var currentTime = DateTime.Now;
+                ClientData.TimeThinking += currentTime.Subtract(startTime).TotalMilliseconds / 100;
+            }
 
-			ClientData.Decision = DecisionType.None;
-			ClientData.Answerer.CanPress = false;
-			_data.IsThinking = false;
-			_actor.SendMessageWithArgs(Messages.Timer, 1, "PAUSE", (int)ClientData.TimeThinking);
+            ClientData.Decision = DecisionType.None;
+            ClientData.Answerer.CanPress = false;
+            _data.IsThinking = false;
+            _actor.SendMessageWithArgs(Messages.Timer, 1, "PAUSE", (int)ClientData.TimeThinking);
 
-			_data.IsDeferringAnswer = false;
+            _data.IsDeferringAnswer = false;
 
-			ClientData.Decision = DecisionType.None;
-			Stop(StopReason.Answer);
-		}
+            ClientData.Decision = DecisionType.None;
+            Stop(StopReason.Answer);
+        }
 
-		private void StartGame(int arg)
+        private void StartGame(int arg)
         {
             var nextArg = arg + 1;
             var extraTime = 0;
@@ -2525,7 +2525,7 @@ namespace SICore
                 _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
             else if (!_actor.Client.CurrentServer.IsOnline(_data.Chooser.Name))
                 waitTime = 20;
-			
+            
             _actor.SendMessage(msg.ToString(), _data.Chooser.Name);
 
             Execute(Tasks.WaitCat, waitTime);
@@ -2571,8 +2571,8 @@ namespace SICore
                         if (_data.Players[i].Flag)
                         {
                             _data.ChooserIndex = _data.AnswererIndex = i;
-							_actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-						}
+                            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                        }
                     }
 
                     _actor.ShowmanReplic($"{_data.Answerer.Name}, {_actor.LO[nameof(R.CatIsYours)]}!");
@@ -2747,24 +2747,24 @@ namespace SICore
             try
             {
                 _data.ThemeDeleters.MoveNext();
-				var currentDeleter = _data.ThemeDeleters.Current;
+                var currentDeleter = _data.ThemeDeleters.Current;
 
                 if (currentDeleter.PlayerIndex == -1)
                 {
-					var indicies = currentDeleter.PossibleIndicies;
+                    var indicies = currentDeleter.PossibleIndicies;
 
-					if (indicies.Count > 1)
-					{
-						RequestForCurrentDeleter(indicies);
-						return;
-					}
+                    if (indicies.Count > 1)
+                    {
+                        RequestForCurrentDeleter(indicies);
+                        return;
+                    }
                     else if (indicies.Count == 0)
                     {
                         throw new Exception("indicies.Count == 0");
                     }
 
-					currentDeleter.SetIndex(indicies.First());
-				}
+                    currentDeleter.SetIndex(indicies.First());
+                }
 
                 playerIndex = currentDeleter.PlayerIndex;
 
@@ -2784,48 +2784,48 @@ namespace SICore
             }
         }
 
-		private void RequestForThemeDelete()
-		{
-			var msg = new StringBuilder(_data.ActivePlayer.Name);
-			msg.Append(", ");
-			msg.Append(ResourceHelper.GetString(_actor.LO[nameof(R.DeleteTheme)]));
+        private void RequestForThemeDelete()
+        {
+            var msg = new StringBuilder(_data.ActivePlayer.Name);
+            msg.Append(", ");
+            msg.Append(ResourceHelper.GetString(_actor.LO[nameof(R.DeleteTheme)]));
             _actor.ShowmanReplic(msg.ToString());
 
-			var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
-			_data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
+            var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
+            _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
-			var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme * 10;
-			if (_data.IsOralNow)
-				_actor.SendMessage(message, _data.ShowMan.Name);
-			else if (!_actor.Client.CurrentServer.IsOnline(_data.ActivePlayer.Name))
-				waitTime = 20;
+            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme * 10;
+            if (_data.IsOralNow)
+                _actor.SendMessage(message, _data.ShowMan.Name);
+            else if (!_actor.Client.CurrentServer.IsOnline(_data.ActivePlayer.Name))
+                waitTime = 20;
 
-			_actor.SendMessage(message, _data.ActivePlayer.Name);
+            _actor.SendMessage(message, _data.ActivePlayer.Name);
 
-			_data.ThemeIndex = -1;
-			Execute(Tasks.WaitDelete, waitTime);
-			WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
-		}
+            _data.ThemeIndex = -1;
+            Execute(Tasks.WaitDelete, waitTime);
+            WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
+        }
 
-		private void RequestForCurrentDeleter(ICollection<int> indicies)
-		{
-			var msg = new StringBuilder(Messages.FirstDelete);
-			for (var i = 0; i < _data.Players.Count; i++)
-			{
-				var good = _data.Players[i].Flag = indicies.Contains(i);
+        private void RequestForCurrentDeleter(ICollection<int> indicies)
+        {
+            var msg = new StringBuilder(Messages.FirstDelete);
+            for (var i = 0; i < _data.Players.Count; i++)
+            {
+                var good = _data.Players[i].Flag = indicies.Contains(i);
 
-				if (good)
-					msg.Append("\n+");
-				else
-					msg.Append("\n-");
-			}
+                if (good)
+                    msg.Append("\n+");
+                else
+                    msg.Append("\n-");
+            }
 
-			_actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
-			var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-			Execute(Tasks.WaitNextToDelete, waitTime);
-			WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
-		}
+            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+            Execute(Tasks.WaitNextToDelete, waitTime);
+            WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
+        }
 
         /// <summary>
         /// Определить следующего ставящего
@@ -3239,8 +3239,8 @@ namespace SICore
                                 if (Engine.CanMoveBack) // Не начало раунда
                                 {
                                     _data.ChooserIndex = index;
-									_actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-								}
+                                    _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                                }
                             }
                         }
                         else
@@ -3262,9 +3262,9 @@ namespace SICore
 
         private void ProcessTheme(Theme theme, int arg)
         {
-			var informed = false;
+            var informed = false;
 
-			if (arg == -1)
+            if (arg == -1)
             {
                 _actor.Print(_actor.Showman() + ReplicManager.OldReplic(_actor.LO[nameof(R.Theme)] + ": " + theme.Name));
                 _actor.SendMessageWithArgs(Messages.Theme, theme.Name);
@@ -3276,7 +3276,7 @@ namespace SICore
                 var authors = _data.PackageDoc.GetRealAuthors(theme.Info.Authors);
                 if (authors.Length > 0)
                 {
-					informed = true;
+                    informed = true;
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfTheme)], string.Join(", ", authors));
                     _actor.ShowmanReplic(res.ToString());
@@ -3289,9 +3289,9 @@ namespace SICore
             {
                 var sources = _data.PackageDoc.GetRealSources(theme.Info.Sources);
                 if (sources.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfTheme)], string.Join(", ", sources));
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3302,9 +3302,9 @@ namespace SICore
             if (arg == 3)
             {
                 if (theme.Info.Comments.Text.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfTheme)], theme.Info.Comments.Text);
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3329,21 +3329,21 @@ namespace SICore
                     Execute(Tasks.AskFinalStake, 20);
                 }
             }
-			else
-			{
-				if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
-				{
-					ExecuteTask(Tasks.MoveNext, 0);
-				}
-				else if (_data.Round.Type != RoundTypes.Final)
-				{
-					ExecuteTask(Tasks.QuestionType, 1);
-				}
-				else
-				{
-					ExecuteTask(Tasks.AskFinalStake, 0);
-				}
-			}
+            else
+            {
+                if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+                {
+                    ExecuteTask(Tasks.MoveNext, 0);
+                }
+                else if (_data.Round.Type != RoundTypes.Final)
+                {
+                    ExecuteTask(Tasks.QuestionType, 1);
+                }
+                else
+                {
+                    ExecuteTask(Tasks.AskFinalStake, 0);
+                }
+            }
         }
 
         private void WaitFor(DecisionType decision, int time, int person, bool isWaiting = true)
@@ -3358,48 +3358,48 @@ namespace SICore
 
         private void ProcessPackage(Package package, int arg)
         {
-			var informed = false;
-			var isRandomPackage = package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
+            var informed = false;
+            var isRandomPackage = package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
 
-			if (arg == 1)
-			{
-				if (!isRandomPackage)
-				{
+            if (arg == 1)
+            {
+                if (!isRandomPackage)
+                {
                     _actor.ShowmanReplic(string.Format(OfObjectPropertyFormat, _actor.LO[nameof(R.PName)], _actor.LO[nameof(R.OfPackage)], package.Name));
 
-					var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
+                    var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
 
-					var packageLogo = _data.Package.Logo;
-					if (!string.IsNullOrEmpty(packageLogo) && packageLogo.Length > 0)
-					{
-						var uri = _data.Share.CreateURI(packageLogo, () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
+                    var packageLogo = _data.Package.Logo;
+                    if (!string.IsNullOrEmpty(packageLogo) && packageLogo.Length > 0)
+                    {
+                        var uri = _data.Share.CreateURI(packageLogo, () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
 
-						foreach (var item in _data.AllPersons.ToArray())
-						{
-							var msg2 = new StringBuilder(msg.ToString());
-							if (_actor.Client.CurrentServer.Contains(item.Name))
-							{
-								msg2.Append(uri);
-							}
-							else
-							{
-								msg2.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
-							}
+                        foreach (var item in _data.AllPersons.ToArray())
+                        {
+                            var msg2 = new StringBuilder(msg.ToString());
+                            if (_actor.Client.CurrentServer.Contains(item.Name))
+                            {
+                                msg2.Append(uri);
+                            }
+                            else
+                            {
+                                msg2.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
+                            }
 
-							_actor.SendMessage(msg2.ToString(), item.Name);
-						}
-					}
-				}
-				else
-					arg++;
-			}
+                            _actor.SendMessage(msg2.ToString(), item.Name);
+                        }
+                    }
+                }
+                else
+                    arg++;
+            }
 
             if (arg == 2)
             {
                 var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
                 if (!isRandomPackage && authors.Length > 0)
                 {
-					informed = true;
+                    informed = true;
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfPackage)], string.Join(", ", authors));
                     _actor.ShowmanReplic(res.ToString());
@@ -3409,12 +3409,12 @@ namespace SICore
             }
 
             if (arg == 3)
-			{
-				var sources = _data.PackageDoc.GetRealSources(package.Info.Sources);
+            {
+                var sources = _data.PackageDoc.GetRealSources(package.Info.Sources);
                 if (sources.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfPackage)], string.Join(", ", sources));
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3423,11 +3423,11 @@ namespace SICore
             }
 
             if (arg == 4)
-			{
-				if (package.Info.Comments.Text.Length > 0 && !isRandomPackage)
-				{
-					informed = true;
-					var res = new StringBuilder();
+            {
+                if (package.Info.Comments.Text.Length > 0 && !isRandomPackage)
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfPackage)], package.Info.Comments.Text);
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3436,11 +3436,11 @@ namespace SICore
             }
 
             if (arg == 5)
-			{
-				if (!string.IsNullOrWhiteSpace(package.Restriction))
-				{
-					informed = true;
-					var res = new StringBuilder();
+            {
+                if (!string.IsNullOrWhiteSpace(package.Restriction))
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.Restrictions)], _actor.LO[nameof(R.OfPackage)], package.Restriction);
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3449,11 +3449,11 @@ namespace SICore
             }
 
             if (arg == 6)
-			{
-				if (!string.IsNullOrWhiteSpace(package.Date) && !isRandomPackage)
-				{
-					informed = true;
-					var res = new StringBuilder();
+            {
+                if (!string.IsNullOrWhiteSpace(package.Date) && !isRandomPackage)
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.CreationDate)], _actor.LO[nameof(R.OfPackage)], package.Date);
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3469,18 +3469,18 @@ namespace SICore
             {
                 Execute(Tasks.MoveNext, 10);
             }
-			else
-			{
-				Execute(Tasks.MoveNext, 1);
-			}
+            else
+            {
+                Execute(Tasks.MoveNext, 1);
+            }
         }
 
         private void ProcessRound(Round round, int arg)
         {
-			var informed = false;
-			var baseTime = arg == 1 ? 30 : 20;
+            var informed = false;
+            var baseTime = arg == 1 ? 30 : 20;
 
-			if (arg == 1)
+            if (arg == 1)
             {
                 _actor.InformSums();
 
@@ -3500,25 +3500,25 @@ namespace SICore
                     _actor.OnStageChanged(GameStages.Round, round.Name);
                 }
 
-				var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
-				var skipRoundAnnounce = isRandomPackage && (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport
-					&& _data.Package.Rounds.Count == 2); // второй раунд - всегда финал
+                var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
+                var skipRoundAnnounce = isRandomPackage && (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport
+                    && _data.Package.Rounds.Count == 2); // второй раунд - всегда финал
 
-				_actor.InformStage(name: skipRoundAnnounce ? "" : round.Name);				
+                _actor.InformStage(name: skipRoundAnnounce ? "" : round.Name);                
 
-				if (!skipRoundAnnounce)
-				{
+                if (!skipRoundAnnounce)
+                {
                     _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.WeBeginRound)]) + " " + round.Name + "!");
                     _actor.SystemReplic(" "); // new line
                     _actor.SystemReplic(round.Name);
-				}
-				else
-				{
-					baseTime = 1;
-				}
+                }
+                else
+                {
+                    baseTime = 1;
+                }
 
-				// Теперь случайные спецвопросы расставляются здесь
-				if (_data.Settings.RandomSpecials)
+                // Теперь случайные спецвопросы расставляются здесь
+                if (_data.Settings.RandomSpecials)
                 {
                     #region Random specials
                     var nonUsedNumbers = new List<int>();
@@ -3624,7 +3624,7 @@ namespace SICore
                 var authors = _data.PackageDoc.GetRealAuthors(round.Info.Authors);
                 if (authors.Length > 0)
                 {
-					informed = true;
+                    informed = true;
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfRound)], string.Join(", ", authors));
                     _actor.ShowmanReplic(res.ToString());
@@ -3638,8 +3638,8 @@ namespace SICore
                 var sources = _data.PackageDoc.GetRealSources(round.Info.Sources);
                 if (sources.Length > 0)
                 {
-					informed = true;
-					var res = new StringBuilder();
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfRound)], string.Join(", ", sources));
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3650,9 +3650,9 @@ namespace SICore
             if (arg == 4)
             {
                 if (round.Info.Comments.Text.Length > 0)
-				{
-					informed = true;
-					var res = new StringBuilder();
+                {
+                    informed = true;
+                    var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfRound)], _data.Package.Info.Comments.Text);
                     _actor.ShowmanReplic(res.ToString());
                 }
@@ -3699,12 +3699,12 @@ namespace SICore
             }
             else if (informed)
             {
-				Execute(Tasks.MoveNext, (adShown ? 60 : 20) + Data.Rand.Next(10));
+                Execute(Tasks.MoveNext, (adShown ? 60 : 20) + Data.Rand.Next(10));
             }
-			else
-			{
-				ExecuteTask(Tasks.MoveNext, 0);
-			}
+            else
+            {
+                ExecuteTask(Tasks.MoveNext, 0);
+            }
         }
 
         /// <summary>
@@ -3795,19 +3795,19 @@ namespace SICore
         }
 
         public bool IsPressMode(bool isMultimediaQuestion)
-		{
-			return true;
-		}
+        {
+            return true;
+        }
 
-		public bool ShowRight => true;
+        public bool ShowRight => true;
 
-		public bool ShowScore => false;
+        public bool ShowScore => false;
 
-		public bool AutomaticGame => false;
+        public bool AutomaticGame => false;
 
-		public bool PlaySpecials => true;
+        public bool PlaySpecials => true;
 
-		public int ThinkingTime => 0;
+        public int ThinkingTime => 0;
 
         public object WorkingLock { get; } = new object();
     }

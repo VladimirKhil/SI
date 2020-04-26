@@ -41,22 +41,22 @@ namespace SICore
             return string.Format("<replic>{0}</replic>{1}", Escape(s), Line());
         }
 
-		/// <summary>
-		/// Реплика
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static string OldReplic(string s)
-		{
-			return string.Format("<replic old=\"true\">{0}</replic>{1}", Escape(s), Line());
-		}
+        /// <summary>
+        /// Реплика
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string OldReplic(string s)
+        {
+            return string.Format("<replic old=\"true\">{0}</replic>{1}", Escape(s), Line());
+        }
 
-		/// <summary>
-		/// Системное сообщение
-		/// </summary>
-		/// <param name="s"></param>
-		/// <returns></returns>
-		public static string System(string s)
+        /// <summary>
+        /// Системное сообщение
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string System(string s)
         {
             return string.Format("<system>{0}</system>{1}", Escape(s), Line());
         }

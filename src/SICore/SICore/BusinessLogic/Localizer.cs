@@ -5,29 +5,29 @@ using System.Resources;
 
 namespace SICore.BusinessLogic
 {
-	public sealed class Localizer: ILocalizer
-	{
-		private readonly ResourceManager _resourceManager;
-		private ResourceManager _packagesResourceManager;
+    public sealed class Localizer: ILocalizer
+    {
+        private readonly ResourceManager _resourceManager;
+        private ResourceManager _packagesResourceManager;
 
-		public CultureInfo Culture { get; }
+        public CultureInfo Culture { get; }
 
-		public Localizer(string culture)
-		{
-			_resourceManager = new ResourceManager("SICore.Properties.Resources", typeof(Resources).Assembly);
-			Culture = new CultureInfo(culture ?? "ru-RU");
-		}
+        public Localizer(string culture)
+        {
+            _resourceManager = new ResourceManager("SICore.Properties.Resources", typeof(Resources).Assembly);
+            Culture = new CultureInfo(culture ?? "ru-RU");
+        }
 
-		public string this[string key] => _resourceManager.GetString(key, Culture);
+        public string this[string key] => _resourceManager.GetString(key, Culture);
 
-		public string GetPackagesString(string key)
-		{
-			if (_packagesResourceManager == null)
-			{
-				_packagesResourceManager = new ResourceManager("SIPackages.Properties.Resources", typeof(SIPackages.Properties.Resources).Assembly);
-			}
+        public string GetPackagesString(string key)
+        {
+            if (_packagesResourceManager == null)
+            {
+                _packagesResourceManager = new ResourceManager("SIPackages.Properties.Resources", typeof(SIPackages.Properties.Resources).Assembly);
+            }
 
-			return _packagesResourceManager.GetString(key, Culture);
-		}
-	}
+            return _packagesResourceManager.GetString(key, Culture);
+        }
+    }
 }

@@ -8,7 +8,7 @@ namespace SICore
     {
         IClient Client { get; }
 
-		ILocalizer LO { get; }
+        ILocalizer LO { get; }
 
         /// <summary>
         /// Добавить сообщение в лог

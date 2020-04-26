@@ -19,10 +19,10 @@ namespace SICore.Connections
         private readonly byte[] _buffer = new byte[5000];
         private readonly List<byte> _bufferCache = new List<byte>();
         private int _messageSize = -1;
-		
-		protected readonly IConnectionLogger _logger;
+        
+        protected readonly IConnectionLogger _logger;
 
-		public override string RemoteAddress
+        public override string RemoteAddress
         {
             get
             {
@@ -46,27 +46,27 @@ namespace SICore.Connections
         internal TcpReadConnection(TcpClient client, IConnectionLogger gameLogger)
         {
             _tcpClient = client;
-			_logger = gameLogger;
+            _logger = gameLogger;
         }
 
         public async void StartRead(bool waitForUpgrade)
         {
             try
             {
-				if (waitForUpgrade)
-				{
-					await WaitForConnectionUpgrade(_tcpClient);
-				}
+                if (waitForUpgrade)
+                {
+                    await WaitForConnectionUpgrade(_tcpClient);
+                }
 
                 var ns = _tcpClient.GetStream();
-				ns.ReadTimeout = 20 * 1000;
+                ns.ReadTimeout = 20 * 1000;
                 while (true)
                 {
                     var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length);
                     if (bytesRead < 1)
                     {
-						// Нормальное закрытие соединения
-						CloseCore(true, false);
+                        // Нормальное закрытие соединения
+                        CloseCore(true, false);
                         return;
                     }
 
@@ -94,12 +94,12 @@ namespace SICore.Connections
             }
             catch (IOException)
             {
-				// Разрыв соединения
-				CloseCore(true, true);
+                // Разрыв соединения
+                CloseCore(true, true);
             }
             catch (InvalidOperationException)
             {
-				CloseCore(true, true);
+                CloseCore(true, true);
             }
             catch (Exception e)
             {
@@ -108,21 +108,21 @@ namespace SICore.Connections
             }
         }
 
-		private async Task WaitForConnectionUpgrade(TcpClient tcpClient)
-		{
-			var buffer = new byte[5000];
-			var networkStream = tcpClient.GetStream();
+        private async Task WaitForConnectionUpgrade(TcpClient tcpClient)
+        {
+            var buffer = new byte[5000];
+            var networkStream = tcpClient.GetStream();
 
             var upgradeMessage = new StringBuilder();
-			do
-			{
-				var bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
-				if (bytesRead < 1)
-				{
-					// Нормальное закрытие соединения
-					CloseCore(true, false);
-					return;
-				}
+            do
+            {
+                var bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead < 1)
+                {
+                    // Нормальное закрытие соединения
+                    CloseCore(true, false);
+                    return;
+                }
 
                 upgradeMessage.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
 
@@ -149,18 +149,18 @@ namespace SICore.Connections
             ConnectionId = connectionId;
 
             var response = $"HTTP/1.1 101 Switching Protocols\nUpgrade: sigame\nConnection: Upgrade{connectionIdHeader}\n\n";
-			var bytes = Encoding.UTF8.GetBytes(response);
-			await networkStream.WriteAsync(bytes, 0, bytes.Length);
-		}
+            var bytes = Encoding.UTF8.GetBytes(response);
+            await networkStream.WriteAsync(bytes, 0, bytes.Length);
+        }
 
-		protected bool Deserialize(byte[] data, out Message msg)
+        protected bool Deserialize(byte[] data, out Message msg)
         {
             try
             {
-				if (_logger != null)
-				{
-					_logger.Log(GameId, UserName + " in: " + Encoding.UTF8.GetString(data));
-				}
+                if (_logger != null)
+                {
+                    _logger.Log(GameId, UserName + " in: " + Encoding.UTF8.GetString(data));
+                }
 
                 using var ms = new MemoryStream(data);
                 using var reader = XmlReader.Create(ms);

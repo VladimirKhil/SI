@@ -102,7 +102,7 @@ namespace SICore.Connections
             writer.WriteEndElement();
         }
 
-		public byte[] Serialize()
+        public byte[] Serialize()
         {
             using var memory = new MemoryStream();
             using (var writer = XmlWriter.Create(memory, Settings))

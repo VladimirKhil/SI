@@ -17,15 +17,15 @@ namespace SICore
         ViewerData MyData { get; }
 
         IViewer MyLogic { get; }
-		string Avatar { get; set; }
+        string Avatar { get; set; }
         string ServerPublicPackageUrl { get; set; }
         string[] ContentPublicBaseUrls { get; set; }
 
         event Action PersonConnected;
-		event Action PersonDisconnected;
-		event Action<int, string, string> Timer;
+        event Action PersonDisconnected;
+        event Action<int, string, string> Timer;
 
-		void GetInfo();
+        void GetInfo();
 
         void Pause();
 
@@ -34,10 +34,10 @@ namespace SICore
         void Init();
 
         event Action<IViewerClient> Switch;
-		event Action StageChanged;
-		event Action<string> Ad;
+        event Action StageChanged;
+        event Action<string> Ad;
 
-		void RecreateCommands();
-		void Move(object arg);
-	}
+        void RecreateCommands();
+        void Move(object arg);
+    }
 }

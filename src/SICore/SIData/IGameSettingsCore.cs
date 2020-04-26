@@ -9,9 +9,9 @@
         Account[] Players { get; }
         Account[] Viewers { get; }
 
-		/// <summary>
-		/// Настройки приложения
-		/// </summary>
+        /// <summary>
+        /// Настройки приложения
+        /// </summary>
         T AppSettings { get; }
 
         bool RandomSpecials { get; }
@@ -19,9 +19,9 @@
         string NetworkGamePassword { get; }
         bool AllowViewers { get; }
 
-		/// <summary>
-		/// Автоматическая игра
-		/// </summary>
-		bool IsAutomatic { get; }
-	}
+        /// <summary>
+        /// Автоматическая игра
+        /// </summary>
+        bool IsAutomatic { get; }
+    }
 }

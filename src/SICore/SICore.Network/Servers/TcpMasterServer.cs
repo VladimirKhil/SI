@@ -37,7 +37,7 @@ namespace SICore.Network.Servers
         /// </summary>
         /// <param name="port">Порт для прослушивания</param>
         public TcpMasterServer(int port, INetworkLocalizer localizer)
-			: base(localizer)
+            : base(localizer)
         {
             _port = port;
         }

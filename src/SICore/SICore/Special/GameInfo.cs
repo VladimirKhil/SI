@@ -42,9 +42,9 @@ namespace SICore
         public bool PasswordRequired { get; set; }
         [DataMember]
         public ConnectionPersonData[] Persons { get; set; }
-		[DataMember]
-		public bool Started { get; set; }
-		[DataMember]
-		public GameModes Mode { get; set; }
-	}
+        [DataMember]
+        public bool Started { get; set; }
+        [DataMember]
+        public GameModes Mode { get; set; }
+    }
 }

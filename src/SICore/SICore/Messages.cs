@@ -10,15 +10,15 @@
         /// </summary>
         public const string Accepted = "ACCEPTED";
 
-		/// <summary>
-		/// Реклама
-		/// </summary>
-		public const string Ads = "ADS";
+        /// <summary>
+        /// Реклама
+        /// </summary>
+        public const string Ads = "ADS";
 
-		/// <summary>
-		/// Ответ
-		/// </summary>
-		public const string Answer = "ANSWER";
+        /// <summary>
+        /// Ответ
+        /// </summary>
+        public const string Answer = "ANSWER";
 
         /// <summary>
         /// Требование апелляции
@@ -180,10 +180,10 @@
         /// </summary>
         public const string Kick = "KICK";
 
-		/// <summary>
-		/// Пометить вопрос
-		/// </summary>
-		public const string Mark = "MARK";
+        /// <summary>
+        /// Пометить вопрос
+        /// </summary>
+        public const string Mark = "MARK";
 
         /// <summary>
         /// Сменить состояние игры
@@ -200,25 +200,25 @@
         /// </summary>
         public const string NextDelete = "NEXTDELETE";
 
-		/// <summary>
-		/// Игра не сущетствует
-		/// </summary>
-		public const string NoGame = "NOGAME";
+        /// <summary>
+        /// Игра не сущетствует
+        /// </summary>
+        public const string NoGame = "NOGAME";
 
         /// <summary>
         /// Удалена финальная тема
         /// </summary>
         public const string Out = "OUT";
 
-		/// <summary>
-		/// Идентификатор пакета
-		/// </summary>
-		public const string PackageId = "PACKAGEID";
+        /// <summary>
+        /// Идентификатор пакета
+        /// </summary>
+        public const string PackageId = "PACKAGEID";
 
-		/// <summary>
-		/// Логотип пакета
-		/// </summary>
-		public const string PackageLogo = "PACKAGELOGO";
+        /// <summary>
+        /// Логотип пакета
+        /// </summary>
+        public const string PackageLogo = "PACKAGELOGO";
 
         /// <summary>
         /// Пас на вопросе
@@ -265,25 +265,25 @@
         /// </summary>
         public const string Person = "PERSON";
 
-		/// <summary>
-		/// Игрок принял решение по апелляции
-		/// </summary>
-		public const string PersonApellated = "PERSONAPELLATED";
+        /// <summary>
+        /// Игрок принял решение по апелляции
+        /// </summary>
+        public const string PersonApellated = "PERSONAPELLATED";
 
-		/// <summary>
-		/// Игрок ответил в финале
-		/// </summary>
-		public const string PersonFinalAnswer = "PERSONFINALANSWER";
+        /// <summary>
+        /// Игрок ответил в финале
+        /// </summary>
+        public const string PersonFinalAnswer = "PERSONFINALANSWER";
 
-		/// <summary>
-		/// Игрок сделал ставку в финале
-		/// </summary>
-		public const string PersonFinalStake = "PERSONFINALSTAKE";
+        /// <summary>
+        /// Игрок сделал ставку в финале
+        /// </summary>
+        public const string PersonFinalStake = "PERSONFINALSTAKE";
 
-		/// <summary>
-		/// Ставка игрока
-		/// </summary>
-		public const string PersonStake = "PERSONSTAKE";
+        /// <summary>
+        /// Ставка игрока
+        /// </summary>
+        public const string PersonStake = "PERSONSTAKE";
 
         /// <summary>
         /// Печать сообщения
@@ -305,15 +305,15 @@
         /// </summary>
         public const string RoundThemes = "ROUNDTHEMES";
 
-		/// <summary>
-		/// Задать игрока, выбирающего вопросы
-		/// </summary>
-		public const string SetChooser = "SETCHOOSER";
+        /// <summary>
+        /// Задать игрока, выбирающего вопросы
+        /// </summary>
+        public const string SetChooser = "SETCHOOSER";
 
-		/// <summary>
-		/// Показать табло
-		/// </summary>
-		public const string ShowTable = "SHOWTABLO";
+        /// <summary>
+        /// Показать табло
+        /// </summary>
+        public const string ShowTable = "SHOWTABLO";
 
         /// <summary>
         /// Изменилась стадия игры
@@ -350,15 +350,15 @@
         /// </summary>
         public const string Table = "TABLO2";
 
-		/// <summary>
-		/// Форма текста
-		/// </summary>
-		public const string TextShape = "TEXTSHAPE";
+        /// <summary>
+        /// Форма текста
+        /// </summary>
+        public const string TextShape = "TEXTSHAPE";
 
-		/// <summary>
-		/// Тема
-		/// </summary>
-		public const string Theme = "THEME";
+        /// <summary>
+        /// Тема
+        /// </summary>
+        public const string Theme = "THEME";
 
         /// <summary>
         /// Время

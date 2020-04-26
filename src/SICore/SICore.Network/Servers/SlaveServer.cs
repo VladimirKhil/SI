@@ -18,18 +18,18 @@ namespace SICore.Network.Servers
         {
             get
             {
-				if (HostServer == null)
-					yield break;
+                if (HostServer == null)
+                    yield break;
 
-				yield return HostServer;
-			}
+                yield return HostServer;
+            }
         }
 
-		public SlaveServer(INetworkLocalizer localizer)
-			: base(localizer)
-		{
+        public SlaveServer(INetworkLocalizer localizer)
+            : base(localizer)
+        {
 
-		}
+        }
 
         public override bool AddConnection(IConnection externalServer)
         {
@@ -56,8 +56,8 @@ namespace SICore.Network.Servers
                 }
             }
 
-			base.RemoveConnection(connection, withError);
-		}
+            base.RemoveConnection(connection, withError);
+        }
 
         public abstract Task Connect(bool upgrade);
 

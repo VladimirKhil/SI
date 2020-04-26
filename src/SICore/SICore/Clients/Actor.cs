@@ -33,7 +33,7 @@ namespace SICore
         public abstract void OnMessageReceived(Message message);
         protected abstract L CreateLogic(Account personData);
 
-		public ILocalizer LO { get; protected set; }
+        public ILocalizer LO { get; protected set; }
 
         public Actor(Client client, Account personData, IGameManager manager, ILocalizer localizer, D data = null)
         {

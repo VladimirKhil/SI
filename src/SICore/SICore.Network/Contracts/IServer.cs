@@ -17,10 +17,10 @@ namespace SICore.Network.Contracts
         object ConnectionsSync { get; }
 
         void AddClient(IClient client);
-		Task DeleteClientAsync(string name);
-		bool IsOnline(string name);
-		bool IsOnlineInternal(string name);
-		string IsOnlineString(string name);
+        Task DeleteClientAsync(string name);
+        bool IsOnline(string name);
+        bool IsOnlineInternal(string name);
+        string IsOnlineString(string name);
         bool Contains(string name);
 
         void OnError(Exception exc, bool isWarning);

@@ -67,8 +67,8 @@ namespace SICore
 
         protected void OnError(Exception exception)
         {
-			Error?.Invoke(exception);
-		}
+            Error?.Invoke(exception);
+        }
 
         public virtual void Dispose()
         {

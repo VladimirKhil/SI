@@ -32,8 +32,8 @@ namespace SICore
         public IViewer MyLogic { get { return _logic; } }
 
         public event Action<IViewerClient> Switch;
-		public event Action StageChanged;
-		public event Action<string> Ad;
+        public event Action StageChanged;
+        public event Action<string> Ad;
 
         public ViewerData MyData => ClientData;
 
@@ -58,9 +58,9 @@ namespace SICore
             ClientData.DeleteTable = new CustomCommand(DeleteTable_Executed) { CanBeExecuted = IsHost };
 
             ClientData.AtomViewed = new CustomCommand(arg => SendMessage(Messages.Atom));
-		}
+        }
 
-		private void ChangeType_Executed(object arg)
+        private void ChangeType_Executed(object arg)
         {
             var account = (PersonAccount)arg;
             var player = account as PlayerAccount;
@@ -123,20 +123,20 @@ namespace SICore
 
             Initialize(isHost);
 
-			ClientData.Picture = personData.Picture;
-		}
+            ClientData.Picture = personData.Picture;
+        }
 
-		public void Move(object arg)
-		{
-			SendMessageWithArgs(Messages.Move, arg);
-		}
-
-		private void Kick_Executed(object arg)
+        public void Move(object arg)
         {
-			if (!(arg is ViewerAccount person))
-				return;
+            SendMessageWithArgs(Messages.Move, arg);
+        }
 
-			if (person == ClientData.Me)
+        private void Kick_Executed(object arg)
+        {
+            if (!(arg is ViewerAccount person))
+                return;
+
+            if (person == ClientData.Me)
             {
                 AddLog(LO[nameof(R.CannotKickYouself)] + Environment.NewLine);
                 return;
@@ -153,10 +153,10 @@ namespace SICore
 
         private void Ban_Executed(object arg)
         {
-			if (!(arg is ViewerAccount person))
-				return;
+            if (!(arg is ViewerAccount person))
+                return;
 
-			if (person == ClientData.Me)
+            if (person == ClientData.Me)
             {
                 AddLog(LO[nameof(R.CannotBanYourself)] + Environment.NewLine);
                 return;
@@ -248,7 +248,7 @@ namespace SICore
                             int.TryParse(mparams[2], out int index);
                             InsertPerson(mparams[1], account, index);
 
-							PersonConnected?.Invoke();
+                            PersonConnected?.Invoke();
 
                             UpdateDeleteTableCommand();
 
@@ -275,7 +275,7 @@ namespace SICore
                             {
                                 person.Connected = false;
                                 person.Name = Constants.FreePlace;
-								person.Picture = "";
+                                person.Picture = "";
                             }
 
                             var personAccount = person as PersonAccount;
@@ -313,7 +313,7 @@ namespace SICore
                                 }
                             }
 
-							PersonDisconnected?.Invoke();
+                            PersonDisconnected?.Invoke();
 
                             UpdateDeleteTableCommand();
 
@@ -343,20 +343,20 @@ namespace SICore
                             break;
                             #endregion
                         }
-					case Messages.PackageId:
-						{
-							if (mparams.Length > 1)
-							{
-								ClientData.PackageId = mparams[1];
-							}
-							break;
-						}
-					case Messages.PackageLogo:
-						{
-							_logic.OnPackageLogo(mparams[1]);
-							break;
-						}
-					case Messages.FalseStart:
+                    case Messages.PackageId:
+                        {
+                            if (mparams.Length > 1)
+                            {
+                                ClientData.PackageId = mparams[1];
+                            }
+                            break;
+                        }
+                    case Messages.PackageLogo:
+                        {
+                            _logic.OnPackageLogo(mparams[1]);
+                            break;
+                        }
+                    case Messages.FalseStart:
                         {
                             if (mparams.Length > 1)
                             {
@@ -374,9 +374,9 @@ namespace SICore
                                 var address = Connector.ServerAddress;
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
-									if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
-										studia = studia.Replace(Constants.GameHost, hostUri.Host);
-								}
+                                    if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                                        studia = studia.Replace(Constants.GameHost, hostUri.Host);
+                                }
                             }
 
                             ClientData.Studia = studia;
@@ -397,7 +397,7 @@ namespace SICore
                             }
 
                             _logic.Print(s.ToString());
-							Ad?.Invoke(null);
+                            Ad?.Invoke(null);
                             break;
 
                             #endregion
@@ -409,20 +409,20 @@ namespace SICore
                             ClientData.TInfo.Pause = mparams[1] == "+";
                             _logic.OnPauseChanged();
 
-							if (mparams.Length > 4)
-							{
-								var message = ClientData.TInfo.Pause ? "USER_PAUSE" : "USER_RESUME";
+                            if (mparams.Length > 4)
+                            {
+                                var message = ClientData.TInfo.Pause ? "USER_PAUSE" : "USER_RESUME";
 
-								_logic.OnTimerChanged(0, message, mparams[2], null);
-								_logic.OnTimerChanged(1, message, mparams[3], null);
-								_logic.OnTimerChanged(2, message, mparams[4], null);
-								
-								Timer?.Invoke(0, message, mparams[2]);
-								Timer?.Invoke(1, message, mparams[3]);
-								Timer?.Invoke(2, message, mparams[4]);
-							}
+                                _logic.OnTimerChanged(0, message, mparams[2], null);
+                                _logic.OnTimerChanged(1, message, mparams[3], null);
+                                _logic.OnTimerChanged(2, message, mparams[4], null);
+                                
+                                Timer?.Invoke(0, message, mparams[2]);
+                                Timer?.Invoke(1, message, mparams[3]);
+                                Timer?.Invoke(2, message, mparams[4]);
+                            }
 
-							break;
+                            break;
 
                             #endregion
                         }
@@ -492,9 +492,9 @@ namespace SICore
                                     for (int i = 0; i < ClientData.Players.Count; i++)
                                     {
                                         ClientData.Players[i].InGame = true;
-										ClientData.Players[i].IsChooser = false;
+                                        ClientData.Players[i].IsChooser = false;
 
-									}
+                                    }
 
                                     break;
 
@@ -503,27 +503,27 @@ namespace SICore
                                     ClientData._atomType = AtomTypes.Text;
                                     break;
 
-								case GameStage.After:
-									ClientData.BackLink.OnGameFinished(ClientData.PackageId);
-									break;
+                                case GameStage.After:
+                                    ClientData.BackLink.OnGameFinished(ClientData.PackageId);
+                                    break;
                             }
 
                             _logic.Stage();
-							StageChanged?.Invoke();
+                            StageChanged?.Invoke();
 
                             #endregion
                             break;
                         }
-					case Messages.Timer:
-						{
-							var timerIndex = int.Parse(mparams[1]);
-							var timerCommand = mparams[2];
+                    case Messages.Timer:
+                        {
+                            var timerIndex = int.Parse(mparams[1]);
+                            var timerCommand = mparams[2];
 
-							_logic.OnTimerChanged(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null, mparams.Length > 4 ? mparams[4] : null);
-							Timer?.Invoke(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null);
+                            _logic.OnTimerChanged(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null, mparams.Length > 4 ? mparams[4] : null);
+                            Timer?.Invoke(timerIndex, timerCommand, mparams.Length > 3 ? mparams[3] : null);
 
-							break;
-						}
+                            break;
+                        }
                     case Messages.GameThemes:
                         {
                             #region GameThemes
@@ -545,16 +545,16 @@ namespace SICore
 
                             var print = mparams[1] == "+";
 
-							lock (ClientData.TInfoLock)
-							{
-								ClientData.TInfo.RoundInfo.Clear();
-								for (int i = 2; i < mparams.Length; i++)
-								{
-									ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
-									if (print)
-										_logic.Print(ReplicManager.System(mparams[i]));
-								}
-							}
+                            lock (ClientData.TInfoLock)
+                            {
+                                ClientData.TInfo.RoundInfo.Clear();
+                                for (int i = 2; i < mparams.Length; i++)
+                                {
+                                    ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
+                                    if (print)
+                                        _logic.Print(ReplicManager.System(mparams[i]));
+                                }
+                            }
 
                             try
                             {
@@ -580,30 +580,30 @@ namespace SICore
                         break;
                     case Messages.Table:
                         {
-							#region Tablo2
+                            #region Tablo2
 
-							lock (ClientData.TInfoLock)
-							{
-								if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
-									break;
+                            lock (ClientData.TInfoLock)
+                            {
+                                if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
+                                    break;
 
-								var index = 1;
-								for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
-								{
-									if (index == mparams.Length)
-										break;
+                                var index = 1;
+                                for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
+                                {
+                                    if (index == mparams.Length)
+                                        break;
 
-									while (index < mparams.Length && mparams[index].Length > 0) // пустой параметр разделяет темы
-									{
-										if (!int.TryParse(mparams[index++], out int price))
-											price = -1;
+                                    while (index < mparams.Length && mparams[index].Length > 0) // пустой параметр разделяет темы
+                                    {
+                                        if (!int.TryParse(mparams[index++], out int price))
+                                            price = -1;
 
-										ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
-									}
+                                        ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
+                                    }
 
-									index++;
-								}
-							}
+                                    index++;
+                                }
+                            }
 
                             _logic.TableLoaded();
 
@@ -624,7 +624,7 @@ namespace SICore
                             #region Choice
 
                             lock (ClientData.ChoiceLock)
-							lock (ClientData.TInfoLock)
+                            lock (ClientData.TInfoLock)
                             {
                                 ClientData.ThemeIndex = int.Parse(mparams[1]);
                                 ClientData.QuestionIndex = int.Parse(mparams[2]);
@@ -638,7 +638,7 @@ namespace SICore
                             {
                                 player.Pass = false;
                                 player.Stake = 0;
-								player.SafeStake = false;
+                                player.SafeStake = false;
                             }
 
                             _logic.Choice();
@@ -652,18 +652,18 @@ namespace SICore
 
                             ClientData._atomType = AtomTypes.Text;
                             ClientData.AtomIndex = -1;
-							ClientData.IsPartial = false;
+                            ClientData.IsPartial = false;
                             ClientData._qtype = mparams[1];
 
-							_logic.QType();
+                            _logic.QType();
 
                             #endregion
                             break;
                         }
 
-					case Messages.TextShape:
-						_logic.TextShape(mparams);
-						break;
+                    case Messages.TextShape:
+                        _logic.TextShape(mparams);
+                        break;
 
                     case Messages.Atom:
                         _logic.SetAtom(mparams);
@@ -685,14 +685,14 @@ namespace SICore
                         {
                             #region Try
 
-							if (mparams.Length > 1 && mparams[1] == "NF")
-							{
-								// Здесь можно не показывать рамку
-								if (!ClientData.BackLink.ShowBorderOnFalseStart)
-								{
-									return;
-								}
-							}
+                            if (mparams.Length > 1 && mparams[1] == "NF")
+                            {
+                                // Здесь можно не показывать рамку
+                                if (!ClientData.BackLink.ShowBorderOnFalseStart)
+                                {
+                                    return;
+                                }
+                            }
 
                             _logic.Try();
 
@@ -701,15 +701,15 @@ namespace SICore
                         }
                     case Messages.EndTry:
                         {
-							#region EndTry
+                            #region EndTry
 
-							if (mparams[1] == "A")
-							{
-								_logic.OnTimerChanged(1, "STOP", "", null);
-								Timer?.Invoke(1, "STOP", "");
-							}
+                            if (mparams[1] == "A")
+                            {
+                                _logic.OnTimerChanged(1, "STOP", "", null);
+                                Timer?.Invoke(1, "STOP", "");
+                            }
 
-							_logic.EndTry(mparams[1]);
+                            _logic.EndTry(mparams[1]);
 
                             #endregion
                             break;
@@ -768,30 +768,30 @@ namespace SICore
                             _logic.OnPersonPass(int.Parse(mparams[1]));
                             break;
                         }
-					case Messages.PersonFinalAnswer:
-						{
-							if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
-							{
-								_logic.OnPersonFinalAnswer(playerIndex);
-							}
-							break;
-						}
-					case Messages.PersonApellated:
-						{
-							if (int.TryParse(mparams[1], out int playerIndex))
-							{
-								_logic.OnPersonApellated(playerIndex);
-							}
-							break;
-						}
-					case Messages.PersonFinalStake:
-						{
-							if (int.TryParse(mparams[1], out int playerIndex))
-							{
-								_logic.OnPersonFinalStake(playerIndex);
-							}
-							break;
-						}
+                    case Messages.PersonFinalAnswer:
+                        {
+                            if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
+                            {
+                                _logic.OnPersonFinalAnswer(playerIndex);
+                            }
+                            break;
+                        }
+                    case Messages.PersonApellated:
+                        {
+                            if (int.TryParse(mparams[1], out int playerIndex))
+                            {
+                                _logic.OnPersonApellated(playerIndex);
+                            }
+                            break;
+                        }
+                    case Messages.PersonFinalStake:
+                        {
+                            if (int.TryParse(mparams[1], out int playerIndex))
+                            {
+                                _logic.OnPersonFinalStake(playerIndex);
+                            }
+                            break;
+                        }
                     case Messages.PersonStake:
                         {
                             #region PersonStake
@@ -801,20 +801,20 @@ namespace SICore
                                 return;
 
                             int stake;
-							if (mparams[2] == "0")
-								stake = -1;
-							else if (mparams[2] == "2")
-								stake = -2;
-							else if (mparams[2] == "3")
-								stake = -3;
-							else
-							{
-								stake = int.Parse(mparams[3]);
-								if (mparams.Length > 4)
-								{
-									ClientData.Players[ClientData._lastStakerNum].SafeStake = true;
-								}
-							}
+                            if (mparams[2] == "0")
+                                stake = -1;
+                            else if (mparams[2] == "2")
+                                stake = -2;
+                            else if (mparams[2] == "3")
+                                stake = -3;
+                            else
+                            {
+                                stake = int.Parse(mparams[3]);
+                                if (mparams.Length > 4)
+                                {
+                                    ClientData.Players[ClientData._lastStakerNum].SafeStake = true;
+                                }
+                            }
 
                             ClientData.Players[ClientData._lastStakerNum].Stake = stake;
 
@@ -827,16 +827,16 @@ namespace SICore
 
                             _logic.StopRound();
 
-							_logic.OnTimerChanged(0, "STOP", "", null);
-							_logic.OnTimerChanged(1, "STOP", "", null);
-							_logic.OnTimerChanged(2, "STOP", "", null);
+                            _logic.OnTimerChanged(0, "STOP", "", null);
+                            _logic.OnTimerChanged(1, "STOP", "", null);
+                            _logic.OnTimerChanged(2, "STOP", "", null);
 
-							Timer?.Invoke(0, "STOP", "");
-							Timer?.Invoke(1, "STOP", "");
-							Timer?.Invoke(2, "STOP", "");
+                            Timer?.Invoke(0, "STOP", "");
+                            Timer?.Invoke(1, "STOP", "");
+                            Timer?.Invoke(2, "STOP", "");
 
-							#endregion
-							break;
+                            #endregion
+                            break;
                         }
                     case Messages.FinalRound:
                         {
@@ -848,7 +848,7 @@ namespace SICore
                             }
 
                             ClientData.AtomIndex = -1;
-							ClientData.IsPartial = false;
+                            ClientData.IsPartial = false;
 
                             #endregion
                             break;
@@ -858,7 +858,7 @@ namespace SICore
                             #region Out
 
                             lock (ClientData.ChoiceLock)
-							lock (ClientData.TInfoLock)
+                            lock (ClientData.TInfoLock)
                             {
                                 ClientData.ThemeIndex = int.Parse(mparams[1]);
                                 if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
@@ -904,28 +904,28 @@ namespace SICore
                             #endregion
                             break;
                         }
-					case Messages.SetChooser:
-						{
-							var index = int.Parse(mparams[1]);
+                    case Messages.SetChooser:
+                        {
+                            var index = int.Parse(mparams[1]);
 
-							for (int i = 0; i < ClientData.Players.Count; i++)
-							{
-								ClientData.Players[i].IsChooser = i == index;
+                            for (int i = 0; i < ClientData.Players.Count; i++)
+                            {
+                                ClientData.Players[i].IsChooser = i == index;
 
-								if (i == index && mparams.Length > 2)
-								{
-									ClientData.Players[i].State = PlayerState.Press;
-								}
-							}
+                                if (i == index && mparams.Length > 2)
+                                {
+                                    ClientData.Players[i].State = PlayerState.Press;
+                                }
+                            }
 
-							break;
-						}
-					case Messages.Ads:
-						if (mparams.Length > 1)
-						{
-							Ad?.Invoke(mparams[1]);
-						}
-						break;
+                            break;
+                        }
+                    case Messages.Ads:
+                        if (mparams.Length > 1)
+                        {
+                            Ad?.Invoke(mparams[1]);
+                        }
+                        break;
                 }
             }
             catch (Exception exc)
@@ -951,12 +951,12 @@ namespace SICore
 
                         CreatePlayerCommands(account);
 
-						var clone = new List<PlayerAccount>(ClientData.Players)
-						{
-							account
-						};
+                        var clone = new List<PlayerAccount>(ClientData.Players)
+                        {
+                            account
+                        };
 
-						ClientData.Players = clone;
+                        ClientData.Players = clone;
 
                         UpdateAddTableCommand();
                         UpdateDeleteTableCommand();
@@ -991,10 +991,10 @@ namespace SICore
                         var isPlayer = personType == "player";
                         if (isPlayer)
                         {
-							if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
-								break;
+                            if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+                                break;
 
-							account = ClientData.Players[index];
+                            account = ClientData.Players[index];
                         }
                         else
                         {
@@ -1039,10 +1039,10 @@ namespace SICore
 
                         var indexString = mparams[2];
 
-						if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
-							break;
+                        if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+                            break;
 
-						PlayerAccount account = null;
+                        PlayerAccount account = null;
                         ViewerAccount newAccount = null;
 
                         ClientData.BeginUpdatePersons();
@@ -1061,12 +1061,12 @@ namespace SICore
                             {
                                 newAccount = new ViewerAccount(account) { Connected = true };
 
-								var cloneV = new List<ViewerAccount>(ClientData.Viewers)
-								{
-									newAccount
-								};
+                                var cloneV = new List<ViewerAccount>(ClientData.Viewers)
+                                {
+                                    newAccount
+                                };
 
-								ClientData.Viewers = cloneV;
+                                ClientData.Viewers = cloneV;
                             }
 
                             if (IsHost)
@@ -1108,10 +1108,10 @@ namespace SICore
                         var isPlayer = personType == "player";
                         if (isPlayer)
                         {
-							if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
-								break;
+                            if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+                                break;
 
-							account = ClientData.Players[index];
+                            account = ClientData.Players[index];
                         }
                         else
                         {
@@ -1253,8 +1253,8 @@ namespace SICore
                                 {
                                     var current = (PersonAccount)ClientData.Me;
 
-									account.BeReadyCommand = current.BeReadyCommand;
-									account.BeUnReadyCommand = current.BeUnReadyCommand;
+                                    account.BeReadyCommand = current.BeReadyCommand;
+                                    account.BeUnReadyCommand = current.BeUnReadyCommand;
 
                                     current.BeReadyCommand = null;
                                     current.BeUnReadyCommand = null;
@@ -1424,10 +1424,10 @@ namespace SICore
                     break;
             }
 
-			if (ClientData.Me is PersonAccount current)
-			{
-				current.BeReadyCommand = current.BeUnReadyCommand = null;
-			}
+            if (ClientData.Me is PersonAccount current)
+            {
+                current.BeReadyCommand = current.BeUnReadyCommand = null;
+            }
 
             viewer.Avatar = Avatar;
             viewer.ServerPublicPackageUrl = ServerPublicPackageUrl;
@@ -1443,7 +1443,7 @@ namespace SICore
 
             Switch?.Invoke(viewer);
 
-			SendPicture();
+            SendPicture();
         }
 
         private void ProcessInfo(string[] mparams)
@@ -1576,16 +1576,16 @@ namespace SICore
             var showman = ClientData.ShowMan;
 
             showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.Connected };
-			showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
-			showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
+            showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
+            showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
         }
 
         private void CreatePlayerCommands(PlayerAccount player)
         {
             player.Free = new CustomCommand(Free_Executed) { CanBeExecuted = player.IsHuman && player.Connected };
-			player.Replace = new CustomCommand(arg => Replace_Executed(player, arg)) { CanBeExecuted = true };
-			player.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = ClientData.Players.Count > 2 };
-			player.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
+            player.Replace = new CustomCommand(arg => Replace_Executed(player, arg)) { CanBeExecuted = true };
+            player.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = ClientData.Players.Count > 2 };
+            player.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
 
             UpdateOthers(player);
         }
@@ -1652,7 +1652,7 @@ namespace SICore
 
                         player.Name = account.Name;
                         player.Picture = account.Picture;
-						player.IsMale = account.IsMale;
+                        player.IsMale = account.IsMale;
                         player.IsHuman = true;
                         player.Connected = true;
                         player.Ready = false;
@@ -1761,18 +1761,18 @@ namespace SICore
         /// <param name="path"></param>
         public void SendPicture()
         {
-			if (Avatar != null)
-			{
-				SendMessage(Messages.Picture, Avatar);
-				return;
-			}
+            if (Avatar != null)
+            {
+                SendMessage(Messages.Picture, Avatar);
+                return;
+            }
 
             if (!string.IsNullOrEmpty(ClientData.Picture))
             {
-				if (!Uri.TryCreate(ClientData.Picture, UriKind.RelativeOrAbsolute, out Uri uri))
-					return;
+                if (!Uri.TryCreate(ClientData.Picture, UriKind.RelativeOrAbsolute, out Uri uri))
+                    return;
 
-				if (!uri.IsAbsoluteUri)
+                if (!uri.IsAbsoluteUri)
                     return;
 
                 if (uri.Scheme == "file" && !_client.Server.Contains(NetworkConstants.GameName)) // Нужно передать локальный файл по сети
@@ -1805,7 +1805,7 @@ namespace SICore
             SendMessage(Messages.Info);
         }
 
-		public void Rename(string name)
+        public void Rename(string name)
         {
             _client.Name = name;
         }

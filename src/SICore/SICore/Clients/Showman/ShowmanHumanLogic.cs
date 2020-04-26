@@ -91,11 +91,11 @@ namespace SICore
             _data.Hint = _actor.LO[nameof(R.HintMakeAStake)];
             _data.BackLink.OnFlash();
 
-			foreach (var player in _data.Players)
-			{
-				player.IsDeciding = false;
-			}
-		}
+            foreach (var player in _data.Players)
+            {
+                player.IsDeciding = false;
+            }
+        }
 
         public void ChooseFinalTheme()
         {
@@ -117,12 +117,12 @@ namespace SICore
             _data.Hint = _actor.LO[nameof(R.HintChooseCatPrice)];
             _data.DialogMode = DialogModes.CatCost;
 
-			foreach (var player in _data.Players)
-			{
-				player.IsDeciding = false;
-			}
+            foreach (var player in _data.Players)
+            {
+                player.IsDeciding = false;
+            }
 
-			_data.BackLink.OnFlash();
+            _data.BackLink.OnFlash();
         }
 
         public void Table()

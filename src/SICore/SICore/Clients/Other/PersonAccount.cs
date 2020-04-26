@@ -61,25 +61,25 @@ namespace SICore
             set { if (_changeType != value) { _changeType = value; OnPropertyChanged(); } }
         }
 
-		private bool _isChooser = false;
+        private bool _isChooser = false;
 
-		public bool IsChooser
-		{
-			get { return _isChooser; }
-			set
-			{
-				if (_isChooser != value)
-				{
-					_isChooser = value;
-					OnPropertyChanged();
-				}
-			}
-		}
+        public bool IsChooser
+        {
+            get { return _isChooser; }
+            set
+            {
+                if (_isChooser != value)
+                {
+                    _isChooser = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
-		/// <summary>
-		/// Заменить
-		/// </summary>
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        /// <summary>
+        /// Заменить
+        /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private CustomCommand _replace = null;
 
         public CustomCommand Replace
@@ -119,7 +119,7 @@ namespace SICore
 
         public bool IsShowman { get; set; }
 
-		public bool IsMe { get;set; }
+        public bool IsMe { get;set; }
 
         private bool isExtendedMode = false;
 
@@ -136,22 +136,22 @@ namespace SICore
             }
         }
 
-		private bool _isDeciding;
+        private bool _isDeciding;
 
-		public bool IsDeciding
-		{
-			get { return _isDeciding; }
-			set
+        public bool IsDeciding
+        {
+            get { return _isDeciding; }
+            set
             {
                 if (_isDeciding != value)
-				{
-					_isDeciding = value;
-					OnPropertyChanged();
-				}
-			}
-		}
-		
-		public PersonAccount(string name, bool sex, bool connected, bool gameStarted)
+                {
+                    _isDeciding = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+        public PersonAccount(string name, bool sex, bool connected, bool gameStarted)
             : base(name, sex, connected)
         {
             _gameStarted = gameStarted;

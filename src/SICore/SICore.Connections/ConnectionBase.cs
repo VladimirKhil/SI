@@ -8,7 +8,7 @@ namespace SICore.Connections
     /// </summary>
     public abstract class ConnectionBase : IConnection
     {
-		protected bool IsClosed { get; private set; } = false;
+        protected bool IsClosed { get; private set; } = false;
 
         public string ConnectionId { get; protected set; }
 
@@ -24,14 +24,14 @@ namespace SICore.Connections
 
         public object ClientsSync { get; } = new object();
 
-		/// <summary>
-		/// Адрес удалённого подключения
-		/// </summary>
+        /// <summary>
+        /// Адрес удалённого подключения
+        /// </summary>
         public abstract string RemoteAddress { get; }
 
-		/// <summary>
-		/// Авторизован ли удалённый клиент
-		/// </summary>
+        /// <summary>
+        /// Авторизован ли удалённый клиент
+        /// </summary>
         public bool IsAuthenticated { get; set; }
 
         /// <summary>
@@ -51,16 +51,16 @@ namespace SICore.Connections
 
         public event Action<Message> SerializationError;
 
-		public string UserName { get; set; } = Guid.NewGuid().ToString();
+        public string UserName { get; set; } = Guid.NewGuid().ToString();
 
-		public int GameId { get; set; }
+        public int GameId { get; set; }
 
-		public abstract void SendMessage(Message m);
+        public abstract void SendMessage(Message m);
 
-		public virtual void Close()
-		{
+        public virtual void Close()
+        {
 
-		}
+        }
 
         protected virtual void CloseCore(bool informServer, bool withError = false)
         {
@@ -69,7 +69,7 @@ namespace SICore.Connections
                 return;
             }
 
-			Close();
+            Close();
 
             IsClosed = true;
 
@@ -83,16 +83,16 @@ namespace SICore.Connections
 
         protected void OnConnectionClose(bool withError)
         {
-			System.Threading.Tasks.Task.Run(() =>
-			{
-				ConnectionClose?.Invoke(this, withError);
-			}).ContinueWith(task =>
-			{
-				if (task.IsFaulted)
-				{
-					OnError(task.Exception.InnerException, true);
-				}
-			});
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                ConnectionClose?.Invoke(this, withError);
+            }).ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    OnError(task.Exception.InnerException, true);
+                }
+            });
         }
 
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
