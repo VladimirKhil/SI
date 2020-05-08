@@ -25,5 +25,7 @@
         /// Максимальное количество игроков в игре
         /// </summary>
         public const int MaxPlayers = 12;
+
+        public const int AutomaticGameStartDuration = 300;
     }
 }

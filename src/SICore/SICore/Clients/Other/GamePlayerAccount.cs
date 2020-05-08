@@ -1,4 +1,5 @@
 ﻿using SIData;
+using System;
 
 namespace SICore
 {
@@ -38,7 +39,7 @@ namespace SICore
         /// <summary>
         /// Ответ игрока
         /// </summary>
-        internal string Answer { get; set; }
+        internal string Answer { get; set; };
 
         /// <summary>
         /// Ответ верен
@@ -69,6 +70,12 @@ namespace SICore
         /// Штраф за пинг (для выравнивания шансов)
         /// </summary>
         internal int PingPenalty { get; set; }
+
+        /// <summary>
+        /// Время последней неудачной попытки нажать кнопку
+        /// </summary>
+        internal DateTime LastBadTryTime { get; set; }
+
         public GamePlayerAccount(Account account)
             : base(account)
         {

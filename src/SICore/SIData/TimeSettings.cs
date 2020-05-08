@@ -182,6 +182,13 @@ namespace SIData
             }
             set { All[TimeSettingsTypes.MediaDelay] = value; }
         }
+        
+        [DefaultValue(3)]
+        [DataMember]
+        /// <summary>
+        /// Время на блокировку игровой кнопки
+        /// </summary>
+        public int TimeForBlockingButton { get; } = 3;
 
         public TimeSettings()
         {

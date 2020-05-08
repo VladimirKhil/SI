@@ -1,7 +1,6 @@
 ﻿using SICore.Connections;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
@@ -444,6 +443,7 @@ namespace SICore
         }
 
         public string PackageId { get; internal set; }
+        public int ButtonBlockingTime { get; internal set; } = 3;
 
         internal event Action AutoReadyChanged;
 

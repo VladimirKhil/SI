@@ -589,7 +589,7 @@
     <value>oral</value>
   </data>
   <data name="TypeSport" xml:space="preserve">
-    <value>sport</value>
+    <value>simple</value>
   </data>
   <data name="UnknownType" xml:space="preserve">
     <value>Unknown question type is detected</value>

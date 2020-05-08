@@ -80,10 +80,10 @@ namespace SICore
             if (_data.Settings.IsAutomatic)
             {
                 // Необходимо запустить игру автоматически
-                Execute(Tasks.AutoGame, 300);
+                Execute(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
                 _data.TimerStartTime[2] = DateTime.Now;
 
-                _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", 300, -2);
+                _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", Constants.AutomaticGameStartDuration, -2);
             }
         }
 
@@ -119,9 +119,7 @@ namespace SICore
 
             if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
             {
-                _data.TimerStartTime[0] = DateTime.Now;
-
-                _actor.SendMessageWithArgs(Messages.Timer, 0, "GO", _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
+                RunRoundTimer();
             }
         }
 
@@ -130,7 +128,9 @@ namespace SICore
             _data.TInfo.RoundInfo.Clear();
 
             foreach (var theme in themes)
+            {
                 _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
+            }
 
             _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.RoundThemes)]));
 
@@ -614,14 +614,20 @@ namespace SICore
 
         protected override void Dispose(bool disposing)
         {
-            lock (ClientData.TaskLock)
+            var locked = Monitor.TryEnter(ClientData.TaskLock, TimeSpan.FromSeconds(5.0));
+            if (!locked)
             {
-                if (_data.AcceptedReports > 0)
-                {
-                    _data.AcceptedReports = 0;
-                    _data.BackLink.SaveReport(_data.GameResultInfo);
-                }
+                ClientData.BackLink.OnError(new Exception($"Cannot lock {nameof(ClientData.TaskLock)}!"));
+            }
 
+            if (_data.AcceptedReports > 0)
+            {
+                _data.AcceptedReports = 0;
+                _data.BackLink.SaveReport(_data.GameResultInfo);
+            }
+
+            try
+            {
                 if (Engine != null)
                 {
                     Engine.Dispose();
@@ -630,6 +636,13 @@ namespace SICore
 
                 base.Dispose(disposing);
             }
+            finally
+            {
+                if (locked)
+                {
+                    Monitor.Exit(ClientData.TaskLock);
+                }
+            }
         }
 
         internal override void Stop(StopReason reason)
@@ -637,7 +650,9 @@ namespace SICore
             if (_stopReason == StopReason.None)
             {
                 if (reason == StopReason.Decision)
+                {
                     ClientData.IsWaiting = false; // Чтобы не обрабатывать повторные сообщения
+                }
 
                 _stopReason = reason;
                 ExecuteImmediate();
@@ -721,55 +736,7 @@ namespace SICore
                     return OnDecisionNextPersonStakeMaking();
 
                 case DecisionType.AuctionStakeMaking:
-
-                    #region AuctionStakeMaking
-
-                    if (_data.StakeType.HasValue)
-                    {
-                        StopWaiting();
-
-                        var playerIndex = _data.Order[_data.OrderIndex];
-                        if (_data.StakeType == StakeMode.Nominal)
-                        {
-                            _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Nominal)]);
-                            _data.Stake = _data.CurPriceRight;
-                            _data.StakerIndex = playerIndex;
-                        }
-                        else if (_data.StakeType == StakeMode.Sum)
-                        {
-                            _actor.PlayerReplic(playerIndex, Notion.FormatNumber(_data.StakeSum));
-                            _data.Stake = _data.StakeSum;
-                            _data.StakerIndex = playerIndex;
-                        }
-                        else if (_data.StakeType == StakeMode.Pass)
-                        {
-                            _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Pass)]);
-                            _data.Players[playerIndex].StakeMaking = false;
-                        }
-                        else
-                        {
-                            _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.VaBank)]);
-                            _data.Stake = _data.Players[playerIndex].Sum;
-                            _data.StakerIndex = playerIndex;
-                            _data.AllIn = true;
-                        }
-
-                        var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
-
-                        var s = new StringBuilder(Messages.PersonStake);
-                        s.Append(Message.ArgsSeparatorChar).Append(playerIndex);
-                        s.Append(Message.ArgsSeparatorChar).Append((int)printedStakeType);
-                        if (printedStakeType == StakeMode.Sum)
-                            s.Append(Message.ArgsSeparatorChar).Append(_data.Stake);
-
-                        _actor.SendMessage(s.ToString());
-
-                        Execute(Tasks.AskStake, 5);
-                        return true;
-                    }
-                    break;
-
-                    #endregion
+                    return OnDecisionAuctionStakeMaking();
 
                 case DecisionType.NextPersonFinalThemeDeleting:
 
@@ -851,6 +818,57 @@ namespace SICore
             }
 
             return false;
+        }
+
+        private bool OnDecisionAuctionStakeMaking()
+        {
+            if (!_data.StakeType.HasValue)
+            {
+                return false;
+            }
+
+            StopWaiting();
+
+            var playerIndex = _data.Order[_data.OrderIndex];
+            if (_data.StakeType == StakeMode.Nominal)
+            {
+                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Nominal)]);
+                _data.Stake = _data.CurPriceRight;
+                _data.StakerIndex = playerIndex;
+            }
+            else if (_data.StakeType == StakeMode.Sum)
+            {
+                _actor.PlayerReplic(playerIndex, Notion.FormatNumber(_data.StakeSum));
+                _data.Stake = _data.StakeSum;
+                _data.StakerIndex = playerIndex;
+            }
+            else if (_data.StakeType == StakeMode.Pass)
+            {
+                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Pass)]);
+                _data.Players[playerIndex].StakeMaking = false;
+            }
+            else
+            {
+                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.VaBank)]);
+                _data.Stake = _data.Players[playerIndex].Sum;
+                _data.StakerIndex = playerIndex;
+                _data.AllIn = true;
+            }
+
+            var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
+
+            var s = new StringBuilder(Messages.PersonStake)
+                .Append(Message.ArgsSeparatorChar).Append(playerIndex)
+                .Append(Message.ArgsSeparatorChar).Append((int)printedStakeType);
+            if (printedStakeType == StakeMode.Sum)
+            {
+                s.Append(Message.ArgsSeparatorChar).Append(_data.Stake);
+            }
+
+            _actor.SendMessage(s.ToString());
+
+            Execute(Tasks.AskStake, 5);
+            return true;
         }
 
         private bool OnDecisionAnswerValidating()
@@ -1076,11 +1094,15 @@ namespace SICore
             _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
             Execute(Tasks.AskToChoose, 20);
-
-            _data.TimerStartTime[0] = DateTime.Now;
-            _actor.SendMessageWithArgs(Messages.Timer, 0, "GO", _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
+            RunRoundTimer();
 
             return true;
+        }
+
+        private void RunRoundTimer()
+        {
+            _data.TimerStartTime[0] = DateTime.Now;
+            _actor.SendMessageWithArgs(Messages.Timer, 0, "GO", _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
         }
 
         private bool OnDecisionAnswering()
@@ -1138,8 +1160,12 @@ namespace SICore
 
         public bool IsRunning { get; set; }
 
+        internal Tasks CurrentTask { get; private set; }
+
         internal void Execute(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
+            CurrentTask = task;
+
             _task = () => ExecuteTask(task, arg);
             if (_data.Settings.AppSettings.Managed && !force && _actor.Client.CurrentServer.IsOnline(_data.HostName))
             {
@@ -1194,7 +1220,9 @@ namespace SICore
 
                             case StopReason.Appellation:
                                 if (task == Tasks.WaitChoose)
+                                {
                                     task = Tasks.AskToChoose;
+                                }
 
                                 PauseExecution(() => ExecuteTask(task, arg));
                                 Execute(Tasks.PrintApellation, 10);
@@ -1207,11 +1235,21 @@ namespace SICore
                                         if (Engine.CanMoveBackRound)
                                         {
                                             FinishRound(false);
-                                            Engine.MoveBackRound();
-                                            _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
+                                            stop = Engine.MoveBackRound();
+                                            if (stop)
+                                            {
+                                                _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
+                                            }
+                                            else
+                                            {
+                                                _stopReason = StopReason.None;
+                                                return;
+                                            }
                                         }
                                         else
+                                        {
                                             stop = false;
+                                        }
 
                                         break;
 
@@ -1235,9 +1273,11 @@ namespace SICore
                                         {
                                             FinishRound(false);
                                             stop = Engine.MoveNextRound();
-                                            _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToNextRound)]);
-                                            
-                                            if (!stop)
+                                            if (stop)
+                                            {
+                                                _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToNextRound)]);
+                                            }
+                                            else
                                             {
                                                 _stopReason = StopReason.None;
                                                 return;
@@ -1322,7 +1362,7 @@ namespace SICore
                             break;
 
                         case Tasks.AskStake:
-                            AskStake();
+                            AskStake(true);
                             break;
 
                         case Tasks.WaitNext:
@@ -1689,7 +1729,7 @@ namespace SICore
             {
                 for (var i = 0; i < _data.Players.Count; i++)
                 {
-                    if (_data.Players[i].InGame && _data.Players[i].Answer.Length == 0)
+                    if (_data.Players[i].InGame && string.IsNullOrEmpty(_data.Players[i].Answer))
                     {
                         _data.Players[i].Answer = _actor.LO[nameof(R.IDontKnow)];
                         _data.Players[i].AnswerIsWrong = true;
@@ -1963,9 +2003,9 @@ namespace SICore
                     _actor.SpecialReplic(res.ToString());
 
                     _actor.SendMessageWithArgs(Messages.Ads, ad);
-
+#if !DEBUG
                     ClientData.MoveNextBlocked = true;
-
+#endif
                     _actor.OnAdShown(adId);
                     adShown = true;
                 }
@@ -2308,11 +2348,16 @@ namespace SICore
 
             if (currentDeleter == null)
             {
-                throw new Exception("currentDeleter == null");
+                throw new Exception("currentDeleter == null: " + _data.ThemeDeleters.GetRemoveLog());
             }
 
             if (currentDeleter.PlayerIndex == -1)
             {
+                if (currentDeleter.PossibleIndicies.Count == 0)
+                {
+                    throw new Exception("currentDeleter.PossibleIndicies.Count == 0: " + _data.ThemeDeleters.GetRemoveLog());
+                }
+
                 currentDeleter.SetIndex(currentDeleter.PossibleIndicies.First());
             }
 
@@ -2760,7 +2805,7 @@ namespace SICore
                     }
                     else if (indicies.Count == 0)
                     {
-                        throw new Exception("indicies.Count == 0");
+                        throw new Exception("indicies.Count == 0: " + _data.ThemeDeleters.GetRemoveLog());
                     }
 
                     currentDeleter.SetIndex(indicies.First());
@@ -2886,7 +2931,7 @@ namespace SICore
                     }
 
                     _data.OrderIndex = -1;
-                    AskStake();
+                    AskStake(false);
                     return false;
                 }
 
@@ -2954,31 +2999,24 @@ namespace SICore
             }
         }
 
-        private void AskStake()
+        private void AskStake(bool canDetectNextStakerGuard)
         {
             int tempStage = 0; // to catch error
-            var initialOrderIndex = _data.OrderIndex;
             var cost = _data.Question.Price;
 
             try
             {
-                do
-                {
-                    _data.OrderIndex++;
-                    if (_data.OrderIndex == _data.Order.Length)
-                        _data.OrderIndex = 0;
-
-                } while (_data.OrderIndex != initialOrderIndex && _data.Order[_data.OrderIndex] != -1 && !_data.Players[_data.Order[_data.OrderIndex]].StakeMaking);
-
-                if (_data.OrderIndex == initialOrderIndex)
-                {
-                    throw new Exception("_data.OrderIndex == initialOrderIndex");
-                }
+                IncrementOrderIndex();
 
                 tempStage = 1;
 
                 if (_data.Order[_data.OrderIndex] == -1) // Необходимо определить следующего ставящего
                 {
+                    if (!canDetectNextStakerGuard)
+                    {
+                        throw new Exception("!canDetectNextStaker");
+                    }
+
                     if (!DetectNextStaker())
                     {
                         return;
@@ -2995,12 +3033,19 @@ namespace SICore
 
                 tempStage = 2;
 
-                var person = _data.Order[_data.OrderIndex];
-                var playerMoney = _data.Players[person].Sum;
+                var playerIndex = _data.Order[_data.OrderIndex];
+
+                if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+                {
+                    throw new ArgumentException($"Bad {nameof(playerIndex)} value {playerIndex}! It must be in [0; {_data.Players.Count - 1}]");
+                }
+
+                var activePlayer = _data.Players[playerIndex];
+                var playerMoney = activePlayer.Sum;
                 if (_data.Stake != -1 && (playerMoney < _data.Stake || playerMoney == _data.Stake && _data.AllIn)) // Не может сделать ставку
                 {
-                    _data.Players[person].StakeMaking = false;
-                    _actor.SendMessageWithArgs(Messages.PersonStake, person, 2);
+                    activePlayer.StakeMaking = false;
+                    _actor.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
 
                     var stakersCount = _data.Players.Count(p => p.StakeMaking);
 
@@ -3009,7 +3054,9 @@ namespace SICore
                         for (var i = 0; i < _data.Players.Count; i++)
                         {
                             if (_data.Players[i].StakeMaking)
+                            {
                                 _data.StakerIndex = i;
+                            }
                         }
 
                         Execute(Tasks.PrintAuctPlayer, 10);
@@ -3023,66 +3070,51 @@ namespace SICore
                 tempStage = 3;
 
                 // Теперь определим возможные ставки
+
+                // Только номинал
                 if (_data.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
                 {
-                    // Только номинал
-                    var s = new StringBuilder(_data.Players[person].Name);
-                    s.Append(", ").Append(_actor.LO[nameof(R.YouCanSayOnly)]);
-                    s.Append(' ').Append(_actor.LO[nameof(R.Nominal)]);
+                    var s = new StringBuilder(activePlayer.Name)
+                        .Append(", ").Append(_actor.LO[nameof(R.YouCanSayOnly)])
+                        .Append(' ').Append(_actor.LO[nameof(R.Nominal)]);
                     _actor.ShowmanReplic(s.ToString());
 
-                    _data.StakerIndex = person;
+                    _data.StakerIndex = playerIndex;
                     _data.Stake = cost;
-                    _actor.SendMessageWithArgs(Messages.PersonStake, person, 1, cost);
+                    _actor.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
                     Execute(Tasks.AskStake, 5);
                     return;
                 }
 
-                _data.StakeVariants[3] = true;
+                // TODO: enum StakeMode, StakeVariants -> HashSet<StakeMode> ?
                 _data.StakeVariants[0] = _data.Stake == -1;
+                _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + 100;
                 _data.StakeVariants[2] = !_data.StakeVariants[0];
-
-                if (_data.AllIn || playerMoney == cost)
-                    _data.StakeVariants[1] = false;
-                else
-                    _data.StakeVariants[1] = true;
-
-                if (playerMoney <= _data.Stake + 100)
-                {
-                    _data.StakeVariants[1] = false;
-                }
+                _data.StakeVariants[3] = true;
 
                 tempStage = 4;
 
-                _data.ActivePlayer = _data.Players[person];
-                var stakeMsg = new StringBuilder(_data.ActivePlayer.Name);
-                stakeMsg.Append(", ");
-                stakeMsg.Append(ResourceHelper.GetString(_actor.LO[nameof(R.YourStake)]));
+                _data.ActivePlayer = activePlayer;
+                var stakeMsg = new StringBuilder(_data.ActivePlayer.Name)
+                    .Append(", ")
+                    .Append(ResourceHelper.GetString(_actor.LO[nameof(R.YourStake)]));
                 _actor.ShowmanReplic(stakeMsg.ToString());
 
                 _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
                 stakeMsg = new StringBuilder(Messages.Stake);
 
-                for (var i = 0; i < 4; i++)
+                for (var i = 0; i < _data.StakeVariants.Length; i++)
                 {
-                    if (_data.StakeVariants[i])
-                        stakeMsg.Append(Message.ArgsSeparatorChar).Append("+");
-                    else
-                        stakeMsg.Append(Message.ArgsSeparatorChar).Append("-");
+                    stakeMsg.Append(Message.ArgsSeparatorChar).Append(_data.StakeVariants[i] ? '+' : '-');
                 }
 
                 var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + 100;
-
-                // TODO: rewrite
-                while (minimumStake % 100 != 0)
-                {
-                    minimumStake++;
-                }
+                var minimumStakeByBase = (int)Math.Ceiling((double)minimumStake / 100) * 100; // TODO: возможность настраивать кратность ставки
 
                 tempStage = 5;
 
-                stakeMsg.Append(Message.ArgsSeparatorChar).Append(minimumStake);
+                stakeMsg.Append(Message.ArgsSeparatorChar).Append(minimumStakeByBase);
 
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
                 if (_data.IsOralNow)
@@ -3109,7 +3141,36 @@ namespace SICore
             {
                 var orders = string.Join(",", _data.Order);
                 var sums = string.Join(",", _data.Players.Select(p => p.Sum));
-                throw new Exception($"AskStake error {tempStage} {sums} {orders} {initialOrderIndex} {_data.OrderIndex} {_data.Players.Count}", exc);
+                throw new Exception($"AskStake error {tempStage} {sums} {orders} {_data.OrderIndex} {_data.Players.Count}", exc);
+            }
+        }
+
+        private void IncrementOrderIndex()
+        {
+            var breakerGuard = 20; // Temp var
+
+            var initialOrderIndex = _data.OrderIndex;
+
+            do
+            {
+                _data.OrderIndex++;
+                if (_data.OrderIndex == _data.Order.Length)
+                {
+                    _data.OrderIndex = 0;
+                }
+
+                breakerGuard--;
+
+                if (breakerGuard == 0)
+                {
+                    throw new Exception($"{nameof(breakerGuard)} == {breakerGuard}");
+                }
+
+            } while (_data.OrderIndex != initialOrderIndex && _data.Order[_data.OrderIndex] != -1 && !_data.Players[_data.Order[_data.OrderIndex]].StakeMaking);
+
+            if (_data.OrderIndex == initialOrderIndex)
+            {
+                throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)}");
             }
         }
 
@@ -3372,7 +3433,7 @@ namespace SICore
                     var packageLogo = _data.Package.Logo;
                     if (!string.IsNullOrEmpty(packageLogo) && packageLogo.Length > 0)
                     {
-                        var uri = _data.Share.CreateURI(packageLogo, () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
+                        var uri = _data.Share.CreateURI(packageLogo.Substring(1), () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
 
                         foreach (var item in _data.AllPersons.ToArray())
                         {
@@ -3504,7 +3565,7 @@ namespace SICore
                 var skipRoundAnnounce = isRandomPackage && (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport
                     && _data.Package.Rounds.Count == 2); // второй раунд - всегда финал
 
-                _actor.InformStage(name: skipRoundAnnounce ? "" : round.Name);                
+                _actor.InformStage(name: skipRoundAnnounce ? "" : round.Name);
 
                 if (!skipRoundAnnounce)
                 {
@@ -3520,7 +3581,7 @@ namespace SICore
                 // Теперь случайные спецвопросы расставляются здесь
                 if (_data.Settings.RandomSpecials)
                 {
-                    #region Random specials
+#region Random specials
                     var nonUsedNumbers = new List<int>();
                     var maxQuestionsInTheme = round.Themes.Max(theme => theme.Questions.Count);
                     var leavedCats = 1 + Data.Rand.Next(3);
@@ -3616,7 +3677,7 @@ namespace SICore
                         else
                             quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Never;
                     }
-                    #endregion
+#endregion
                 }
             }
             else if (arg == 2)
@@ -3678,7 +3739,9 @@ namespace SICore
 
                         _actor.SendMessageWithArgs(Messages.Ads, ad);
 
+#if !DEBUG
                         ClientData.MoveNextBlocked = true;
+#endif
                         adShown = true;
 
                         _actor.OnAdShown(adId);

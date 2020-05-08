@@ -43,6 +43,11 @@ namespace SICore.Clients.Game
                     throw new InvalidOperationException("Индекс уже задан!");
                 }
 
+                if (index == -1)
+                {
+                    throw new ArgumentException("Wrong index value", nameof(index));
+                }
+
                 if (!PossibleIndicies.Contains(index))
                 {
                     throw new InvalidOperationException("Недопустимый индекс!");
@@ -91,7 +96,7 @@ namespace SICore.Clients.Game
                 leftThemesCount = deletersCount;
             }
 
-            // Классы игроков по суммам            
+            // Классы игроков по суммам
             var levels = goodPlayers.GroupBy(p => p.Sum).OrderByDescending(g => g.Key).ToArray();
             var k = leftThemesCount - 1;
             for (var levelIndex = 0; levelIndex < levels.Length; levelIndex++)
@@ -131,6 +136,12 @@ namespace SICore.Clients.Game
 
             _removeLog.Add("Before: " + removeLog.ToString());
 
+            if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
+            {
+                _removeLog.Add("Player is not deleting themes, skipping removing");
+                return;
+            }
+
             var processedPossibleIndicies = new HashSet<HashSet<int>>();
 
             void updatePossibleIndices(IndexInfo indexInfo)
@@ -156,31 +167,11 @@ namespace SICore.Clients.Game
                 processedPossibleIndicies.Add(possibleIndices);
             }
 
-            if (!_order.Any(o => o.PlayerIndex == index))
-            {
-                for (var i = 0; i < _order.Length; i++)
-                {
-                    var playerIndex = _order[i].PlayerIndex;
-                    if (playerIndex > index)
-                    {
-                        _order[i].PlayerIndex--;
-                        continue;
-                    }
-
-                    if (playerIndex != -1)
-                    {
-                        continue;
-                    }
-
-                    updatePossibleIndices(_order[i]);
-                }
-
-                return;
-            }
-
             try
             {
                 var newOrder = new IndexInfo[_order.Length - 1];
+                var possibleVariantsCount = -1;
+                HashSet<int> variantWithIndex = null;
 
                 for (int i = 0, j = 0; i < _order.Length; i++)
                 {
@@ -198,8 +189,23 @@ namespace SICore.Clients.Game
 
                     if (_order[i].PlayerIndex == -1)
                     {
+                        if (_order[i].PossibleIndicies.Contains(index))
+                        {
+                            variantWithIndex = _order[i].PossibleIndicies;
+                            possibleVariantsCount = variantWithIndex.Count;
+                        }
+
+                        if (_order[i].PossibleIndicies == variantWithIndex)
+                        {
+                            possibleVariantsCount--;
+                            if (possibleVariantsCount == 0) // Один вариант нужно удалить
+                            {
+                                continue;
+                            }
+                        }
+
                         updatePossibleIndices(_order[i]);
-                    }                    
+                    }
 
                     j++;
                     if (j == newOrder.Length)

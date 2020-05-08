@@ -151,7 +151,6 @@ namespace SICore
                     continue;
 
                 Inform(item);
-                Inform(item, extended: true);
             }
 
             return result;
@@ -186,32 +185,29 @@ namespace SICore
         /// Отправка данных об игре
         /// </summary>
         /// <param name="person">Тот, кого надо проинформировать</param>
-        private void Inform(string person = NetworkConstants.Everybody, bool update = false, bool extended = false)
+        private void Inform(string person = NetworkConstants.Everybody)
         {
-            var appender = extended ? (Action<Account, StringBuilder>)AppendAccountExt : AppendAccount;
+            var info = new StringBuilder(Messages.Info2)
+                .Append(Message.ArgsSeparatorChar).Append(ClientData.Players.Count).Append(Message.ArgsSeparatorChar);
 
-            var info = new StringBuilder(extended ? Messages.Info2 : Messages.Info).Append(Message.ArgsSeparatorChar).Append(ClientData.Players.Count).Append(Message.ArgsSeparatorChar);
-            appender(ClientData.ShowMan, info);
+            AppendAccountExt(ClientData.ShowMan, info);
             info.Append(Message.ArgsSeparatorChar);
 
             foreach (var item in ClientData.Players)
             {
-                appender(item, info);
+                AppendAccountExt(item, info);
                 info.Append(Message.ArgsSeparatorChar);
             }
 
             foreach (var item in ClientData.Viewers)
             {
-                appender(item, info);
+                AppendAccountExt(item, info);
                 info.Append(Message.ArgsSeparatorChar);
             }
 
-            var msg = update ? info.Append(MessageParams.Info_Update).ToString() : info.ToString().Substring(0, info.Length - 1);
+            var msg = info.ToString().Substring(0, info.Length - 1);
 
             SendMessage(msg, person);
-
-            if (update || !extended)
-                return;
 
             // Сообщим об адресах картинок
             if (person != NetworkConstants.Everybody)
@@ -233,18 +229,10 @@ namespace SICore
 
             SendMessage(string.Join(Message.ArgsSeparator, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed), person);
             SendMessage(string.Join(Message.ArgsSeparator, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-"), person);
+            SendMessage(string.Join(Message.ArgsSeparator, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton), person);
 
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
             SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
-        }
-
-        private void AppendAccount(Account account, StringBuilder info)
-        {
-            info.Append(account.Name);
-            info.Append(Message.ArgsSeparatorChar);
-            info.Append(account.IsMale ? '+' : '-');
-            info.Append(Message.ArgsSeparatorChar);
-            info.Append(_client.Server.IsOnlineString(account.Name));
         }
 
         private void AppendAccountExt(Account account, StringBuilder info)
@@ -258,8 +246,7 @@ namespace SICore
             info.Append(account.IsHuman ? '+' : '-');
             info.Append(Message.ArgsSeparatorChar);
 
-            var person = account as GamePersonAccount;
-            info.Append(person != null && person.Ready ? '+' : '-');
+            info.Append(account is GamePersonAccount person && person.Ready ? '+' : '-');
         }
 
         /// <summary>
@@ -328,24 +315,19 @@ namespace SICore
         /// </summary>
         public void InformTablo(string receiver = NetworkConstants.Everybody)
         {
-            //var message = new StringBuilder(Messages.Tablo); // Для обратной совместимости
             var message2 = new StringBuilder(Messages.Table);
 
             for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
             {
                 for (int j = 0; j < ClientData.TInfo.RoundInfo[i].Questions.Count; j++)
                 {
-                    //message.Append('\n');
-                    //message.Append(this.ClientData.TInfo.RoundInfo[i].Questions[j].Price);
-
-                    message2.Append('\n');
+                    message2.Append(Message.ArgsSeparatorChar);
                     message2.Append(ClientData.TInfo.RoundInfo[i].Questions[j].Price);
                 }
-                message2.Append('\n'); // Новый формат сообщения предусматривает разделение вопросов одной темы
+                message2.Append(Message.ArgsSeparatorChar); // Новый формат сообщения предусматривает разделение вопросов одной темы
             }
 
             SendMessage(message2.ToString(), receiver);
-            //SendMessage(message.ToString(), receiver);
         }
 
         public ConnectionPersonData[] GetInfo()
@@ -381,11 +363,7 @@ namespace SICore
         /// <summary>
         /// Присоединить участника к игре
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="sex"></param>
-        /// <param name="role"></param>
-        /// <param name="password"></param>
-        public bool Join(string name, bool sex, GameRole role, string password, out string message)
+        public bool Join(string name, bool isMale, GameRole role, string password, Action connectionAuthenticator, out string message)
         {
             lock (ClientData.TaskLock)
             {
@@ -445,7 +423,8 @@ namespace SICore
                 {
                     var accounts = accountsToSearch.ToArray();
 
-                    var result = CheckAccountNew(role.ToString().ToLower(), name, sex ? "m" : "f", ref found, index, accounts[index]);
+                    var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index, accounts[index],
+                            connectionAuthenticator);
                     if (result.HasValue)
                     {
                         if (!result.Value)
@@ -454,7 +433,9 @@ namespace SICore
                             return false;
                         }
                         else
+                        {
                             found = true;
+                        }
                     }
                 }
                 else
@@ -462,7 +443,8 @@ namespace SICore
                     foreach (var item in accountsToSearch)
                     {
                         index++;
-                        var result = CheckAccountNew(role.ToString().ToLower(), name, sex ? "m" : "f", ref found, index, item);
+                        var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index, item,
+                            connectionAuthenticator);
                         if (result.HasValue)
                         {
                             if (!result.Value)
@@ -635,7 +617,9 @@ namespace SICore
                                 }
 
                                 if (!found)
+                                {
                                     SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.NoFreePlaceForName)], message.Sender);
+                                }
                             }
                             #endregion
                             break;
@@ -694,11 +678,12 @@ namespace SICore
                             #region Info
 
                             Inform(message.Sender);
-                            Inform(message.Sender, extended: true);
                             foreach (var item in ClientData.MainPersons)
                             {
                                 if (item.Ready)
-                                    SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
+                                {
+                                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                                }
                             }
 
                             InformStage(message.Sender);
@@ -714,6 +699,15 @@ namespace SICore
                                         if (ClientData.TabloInformStage > 1)
                                             InformTablo(message.Sender);
                                     }
+                                }
+                            }
+                            else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
+                            {
+                                var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.Now - ClientData.TimerStartTime[2]).TotalSeconds * 10;
+
+                                if (leftTimeBeforeStart > 0)
+                                {
+                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, "GO", leftTimeBeforeStart, -2), message.Sender);
                                 }
                             }
 
@@ -1516,62 +1510,76 @@ namespace SICore
 
         private void OnI(Message message)
         {
-            if (ClientData.Decision == DecisionType.Pressing)
+            if (ClientData.Decision != DecisionType.Pressing)
             {
-                var answererIndex = -1;
                 for (var i = 0; i < ClientData.Players.Count; i++)
-                {
-                    var item = ClientData.Players[i];
-                    if (item.Name == message.Sender && item.CanPress)
-                    {
-                        answererIndex = i;
-                        break;
-                    }
-                }
-
-                if (answererIndex != -1)
-                {
-                    var penalty = ClientData.Players[answererIndex].PingPenalty;
-                    var penaltyStartTime = DateTime.Now;
-                    if (ClientData.IsDeferringAnswer)
-                    {
-                        var futureTime = penaltyStartTime.AddMilliseconds(penalty * 100);
-                        var currentFutureTime = ClientData.PenaltyStartTime.AddMilliseconds(ClientData.Penalty * 100);
-
-                        if (futureTime >= currentFutureTime) // Событие произойдёт позже
-                            return;
-                    }
-
-                    ClientData.AnswererIndex = answererIndex;
-
-                    ClientData.Answerer.PingPenalty = Math.Min(2, ClientData.Answerer.PingPenalty + 1);
-
-                    if (penalty == 0)
-                    {
-                        _logic.AskAnswerDeferred();
-                    }
-                    else
-                    {
-                        ClientData.IsDeferringAnswer = true;
-                        ClientData.PenaltyStartTime = penaltyStartTime;
-                        ClientData.Penalty = penalty;
-                        _logic.Stop(StopReason.Wait);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i < ClientData.Players.Count; i++)
                 {
                     var player = ClientData.Players[i];
                     if (player.Name == message.Sender)
                     {
                         if (ClientData.Answerer != player)
+                        {
+                            player.LastBadTryTime = DateTime.Now;
                             SendMessageWithArgs(Messages.WrongTry, i);
+                        }
 
                         break;
                     }
                 }
+
+                return;
+            }
+
+            var answererIndex = -1;
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                var player = ClientData.Players[i];
+                if (player.Name == message.Sender && player.CanPress
+                    && DateTime.Now.Subtract(player.LastBadTryTime).TotalSeconds >= ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton)
+                {
+                    answererIndex = i;
+                    break;
+                }
+            }
+
+            if (answererIndex == -1)
+            {
+                return;
+            }
+
+            if (!ClientData.Settings.AppSettings.UsePingPenalty)
+            {
+                ClientData.AnswererIndex = answererIndex;
+                _logic.AskAnswerDeferred();
+                return;
+            }
+
+            var penalty = ClientData.Players[answererIndex].PingPenalty;
+            var penaltyStartTime = DateTime.Now;
+            if (ClientData.IsDeferringAnswer)
+            {
+                var futureTime = penaltyStartTime.AddMilliseconds(penalty * 100);
+                var currentFutureTime = ClientData.PenaltyStartTime.AddMilliseconds(ClientData.Penalty * 100);
+
+                if (futureTime >= currentFutureTime) // Событие произойдёт позже
+                {
+                    return;
+                }
+            }
+
+            ClientData.AnswererIndex = answererIndex;
+            ClientData.Answerer.PingPenalty = Math.Min(2, ClientData.Answerer.PingPenalty + 1);
+
+            if (penalty == 0)
+            {
+                _logic.AskAnswerDeferred();
+            }
+            else
+            {
+                ClientData.IsDeferringAnswer = true;
+                ClientData.PenaltyStartTime = penaltyStartTime;
+                ClientData.Penalty = penalty;
+                _logic.Stop(StopReason.Wait);
             }
         }
 
@@ -1643,7 +1651,6 @@ namespace SICore
                 ClientData.EndUpdatePersons();
             }
 
-            Inform(update: true);
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
@@ -1705,7 +1712,6 @@ namespace SICore
                     _client.Server.DeleteClientAsync(account.Name);
                 }
 
-                Inform(update: true);
                 foreach (var item in ClientData.MainPersons)
                 {
                     if (item.Ready)
@@ -1766,6 +1772,11 @@ namespace SICore
 
                     Logic.ContinueQuestion();
                 }
+                else if (Logic.CurrentTask == Tasks.AskRight)
+                {
+                    // Игрока удалил после того, как он дал ответ. Но ещё не обратились к ведущему
+                    Logic.ContinueQuestion();
+                }
             }
 
             if (ClientData.AppelaerIndex > playerIndex)
@@ -1789,7 +1800,7 @@ namespace SICore
             }
 
             var currentOrder = ClientData.Order;
-            if (currentOrder != null)
+            if (currentOrder != null && ClientData.Type != null && ClientData.Type.Name == QuestionTypes.Auction)
             {
                 ClientData.OrderHistory.Append("Before ").Append(playerIndex).Append(' ')
                     .Append(string.Join(",", currentOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
@@ -1810,12 +1821,34 @@ namespace SICore
 
                 if (ClientData.OrderIndex == currentOrder.Length - 1)
                 {
-                    ClientData.OrderIndex = 0;
+                    ClientData.OrderIndex = newOrder.Length - 1;
                 }
 
                 ClientData.Order = newOrder;
 
-                ClientData.OrderHistory.Append(string.Join(",", newOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
+                ClientData.OrderHistory.Append("After ").Append(string.Join(",", newOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
+
+                if (!ClientData.Players.Any(p => p.StakeMaking))
+                {
+                    Logic.AddHistory($"Last staker dropped");
+                    Logic.Engine.SkipQuestion();
+                }
+                else if (ClientData.OrderIndex != -1 && ClientData.Order[ClientData.OrderIndex] == -1)
+                {
+                    Logic.AddHistory($"Current staker dropped");
+                    if (ClientData.Decision == DecisionType.AuctionStakeMaking)
+                    {
+                        // Ставящего удалили. Нужно продвинуть игру дальше
+                        Logic.StopWaiting();
+
+                        if (ClientData.IsOralNow)
+                        {
+                            SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                        }
+
+                        Logic.Execute(Tasks.AskStake, 20);
+                    }
+                }
             }
 
             if (ClientData.ThemeDeleters != null)
@@ -1860,68 +1893,75 @@ namespace SICore
 
         private void FreeTable(Message message, string[] args, Account host)
         {
-            if (ClientData.Stage == GameStage.Before && args.Length > 2)
+            if (ClientData.Stage != GameStage.Before || args.Length <= 2)
             {
-                var personType = args[2];
+                return;
+            }
 
-                GamePersonAccount account;
-                int index = -1;
+            var personType = args[2];
 
-                var isPlayer = personType == "player";
+            GamePersonAccount account;
+            int index = -1;
 
+            var isPlayer = personType == "player";
+
+            if (isPlayer)
+            {
+                if (args.Length < 4)
+                {
+                    return;
+                }
+
+                var indexStr = args[3];
+
+                if (!int.TryParse(indexStr, out index) || index < 0 || index >= ClientData.Players.Count)
+                {
+                    return;
+                }
+
+                account = ClientData.Players[index];
+            }
+            else
+            {
+                account = ClientData.ShowMan;
+            }
+
+            if (!_client.Server.IsOnline(account.Name) || !account.IsHuman)
+                return;
+
+            var newAccount = new Account { IsHuman = true, Name = Constants.FreePlace };
+
+            ClientData.BeginUpdatePersons();
+
+            try
+            {
                 if (isPlayer)
                 {
-                    if (args.Length < 4)
-                        return;
-
-                    var indexStr = args[3];
-
-                    if (!int.TryParse(indexStr, out index))
-                        return;
-
-                    account = ClientData.Players[index];
+                    ClientData.Players[index] = new GamePlayerAccount(newAccount);
                 }
                 else
-                    account = ClientData.ShowMan;
-
-                if (!_client.Server.IsOnline(account.Name) || !account.IsHuman)
-                    return;
-
-                var newAccount = new Account { IsHuman = true, Name = Constants.FreePlace };
-
-                ClientData.BeginUpdatePersons();
-
-                try
                 {
-                    if (isPlayer)
-                    {
-                        ClientData.Players[index] = new GamePlayerAccount(newAccount);
-                    }
-                    else
-                    {
-                        ClientData.ShowMan = new GamePersonAccount(newAccount);
-                    }
-
-                    account.Ready = false;
-                    ClientData.Viewers.Add(account);
-                }
-                finally
-                {
-                    ClientData.EndUpdatePersons();
+                    ClientData.ShowMan = new GamePersonAccount(newAccount);
                 }
 
-                Inform(update: true);
-                foreach (var item in ClientData.MainPersons)
-                {
-                    if (item.Ready)
-                        SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
-                }
-
-                SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
-                SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}");
-
-                OnPersonsChanged();
+                account.Ready = false;
+                ClientData.Viewers.Add(account);
             }
+            finally
+            {
+                ClientData.EndUpdatePersons();
+            }
+
+            foreach (var item in ClientData.MainPersons)
+            {
+                if (item.Ready)
+                    SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
+            }
+
+            SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
+            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}");
+
+            OnPersonsChanged();
         }
 
         private void SetPerson(Message message, string[] args, Account host)
@@ -1964,7 +2004,6 @@ namespace SICore
                 SetHumanPerson(isPlayer, account, replacer, index);
             }
 
-            Inform(update: true);
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
@@ -2198,7 +2237,7 @@ namespace SICore
                     {
                         lock (ClientData.TaskLock)
                         {
-                            Inform(newAccount.Name, extended: true);
+                            Inform(newAccount.Name);
                         }
                     });
                 }
@@ -2226,7 +2265,7 @@ namespace SICore
                     {
                         lock (ClientData.TaskLock)
                         {
-                            Inform(newAccount.Name, extended: true);
+                            Inform(newAccount.Name);
                         }
                     });
                 }
@@ -2236,7 +2275,6 @@ namespace SICore
                 ClientData.EndUpdatePersons();
             }
 
-            Inform(update: true);
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
@@ -2322,7 +2360,8 @@ namespace SICore
             return true;
         }
 
-        private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, Account account)
+        private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, Account account,
+            Action connectionAuthenticator)
         {
             if (_client.Server.IsOnline(account.Name))
             {
@@ -2347,15 +2386,14 @@ namespace SICore
             }
 
             var sb = new StringBuilder();
-            if (account.IsMale)
-                sb.Append(LO[nameof(R.Connected_Male)] + " ");
-            else
-                sb.Append(LO[nameof(R.Connected_Female)] + " ");
+            sb.Append(LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)] + " ");
 
             sb.Append(name);
             SpecialReplic(sb.ToString());
 
             SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
+
+            connectionAuthenticator();
 
             OnPersonsChanged();
 

@@ -223,14 +223,8 @@ namespace SIEngine
             return false;
         }
 
-        protected override bool AcceptRound(Round round)
-        {
-            return round.Type != RoundTypes.Final;
-        }
+        protected override bool AcceptRound(Round round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
 
-        public override bool CanNext()
-        {
-            return _stage != GameStage.End;
-        }
+        public override bool CanNext() => _stage != GameStage.End;
     }
 }

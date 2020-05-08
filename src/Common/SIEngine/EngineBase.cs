@@ -14,6 +14,8 @@ namespace SIEngine
     /// </summary>
     public abstract class EngineBase : IDisposable, INotifyPropertyChanged
     {
+        private bool _isDisposed = false;
+
         protected IEngineSettingsProvider _settingsProvider;
 
         protected GameStage _stage = GameStage.Begin;
@@ -33,7 +35,7 @@ namespace SIEngine
             }
         }
 
-        protected SIDocument _document;
+        protected readonly SIDocument _document;
 
         protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0, _atomIndex = 0;
         protected bool _isMedia;
@@ -185,7 +187,7 @@ namespace SIEngine
 
         #endregion
 
-        public EngineBase(SIDocument document, IEngineSettingsProvider settingsProvider)
+        protected EngineBase(SIDocument document, IEngineSettingsProvider settingsProvider)
         {
             _document = document;
             _settingsProvider = settingsProvider;
@@ -322,36 +324,50 @@ namespace SIEngine
                     OnEndGame();
                     moved = false;
                 }
-            } while (_stage == GameStage.Round && (!_activeRound.Themes.Any(theme => theme.Questions.Any()) || !AcceptRound(_activeRound)));
+            } while (_stage == GameStage.Round && !AcceptRound(_activeRound));
 
             CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
             CanMoveBackRound = _roundIndex > 0;
 
             UpdateCanNext();
             if (moved)
+            {
                 OnNextRound(showSign);
+            }
 
             CanMoveBack = false;
             return moved;
         }
 
-        protected abstract bool AcceptRound(Round round);
+        protected virtual bool AcceptRound(Round round) => _activeRound.Themes.Any(theme => theme.Questions.Any());
 
-        public virtual void MoveBackRound()
+        public virtual bool MoveBackRound()
         {
-            if (_roundIndex > 0)
+            if (!CanMoveBackRound)
             {
+                return false;
+            }
+
+            var moved = true;
+            do
+            {
+                if (_roundIndex == 0) // Прокрутились назад, и нормального раунда не нашли. Возвращаемся к первому подходящему раунду
+                {
+                    return MoveNextRound();
+                }
+
                 _roundIndex--;
                 SetActiveRound();
 
-                CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
-                CanMoveBackRound = _roundIndex > 0;
-
                 Stage = GameStage.Round;
-                UpdateCanNext();
-            }
+            } while (!AcceptRound(_activeRound));
+
+            CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
+            CanMoveBackRound = _roundIndex > 0;
+            UpdateCanNext();
 
             CanMoveBack = false;
+            return moved;
         }
 
         public abstract bool CanNext();
@@ -585,14 +601,23 @@ namespace SIEngine
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+
             lock (_autoLock)
             {
-                if (_document != null)
-                {
-                    _document.Dispose();
-                    _document = null;
-                }
+                _document.Dispose();
             }
+
+            _isDisposed = true;
         }
     }
 }

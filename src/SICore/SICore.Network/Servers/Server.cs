@@ -369,10 +369,7 @@ namespace SICore.Network.Servers
         /// </summary>
         /// <param name="name">Имя клиента</param>
         /// <returns>Находится ли онлайн</returns>
-        public bool IsOnline(string name)
-        {
-            return AllClients.Contains(name);
-        }
+        public bool IsOnline(string name) => AllClients.Contains(name);
 
         public bool IsOnlineInternal(string name)
         {

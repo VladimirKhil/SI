@@ -10,6 +10,10 @@
     <Description>SIGame data</Description>
     <Copyright>Copyright © Svoyak-soft 2012 - 2020</Copyright>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <LangVersion>7.1</LangVersion>

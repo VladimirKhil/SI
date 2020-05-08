@@ -112,7 +112,7 @@ namespace SICore
         /// <summary>
         /// Тип вопроса
         /// </summary>
-        internal QuestionType Type;
+        internal QuestionType Type { get; set; }
 
         private BagCatInfo _catInfo = null;
 
@@ -430,7 +430,14 @@ namespace SICore
         /// </summary>
         public bool IsOral { get; set; }
 
+        /// <summary>
+        /// Может ли ведущий сейчас принять решение за игрока в устной игре
+        /// </summary>
         public bool IsOralNow { get; set; }
+
+        /// <summary>
+        /// Штраф за хороший пинг
+        /// </summary>
         public int Penalty { get; internal set; }
         public DateTime PenaltyStartTime { get; internal set; }
 

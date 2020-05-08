@@ -118,12 +118,25 @@ namespace SICore
 
         protected virtual void Dispose(bool disposing)
         {
-            lock (_taskTimerLock)
+            var locked = Monitor.TryEnter(_taskTimerLock, TimeSpan.FromSeconds(5.0));
+            if (!locked)
+            {
+                ClientData.BackLink.OnError(new Exception($"Cannot lock {nameof(_taskTimerLock)}!"));
+            }
+
+            try
             {
                 if (_taskTimer != null)
                 {
                     _taskTimer.Dispose();
                     _taskTimer = null;
+                }
+            }
+            finally
+            {
+                if (locked)
+                {
+                    Monitor.Exit(_taskTimerLock);
                 }
             }
         }

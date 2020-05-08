@@ -1676,7 +1676,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на спортивная.
+        ///   Ищет локализованную строку, похожую на упрощённая.
         /// </summary>
         public static string TypeSport {
             get {

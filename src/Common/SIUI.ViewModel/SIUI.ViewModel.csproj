@@ -14,6 +14,10 @@
     <Copyright>Copyright © Svoyak-soft 2012 - 2020</Copyright>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />
   </ItemGroup>

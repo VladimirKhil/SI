@@ -315,7 +315,8 @@ namespace SIEngine
             }
         }
 
-        protected override bool AcceptRound(Round round) => round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null);
+        protected override bool AcceptRound(Round round) => base.AcceptRound(round) &&
+            (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null));
 
         public override Tuple<int, int, int> MoveBack()
         {
@@ -366,7 +367,9 @@ namespace SIEngine
             }
 
             if (_stage != GameStage.WaitDelete)
+            {
                 return;
+            }
 
             Stage = GameStage.AfterDelete;
             _themeIndex = _finalMap[publicThemeIndex];
@@ -391,7 +394,9 @@ namespace SIEngine
             }
 
             if (_activeQuestion.Type.Name != QuestionTypes.Simple && !_settingsProvider.PlaySpecials)
+            {
                 _activeQuestion.Type.Name = QuestionTypes.Simple;
+            }
 
             OnQuestionSelected(_themeIndex, _questionIndex, _activeTheme, _activeQuestion);
 
@@ -402,7 +407,9 @@ namespace SIEngine
 
             UpdateCanNext();
             if (_activeQuestion != null && _activeQuestion.Type.Name != QuestionTypes.Simple)
+            {
                 AutoNext(6000);
+            }
         }
 
         private void DoPrepareFinalQuestion()
@@ -461,10 +468,11 @@ namespace SIEngine
             return base.MoveNextRound(showSign);
         }
 
-        public override void MoveBackRound()
+        public override bool MoveBackRound()
         {
-            base.MoveBackRound();
             _history.Clear();
+
+            return base.MoveBackRound();
         }
 
         public override bool CanNext() => _stage != GameStage.End && (_stage != GameStage.RoundTable || _forward.Count > 0)

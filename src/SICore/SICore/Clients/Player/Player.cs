@@ -115,11 +115,15 @@ namespace SICore
             lock (_readyLock)
             {
                 if (ClientData.Me == null)
+                {
                     return;
+                }
 
                 var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand;
                 if (ClientData.AutoReady && readyCommand != null)
+                {
                     readyCommand.Execute(null);
+                }
             }
         }
 
@@ -127,7 +131,7 @@ namespace SICore
         {
             try
             {
-                await Task.Delay(3000);
+                await Task.Delay(ClientData.ButtonBlockingTime * 1000);
                 buttonDisabledByTimer = false;
                 EnableGameButton();
             }

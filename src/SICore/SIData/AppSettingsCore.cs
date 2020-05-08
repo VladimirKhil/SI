@@ -18,6 +18,7 @@ namespace SIData
         public const bool DefaultOral = false;
         public const bool DefaultManaged = false;
         public const bool DefaultIgnoreWrong = false;
+        public const bool DefaultUsePingPenalty = false;
         public const GameModes DefaultGameMode = GameModes.Tv;
         public const int DefaultRandomRoundsCount = 3;
         public const int DefaultRandomThemesCount = 6;
@@ -147,6 +148,21 @@ namespace SIData
         {
             get { return _ignoreWrong; }
             set { _ignoreWrong = value; OnPropertyChanged(); }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _usePingPenalty = DefaultUsePingPenalty;
+
+        /// <summary>
+        /// Штрафовать ли за хороший пинг (выравнивание пинга)
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(DefaultUsePingPenalty)]
+        [DataMember]
+        public bool UsePingPenalty
+        {
+            get { return _usePingPenalty; }
+            set { _usePingPenalty = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

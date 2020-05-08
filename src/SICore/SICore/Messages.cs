@@ -41,6 +41,11 @@
         public const string Ban = "BAN";
 
         /// <summary>
+        /// Время блокировки Игровой кнопки
+        /// </summary>
+        public const string ButtonBlockingTime = "BUTTON_BLOCKING_TIME";
+
+        /// <summary>
         /// Отмена ожидания решения
         /// </summary>
         public const string Cancel = "CANCEL";
@@ -359,11 +364,6 @@
         /// Тема
         /// </summary>
         public const string Theme = "THEME";
-
-        /// <summary>
-        /// Время
-        /// </summary>
-        public const string Time = "TIME";
 
         /// <summary>
         /// Изменения таймера

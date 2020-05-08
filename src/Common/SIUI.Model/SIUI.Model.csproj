@@ -10,6 +10,10 @@
     <Copyright>Copyright © Svoyak-soft 2010 - 2020</Copyright>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />

@@ -97,7 +97,21 @@ namespace SICore
             var account = (PersonAccount)arg;
             var player = account as PlayerAccount;
 
-            SendMessage(Messages.Config, MessageParams.Config_Free, player != null ? "player" : "showman", player != null ? ClientData.Players.IndexOf(player).ToString() : "");
+            var indexString = "";
+
+            if (player != null)
+            {
+                var index = ClientData.Players.IndexOf(player);
+                if (index < 0 || index >= ClientData.Players.Count)
+                {
+                    AddLog($"Wrong index: {index}" + Environment.NewLine);
+                    return;
+                }
+
+                indexString = index.ToString();
+            }
+
+            SendMessage(Messages.Config, MessageParams.Config_Free, player != null ? "player" : "showman", indexString);
         }
 
         private void Delete_Executed(object arg)
@@ -343,6 +357,15 @@ namespace SICore
                             break;
                             #endregion
                         }
+                    case Messages.ButtonBlockingTime:
+                        if (mparams.Length > 1)
+                        {
+                            if (int.TryParse(mparams[1], out var buttonBlockingTime) && buttonBlockingTime > 0)
+                            {
+                                ClientData.ButtonBlockingTime = buttonBlockingTime;
+                            }
+                        }
+                        break;
                     case Messages.PackageId:
                         {
                             if (mparams.Length > 1)
@@ -1800,10 +1823,7 @@ namespace SICore
         /// <summary>
         /// Получить информацию об игре
         /// </summary>
-        public void GetInfo()
-        {
-            SendMessage(Messages.Info);
-        }
+        public void GetInfo() => SendMessage(Messages.Info);
 
         public void Rename(string name)
         {

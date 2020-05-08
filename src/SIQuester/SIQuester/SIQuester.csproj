@@ -445,6 +445,9 @@
     <None Include="Resources\map_go.png" />
     <None Include="Resources\WindowsIcons-license.txt" />
     <None Include="Resources\Entypo-license.txt" />
+    <None Include="licenses\Modern UI Icons.license.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="ygpackage3.1.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

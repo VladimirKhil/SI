@@ -19,7 +19,7 @@ namespace SIPackages.Core
                 return null;
 
             int.TryParse(m.Groups["min"].ToString(), out var minimum);
-            int.TryParse(m.Groups["min"].ToString(), out var maximum);
+            int.TryParse(m.Groups["max"].ToString(), out var maximum);
             var stepString = m.Groups["step"].ToString();
 
             return new BagCatInfo

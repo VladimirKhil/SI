@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <!-- При обновлении нужно повысить ProductVersion и задать новый GUID для ProductCode -->
+
+  <?define Manufacturer="Свояк-софт" ?>
+  <?define ProductName="SIQuester" ?>
+  <?define ProductDescription="Редактор вопросов для SIGame" ?>
+  <?define ManufacturerEn="Svoyak-soft" ?>
+  <?define ProductNameEn="SIQuester" ?>
+  <?define ProductVersion="!(bind.FileVersion.$(var.SIQuester.TargetFileName))" ?>
+  <?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
+  <?define ProductNameR="SIQuester'а" ?>
+
+  <Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+
+		<MajorUpgrade DowngradeErrorMessage="Уже установлена более поздняя версия $(var.ProductNameR). Установка будет прекращена." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
+		<MediaTemplate EmbedCab="yes" />
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED" />
+    
+    <Icon Id="AppIcon" SourceFile="$(var.SIQuester.ProjectDir)Resources\logo.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+
+    <Property Id="WixShellExecTarget" Value="[#SIQuester.exe]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <InstallExecuteSequence>
+      <LaunchConditions After="AppSearch" />
+      <FindRelatedProducts After="LaunchConditions" />
+
+      <Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
+    </InstallExecuteSequence>
+
+    <InstallUISequence>
+      <LaunchConditions After="AppSearch" />
+      <FindRelatedProducts After="LaunchConditions" />
+    </InstallUISequence>
+
+    <Feature Id="ProductFeature" Title="SIQuester.Setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="Manufacturer" />
+      <ComponentGroupRef Id="ManufacturerProgramMenu" />
+      <ComponentGroupRef Id="ApplicationProgramMenu" />
+      <ComponentGroupRef Id="Licenses" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
+          <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
+            <Directory Id="LicensesFolder" Name="Licenses" />
+          </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
+          <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
+        </Directory>
+      </Directory>
+    </Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
+      <Component Guid="34937928-a817-430e-bc55-e9b75525ae8e">
+        <File Source="$(var.SIQuester.TargetDir)SIQuester.exe" KeyPath="yes" Checksum="yes">
+          <netfx:NativeImage Id="ngen_SIQuester.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
+        </File>
+
+        <ProgId Id="SI.Question" Description="Вопросы СИ" Advertise="yes">
+          <Extension Id="siq" ContentType="application/x-zip-compressed">
+            <Verb Id="open" Command="Открыть" Argument="&quot;%1&quot;" />
+          </Extension>
+        </ProgId>
+      </Component>
+      <Component Guid="c4fc8a86-f9a5-476b-a95c-2c3e4884477e">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)SIQuester.ViewModel.dll" />
+      </Component>
+      <Component Guid="a7ea249a-13bc-4bf0-9abe-04f7de993268">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Notions.dll" />
+      </Component>
+      <Component Guid="63df2917-c057-4f59-9c06-5eb182fa6943">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Lingware.Spard.dll" />
+      </Component>
+      <Component Guid="9576edf4-0ee1-4a34-93ae-54ed9370d9e1">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)SIPackages.dll" />
+      </Component>
+      <Component Guid="b8c64957-04ea-472e-ae01-3627baab2f6b">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)QTxtConverter.dll" />
+      </Component>
+      <Component Guid="437d7231-34b0-4525-8a1b-2fbad2b0ce54">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Microsoft.WindowsAPICodePack.dll" />
+      </Component>
+      <Component Guid="ab8a3fc9-02b6-4147-b064-c30eb73640f7">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Microsoft.WindowsAPICodePack.Shell.dll" />
+      </Component>
+      <Component Guid="{8719608C-AC17-4252-94A7-A00C1B9DE46C}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)MahApps.Metro.dll" />
+      </Component>
+      <Component Guid="{F0265FA9-8E3A-44ED-9A1E-554F02597BDB}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Windows.Interactivity.dll" />
+      </Component>
+      <Component Guid="{0497682E-D9CD-4CB0-8D0B-5B1247A98C08}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <Component Guid="{BE062A3B-5687-4676-9F5B-710AFB837C5F}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Net.Http.Formatting.dll" />
+      </Component>
+      <Component Guid="{6710D08D-43F3-467C-8C17-15E7E2791217}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)netstandard.dll" />
+      </Component>
+      <Component Guid="{4F526FA0-C8FB-4DF3-B35E-C3E6794E8870}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Net.Http.dll" />
+      </Component>
+      <Component Guid="{7EA2B930-DD62-421F-A02C-A0A8928FB372}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.IO.Compression.dll" />
+      </Component>
+	  <Component Guid="{EE5826EA-A2C6-4A4A-B05B-54B1F4983471}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Runtime.dll" />
+      </Component>
+      <Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Help.xps" />
+      </Component>
+      <Component Guid="07b97ccd-d9dd-46a6-9838-85f12e5e5760">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)SIQuester.exe.config" />
+      </Component>
+      <Component Guid="46306d8e-094a-4559-a541-df3cbf95b19a">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)ygpackagekey3.0.xslt" />
+      </Component>
+      <Component Guid="f23e003c-a0d6-4352-8ad7-8b6ecd104322">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)ygpackagesimple3.0.xslt" />
+      </Component>
+      <Component Id="RegistryPath" Guid="88aa1365-b38f-4c3d-ad27-a9aeb64154f2">
+        <RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
+                  Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
+      
+        <RemoveFolder Id="INSTALLLOCATION" On="uninstall" />
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="Licenses" Directory="LicensesFolder">
+      <Component Guid="{EE005A72-17BE-4FA6-BB19-3F6C55338951}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\MahApps.Metro.LICENSE" />
+      </Component>
+      <Component Guid="{6874C052-7D52-4E31-9BF3-D6563FE7F8AB}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\MahApps.Metro.LICENSE+" />
+      </Component>
+      <Component Guid="{E05E068D-CD01-4F91-90D2-B110E3A31DCA}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\Newtonsoft.Json.LICENSE.md" />
+      </Component>
+      <Component Guid="{930943B4-D03E-40C3-8196-B966C21EB6C1}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\Modern UI Icons.license.txt" />
+      </Component>
+      <Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
+        <File KeyPath="yes" Source="$(var.SIQuester.ProjectDir)..\..\..\LICENSE" />
+      </Component>
+      <Component Id="LicensesReg" Guid="{E903B74E-2536-49A6-B842-4D8A3BAA342A}">
+        <RegistryValue Id="LicensesFolderReg" Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="LicensesFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">
+      <Component Guid="{D25F3F12-BFB4-447B-959B-276F4CB6C931}">
+        <RemoveFolder Id="ManufacturerFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+    
+  <Fragment>
+    <ComponentGroup Id="ManufacturerProgramMenu" Directory="ManufacturerProgramMenuFolder">
+      <Component Id="ManufacturerProgramMenuFolderComponent" Guid="ef32132e-376b-4474-ad3e-fee22dd8a1c1">
+        <RemoveFolder Id="ManufacturerProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ApplicationProgramMenu" Directory="ApplicationProgramMenuFolder">
+      <Component Id="ApplicationShortcut" Guid="0e6c2180-0b6c-4c3f-bb40-bdb1e7b2f407">
+        <Shortcut Id="Shortcut" Name="$(var.ProductName)" Description="$(var.ProductDescription)" Target="[INSTALLLOCATION]SIQuester.exe" WorkingDirectory="INSTALLLOCATION" />
+        <RemoveFolder Id="ApplicationProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
