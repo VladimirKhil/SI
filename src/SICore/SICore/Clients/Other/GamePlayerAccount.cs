@@ -39,7 +39,7 @@ namespace SICore
         /// <summary>
         /// Ответ игрока
         /// </summary>
-        internal string Answer { get; set; };
+        internal string Answer { get; set; }
 
         /// <summary>
         /// Ответ верен

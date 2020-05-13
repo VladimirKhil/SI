@@ -62,17 +62,7 @@ namespace SIUI.Behaviors
                 }
             }
 
-            mediaElement.Loaded += (sender, e2) =>
-            {
-                try
-                {
-                    mediaElement.Play();
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-            };
+            mediaElement.Loaded += loaded;
 
             SourceDescriptor.AddValueChanged(mediaElement, loaded);
 

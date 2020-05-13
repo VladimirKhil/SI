@@ -29,6 +29,10 @@ namespace SIEngine
 
         public bool CanSelectTheme => _stage == GameStage.WaitDelete;
 
+        public List<int> FinalMap => _finalMap; // for debugging only
+
+        public int LeftQuestionsCount => _questionsTable.Count; // for debugging only
+
         public TvEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
             : base(document, settingsProvider)
         {

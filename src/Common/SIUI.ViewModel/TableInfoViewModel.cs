@@ -32,7 +32,42 @@ namespace SIUI.ViewModel
         public bool Pause
         {
             get { return _model.Pause; }
-            set { _model.Pause = value; OnPropertyChanged(); }
+            set
+            {
+                if (_model.Pause != value)
+                {
+                    _model.Pause = value;
+                    OnPropertyChanged();
+                    UpdateMediaState();
+                }
+            }
+        }
+
+        private bool _isMediaStopped;
+
+        public bool IsMediaStopped
+        {
+            get { return _isMediaStopped; }
+            set
+            {
+                if (_isMediaStopped != value)
+                {
+                    _isMediaStopped = value;
+                    UpdateMediaState();
+                }
+            }
+        }
+
+        private void UpdateMediaState()
+        {
+            if (_model.Pause || _isMediaStopped)
+            {
+                OnMediaPause();
+            }
+            else
+            {
+                OnMediaResume();
+            }
         }
 
         private string _text = "";

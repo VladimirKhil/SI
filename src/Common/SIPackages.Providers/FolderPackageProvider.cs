@@ -14,7 +14,7 @@ namespace SIPackages.Providers
             _folder = folder;
         }
 
-        public Task<IEnumerable<string>> GetPackages()
+        public Task<IEnumerable<string>> GetPackagesAsync()
         {
             var dir = new DirectoryInfo(_folder);
             return Task.FromResult(dir.EnumerateDirectories()
@@ -22,6 +22,6 @@ namespace SIPackages.Providers
                 .Select(directory => directory.Name));
         }
 
-        public Task<SIDocument> GetPackage(string name) => Task.FromResult(SIDocument.Load(Path.Combine(_folder, name)));
+        public Task<SIDocument> GetPackageAsync(string name) => Task.FromResult(SIDocument.Load(Path.Combine(_folder, name)));
     }
 }

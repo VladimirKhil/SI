@@ -179,7 +179,7 @@ namespace SICore
             {
                 int stakeSum = -1;
                 var stakeMode = MakeStake(_data.QuestionIndex, _data.Players.Select(p => p.Sum).ToArray(), myIndex,
-                    _data._lastStakerNum,
+                    _data.LastStakerIndex,
                     _account.Style, _data.PersonDataExtensions.Var, _account.N1, _account.N5, _account.B1,
                     _account.B5, isCritical, _data.PersonDataExtensions.StakeInfo.Minimum, out stakeSum);
 
@@ -197,7 +197,7 @@ namespace SICore
                     "N1 = {10}, N5 = {11}, B1 = {12}, B5 = {13}, Critical = {14}. MinCost = {15}",
                     exc,
                     _data.QuestionIndex, string.Join(", ", _data.Players.Select(p => p.Sum)),
-                    myIndex, _data._lastStakerNum, _account.Style, _data.PersonDataExtensions.Var[0], _data.PersonDataExtensions.Var[1], _data.PersonDataExtensions.Var[2], _data.PersonDataExtensions.Var[3],
+                    myIndex, _data.LastStakerIndex, _account.Style, _data.PersonDataExtensions.Var[0], _data.PersonDataExtensions.Var[1], _data.PersonDataExtensions.Var[2], _data.PersonDataExtensions.Var[3],
                     _account.N1, _account.N5, _account.B1, _account.B5, isCritical, _data.PersonDataExtensions.StakeInfo.Minimum).AppendLine();
             }
         }

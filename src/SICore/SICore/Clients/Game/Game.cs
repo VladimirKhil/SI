@@ -46,10 +46,10 @@ namespace SICore
         public ComputerAccount[] DefaultPlayers { get; set; }
         public ComputerAccount[] DefaultShowmans { get; set; }
 
-        public Game(Client client)
+        public Game(Client client, string documentPath)
             : base(client, null, null, null)
         {
-            
+            ClientData.DocumentPath = documentPath;
         }
 
         protected override GameLogic CreateLogic(Account personData)
@@ -734,68 +734,7 @@ namespace SICore
                             break;
 
                         case Messages.Pause:
-                            if ((message.Sender == ClientData.HostName || message.Sender == ClientData.ShowMan.Name)
-                                && args.Length > 1)
-                            {
-                                #region Pause
-
-                                int[] times = new int[3];
-
-                                // Владелец игры взял паузу
-                                if (args[1] == "+")
-                                {
-                                    if (!ClientData.TInfo.Pause)
-                                    {
-                                        ClientData.TInfo.Pause = true;
-                                        ClientData.PauseStartTime = DateTime.Now;
-
-                                        if (ClientData.IsThinking)
-                                        {
-                                            var startTime = ClientData.TimerStartTime[1];
-
-                                            ClientData.TimeThinking = ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;                                        
-                                        }
-
-                                        for (int i = 0; i < 3; i++)
-                                        {
-                                            times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-                                        }                                        
-
-                                        _logic.Stop(StopReason.Pause);
-                                        SpecialReplic(LO[nameof(R.PauseInGame)]);
-                                    }
-                                }
-                                else
-                                {
-                                    if (ClientData.TInfo.Pause)
-                                    {
-                                        ClientData.TInfo.Pause = false;
-
-                                        //if (this.ClientData.IsThinking)
-                                        //{
-                                        //    this.ClientData.StartTryTime = DateTime.Now.Subtract(TimeSpan.FromMilliseconds(this.ClientData.TimeThinking * 100));
-                                        //}
-
-                                        var pauseDuration = DateTime.Now.Subtract(ClientData.PauseStartTime);
-
-                                        for (int i = 0; i < 3; i++)
-                                        {
-                                            times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-                                            ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
-                                        }
-
-                                        _logic.ResumeExecution();
-                                        if (_logic.StopReason == StopReason.Decision)
-                                            _logic.ExecuteImmediate(); // Вдруг уже готово
-
-                                        SpecialReplic(LO[nameof(R.GameResumed)]);
-                                    }
-                                }
-
-                                SendMessageWithArgs(Messages.Pause, args[1], times[0], times[1], times[2]);
-
-                                #endregion
-                            }
+                            OnPause(message, args);
                             break;
 
                         case Messages.Start:
@@ -932,19 +871,8 @@ namespace SICore
                             break;
 
                         case Messages.Atom:
-                            {
-                                ClientData.HaveViewedAtom--;
-                                if (ClientData.HaveViewedAtom == 0)
-                                {
-                                    _logic.ExecuteImmediate();
-                                }
-                                else
-                                {
-                                    // Иногда кто-то отваливается, и процесс затягивается на 60 секунд. Это недопустимо. Дадим 3 секунды
-                                    _logic.Execute(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
-                                }
-                                break;
-                            }
+                            OnAtom();
+                            break;
 
                         case Messages.Report:
                             #region Report
@@ -1338,6 +1266,101 @@ namespace SICore
                 {
                     Share_Error(new Exception(message.Text, exc));
                 }
+            }
+        }
+
+        private void OnPause(Message message, string[] args)
+        {
+            if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+            {
+                return;
+            }
+
+            var times = new int[3];
+
+            // Владелец игры взял паузу
+            if (args[1] == "+")
+            {
+                if (ClientData.TInfo.Pause)
+                {
+                    return;
+                }
+
+                ClientData.TInfo.Pause = true;
+                ClientData.PauseStartTime = DateTime.Now;
+
+                if (ClientData.IsThinking)
+                {
+                    var startTime = ClientData.TimerStartTime[1];
+
+                    ClientData.TimeThinking = ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                }
+
+                if (ClientData.IsPlayingMedia)
+                {
+                    ClientData.IsPlayingMediaPaused = true;
+                    ClientData.IsPlayingMedia = false;
+                }
+
+                for (var i = 0; i < 3; i++)
+                {
+                    times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+                }
+
+                _logic.Stop(StopReason.Pause);
+                SpecialReplic(LO[nameof(R.PauseInGame)]);
+            }
+            else
+            {
+                if (!ClientData.TInfo.Pause)
+                {
+                    return;
+                }
+
+                ClientData.TInfo.Pause = false;
+
+                var pauseDuration = DateTime.Now.Subtract(ClientData.PauseStartTime);
+
+                for (var i = 0; i < 3; i++)
+                {
+                    times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+                    ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
+                }
+
+                if (ClientData.IsPlayingMediaPaused)
+                {
+                    ClientData.IsPlayingMediaPaused = false;
+                    ClientData.IsPlayingMedia = true;
+                }
+
+                _logic.ResumeExecution();
+                if (_logic.StopReason == StopReason.Decision)
+                {
+                    _logic.ExecuteImmediate(); // Вдруг уже готово
+                }
+
+                SpecialReplic(LO[nameof(R.GameResumed)]);
+            }
+
+            SendMessageWithArgs(Messages.Pause, args[1], times[0], times[1], times[2]);
+        }
+
+        private void OnAtom()
+        {
+            if (!ClientData.IsPlayingMedia)
+            {
+                return;
+            }
+
+            ClientData.HaveViewedAtom--;
+            if (ClientData.HaveViewedAtom == 0)
+            {
+                _logic.ExecuteImmediate();
+            }
+            else
+            {
+                // Иногда кто-то отваливается, и процесс затягивается на 60 секунд. Это недопустимо. Дадим 3 секунды
+                _logic.Execute(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
             }
         }
 
@@ -1854,6 +1877,18 @@ namespace SICore
             if (ClientData.ThemeDeleters != null)
             {
                 ClientData.ThemeDeleters.RemoveAt(playerIndex);
+                if (ClientData.ThemeDeleters.IsEmpty())
+                {
+                    // Удалили вообще всех, кто мог играть в финале. Завершаем раунд
+                    if (Logic.Engine.CanMoveNextRound)
+                    {
+                        Logic.Engine.MoveNextRound();
+                    }
+                    else
+                    {
+                        Logic.Execute(Tasks.Winner, 10); // Делать нечего. Завершаем игру
+                    }
+                }
             }
 
             var newHistory = new List<AnswerResult>();

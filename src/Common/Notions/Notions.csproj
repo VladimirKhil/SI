@@ -10,9 +10,12 @@
     <Product>Notions</Product>
     <Description>String processing functions</Description>
     <Company>Svoyak-soft</Company>
-    <Version>2.6.2</Version>
-    <Copyright>Copyright © Svoyak-soft 2007 - 2019</Copyright>
-    <LangVersion>7.1</LangVersion>
+    <Version>2.7.1</Version>
+    <Copyright>Copyright © Svoyak-soft 2007 - 2020</Copyright>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />

@@ -169,9 +169,9 @@ namespace SICore
 
         }
 
-        public void OnPauseChanged()
+        public void OnPauseChanged(bool isPaused)
         {
-
+            ClientData.TInfo.Pause = isPaused;
         }
 
         public void TableLoaded()

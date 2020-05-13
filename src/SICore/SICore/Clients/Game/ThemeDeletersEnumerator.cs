@@ -57,7 +57,7 @@ namespace SICore.Clients.Game
                 PossibleIndicies.Remove(index);
             }
 
-            public override string ToString() => PlayerIndex == -1 ? string.Join("|", PossibleIndicies) : PlayerIndex.ToString();
+            public override string ToString() => PlayerIndex == -1 ? $"[{string.Join("|", PossibleIndicies)}]" : PlayerIndex.ToString();
         }
 
         /// <summary>
@@ -126,6 +126,11 @@ namespace SICore.Clients.Game
             }
         }
 
+        public ThemeDeletersEnumerator(IndexInfo[] order)
+        {
+            _order = order;
+        }
+
         private readonly List<string> _removeLog = new List<string>(); // Temp for catch errors
 
         public string GetRemoveLog() => string.Join(Environment.NewLine, _removeLog);
@@ -138,7 +143,17 @@ namespace SICore.Clients.Game
 
             if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
             {
-                _removeLog.Add("Player is not deleting themes, skipping removing");
+                for (var i = 0; i < _order.Length; i++)
+                {
+                    var playerIndex = _order[i].PlayerIndex;
+                    if (playerIndex > index)
+                    {
+                        _order[i].PlayerIndex--;
+                        continue;
+                    }
+                }
+
+                _removeLog.Add("After: " + ToString());
                 return;
             }
 
@@ -175,7 +190,8 @@ namespace SICore.Clients.Game
 
                 for (int i = 0, j = 0; i < _order.Length; i++)
                 {
-                    if (_order[i].PlayerIndex == index)
+                    if (_order[i].PlayerIndex == index
+                        || _order[i].PlayerIndex == -1 && _order[i].PossibleIndicies.Count == 1 && _order[i].PossibleIndicies.Contains(index))
                     {
                         continue;
                     }
@@ -189,7 +205,7 @@ namespace SICore.Clients.Game
 
                     if (_order[i].PlayerIndex == -1)
                     {
-                        if (_order[i].PossibleIndicies.Contains(index))
+                        if (!processedPossibleIndicies.Contains(_order[i].PossibleIndicies) && _order[i].PossibleIndicies.Contains(index))
                         {
                             variantWithIndex = _order[i].PossibleIndicies;
                             possibleVariantsCount = variantWithIndex.Count;
@@ -252,6 +268,8 @@ namespace SICore.Clients.Game
         }
 
         public void MoveBack() => _orderIndex--;
+
+        public bool IsEmpty() => _order.Length == 0;
 
         public override string ToString() => new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
                 .Append(' ').Append(_orderIndex).Append(' ').Append(_cycle).ToString();

@@ -16,13 +16,13 @@ namespace SICore.PlatformSpecific
             _folder = folder;
         }
 
-        public Task<IEnumerable<string>> GetPackages()
+        public Task<IEnumerable<string>> GetPackagesAsync()
         {
             var dir = new DirectoryInfo(_folder);
             return Task.FromResult(dir.EnumerateFiles("*.siq").Select(file => file.Name));
         }
 
-        public Task<SIDocument> GetPackage(string name)
+        public Task<SIDocument> GetPackageAsync(string name)
         {
             return Task.FromResult(SIDocument.Load(File.OpenRead(Path.Combine(_folder, name))));
         }

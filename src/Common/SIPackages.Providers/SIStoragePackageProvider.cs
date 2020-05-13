@@ -42,7 +42,7 @@ namespace SIPackages.Providers
             }
         }
 
-        public async Task<SIDocument> GetPackage(string name)
+        public async Task<SIDocument> GetPackageAsync(string name)
         {
             if (string.IsNullOrEmpty(_storageOriginsPath))
             {
@@ -87,6 +87,6 @@ namespace SIPackages.Providers
             }
         }
 
-        public async Task<IEnumerable<string>> GetPackages() => await _service.GetPackagesByTagAsync();
+        public async Task<IEnumerable<string>> GetPackagesAsync() => await _service.GetPackagesByTagAsync();
     }
 }

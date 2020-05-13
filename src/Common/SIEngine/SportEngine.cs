@@ -51,10 +51,7 @@ namespace SIEngine
 
                     OnRound(_activeRound);
 
-                    //this.Stage = GameStage.RoundThemes;
-
                     _timeout = false;
-                    //AutoNext(7000);
 
                     _themeIndex = -1;
                     MoveNextTheme();

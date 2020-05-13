@@ -122,7 +122,7 @@ namespace SICore
 
         void SetText(string text);
 
-        void OnPauseChanged();
+        void OnPauseChanged(bool isPaused);
 
         void TableLoaded();
 

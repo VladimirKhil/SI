@@ -20,21 +20,21 @@ namespace SIPackages.Providers
         /// </summary>
         public const string RandomIndicator = "{random}";
 
-        public static async Task<SIDocument> GenerateRandomPackage(IPackagesProvider provider, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100, Stream stream = null)
+        public static async Task<SIDocument> GenerateRandomPackageAsync(IPackagesProvider provider, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100, Stream stream = null)
         {
             var doc = SIDocument.Create(name, author, stream);
-            return await GenerateCore(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
+            return await GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
         }
 
-        public static async Task<SIDocument> GenerateRandomPackage(IPackagesProvider provider, string folder, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100)
+        public static async Task<SIDocument> GenerateRandomPackageAsync(IPackagesProvider provider, string folder, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100)
         {
             var doc = SIDocument.Create(name, author, folder);
-            return await GenerateCore(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
+            return await GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
         }
 
-        private static async Task<SIDocument> GenerateCore(IPackagesProvider provider, int roundsCount, int themesCount, int baseCost, SIDocument doc, string roundNameFormat)
+        private static async Task<SIDocument> GenerateCoreAsync(IPackagesProvider provider, int roundsCount, int themesCount, int baseCost, SIDocument doc, string roundNameFormat)
         {
-            var files = (await provider.GetPackages()).ToList();
+            var files = (await provider.GetPackagesAsync()).ToList();
 
             var packageComments = new StringBuilder(RandomIndicator); // Информация для отчёта об игре
 
@@ -79,7 +79,7 @@ namespace SIPackages.Providers
         private static async Task<bool> ExtractTheme(IPackagesProvider provider, SIDocument doc, List<string> files, int roundIndex, Func<Round, bool> predicate/*, List<int> usedThemes*/, StringBuilder packageComments, int baseCost)
         {
             var fIndex = Rand.Next(files.Count);
-            var doc2 = await provider.GetPackage(files[fIndex]);
+            var doc2 = await provider.GetPackageAsync(files[fIndex]);
             if (doc2 == null)
             {
                 throw new PackageNotFoundException(files[fIndex]);

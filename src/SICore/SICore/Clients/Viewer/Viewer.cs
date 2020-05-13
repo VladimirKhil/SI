@@ -407,30 +407,13 @@ namespace SICore
                             break;
                         }
                     case Messages.Print:
-                        {
-                            #region Print
-
-                            var s = new StringBuilder();
-
-                            for (int i = 0; i < mparams.Length - 1; i++)
-                            {
-                                if (s.Length > 0)
-                                    s.Append(Message.ArgsSeparatorChar);
-                                s.Append(mparams[i + 1]);
-                            }
-
-                            _logic.Print(s.ToString());
-                            Ad?.Invoke(null);
-                            break;
-
-                            #endregion
-                        }
+                        OnPrint(mparams);
+                        break;
                     case Messages.Pause:
                         {
                             #region Pause
 
-                            ClientData.TInfo.Pause = mparams[1] == "+";
-                            _logic.OnPauseChanged();
+                            _logic.OnPauseChanged(mparams[1] == "+");
 
                             if (mparams.Length > 4)
                             {
@@ -563,43 +546,12 @@ namespace SICore
                             break;
                         }
                     case Messages.RoundThemes:
-                        {
-                            #region RoundThemes
+                        OnRoundThemes(mparams);
+                        break;
 
-                            var print = mparams[1] == "+";
-
-                            lock (ClientData.TInfoLock)
-                            {
-                                ClientData.TInfo.RoundInfo.Clear();
-                                for (int i = 2; i < mparams.Length; i++)
-                                {
-                                    ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
-                                    if (print)
-                                        _logic.Print(ReplicManager.System(mparams[i]));
-                                }
-                            }
-
-                            try
-                            {
-                                _logic.RoundThemes(print);
-                            }
-                            catch (InvalidProgramException exc)
-                            {
-                                ClientData.BackLink.SendError(exc, true);
-                            }
-
-                            #endregion
-                            break;
-                        }
                     case Messages.Theme:
                     case Messages.Question:
-                        _logic.SetText(mparams[1]);
-
-                        foreach (var item in ClientData.Players)
-                        {
-                            item.State = PlayerState.None;
-                        }
-
+                        OnThemeOrQuestion(mparams);
                         break;
                     case Messages.Table:
                         {
@@ -816,34 +768,9 @@ namespace SICore
                             break;
                         }
                     case Messages.PersonStake:
-                        {
-                            #region PersonStake
+                        OnPersonStake(mparams);
+                        break;
 
-                            ClientData._lastStakerNum = int.Parse(mparams[1]);
-                            if (ClientData._lastStakerNum < 0 || ClientData._lastStakerNum >= ClientData.Players.Count)
-                                return;
-
-                            int stake;
-                            if (mparams[2] == "0")
-                                stake = -1;
-                            else if (mparams[2] == "2")
-                                stake = -2;
-                            else if (mparams[2] == "3")
-                                stake = -3;
-                            else
-                            {
-                                stake = int.Parse(mparams[3]);
-                                if (mparams.Length > 4)
-                                {
-                                    ClientData.Players[ClientData._lastStakerNum].SafeStake = true;
-                                }
-                            }
-
-                            ClientData.Players[ClientData._lastStakerNum].Stake = stake;
-
-                            #endregion
-                            break;
-                        }
                     case Messages.Stop:
                         {
                             #region Stop
@@ -953,8 +880,95 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                throw new Exception(string.Join("\n", mparams), exc);
+                throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
             }
+        }
+
+        private void OnRoundThemes(string[] mparams)
+        {
+            var print = mparams[1] == "+";
+
+            lock (ClientData.TInfoLock)
+            {
+                ClientData.TInfo.RoundInfo.Clear();
+                for (var i = 2; i < mparams.Length; i++)
+                {
+                    ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
+                    if (print)
+                    {
+                        _logic.Print(ReplicManager.System(mparams[i]));
+                    }
+                }
+            }
+
+            try
+            {
+                _logic.RoundThemes(print);
+            }
+            catch (InvalidProgramException exc)
+            {
+                ClientData.BackLink.SendError(exc, true);
+            }
+
+            Ad?.Invoke(null);
+        }
+
+        private void OnThemeOrQuestion(string[] mparams)
+        {
+            _logic.SetText(mparams[1]);
+
+            foreach (var item in ClientData.Players)
+            {
+                item.State = PlayerState.None;
+            }
+
+            Ad?.Invoke(null);
+        }
+
+        private void OnPersonStake(string[] mparams)
+        {
+            if (!int.TryParse(mparams[1], out var lastStakerIndex) ||
+                lastStakerIndex < 0 || lastStakerIndex >= ClientData.Players.Count)
+                return;
+
+            ClientData.LastStakerIndex = lastStakerIndex;
+
+            int stake;
+            if (mparams[2] == "0")
+                stake = -1;
+            else if (mparams[2] == "2")
+                stake = -2;
+            else if (mparams[2] == "3")
+                stake = -3;
+            else
+            {
+                int.TryParse(mparams[3], out stake);
+                if (mparams.Length > 4)
+                {
+                    ClientData.Players[ClientData.LastStakerIndex].SafeStake = true;
+                }
+            }
+
+            ClientData.Players[ClientData.LastStakerIndex].Stake = stake;
+
+            Ad?.Invoke(null);
+        }
+
+        private void OnPrint(string[] mparams)
+        {
+            var s = new StringBuilder();
+
+            for (var i = 0; i < mparams.Length - 1; i++)
+            {
+                if (s.Length > 0)
+                {
+                    s.Append(Message.ArgsSeparatorChar);
+                }
+
+                s.Append(mparams[i + 1]);
+            }
+
+            _logic.Print(s.ToString());
         }
 
         private void ProcessConfig(string[] mparams)
@@ -1487,8 +1501,6 @@ namespace SICore
                     Ready = mparams[mIndex++] == "+"
                 };
 
-                CreateShowmanCommands();
-
                 var newPlayers = new List<PlayerAccount>();
                 for (int i = 0; i < numOfPlayers; i++)
                 {
@@ -1502,11 +1514,6 @@ namespace SICore
                 }
 
                 ClientData.Players = newPlayers;
-
-                foreach (var account in ClientData.Players)
-                {
-                    CreatePlayerCommands(account);
-                }
 
                 var newViewers = new List<ViewerAccount>();
                 for (int i = 0; i < numOfViewers; i++)
@@ -1524,6 +1531,13 @@ namespace SICore
             finally
             {
                 ClientData.EndUpdatePersons();
+            }
+
+            CreateShowmanCommands();
+
+            foreach (var account in ClientData.Players)
+            {
+                CreatePlayerCommands(account);
             }
 
             foreach (var account in MyData.MainPersons)

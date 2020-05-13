@@ -12,6 +12,7 @@ using SIPackages.Providers;
 using SIUI.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -192,6 +193,8 @@ namespace SICore
             _data.isQuestionPlaying = true;
             _data.IsAnswer = false;
             _data.CurPriceRight = _data.CurPriceWrong = question.Price;
+            _data.IsPlayingMedia = false;
+            _data.IsPlayingMediaPaused = false;
             _actor.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
             _actor.SendMessageWithArgs(Messages.Question, question.Price);
 
@@ -321,6 +324,12 @@ namespace SICore
                         : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
 
                     var uri = _data.Share.CreateURI(filename, link.GetStream, mediaCategory);
+                    var localUri = ClientData.DocumentPath != null ? Path.Combine(ClientData.DocumentPath, mediaCategory, Uri.UnescapeDataString(filename)) : null;
+
+                    if (localUri != null && !File.Exists(localUri))
+                    {
+                        localUri = null;
+                    }
 
                     _data.OpenedFiles.Add(filename);
 
@@ -329,7 +338,7 @@ namespace SICore
                         var msg2 = new StringBuilder(msg.ToString());
                         if (_actor.Client.CurrentServer.Contains(item.Name))
                         {
-                            msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(uri);
+                            msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(localUri ?? uri);
                         }
                         else
                         {
@@ -396,6 +405,9 @@ namespace SICore
             _data.AtomType = atom.Type;
             _data.CanMarkQuestion = true;
 
+            _data.IsPlayingMedia = atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio;
+            _data.IsPlayingMediaPaused = false;
+
             var isPartial = _data.IsPartial && atom.Type == AtomTypes.Text;
             if (isPartial)
             {
@@ -438,6 +450,8 @@ namespace SICore
             if (!final)
             {
                 _data.IsQuestionFinished = true;
+                _data.IsPlayingMedia = false;
+                _data.IsPlayingMediaPaused = false;
 
                 if (!_data.isQuestionPlaying)
                     Execute(Tasks.MoveNext, 1, force: true);
@@ -502,14 +516,27 @@ namespace SICore
             }
 
             if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Tv)
+            {
+                var activeQuestionsCount = GetRoundActiveQuestionsCount();
+
+                if (activeQuestionsCount == 0)
+                {
+                    throw new Exception($"{nameof(activeQuestionsCount)} == 0! {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
+                }
+
                 Execute(Tasks.AskToChoose, 4, force: true);
+            }
             else
+            {
                 Execute(Tasks.MoveNext, 10, force: true);
+            }
 
             foreach (var player in _data.Players)
             {
                 if (player.PingPenalty > 0)
+                {
                     player.PingPenalty--;
+                }
             }
 
             _data.CanMarkQuestion = false;
@@ -574,12 +601,16 @@ namespace SICore
         {
             if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
             {
-                throw new ArgumentException(nameof(themeIndex));
+                var errorMessage = new StringBuilder(themeIndex).Append(' ')
+                    .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"{t.Name != null} {t.Questions.Count}"))).Append(' ')
+                    .Append(_data.ThemeIndex).Append(' ')
+                    .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
+                throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
             }
 
             _actor.SendMessageWithArgs(Messages.Out, themeIndex);
 
-            int playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
+            var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
             var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
             _actor.PlayerReplic(playerIndex, themeName);
         }
@@ -923,6 +954,11 @@ namespace SICore
                     _data.IsThinking = false;
                     _actor.SendMessageWithArgs(Messages.Timer, 1, "STOP");
 
+                    if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
+                    {
+                        Engine.SkipQuestion();
+                    }
+
                     Execute(Tasks.MoveNext, 1, force: true);
                 }
                 else
@@ -1032,6 +1068,7 @@ namespace SICore
             }
             else
             {
+                _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
                 _actor.SendMessage(Messages.Resume);
                 Execute(Tasks.MoveNext, _data.AtomTime, force: true);
             }
@@ -1107,13 +1144,13 @@ namespace SICore
 
         private bool OnDecisionAnswering()
         {
-            if (_data.Answerer == null)
+            if (!IsFinalRound())
             {
-                return false;
-            }
+                if (_data.Answerer == null || string.IsNullOrEmpty(_data.Answerer.Answer))
+                {
+                    return false;
+                }
 
-            if (!IsFinalRound() && _data.Answerer.Answer.Length > 0)
-            {
                 StopWaiting();
 
                 _actor.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
@@ -1130,20 +1167,15 @@ namespace SICore
                 return true;
             }
 
-            if (IsFinalRound())
-            {
-                StopWaiting();
+            StopWaiting();
 
-                var s = ResourceHelper.GetString(_actor.LO[nameof(R.LetsSee)]);
-                _actor.ShowmanReplic(s);
+            var s = ResourceHelper.GetString(_actor.LO[nameof(R.LetsSee)]);
+            _actor.ShowmanReplic(s);
 
-                _data.ThemeDeleters.Reset(false);
-                Execute(Tasks.Announce, 15);
+            _data.ThemeDeleters.Reset(false);
+            Execute(Tasks.Announce, 15);
 
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         public bool IsFinalRound() => _data.Round.Type == RoundTypes.Final;
@@ -1201,7 +1233,7 @@ namespace SICore
                     {
                         var stop = true;
 
-                        _tasksHistory.Enqueue("StopReason " + _stopReason.ToString());
+                        _tasksHistory.Enqueue($"StopReason {_stopReason} {(_stopReason == StopReason.Move ? _data.MoveDirection.ToString() : "")}");
 
                         // Прекратить обычное выполнение
                         switch (_stopReason)
@@ -2409,6 +2441,8 @@ namespace SICore
             _actor.SendMessageWithArgs(Messages.Timer, 1, "PAUSE", (int)ClientData.TimeThinking);
 
             _data.IsDeferringAnswer = false;
+            _data.IsPlayingMediaPaused = _data.IsPlayingMedia;
+            _data.IsPlayingMedia = false;
 
             ClientData.Decision = DecisionType.None;
             Stop(StopReason.Answer);
@@ -2733,7 +2767,7 @@ namespace SICore
             var timeSettings = _data.Settings.AppSettings.TimeSettings;
             var msg = new StringBuilder();
 
-            if (_data.Round.Type == RoundTypes.Final)
+            if (IsFinalRound())
             {
                 _actor.ShowmanReplic(_actor.LO[nameof(R.StartThink)]);
                 for (var i = 0; i < _data.Players.Count; i++)
@@ -2878,96 +2912,121 @@ namespace SICore
         /// <returns>Стоит ли продолжать выполнение</returns>
         private bool DetectNextStaker()
         {
-            var candidatesAll = Enumerable.Range(0, _data.Order.Length).Except(_data.Order).ToArray(); // Незадействованные игроки
-            if (_data.OrderIndex < _data.Order.Length - 1)
+            var errorLog = new StringBuilder()
+                .Append(' ').Append(_data.Stake).Append(' ').Append(_data.OrderIndex)
+                .Append(' ').Append(string.Join(":", _data.Order))
+                .Append(' ').Append(string.Join(":", _data.Players.Select(p => p.Sum)))
+                .Append(' ').Append(string.Join(":", _data.Players.Select(p => p.StakeMaking)))
+                .Append(' ').Append(string.Join(":", _data.OrderHistory));
+
+            var stage = 0;
+
+            try
             {
-                // Ещё есть, из кого выбирать
-
-                // Сначала отбросим тех, у кого недостаточно денег для ставки
-                var candidates = candidatesAll.Where(n => _data.Players[n].Sum > _data.Stake || _data.Players[n].Sum == _data.Stake && _data.Stake > _data.Question.Price);
-
-                if (candidates.Count() > 1)
+                var candidatesAll = Enumerable.Range(0, _data.Order.Length).Except(_data.Order).ToArray(); // Незадействованные игроки
+                if (_data.OrderIndex < _data.Order.Length - 1)
                 {
-                    // У кандидатов должна быть минимальная сумма
-                    var minSum = candidates.Min(n => _data.Players[n].Sum);
-                    candidates = candidates.Where(n => _data.Players[n].Sum == minSum);
-                }
+                    // Ещё есть, из кого выбирать
 
-                if (!candidates.Any()) // Никто из оставшихся не может перебить ставку
-                {
-                    int ind = _data.OrderIndex;
-                    for (var i = 0; i < candidatesAll.Length; i++)
+                    // Сначала отбросим тех, у кого недостаточно денег для ставки
+                    var candidates = candidatesAll.Where(n => _data.Players[n].Sum > _data.Stake || _data.Players[n].Sum == _data.Stake && _data.Stake > _data.Question.Price);
+
+                    if (candidates.Count() > 1)
                     {
-                        _data.Order[ind + i] = candidatesAll[i];
-                        CheckOrder(ind + i);
-                        _data.Players[candidatesAll[i]].StakeMaking = false;
+                        // У кандидатов должна быть минимальная сумма
+                        var minSum = candidates.Min(n => _data.Players[n].Sum);
+                        candidates = candidates.Where(n => _data.Players[n].Sum == minSum);
                     }
 
-                    var stakersCount = _data.Players.Count(p => p.StakeMaking);
-                    if (stakersCount == 1)
+                    if (!candidates.Any()) // Никто из оставшихся не может перебить ставку
                     {
-                        // Игрок определён
-                        for (var i = 0; i < _data.Players.Count; i++)
+                        stage = 1;
+
+                        var ind = _data.OrderIndex;
+                        for (var i = 0; i < candidatesAll.Length; i++)
                         {
-                            if (_data.Players[i].StakeMaking)
-                            {
-                                _data.StakerIndex = i;
-                                break;
-                            }
+                            _data.Order[ind + i] = candidatesAll[i];
+                            CheckOrder(ind + i);
+                            _data.Players[candidatesAll[i]].StakeMaking = false;
                         }
 
-                        _data.ChooserIndex = _data.StakerIndex;
-                        _data.AnswererIndex = _data.StakerIndex;
-                        _data.CurPriceRight = _data.Stake;
-                        _data.CurPriceWrong = _data.Stake;
+                        stage = 2;
 
-                        if (_data.AnswererIndex == -1)
-                            _data.BackLink.SendError(new Exception("this.data.AnswererIndex == -1"), true);
+                        var stakersCount = _data.Players.Count(p => p.StakeMaking);
+                        if (stakersCount == 1)
+                        {
+                            // Игрок определён
+                            for (var i = 0; i < _data.Players.Count; i++)
+                            {
+                                if (_data.Players[i].StakeMaking)
+                                {
+                                    _data.StakerIndex = i;
+                                    break;
+                                }
+                            }
 
-                        _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                            _data.ChooserIndex = _data.StakerIndex;
+                            _data.AnswererIndex = _data.StakerIndex;
+                            _data.CurPriceRight = _data.Stake;
+                            _data.CurPriceWrong = _data.Stake;
 
-                        Execute(Tasks.PrintQue, 10, 1);
+                            if (_data.AnswererIndex == -1)
+                                _data.BackLink.SendError(new Exception("this.data.AnswererIndex == -1"), true);
+
+                            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+
+                            Execute(Tasks.PrintQue, 10, 1);
+                            return false;
+                        }
+
+                        _data.OrderIndex = -1;
+                        AskStake(false);
                         return false;
                     }
 
-                    _data.OrderIndex = -1;
-                    AskStake(false);
-                    return false;
-                }
+                    stage = 3;
 
-                _data.IsWaiting = false;
-                if (candidates.Count() == 1)
-                {
-                    _data.Order[_data.OrderIndex] = candidates.First();
-                    CheckOrder(_data.OrderIndex);
+                    _data.IsWaiting = false;
+                    if (candidates.Count() == 1)
+                    {
+                        _data.Order[_data.OrderIndex] = candidates.First();
+                        CheckOrder(_data.OrderIndex);
+                    }
+                    else
+                    {
+                        // Без ведущего не обойтись
+                        var msg = new StringBuilder(Messages.FirstStake);
+                        for (var i = 0; i < _data.Players.Count; i++)
+                        {
+                            _data.Players[i].Flag = candidates.Contains(i);
+                            msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
+                        }
+
+                        _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+
+                        var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+                        Execute(Tasks.WaitNext, time);
+                        WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
+                        return false;
+                    }
                 }
                 else
                 {
-                    // Без ведущего не обойтись
-                    var msg = new StringBuilder(Messages.FirstStake);
-                    for (var i = 0; i < _data.Players.Count; i++)
-                    {
-                        _data.Players[i].Flag = candidates.Contains(i);
-                        msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
-                    }
+                    stage = 4;
 
-                    _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
-
-                    var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-                    Execute(Tasks.WaitNext, time);
-                    WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
-                    return false;
+                    // Остался последний игрок, выбор очевиден
+                    var leftIndex = candidatesAll[0];
+                    _data.Order[_data.OrderIndex] = leftIndex;
+                    CheckOrder(_data.OrderIndex);
                 }
-            }
-            else
-            {
-                // Остался последний игрок, выбор очевиден
-                var leftIndex = candidatesAll[0];
-                _data.Order[_data.OrderIndex] = leftIndex;
-                CheckOrder(_data.OrderIndex);
-            }
 
-            return true;
+                return true;
+            }
+            catch (Exception exc)
+            {
+                errorLog.Append(' ').Append(stage);
+                throw new Exception(errorLog.ToString(), exc);
+            }
         }
 
         public void CheckOrder(int index)
@@ -3141,7 +3200,8 @@ namespace SICore
             {
                 var orders = string.Join(",", _data.Order);
                 var sums = string.Join(",", _data.Players.Select(p => p.Sum));
-                throw new Exception($"AskStake error {tempStage} {sums} {orders} {_data.OrderIndex} {_data.Players.Count}", exc);
+                var stakeMaking = string.Join(",", _data.Players.Select(p => p.StakeMaking));
+                throw new Exception($"AskStake error {tempStage} {sums} {stakeMaking} {orders} {_data.Stake} {_data.OrderIndex} {_data.Players.Count} {_data.OrderHistory}", exc);
             }
         }
 
@@ -3163,14 +3223,14 @@ namespace SICore
 
                 if (breakerGuard == 0)
                 {
-                    throw new Exception($"{nameof(breakerGuard)} == {breakerGuard}");
+                    throw new Exception($"{nameof(breakerGuard)} == {breakerGuard} (${initialOrderIndex})");
                 }
 
             } while (_data.OrderIndex != initialOrderIndex && _data.Order[_data.OrderIndex] != -1 && !_data.Players[_data.Order[_data.OrderIndex]].StakeMaking);
 
             if (_data.OrderIndex == initialOrderIndex)
             {
-                throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)}");
+                throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)} (${initialOrderIndex})");
             }
         }
 
@@ -3581,103 +3641,7 @@ namespace SICore
                 // Теперь случайные спецвопросы расставляются здесь
                 if (_data.Settings.RandomSpecials)
                 {
-#region Random specials
-                    var nonUsedNumbers = new List<int>();
-                    var maxQuestionsInTheme = round.Themes.Max(theme => theme.Questions.Count);
-                    var leavedCats = 1 + Data.Rand.Next(3);
-                    var leavedAucts = 1 + Data.Rand.Next(3);
-                    var leavedSponsored = Data.Rand.Next(2);
-                    for (int ti = 0; ti < round.Themes.Count; ti++)
-                    {
-                        var theme = round.Themes[ti];
-                        for (int qi = 0; qi < theme.Questions.Count; qi++)
-                        {
-                            var quest = theme.Questions[qi];
-                            if (quest.Type.Name != QuestionTypes.Cat && quest.Type.Name != QuestionTypes.BagCat)
-                            {
-                                nonUsedNumbers.Add(ti * maxQuestionsInTheme + qi);
-                                quest.Type.Name = QuestionTypes.Simple;
-                            }
-                            else
-                            {
-                                leavedCats--;
-                            }
-                        }
-                    }
-
-                    while (nonUsedNumbers.Count > 0 && leavedSponsored > 0)
-                    {
-                        var num = Data.Rand.Next(nonUsedNumbers.Count);
-                        var val = nonUsedNumbers[num];
-                        nonUsedNumbers.RemoveAt(num);
-                        leavedSponsored--;
-                        var ti = val / maxQuestionsInTheme;
-                        var qi = val % maxQuestionsInTheme;
-                        round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Sponsored;
-                    }
-
-                    while (nonUsedNumbers.Count > 0 && leavedAucts > 0)
-                    {
-                        var num = Data.Rand.Next(nonUsedNumbers.Count);
-                        var val = nonUsedNumbers[num];
-                        nonUsedNumbers.RemoveAt(num);
-                        leavedAucts--;
-                        var ti = val / maxQuestionsInTheme;
-                        var qi = val % maxQuestionsInTheme;
-                        round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Auction;
-                    }
-
-                    while (nonUsedNumbers.Count > 0 && leavedCats > 0)
-                    {
-                        var num = Data.Rand.Next(nonUsedNumbers.Count);
-                        var val = nonUsedNumbers[num];
-                        nonUsedNumbers.RemoveAt(num);
-                        leavedCats--;
-                        var ti = val / maxQuestionsInTheme;
-                        var qi = val % maxQuestionsInTheme;
-                        var quest = round.Themes[ti].Questions[qi];
-                        quest.Type.Name = QuestionTypes.BagCat;
-
-                        quest.Type[QuestionTypeParams.Cat_Theme] = round.Themes[ti].Name;
-
-                        int var = Data.Rand.Next(3);
-                        if (var == 0)
-                            quest.Type[QuestionTypeParams.Cat_Cost] = ((Data.Rand.Next(20) + 1) * 100).ToString();
-                        else if (var == 1)
-                            quest.Type[QuestionTypeParams.Cat_Cost] = "0";
-                        else
-                        {
-                            var sumMin = (Data.Rand.Next(10) + 1) * 100;
-                            var sumMax = sumMin + (Data.Rand.Next(10) + 1) * 100;
-                            var maxSteps = (sumMax - sumMin) / 100;
-
-                            var possibleSteps = Enumerable.Range(1, maxSteps).Where(step => maxSteps % step == 0).ToArray();
-                            var stepIndex = Data.Rand.Next(possibleSteps.Length);
-                            var steps = possibleSteps[stepIndex];
-
-                            //int steps = 1;
-                            //do steps = Data.Rand.Next(maxSteps) + 1; while (maxSteps % steps != 0);
-                            var str = new StringBuilder().AppendFormat("[{0};{1}]", sumMin, sumMax);
-                            if (steps != maxSteps)
-                                str.Append('/').Append(steps * 100);
-                            quest.Type[QuestionTypeParams.Cat_Cost] = str.ToString();
-                        }
-
-                        var = Data.Rand.Next(2);
-                        if (var == 0)
-                            quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_True;
-                        else
-                            quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_False;
-
-                        var = Data.Rand.Next(100);
-                        if (var < 30)
-                            quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Before;
-                        else if (var < 90)
-                            quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_After;
-                        else
-                            quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Never;
-                    }
-#endregion
+                    RandomizeSpecials(round);
                 }
             }
             else if (arg == 2)
@@ -3732,7 +3696,7 @@ namespace SICore
                     if (!string.IsNullOrEmpty(ad))
                     {
                         informed = true;
-                        var res = new StringBuilder(_actor.LO[nameof(R.Ads)] + ": ").Append(ad);
+                        var res = new StringBuilder(_actor.LO[nameof(R.Ads)]).Append(": ").Append(ad);
 
                         _actor.ShowmanReplic(res.ToString());
                         _actor.SpecialReplic(res.ToString());
@@ -3747,7 +3711,9 @@ namespace SICore
                         _actor.OnAdShown(adId);
                     }
                     else
+                    {
                         arg++;
+                    }
                 }
                 catch (Exception exc)
                 {
@@ -3767,6 +3733,105 @@ namespace SICore
             else
             {
                 ExecuteTask(Tasks.MoveNext, 0);
+            }
+        }
+
+        private void RandomizeSpecials(Round round)
+        {
+            var nonUsedNumbers = new List<int>();
+            var maxQuestionsInTheme = round.Themes.Max(theme => theme.Questions.Count);
+            var leavedCats = 1 + Data.Rand.Next(3);
+            var leavedAucts = 1 + Data.Rand.Next(3);
+            var leavedSponsored = Data.Rand.Next(2);
+            for (int ti = 0; ti < round.Themes.Count; ti++)
+            {
+                var theme = round.Themes[ti];
+                for (int qi = 0; qi < theme.Questions.Count; qi++)
+                {
+                    var quest = theme.Questions[qi];
+                    if (quest.Type.Name != QuestionTypes.Cat && quest.Type.Name != QuestionTypes.BagCat)
+                    {
+                        nonUsedNumbers.Add(ti * maxQuestionsInTheme + qi);
+                        quest.Type.Name = QuestionTypes.Simple;
+                    }
+                    else
+                    {
+                        leavedCats--;
+                    }
+                }
+            }
+
+            while (nonUsedNumbers.Count > 0 && leavedSponsored > 0)
+            {
+                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var val = nonUsedNumbers[num];
+                nonUsedNumbers.RemoveAt(num);
+                leavedSponsored--;
+                var ti = val / maxQuestionsInTheme;
+                var qi = val % maxQuestionsInTheme;
+                round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Sponsored;
+            }
+
+            while (nonUsedNumbers.Count > 0 && leavedAucts > 0)
+            {
+                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var val = nonUsedNumbers[num];
+                nonUsedNumbers.RemoveAt(num);
+                leavedAucts--;
+                var ti = val / maxQuestionsInTheme;
+                var qi = val % maxQuestionsInTheme;
+                round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Auction;
+            }
+
+            while (nonUsedNumbers.Count > 0 && leavedCats > 0)
+            {
+                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var val = nonUsedNumbers[num];
+                nonUsedNumbers.RemoveAt(num);
+                leavedCats--;
+                var ti = val / maxQuestionsInTheme;
+                var qi = val % maxQuestionsInTheme;
+                var quest = round.Themes[ti].Questions[qi];
+                quest.Type.Name = QuestionTypes.BagCat;
+
+                quest.Type[QuestionTypeParams.Cat_Theme] = round.Themes[ti].Name;
+
+                int var = Data.Rand.Next(3);
+                if (var == 0)
+                    quest.Type[QuestionTypeParams.Cat_Cost] = ((Data.Rand.Next(20) + 1) * 100).ToString();
+                else if (var == 1)
+                    quest.Type[QuestionTypeParams.Cat_Cost] = "0";
+                else
+                {
+                    var sumMin = (Data.Rand.Next(10) + 1) * 100;
+                    var sumMax = sumMin + (Data.Rand.Next(10) + 1) * 100;
+                    var maxSteps = (sumMax - sumMin) / 100;
+
+                    var possibleSteps = Enumerable.Range(1, maxSteps).Where(step => maxSteps % step == 0).ToArray();
+                    var stepIndex = Data.Rand.Next(possibleSteps.Length);
+                    var steps = possibleSteps[stepIndex];
+
+                    //int steps = 1;
+                    //do steps = Data.Rand.Next(maxSteps) + 1; while (maxSteps % steps != 0);
+                    var str = new StringBuilder().AppendFormat("[{0};{1}]", sumMin, sumMax);
+                    if (steps != maxSteps)
+                        str.Append('/').Append(steps * 100);
+                    quest.Type[QuestionTypeParams.Cat_Cost] = str.ToString();
+                }
+
+                var = Data.Rand.Next(2);
+                if (var == 0)
+                    quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_True;
+                else
+                    quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_False;
+
+                var = Data.Rand.Next(100);
+                if (var < 30)
+                    quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Before;
+                else if (var < 90)
+                    quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_After;
+                else
+                    quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Never;
             }
         }
 

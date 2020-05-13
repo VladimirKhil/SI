@@ -456,6 +456,7 @@ namespace SICore
             }
 
             TInfo.TStage = TableStage.Question;
+            TInfo.IsMediaStopped = false;
 
             switch (_data._atomType)
             {
@@ -642,7 +643,9 @@ namespace SICore
         {
             TInfo.QuestionStyle = QuestionStyle.Normal;
             if (_data._atomType == AtomTypes.Audio || _data._atomType == AtomTypes.Video)
-                TInfo.OnMediaPause();
+            {
+                TInfo.IsMediaStopped = true;
+            }
 
             if (!int.TryParse(text, out int number))
             {
@@ -915,10 +918,7 @@ namespace SICore
             TInfo.TStage = TableStage.Round;
         }
 
-        public void OnPauseChanged()
-        {
-            TInfo.Pause = _data.TInfo.Pause;
-        }
+        public void OnPauseChanged(bool isPaused) => TInfo.Pause = isPaused;
 
         public void TableLoaded()
         {
@@ -950,10 +950,7 @@ namespace SICore
             }
         }
 
-        public void Resume()
-        {
-            TInfo.OnMediaResume();
-        }
+        public void Resume() => TInfo.IsMediaStopped = false;
 
         public async void PrintGreeting()
         {

@@ -457,5 +457,10 @@ namespace SICore
         public DateTime StartTryTime { get; internal set; }
 
         public bool MoveNextBlocked { get; set; }
+
+        public bool IsPlayingMedia { get; set; }
+
+        public bool IsPlayingMediaPaused { get; set; }
+        public string DocumentPath { get; internal set; }
     }
 }

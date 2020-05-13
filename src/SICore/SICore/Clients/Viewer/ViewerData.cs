@@ -171,7 +171,7 @@ namespace SICore
 
         internal int Winner { get; set; }
 
-        internal int _lastStakerNum = -1;
+        internal int LastStakerIndex { get; set; } = -1;
 
         private ViewerAccount _me = null;
 
