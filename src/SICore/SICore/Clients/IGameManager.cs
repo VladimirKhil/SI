@@ -1,9 +1,7 @@
 ﻿using SICore.PlatformSpecific;
-using Services.SI;
 using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
-using SICore.Results;
 
 namespace SICore
 {
@@ -42,5 +40,6 @@ namespace SICore
         /// </summary>
         /// <returns></returns>
         string GetAd(string localization, out int adId);
+        void OnText(string text);
     }
 }

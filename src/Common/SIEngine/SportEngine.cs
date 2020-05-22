@@ -2,7 +2,6 @@
 using SIPackages.Core;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SIEngine
 {
@@ -87,31 +86,8 @@ namespace SIEngine
                     break;
 
                 case GameStage.Question:
-                    #region Question
-                    {
-                        var playMode = PlayQuestionAtom();
-                        var pressMode = _settingsProvider.IsPressMode(_isMedia);
-                        if (playMode == QuestionPlayMode.AlreadyFinished)
-                        {
-                            Stage = (_settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.EndQuestion);
-
-                            if (pressMode)
-                            {
-                                OnWaitTry(_activeQuestion);
-                                AutoNext(1000 * (Math.Min(5, _settingsProvider.ThinkingTime)));
-                            }
-                            else
-                                MoveNext();
-                        }
-                        else
-                        {
-                            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, pressMode);
-                            AutoNext(1000 * (_settingsProvider.ThinkingTime + _activeQuestion.Scenario.ToString().Length / 20));
-                        }
-
-                        break;
-                    }
-                    #endregion
+                    OnQuestion();
+                    break;
 
                 case GameStage.RightAnswer:
                     #region RightAnswer

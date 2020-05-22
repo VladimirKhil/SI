@@ -25,7 +25,7 @@ namespace SICore
 
         public TableInfoViewModel TInfo { get; }
 
-        public ViewerHumanLogic(P client, ViewerData data)
+        protected ViewerHumanLogic(P client, ViewerData data)
             : base(client, data)
         {
             TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
@@ -89,61 +89,66 @@ namespace SICore
         /// <param name="text">Выводимый текст</param>
         virtual public void Print(string text)
         {
-            var toform = new StringBuilder();
-            var toproto = new StringBuilder();
+            var chatMessageBuilder = new StringBuilder();
+            var logMessageBuilder = new StringBuilder();
 
             var isPrintable = false;
             var special = false;
 
             try
             {
-                using (var reader = new StringReader(text))
+                using var reader = new StringReader(text);
+                using var xmlReader = XmlReader.Create(reader, ReaderSettings);
+
+                xmlReader.Read();
+                while (!xmlReader.EOF)
                 {
-                    using (var xmlReader = XmlReader.Create(reader, ReaderSettings))
+                    if (xmlReader.NodeType == XmlNodeType.Element)
+                    {
+                        ParseMessageToPrint(xmlReader, chatMessageBuilder, logMessageBuilder, ref isPrintable, ref special);
+                    }
+                    else
                     {
                         xmlReader.Read();
-                        while (!xmlReader.EOF)
-                        {
-                            if (xmlReader.NodeType == XmlNodeType.Element)
-                            {
-                                ToFormAndProto(xmlReader, toform, toproto, ref isPrintable, ref special);
-                            }
-                            else
-                                xmlReader.Read();
-                        }
                     }
                 }
             }
             catch (XmlException exc)
             {
-                throw new Exception(_actor.LO[nameof(R.StringParseError)] + " " + text + ".", exc);
+                throw new Exception($"{_actor.LO[nameof(R.StringParseError)]} {text}.", exc);
             }
 
-            var toFormStr = toform.ToString();
+            var toFormStr = chatMessageBuilder.ToString();
             if (isPrintable)
             {
                 var pair = toFormStr.Split(':');
                 var speech = (pair.Length > 1 && pair[0].Length + 2 < toFormStr.Length) ? toFormStr.Substring(pair[0].Length + 2) : toFormStr;
 
                 if (_data.Speaker != null)
+                {
                     _data.Speaker.Replic = "";
+                }
 
                 _data.Speaker = _data.MainPersons.FirstOrDefault(item => item.Name == pair[0]);
                 if (_data.Speaker != null)
+                {
                     _data.Speaker.Replic = speech.Trim();
+                }
             }
 
             if (_data.BackLink.TranslateGameToChat || special)
+            {
                 _data.OnAddString(null, toFormStr, LogMode.Protocol);
+            }
 
             if (_data.BackLink.MakeLogs)
-                AddToFileLog(toproto.ToString());
+            {
+                AddToFileLog(logMessageBuilder.ToString());
+            }
         }
 
-        internal void AddToFileLog(Message message)
-        {
-            AddToFileLog(string.Format("<span style=\"color: gray; font-weight: bold\">{0}:</span> <span style=\"font-weight: bold\">{1}</span><br />", message.Sender, message.Text));
-        }
+        internal void AddToFileLog(Message message) =>
+            AddToFileLog($"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> <span style=\"font-weight: bold\">{message.Text}</span><br />");
 
         internal void AddToFileLog(string text)
         {
@@ -153,8 +158,7 @@ namespace SICore
                 {
                     try
                     {
-                        string path = null;
-                        var stream = _data.BackLink.CreateLog(_actor.Client.Name, out path);
+                        var stream = _data.BackLink.CreateLog(_actor.Client.Name, out var path);
                         _data.ProtocolPath = path;
                         _data.ProtocolWriter = new StreamWriter(stream);
                         _data.ProtocolWriter.Write(text);
@@ -188,7 +192,8 @@ namespace SICore
             }
         }
 
-        private void ToFormAndProto(XmlReader reader, StringBuilder toForm, StringBuilder toProto, ref bool isPrintable, ref bool special)
+        private void ParseMessageToPrint(XmlReader reader, StringBuilder chatMessageBuilder,
+            StringBuilder logMessageBuilder, ref bool isPrintable, ref bool special)
         {
             var name = reader.Name;
             var content = reader.ReadElementContentAsString();
@@ -196,15 +201,15 @@ namespace SICore
             switch (name)
             {
                 case "this.client":
-                    toForm.AppendFormat("{0}: ", content);
-                    toProto.AppendFormat("<span style=\"color: #646464; font-weight: bold\">{0}: </span>", content);
+                    chatMessageBuilder.AppendFormat("{0}: ", content);
+                    logMessageBuilder.AppendFormat("<span style=\"color: #646464; font-weight: bold\">{0}: </span>", content);
                     break;
 
                 case "player":
                     {
                         isPrintable = true;
 
-                        var n = Int32.Parse(content);
+                        var n = int.Parse(content);
                         string s;
                         if (n == 0)
                             s = "<span style=\"color: #EF21A9; font-weight:bold\">";
@@ -222,41 +227,41 @@ namespace SICore
                             s = "<span style=\"color: #00FFFF; font-weight:bold\">";
                         else
                         {
-                            _data.SystemLog.AppendLine(_actor.LO[nameof(R.BadTextInLog)] + ": " + toProto);
+                            _data.SystemLog.AppendLine(_actor.LO[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
                             return;
                         }
 
                         var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + _actor.LO[nameof(R.UnknownPerson)] + ">";
-                        toForm.AppendFormat("{0}: ", playerName);
-                        toProto.AppendFormat("{0}{1}: </span>", s, playerName);
+                        chatMessageBuilder.AppendFormat("{0}: ", playerName);
+                        logMessageBuilder.AppendFormat("{0}{1}: </span>", s, playerName);
                     }
                     break;
 
                 case "showman":
                     isPrintable = true;
-                    toForm.AppendFormat("{0}: ", content);
-                    toProto.AppendFormat("<span style=\"color: #0AEA2A; font-weight: bold\">{0}: </span>", content);
+                    chatMessageBuilder.AppendFormat("{0}: ", content);
+                    logMessageBuilder.AppendFormat("<span style=\"color: #0AEA2A; font-weight: bold\">{0}: </span>", content);
                     break;
 
                 case "replic":
-                    toForm.Append(content);
-                    toProto.AppendFormat("<span style=\"font-weight: bold\">{0}</span>", content);
+                    chatMessageBuilder.Append(content);
+                    logMessageBuilder.AppendFormat("<span style=\"font-weight: bold\">{0}</span>", content);
                     break;
 
                 case "system":
-                    toForm.Append(content);
-                    toProto.AppendFormat("<span style=\"font-style: italic\">{0}</span>", content);
+                    chatMessageBuilder.Append(content);
+                    logMessageBuilder.AppendFormat("<span style=\"font-style: italic\">{0}</span>", content);
                     break;
 
                 case "special":
                     special = true;
-                    toForm.AppendFormat("* {0}", content.ToUpper());
-                    toProto.AppendFormat("<span style=\"font-style: italic; font-weight: bold\">{0}</span>", content);
+                    chatMessageBuilder.AppendFormat("* {0}", content.ToUpper());
+                    logMessageBuilder.AppendFormat("<span style=\"font-style: italic; font-weight: bold\">{0}</span>", content);
                     break;
 
                 case "line":
-                    toForm.Append('\r');
-                    toProto.Append("<br />");
+                    chatMessageBuilder.Append('\r');
+                    logMessageBuilder.Append("<br />");
                     break;
             }
         }
@@ -395,7 +400,7 @@ namespace SICore
                 }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
         }
 
-        virtual public void Choice()
+        virtual public async void Choice()
         {
             TInfo.Text = "";
             TInfo.MediaSource = null;
@@ -407,12 +412,32 @@ namespace SICore
                 item.State = PlayerState.None;
             }
 
+            var select = false;
+
             lock (_data.ChoiceLock)
-            lock (TInfo.RoundInfoLock)
             {
-                if (_data.ThemeIndex > -1 && _data.ThemeIndex < TInfo.RoundInfo.Count &&
-                    _data.QuestionIndex > -1 && _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
-                    TInfo.PlaySimpleSelection(_data.ThemeIndex, _data.QuestionIndex);
+                lock (TInfo.RoundInfoLock)
+                {
+                    if (_data.ThemeIndex > -1 && _data.ThemeIndex < TInfo.RoundInfo.Count &&
+                        _data.QuestionIndex > -1 && _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
+                    {
+                        select = true;
+                    }
+                }
+            }
+
+            if (!select)
+            {
+                return;
+            }
+
+            try
+            {
+                await TInfo.PlaySimpleSelectionAsync(_data.ThemeIndex, _data.QuestionIndex);
+            }
+            catch (Exception exc)
+            {
+                _actor.Client.CurrentServer.OnError(exc, false);
             }
         }
 
@@ -492,6 +517,7 @@ namespace SICore
 
                     TInfo.QuestionContentType = QuestionContentType.Text;
                     TInfo.Sound = false;
+                    _data.BackLink.OnText(text.ToString());
                     break;
 
                 case AtomTypes.Video:

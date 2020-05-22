@@ -1276,7 +1276,7 @@ namespace SICore
                                     current.BeReadyCommand = null;
                                     current.BeUnReadyCommand = null;
 
-                                    ClientData.Me = other;
+                                    UpdateMe(other);
                                 }
                             }
                             else if (other == ClientData.Me)
@@ -1296,7 +1296,7 @@ namespace SICore
                                     current.BeReadyCommand = null;
                                     current.BeUnReadyCommand = null;
 
-                                    ClientData.Me = account;
+                                    UpdateMe(account);
                                 }
                             }
                         }
@@ -1471,7 +1471,7 @@ namespace SICore
             viewer.ContentPublicBaseUrls = ContentPublicBaseUrls;
             // TODO: Больше ничего не надо переносить в новый IViewerClient?
 
-            ClientData.Me = newAccount;
+            UpdateMe(newAccount);
             viewer.Init();
 
             Dispose();
@@ -1481,6 +1481,11 @@ namespace SICore
             Switch?.Invoke(viewer);
 
             SendPicture();
+        }
+
+        protected virtual void UpdateMe(ViewerAccount newAccount)
+        {
+            ClientData.Me = newAccount;
         }
 
         private void ProcessInfo(string[] mparams)
@@ -1545,7 +1550,7 @@ namespace SICore
                 account.IsExtendedMode = IsHost;
             }
 
-            ClientData.Me = ClientData.AllPersons.FirstOrDefault(item => item.Name == _client.Name);
+            UpdateMe(ClientData.AllPersons.FirstOrDefault(item => item.Name == _client.Name));
             if (ClientData.Me != null)
             {
                 ClientData.Me.Picture = ClientData.Picture;
@@ -1656,7 +1661,7 @@ namespace SICore
 
             showman.Others = showman.IsHuman ?
                     MyData.AllPersons.Where(p => p.IsHuman && p.Connected).Except(new ViewerAccount[] { showman }).ToArray()
-                    : new ViewerAccount[0];
+                    : Array.Empty<ViewerAccount>();
 
             showman.Replace.CanBeExecuted = showman.Others.Any();
         }
@@ -1732,20 +1737,6 @@ namespace SICore
             {
                 _logic.ReceiveText(message);
             }
-        }
-
-        /// <summary>
-        /// Заполнить данные аккаунта на основании присланной информации
-        /// </summary>
-        /// <param name="knownAccount"></param>
-        /// <param name="name"></param>
-        /// <param name="sex"></param>
-        /// <param name="connected"></param>
-        private void SetAccountData(ViewerAccount knownAccount, string name, string sex, string connected)
-        {
-            knownAccount.Name = name;
-            knownAccount.IsMale = sex == "+";
-            knownAccount.Connected = connected == "+";
         }
 
         /// <summary>

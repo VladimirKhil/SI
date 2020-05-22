@@ -50,7 +50,7 @@ namespace SIPackages.Providers
 
                 try
                 {
-                    var request = WebRequest.Create(string.Format("{0}/{1}", _storageUrl, Uri.EscapeDataString(name)));
+                    var request = WebRequest.Create($"{_storageUrl}/{Uri.EscapeDataString(name)}"); // TODO: -> HttpClient
                     using (var response = await request.GetResponseAsync())
                     using (var stream = response.GetResponseStream())
                     {

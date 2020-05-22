@@ -245,17 +245,17 @@ namespace SICore
         /// <summary>
         /// Текущая ставка
         /// </summary>
-        internal int Stake = -1;
+        internal int Stake { get; set; } = -1;
 
         /// <summary>
         /// Пошёл ли кто-нибудь ва-банк
         /// </summary>
-        internal bool AllIn = false;
+        internal bool AllIn { get; set; } = false;
 
         /// <summary>
         /// Завершаем ли раунд
         /// </summary>
-        internal bool IsRoundEnding = false;
+        internal bool IsRoundEnding { get; set; } = false;
 
         /// <summary>
         /// Допустимые варианты ставок: 
@@ -264,17 +264,17 @@ namespace SICore
         /// - пас
         /// - ва-банк
         /// </summary>
-        internal bool[] StakeVariants = new bool[4];
+        internal bool[] StakeVariants { get; set; } = new bool[4];
 
         /// <summary>
         /// Тип ставки
         /// </summary>
-        internal StakeMode? StakeType;
+        internal StakeMode? StakeType { get; set; }
 
         /// <summary>
         /// Сумма ставки
         /// </summary>
-        internal int StakeSum = -1;
+        internal int StakeSum { get; set; } = -1;
 
         /// <summary>
         /// Получено ли решение ведущего
@@ -284,7 +284,7 @@ namespace SICore
         /// <summary>
         /// Играется ли вопрос
         /// </summary>
-        internal bool isQuestionPlaying = false;
+        internal bool IsQuestionPlaying { get; set; } = false;
 
         internal int TabloInformStage = 0;
         internal object TabloInformStageLock = new object();

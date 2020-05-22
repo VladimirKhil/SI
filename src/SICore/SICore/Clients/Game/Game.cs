@@ -52,10 +52,7 @@ namespace SICore
             ClientData.DocumentPath = documentPath;
         }
 
-        protected override GameLogic CreateLogic(Account personData)
-        {
-            return new GameLogic(this, ClientData);
-        }
+        protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData);
 
         public override void Dispose()
         {
@@ -256,7 +253,7 @@ namespace SICore
         public void InformSums(string person = NetworkConstants.Everybody)
         {
             var message = new StringBuilder(Messages.Sums);
-            for (int i = 0; i < ClientData.Players.Count; i++)
+            for (var i = 0; i < ClientData.Players.Count; i++)
             {
                 message.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].Sum);
             }
@@ -271,11 +268,13 @@ namespace SICore
         {
             var s = new StringBuilder(LO[nameof(R.Score)]).Append(": ");
             var total = ClientData.Players.Count;
-            for (int i = 0; i < total; i++)
+            for (var i = 0; i < total; i++)
             {
                 s.Append(Notion.FormatNumber(ClientData.Players[i].Sum));
                 if (i < total - 1)
+                {
                     s.Append("; ");
+                }
             }
 
             SystemReplic(s.ToString());
@@ -288,7 +287,9 @@ namespace SICore
             for (int i = 0; i < total; i++)
             {
                 if (s.Length > 0)
+                {
                     s.Append(", ");
+                }
 
                 s.AppendFormat("{0}: {1}", ClientData.Players[i].Name, ClientData.Players[i].Sum);
             }
@@ -299,10 +300,8 @@ namespace SICore
         /// <summary>
         /// Выдача информации о состоянии игры
         /// </summary>
-        public void InformStage(string person = NetworkConstants.Everybody, string name = null)
-        {
+        public void InformStage(string person = NetworkConstants.Everybody, string name = null) =>
             SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, ClientData.Stage.ToString(), name ?? ""), person);
-        }
 
         internal void InformRoundThemes(string person = NetworkConstants.Everybody, bool play = true)
         {
@@ -367,7 +366,8 @@ namespace SICore
         {
             lock (ClientData.TaskLock)
             {
-                if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && ClientData.Settings.NetworkGamePassword != password)
+                if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
+                    && ClientData.Settings.NetworkGamePassword != password)
                 {
                     message = LO[nameof(R.WrongPassword)];
                     return false;
@@ -393,10 +393,10 @@ namespace SICore
                         accountsToSearch = ClientData.Players;
                         if (ClientData.HostName == name) // Подключение организатора
                         {
-                            var defaultPlayers = ClientData.Settings.Players;
-                            for (int i = 0; i < defaultPlayers.Length; i++)
+                            var players = ClientData.Players;
+                            for (var i = 0; i < players.Count; i++)
                             {
-                                if (defaultPlayers[i].Name == name)
+                                if (players[i].Name == name)
                                 {
                                     index = i;
                                     break;
@@ -423,8 +423,9 @@ namespace SICore
                 {
                     var accounts = accountsToSearch.ToArray();
 
-                    var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index, accounts[index],
-                            connectionAuthenticator);
+                    var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index,
+                        accounts[index], connectionAuthenticator);
+
                     if (result.HasValue)
                     {
                         if (!result.Value)
@@ -445,6 +446,7 @@ namespace SICore
                         index++;
                         var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index, item,
                             connectionAuthenticator);
+
                         if (result.HasValue)
                         {
                             if (!result.Value)
@@ -787,7 +789,9 @@ namespace SICore
                                 var person = ClientData.MainPersons.FirstOrDefault(item => message.Sender == item.Name);
 
                                 if (person == null)
+                                {
                                     return;
+                                }
 
                                 if (args.Length > 2)
                                 {
@@ -1160,38 +1164,7 @@ namespace SICore
                             break;
 
                         case Messages.Move:
-                            if ((message.Sender == ClientData.HostName || message.Sender == ClientData.ShowMan.Name) && args.Length > 1)
-                            {
-                                if (int.TryParse(args[1], out int direction))
-                                {
-                                    ClientData.MoveDirection = direction;
-
-                                    switch (direction)
-                                    {
-                                        case -2:
-                                            if (!_logic.Engine.CanMoveBackRound)
-                                                return;
-                                            break;
-
-                                        case -1:
-                                            if (!_logic.Engine.CanMoveBack)
-                                                return;
-                                            break;
-
-                                        case 1:
-                                            if (ClientData.MoveNextBlocked)
-                                                return;
-                                            break;
-
-                                        case 2:
-                                            if (!_logic.Engine.CanMoveNextRound)
-                                                return;
-                                            break;
-                                    }
-
-                                    _logic.Stop(StopReason.Move);
-                                }
-                            }
+                            OnMove(message, args);
                             break;
 
                         case Messages.Kick:
@@ -1269,6 +1242,52 @@ namespace SICore
             }
         }
 
+        private void OnMove(Message message, string[] args)
+        {
+            if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
+            {
+                return;
+            }
+
+            if (!int.TryParse(args[1], out int direction))
+            {
+                return;
+            }
+
+            if (ClientData.TInfo.Pause && direction == 1)
+            {
+                OnPauseCore(false);
+                return;
+            }
+
+            ClientData.MoveDirection = direction;
+
+            switch (direction)
+            {
+                case -2:
+                    if (!_logic.Engine.CanMoveBackRound)
+                        return;
+                    break;
+
+                case -1:
+                    if (!_logic.Engine.CanMoveBack)
+                        return;
+                    break;
+
+                case 1:
+                    if (ClientData.MoveNextBlocked)
+                        return;
+                    break;
+
+                case 2:
+                    if (!_logic.Engine.CanMoveNextRound)
+                        return;
+                    break;
+            }
+
+            _logic.Stop(StopReason.Move);
+        }
+
         private void OnPause(Message message, string[] args)
         {
             if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
@@ -1276,10 +1295,15 @@ namespace SICore
                 return;
             }
 
+            OnPauseCore(args[1] == "+");
+        }
+
+        private void OnPauseCore(bool isPauseEnabled)
+        {
             var times = new int[3];
 
             // Владелец игры взял паузу
-            if (args[1] == "+")
+            if (isPauseEnabled)
             {
                 if (ClientData.TInfo.Pause)
                 {
@@ -1288,6 +1312,8 @@ namespace SICore
 
                 ClientData.TInfo.Pause = true;
                 ClientData.PauseStartTime = DateTime.Now;
+
+                Logic.AddHistory("Pause activated");
 
                 if (ClientData.IsThinking)
                 {
@@ -1317,6 +1343,13 @@ namespace SICore
                     return;
                 }
 
+                if (_logic.StopReason == StopReason.Pause)
+                {
+                    // Заходим в паузу
+                    _logic.AddHistory("Immediate pause resume");
+                    _logic.CancelStop();
+                }
+
                 ClientData.TInfo.Pause = false;
 
                 var pauseDuration = DateTime.Now.Subtract(ClientData.PauseStartTime);
@@ -1333,6 +1366,8 @@ namespace SICore
                     ClientData.IsPlayingMedia = true;
                 }
 
+                Logic.AddHistory($"Pause resumed ({string.Join("|", _logic.OldTasks.Select(t => $"{(Tasks)t.Item1}:{t.Item2}"))} {_logic.StopReason})");
+
                 _logic.ResumeExecution();
                 if (_logic.StopReason == StopReason.Decision)
                 {
@@ -1342,7 +1377,7 @@ namespace SICore
                 SpecialReplic(LO[nameof(R.GameResumed)]);
             }
 
-            SendMessageWithArgs(Messages.Pause, args[1], times[0], times[1], times[2]);
+            SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
         }
 
         private void OnAtom()
@@ -1360,7 +1395,7 @@ namespace SICore
             else
             {
                 // Иногда кто-то отваливается, и процесс затягивается на 60 секунд. Это недопустимо. Дадим 3 секунды
-                _logic.Execute(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
+                _logic.ScheduleExecution(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
             }
         }
 
@@ -1509,7 +1544,7 @@ namespace SICore
 
         private void OnPass(Message message)
         {
-            if (!ClientData.isQuestionPlaying)
+            if (!ClientData.IsQuestionPlaying)
             {
                 return;
             }
@@ -1527,7 +1562,7 @@ namespace SICore
 
             if (ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
             {
-                _logic.Execute(Tasks.WaitTry, 3, force: true);
+                _logic.ScheduleExecution(Tasks.WaitTry, 3, force: true);
             }
         }
 
@@ -1795,7 +1830,7 @@ namespace SICore
 
                     Logic.ContinueQuestion();
                 }
-                else if (Logic.CurrentTask == Tasks.AskRight)
+                else if ((Tasks)Logic.CurrentTask == Tasks.AskRight)
                 {
                     // Игрока удалил после того, как он дал ответ. Но ещё не обратились к ведущему
                     Logic.ContinueQuestion();
@@ -1832,7 +1867,14 @@ namespace SICore
 
                 for (int i = 0, j = 0; i < currentOrder.Length; i++)
                 {
-                    if (currentOrder[i] != playerIndex)
+                    if (currentOrder[i] == playerIndex)
+                    {
+                        if (ClientData.OrderIndex >= i)
+                        {
+                            ClientData.OrderIndex--; // -1 - OK
+                        }
+                    }
+                    else
                     {
                         newOrder[j++] = currentOrder[i] - (currentOrder[i] > playerIndex ? 1 : 0);
                         if (j == newOrder.Length)
@@ -1855,6 +1897,7 @@ namespace SICore
                 {
                     Logic.AddHistory($"Last staker dropped");
                     Logic.Engine.SkipQuestion();
+                    Logic.ScheduleExecution(Tasks.MoveNext, 20, 1);
                 }
                 else if (ClientData.OrderIndex != -1 && ClientData.Order[ClientData.OrderIndex] == -1)
                 {
@@ -1869,12 +1912,12 @@ namespace SICore
                             SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                         }
 
-                        Logic.Execute(Tasks.AskStake, 20);
+                        Logic.ScheduleExecution(Tasks.AskStake, 20);
                     }
                 }
             }
 
-            if (ClientData.ThemeDeleters != null)
+            if (Logic.IsFinalRound() && ClientData.ThemeDeleters != null)
             {
                 ClientData.ThemeDeleters.RemoveAt(playerIndex);
                 if (ClientData.ThemeDeleters.IsEmpty())
@@ -1886,7 +1929,7 @@ namespace SICore
                     }
                     else
                     {
-                        Logic.Execute(Tasks.Winner, 10); // Делать нечего. Завершаем игру
+                        Logic.ScheduleExecution(Tasks.Winner, 10); // Делать нечего. Завершаем игру
                     }
                 }
             }
@@ -1921,7 +1964,7 @@ namespace SICore
                     // Спросим заново
                     SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     _logic.StopWaiting();
-                    _logic.Execute(Tasks.AskFirst, 20);
+                    _logic.ScheduleExecution(Tasks.AskFirst, 20);
                     break;
             }
         }
@@ -2334,7 +2377,7 @@ namespace SICore
             OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
             InformStage();
             ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
-            _logic.Execute(Tasks.StartGame, 1, 1);
+            _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
         }
 
         private bool? CheckAccount(Message message, string role, string name, string sex, ref bool found, int index, Account account)
@@ -2453,11 +2496,15 @@ namespace SICore
 
         private void InformPicture(Account account, string receiver)
         {
-            if (!string.IsNullOrEmpty(account.Picture))
+            if (string.IsNullOrEmpty(account.Picture))
             {
-                var link = CreateUri(account.Name, account.Picture, receiver);
-                if (link != null)
-                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
+                return;
+            }
+
+            var link = CreateUri(account.Name, account.Picture, receiver);
+            if (link != null)
+            {
+                SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
             }
         }
 
@@ -2574,29 +2621,20 @@ namespace SICore
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public string Viewer(string s)
-        {
-            return string.Format("<viewer>{0}</viewer>", ReplicManager.Escape(s));
-        }
+        public static string Viewer(string s) => $"<viewer>{ReplicManager.Escape(s)}</viewer>";
 
         /// <summary>
         /// Игрок
         /// </summary>
         /// <param name="n">Номер игрока</param>
         /// <returns></returns>
-        public string Player(int n)
-        {
-            return string.Format("<player>{0}</player>", n);
-        }
+        public static string Player(int n) => $"<player>{n}</player>";
 
         /// <summary>
         /// Ведущий
         /// </summary>
         /// <returns></returns>
-        public string Showman()
-        {
-            return string.Format("<showman>{0}</showman>", ReplicManager.Escape(ClientData.ShowMan.Name));
-        }
+        public string Showman() => $"<showman>{ReplicManager.Escape(ClientData.ShowMan.Name)}</showman>";
 
         #endregion
     }

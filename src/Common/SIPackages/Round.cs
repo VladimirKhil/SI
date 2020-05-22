@@ -1,6 +1,5 @@
 ﻿using SIPackages.Core;
 using SIPackages.Properties;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -93,16 +92,21 @@ namespace SIPackages
             writer.WriteStartElement("round");
             writer.WriteAttributeString("name", _name);
             if (_type != RoundTypes.Standart)
+            {
                 writer.WriteAttributeString("type", _type);
+            }
+
             base.WriteXml(writer);
 
             if (Themes.Any())
             {
                 writer.WriteStartElement("themes");
+
                 foreach (var item in Themes)
                 {
                     item.WriteXml(writer);
                 }
+
                 writer.WriteEndElement();
             }
 

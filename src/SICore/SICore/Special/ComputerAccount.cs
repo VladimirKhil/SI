@@ -429,33 +429,43 @@ namespace SICore
                 Style = PlayerStyle.Careful;
             else
                 Style = PlayerStyle.Normal;
+
             V1 = r.Next(101);
             V2 = r.Next(101);
             V3 = r.Next(101 - V2);
-            char[] prior = "123456".ToCharArray();
+
+            var prior = "123456".ToCharArray();
             P1 = "123456".ToCharArray();
-            int j = 0;
+
+            int j;
             for (int i = 0; i < 6; i++)
             {
                 j = r.Next(6 - i);
                 P1[i] = prior[j];
                 for (int k = j; k < 5 - i; k++)
+                {
                     prior[k] = prior[k + 1];
+                }
             }
+
             V4 = r.Next(101);
             V5 = r.Next(101 - V4);
             V6 = r.Next(101 - V4 - V5);
             V7 = r.Next(101 - V4 - V5 - V6);
+
             prior = "12345".ToCharArray();
             P2 = "12345".ToCharArray();
-            j = 0;
+
             for (int i = 0; i < 5; i++)
             {
                 j = r.Next(5 - i);
                 P2[i] = prior[j];
                 for (int k = j; k < 4 - i; k++)
+                {
                     prior[k] = prior[k + 1];
+                }
             }
+
             F = 50 + r.Next(76);
             B0 = (int)(F * (((double)r.Next(91)) / 100 + 1));
             S = r.Next(5);
@@ -522,13 +532,12 @@ namespace SICore
                 {
                     var serializer = new JsonSerializer();
 
-                    using (var personsJsonStream = System.Reflection.Assembly.GetExecutingAssembly()
-                        .GetManifestResourceStream("SICore.persons.json"))
-                    using (var streamReader = new StreamReader(personsJsonStream))
-                    using (var reader = new JsonTextReader(streamReader))
-                    {
-                        _storedPersons = serializer.Deserialize<StoredPersons>(reader);
-                    }
+                    using var personsJsonStream = System.Reflection.Assembly.GetExecutingAssembly()
+                        .GetManifestResourceStream("SICore.persons.json");
+                    using var streamReader = new StreamReader(personsJsonStream);
+                    using var reader = new JsonTextReader(streamReader);
+
+                    _storedPersons = serializer.Deserialize<StoredPersons>(reader);
                 }
 
                 return _storedPersons;

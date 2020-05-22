@@ -68,7 +68,7 @@ namespace SICore.Network.Servers
 
         protected readonly INetworkLocalizer _localizer;
 
-        public Server(INetworkLocalizer localizer)
+        protected Server(INetworkLocalizer localizer)
         {
             _localizer = localizer;
         }
@@ -166,7 +166,7 @@ namespace SICore.Network.Servers
             }
             catch (Exception exc)
             {
-                OnError(new Exception("Message: " + m.Text, exc), false);
+                OnError(new Exception($"Message: {m.Text}", exc), false);
             }
         }
 
@@ -176,7 +176,7 @@ namespace SICore.Network.Servers
             {
                 foreach (var client in _clients)
                 {
-                    if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || client.Name == "" || !message.IsSystem && !message.IsPrivate)
+                    if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
                     {
                         client.AddIncomingMessage(message);
                     }

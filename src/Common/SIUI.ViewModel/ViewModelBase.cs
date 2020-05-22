@@ -10,12 +10,12 @@ namespace SIUI.ViewModel
 
         public T Model => _model;
 
-        public ViewModelBase()
+        protected ViewModelBase()
         {
             _model = new T();
         }
 
-        public ViewModelBase(T model)
+        protected ViewModelBase(T model)
         {
             _model = model;
         }

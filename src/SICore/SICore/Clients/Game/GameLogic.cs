@@ -1,7 +1,6 @@
 ﻿using Notions;
 using SICore.Clients.Game;
 using SICore.Connections;
-using SICore.Network;
 using SICore.Results;
 using SICore.Special;
 using SICore.Utils;
@@ -81,7 +80,7 @@ namespace SICore
             if (_data.Settings.IsAutomatic)
             {
                 // Необходимо запустить игру автоматически
-                Execute(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
+                ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
                 _data.TimerStartTime[2] = DateTime.Now;
 
                 _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", Constants.AutomaticGameStartDuration, -2);
@@ -109,7 +108,7 @@ namespace SICore
 
             _actor.SendMessage(msg.ToString());
 
-            Execute(Tasks.MoveNext, 11 + 150 * gameThemes.Length / 18);
+            ScheduleExecution(Tasks.MoveNext, 11 + 150 * gameThemes.Length / 18);
         }
 
         private void Engine_Round(Round round)
@@ -172,8 +171,8 @@ namespace SICore
                 _data.TabloInformStage = 2;
             }
 
-            _data.isQuestionPlaying = false;
-            Execute(Tasks.AskFirst, 19 * _data.TInfo.RoundInfo.Count + Data.Rand.Next(10));
+            _data.IsQuestionPlaying = false;
+            ScheduleExecution(Tasks.AskFirst, 19 * _data.TInfo.RoundInfo.Count + Data.Rand.Next(10));
         }
 
         /// <summary>
@@ -190,7 +189,7 @@ namespace SICore
         private void Engine_Question(Question question)
         {
             _data.Question = question;
-            _data.isQuestionPlaying = true;
+            _data.IsQuestionPlaying = true;
             _data.IsAnswer = false;
             _data.CurPriceRight = _data.CurPriceWrong = question.Price;
             _data.IsPlayingMedia = false;
@@ -205,7 +204,7 @@ namespace SICore
                 _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
             }
 
-            Execute(Tasks.QuestionType, 10, 1, force: true);
+            ScheduleExecution(Tasks.QuestionType, 10, 1, force: true);
         }
 
         private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
@@ -235,11 +234,11 @@ namespace SICore
             if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Tv && !_data.ThemeInfo[themeIndex])
             {
                 _data.ThemeInfo[themeIndex] = true;
-                Execute(Tasks.Theme, 10, 1, true);
+                ScheduleExecution(Tasks.Theme, 10, 1, true);
             }
             else
             {
-                Execute(Tasks.QuestionType, 10, 1, true);
+                ScheduleExecution(Tasks.QuestionType, 10, 1, true);
             }
         }
 
@@ -255,7 +254,7 @@ namespace SICore
 
                 _data.Text = text;
                 _data.TextLength = 0;
-                ExecuteTask(Tasks.PrintPartial, 0);
+                ExecuteTask((int)Tasks.PrintPartial, 0);
             }
             else
             {
@@ -414,7 +413,7 @@ namespace SICore
                 return;
             }
 
-            Execute(Tasks.MoveNext, atomTime, force: true);
+            ScheduleExecution(Tasks.MoveNext, atomTime, force: true);
             _data.TimeThinking = 0.0;
         }
 
@@ -453,16 +452,16 @@ namespace SICore
                 _data.IsPlayingMedia = false;
                 _data.IsPlayingMediaPaused = false;
 
-                if (!_data.isQuestionPlaying)
-                    Execute(Tasks.MoveNext, 1, force: true);
+                if (!_data.IsQuestionPlaying)
+                    ScheduleExecution(Tasks.MoveNext, 1, force: true);
                 else if (_data.Type.Name != QuestionTypes.Simple)
-                    Execute(Tasks.AskAnswer, 1, force: true);
+                    ScheduleExecution(Tasks.AskAnswer, 1, force: true);
                 else
-                    Execute(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Data.Rand.Next(10)), force: true); // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
+                    ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Data.Rand.Next(10)), force: true); // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
             }
             else
             {
-                Execute(Tasks.AskAnswer, 1, force: true);
+                ScheduleExecution(Tasks.AskAnswer, 1, force: true);
                 _actor.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
             }
         }
@@ -486,7 +485,7 @@ namespace SICore
 
             _data.AllowApellation = true;
             var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-            Execute(Tasks.QuestSourComm, (answerTime == 0 ? 2 : answerTime) * 10, 1);
+            ScheduleExecution(Tasks.QuestSourComm, (answerTime == 0 ? 2 : answerTime) * 10, 1);
         }
 
         private void Engine_RightAnswer()
@@ -524,11 +523,11 @@ namespace SICore
                     throw new Exception($"{nameof(activeQuestionsCount)} == 0! {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
                 }
 
-                Execute(Tasks.AskToChoose, 4, force: true);
+                ScheduleExecution(Tasks.AskToChoose, 4, force: true);
             }
             else
             {
-                Execute(Tasks.MoveNext, 10, force: true);
+                ScheduleExecution(Tasks.MoveNext, 10, force: true);
             }
 
             foreach (var player in _data.Players)
@@ -556,7 +555,7 @@ namespace SICore
                 _data.OpenedFiles.Clear();
             }
 
-            _data.isQuestionPlaying = false;
+            _data.IsQuestionPlaying = false;
 
             _actor.InformSums();
             _actor.AnnounceSums();
@@ -569,7 +568,7 @@ namespace SICore
 
             _data.IsRoundEnding = true;
             if (move)
-                Execute(Tasks.MoveNext, 40);
+                ScheduleExecution(Tasks.MoveNext, 40);
         }
 
         void Engine_RoundEmpty()
@@ -592,17 +591,17 @@ namespace SICore
             _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
             _data.ThemeDeleters.Reset(true);
 
-            Execute(Tasks.MoveNext, 20 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.MoveNext, 20 + Data.Rand.Next(10));
         }
 
-        private void Engine_WaitDelete() => ExecuteTask(Tasks.AskToDelete, 0);
+        private void Engine_WaitDelete() => ExecuteTask((int)Tasks.AskToDelete, 0);
 
         private void Engine_ThemeDeleted(int themeIndex)
         {
             if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
             {
-                var errorMessage = new StringBuilder(themeIndex).Append(' ')
-                    .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"{t.Name != null} {t.Questions.Count}"))).Append(' ')
+                var errorMessage = new StringBuilder(themeIndex.ToString()).Append(' ')
+                    .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})"))).Append(' ')
                     .Append(_data.ThemeIndex).Append(' ')
                     .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
@@ -625,7 +624,7 @@ namespace SICore
             str += " " + theme.Name;
             _actor.ShowmanReplic(str);
 
-            Execute(Tasks.Theme, 10, 1);
+            ScheduleExecution(Tasks.Theme, 10, 1);
         }
 
         private void Engine_EndGame()
@@ -640,7 +639,7 @@ namespace SICore
                 _data.GameResultInfo.Results.Add(new PersonResult { Name = _data.Players[i].Name, Sum = _data.Players[i].Sum });
             }
 
-            Execute(Tasks.Winner, 15 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.Winner, 15 + Data.Rand.Next(10));
         }
 
         protected override void Dispose(bool disposing)
@@ -678,17 +677,21 @@ namespace SICore
 
         internal override void Stop(StopReason reason)
         {
-            if (_stopReason == StopReason.None)
+            if (_stopReason != StopReason.None)
             {
-                if (reason == StopReason.Decision)
-                {
-                    ClientData.IsWaiting = false; // Чтобы не обрабатывать повторные сообщения
-                }
-
-                _stopReason = reason;
-                ExecuteImmediate();
+                return;
             }
+
+            if (reason == StopReason.Decision)
+            {
+                ClientData.IsWaiting = false; // Чтобы не обрабатывать повторные сообщения
+            }
+
+            _stopReason = reason;
+            ExecuteImmediate();
         }
+
+        internal void CancelStop() => _stopReason = StopReason.None;
 
         /// <summary>
         /// Решение принято
@@ -736,7 +739,7 @@ namespace SICore
 
                         _data.ChooserIndex = _data.AnswererIndex;
                         _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-                        Execute(Tasks.CatInfo, 10);
+                        ScheduleExecution(Tasks.CatInfo, 10);
                         return true;
                     }
 
@@ -755,7 +758,7 @@ namespace SICore
                         _data.CurPriceWrong = _data.CurPriceRight;
                         _actor.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
 
-                        Execute(Tasks.AskCatCost, 20);
+                        ScheduleExecution(Tasks.AskCatCost, 20);
                         return true;
                     }
 
@@ -781,7 +784,7 @@ namespace SICore
 
                         _data.ThemeDeleters.MoveBack();
 
-                        Execute(Tasks.AskToDelete, 1);
+                        ScheduleExecution(Tasks.AskToDelete, 1);
                         return true;
                     }
                     break;
@@ -789,31 +792,7 @@ namespace SICore
                     #endregion
 
                 case DecisionType.FinalThemeDeleting:
-
-                    #region FinalThemeDeleting
-
-                    if (_data.ThemeIndex != -1)
-                    {
-                        StopWaiting();
-                        ((SIEngine.TvEngine)Engine).SelectTheme(_data.ThemeIndex);
-
-                        var innerThemeIndex = ((SIEngine.TvEngine)Engine).OnReady(out bool more);
-                        if (innerThemeIndex > -1)
-                        {
-                            // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
-                            _data.TInfo.RoundInfo[_data.ThemeIndex].Name = null;
-                            if (more)
-                            {
-                                Execute(Tasks.MoveNext, 10);
-                            }
-                        }
-
-                        return true;
-                    }
-
-                    break;
-
-                    #endregion
+                    return OnFinalThemeDeleting();
 
                 case DecisionType.FinalStakeMaking:
 
@@ -829,7 +808,7 @@ namespace SICore
                         _data.QuestionIndex = Data.Rand.Next(questionsCount); // А то в отчётах об игре встречаются глюки
                         _data.Question = _data.Theme.Questions[_data.QuestionIndex];
 
-                        Execute(Tasks.QuestionType, 10, 1);
+                        ScheduleExecution(Tasks.QuestionType, 10, 1);
                         return true;
                     }
                     break;
@@ -841,7 +820,7 @@ namespace SICore
                     #region ApellationDecision
 
                     StopWaiting();
-                    Execute(Tasks.CheckApellation, 20);
+                    ScheduleExecution(Tasks.CheckApellation, 20);
 
                     return true;
 
@@ -849,6 +828,30 @@ namespace SICore
             }
 
             return false;
+        }
+
+        private bool OnFinalThemeDeleting()
+        {
+            if (_data.ThemeIndex == -1)
+            {
+                return false;
+            }
+
+            StopWaiting();
+            ((SIEngine.TvEngine)Engine).SelectTheme(_data.ThemeIndex);
+
+            var innerThemeIndex = ((SIEngine.TvEngine)Engine).OnReady(out bool more);
+            if (innerThemeIndex > -1)
+            {
+                // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
+                _data.TInfo.RoundInfo[_data.ThemeIndex].Name = null;
+                if (more)
+                {
+                    ScheduleExecution(Tasks.MoveNext, 10);
+                }
+            }
+
+            return true;
         }
 
         private bool OnDecisionAuctionStakeMaking()
@@ -860,7 +863,18 @@ namespace SICore
 
             StopWaiting();
 
+            if (_data.OrderIndex == -1)
+            {
+                throw new ArgumentException($"{nameof(_data.OrderIndex)} == -1! ${_data.OrderHistory}", nameof(_data.OrderIndex));
+            }
+
             var playerIndex = _data.Order[_data.OrderIndex];
+
+            if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            {
+                throw new ArgumentException($"{nameof(playerIndex)} == ${playerIndex} but it must be in [0; ${_data.Players.Count - 1}]! ${_data.OrderHistory}", nameof(playerIndex));
+            }
+
             if (_data.StakeType == StakeMode.Nominal)
             {
                 _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Nominal)]);
@@ -888,17 +902,45 @@ namespace SICore
 
             var printedStakeType = _data.StakeType == StakeMode.Nominal ? StakeMode.Sum : _data.StakeType;
 
-            var s = new StringBuilder(Messages.PersonStake)
-                .Append(Message.ArgsSeparatorChar).Append(playerIndex)
-                .Append(Message.ArgsSeparatorChar).Append((int)printedStakeType);
+            var stakeMessage = new MessageBuilder(Messages.PersonStake, playerIndex, (int)printedStakeType);
+
             if (printedStakeType == StakeMode.Sum)
             {
-                s.Append(Message.ArgsSeparatorChar).Append(_data.Stake);
+                stakeMessage.Add(_data.Stake);
             }
 
-            _actor.SendMessage(s.ToString());
+            _actor.SendMessage(stakeMessage.Build());
 
-            Execute(Tasks.AskStake, 5);
+            if (_data.StakeType != StakeMode.Pass)
+            {
+                for (var i = 0; i < _data.Players.Count; i++)
+                {
+                    var player = _data.Players[i];
+                    if (i != _data.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
+                    {
+                        player.StakeMaking = false;
+                        _actor.SendMessageWithArgs(Messages.PersonStake, i, 2);
+                    }
+                }
+
+                var stakersCount = _data.Players.Count(p => p.StakeMaking);
+
+                if (stakersCount == 1) // Игрок определился
+                {
+                    for (var i = 0; i < _data.Players.Count; i++)
+                    {
+                        if (_data.Players[i].StakeMaking)
+                        {
+                            _data.StakerIndex = i;
+                        }
+                    }
+
+                    ScheduleExecution(Tasks.PrintAuctPlayer, 10);
+                    return true;
+                }
+            }
+
+            ScheduleExecution(Tasks.AskStake, 5);
             return true;
         }
 
@@ -948,7 +990,7 @@ namespace SICore
                     _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                     _actor.InformSums();
 
-                    _data.isQuestionPlaying = false;
+                    _data.IsQuestionPlaying = false;
                     _data.AnnounceAnswer = false;
 
                     _data.IsThinking = false;
@@ -956,10 +998,10 @@ namespace SICore
 
                     if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
                     {
-                        Engine.SkipQuestion();
+                        Engine.MoveToAnswer();
                     }
 
-                    Execute(Tasks.MoveNext, 1, force: true);
+                    ScheduleExecution(Tasks.MoveNext, 1, force: true);
                 }
                 else
                 {
@@ -971,7 +1013,7 @@ namespace SICore
                     }
 
                     _data.PlayerIsRight = true;
-                    Execute(Tasks.AnnounceStake, 15);
+                    ScheduleExecution(Tasks.AnnounceStake, 15);
                 }
             }
             else
@@ -995,10 +1037,10 @@ namespace SICore
                     s = new StringBuilder(Messages.Person)
                         .Append(Message.ArgsSeparatorChar)
                         .Append('-')
-                        .Append(Message.ArgsSeparatorChar);
-
-                    s.Append(_data.AnswererIndex);
-                    s.Append(Message.ArgsSeparatorChar).Append(_data.CurPriceWrong);
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.AnswererIndex)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.CurPriceWrong);
 
                     _actor.SendMessage(s.ToString());
 
@@ -1024,7 +1066,7 @@ namespace SICore
                     _actor.ShowmanReplic(s.ToString());
                     _data.PlayerIsRight = false;
 
-                    Execute(Tasks.AnnounceStake, 15);
+                    ScheduleExecution(Tasks.AnnounceStake, 15);
                 }
             }
 
@@ -1038,7 +1080,7 @@ namespace SICore
         {
             if (IsSpecialQuestion())
             {
-                Execute(Tasks.WaitTry, 20);
+                ScheduleExecution(Tasks.WaitTry, 20);
                 return;
             }
 
@@ -1046,7 +1088,7 @@ namespace SICore
 
             if (!canAnybodyPress)
             {
-                Execute(Tasks.WaitTry, 20, force: true);
+                ScheduleExecution(Tasks.WaitTry, 20, force: true);
                 return;
             }
 
@@ -1057,20 +1099,20 @@ namespace SICore
 
             if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
             {
-                Execute(Tasks.AskToTry, 10, force: true);
+                ScheduleExecution(Tasks.AskToTry, 10, force: true);
                 return;
             }
 
             // Возобновить чтение вопроса
             if (_data.IsPartial && _data.AtomType == AtomTypes.Text)
             {
-                Execute(Tasks.PrintPartial, 5, force: true);
+                ScheduleExecution(Tasks.PrintPartial, 5, force: true);
             }
             else
             {
                 _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
                 _actor.SendMessage(Messages.Resume);
-                Execute(Tasks.MoveNext, _data.AtomTime, force: true);
+                ScheduleExecution(Tasks.MoveNext, _data.AtomTime, force: true);
             }
 
             for (var i = 0; i < _data.Players.Count; i++)
@@ -1112,7 +1154,7 @@ namespace SICore
             _actor.ShowmanReplic(s);
 
             _data.OrderIndex--;
-            Execute(Tasks.AskStake, 10);
+            ScheduleExecution(Tasks.AskStake, 10);
             return true;
         }
 
@@ -1130,7 +1172,14 @@ namespace SICore
 
             _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
-            Execute(Tasks.AskToChoose, 20);
+            var activeQuestionsCount = GetRoundActiveQuestionsCount();
+
+            if (activeQuestionsCount == 0)
+            {
+                throw new Exception($"{nameof(activeQuestionsCount)} == 0! {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
+            }
+
+            ScheduleExecution(Tasks.AskToChoose, 20);
             RunRoundTimer();
 
             return true;
@@ -1161,7 +1210,7 @@ namespace SICore
                 }
                 else
                 {
-                    Execute(Tasks.AskRight, 15, force: true);
+                    ScheduleExecution(Tasks.AskRight, 15, force: true);
                 }
 
                 return true;
@@ -1173,12 +1222,12 @@ namespace SICore
             _actor.ShowmanReplic(s);
 
             _data.ThemeDeleters.Reset(false);
-            Execute(Tasks.Announce, 15);
+            ScheduleExecution(Tasks.Announce, 15);
 
             return true;
         }
 
-        public bool IsFinalRound() => _data.Round.Type == RoundTypes.Final;
+        public bool IsFinalRound() => _data.Round?.Type == RoundTypes.Final;
 
         public void StopWaiting()
         {
@@ -1192,13 +1241,9 @@ namespace SICore
 
         public bool IsRunning { get; set; }
 
-        internal Tasks CurrentTask { get; private set; }
-
-        internal void Execute(Tasks task, double taskTime, int arg = 0, bool force = false)
+        internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
-            CurrentTask = task;
-
-            _task = () => ExecuteTask(task, arg);
+            SetTask((int)task, arg);
             if (_data.Settings.AppSettings.Managed && !force && _actor.Client.CurrentServer.IsOnline(_data.HostName))
             {
                 IsRunning = false;
@@ -1206,22 +1251,16 @@ namespace SICore
             }
 
             IsRunning = true;
-
-            lock (_taskTimerLock)
-            {
-                if (_taskTimer != null && taskTime > 0)
-                {
-                    _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-                    _finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);
-                }
-            }
+            RunTaskTimer(taskTime);
         }
 
         /// <summary>
         /// Выполнение текущей задачи
         /// </summary>
-        override protected void ExecuteTask(Tasks task, int arg)
+        override protected void ExecuteTask(int taskId, int arg)
         {
+            var task = (Tasks)taskId;
+
             lock (ClientData.TaskLock)
             {
                 try
@@ -1233,13 +1272,16 @@ namespace SICore
                     {
                         var stop = true;
 
-                        _tasksHistory.Enqueue($"StopReason {_stopReason} {(_stopReason == StopReason.Move ? _data.MoveDirection.ToString() : "")}");
+                        var stopReasonDetails = _stopReason == StopReason.Move ? _data.MoveDirection.ToString()
+                            : (_stopReason == StopReason.Decision ? ClientData.Decision.ToString() : "");
+
+                        _tasksHistory.Enqueue($"StopReason {_stopReason} {stopReasonDetails}");
 
                         // Прекратить обычное выполнение
                         switch (_stopReason)
                         {
                             case StopReason.Pause:
-                                PauseExecution(() => ExecuteTask(task, arg));
+                                PauseExecution((int)task, arg);
                                 break;
 
                             case StopReason.Decision:
@@ -1247,7 +1289,7 @@ namespace SICore
                                 break;
 
                             case StopReason.Answer:
-                                Execute(Tasks.AskAnswer, 7, force: true);
+                                ScheduleExecution(Tasks.AskAnswer, 7, force: true);
                                 break;
 
                             case StopReason.Appellation:
@@ -1256,8 +1298,8 @@ namespace SICore
                                     task = Tasks.AskToChoose;
                                 }
 
-                                PauseExecution(() => ExecuteTask(task, arg));
-                                Execute(Tasks.PrintApellation, 10);
+                                PauseExecution((int)task, arg);
+                                ScheduleExecution(Tasks.PrintApellation, 10);
                                 break;
 
                             case StopReason.Move:
@@ -1325,12 +1367,12 @@ namespace SICore
                                 }
 
                                 if (stop)
-                                    Execute(Tasks.MoveNext, 10);
+                                    ScheduleExecution(Tasks.MoveNext, 10);
 
                                 break;
 
                             case StopReason.Wait:
-                                Execute(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
+                                ScheduleExecution(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
                                 break;
                         }
 
@@ -1347,10 +1389,7 @@ namespace SICore
                     switch (task)
                     {
                         case Tasks.MoveNext:
-                            if (Engine != null)
-                                Engine.MoveNext();
-
-                            ClientData.MoveNextBlocked = false;
+                            MoveNext();
                             break;
 
                         case Tasks.StartGame:
@@ -1488,7 +1527,7 @@ namespace SICore
 
                             if (_data.Answerer == null)
                             {
-                                ExecuteTask(Tasks.MoveNext, 10);
+                                ScheduleExecution(Tasks.MoveNext, 10);
                                 break;
                             }
 
@@ -1583,7 +1622,7 @@ namespace SICore
                             _actor.InformStage();
 
                             _data.ReportsCount = _data.Players.Count;
-                            Execute(Tasks.WaitReport, 10 * 60 * 5); // 5 минут
+                            ScheduleExecution(Tasks.WaitReport, 10 * 60 * 5); // 5 минут
                             WaitFor(DecisionType.Reporting, 10 * 60 * 5, -3);
 
                             _data.AcceptedReports = 0;
@@ -1606,24 +1645,30 @@ namespace SICore
                 catch (Exception exc)
                 {
                     _data.BackLink.SendError(new Exception($"Task: {task}, param: {arg}, history: {string.Join(", ", _tasksHistory)}", exc));
-                    ExecuteTask(Tasks.NoTask, 10);
+                    ScheduleExecution(Tasks.NoTask, 10);
                     ClientData.MoveNextBlocked = true;
-                    _actor.SystemReplic("Game ERROR");
+                    _actor.SpecialReplic("Game ERROR");
                 }
             }
         }
 
+        private void MoveNext()
+        {
+            Engine?.MoveNext();
+            ClientData.MoveNextBlocked = false;
+        }
+
         private void PrintAuctPlayer()
         {
+            if (_data.StakerIndex == -1)
+            {
+                throw new ArgumentException($"{nameof(PrintAuctPlayer)}: {nameof(_data.StakerIndex)} == -1", nameof(_data.StakerIndex));
+            }
+
             _data.ChooserIndex = _data.StakerIndex;
             _data.AnswererIndex = _data.StakerIndex;
             _data.CurPriceRight = _data.Stake;
             _data.CurPriceWrong = _data.Stake;
-
-            if (_data.AnswererIndex == -1)
-            {
-                _data.BackLink.SendError(new Exception($"{nameof(PrintAuctPlayer)}: {nameof(_data.AnswererIndex)} == -1"), true);
-            }
 
             _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
@@ -1631,7 +1676,7 @@ namespace SICore
                 .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(_actor.LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, _actor.LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
             _actor.ShowmanReplic(msg.ToString());
 
-            Execute(Tasks.PrintQue, 15 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.PrintQue, 15 + Data.Rand.Next(10));
         }
 
         private void WaitNext(Tasks task)
@@ -1662,6 +1707,11 @@ namespace SICore
 
         private void WaitStake()
         {
+            if (_data.OrderIndex == -1)
+            {
+                throw new ArgumentException($"{nameof(_data.OrderIndex)} == -1: {_data.OrderHistory}");
+            }
+
             var playerIndex = _data.Order[_data.OrderIndex];
 
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
@@ -1700,7 +1750,7 @@ namespace SICore
                         waitTime = 20;
                 }
 
-                Execute(Tasks.WaitCatCost, waitTime);
+                ScheduleExecution(Tasks.WaitCatCost, waitTime);
                 WaitFor(DecisionType.CatCostSetting, waitTime, _data.AnswererIndex);
             }
             else if (_data.Type[QuestionTypeParams.BagCat_Knows] == QuestionTypeParams.BagCat_Knows_Value_Never)
@@ -1714,14 +1764,14 @@ namespace SICore
                 _actor.InformSums();
 
                 Engine.SkipQuestion();
-                Execute(Tasks.MoveNext, 20, 1);
+                ScheduleExecution(Tasks.MoveNext, 20, 1);
             }
             else
             {
                 _data.CurPriceWrong = _data.CurPriceRight;
                 _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
                 _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-                Execute(Tasks.PrintQue, 2);
+                ScheduleExecution(Tasks.PrintQue, 2);
             }
         }
 
@@ -1748,7 +1798,7 @@ namespace SICore
             {
                 if (_data.Answerer == null)
                 {
-                    Execute(Tasks.MoveNext, 10);
+                    ScheduleExecution(Tasks.MoveNext, 10);
                     return;
                 }
 
@@ -1789,7 +1839,7 @@ namespace SICore
 
         private void PrintQue()
         {
-            if (_data.Round.Type != RoundTypes.Final)
+            if (!IsFinalRound())
             {
                 var isSpecial = _data.Type.Name == QuestionTypes.Auction || _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat || _data.Type.Name == QuestionTypes.Sponsored;
 
@@ -1814,7 +1864,7 @@ namespace SICore
 
             _data.IsAnswer = false;
 
-            Execute(Tasks.MoveNext, 1, 1, true);
+            ScheduleExecution(Tasks.MoveNext, 1, 1, true);
         }
 
         private void WaitTry()
@@ -1825,9 +1875,9 @@ namespace SICore
             _actor.SendMessageWithArgs(Messages.EndTry, "A"); // Timer 1 STOP
 
             _data.AnnounceAnswer = true;
-            Execute(Tasks.MoveNext, 1, force: true);
+            ScheduleExecution(Tasks.MoveNext, 1, force: true);
 
-            _data.isQuestionPlaying = false;
+            _data.IsQuestionPlaying = false;
         }
 
         private void WaitFinalStake()
@@ -1890,7 +1940,7 @@ namespace SICore
 
             _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.Answerer.FinalStake);
 
-            Execute(Tasks.Announce, 15);
+            ScheduleExecution(Tasks.Announce, 15);
         }
 
         private void AskFinalStake()
@@ -1910,7 +1960,7 @@ namespace SICore
             }
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
-            Execute(Tasks.WaitFinalStake, waitTime);
+            ScheduleExecution(Tasks.WaitFinalStake, waitTime);
             WaitFor(DecisionType.FinalStakeMaking, waitTime, -2);
         }
 
@@ -1954,25 +2004,25 @@ namespace SICore
                     _actor.ShowmanReplic(_actor.LO[nameof(R.NobodyInFinal)]);
                     if (Engine.MoveNextRound())
                     {
-                        Execute(Tasks.MoveNext, 15 + Data.Rand.Next(10), 1);
+                        ScheduleExecution(Tasks.MoveNext, 15 + Data.Rand.Next(10), 1);
                     }
 
                     return;
                 }
 
                 _data.AnnounceAnswer = true; // инициализация
-                Execute(Tasks.PrintFinal, 1, 2, true);
+                ScheduleExecution(Tasks.PrintFinal, 1, 2, true);
             }
             else if (arg < 2 + _data.Players.Count)
             {
                 if (_data.Players[arg - 2].InGame)
                 {
-                    Execute(Tasks.PrintFinal, 1, arg + 1, true);
+                    ScheduleExecution(Tasks.PrintFinal, 1, arg + 1, true);
                 }
                 else
                 {
                     _actor.ShowmanReplic(_data.Players[arg - 2].Name + " " + _actor.LO[nameof(R.NotInFinal)]);
-                    Execute(Tasks.PrintFinal, 15, arg + 1);
+                    ScheduleExecution(Tasks.PrintFinal, 15, arg + 1);
                 }
             }
             else
@@ -1980,7 +2030,7 @@ namespace SICore
                 _actor.InformStage(name: _data.Round.Name);
                 _actor.ShowmanReplic($"{ResourceHelper.GetString(_actor.LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
-                Execute(Tasks.Round, 10, 2);
+                ScheduleExecution(Tasks.Round, 10, 2);
             }
         }
 
@@ -2009,7 +2059,7 @@ namespace SICore
                 _actor.SendMessageWithArgs(Messages.Winner, -1);
             }
 
-            Execute(Tasks.GoodLuck, 20 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.GoodLuck, 20 + Data.Rand.Next(10));
         }
 
         private void PrintSponsored(int arg)
@@ -2047,7 +2097,7 @@ namespace SICore
 
             if (arg < 3)
             {
-                Execute(Tasks.PrintSponsored, adShown ? 60 : 10, arg + 1);
+                ScheduleExecution(Tasks.PrintSponsored, adShown ? 60 : 10, arg + 1);
             }
             else
             {
@@ -2055,7 +2105,7 @@ namespace SICore
                 _actor.ShowmanReplic(_data.Chooser.Name + ", " + string.Format(_actor.LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight)));
                 _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
                 _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-                Execute(Tasks.PrintQue, 10);
+                ScheduleExecution(Tasks.PrintQue, 10);
             }
         }
 
@@ -2080,7 +2130,9 @@ namespace SICore
             {
                 var knows = _data.Type[QuestionTypeParams.BagCat_Knows];
                 if (knows != QuestionTypeParams.BagCat_Knows_Value_Before)
+                {
                     isCat = true;
+                }
             }
 
             if (isCat)
@@ -2089,13 +2141,14 @@ namespace SICore
                 taskTime += 25;
             }
 
-            isCat = true;
             if (isBagCat)
-                Execute(Tasks.AskCatCost, taskTime);
+            {
+                ScheduleExecution(Tasks.AskCatCost, taskTime);
+            }
             else
             {
                 _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-                Execute(Tasks.PrintQue, taskTime);
+                ScheduleExecution(Tasks.PrintQue, taskTime);
             }
         }
 
@@ -2117,7 +2170,7 @@ namespace SICore
 
             _data.AllIn = false;
             _data.OrderIndex = -1;
-            Execute(Tasks.AskStake, 10);
+            ScheduleExecution(Tasks.AskStake, 10);
         }
 
         private void AskToTry()
@@ -2142,7 +2195,7 @@ namespace SICore
             _actor.SendMessageWithArgs(Messages.Timer, 1, "RESUME");
             _data.Decision = DecisionType.Pressing;
 
-            Execute(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);
+            ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);
         }
 
         private void WaitChoose()
@@ -2204,9 +2257,9 @@ namespace SICore
 
             if (arg == 2)
             {
-                if (_data.Round.Type == RoundTypes.Final)
+                if (IsFinalRound())
                 {
-                    Execute(Tasks.PrintQue, 1, force: true);
+                    ScheduleExecution(Tasks.PrintQue, 1, force: true);
                     return;
                 }
 
@@ -2231,7 +2284,7 @@ namespace SICore
                     {
                         // Нужно сказать, что тема будет другой
                         _actor.ShowmanReplic(_actor.LO[nameof(R.QuestionWithSpecialTheme)] + ": " + catTheme);
-                        Execute(Tasks.PrintQue, 20, force: true);
+                        ScheduleExecution(Tasks.PrintQue, 20, force: true);
                         return;
                     }
                 }
@@ -2247,20 +2300,20 @@ namespace SICore
                 // Реакция согласно типу вопроса
                 if (_data.Type.Name == QuestionTypes.Auction)
                 {
-                    Execute(Tasks.PrintAuct, 8 + Data.Rand.Next(10), force: true);
+                    ScheduleExecution(Tasks.PrintAuct, 8 + Data.Rand.Next(10), force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
                 {
-                    Execute(Tasks.PrintCat, 8 + Data.Rand.Next(10), 1, force: true);
+                    ScheduleExecution(Tasks.PrintCat, 8 + Data.Rand.Next(10), 1, force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Sponsored)
                 {
-                    // Вопрос от спонсора
-                    Execute(Tasks.PrintSponsored, 8 + Data.Rand.Next(10), 1, force: true);
+                    // Вопрос без риска
+                    ScheduleExecution(Tasks.PrintSponsored, 8 + Data.Rand.Next(10), 1, force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Simple)
                 {
-                    Execute(Tasks.PrintQue, 1, force: true);
+                    ScheduleExecution(Tasks.PrintQue, 1, force: true);
                 }
                 else // Неподдерживаемый игрой тип
                 {
@@ -2279,12 +2332,12 @@ namespace SICore
                     _actor.ShowmanReplic(_actor.LO[nameof(R.ManuallyPlayedQuestion)]);
 
                     Engine.SkipQuestion();
-                    Execute(Tasks.MoveNext, 150, 1);
+                    ScheduleExecution(Tasks.MoveNext, 150, 1);
                 }
                 return;
             }
 
-            Execute(Tasks.QuestionType, 20, arg + 1);
+            ScheduleExecution(Tasks.QuestionType, 20, arg + 1);
         }
 
         private void PrintPartial()
@@ -2300,56 +2353,53 @@ namespace SICore
             _data.TextLength += printingLength;
             if (_data.TextLength < text.Length)
             {
-                Execute(Tasks.PrintPartial, 5, force: true);
+                ScheduleExecution(Tasks.PrintPartial, 5, force: true);
             }
             else
             {
-                Execute(Tasks.MoveNext, 10, force: true);
+                ScheduleExecution(Tasks.MoveNext, 10, force: true);
                 _data.TimeThinking = 0.0;
             }
         }
 
         private void QuestionSourcesAndComments(Tasks task, int arg)
         {
-            var informed = false;
             if (arg == 1)
             {
                 var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
                 if (sources.Length > 0)
                 {
-                    informed = true;
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 2)
             {
                 if (_data.Question.Info.Comments.Text.Length > 0)
                 {
-                    informed = true;
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg < 3)
             {
-                Execute(task, 20, arg + 1);
-            }
-            else if (informed)
-            {
-                Execute(Tasks.MoveNext, 1);
+                ScheduleExecution(task, 20, arg + 1);
             }
             else
             {
-                ExecuteTask(Tasks.MoveNext, 0);
+                ScheduleExecution(Tasks.MoveNext, 1);
             }
         }
 
@@ -2372,7 +2422,7 @@ namespace SICore
         {
             if (!_data.ThemeDeleters.MoveNext())
             {
-                Execute(Tasks.MoveNext, 15, 1, true);
+                ScheduleExecution(Tasks.MoveNext, 15, 1, true);
                 return;
             }
 
@@ -2413,7 +2463,7 @@ namespace SICore
 
             _actor.ShowmanReplic(msg.ToString());
 
-            Execute(Tasks.AskRight, 20, force: true);
+            ScheduleExecution(Tasks.AskRight, 20, force: true);
         }
 
         internal void AskAnswerDeferred()
@@ -2472,9 +2522,9 @@ namespace SICore
             }
 
             if (nextArg != -1)
-                Execute(Tasks.StartGame, 10 + extraTime, nextArg);
+                ScheduleExecution(Tasks.StartGame, 10 + extraTime, nextArg);
             else
-                Execute(Tasks.MoveNext, 10 + extraTime, 0);
+                ScheduleExecution(Tasks.MoveNext, 10 + extraTime, 0);
         }
 
         private string BuildRulesString(AppSettingsCore settings)
@@ -2526,7 +2576,7 @@ namespace SICore
 
         private void AskToChoose()
         {
-            _data.isQuestionPlaying = true;
+            _data.IsQuestionPlaying = true;
 
             _actor.InformSums();
             _actor.AnnounceSums();
@@ -2547,7 +2597,7 @@ namespace SICore
 
             if (activeQuestionsCount == 0)
             {
-                throw new Exception("activeQuestionsCount == 0");
+                throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
             }
 
             msg.Append(ResourceHelper.GetString(_actor.LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
@@ -2585,7 +2635,7 @@ namespace SICore
                 time = 20;
             }
 
-            Execute(Tasks.WaitChoose, time);
+            ScheduleExecution(Tasks.WaitChoose, time);
             WaitFor(DecisionType.QuestionChoosing, time, _data.ChooserIndex);
         }
 
@@ -2607,7 +2657,7 @@ namespace SICore
             
             _actor.SendMessage(msg.ToString(), _data.Chooser.Name);
 
-            Execute(Tasks.WaitCat, waitTime);
+            ScheduleExecution(Tasks.WaitCat, waitTime);
             WaitFor(DecisionType.CatGiving, waitTime, _data.ChooserIndex);
         }
 
@@ -2631,7 +2681,7 @@ namespace SICore
                         arg++;
                 }
 
-                Execute(Tasks.PrintCat, 15 + Data.Rand.Next(10), arg);
+                ScheduleExecution(Tasks.PrintCat, 15 + Data.Rand.Next(10), arg);
             }
             else if (arg == 2)
             {
@@ -2655,18 +2705,18 @@ namespace SICore
                     }
 
                     _actor.ShowmanReplic($"{_data.Answerer.Name}, {_actor.LO[nameof(R.CatIsYours)]}!");
-                    Execute(Tasks.CatInfo, 10);
+                    ScheduleExecution(Tasks.CatInfo, 10);
                 }
                 else
                 {
                     _actor.ShowmanReplic($"{_data.Chooser.Name}, {_actor.LO[nameof(R.GiveCat)]}");
-                    Execute(Tasks.AskCat, 10 + Data.Rand.Next(10), force: true);
+                    ScheduleExecution(Tasks.AskCat, 10 + Data.Rand.Next(10), force: true);
                 }
             }
             else if (arg == 3)
             {
                 PrintCatInfo();
-                Execute(Tasks.PrintCat, 20 + Data.Rand.Next(10), 2);
+                ScheduleExecution(Tasks.PrintCat, 20 + Data.Rand.Next(10), 2);
             }
         }
 
@@ -2716,7 +2766,7 @@ namespace SICore
                 _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-                Execute(Tasks.WaitFirst, waitTime);
+                ScheduleExecution(Tasks.WaitFirst, waitTime);
                 WaitFor(DecisionType.StarterChoosing, waitTime, -1);
             }
         }
@@ -2741,7 +2791,7 @@ namespace SICore
                     SendAnswersInfoToShowman(_data.Answerer.Answer);
 
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-                Execute(Tasks.WaitRight, waitTime);
+                ScheduleExecution(Tasks.WaitRight, waitTime);
                 WaitFor(DecisionType.AnswerValidating, waitTime, -1);
             }
         }
@@ -2779,14 +2829,14 @@ namespace SICore
                     }
                 }
 
-                Execute(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
+                ScheduleExecution(Tasks.WaitAnswer, timeSettings.TimeForFinalThinking * 10, force: true);
                 WaitFor(DecisionType.Answering, timeSettings.TimeForFinalThinking * 10, -2, false);
                 return;
             }
 
             if (_data.Answerer == null)
             {
-                Execute(Tasks.MoveNext, 10);
+                ScheduleExecution(Tasks.MoveNext, 10);
                 return;
             }
 
@@ -2816,7 +2866,7 @@ namespace SICore
 
             _data.Answerer.Answer = "";
 
-            Execute(Tasks.WaitAnswer, time1);
+            ScheduleExecution(Tasks.WaitAnswer, time1);
             WaitFor(DecisionType.Answering, time1, _data.AnswererIndex);
         }
 
@@ -2882,7 +2932,7 @@ namespace SICore
             _actor.SendMessage(message, _data.ActivePlayer.Name);
 
             _data.ThemeIndex = -1;
-            Execute(Tasks.WaitDelete, waitTime);
+            ScheduleExecution(Tasks.WaitDelete, waitTime);
             WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
         }
 
@@ -2902,7 +2952,7 @@ namespace SICore
             _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-            Execute(Tasks.WaitNextToDelete, waitTime);
+            ScheduleExecution(Tasks.WaitNextToDelete, waitTime);
             WaitFor(DecisionType.NextPersonFinalThemeDeleting, waitTime, -1);
         }
 
@@ -2975,7 +3025,7 @@ namespace SICore
 
                             _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
-                            Execute(Tasks.PrintQue, 10, 1);
+                            ScheduleExecution(Tasks.PrintQue, 10, 1);
                             return false;
                         }
 
@@ -3005,7 +3055,7 @@ namespace SICore
                         _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
                         var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-                        Execute(Tasks.WaitNext, time);
+                        ScheduleExecution(Tasks.WaitNext, time);
                         WaitFor(DecisionType.NextPersonStakeMaking, time, -1);
                         return false;
                     }
@@ -3086,7 +3136,7 @@ namespace SICore
                 if (others.All(p => !p.StakeMaking)) // Остальные не могут ставить
                 {
                     // Нельзя повысить ставку
-                    Execute(Tasks.PrintAuctPlayer, 10);
+                    ScheduleExecution(Tasks.PrintAuctPlayer, 10);
                     return;
                 }
 
@@ -3118,11 +3168,11 @@ namespace SICore
                             }
                         }
 
-                        Execute(Tasks.PrintAuctPlayer, 10);
+                        ScheduleExecution(Tasks.PrintAuctPlayer, 10);
                         return;
                     }
 
-                    Execute(Tasks.AskStake, 5);
+                    ScheduleExecution(Tasks.AskStake, 5);
                     return;
                 }
 
@@ -3136,17 +3186,18 @@ namespace SICore
                     var s = new StringBuilder(activePlayer.Name)
                         .Append(", ").Append(_actor.LO[nameof(R.YouCanSayOnly)])
                         .Append(' ').Append(_actor.LO[nameof(R.Nominal)]);
+
                     _actor.ShowmanReplic(s.ToString());
 
                     _data.StakerIndex = playerIndex;
                     _data.Stake = cost;
                     _actor.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
-                    Execute(Tasks.AskStake, 5);
+                    ScheduleExecution(Tasks.AskStake, 5);
                     return;
                 }
 
                 // TODO: enum StakeMode, StakeVariants -> HashSet<StakeMode> ?
-                _data.StakeVariants[0] = _data.Stake == -1;
+                _data.StakeVariants[0] = _data.StakerIndex == -1;
                 _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + 100;
                 _data.StakeVariants[2] = !_data.StakeVariants[0];
                 _data.StakeVariants[3] = true;
@@ -3154,9 +3205,11 @@ namespace SICore
                 tempStage = 4;
 
                 _data.ActivePlayer = activePlayer;
+
                 var stakeMsg = new StringBuilder(_data.ActivePlayer.Name)
                     .Append(", ")
                     .Append(ResourceHelper.GetString(_actor.LO[nameof(R.YourStake)]));
+
                 _actor.ShowmanReplic(stakeMsg.ToString());
 
                 _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
@@ -3193,7 +3246,7 @@ namespace SICore
 
                 _data.StakeType = null;
                 _data.StakeSum = -1;
-                Execute(Tasks.WaitStake, waitTime);
+                ScheduleExecution(Tasks.WaitStake, waitTime);
                 WaitFor(DecisionType.AuctionStakeMaking, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
             }
             catch (Exception exc)
@@ -3223,14 +3276,14 @@ namespace SICore
 
                 if (breakerGuard == 0)
                 {
-                    throw new Exception($"{nameof(breakerGuard)} == {breakerGuard} (${initialOrderIndex})");
+                    throw new Exception($"{nameof(breakerGuard)} == {breakerGuard} ({initialOrderIndex})");
                 }
 
             } while (_data.OrderIndex != initialOrderIndex && _data.Order[_data.OrderIndex] != -1 && !_data.Players[_data.Order[_data.OrderIndex]].StakeMaking);
 
             if (_data.OrderIndex == initialOrderIndex)
             {
-                throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)} (${initialOrderIndex})");
+                throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)} ({initialOrderIndex})");
             }
         }
 
@@ -3277,7 +3330,7 @@ namespace SICore
             _data.ApelAnswersReceivedCount = 0;
             _data.ApelAnswersRightReceivedCount = 0;
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-            Execute(Tasks.WaitApellationDecision, waitTime);
+            ScheduleExecution(Tasks.WaitApellationDecision, waitTime);
             WaitFor(DecisionType.ApellationDecision, waitTime, -2);
         }
 
@@ -3433,36 +3486,36 @@ namespace SICore
 
             if (arg < 3)
             {
-                Execute(Tasks.Theme, 20, arg + 1);
+                ScheduleExecution(Tasks.Theme, 20, arg + 1);
             }
             else if (informed)
             {
                 if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
                 {
-                    Execute(Tasks.MoveNext, 20);
+                    ScheduleExecution(Tasks.MoveNext, 20);
                 }
                 else if (_data.Round.Type != RoundTypes.Final)
                 {
-                    Execute(Tasks.QuestionType, 1, 1);
+                    ScheduleExecution(Tasks.QuestionType, 1, 1);
                 }
                 else
                 {
-                    Execute(Tasks.AskFinalStake, 20);
+                    ScheduleExecution(Tasks.AskFinalStake, 20);
                 }
             }
             else
             {
                 if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
                 {
-                    ExecuteTask(Tasks.MoveNext, 0);
+                    ScheduleExecution(Tasks.MoveNext, 1, 0);
                 }
                 else if (_data.Round.Type != RoundTypes.Final)
                 {
-                    ExecuteTask(Tasks.QuestionType, 1);
+                    ScheduleExecution(Tasks.QuestionType, 1, 1);
                 }
                 else
                 {
-                    ExecuteTask(Tasks.AskFinalStake, 0);
+                    ScheduleExecution(Tasks.AskFinalStake, 1, 0);
                 }
             }
         }
@@ -3512,7 +3565,9 @@ namespace SICore
                     }
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 2)
@@ -3526,7 +3581,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 3)
@@ -3540,7 +3597,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 4)
@@ -3553,7 +3612,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 5)
@@ -3566,7 +3627,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 6)
@@ -3579,20 +3642,22 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg < 6)
             {
-                Execute(Tasks.Package, 15, arg + 1);
+                ScheduleExecution(Tasks.Package, 15, arg + 1);
             }
             else if (informed)
             {
-                Execute(Tasks.MoveNext, 10);
+                ScheduleExecution(Tasks.MoveNext, 10);
             }
             else
             {
-                Execute(Tasks.MoveNext, 1);
+                ScheduleExecution(Tasks.MoveNext, 1);
             }
         }
 
@@ -3612,7 +3677,7 @@ namespace SICore
                 {
                     _data.Stage = GameStage.Final;
                     _actor.OnStageChanged(GameStages.Final, _actor.LO[nameof(R.Final)]);
-                    Execute(Tasks.PrintFinal, 1, 1, true);
+                    ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
                     return;
                 }
                 else
@@ -3724,15 +3789,15 @@ namespace SICore
 
             if (arg < 5)
             {
-                Execute(Tasks.Round, baseTime + Data.Rand.Next(10), arg + 1);
+                ScheduleExecution(Tasks.Round, baseTime + Data.Rand.Next(10), arg + 1);
             }
             else if (informed)
             {
-                Execute(Tasks.MoveNext, (adShown ? 60 : 20) + Data.Rand.Next(10));
+                ScheduleExecution(Tasks.MoveNext, (adShown ? 60 : 20) + Data.Rand.Next(10));
             }
             else
             {
-                ExecuteTask(Tasks.MoveNext, 0);
+                ScheduleExecution(Tasks.MoveNext, 1);
             }
         }
 

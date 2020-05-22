@@ -6,18 +6,12 @@
 
         public int this[int i]
         {
-            get
+            get => i switch
             {
-                switch (i)
-                {
-                    case 0:
-                        return _data.RoundTime;
-                    case 1:
-                        return _data.PressingTime;
-                    default:
-                        return _data.ThinkingTime;
-                }
-            }
+                0 => _data.RoundTime,
+                1 => _data.PressingTime,
+                _ => _data.ThinkingTime,
+            };
             set
             {
                 switch (i)

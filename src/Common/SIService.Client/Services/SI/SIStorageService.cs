@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,30 +13,34 @@ namespace Services.SI
         private static readonly JsonSerializer Serializer = new JsonSerializer();
         private static readonly HttpClient Client = new HttpClient();
 
-        private readonly string _address;
+        private readonly string _serverUri;
 
         static SIStorageService()
         {
             Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
         }
 
-        public SIStorageService(string address = "http://vladimirkhil.com/api/si")
+        public SIStorageService(string serverUri = "https://vladimirkhil.com/api/si")
         {
-            _address = address;
+            _serverUri = serverUri;
         }
 
-        public async Task<Package[]> GetAllPackagesAsync() => await GetAsync<Package[]>("Packages");
+        public Task<Package[]> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<Package[]>("Packages", cancellationToken);
 
-        public async Task<PackageCategory[]> GetCategoriesAsync() => await GetAsync<PackageCategory[]>("Categories");
+        public Task<PackageCategory[]> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<PackageCategory[]>("Categories", cancellationToken);
 
-        public async Task<Package[]> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction) =>
-            await GetAsync<Package[]>("Packages?categoryID=" + categoryID + "&restriction=" + Uri.EscapeDataString(restriction));
+        public Task<Package[]> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction, CancellationToken cancellationToken = default) =>
+            GetAsync<Package[]>($"Packages?categoryID={categoryID}&restriction={Uri.EscapeDataString(restriction)}", cancellationToken);
 
-        public async Task<Uri> GetPackageByIDAsync(int packageID) => await GetAsync<Uri>("Package?packageID=" + packageID);
+        public Task<Uri> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+            GetAsync<Uri>($"Package?packageID={packageID}", cancellationToken);
 
-        public async Task<Uri> GetPackageByGuidAsync(string packageGuid) => await GetAsync<Uri>("PackageByGuid?packageGuid=" + packageGuid);
+        public Task<Uri> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+            GetAsync<Uri>($"PackageByGuid?packageGuid={packageGuid}", cancellationToken);
 
-        public async Task<string[]> GetPackagesByTagAsync(int? tagId = null)
+        public Task<string[]> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
         {
             var queryString = new StringBuilder();
 
@@ -48,19 +49,24 @@ namespace Services.SI
                 queryString.Append("tagId=").Append(tagId.Value);
             }
 
-            return await GetAsync<string[]>("PackagesByTag" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+            var packageFilter = queryString.Length > 0 ? $"?{queryString}" : "";
+            return GetAsync<string[]>($"PackagesByTag{packageFilter}", cancellationToken);
         }
 
-        public async Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
-            await GetAsync<NewServerInfo[]>("GetGameServersUrisNew", cancellationToken);
+        public Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<NewServerInfo[]>("GetGameServersUrisNew", cancellationToken);
 
-        public async Task<NamedObject[]> GetAuthorsAsync() => await GetAsync<NamedObject[]>("Authors");
+        public Task<NamedObject[]> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<NamedObject[]>("Authors", cancellationToken);
 
-        public async Task<NamedObject[]> GetPublishersAsync() => await GetAsync<NamedObject[]>("Publishers");
+        public Task<NamedObject[]> GetPublishersAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<NamedObject[]>("Publishers", cancellationToken);
 
-        public async Task<NamedObject[]> GetTagsAsync() => await GetAsync<NamedObject[]>("Tags");
+        public Task<NamedObject[]> GetTagsAsync(CancellationToken cancellationToken = default) =>
+            GetAsync<NamedObject[]>("Tags", cancellationToken);
 
-        public async Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1, int? publisherId = null, int? authorId = null,
+        public Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1,
+            int? publisherId = null, int? authorId = null,
             string restriction = null, PackageSortMode sortMode = PackageSortMode.Name, bool sortAscending = true)
         {
             var queryString = new StringBuilder();
@@ -129,16 +135,16 @@ namespace Services.SI
                 queryString.Append("sortAscending=false");
             }
 
-            return await GetAsync<PackageInfo[]>("FilteredPackages" + (queryString.Length > 0 ? "?" + queryString.ToString() : ""));
+            return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}");
         }
 
         private async Task<T> GetAsync<T>(string request, CancellationToken cancellationToken = default)
         {
-            using (var responseMessage = await Client.GetAsync(_address + "/" + request, cancellationToken))
+            using (var responseMessage = await Client.GetAsync($"{_serverUri}/{request}", cancellationToken))
             {
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    throw new Exception("GetAsync error: " + responseMessage.Content.ReadAsStringAsync());
+                    throw new Exception($"GetAsync error: {await responseMessage.Content.ReadAsStringAsync()}");
                 }
 
                 using (var responseStream = await responseMessage.Content.ReadAsStreamAsync())

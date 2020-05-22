@@ -25,7 +25,7 @@ namespace SICore.Network.Servers
             }
         }
 
-        public SlaveServer(INetworkLocalizer localizer)
+        protected SlaveServer(INetworkLocalizer localizer)
             : base(localizer)
         {
 

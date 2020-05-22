@@ -32,7 +32,7 @@ namespace SICore
             {
                 SendMessage(Messages.I);
                 DisableGameButton(false);
-                ReleaseGameButton();
+                ReleaseGameButtonAsync();
             }) { CanBeExecuted = true };
 
             ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
@@ -127,7 +127,7 @@ namespace SICore
             }
         }
 
-        private async void ReleaseGameButton()
+        private async void ReleaseGameButtonAsync()
         {
             try
             {
@@ -135,15 +135,22 @@ namespace SICore
                 buttonDisabledByTimer = false;
                 EnableGameButton();
             }
-            catch
+            catch (Exception exc)
             {
-
+                Client.CurrentServer.OnError(exc, true);
             }
         }
 
-        private void Clear()
+        private void Clear() => _logic.Clear();
+
+        protected override void UpdateMe(ViewerAccount newAccount)
         {
-            _logic.Clear();
+            if (!(newAccount is PlayerAccount))
+            {
+                throw new Exception($"Wrong account type: got {newAccount.GetType()} but PlayerAccount needed!");
+            }
+
+            base.UpdateMe(newAccount);
         }
 
         public override void Init()
@@ -161,10 +168,14 @@ namespace SICore
                     _logic.OnInitialized();
 
                     if (ClientData.AutoReady)
+                    {
                         readyCommand.Execute(null);
+                    }
                 }
                 else
+                {
                     ClientData.Hint = LO[nameof(R.HintInitError)];
+                }
             }
         }
 
@@ -304,10 +315,10 @@ namespace SICore
 
                         ClientData.PersonDataExtensions.StakeInfo = new StakeInfo()
                         {
-                            Minimum = Int32.Parse(mparams[5]),
+                            Minimum = int.Parse(mparams[5]),
                             Maximum = ((PlayerAccount)ClientData.Me).Sum,
                             Step = 100,
-                            Stake = Int32.Parse(mparams[5])
+                            Stake = int.Parse(mparams[5])
                         };
 
                         _logic.Stake();
@@ -427,7 +438,9 @@ namespace SICore
         private void EnableGameButton()
         {
             if (!buttonDisabledByGame && !buttonDisabledByTimer)
+            {
                 ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = true;
+            }
         }
 
         /// <summary>

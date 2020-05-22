@@ -62,12 +62,12 @@ namespace SICore
         /// Можно ли думать над вопросом до истечения времени
         /// </summary>
         internal bool _longThink;
-        internal bool _canAnswer;
+        internal bool CanAnswer { get; set; }
 
         /// <summary>
         /// Знает ли ответ
         /// </summary>
-        internal bool _knowsAnswer = false;
+        internal bool KnowsAnswer { get; set; } = false;
 
         /// <summary>
         /// Уверен ли в ответе

@@ -49,14 +49,14 @@ namespace SIPackages
 
         #region Static
 
-        private static readonly string ContentFileName = "content.xml";
-        private static readonly string AuthorsFileName = "authors.xml";
-        private static readonly string SourcesFileName = "sources.xml";
+        private const string ContentFileName = "content.xml";
+        private const string AuthorsFileName = "authors.xml";
+        private const string SourcesFileName = "sources.xml";
 
         /// <summary>
         /// Хранилище текстов
         /// </summary>
-        private static readonly string TextsStorageName = "Texts";
+        private const string TextsStorageName = "Texts";
         /// <summary>
         /// Хранилище изображений
         /// </summary>
@@ -409,8 +409,7 @@ namespace SIPackages
             var result = new List<string>();
             for (int i = 0; i < authors.Count; i++)
             {
-                string tail;
-                var author = GetLink(authors, i, out tail);
+                var author = GetLink(authors, i, out var tail);
                 result.Add(author == null ? authors[i] : author.ToString() + tail);
             }
 
@@ -425,10 +424,9 @@ namespace SIPackages
         public string[] GetRealSources(Sources sources)
         {
             var result = new List<string>();
-            for (int i = 0; i < sources.Count; i++)
+            for (var i = 0; i < sources.Count; i++)
             {
-                string tail;
-                var source = GetLink(sources, i, out tail);
+                var source = GetLink(sources, i, out var tail);
                 result.Add(source == null ? sources[i] : source.ToString() + tail);
             }
 

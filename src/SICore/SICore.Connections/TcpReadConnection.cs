@@ -159,7 +159,7 @@ namespace SICore.Connections
             {
                 if (_logger != null)
                 {
-                    _logger.Log(GameId, UserName + " in: " + Encoding.UTF8.GetString(data));
+                    _logger.Log(GameId, $"{UserName} in: {Encoding.UTF8.GetString(data)}");
                 }
 
                 using var ms = new MemoryStream(data);

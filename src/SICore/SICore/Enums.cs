@@ -90,31 +90,31 @@ namespace SICore
         /// </summary>
         PrintPartial,
         /// <summary>
-        /// Объявление Кота в мешке
+        /// Объявление Вопроса с секретом
         /// </summary>
         PrintCat,
         /// <summary>
-        /// Выяснение, кому будет отдан Кот в мешке
+        /// Выяснение, кому будет отдан Вопрос с секретом
         /// </summary>
         AskCat,
         /// <summary>
-        /// Ожидание решения игрока об отдаче Кота в мешке
+        /// Ожидание решения игрока об отдаче Вопроса с секретом
         /// </summary>
         WaitCat,
         /// <summary>
-        /// Определение стоимости Кота в мешке
+        /// Определение стоимости Вопроса с секретом
         /// </summary>
         AskCatCost,
         /// <summary>
-        /// Ожидание решения игрока о стоимости Кота в мешке
+        /// Ожидание решения игрока о стоимости Вопросе с секретом
         /// </summary>
         WaitCatCost,
         /// <summary>
-        /// Объявление информации о Коте в мешке
+        /// Объявление информации о Вопросе с секретом
         /// </summary>
         CatInfo,
         /// <summary>
-        /// Объявление аукциона
+        /// Объявление Вопроса со ставкой
         /// </summary>
         PrintAuct,
         /// <summary>
@@ -130,7 +130,7 @@ namespace SICore
         /// </summary>
         WaitStake,
         /// <summary>
-        /// Объявление игрока, играющего аукцион
+        /// Объявление игрока, играющего Вопрос со ставкой
         /// </summary>
         PrintAuctPlayer,
         /// <summary>
@@ -150,11 +150,11 @@ namespace SICore
         /// </summary>
         WaitNextToDelete,
         /// <summary>
-        /// Выяснение ставки игрока в финале
+        /// Выяснение ставки игроков в финале
         /// </summary>
         AskFinalStake,
         /// <summary>
-        /// Ожидание ставки игрока в финале
+        /// Ожидание ставки игроков в финале
         /// </summary>
         WaitFinalStake,
         /// <summary>
@@ -178,7 +178,7 @@ namespace SICore
         /// </summary>
         GoodLuck,
         /// <summary>
-        /// Вопрос от спонсора
+        /// Вопрос без риска
         /// </summary>
         PrintSponsored,
         /// <summary>
@@ -247,15 +247,15 @@ namespace SICore
         /// </summary>
         PlayerButtonPressing,
         /// <summary>
-        /// Отдача Кота в мешке
+        /// Отдача Вопроса с секретом
         /// </summary>
         CatGiving,
         /// <summary>
-        /// Выбор стоимости Кота
+        /// Выбор стоимости Вопроса с секретом
         /// </summary>
         CatCostSetting,
         /// <summary>
-        /// Выставление ставки на аукционе
+        /// Выставление ставки на Вопросе со ставкой
         /// </summary>
         AuctionStakeMaking,
         /// <summary>
@@ -283,7 +283,7 @@ namespace SICore
         /// </summary>
         StarterChoosing,
         /// <summary>
-        /// Выбор следующего ставящего на аукционе
+        /// Выбор следующего ставящего на Вопросе со ставкой
         /// </summary>
         NextPersonStakeMaking,
         /// <summary>

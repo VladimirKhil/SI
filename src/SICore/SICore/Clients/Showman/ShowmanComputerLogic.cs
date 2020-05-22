@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using SICore.Clients.Showman;
+using System.Linq;
 
 namespace SICore
 {
@@ -13,6 +14,34 @@ namespace SICore
             
         }
 
+        internal void ScheduleExecution(ShowmanTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
+
+        protected override void ExecuteTask(int taskId, int arg)
+        {
+            var task = (ShowmanTasks)taskId;
+            switch (task)
+            {
+                case ShowmanTasks.AnswerFirst:
+                    AnswerFirst();
+                    break;
+
+                case ShowmanTasks.AnswerNextStake:
+                    AnswerNextStake();
+                    break;
+
+                case ShowmanTasks.AnswerRight:
+                    AnswerRight();
+                    break;
+
+                case ShowmanTasks.AnswerNextToDelete:
+                    AnswerNextToDelete();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         private void SelectPlayer(string message)
         {
             int num = _data.Players.Count(p => p.CanBeSelected);
@@ -23,20 +52,11 @@ namespace SICore
             _actor.SendMessage(message, i.ToString());
         }
 
-        private void AnswerNextToDelete()
-        {
-            SelectPlayer(Messages.NextDelete);
-        }
+        private void AnswerNextToDelete() => SelectPlayer(Messages.NextDelete);
 
-        private void AnswerNextStake()
-        {
-            SelectPlayer(Messages.Next);
-        }
+        private void AnswerNextStake() => SelectPlayer(Messages.Next);
 
-        private void AnswerFirst()
-        {
-            SelectPlayer(Messages.First);
-        }
+        private void AnswerFirst() => SelectPlayer(Messages.First);
 
         private void AnswerRight()
         {
@@ -57,25 +77,13 @@ namespace SICore
 
         #region ShowmanInterface Members
 
-        public void StarterChoose()
-        {
-            Execute(AnswerFirst, 10 + Data.Rand.Next(10));
-        }
+        public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Data.Rand.Next(10));
 
-        public void FirstStake()
-        {
-            Execute(AnswerNextStake, 10 + Data.Rand.Next(10));
-        }
+        public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Data.Rand.Next(10));
 
-        public void IsRight()
-        {
-            Execute(AnswerRight, 10 + Data.Rand.Next(10));
-        }
+        public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Data.Rand.Next(10));
 
-        public void FirstDelete()
-        {
-            Execute(AnswerNextToDelete, 10 + Data.Rand.Next(10));
-        }
+        public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Data.Rand.Next(10));
 
         public void ChangeSum()
         {

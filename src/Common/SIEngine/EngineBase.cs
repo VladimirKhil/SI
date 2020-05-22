@@ -23,9 +23,10 @@ namespace SIEngine
         /// <summary>
         /// Стадия игры
         /// </summary>
-        protected GameStage Stage
+        public GameStage Stage
         {
-            set
+            get => _stage;
+            protected set
             {
                 if (_stage != value)
                 {
@@ -379,6 +380,33 @@ namespace SIEngine
         public void SetTimeout() => _timeout = true;
 
         public void SkipQuestion() => Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+
+        public void MoveToAnswer() => Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.EndQuestion;
+
+        protected void OnQuestion()
+        {
+            var playMode = PlayQuestionAtom();
+            var pressMode = _settingsProvider.IsPressMode(_isMedia);
+            if (playMode == QuestionPlayMode.AlreadyFinished)
+            {
+                MoveToAnswer();
+
+                if (pressMode)
+                {
+                    OnWaitTry(_activeQuestion);
+                    AutoNext(1000 * (Math.Min(5, _settingsProvider.ThinkingTime)));
+                }
+                else
+                {
+                    MoveNext();
+                }
+            }
+            else
+            {
+                OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, pressMode);
+                AutoNext(1000 * (_settingsProvider.ThinkingTime + _activeQuestion.Scenario.ToString().Length / 20));
+            }
+        }
 
         /// <summary>
         /// Отобразить вопрос (его часть)

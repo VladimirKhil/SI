@@ -29,11 +29,15 @@ namespace SICore
 
         public Data Data => _data;
 
-        protected Timer _taskTimer = null;
-        protected Action _task = null;
-        private readonly Stack<Tuple<Action, int>> _oldTasks = new Stack<Tuple<Action, int>>();
-        protected object _taskTimerLock = new object();
-        protected DateTime _finishingTime;
+        private Timer _taskTimer = null;
+        private int _taskArgument = -1;
+        private readonly Stack<Tuple<int, int, int>> _oldTasks = new Stack<Tuple<int, int, int>>();
+        private readonly object _taskTimerLock = new object();
+        private DateTime _finishingTime;
+
+        internal int CurrentTask { get; private set; } = -1;
+
+        internal IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 
         internal Logic(A actor, D data)
         {
@@ -45,11 +49,11 @@ namespace SICore
         // TODO: PERF
         private void TaskTimer_Elapsed(object state)
         {
-            if (_task != null)
+            if (CurrentTask != -1)
             {
                 try
                 {
-                    _task();
+                    ExecuteTask(CurrentTask, _taskArgument);
                 }
                 catch (Exception exc)
                 {
@@ -82,11 +86,11 @@ namespace SICore
             }
         }
 
-        protected void PauseExecution(Action task)
+        protected void PauseExecution(int task, int taskArgument)
         {
             var now = DateTime.Now;
-            _oldTasks.Push(Tuple.Create(task, (int)((_finishingTime - now).TotalMilliseconds / 100)));
-            _task = null;
+            _oldTasks.Push(Tuple.Create(task, taskArgument, (int)((_finishingTime - now).TotalMilliseconds / 100)));
+            CurrentTask = -1;
         }
 
         protected internal void ResumeExecution(int resumeTime = 0)
@@ -94,7 +98,7 @@ namespace SICore
             if (_oldTasks.Any())
             {
                 var oldTask = _oldTasks.Pop();
-                Execute(oldTask.Item1, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item2));
+                ScheduleExecution(oldTask.Item1, oldTask.Item2, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3));
             }
         }
 
@@ -103,7 +107,7 @@ namespace SICore
         /// </summary>
         /// <param name="task">Выполняемая задача</param>
         /// <param name="arg">Параметр задачи</param>
-        protected virtual void ExecuteTask(Tasks task, int arg) { }
+        protected virtual void ExecuteTask(int task, int arg) { }
 
         /// <summary>
         /// Запись сообщения в лог
@@ -149,23 +153,10 @@ namespace SICore
 
         #endregion
 
-        /// <summary>
-        /// Выполнить действие через заданный промежуток времени
-        /// </summary>
-        /// <param name="task">Действие</param>
-        /// <param name="taskTime">Промежуток времени</param>
-        /// <param name="taskParam">Параметр действия</param>
-        protected void Execute(Action task, double taskTime)
+        protected void SetTask(int task, int taskArgument)
         {
-            _task = task;
-            lock (_taskTimerLock)
-            {
-                if (_taskTimer != null)
-                {
-                    _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-                    _finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);
-                }
-            }
+            CurrentTask = task;
+            _taskArgument = taskArgument;
         }
 
         /// <summary>
@@ -173,13 +164,18 @@ namespace SICore
         /// </summary>
         /// <param name="task">Действие</param>
         /// <param name="taskTime">Промежуток времени</param>
-        /// <param name="arg">Параметр действия</param>
-        protected void Execute(Action<int> task, double taskTime, int arg)
+        /// <param name="taskParam">Параметр действия</param>
+        protected void ScheduleExecution(int task, int taskArgument, double taskTime)
         {
-            _task = () => task(arg);
+            SetTask(task, taskArgument);
+            RunTaskTimer(taskTime);
+        }
+
+        protected void RunTaskTimer(double taskTime)
+        {
             lock (_taskTimerLock)
             {
-                if (_taskTimer != null)
+                if (_taskTimer != null && taskTime > 0)
                 {
                     _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
                     _finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);

@@ -19,20 +19,14 @@ namespace SIPackages
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _text = "";
 
-        public bool IsLink
-        {
-            get { return _text.Length > 0 && _text[0] == '@'; }
-        }
+        public bool IsLink => _text.Length > 0 && _text[0] == '@';
 
         /// <summary>
         /// Тип единицы
         /// </summary>
         public string Type
         {
-            get
-            {
-                return _type;
-            }
+            get => _type;
             set
             {
                 if (_type != value)
@@ -74,10 +68,7 @@ namespace SIPackages
         [DefaultValue(0)]
         public int AtomTime
         {
-            get
-            {
-                return _atomTime;
-            }
+            get => _atomTime;
             set
             {
                 if (_atomTime != value)
@@ -94,10 +85,7 @@ namespace SIPackages
         /// </summary>
         public string Text
         {
-            get
-            {
-                return _text;
-            }
+            get => _text;
             set
             {
                 if (_text != value)
@@ -109,10 +97,7 @@ namespace SIPackages
             }
         }
 
-        public bool Contains(string value)
-        {
-            return _text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
-        }
+        public bool Contains(string value) => _text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
         /// <summary>
         /// Строковое представление единицы
@@ -121,7 +106,9 @@ namespace SIPackages
         public override string ToString()
         {
             if (_type == AtomTypes.Text)
+            {
                 return _text;
+            }
 
             var res = new StringBuilder();
             res.AppendFormat("#{0} ", _type);

@@ -60,10 +60,14 @@ namespace SIPackages.PlatformSpecific.Net45
         public string[] GetEntries(string category)
         {
             if (_zipArchive.Mode == ZipArchiveMode.Create)
-                return new string[0];
+            {
+                return Array.Empty<string>();
+            }
 
-            return _zipArchive.Entries.Where(entry => entry.FullName.StartsWith(category))
-                .Select(entry => Uri.UnescapeDataString(entry.Name)).ToArray();
+            return _zipArchive.Entries
+                .Where(entry => entry.FullName.StartsWith(category))
+                .Select(entry => Uri.UnescapeDataString(entry.Name))
+                .ToArray();
         }
 
         public StreamInfo GetStream(string name, bool read = true)

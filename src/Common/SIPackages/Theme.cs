@@ -1,7 +1,6 @@
 ﻿using SIPackages.Properties;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace SIPackages
@@ -17,7 +16,7 @@ namespace SIPackages
         /// Строковое представление темы
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => Resources.Theme + ": " + Name;
+        public override string ToString() => $"{Resources.Theme}: {Name}";
 
         /// <summary>
         /// Создание нового вопроса в теме

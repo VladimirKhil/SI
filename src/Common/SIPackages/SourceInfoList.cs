@@ -26,10 +26,12 @@ namespace SIPackages
                         switch (reader.LocalName)
                         {
                             case "Source":
-                                sourceInfo = new SourceInfo();
-                                sourceInfo.Id = reader["id"];
+                                sourceInfo = new SourceInfo
+                                {
+                                    Id = reader["id"]
+                                };
 
-                                this.Add(sourceInfo);
+                                Add(sourceInfo);
                                 break;
 
                             case "Author":

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SIEngine
+﻿namespace SIEngine
 {
     public interface IEngineSettingsProvider
     {

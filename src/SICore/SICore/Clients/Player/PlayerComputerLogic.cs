@@ -1,4 +1,5 @@
-﻿using SICore.Connections;
+﻿using SICore.Clients.Player;
+using SICore.Connections;
 using SICore.Network.Contracts;
 using SICore.Special;
 using SICore.Utils;
@@ -34,6 +35,54 @@ namespace SICore
             _account = account;
         }
 
+        internal void ScheduleExecution(PlayerTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
+
+        protected override void ExecuteTask(int taskId, int arg)
+        {
+            var task = (PlayerTasks)taskId;
+            switch (task)
+            {
+                case PlayerTasks.Answer:
+                    AnswerTask();
+                    break;
+
+                case PlayerTasks.Choose:
+                    Choose();
+                    break;
+
+                case PlayerTasks.AnswerRight:
+                    AnswerRight();
+                    break;
+
+                case PlayerTasks.AnswerWrong:
+                    AnswerWrong();
+                    break;
+
+                case PlayerTasks.Cat:
+                    CatTask();
+                    break;
+
+                case PlayerTasks.CatCost:
+                    CatCostTask();
+                    break;
+
+                case PlayerTasks.ChooseFinal:
+                    ChooseFinal();
+                    break;
+
+                case PlayerTasks.FinalStake:
+                    FinalStakeTask();
+                    break;
+
+                case PlayerTasks.Stake:
+                    StakeTask();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (_thinkingTimer != null)
@@ -64,12 +113,12 @@ namespace SICore
                     // Знает
                     if (r < _account.F)
                     {
-                        playerData._knowsAnswer = true;
+                        playerData.KnowsAnswer = true;
                         playerData._isSure = true;
 
                         if (playerData._longThink)
                         {
-                            Execute(AnswerTask, 1);
+                            ScheduleExecution(PlayerTasks.Answer, 1);
                             _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         }
                     }
@@ -80,9 +129,9 @@ namespace SICore
                         var s = Data.Rand.Next(100);
 
                         if (s < (int)(Math.Exp(1 - ((double)r) / _account.F) * 100))
-                            playerData._knowsAnswer = true;
+                            playerData.KnowsAnswer = true;
                         else
-                            playerData._knowsAnswer = false;
+                            playerData.KnowsAnswer = false;
                     }
                     else if (playerData._bestBrave > r)
                         playerData._bestBrave = r;
@@ -96,11 +145,11 @@ namespace SICore
                     playerData._isSure = false;
                     var ran = Data.Rand.Next(100);
                     if (ran < (int)(Math.Exp(1 - ((double)playerData._bestBrave) / _account.F) * 100))
-                        playerData._knowsAnswer = true;
+                        playerData.KnowsAnswer = true;
                     else
-                        playerData._knowsAnswer = false;
+                        playerData.KnowsAnswer = false;
 
-                    Execute(AnswerTask, 1);
+                    ScheduleExecution(PlayerTasks.Answer, 1);
                     _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
                 else if (playerData.MyTry && playerData._readyToPress && !_data.TInfo.Pause)
@@ -126,15 +175,9 @@ namespace SICore
             _data.PlayerDataExtensions._realBrave = _account.B0;
         }
 
-        private void AnswerRight()
-        {
-            _actor.SendMessage(Messages.IsRight, "+");
-        }
+        private void AnswerRight() => _actor.SendMessage(Messages.IsRight, "+");
 
-        private void AnswerWrong()
-        {
-            _actor.SendMessage(Messages.IsRight, "-");
-        }
+        private void AnswerWrong() => _actor.SendMessage(Messages.IsRight, "-");
 
         private void FinalStakeTask()
         {
@@ -292,7 +335,7 @@ namespace SICore
             {
                 var ans = new StringBuilder(Messages.Answer).Append(Message.ArgsSeparatorChar);
 
-                if (_data.PlayerDataExtensions._knowsAnswer)
+                if (_data.PlayerDataExtensions.KnowsAnswer)
                     ans.Append("RIGHT").Append(Message.ArgsSeparatorChar);
                 else
                     ans.Append("WRONG").Append(Message.ArgsSeparatorChar);
@@ -546,7 +589,7 @@ namespace SICore
                 }
 
                 // Определяем множество паретооптимальных ставок
-                PlayerComputerLogic.ParetoStakes(mySum, ops.ToArray(), ref res);
+                ParetoStakes(mySum, ops.ToArray(), ref res);
             }
             else
                 res.Add(new Interval(1, Math.Max(mySum - 1, 1)));
@@ -595,16 +638,20 @@ namespace SICore
             var mySum = sums[myIndex];
             int bestNum = -1;
             for (i = 0; i < sums.Length; i++)
+            {
                 if (i != myIndex && sums[i] == bestSum)
+                {
                     bestNum = i;
+                }
+            }
 
             var pass = new List<Interval>();
             var plus100 = new List<Interval>();
             var max = new List<Interval>();
             var result = new List<IntervalProbability>();
             // Сначала просчитаем оптимальную реакцию нашего противника на все возможные наши ставки
-            PlayerComputerLogic.StakeDecisions(style, bestSum, mySum, bestNum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, true /*т.к. он второй, то он всегда может спасовать*/, vars[2] ? sums[lastStakerIndex] : 0, lastStakerIndex, ref result);
-            PlayerComputerLogic.StakeDecisions(style, mySum, bestSum, bestNum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, vars[2], vars[2] ? sums[lastStakerIndex] : 0, lastStakerIndex, ref result);
+            StakeDecisions(style, bestSum, mySum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, true /*т.к. он второй, то он всегда может спасовать*/, vars[2] ? sums[lastStakerIndex] : 0, ref result);
+            StakeDecisions(style, mySum, bestSum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, vars[2], vars[2] ? sums[lastStakerIndex] : 0, ref result);
 
             int maxL = result[0].Probabilities.Count;
             int li = 0;
@@ -1109,7 +1156,6 @@ namespace SICore
         /// <param name="style">Стиль игрока</param>
         /// <param name="mySum">Сумма</param>
         /// <param name="bestSum">Сумма лучшего из оппонентов</param>
-        /// <param name="bestNum">Номер лучшего из преследователей</param>
         /// <param name="minStake">Минимальная возникающая ставка</param>
         /// <param name="maxStake">Максимальная возникающая ставка</param>
         /// <param name="p">Вероятность ответа на вопрос</param>
@@ -1118,9 +1164,8 @@ namespace SICore
         /// <param name="max">Интервалы ставок, на которых игрок сделает максимальную разумную ставку</param>
         /// <param name="canPass">Возможен ли пас в качестве варианта ставок</param>
         /// <param name="stakerSum">Сумма на счёте ставящего при возможности паса (иначе 0)</param>
-        /// <param name="stakerNum">Номер последнего ставящего</param>
         /// <param name="result">Паретооптимальное множество ставок</param>
-        internal static void StakeDecisions(PlayerStyle style, int mySum, int bestSum, int bestNum, int minStake, int maxStake, double p, ref List<Interval> pass, ref List<Interval> plus100, ref List<Interval> max, bool canPass, int stakerSum, int stakerNum, ref List<IntervalProbability> result)
+        internal static void StakeDecisions(PlayerStyle style, int mySum, int bestSum, int minStake, int maxStake, double p, ref List<Interval> pass, ref List<Interval> plus100, ref List<Interval> max, bool canPass, int stakerSum, ref List<IntervalProbability> result)
         {
             // Для всех возможных ставок определим наиболее вероятные ответы соперника
 
@@ -1374,7 +1419,7 @@ namespace SICore
                     int decision = 0;
                     if (candidates.Count > 1)
                     {
-                        int j = 0;
+                        int j;
                         switch (style)
                         {
                             case PlayerStyle.Agressive:
@@ -1400,7 +1445,6 @@ namespace SICore
                                 break;
 
                             default:
-
                                 var index = Data.Rand.Next(candidates.Count);
                                 j = candidates[index];
 
@@ -1409,7 +1453,9 @@ namespace SICore
                         }
                     }
                     else
+                    {
                         decision = candidates[0];
+                    }
 
                     switch (decision)
                     {
@@ -1456,10 +1502,7 @@ namespace SICore
         /// <summary>
         /// Выбор вопроса
         /// </summary>
-        public void ChooseQuest()
-        {
-            Execute(Choose, 20 + Data.Rand.Next(10));
-        }
+        public void ChooseQuest() => ScheduleExecution(PlayerTasks.Choose, 20 + Data.Rand.Next(10));
 
         /// <summary>
         /// Получение части вопроса
@@ -1474,7 +1517,7 @@ namespace SICore
             {
                 playerData.IsQuestionInProgress = false;
 
-                playerData._canAnswer = false;
+                playerData.CanAnswer = false;
                 playerData._difficulty = 0;
                 playerData._longThink = true;
                 if (_data.Stage == GameStage.Round)
@@ -1497,7 +1540,7 @@ namespace SICore
                 _thinkingTimer.Change(100, 100);
                 playerData._realSpeed = (_account.S + 1) * 10;
                 playerData._bestBrave = 10000;
-                playerData._knowsAnswer = false;
+                playerData.KnowsAnswer = false;
                 playerData._isSure = false;
                 playerData._readyToPress = false;
             }
@@ -1517,9 +1560,13 @@ namespace SICore
         public void Answer()
         {
             if (_data._qtype == QuestionTypes.Simple)
-                Execute(AnswerTask, 10 + Data.Rand.Next(10));
+            {
+                ScheduleExecution(PlayerTasks.Answer, 10 + Data.Rand.Next(10));
+            }
             else
-                _data.PlayerDataExtensions._canAnswer = true;
+            {
+                _data.PlayerDataExtensions.CanAnswer = true;
+            }
         }
 
         /// <summary>
@@ -1527,48 +1574,30 @@ namespace SICore
         /// </summary>
         public void Cat()
         {
-            Execute(CatTask, 10 + Data.Rand.Next(10));
+            ScheduleExecution(PlayerTasks.Cat, 10 + Data.Rand.Next(10));
         }
 
         /// <summary>
         /// Необходимо сделать ставку
         /// </summary>
-        public void Stake()
-        {
-            Execute(StakeTask, 10 + Data.Rand.Next(10));
-        }
+        public void Stake() => ScheduleExecution(PlayerTasks.Stake, 10 + Data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо выбрать финальную тему
         /// </summary>
-        public void ChooseFinalTheme()
-        {
-            Execute(ChooseFinal, 10 + Data.Rand.Next(10));
-        }
+        public void ChooseFinalTheme() => ScheduleExecution(PlayerTasks.ChooseFinal, 10 + Data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо сделать финальную ставку
         /// </summary>
-        public void FinalStake()
-        {
-            Execute(FinalStakeTask, 10 + Data.Rand.Next(20));
-        }
+        public void FinalStake() => ScheduleExecution(PlayerTasks.FinalStake, 10 + Data.Rand.Next(20));
 
         /// <summary>
         /// Необходимо выбрать стоимость кота
         /// </summary>
-        public void CatCost()
-        {
-            Execute(CatCostTask, 15);
-        }
+        public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
-        public void IsRight(bool voteForRight)
-        {
-            if (voteForRight)
-                Execute(AnswerRight, 10 + Data.Rand.Next(10));
-            else
-                Execute(AnswerWrong, 10 + Data.Rand.Next(10));
-        }
+        public void IsRight(bool voteForRight) => ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Data.Rand.Next(10));
 
         public void Connected(string name)
         {

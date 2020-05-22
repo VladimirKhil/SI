@@ -35,7 +35,7 @@ namespace SICore
 
         public ILocalizer LO { get; protected set; }
 
-        public Actor(Client client, Account personData, IGameManager manager, ILocalizer localizer, D data = null)
+        protected Actor(Client client, Account personData, IGameManager manager, ILocalizer localizer, D data = null)
         {
             _client = client;
             ClientData = data ?? new D();

@@ -3,6 +3,7 @@ using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace SIUI.ViewModel
 {
@@ -358,19 +359,19 @@ namespace SIUI.ViewModel
         /// </summary>
         /// <param name="i"></param>
         /// <param name="j"></param>
-        public void PlaySimpleSelection(int i, int j)
+        public Task PlaySimpleSelectionAsync(int i, int j)
         {
             Finished = false;
             _isComplex = false;
 
             RoundInfo[i].Questions[j].State = QuestionInfoStages.Blinking;
-            RoundInfo[i].Questions[j].SilentFlashOut();
+            return RoundInfo[i].Questions[j].SilentFlashOutAsync();
         }
 
         /// <summary>
         /// Отобразить сложный выбор (спецвопроса)
         /// </summary>
-        public void PlayComplexSelection(int themeIndex, int questionIndex, bool setActive)
+        public Task PlayComplexSelectionAsync(int themeIndex, int questionIndex, bool setActive)
         {
             Finished = false;
             _isComplex = true;
@@ -380,7 +381,7 @@ namespace SIUI.ViewModel
             }
 
             RoundInfo[themeIndex].Questions[questionIndex].State = QuestionInfoStages.Blinking;
-            RoundInfo[themeIndex].Questions[questionIndex].SilentFlashOut();
+            return RoundInfo[themeIndex].Questions[questionIndex].SilentFlashOutAsync();
         }
 
         public event Action MediaStart;

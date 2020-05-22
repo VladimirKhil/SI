@@ -60,13 +60,13 @@ namespace SIUI.Behaviors
             var textBlock = (TextBlock)d;
             var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
 
-            PropertyChangedEventHandler handler = (sender, e2) =>
+            void handler(object sender, PropertyChangedEventArgs e2)
             {
                 if (e2.PropertyName == nameof(TableInfoViewModel.TextLength))
                 {
                     UpdateAnimation(textBlock, tableInfoViewModel);
                 }
-            };
+            }
 
             if (!(bool)e.NewValue)
             {

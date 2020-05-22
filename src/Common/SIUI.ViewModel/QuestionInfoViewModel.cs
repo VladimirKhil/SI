@@ -35,7 +35,7 @@ namespace SIUI.ViewModel
             _model = questionInfo;
         }
 
-        internal async void SilentFlashOut()
+        internal async Task SilentFlashOutAsync()
         {
             await Task.Delay(500);
 

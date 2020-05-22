@@ -12,12 +12,12 @@ namespace SIPackages
     public sealed class QuestionType : Named
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<QuestionTypeParam> _parameters = new List<QuestionTypeParam>();
+        private readonly List<QuestionTypeParam> _parameters = new List<QuestionTypeParam>();
 
         /// <summary>
         /// Параметры типа
         /// </summary>
-        public List<QuestionTypeParam> Params { get { return _parameters; } }
+        public List<QuestionTypeParam> Params => _parameters;
 
         public QuestionType()
             : base(QuestionTypes.Simple)
@@ -36,16 +36,20 @@ namespace SIPackages
             {
                 var item = _parameters.FirstOrDefault(qtp => qtp.Name == name);
                 if (item != null)
+                {
                     item.Value = value;
+                }
                 else
+                {
                     _parameters.Add(new QuestionTypeParam { Name = name, Value = value });
+                }
             }
         }
 
-        public override bool Contains(string value)
-        {
-            return Name.Contains(value) || _parameters.Any(item => item.Name.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1 || item.Value.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1);
-        }
+        public override bool Contains(string value) =>
+            Name.Contains(value)
+                || _parameters.Any(item => item.Name.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1
+                    || item.Value.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1);
 
         public override IEnumerable<SearchData> Search(string value)
         {

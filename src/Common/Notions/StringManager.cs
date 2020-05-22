@@ -21,10 +21,7 @@
         /// <param name="string2">Вторая строка</param>
         /// <param name="equal">Массив совпадающих символов в двух строках</param>
         /// <returns>Величина нормы: чем меньше - тем лучше</returns>
-        public static int MaxLengthNorm(string string1, string string2, Point[] equal)
-        {
-            return -equal.Length;
-        }
+        public static int MaxLengthNorm(string string1, string string2, Point[] equal) => -equal.Length;
 
         /// <summary>
         /// Норма общей подстроки для вычисления шаблона темы и вопроса СИ
