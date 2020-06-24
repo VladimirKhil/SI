@@ -47,7 +47,7 @@ namespace SICore.Network.Servers
 
             var address = connection.RemoteAddress;
 
-            if (_banned.TryGetValue(address, out DateTime date) && date > DateTime.Now)
+            if (_banned.TryGetValue(address, out DateTime date) && date > DateTime.UtcNow)
             {
                 connection.SendMessage(
                     new Message(
@@ -107,7 +107,7 @@ namespace SICore.Network.Servers
                         var address = connection.RemoteAddress;
                         if (address.Length > 0)
                         {
-                            _banned[address] = ban ? DateTime.MaxValue : DateTime.Now.AddMinutes(5.0);
+                            _banned[address] = ban ? DateTime.MaxValue : DateTime.UtcNow.AddMinutes(5.0);
                         }
 
                         connectionToClose = connection;

@@ -10,7 +10,7 @@
     <Product>SIEngine</Product>
     <Description>SIGame engine</Description>
     <Company>Svoyak-soft</Company>
-    <Version>2.10.1</Version>
+    <Version>2.11.1</Version>
     <Copyright>Copyright © Svoyak-soft 2007 - 2020</Copyright>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>

@@ -25,7 +25,7 @@ namespace SICore
 
         protected int GetTimePercentage(int timerIndex)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var timer = timersInfo[timerIndex];
             if (!timer.IsEnabled)
@@ -200,7 +200,7 @@ namespace SICore
             {
                 case "GO":
                     var maxTime = int.Parse(arg);
-                    var now = DateTime.Now;
+                    var now = DateTime.UtcNow;
                     timersInfo[timerIndex].IsEnabled = true;
                     timersInfo[timerIndex].StartTime = now;
                     timersInfo[timerIndex].EndTime = now.AddMilliseconds(maxTime * 100);
@@ -236,7 +236,7 @@ namespace SICore
                         return;
                     }
 
-                    var now2 = DateTime.Now;
+                    var now2 = DateTime.UtcNow;
                     timersInfo[timerIndex].EndTime = now2.AddMilliseconds((timersInfo[timerIndex].MaxTime - timersInfo[timerIndex].PauseTime) * 100);
                     timersInfo[timerIndex].StartTime = timersInfo[timerIndex].EndTime.AddMilliseconds(-timersInfo[timerIndex].MaxTime * 100);
                     break;
@@ -248,7 +248,7 @@ namespace SICore
                         return;
                     }
 
-                    var now3 = DateTime.Now;
+                    var now3 = DateTime.UtcNow;
                     timersInfo[timerIndex].EndTime = now3.AddMilliseconds((timersInfo[timerIndex].MaxTime - timersInfo[timerIndex].PauseTime) * 100);
                     timersInfo[timerIndex].StartTime = timersInfo[timerIndex].EndTime.AddMilliseconds(-timersInfo[timerIndex].MaxTime * 100);
                     break;

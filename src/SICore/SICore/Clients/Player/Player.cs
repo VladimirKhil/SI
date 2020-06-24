@@ -103,14 +103,14 @@ namespace SICore
                 new PlayerComputerLogic(this, ClientData, (ComputerAccount)personData);
         }
 
-        public override void Dispose()
+        public override void Dispose(bool disposing)
         {
             ClientData.AutoReadyChanged -= ClientData_AutoReadyChanged;
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 
-        void ClientData_AutoReadyChanged()
+        private void ClientData_AutoReadyChanged()
         {
             lock (_readyLock)
             {
@@ -142,16 +142,6 @@ namespace SICore
         }
 
         private void Clear() => _logic.Clear();
-
-        protected override void UpdateMe(ViewerAccount newAccount)
-        {
-            if (!(newAccount is PlayerAccount))
-            {
-                throw new Exception($"Wrong account type: got {newAccount.GetType()} but PlayerAccount needed!");
-            }
-
-            base.UpdateMe(newAccount);
-        }
 
         public override void Init()
         {
@@ -197,18 +187,27 @@ namespace SICore
                     case Messages.Stage:
                         #region STAGE
 
-                        if (mparams[1] == "Round")
+                        if (mparams.Length == 0)
+                        {
+                            break;
+                        }
+
+                        if (mparams[1] == nameof(GameStage.Round))
                         {
                             lock (ClientData.ChoiceLock)
                             {
                                 ClientData.QuestionIndex = -1;
                                 ClientData.ThemeIndex = -1;
                             }
+
+                            Clear();
                         }
-                        else if (mparams[1] == "Final")
+                        else if (mparams[1] == nameof(GameStage.Final))
                         {
                             ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                         }
+
+                        ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
 
                         #endregion
                         break;
@@ -249,7 +248,7 @@ namespace SICore
                         break;
 
                     case Messages.Atom:
-                        if (ClientData._qtype == QuestionTypes.Simple)
+                        if (ClientData.QuestionType == QuestionTypes.Simple)
                         {
                             buttonDisabledByGame = false;
                             EnableGameButton();
@@ -257,6 +256,11 @@ namespace SICore
                             if (!ClientData.FalseStart)
                                 ClientData.PlayerDataExtensions.MyTry = true;
                         }
+                        break;
+
+                    case Messages.Try:
+                        ClientData.PlayerDataExtensions.Pass.CanBeExecuted = true;
+                        ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
                         break;
 
                     case Messages.YouTry:
@@ -270,7 +274,12 @@ namespace SICore
                         DisableGameButton();
 
                         if (mparams[1] == "A")
+                        {
                             _logic.EndThink();
+
+                            ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.NumApps > 0;
+                            ClientData.PlayerDataExtensions.Pass.CanBeExecuted = false;
+                        }
                         break;
 
                     case Messages.Answer:
@@ -370,6 +379,22 @@ namespace SICore
                             ClientData.DialogMode = DialogModes.AnswerValidation;
                             ((PlayerAccount)ClientData.Me).IsDeciding = false;
                         }
+                        break;
+
+                    case Messages.Person:
+                        if (mparams.Length < 4)
+                        {
+                            break;
+                        }
+
+                        var isRight = mparams[1] == "+";
+                        if (!int.TryParse(mparams[2], out var playerIndex)
+                            || playerIndex < 0 || playerIndex >= ClientData.Players.Count)
+                        {
+                            break;
+                        }
+
+                        _logic.PersonAnswered(playerIndex, isRight);
                         break;
 
                     case Messages.Connected:

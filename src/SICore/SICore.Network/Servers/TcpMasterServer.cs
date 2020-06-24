@@ -115,16 +115,7 @@ namespace SICore.Network.Servers
         {
             var connection = new Connection(tcpClient, null);
             AddConnection(connection);
-
-            try
-            {
-                connection.StartRead(false);
-            }
-            catch (Exception exc)
-            {
-                RemoveConnection(connection, true);
-                throw exc;
-            }
+            connection.StartRead(false);
         }
     }
 }

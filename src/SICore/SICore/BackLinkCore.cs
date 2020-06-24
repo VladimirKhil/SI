@@ -49,8 +49,8 @@ namespace SICore.PlatformSpecific
             var userFolder = Path.Combine(LogsFolder, name);
             Directory.CreateDirectory(userFolder);
 
-            var now = DateTime.Now;
-            var protoFileName = $"{now.Year}.{now.Month}.{now.Day}_{now.Hour}.{now.Minute}.{now.Second}_log.html";
+            var now = DateTimeOffset.Now;
+            var protoFileName = $"{now.Year}.{now.Month}.{now.Day}_{now.Hour}.{now.Minute}.{now.Second}_{now.Offset.TotalMinutes}_log.html";
             logUri = Path.Combine(userFolder, protoFileName);
 
             return File.Create(logUri);

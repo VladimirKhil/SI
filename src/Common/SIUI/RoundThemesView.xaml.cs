@@ -1,12 +1,11 @@
-﻿using System;
+﻿using SIUI.ViewModel;
+using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media.Animation;
-using System.ComponentModel;
-using System.Threading;
-using SIUI.ViewModel;
-using System.Threading.Tasks;
 
 namespace SIUI
 {
@@ -39,8 +38,7 @@ namespace SIUI
             }
             else
             {
-                var tableInfo = DataContext as TableInfoViewModel;
-                if (tableInfo != null)
+                if (DataContext is TableInfoViewModel tableInfo)
                 {
                     lock (tableInfo.TStageLock)
                     {

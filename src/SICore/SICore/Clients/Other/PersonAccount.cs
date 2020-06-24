@@ -119,8 +119,6 @@ namespace SICore
 
         public bool IsShowman { get; set; }
 
-        public bool IsMe { get;set; }
-
         private bool isExtendedMode = false;
 
         public bool IsExtendedMode

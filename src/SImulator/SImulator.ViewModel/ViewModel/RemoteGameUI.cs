@@ -335,16 +335,10 @@ namespace SImulator.ViewModel
 
             GameHost.OnQuestionSelected(themeIndex, questionIndex);
         }
-        
-        public void PlaySimpleSelection(int theme, int quest)
-        {
-            TInfo.PlaySimpleSelection(theme, quest);
-        }
 
-        public void PlayComplexSelection(int theme, int quest, bool setActive)
-        {
-            TInfo.PlayComplexSelection(theme, quest, setActive);
-        }
+        public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
+
+        public void PlayComplexSelection(int theme, int quest, bool setActive) => TInfo.PlayComplexSelectionAsync(theme, quest, setActive);
 
         public void PlaySelection(int theme)
         {

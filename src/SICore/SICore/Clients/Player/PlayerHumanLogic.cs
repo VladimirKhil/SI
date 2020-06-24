@@ -36,33 +36,9 @@ namespace SICore
             _data.BackLink.OnFlash();
         }
 
-        public override void Stage()
+        public void PersonAnswered(int playerIndex, bool isRight)
         {
-            _data.PlayerDataExtensions.Apellate.CanBeExecuted = false;
-            base.Stage();
-        }
-
-        public override void Try()
-        {
-            base.Try();
-            _data.PlayerDataExtensions.Pass.CanBeExecuted = true;
-            _data.PlayerDataExtensions.Apellate.CanBeExecuted = false;
-        }
-
-        public override void EndTry(string text)
-        {
-            base.EndTry(text);
-            if (text == "A")
-            {
-                _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.NumApps > 0;
-                _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
-            }
-        }
-
-        public override void Person(int playerIndex, bool isRight)
-        {
-            base.Person(playerIndex, isRight);
-            if ((_data.Stage == GameStage.Final && _data.Players[playerIndex].Name == _actor.Client.Name || isRight))
+            if (_data.Stage == GameStage.Final && _data.Players[playerIndex].Name == _actor.Client.Name || isRight)
             {
                 _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.NumApps > 0;
                 _data.PlayerDataExtensions.Pass.CanBeExecuted = false;

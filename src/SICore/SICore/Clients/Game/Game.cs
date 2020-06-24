@@ -54,7 +54,7 @@ namespace SICore
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData);
 
-        public override void Dispose()
+        public override void Dispose(bool disposing)
         {
             if (ClientData.Share != null)
             {
@@ -62,7 +62,7 @@ namespace SICore
                 ClientData.Share.Dispose();
             }
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 
         /// <summary>
@@ -638,12 +638,10 @@ namespace SICore
 
                                 var withError = args[2] == "+";
 
-                                if (account.IsMale)
-                                    res.Append(LO[nameof(R.Disconnected_Male)] + " ");
-                                else
-                                    res.Append(LO[nameof(R.Disconnected_Female)] + " ");
+                                res.Append(LO[account.IsMale ? nameof(R.Disconnected_Male) : nameof(R.Disconnected_Female)])
+                                    .Append(' ')
+                                    .Append(account.Name);
 
-                                res.Append(account.Name);
                                 SpecialReplic(res.ToString());
 
                                 SendMessageWithArgs(Messages.Disconnected, account.Name);
@@ -699,13 +697,15 @@ namespace SICore
                                     {
                                         InformRoundThemes(message.Sender, false);
                                         if (ClientData.TabloInformStage > 1)
+                                        {
                                             InformTablo(message.Sender);
+                                        }
                                     }
                                 }
                             }
                             else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
                             {
-                                var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.Now - ClientData.TimerStartTime[2]).TotalSeconds * 10;
+                                var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
 
                                 if (leftTimeBeforeStart > 0)
                                 {
@@ -948,22 +948,7 @@ namespace SICore
                             break;
 
                         case Messages.CatCost:
-                            if (ClientData.IsWaiting && ClientData.Decision == DecisionType.CatCostSetting
-                                && (message.Sender == ClientData.Answerer.Name
-                                || ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
-                            {
-                                #region CatCost
-
-                                if (int.TryParse(args[1], out int sum)
-                                    && sum >= ClientData.CatInfo.Minimum
-                                    && sum <= ClientData.CatInfo.Maximum
-                                    && (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0)
-                                    ClientData.CurPriceRight = sum;
-
-                                _logic.Stop(StopReason.Decision);
-
-                                #endregion
-                            }
+                            OnCatCost(message, args);
                             break;
 
                         case Messages.Stake:
@@ -1094,9 +1079,9 @@ namespace SICore
                             break;
 
                         case Messages.Apellate:
-                            if (ClientData.AllowApellation)
+                            if (ClientData.AllowAppellation)
                             {
-                                #region Apellate
+                                #region Appellate
 
                                 ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
                                 ClientData.AppellationSource = message.Sender;
@@ -1135,7 +1120,7 @@ namespace SICore
                                 if (ClientData.AppelaerIndex != -1)
                                 {
                                     // Начата процедура апелляции
-                                    ClientData.AllowApellation = false;
+                                    ClientData.AllowAppellation = false;
                                     _logic.Stop(StopReason.Appellation);
                                 }
 
@@ -1144,23 +1129,7 @@ namespace SICore
                             break;
 
                         case Messages.Change:
-                            if (message.Sender == ClientData.ShowMan.Name && args.Length == 3)
-                            {
-                                #region Change
-
-                                if (!int.TryParse(args[1], out var playerIndex) || !int.TryParse(args[2], out var sum)
-                                    || playerIndex < 1 || playerIndex > ClientData.Players.Count)
-                                {
-                                    break;
-                                }
-
-                                var player = ClientData.Players[playerIndex - 1];
-                                player.Sum = sum;
-                                SpecialReplic($"{ClientData.ShowMan.Name} {LO[nameof(R.Change1)]} {player.Name}{LO[nameof(R.Change3)]} {Notion.FormatNumber(player.Sum)}");
-                                InformSums();
-
-                                #endregion
-                            }
+                            OnChanged(message, args);
                             break;
 
                         case Messages.Move:
@@ -1242,6 +1211,48 @@ namespace SICore
             }
         }
 
+        private void OnCatCost(Message message, string[] args)
+        {
+            if (!ClientData.IsWaiting || ClientData.Decision != DecisionType.CatCostSetting
+                || (ClientData.Answerer == null || message.Sender != ClientData.Answerer.Name)
+                && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+            {
+                return;
+            }
+
+            if (int.TryParse(args[1], out int sum)
+                && sum >= ClientData.CatInfo.Minimum
+                && sum <= ClientData.CatInfo.Maximum
+                && (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0)
+            {
+                ClientData.CurPriceRight = sum;
+            }
+
+            _logic.Stop(StopReason.Decision);
+        }
+
+        private void OnChanged(Message message, string[] args)
+        {
+            if (message.Sender != ClientData.ShowMan.Name || args.Length != 3)
+            {
+                return;
+            }
+
+            if (!int.TryParse(args[1], out var playerIndex) || !int.TryParse(args[2], out var sum)
+                || playerIndex < 1 || playerIndex > ClientData.Players.Count)
+            {
+                return;
+            }
+
+            var player = ClientData.Players[playerIndex - 1];
+            player.Sum = sum;
+
+            SpecialReplic($"{ClientData.ShowMan.Name} {LO[nameof(R.Change1)]} {player.Name}{LO[nameof(R.Change3)]} {Notion.FormatNumber(player.Sum)}");
+            InformSums();
+
+            _logic.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
+        }
+
         private void OnMove(Message message, string[] args)
         {
             if (message.Sender != ClientData.HostName && message.Sender != ClientData.ShowMan.Name || args.Length <= 1)
@@ -1311,7 +1322,7 @@ namespace SICore
                 }
 
                 ClientData.TInfo.Pause = true;
-                ClientData.PauseStartTime = DateTime.Now;
+                ClientData.PauseStartTime = DateTime.UtcNow;
 
                 Logic.AddHistory("Pause activated");
 
@@ -1343,16 +1354,9 @@ namespace SICore
                     return;
                 }
 
-                if (_logic.StopReason == StopReason.Pause)
-                {
-                    // Заходим в паузу
-                    _logic.AddHistory("Immediate pause resume");
-                    _logic.CancelStop();
-                }
-
                 ClientData.TInfo.Pause = false;
 
-                var pauseDuration = DateTime.Now.Subtract(ClientData.PauseStartTime);
+                var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
 
                 for (var i = 0; i < 3; i++)
                 {
@@ -1366,12 +1370,21 @@ namespace SICore
                     ClientData.IsPlayingMedia = true;
                 }
 
-                Logic.AddHistory($"Pause resumed ({string.Join("|", _logic.OldTasks.Select(t => $"{(Tasks)t.Item1}:{t.Item2}"))} {_logic.StopReason})");
-
-                _logic.ResumeExecution();
-                if (_logic.StopReason == StopReason.Decision)
+                if (_logic.StopReason == StopReason.Pause)
                 {
-                    _logic.ExecuteImmediate(); // Вдруг уже готово
+                    // Заходим в паузу
+                    _logic.AddHistory("Immediate pause resume");
+                    _logic.CancelStop();
+                }
+                else
+                {
+                    _logic.AddHistory($"Pause resumed ({_logic.PrintOldTasks()} {_logic.StopReason})");
+
+                    _logic.ResumeExecution();
+                    if (_logic.StopReason == StopReason.Decision)
+                    {
+                        _logic.ExecuteImmediate(); // Вдруг уже готово
+                    }
                 }
 
                 SpecialReplic(LO[nameof(R.GameResumed)]);
@@ -1522,20 +1535,20 @@ namespace SICore
                 return;
             }
 
-            if (ClientData.Decision == DecisionType.ApellationDecision)
+            if (ClientData.Decision == DecisionType.AppellationDecision)
             {
                 for (var i = 0; i < ClientData.Players.Count; i++)
                 {
                     if (ClientData.Players[i].Flag && ClientData.Players[i].Name == message.Sender)
                     {
-                        ClientData.ApelAnswersRightReceivedCount += args[1] == "+" ? 1 : 0;
+                        ClientData.AppellationAnswersRightReceivedCount += args[1] == "+" ? 1 : 0;
                         ClientData.Players[i].Flag = false;
-                        ClientData.ApelAnswersReceivedCount++;
+                        ClientData.AppellationAnswersReceivedCount++;
                         SendMessageWithArgs(Messages.PersonApellated, i);
                     }
                 }
 
-                if (ClientData.ApelAnswersReceivedCount == ClientData.Players.Count - 1)
+                if (ClientData.AppellationAnswersReceivedCount == ClientData.Players.Count - 1)
                 {
                     _logic.Stop(StopReason.Decision);
                 }
@@ -1577,7 +1590,7 @@ namespace SICore
                     {
                         if (ClientData.Answerer != player)
                         {
-                            player.LastBadTryTime = DateTime.Now;
+                            player.LastBadTryTime = DateTime.UtcNow;
                             SendMessageWithArgs(Messages.WrongTry, i);
                         }
 
@@ -1593,7 +1606,7 @@ namespace SICore
             {
                 var player = ClientData.Players[i];
                 if (player.Name == message.Sender && player.CanPress
-                    && DateTime.Now.Subtract(player.LastBadTryTime).TotalSeconds >= ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton)
+                    && DateTime.UtcNow.Subtract(player.LastBadTryTime).TotalSeconds >= ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton)
                 {
                     answererIndex = i;
                     break;
@@ -1613,7 +1626,7 @@ namespace SICore
             }
 
             var penalty = ClientData.Players[answererIndex].PingPenalty;
-            var penaltyStartTime = DateTime.Now;
+            var penaltyStartTime = DateTime.UtcNow;
             if (ClientData.IsDeferringAnswer)
             {
                 var futureTime = penaltyStartTime.AddMilliseconds(penalty * 100);
@@ -1794,6 +1807,18 @@ namespace SICore
             OnPersonsChanged();
         }
 
+        private void PlanExecution(Tasks task, double taskTime, int arg = 0)
+        {
+            if (ClientData.TInfo.Pause)
+            {
+                Logic.UpdatePausedTask((int)task, arg, (int)taskTime);
+            }
+            else
+            {
+                Logic.ScheduleExecution(task, taskTime, arg);
+            }
+        }
+
         private void DropPlayerIndex(int playerIndex)
         {
             if (ClientData.ChooserIndex > playerIndex)
@@ -1818,6 +1843,8 @@ namespace SICore
 
                 Logic.AddHistory($"AnswererIndex dropped");
 
+                var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
+
                 if (ClientData.Decision == DecisionType.Answering && !Logic.IsFinalRound())
                 {
                     // Отвечающего удалили. Нужно продвинуть игру дальше
@@ -1828,12 +1855,21 @@ namespace SICore
                         SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     }
 
-                    Logic.ContinueQuestion();
+                    PlanExecution(Tasks.ContinueQuestion, 1);
                 }
-                else if ((Tasks)Logic.CurrentTask == Tasks.AskRight)
+                else if (nextTask == Tasks.AskRight)
                 {
                     // Игрока удалил после того, как он дал ответ. Но ещё не обратились к ведущему
-                    Logic.ContinueQuestion();
+                    PlanExecution(Tasks.ContinueQuestion, 1);
+                }
+                else if (nextTask == Tasks.CatInfo || nextTask == Tasks.AskCatCost || nextTask == Tasks.WaitCatCost)
+                {
+                    Logic.Engine.SkipQuestion();
+                    PlanExecution(Tasks.MoveNext, 20, 1);
+                }
+                else if (nextTask == Tasks.AnnounceStake)
+                {
+                    PlanExecution(Tasks.Announce, 15);
                 }
             }
 
@@ -1853,8 +1889,24 @@ namespace SICore
             }
             else if (ClientData.StakerIndex == playerIndex)
             {
-                ClientData.StakerIndex = -1;
-                Logic.AddHistory($"StakerIndex dropped");
+                var stakersCount = ClientData.Players.Count(p => p.StakeMaking);
+                if (stakersCount == 1)
+                {
+                    for (int i = 0; i < ClientData.Players.Count; i++)
+                    {
+                        if (ClientData.Players[i].StakeMaking)
+                        {
+                            ClientData.StakerIndex = i;
+                            Logic.AddHistory($"StakerIndex set to {i}");
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    ClientData.StakerIndex = -1;
+                    Logic.AddHistory("StakerIndex dropped");
+                }
             }
 
             var currentOrder = ClientData.Order;
@@ -1897,9 +1949,9 @@ namespace SICore
                 {
                     Logic.AddHistory($"Last staker dropped");
                     Logic.Engine.SkipQuestion();
-                    Logic.ScheduleExecution(Tasks.MoveNext, 20, 1);
+                    PlanExecution(Tasks.MoveNext, 20, 1);
                 }
-                else if (ClientData.OrderIndex != -1 && ClientData.Order[ClientData.OrderIndex] == -1)
+                else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
                 {
                     Logic.AddHistory($"Current staker dropped");
                     if (ClientData.Decision == DecisionType.AuctionStakeMaking)
@@ -1912,7 +1964,7 @@ namespace SICore
                             SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                         }
 
-                        Logic.ScheduleExecution(Tasks.AskStake, 20);
+                        PlanExecution(Tasks.AskStake, 20);
                     }
                 }
             }
@@ -1929,7 +1981,7 @@ namespace SICore
                     }
                     else
                     {
-                        Logic.ScheduleExecution(Tasks.Winner, 10); // Делать нечего. Завершаем игру
+                        PlanExecution(Tasks.Winner, 10); // Делать нечего. Завершаем игру
                     }
                 }
             }
@@ -1964,7 +2016,7 @@ namespace SICore
                     // Спросим заново
                     SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     _logic.StopWaiting();
-                    _logic.ScheduleExecution(Tasks.AskFirst, 20);
+                    PlanExecution(Tasks.AskFirst, 20);
                     break;
             }
         }
@@ -2581,9 +2633,11 @@ namespace SICore
                 case MessageTypes.System:
                     Print(ReplicManager.System(text));
                     break;
+
                 case MessageTypes.Special:
                     Print(ReplicManager.Special(text));
                     break;
+
                 case MessageTypes.Replic:
                     if (!personRole.HasValue)
                     {
@@ -2594,6 +2648,7 @@ namespace SICore
                     {
                         case GameRole.Viewer: // Не используется
                             break;
+
                         case GameRole.Player:
                             if (!personIndex.HasValue)
                             {
@@ -2602,12 +2657,20 @@ namespace SICore
 
                             Print(Player(personIndex.Value) + ReplicManager.Replic(text));
                             break;
+
                         case GameRole.Showman:
                             Print(Showman() + ReplicManager.Replic(text));
                             break;
                     }
+
                     break;
             }
+
+            var person = messageType == MessageTypes.System ? ReplicCodes.System.ToString()
+                : messageType == MessageTypes.Special ? ReplicCodes.Special.ToString() :
+                (personRole == GameRole.Player ? ReplicCodes.Player + personIndex.Value.ToString() : ReplicCodes.Showman.ToString());
+
+            SendMessageWithArgs(Messages.Replic, person, text);
         }
 
         public void SendMessage(string text, string receiver = NetworkConstants.Everybody) => _client.SendMessage(text, true, receiver);

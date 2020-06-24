@@ -740,7 +740,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Протокол https не поддерживается!.
+        ///   Ищет локализованную строку, похожую на Ошибка загрузки медиа {0}. Протокол https не поддерживается!.
         /// </summary>
         public static string HttpsProtocolIsNotSupported {
             get {
@@ -880,6 +880,33 @@ namespace SICore.Properties {
         public static string ManuallyPlayedQuestion {
             get {
                 return ResourceManager.GetString("ManuallyPlayedQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Медиафайл не поддерживается.
+        /// </summary>
+        public static string MediaFileNotSupported {
+            get {
+                return ResourceManager.GetString("MediaFileNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка загрузки медиа.
+        /// </summary>
+        public static string MediaLoadError {
+            get {
+                return ResourceManager.GetString("MediaLoadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} не найден в пакете!.
+        /// </summary>
+        public static string MediaNotFound {
+            get {
+                return ResourceManager.GetString("MediaNotFound", resourceCulture);
             }
         }
         
@@ -1208,7 +1235,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уважаемые игроки, прошу вас определить, правилен ли ответ {1} на прозвучавший вопрос.
+        ///   Ищет локализованную строку, похожую на Уважаемые игроки, прошу вас определить, правилен ли ответ {0} на прозвучавший вопрос.
         /// </summary>
         public static string PleaseCheckApellation {
             get {

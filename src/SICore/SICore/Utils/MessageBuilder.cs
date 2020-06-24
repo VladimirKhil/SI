@@ -28,6 +28,12 @@ namespace SICore.Utils
             return this;
         }
 
+        public MessageBuilder AddRange(IEnumerable<object> args)
+        {
+            _messageArgs.AddRange(args);
+            return this;
+        }
+
         public string Build() => string.Join(Message.ArgsSeparator, _messageArgs);
     }
 }

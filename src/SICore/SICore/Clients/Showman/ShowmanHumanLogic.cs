@@ -1,5 +1,4 @@
-﻿using SICore.Properties;
-using SIUI.ViewModel;
+﻿using SIUI.ViewModel;
 using R = SICore.Properties.Resources;
 
 namespace SICore

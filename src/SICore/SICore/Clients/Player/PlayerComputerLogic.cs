@@ -100,32 +100,32 @@ namespace SICore
             {
                 var playerData = _data.PlayerDataExtensions;
 
-                if (playerData._realSpeed > 0)
+                if (playerData.RealSpeed > 0)
                 {
-                    playerData._realSpeed--;
+                    playerData.RealSpeed--;
                     return;
                 }
 
-                var r = Data.Rand.Next(playerData._difficulty) + 1;
+                var r = Data.Rand.Next(playerData.Difficulty) + 1;
                 // Жмёт на кнопку
-                if (r < playerData._realBrave)
+                if (r < playerData.RealBrave)
                 {
                     // Знает
                     if (r < _account.F)
                     {
                         playerData.KnowsAnswer = true;
-                        playerData._isSure = true;
+                        playerData.IsSure = true;
 
-                        if (playerData._longThink)
+                        if (playerData.LongThink)
                         {
                             ScheduleExecution(PlayerTasks.Answer, 1);
                             _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
                         }
                     }
                     // Угадывает
-                    else if (!playerData._longThink)
+                    else if (!playerData.LongThink)
                     {
-                        playerData._isSure = false;
+                        playerData.IsSure = false;
                         var s = Data.Rand.Next(100);
 
                         if (s < (int)(Math.Exp(1 - ((double)r) / _account.F) * 100))
@@ -133,18 +133,18 @@ namespace SICore
                         else
                             playerData.KnowsAnswer = false;
                     }
-                    else if (playerData._bestBrave > r)
-                        playerData._bestBrave = r;
+                    else if (playerData.BestBrave > r)
+                        playerData.BestBrave = r;
 
-                    if (!playerData._longThink)
-                        playerData._readyToPress = true;
+                    if (!playerData.LongThink)
+                        playerData.ReadyToPress = true;
                 }
 
-                if (playerData._longThink && ((double)playerData._bestBrave / _account.F <= 1.3 || GetTimePercentage(2) > 95))
+                if (playerData.LongThink && ((double)playerData.BestBrave / _account.F <= 1.3 || GetTimePercentage(2) > 95))
                 {
-                    playerData._isSure = false;
+                    playerData.IsSure = false;
                     var ran = Data.Rand.Next(100);
-                    if (ran < (int)(Math.Exp(1 - ((double)playerData._bestBrave) / _account.F) * 100))
+                    if (ran < (int)(Math.Exp(1 - ((double)playerData.BestBrave) / _account.F) * 100))
                         playerData.KnowsAnswer = true;
                     else
                         playerData.KnowsAnswer = false;
@@ -152,7 +152,7 @@ namespace SICore
                     ScheduleExecution(PlayerTasks.Answer, 1);
                     _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
-                else if (playerData.MyTry && playerData._readyToPress && !_data.TInfo.Pause)
+                else if (playerData.MyTry && playerData.ReadyToPress && !_data.TInfo.Pause)
                 {
                     var delay = Data.Rand.Next(4);
                     await Task.Delay(delay * 100); // Дадим возможность обжать
@@ -172,7 +172,7 @@ namespace SICore
 
             _account = account;
             _data.Picture = account.Picture;
-            _data.PlayerDataExtensions._realBrave = _account.B0;
+            _data.PlayerDataExtensions.RealBrave = _account.B0;
         }
 
         private void AnswerRight() => _actor.SendMessage(Messages.IsRight, "+");
@@ -341,7 +341,7 @@ namespace SICore
                     ans.Append("WRONG").Append(Message.ArgsSeparatorChar);
 
                 if (_data.Stage == GameStage.Round)
-                    if (_data.PlayerDataExtensions._isSure)
+                    if (_data.PlayerDataExtensions.IsSure)
                         ans.Append(string.Format(ResourceHelper.GetString(_actor.LO[nameof(R.Sure)]), _data.Me.IsMale ? "" : "a"));
                     else
                         ans.Append(ResourceHelper.GetString(_actor.LO[nameof(R.NotSure)]));
@@ -857,25 +857,25 @@ namespace SICore
         /// <summary>
         /// Реакция на изменение чьего-то ответа / неответа
         /// </summary>
-        public override void Person(int playerIndex, bool isRight)
+        public void PersonAnswered(int playerIndex, bool isRight)
         {
-            base.Person(playerIndex, isRight);
-
             if (ClientData.Me == null)
+            {
                 return;
+            }
 
             var playerData = _data.PlayerDataExtensions;
 
             if (_actor.MySum < -2000) // Отрицательная сумма -> смелость падает
-                if (playerData._realBrave >= _account.F + 80)
-                    playerData._realBrave -= 80;
+                if (playerData.RealBrave >= _account.F + 80)
+                    playerData.RealBrave -= 80;
                 else
-                    playerData._realBrave = _account.F;
+                    playerData.RealBrave = _account.F;
             else if (_actor.MySum < 0)
-                if (playerData._realBrave >= _account.F + 10)
-                    playerData._realBrave -= 10;
+                if (playerData.RealBrave >= _account.F + 10)
+                    playerData.RealBrave -= 10;
                 else
-                    playerData._realBrave = _account.F;
+                    playerData.RealBrave = _account.F;
 
             if (isRight)
             {
@@ -889,17 +889,17 @@ namespace SICore
                 switch (_account.Style)
                 {
                     case PlayerStyle.Agressive:
-                        playerData._realBrave += 7;
+                        playerData.RealBrave += 7;
                         playerData.DeltaBrave = 3;
                         break;
 
                     case PlayerStyle.Normal:
-                        playerData._realBrave += 5;
+                        playerData.RealBrave += 5;
                         playerData.DeltaBrave = 2;
                         break;
 
                     default:
-                        playerData._realBrave += 3;
+                        playerData.RealBrave += 3;
                         playerData.DeltaBrave = 1;
                         break;
                 }
@@ -909,31 +909,31 @@ namespace SICore
                 switch (_account.Style)
                 {
                     case PlayerStyle.Agressive:
-                        playerData._realBrave -= 60;
+                        playerData.RealBrave -= 60;
                         playerData.DeltaBrave = 3;
                         break;
 
                     case PlayerStyle.Normal:
-                        playerData._realBrave -= 80;
+                        playerData.RealBrave -= 80;
                         playerData.DeltaBrave = 2;
                         break;
 
                     default:
-                        playerData._realBrave -= 100;
+                        playerData.RealBrave -= 100;
                         playerData.DeltaBrave = 1;
                         break;
                 }
             }
             else if (isRight) // Кто-то другой ответил правильно
             {
-                playerData._realBrave += playerData.DeltaBrave;
+                playerData.RealBrave += playerData.DeltaBrave;
                 if (playerData.DeltaBrave < 5)
                     playerData.DeltaBrave++;
             }
 
             // Критическая ситуация
             if (IsCritical())
-                playerData._realBrave += 10;
+                playerData.RealBrave += 10;
         }
 
         /// <summary>
@@ -1518,31 +1518,31 @@ namespace SICore
                 playerData.IsQuestionInProgress = false;
 
                 playerData.CanAnswer = false;
-                playerData._difficulty = 0;
-                playerData._longThink = true;
+                playerData.Difficulty = 0;
+                playerData.LongThink = true;
                 if (_data.Stage == GameStage.Round)
                 {
-                    if (_data._qtype == QuestionTypes.Simple)
-                        playerData._longThink = false;
+                    if (_data.QuestionType == QuestionTypes.Simple)
+                        playerData.LongThink = false;
 
                     if (playerData.MyTry)
-                        playerData._difficulty = 6500;
+                        playerData.Difficulty = 6500;
                     else
-                        playerData._difficulty = 13000;
+                        playerData.Difficulty = 13000;
 
-                    playerData._difficulty *= (_data.QuestionIndex + 1);
-                    if (_data._qtype == QuestionTypes.Auction || _data._qtype == QuestionTypes.Cat || _data._qtype == QuestionTypes.BagCat || _data._qtype == QuestionTypes.Sponsored)
-                        playerData._difficulty *= 2;
+                    playerData.Difficulty *= (_data.QuestionIndex + 1);
+                    if (_data.QuestionType == QuestionTypes.Auction || _data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat || _data.QuestionType == QuestionTypes.Sponsored)
+                        playerData.Difficulty *= 2;
                 }
                 else
-                    playerData._difficulty = 50000;
+                    playerData.Difficulty = 50000;
 
                 _thinkingTimer.Change(100, 100);
-                playerData._realSpeed = (_account.S + 1) * 10;
-                playerData._bestBrave = 10000;
+                playerData.RealSpeed = (_account.S + 1) * 10;
+                playerData.BestBrave = 10000;
                 playerData.KnowsAnswer = false;
-                playerData._isSure = false;
-                playerData._readyToPress = false;
+                playerData.IsSure = false;
+                playerData.ReadyToPress = false;
             }
         }
 
@@ -1559,7 +1559,7 @@ namespace SICore
         /// </summary>
         public void Answer()
         {
-            if (_data._qtype == QuestionTypes.Simple)
+            if (_data.QuestionType == QuestionTypes.Simple)
             {
                 ScheduleExecution(PlayerTasks.Answer, 10 + Data.Rand.Next(10));
             }
@@ -1627,7 +1627,7 @@ namespace SICore
 
             if (_account != null)
             {
-                _data.PlayerDataExtensions._realBrave = _account.B0;
+                _data.PlayerDataExtensions.RealBrave = _account.B0;
             }
 
             ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);

@@ -32,7 +32,9 @@ namespace SIUI.Behaviors
         public static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is TextBlock textBlock))
+            {
                 return;
+            }
 
             if ((bool)e.NewValue)
             {
@@ -79,7 +81,9 @@ namespace SIUI.Behaviors
             var textBlock = (TextBlock)sender;
 
             if (!(VisualTreeHelper.GetParent(textBlock) is FrameworkElement parent))
+            {
                 return;
+            }
 
             SetParent(textBlock, parent);
 
@@ -152,22 +156,30 @@ namespace SIUI.Behaviors
         {
             var textBlock = sender as TextBlock;
             if (!(VisualTreeHelper.GetParent(textBlock) is FrameworkElement parent))
+            {
                 return;
+            }
 
             var width = parent.ActualWidth - textBlock.Margin.Left - textBlock.Margin.Right;
             var height = parent.ActualHeight - textBlock.Margin.Top - textBlock.Margin.Bottom;
 
             if (textBlock.Text.Length == 0 || width < double.Epsilon || height < double.Epsilon)
+            {
                 return;
+            }
 
             if (textBlock.DataContext != null && textBlock.DataContext.ToString() == "{DisconnectedItem}")
+            {
                 return;
+            }
 
             var ft = new FormattedText(textBlock.Text, CultureInfo.CurrentUICulture, textBlock.FlowDirection, new Typeface(textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch), 1.0, textBlock.Foreground) { TextAlignment = textBlock.TextAlignment, Trimming = textBlock.TextTrimming };
 
             var lineHeight = GetInterlinyage(textBlock);
             if (lineHeight < textBlock.FontFamily.LineSpacing)
+            {
                 lineHeight = textBlock.FontFamily.LineSpacing;
+            }
 
             var coef = lineHeight / textBlock.FontFamily.LineSpacing;
 
@@ -181,7 +193,7 @@ namespace SIUI.Behaviors
                 // Предскажем количество строк текста, исходя из полученных параметров
 
                 // Количество блоков, получаемое при "разрезании" всего текста (с размером шрифта 1) на куски, равные по длина доступной ширине текстового блока
-                var numOfLines = Math.Max(1.0, Math.Floor(ft.Height / textBlock.FontFamily.LineSpacing));
+                var numOfLines = Math.Max(1.0, Math.Round(ft.Height / textBlock.FontFamily.LineSpacing));
                 var fullTextLength = ft.WidthIncludingTrailingWhitespace * numOfLines;
                 var numberOfLinesPredictedByWidth = fullTextLength / width;
 

@@ -18,7 +18,7 @@ namespace SICore
         /// <summary>
         /// Сам клиент
         /// </summary>
-        protected A _actor;
+        protected readonly A _actor;
 
         /// <summary>
         /// Данные
@@ -36,6 +36,8 @@ namespace SICore
         private DateTime _finishingTime;
 
         internal int CurrentTask { get; private set; } = -1;
+
+        internal int NextTask => _oldTasks.Any() ? _oldTasks.Peek().Item1 : -1;
 
         internal IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 
@@ -88,7 +90,7 @@ namespace SICore
 
         protected void PauseExecution(int task, int taskArgument)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             _oldTasks.Push(Tuple.Create(task, taskArgument, (int)((_finishingTime - now).TotalMilliseconds / 100)));
             CurrentTask = -1;
         }
@@ -101,6 +103,18 @@ namespace SICore
                 ScheduleExecution(oldTask.Item1, oldTask.Item2, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3));
             }
         }
+
+        protected internal void UpdatePausedTask(int task, int taskArgument, int taskTime)
+        {
+            if (_oldTasks.Any())
+            {
+                _oldTasks.Pop();
+            }
+
+            _oldTasks.Push(Tuple.Create(task, taskArgument, taskTime));
+        }
+
+        protected void ClearOldTasks() => _oldTasks.Clear();
 
         /// <summary>
         /// Выполнить задачу
@@ -175,10 +189,10 @@ namespace SICore
         {
             lock (_taskTimerLock)
             {
-                if (_taskTimer != null && taskTime > 0)
+                if (_taskTimer != null && taskTime > 0 && taskTime < 10 * 60 * 10) // 10 min
                 {
                     _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-                    _finishingTime = DateTime.Now + TimeSpan.FromMilliseconds(taskTime * 100);
+                    _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
                 }
             }
         }

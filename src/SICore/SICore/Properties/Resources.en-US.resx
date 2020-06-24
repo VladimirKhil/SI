@@ -442,7 +442,7 @@
     <value>So, we are taking the theme; We are taking the theme</value>
   </data>
   <data name="PleaseCheckApellation" xml:space="preserve">
-    <value>Dear players, please, check whether the answer of {1} was correct</value>
+    <value>Dear players, please, check whether the answer of {0} was correct</value>
   </data>
   <data name="PleaseChooseCatCost" xml:space="preserve">
     <value>choose the cost of the question, please</value>
@@ -661,7 +661,7 @@
     <value>Error while writing log to disc</value>
   </data>
   <data name="HttpsProtocolIsNotSupported" xml:space="preserve">
-    <value>Https protocol is not supported!</value>
+    <value>Media {0} load error. Https protocol is not supported!</value>
   </data>
   <data name="Label_Auction" xml:space="preserve">
     <value>QUESTION WITH STAKE</value>
@@ -731,5 +731,14 @@
   </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Wrong answers</value>
+  </data>
+  <data name="MediaNotFound" xml:space="preserve">
+    <value>File {0} not found in game package!</value>
+  </data>
+  <data name="MediaFileNotSupported" xml:space="preserve">
+    <value>Media file is not supported</value>
+  </data>
+  <data name="MediaLoadError" xml:space="preserve">
+    <value>Media load error</value>
   </data>
 </root>

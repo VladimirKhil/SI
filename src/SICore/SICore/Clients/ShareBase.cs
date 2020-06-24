@@ -74,7 +74,5 @@ namespace SICore
         {
             
         }
-
-        public abstract string CreatePublicURI(string uri, string mediaCategory);
     }
 }

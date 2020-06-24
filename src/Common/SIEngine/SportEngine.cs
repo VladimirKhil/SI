@@ -90,27 +90,8 @@ namespace SIEngine
                     break;
 
                 case GameStage.RightAnswer:
-                    #region RightAnswer
-                    OnRightAnswer();
-
-                    if (!_useAnswerMarker)
-                    {
-                        OnSimpleAnswer(_activeQuestion.Right.Count > 0 ? _activeQuestion.Right[0] : " ");
-                    }
-                    else // Ответ находится в тексте вопроса
-                    {
-                        var mode = PlayQuestionAtom();
-                        if (mode == QuestionPlayMode.InProcess)
-                        {
-                            Stage = GameStage.RightAnswerProceed;
-                            break;
-                        }
-                    }
-
-                    Stage = GameStage.EndQuestion;
-                    AutoNext(3000);
+                    ProcessRightAnswer();
                     break;
-                    #endregion
 
                 case GameStage.RightAnswerProceed:
                     #region RightAnswerProceed

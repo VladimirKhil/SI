@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -19,6 +21,8 @@ namespace SICore.Connections
         private readonly byte[] _buffer = new byte[5000];
         private readonly List<byte> _bufferCache = new List<byte>();
         private int _messageSize = -1;
+
+        protected int ProtocolVersion { get; set; } = 1;
         
         protected readonly IConnectionLogger _logger;
 
@@ -55,7 +59,19 @@ namespace SICore.Connections
             {
                 if (waitForUpgrade)
                 {
-                    await WaitForConnectionUpgrade(_tcpClient);
+                    await WaitForConnectionUpgradeAsync(_tcpClient);
+                }
+
+                if (ProtocolVersion == 2)
+                {
+                    var pipe = new Pipe();
+                    Task writing = FillPipeAsync(pipe.Writer);
+                    Task reading = ReadPipeAsync(pipe.Reader);
+
+                    await Task.WhenAll(reading, writing);
+                    // Нормальное закрытие соединения
+                    CloseCore(true, false);
+                    return;
                 }
 
                 var ns = _tcpClient.GetStream();
@@ -108,7 +124,73 @@ namespace SICore.Connections
             }
         }
 
-        private async Task WaitForConnectionUpgrade(TcpClient tcpClient)
+        private async Task FillPipeAsync(PipeWriter writer)
+        {
+            var ns = _tcpClient.GetStream();
+            ns.ReadTimeout = 20 * 1000;
+
+            while (true)
+            {
+                //var memory = writer.GetMemory(_buffer.Length);
+                try
+                {
+                    var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length);
+                    if (bytesRead < 1)
+                    {
+                        break;
+                    }
+
+                    await writer.WriteAsync(new ReadOnlyMemory<byte>(_buffer, 0, bytesRead));
+                    //writer.Advance(bytesRead);
+                }
+                catch (Exception ex)
+                {
+                    OnError(ex, true);
+                    break;
+                }
+
+                var result = await writer.FlushAsync();
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+            }
+
+            writer.Complete();
+        }
+
+        private async Task ReadPipeAsync(PipeReader reader)
+        {
+            while (true)
+            {
+                var result = await reader.ReadAsync();
+
+                var buffer = result.Buffer;
+                SequencePosition? position;
+                do
+                {
+                    position = buffer.PositionOf((byte)0);
+
+                    if (position != null)
+                    {
+                        OnMessageReceived(MessageSerializer.DeserializeMessage(buffer.Slice(0, position.Value)));
+                        buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
+                    }
+                } while (position != null);
+
+                reader.AdvanceTo(buffer.Start, buffer.End);
+
+                if (result.IsCompleted)
+                {
+                    break;
+                }
+            }
+
+            reader.Complete();
+        }
+
+        private async Task WaitForConnectionUpgradeAsync(TcpClient tcpClient)
         {
             var buffer = new byte[5000];
             var networkStream = tcpClient.GetStream();
@@ -146,9 +228,21 @@ namespace SICore.Connections
                 connectionIdHeader = $"\nConnectionId: {connectionId}";
             }
 
+            if (headers.TryGetValue("Upgrade", out var protocol))
+            {
+                if (protocol == "sigame2")
+                {
+                    ProtocolVersion = 2;
+                }
+            }
+            else
+            {
+                protocol = "sigame";
+            }
+
             ConnectionId = connectionId;
 
-            var response = $"HTTP/1.1 101 Switching Protocols\nUpgrade: sigame\nConnection: Upgrade{connectionIdHeader}\n\n";
+            var response = $"HTTP/1.1 101 Switching Protocols\nUpgrade: {protocol}\nConnection: Upgrade{connectionIdHeader}\n\n";
             var bytes = Encoding.UTF8.GetBytes(response);
             await networkStream.WriteAsync(bytes, 0, bytes.Length);
         }

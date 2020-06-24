@@ -57,11 +57,11 @@ namespace SICore
             }
         }
 
-        internal int _difficulty;
+        internal int Difficulty { get; set; }
         /// <summary>
         /// Можно ли думать над вопросом до истечения времени
         /// </summary>
-        internal bool _longThink;
+        internal bool LongThink { get; set; }
         internal bool CanAnswer { get; set; }
 
         /// <summary>
@@ -72,26 +72,26 @@ namespace SICore
         /// <summary>
         /// Уверен ли в ответе
         /// </summary>
-        internal bool _isSure = false;
+        internal bool IsSure { get; set; } = false;
 
         /// <summary>
         /// Готов ли жать на кнопку
         /// </summary>
-        internal bool _readyToPress = false;
+        internal bool ReadyToPress { get; set; } = false;
 
         /// <summary>
         /// Текущая величина смелости
         /// </summary>
-        internal int _realBrave = 0;
+        internal int RealBrave { get; set; } = 0;
 
-        internal int DeltaBrave = 0;
+        internal int DeltaBrave { get; set; } = 0;
 
         /// <summary>
         /// Текущая скорость реакции
         /// </summary>
-        internal int _realSpeed = 0;
+        internal int RealSpeed { get; set; } = 0;
 
-        internal int _bestBrave = 0;
+        internal int BestBrave { get; set; } = 0;
 
         /// <summary>
         /// Продолжается ли чтение вопроса

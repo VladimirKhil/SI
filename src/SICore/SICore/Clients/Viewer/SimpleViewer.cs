@@ -1,6 +1,5 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Network.Clients;
-using SICore.Network.Contracts;
 using SIData;
 using System;
 

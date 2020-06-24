@@ -88,7 +88,7 @@ namespace Notions
             int c = lstr.Length;
             if (c == 0)
                 return string.Empty;
-            var random = new Random(DateTime.Now.Millisecond);
+            var random = new Random(DateTime.UtcNow.Millisecond);
             return lstr[random.Next(c)];
         }
 

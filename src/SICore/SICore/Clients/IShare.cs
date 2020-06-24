@@ -1,7 +1,6 @@
 ﻿using SIPackages.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace SICore
 {
@@ -17,6 +16,5 @@ namespace SICore
         bool ContainsURI(string file);
 
         void StopURI(IEnumerable<string> toRemove);
-        string CreatePublicURI(string uri, string mediaCategory);
     }
 }

@@ -40,10 +40,5 @@ namespace SICore
 
             return response();
         }
-
-        public override string CreatePublicURI(string uri, string mediaCategory)
-        {
-            return $"{_rootPath}/{mediaCategory}/{uri}";
-        }
     }
 }

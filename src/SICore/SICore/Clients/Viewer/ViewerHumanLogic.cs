@@ -1,4 +1,5 @@
-﻿using SICore.Connections;
+﻿using SICore.Clients.Viewer;
+using SICore.Connections;
 using SICore.Network;
 using SIData;
 using SIPackages.Core;
@@ -36,8 +37,20 @@ namespace SICore
             TInfo.MediaLoadError += TInfo_MediaLoadError;
         }
 
-        private void TInfo_MediaLoadError(Exception exc) =>
-            _data.OnAddString(null, $"MEDIA {TInfo.MediaSource?.Uri} LOAD ERROR: {exc}{Environment.NewLine}", LogMode.Log);
+        private void TInfo_MediaLoadError(Exception exc)
+        {
+            string error;
+            if (exc is NotSupportedException)
+            {
+                error = $"{_actor.LO[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
+            }
+            else
+            {
+                error = exc.ToString();
+            }
+
+            _data.OnAddString(null, $"{_actor.LO[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
+        }
 
         private void TInfo_Ready(object sender, EventArgs e)
         {
@@ -266,7 +279,7 @@ namespace SICore
             }
         }
 
-        virtual public void Stage()
+        public void Stage()
         {
             switch (_data.Stage)
             {
@@ -299,13 +312,13 @@ namespace SICore
                         }
                     }
 
-                    Print(ReplicManager.Special(_actor.LO[nameof(R.GameStarted)] + " " + DateTime.Now.ToString()));
+                    Print(ReplicManager.Special($"{_actor.LO[nameof(R.GameStarted)]} {DateTime.Now}"));
                     break;
 
                 case GameStage.Round:
                 case GameStage.Final:
                     TInfo.TStage = TableStage.Round;
-                    _data.Sound = "beginround";
+                    _data.Sound = Sounds.RoundBegin;
 
                     foreach (var item in _data.Players)
                     {
@@ -363,10 +376,12 @@ namespace SICore
                 if (_data.Stage == GameStage.Round)
                 {
                     TInfo.TStage = TableStage.RoundThemes;
-                    _data.BackLink.PlaySound("cathegories");
+                    _data.BackLink.PlaySound(Sounds.RoundThemes);
                 }
                 else
+                {
                     TInfo.TStage = TableStage.Final;
+                }
             }
         }
 
@@ -460,9 +475,9 @@ namespace SICore
 
         virtual public void SetAtom(string[] mparams)
         {
-            _data._atomType = mparams[1];
+            _data.AtomType = mparams[1];
 
-            var isPartial = _data._atomType == Constants.PartialText;
+            var isPartial = _data.AtomType == Constants.PartialText;
 
             if (isPartial)
             {
@@ -483,7 +498,7 @@ namespace SICore
             TInfo.TStage = TableStage.Question;
             TInfo.IsMediaStopped = false;
 
-            switch (_data._atomType)
+            switch (_data.AtomType)
             {
                 case AtomTypes.Text:
                 case Constants.PartialText:
@@ -558,11 +573,16 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        Print(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                        var warningMessage = string.Format(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
+
+                        TInfo.QuestionContentType = QuestionContentType.Text;
+                        TInfo.Sound = false;
+                        TInfo.Text = warningMessage;
+                        _data.OnAddString(null, warningMessage, LogMode.Protocol);
                         return;
                     }
 
-                    if (_data._atomType == AtomTypes.Image)
+                    if (_data.AtomType == AtomTypes.Image)
                     {
                         TInfo.MediaSource = new MediaSource(uri);
                         TInfo.QuestionContentType = QuestionContentType.Image;
@@ -570,7 +590,7 @@ namespace SICore
                     }
                     else
                     {
-                        if (_data._atomType == AtomTypes.Audio)
+                        if (_data.AtomType == AtomTypes.Audio)
                         {
                             TInfo.SoundSource = new MediaSource(mediaUri.ToString());
                             TInfo.QuestionContentType = QuestionContentType.None;
@@ -656,7 +676,7 @@ namespace SICore
             }
         }
 
-        virtual public void Try()
+        public void Try()
         {
             TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
         }
@@ -668,14 +688,14 @@ namespace SICore
         virtual public void EndTry(string text)
         {
             TInfo.QuestionStyle = QuestionStyle.Normal;
-            if (_data._atomType == AtomTypes.Audio || _data._atomType == AtomTypes.Video)
+            if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.Video)
             {
                 TInfo.IsMediaStopped = true;
             }
 
             if (!int.TryParse(text, out int number))
             {
-                _data.Sound = "noanswer";
+                _data.Sound = Sounds.QuestionNoAnswers;
                 return;
             }
 
@@ -697,15 +717,12 @@ namespace SICore
         {
             if (isRight)
             {
-                if (_data.CurPriceRight >= 2000)
-                    _data.Sound = Notions.Notion.RandomString("APPLAUSE", "RINGIN");
-                else
-                    _data.Sound = Notions.Notion.RandomString("CLAP", "TADA");
-
+                _data.Sound = _data.CurPriceRight >= 2000 ? Sounds.ApplauseBig : Sounds.ApplauseSmall;
                 _data.Players[playerIndex].State = PlayerState.Right;
             }
             else
             {
+                _data.Sound = Sounds.AnswerWrong;
                 _data.Players[playerIndex].Pass = true;
                 _data.Players[playerIndex].State = PlayerState.Wrong;
             }
@@ -737,7 +754,7 @@ namespace SICore
 
         public void QType()
         {
-            if (_data._qtype == QuestionTypes.Auction)
+            if (_data.QuestionType == QuestionTypes.Auction)
             {
                 TInfo.Text = _actor.LO[nameof(R.Label_Auction)];
 
@@ -750,9 +767,9 @@ namespace SICore
                 }
 
                 TInfo.TStage = TableStage.Special;
-                _data.Sound = "auction";
+                _data.Sound = Sounds.QuestionStake;
             }
-            else if (_data._qtype == QuestionTypes.Cat || _data._qtype == QuestionTypes.BagCat)
+            else if (_data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat)
             {
                 TInfo.Text = _actor.LO[nameof(R.Label_CatInBag)];
                 lock (TInfo.RoundInfoLock)
@@ -764,9 +781,9 @@ namespace SICore
                 }
 
                 TInfo.TStage = TableStage.Special;
-                _data.Sound = "catinbag";
+                _data.Sound = Sounds.QuestionSecret;
             }
-            else if (_data._qtype == QuestionTypes.Sponsored)
+            else if (_data.QuestionType == QuestionTypes.Sponsored)
             {
                 TInfo.Text = _actor.LO[nameof(R.Label_Sponsored)];
                 lock (TInfo.RoundInfoLock)
@@ -778,9 +795,9 @@ namespace SICore
                 }
 
                 TInfo.TStage = TableStage.Special;
-                _data.Sound = "norisk";
+                _data.Sound = Sounds.QuestionNoRisk;
             }
-            else if (_data._qtype != QuestionTypes.Simple)
+            else if (_data.QuestionType != QuestionTypes.Simple)
             {
                 foreach (var item in TInfo.RoundInfo)
                 {
@@ -801,7 +818,7 @@ namespace SICore
         virtual public void Out(int themeIndex)
         {
             TInfo.PlaySelection(themeIndex);
-            _data.Sound = "shrink";
+            _data.Sound = Sounds.FinalDelete;
         }
 
         public void Winner()
@@ -818,7 +835,9 @@ namespace SICore
         private void WinnerUI()
         {
             if (_data.Winner > -1)
-                _data.Sound = Notions.Notion.RandomString("ESC_2", "VIPER2");
+            {
+                _data.Sound = Sounds.ApplauseFinal;
+            }
 
             // Лучшие игроки
             _data.BackLink.SaveBestPlayers(_data.Players);
@@ -826,7 +845,7 @@ namespace SICore
 
         public void TimeOut()
         {
-            _data.Sound = "timeout";
+            _data.Sound = Sounds.RoundTimeout;
         }
 
         protected override void Dispose(bool disposing)
@@ -851,7 +870,7 @@ namespace SICore
 
         public void FinalThink()
         {
-            _data.BackLink.PlaySound("finalthink");
+            _data.BackLink.PlaySound(Sounds.FinalThink);
         }
 
         public void UpdatePicture(Account account, string path)

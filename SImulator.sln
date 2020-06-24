@@ -3,38 +3,38 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29201.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SImulator", "SImulator\SImulator.csproj", "{E7037610-B1C0-4D3B-8FF7-A2BC7E8B1BFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SImulator", "src\SImulator\SImulator\SImulator.csproj", "{E7037610-B1C0-4D3B-8FF7-A2BC7E8B1BFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{069B16F1-8F70-4CFC-8651-E4763D225B60}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{117739F8-28CD-4CC4-950C-E3513265A87D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel", "SImulator.ViewModel\SImulator.ViewModel.csproj", "{206D6F95-54D5-4029-8B7F-9A7841E2CE02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel", "src\SImulator\SImulator.ViewModel\SImulator.ViewModel.csproj", "{206D6F95-54D5-4029-8B7F-9A7841E2CE02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages", "..\Common\SIPackages\SIPackages.csproj", "{90C6B7EB-DF4B-487A-A760-0D45AA4CACAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages", "src\Common\SIPackages\SIPackages.csproj", "{90C6B7EB-DF4B-487A-A760-0D45AA4CACAF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIEngine", "..\Common\SIEngine\SIEngine.csproj", "{125010AD-BE93-4514-9EC3-3E97966FFC64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIEngine", "src\Common\SIEngine\SIEngine.csproj", "{125010AD-BE93-4514-9EC3-3E97966FFC64}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.Model", "..\Common\SIUI.Model\SIUI.Model.csproj", "{64F97376-E3D1-4C19-97C8-0F3489B5BBE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.Model", "src\Common\SIUI.Model\SIUI.Model.csproj", "{64F97376-E3D1-4C19-97C8-0F3489B5BBE9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.ViewModel", "..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj", "{6A834083-BE81-4BEA-996B-1287154747A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.ViewModel", "src\Common\SIUI.ViewModel\SIUI.ViewModel.csproj", "{6A834083-BE81-4BEA-996B-1287154747A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIUI", "..\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIUI", "src\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "..\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "src\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "..\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F7CE4B38-4286-47BA-B5BA-0E4FA77E594E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel.Tests", "..\..\test\SImulator\SImulator.ViewModel.Tests\SImulator.ViewModel.Tests.csproj", "{CB2B8CE7-876C-4D16-BFA4-E1F67F949280}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel.Tests", "test\SImulator\SImulator.ViewModel.Tests\SImulator.ViewModel.Tests.csproj", "{CB2B8CE7-876C-4D16-BFA4-E1F67F949280}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\Common\SIService.Client\SIService.Client.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
-		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
-		..\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
-		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
+		src\Common\SIService.Client\SIService.Client.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
+		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

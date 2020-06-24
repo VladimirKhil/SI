@@ -90,6 +90,10 @@ namespace SICore
         /// </summary>
         PrintPartial,
         /// <summary>
+        /// Продолжить отыгрыш вопроса
+        /// </summary>
+        ContinueQuestion,
+        /// <summary>
         /// Объявление Вопроса с секретом
         /// </summary>
         PrintCat,
@@ -184,15 +188,15 @@ namespace SICore
         /// <summary>
         /// Сообщить об апелляции
         /// </summary>
-        PrintApellation,
+        PrintAppellation,
         /// <summary>
         /// Ожидание решения игроков об апелляции
         /// </summary>
-        WaitApellationDecision,
+        WaitAppellationDecision,
         /// <summary>
         /// Принять апелляцию
         /// </summary>
-        CheckApellation,
+        CheckAppellation,
         /// <summary>
         /// Ожидаем, пока игроки напишут отчёт
         /// </summary>
@@ -293,7 +297,7 @@ namespace SICore
         /// <summary>
         /// Решение игроков о правильности ответа
         /// </summary>
-        ApellationDecision,
+        AppellationDecision,
         /// <summary>
         /// Отправка отчёта
         /// </summary>

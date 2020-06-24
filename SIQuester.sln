@@ -7,36 +7,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D8DC2E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{B812C629-7DBF-4094-AA34-059C9094A226}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "..\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "src\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "..\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester.ViewModel", "SIQuester.ViewModel\SIQuester.ViewModel.csproj", "{8B3640F3-9547-4B76-874D-7FA2E75AD679}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester.ViewModel", "src\SIQuester\SIQuester.ViewModel\SIQuester.ViewModel.csproj", "{8B3640F3-9547-4B76-874D-7FA2E75AD679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester", "SIQuester\SIQuester.csproj", "{D689345A-26EB-432D-8442-67E1DE287FE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester", "src\SIQuester\SIQuester\SIQuester.csproj", "{D689345A-26EB-432D-8442-67E1DE287FE9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTxtConverter", "QTxtConverter\QTxtConverter.csproj", "{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTxtConverter", "src\SIQuester\QTxtConverter\QTxtConverter.csproj", "{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notions", "..\Common\Notions\Notions.csproj", "{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notions", "src\Common\Notions\Notions.csproj", "{63F7DDE1-3041-4A56-BDE5-D82F9AF68C85}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages", "..\Common\SIPackages\SIPackages.csproj", "{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages", "src\Common\SIPackages\SIPackages.csproj", "{7F28FDA6-4250-4154-93B0-D1CE9B838BFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{03BB87B1-7EA0-49F8-B8A5-46A64E7A6E0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notions.Tests", "..\..\test\Common\Notions.Tests\Notions.Tests.csproj", "{BD1AE59E-2B61-42B6-B695-D1C89AA74A1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Notions.Tests", "test\Common\Notions.Tests\Notions.Tests.csproj", "{BD1AE59E-2B61-42B6-B695-D1C89AA74A1B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{9BD30589-9C99-4E58-8447-2DDB33A7F0FC}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SIQuester.Setup", "..\..\deploy\SIQuester.Setup\SIQuester.Setup.wixproj", "{191BE083-3920-4C18-8130-4D6B2BF0AB59}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SIQuester.Setup", "deploy\SIQuester.Setup\SIQuester.Setup.wixproj", "{191BE083-3920-4C18-8130-4D6B2BF0AB59}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SIQuester.Bootstrapper", "..\..\deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj", "{80E6576A-4906-4D07-B473-A994EDDD13AC}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SIQuester.Bootstrapper", "deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj", "{80E6576A-4906-4D07-B473-A994EDDD13AC}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
-		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
-		..\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
-		..\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
+		src\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
+		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

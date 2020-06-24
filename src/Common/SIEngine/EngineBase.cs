@@ -381,7 +381,25 @@ namespace SIEngine
 
         public void SkipQuestion() => Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
 
-        public void MoveToAnswer() => Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.EndQuestion;
+        public void MoveToAnswer()
+        {
+            if (Stage == GameStage.Question)
+            {
+                // Нужно прокрутиться до ответа
+                QuestionPlayMode playMode;
+                do
+                {
+                    playMode = PlayQuestionAtom();
+                } while (playMode != QuestionPlayMode.AlreadyFinished);
+            }
+
+            SetAnswerStage();
+        }
+
+        private void SetAnswerStage()
+        {
+            Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.EndQuestion;
+        }
 
         protected void OnQuestion()
         {
@@ -389,12 +407,12 @@ namespace SIEngine
             var pressMode = _settingsProvider.IsPressMode(_isMedia);
             if (playMode == QuestionPlayMode.AlreadyFinished)
             {
-                MoveToAnswer();
+                SetAnswerStage();
 
                 if (pressMode)
                 {
                     OnWaitTry(_activeQuestion);
-                    AutoNext(1000 * (Math.Min(5, _settingsProvider.ThinkingTime)));
+                    AutoNext(1000 * Math.Min(5, _settingsProvider.ThinkingTime));
                 }
                 else
                 {
@@ -417,7 +435,9 @@ namespace SIEngine
         protected QuestionPlayMode PlayQuestionAtom()
         {
             if (_atomIndex == _activeQuestion.Scenario.Count)
+            {
                 return QuestionPlayMode.AlreadyFinished;
+            }
 
             var activeAtom = ActiveAtom;
             _isMedia = false;
@@ -492,7 +512,9 @@ namespace SIEngine
                 case AtomTypes.Marker:
                     _atomIndex++;
                     if (_atomIndex < _activeQuestion.Scenario.Count)
+                    {
                         _useAnswerMarker = true; // Прерываем отыгрыш вопроса: остальное - ответ
+                    }
 
                     return QuestionPlayMode.AlreadyFinished;
 
@@ -505,17 +527,43 @@ namespace SIEngine
             OnQuestionAtom(activeAtom);
 
             if (_atomIndex == _activeQuestion.Scenario.Count)
+            {
                 return QuestionPlayMode.JustFinished;
+            }
 
             if (ActiveAtom.Type == AtomTypes.Marker)
             {
                 if (_atomIndex + 1 < _activeQuestion.Scenario.Count)
+                {
                     _useAnswerMarker = true;
+                }
 
                 return QuestionPlayMode.JustFinished;
             }
 
             return QuestionPlayMode.InProcess;
+        }
+
+        protected void ProcessRightAnswer()
+        {
+            OnRightAnswer();
+
+            if (!_useAnswerMarker)
+            {
+                OnSimpleAnswer(_activeQuestion.Right.FirstOrDefault() ?? " ");
+            }
+            else // Ответ находится в тексте вопроса
+            {
+                var mode = PlayQuestionAtom();
+                if (mode == QuestionPlayMode.InProcess)
+                {
+                    Stage = GameStage.RightAnswerProceed;
+                    return;
+                }
+            }
+
+            Stage = GameStage.EndQuestion;
+            AutoNext(3000);
         }
 
         /// <summary>

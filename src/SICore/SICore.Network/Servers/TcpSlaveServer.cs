@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SICore.Connections.Errors;
 using SICore.Network.Contracts;
 using System;
 using System.Linq;
@@ -43,66 +44,21 @@ namespace SICore.Network.Servers
                 throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
             }
 
+            var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
             if (upgrade)
             {
-                _connectionId = await Upgrade(tcp, _connectionId);
-            }
-
-            var extServer = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
-            AddConnection(extServer);
-
-            try
-            {
-                extServer.StartRead(false);
-            }
-            catch (Exception exc)
-            {
-                RemoveConnection(extServer, true);
-                throw exc;
-            }
-        }
-
-        private async Task<string> Upgrade(TcpClient tcp, string connectionId = null)
-        {
-            var connectionIdHeader = connectionId != null ? $"\nConnectionId: {connectionId}" : "";
-
-            var upgradeText = $"GET / HTTP/1.1\nHost: {_serverAddress}\nConnection: Upgrade{connectionIdHeader}\nUpgrade: sigame\n\n";
-            var bytes = Encoding.UTF8.GetBytes(upgradeText);
-            await tcp.GetStream().WriteAsync(bytes, 0, bytes.Length);
-
-            var buffer = new byte[5000];
-
-            var upgradeMessage = new StringBuilder();
-            do
-            {
-                var bytesRead = await tcp.GetStream().ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead < 1)
+                try
                 {
-                    // Нормальное закрытие соединения
-                    tcp.Close();
-                    throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!");
+                    _connectionId = await connection.UpgradeAsync(_serverAddress, _connectionId);
                 }
-
-                upgradeMessage.Append(Encoding.UTF8.GetString(buffer, 0, bytesRead));
-            } while (!upgradeMessage.ToString().EndsWith("\n\n") && !upgradeMessage.ToString().EndsWith("\r\n\r\n"));
-
-            var headers = upgradeMessage
-                .ToString()
-                .Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                .Skip(1)
-                .Select(headerString =>
+                catch (ConnectionException exc)
                 {
-                    var split = headerString.Split(new[] { ": " }, StringSplitOptions.None);
-                    return new { Name = split[0], Value = split[1] };
-                })
-                .ToDictionary(val => val.Name, val => val.Value);
-
-            if (!headers.TryGetValue("ConnectionId", out string connectionIdFromServer))
-            {
-                connectionIdFromServer = connectionId;
+                    throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!", exc);
+                }
             }
 
-            return connectionIdFromServer;
+            AddConnection(connection);
+            connection.StartRead(false);
         }
     }
 }

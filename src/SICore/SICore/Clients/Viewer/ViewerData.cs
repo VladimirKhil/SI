@@ -159,11 +159,11 @@ namespace SICore
         /// <summary>
         /// Тип вопроса
         /// </summary>
-        public string _qtype;
+        public string QuestionType { get; set; }
 
         public bool IsPartial { get; set; }
 
-        public string _atomType = "";
+        public string AtomType { get; set; } = "";
         /// <summary>
         /// Номер текущего атома сценария вопроса
         /// </summary>
@@ -173,29 +173,14 @@ namespace SICore
 
         internal int LastStakerIndex { get; set; } = -1;
 
-        private ViewerAccount _me = null;
+        public string Name { get; internal set; }
 
         public ViewerAccount Me
         {
-            get { return _me; }
-            internal set
+            get
             {
-                if (_me != value)
-                {
-                    if (_me is PersonAccount oldPersonAccount)
-                    {
-                        oldPersonAccount.IsMe = false;
-                    }
-
-                    _me = value;
-
-                    if (_me is PersonAccount personAccount)
-                    {
-                        personAccount.IsMe = true;
-                    }
-
-                    OnPropertyChanged();
-                }
+                AllPersons.TryGetValue(Name, out var me);
+                return me;
             }
         }
 
@@ -308,9 +293,13 @@ namespace SICore
         {
             var accounts = new List<ViewerAccount>();
             if (_showMan != null)
+            {
                 accounts.Add(_showMan);
+            }
 
-            AllPersons = accounts.Concat(_players).Concat(_viewers).ToArray();
+            AllPersons = accounts.Concat(_players).Concat(_viewers)
+                .Where(account => account.Connected)
+                .ToDictionary(account => account.Name);
         }
 
         public void OnMainPersonsChanged()
@@ -368,17 +357,14 @@ namespace SICore
             }
         }
 
-        private ViewerAccount[] _allPersons = Array.Empty<ViewerAccount>();
+        private Dictionary<string, ViewerAccount> _allPersons = new Dictionary<string, ViewerAccount>();
 
         /// <summary>
         /// Все участники
         /// </summary>
-        public ViewerAccount[] AllPersons
+        public Dictionary<string, ViewerAccount> AllPersons
         {
-            get
-            {
-                return _allPersons;
-            }
+            get => _allPersons;
             private set
             {
                 _allPersons = value;

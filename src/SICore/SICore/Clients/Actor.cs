@@ -3,6 +3,7 @@ using SICore.Connections;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SIData;
+using System;
 
 namespace SICore
 {
@@ -58,13 +59,19 @@ namespace SICore
             _logic.AddLog(s);
         }
 
-        public virtual void Dispose()
+        public virtual void Dispose(bool disposing)
         {
             _client.MessageReceived -= OnMessageReceived;
             _client.Disposed -= Dispose;
             _client.InfoReplaced -= Client_InfoReplaced;
 
             _logic.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

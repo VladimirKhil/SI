@@ -438,7 +438,7 @@
     <value>Минимум или максимум в раунде (на выбор)</value>
   </data>
   <data name="PleaseCheckApellation" xml:space="preserve">
-    <value>Уважаемые игроки, прошу вас определить, правилен ли ответ {1} на прозвучавший вопрос</value>
+    <value>Уважаемые игроки, прошу вас определить, правилен ли ответ {0} на прозвучавший вопрос</value>
   </data>
   <data name="PleaseChooseCatCost" xml:space="preserve">
     <value>выберите стоимость вопроса, пожалуйста</value>
@@ -663,7 +663,7 @@
     <value>Ошибка записи лога на дискs</value>
   </data>
   <data name="HttpsProtocolIsNotSupported" xml:space="preserve">
-    <value>Протокол https не поддерживается!</value>
+    <value>Ошибка загрузки медиа {0}. Протокол https не поддерживается!</value>
   </data>
   <data name="Label_Auction" xml:space="preserve">
     <value>ВОПРОС СО СТАВКОЙ</value>
@@ -733,5 +733,14 @@
   </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неверные ответы</value>
+  </data>
+  <data name="MediaNotFound" xml:space="preserve">
+    <value>Файл {0} не найден в пакете!</value>
+  </data>
+  <data name="MediaFileNotSupported" xml:space="preserve">
+    <value>Медиафайл не поддерживается</value>
+  </data>
+  <data name="MediaLoadError" xml:space="preserve">
+    <value>Ошибка загрузки медиа</value>
   </data>
 </root>

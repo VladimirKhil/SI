@@ -306,6 +306,11 @@
         public const string Question = "QUESTION";
 
         /// <summary>
+        /// Реплика игры/участника
+        /// </summary>
+        public const string Replic = "REPLIC";
+
+        /// <summary>
         /// Темы раунда
         /// </summary>
         public const string RoundThemes = "ROUNDTHEMES";
@@ -379,6 +384,11 @@
         /// Можно нажимать на кнопку
         /// </summary>
         public const string Try = "TRY";
+
+        /// <summary>
+        /// Необходимо провалидировать ответ игрока
+        /// </summary>
+        public const string Validation = "VALIDATIION";
 
         /// <summary>
         /// Победитель

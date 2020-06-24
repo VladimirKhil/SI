@@ -128,7 +128,7 @@ namespace SIPackages
         private static void Init(SIDocument document)
         {
             document._package.ID = Guid.NewGuid().ToString();
-            document._package.Date = DateTime.Now.ToString("dd.MM.yyyy");
+            document._package.Date = DateTime.UtcNow.ToString("dd.MM.yyyy");
         }
 
         private void CreateInternal(Stream stream, string name, string author)

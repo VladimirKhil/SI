@@ -1,12 +1,12 @@
-﻿using SIData;
+﻿using SICore.Clients.Game;
+using SICore.Results;
+using SIData;
 using SIPackages;
 using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SICore.Clients.Game;
 using System.Text;
-using SICore.Results;
 
 namespace SICore
 {
@@ -18,34 +18,34 @@ namespace SICore
         /// <summary>
         /// Настройки игры
         /// </summary>
-        public IGameSettingsCore<AppSettingsCore> Settings;
+        public IGameSettingsCore<AppSettingsCore> Settings { get; set; }
 
         /// <summary>
         /// Текущий документ пакета
         /// </summary>
-        internal SIDocument PackageDoc;
+        internal SIDocument PackageDoc { get; set; }
 
         /// <summary>
         /// Текущий пакет
         /// </summary>
-        internal Package Package;
+        internal Package Package { get; set; }
 
         /// <summary>
         /// Текущий раунд
         /// </summary>
         public Round Round { get; set; }
 
-        internal int QLength;
+        internal int QLength { get; set; }
 
         /// <summary>
         /// Текущая тема
         /// </summary>
-        internal Theme Theme;
+        internal Theme Theme { get; set; }
 
         /// <summary>
         /// Текущий выбирающий игрок
         /// </summary>
-        internal GamePlayerAccount ActivePlayer = null;
+        internal GamePlayerAccount ActivePlayer { get; set; }
 
         /// <summary>
         /// Текущий отвечающий игрок
@@ -137,7 +137,7 @@ namespace SICore
         /// <summary>
         /// Время начала раунда
         /// </summary>
-        internal DateTime[] TimerStartTime { get; set; } = new DateTime[3] { DateTime.Now, DateTime.Now, DateTime.Now };
+        internal DateTime[] TimerStartTime { get; set; } = new DateTime[3] { DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow };
 
         /// <summary>
         /// Время начала паузы
@@ -307,11 +307,11 @@ namespace SICore
         /// <summary>
         /// Количество полученных ответов на апелляцию
         /// </summary>
-        public int ApelAnswersReceivedCount { get; set; }
+        public int AppellationAnswersReceivedCount { get; set; }
         /// <summary>
         /// Количество полученных положительных ответов на апелляцию
         /// </summary>
-        public int ApelAnswersRightReceivedCount { get; set; }
+        public int AppellationAnswersRightReceivedCount { get; set; }
 
         internal bool IsAnswer { get; set; }
 
@@ -405,9 +405,9 @@ namespace SICore
         public int ReportsCount { get; set; }
         public int AcceptedReports { get; set; }
 
-        internal List<string> OpenedFiles = new List<string>();
-        public bool AnnounceAnswer;
-        public bool AllowApellation;
+        internal List<string> OpenedFiles { get; set; } = new List<string>();
+        public bool AnnounceAnswer { get; set; }
+        public bool AllowAppellation { get; set; }
 
         public object TaskLock { get; } = new object();
 
