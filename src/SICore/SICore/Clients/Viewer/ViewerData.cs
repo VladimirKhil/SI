@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Input;
 
 namespace SICore
@@ -266,8 +267,10 @@ namespace SICore
             {
                 _showMan = value;
                 OnPropertyChanged();
-                if (isUpdating)
+                if (_isUpdating)
+                {
                     return;
+                }
 
                 OnMainPersonsChanged();
                 OnAllPersonsChanged();
@@ -291,22 +294,38 @@ namespace SICore
         
         public void OnAllPersonsChanged()
         {
+            _personsUpdateHistory.Append("Update: ").Append(PrintPersons()).AppendLine();
+
             var accounts = new List<ViewerAccount>();
             if (_showMan != null)
             {
                 accounts.Add(_showMan);
             }
 
-            AllPersons = accounts.Concat(_players).Concat(_viewers)
-                .Where(account => account.Connected)
-                .ToDictionary(account => account.Name);
+            try
+            {
+                AllPersons = accounts.Concat(_players).Concat(_viewers)
+                    .Where(account => account.Connected)
+                    .ToDictionary(account => account.Name);
+            }
+            catch (ArgumentException exc)
+            {
+                throw new Exception($"OnAllPersonsChanged error: {_personsUpdateHistory}", exc);
+            }
+
+            if (!AllPersons.ContainsKey(Name))
+            {
+                throw new Exception($"!AllPersons.ContainsKey({Name})! {string.Join(",", AllPersons.Keys)} {_personsUpdateHistory}");
+            }
         }
 
         public void OnMainPersonsChanged()
         {
             var accounts = new List<PersonAccount>();
             if (_showMan != null)
+            {
                 accounts.Add(_showMan);
+            }
 
             MainPersons = accounts.Concat(_players).ToArray();
         }
@@ -372,18 +391,33 @@ namespace SICore
             }
         }
 
-        private bool isUpdating = false;
+        private StringBuilder _personsUpdateHistory = new StringBuilder();
+
+        private bool _isUpdating = false;
 
         internal void BeginUpdatePersons()
         {
-            isUpdating = true;
+            _isUpdating = true;
+            _personsUpdateHistory.Append("Before: ").Append(PrintPersons());
         }
 
         internal void EndUpdatePersons()
         {
-            isUpdating = false;
+            _isUpdating = false;
+
             OnMainPersonsChanged();
             OnAllPersonsChanged();
+        }
+
+        private string PrintPersons()
+        {
+            var result = new StringBuilder();
+
+            result.Append("Showman: ").Append(ShowMan?.Name).AppendLine();
+            result.Append("Players: ").Append(string.Join(", ", Players.Select(p => p.Name))).AppendLine();
+            result.Append("Viewers: ").Append(string.Join(", ", Viewers.Select(v => v.Name))).AppendLine();
+
+            return result.ToString();
         }
 
         public ViewerData()

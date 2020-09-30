@@ -1,16 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Services.SI.ViewModel
 {
     [Obsolete]
     public sealed class SIStorage : INotifyPropertyChanged
     {
-        private SIStorageService _siService;
+        private SIStorageServiceClient _siService;
 
         /// <summary>
         /// Выбранный пакет
@@ -106,7 +105,7 @@ namespace Services.SI.ViewModel
 
         public void Open()
         {
-            _siService = new SIStorageService();
+            _siService = new SIStorageServiceClient();
         }
 
         public async Task<Uri> LoadSelectedPackageUriAsync()

@@ -1,4 +1,5 @@
 ﻿
+using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 
 namespace SICore.Network.Servers
@@ -8,8 +9,8 @@ namespace SICore.Network.Servers
     /// </summary>
     public sealed class BasicServer : MasterServer
     {
-        public BasicServer(INetworkLocalizer localizer)
-            : base(localizer)
+        public BasicServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+            : base(serverConfiguration, localizer)
         {
 
         }

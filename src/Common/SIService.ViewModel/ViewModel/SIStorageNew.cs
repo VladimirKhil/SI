@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Services.SI.ViewModel
 {
     public sealed class SIStorageNew : INotifyPropertyChanged
     {
-        private SIStorageService _siService;
+        private SIStorageServiceClient _siService;
 
         private bool _isLoading;
 
@@ -211,7 +209,7 @@ namespace Services.SI.ViewModel
 
         public void Open()
         {
-            _siService = new SIStorageService();
+            _siService = new SIStorageServiceClient();
             IsLoading = true;
             LoadPublishersAsync();
         }

@@ -38,7 +38,7 @@ namespace SICore
 
         internal void OnAdShown(int adId)
         {
-            AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Count(p => p.IsHuman));
+            AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
         }
 
         private IMasterServer MasterServer => (IMasterServer)_client.Server;
@@ -374,8 +374,7 @@ namespace SICore
                 }
 
                 // Подсоединение к игре
-                var person = ClientData.AllPersons.FirstOrDefault(item => _client.Server.IsOnline(item.Name) && name == item.Name);
-                if (person != null)
+                if (ClientData.AllPersons.ContainsKey(name))
                 {
                     message = string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name);
                     return false;
@@ -413,7 +412,7 @@ namespace SICore
                         break;
 
                     default: // Viewer
-                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account() { Name = Constants.FreePlace, IsHuman = true } });
+                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account { Name = Constants.FreePlace, IsHuman = true } });
                         break;
                 }
 
@@ -546,8 +545,7 @@ namespace SICore
                                 var sex = args[3];
 
                                 // Подсоединение к игре
-                                var person = ClientData.AllPersons.FirstOrDefault(item => _client.Server.IsOnline(item.Name) && name == item.Name);
-                                if (person != null)
+                                if (ClientData.AllPersons.ContainsKey(name))
                                 {
                                     SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
                                     return;
@@ -585,7 +583,7 @@ namespace SICore
                                         break;
 
                                     default:
-                                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account() { Name = Constants.FreePlace, IsHuman = true } });
+                                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account { Name = Constants.FreePlace, IsHuman = true } });
                                         break;
                                 }
 
@@ -629,12 +627,10 @@ namespace SICore
                         case SystemMessages.Disconnect:
                             #region Disconnect
                             {
-                                if (args.Length < 3)
+                                if (args.Length < 3 || !ClientData.AllPersons.TryGetValue(args[1], out var account))
+                                {
                                     return;
-
-                                var account = ClientData.AllPersons.FirstOrDefault(acc => acc.Name == args[1]);
-                                if (account == null)
-                                    return;
+                                }
 
                                 var withError = args[2] == "+";
 
@@ -659,7 +655,9 @@ namespace SICore
                                         person.Name = Constants.FreePlace;
                                         person.Picture = "";
                                         if (isBefore)
+                                        {
                                             person.Ready = false;
+                                        }
                                     }
                                 }
 
@@ -1141,9 +1139,10 @@ namespace SICore
                             {
                                 var person = args[1];
 
-                                var per = ClientData.AllPersons.FirstOrDefault(p => p.Name == person);
-                                if (per == null)
+                                if (!ClientData.AllPersons.TryGetValue(person, out var per))
+                                {
                                     return;
+                                }
 
                                 if (per.Name == message.Sender)
                                 {
@@ -1168,9 +1167,10 @@ namespace SICore
                             {
                                 var person = args[1];
 
-                                var per = ClientData.AllPersons.FirstOrDefault(p => p.Name == person);
-                                if (per == null)
+                                if (!ClientData.AllPersons.TryGetValue(person, out var per))
+                                {
                                     return;
+                                }
 
                                 if (per.Name == message.Sender)
                                 {
@@ -1671,13 +1671,15 @@ namespace SICore
                 return;
             }
 
-            var host = ClientData.AllPersons.FirstOrDefault(p => p.Name == ClientData.HostName);
+            if (!ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
+            {
+                return;
+            }
 
             switch (args[1])
             {
                 case MessageParams.Config_AddTable:
                     AddTable(message, host);
-
                     break;
 
                 case MessageParams.Config_DeleteTable:
@@ -1746,61 +1748,62 @@ namespace SICore
             }
 
             var indexStr = args[2];
-            if (ClientData.Players.Count > 2 && int.TryParse(indexStr, out int index) && index > -1
-                && index < ClientData.Players.Count)
+            if (ClientData.Players.Count <= 2 || !int.TryParse(indexStr, out int index) || index <= -1
+                || index >= ClientData.Players.Count)
             {
-                var account = ClientData.Players[index];
+                return;
+            }
 
-                if (ClientData.Stage != GameStage.Before && account.IsHuman && _client.Server.IsOnline(account.Name))
+            var account = ClientData.Players[index];
+            var isOnline = _client.Server.IsOnline(account.Name);
+
+            if (ClientData.Stage != GameStage.Before && account.IsHuman && isOnline)
+            {
+                return;
+            }
+
+            ClientData.BeginUpdatePersons();
+
+            try
+            {
+                ClientData.Players.RemoveAt(index);
+                Logic.AddHistory($"Player removed at {index}");
+
+                DropPlayerIndex(index);
+
+                if (isOnline && account.IsHuman)
                 {
-                    return;
+                    ClientData.Viewers.Add(account);
                 }
+            }
+            finally
+            {
+                ClientData.EndUpdatePersons();
+            }
 
-                var isOnline = _client.Server.IsOnline(account.Name);
+            if (!account.IsHuman)
+            {
+                // Удалить клиента компьютерного игрока
+                _client.Server.DeleteClientAsync(account.Name);
+            }
 
-                ClientData.BeginUpdatePersons();
-
-                try
+            foreach (var item in ClientData.MainPersons)
+            {
+                if (item.Ready)
                 {
-                    ClientData.Players.RemoveAt(index);
-                    Logic.AddHistory($"Player removed at {index}");
-
-                    DropPlayerIndex(index);
-
-                    if (isOnline && account.IsHuman)
-                    {
-                        ClientData.Viewers.Add(account);
-                    }
+                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
                 }
-                finally
-                {
-                    ClientData.EndUpdatePersons();
-                }
+            }
 
-                if (!account.IsHuman)
-                {
-                    // Удалить клиента компьютерного игрока
-                    _client.Server.DeleteClientAsync(account.Name);
-                }
+            SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
+            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}");
 
-                foreach (var item in ClientData.MainPersons)
+            if (ClientData.Stage == GameStage.Before)
+            {
+                var readyAll = ClientData.MainPersons.All(p => p.Ready);
+                if (readyAll)
                 {
-                    if (item.Ready)
-                    {
-                        SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
-                    }
-                }
-
-                SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
-                SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}");
-
-                if (ClientData.Stage == GameStage.Before)
-                {
-                    var readyAll = ClientData.MainPersons.All(p => p.Ready);
-                    if (readyAll)
-                    {
-                        StartGame();
-                    }
+                    StartGame();
                 }
             }
 
@@ -1954,18 +1957,24 @@ namespace SICore
                 else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
                 {
                     Logic.AddHistory($"Current staker dropped");
-                    if (ClientData.Decision == DecisionType.AuctionStakeMaking)
+                    if (ClientData.Decision == DecisionType.AuctionStakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
                     {
                         // Ставящего удалили. Нужно продвинуть игру дальше
                         Logic.StopWaiting();
 
-                        if (ClientData.IsOralNow)
+                        if (ClientData.IsOralNow || ClientData.Decision == DecisionType.NextPersonStakeMaking)
                         {
                             SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                         }
 
                         PlanExecution(Tasks.AskStake, 20);
                     }
+                }
+                else if (ClientData.Decision == DecisionType.NextPersonStakeMaking)
+                {
+                    Logic.StopWaiting();
+                    SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    PlanExecution(Tasks.AskStake, 20);
                 }
             }
 
@@ -2127,6 +2136,11 @@ namespace SICore
             var oldName = account.Name;
             if (!account.IsHuman)
             {
+                if (ClientData.AllPersons.ContainsKey(replacer))
+                {
+                    return;
+                }
+
                 SetComputerPerson(isPlayer, account, replacer);
             }
             else
@@ -2155,7 +2169,9 @@ namespace SICore
             if (isPlayer)
             {
                 if (DefaultPlayers == null)
+                {
                     return;
+                }
 
                 var found = false;
                 for (int j = 0; j < DefaultPlayers.Length; j++)
@@ -2274,9 +2290,7 @@ namespace SICore
             GamePersonAccount account;
             int index = -1;
 
-            var host = ClientData.AllPersons.FirstOrDefault(p => p.Name == ClientData.HostName);
-
-            if (host == null)
+            if (!ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
             {
                 Trace.TraceWarning("ChangePersonType: host == null");
                 return;

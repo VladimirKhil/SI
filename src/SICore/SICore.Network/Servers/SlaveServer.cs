@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,8 +26,8 @@ namespace SICore.Network.Servers
             }
         }
 
-        protected SlaveServer(INetworkLocalizer localizer)
-            : base(localizer)
+        protected SlaveServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+            : base(serverConfiguration, localizer)
         {
 
         }

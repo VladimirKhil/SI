@@ -1,5 +1,6 @@
 ﻿using SICore.Connections;
 using SICore.Connections.Errors;
+using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
 using System.Linq;
@@ -22,8 +23,8 @@ namespace SICore.Network.Servers
         /// </summary>
         /// <param name="port">Имя порта для подключения</param>
         /// <param name="serverAddress">Адрес сервера</param>
-        public TcpSlaveServer(int port, string serverAddress, INetworkLocalizer localizer)
-            : base(localizer)
+        public TcpSlaveServer(int port, string serverAddress, ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+            : base(serverConfiguration, localizer)
         {
             _serverAddress = serverAddress;
             _port = port;

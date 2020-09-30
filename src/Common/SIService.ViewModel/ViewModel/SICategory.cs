@@ -8,7 +8,7 @@ namespace Services.SI.ViewModel
     public sealed class SICategory : INotifyPropertyChanged
     {
         private readonly PackageCategory _category;
-        private readonly SIStorageService _siService;
+        private readonly SIStorageServiceClient _siService;
 
         private string _restriction;
 
@@ -50,7 +50,7 @@ namespace Services.SI.ViewModel
 
         public event Action<Exception> Error;
 
-        public SICategory(PackageCategory category, SIStorageService siService, string restriction)
+        public SICategory(PackageCategory category, SIStorageServiceClient siService, string restriction)
         {
             _category = category;
             _restriction = restriction;

@@ -1,6 +1,5 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Network.Clients;
-using SICore.Network.Contracts;
 using SIData;
 using SIPackages.Core;
 using System;
@@ -285,7 +284,9 @@ namespace SICore
                     case Messages.Answer:
                         ClientData.PersonDataExtensions.Answer = "";
                         ClientData.DialogMode = DialogModes.Answer;
+
                         ((PlayerAccount)ClientData.Me).IsDeciding = false;
+
                         _logic.Answer();
                         break;
 
@@ -320,7 +321,9 @@ namespace SICore
                         ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
                         ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
                         for (int i = 0; i < 4; i++)
+                        {
                             ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
+                        }
 
                         ClientData.PersonDataExtensions.StakeInfo = new StakeInfo()
                         {

@@ -857,31 +857,38 @@ namespace SICore
 
             if (ClientData.AllPersons.TryGetValue(name, out var person))
             {
-                person.Connected = false;
-                person.Name = Constants.FreePlace;
-                person.Picture = "";
+                ClientData.BeginUpdatePersons();
 
-                var personAccount = person as PersonAccount;
-                if (ClientData.Stage == GameStage.Before && personAccount != null)
+                try
                 {
-                    personAccount.Ready = false;
-                }
+                    person.Connected = false;
+                    person.Name = Constants.FreePlace;
+                    person.Picture = "";
 
-                if (personAccount == null)
-                {
-                    ClientData.Viewers.Remove(person);
+                    var personAccount = person as PersonAccount;
+                    if (ClientData.Stage == GameStage.Before && personAccount != null)
+                    {
+                        personAccount.Ready = false;
+                    }
+
+                    if (personAccount == null)
+                    {
+                        ClientData.Viewers.Remove(person);
+                    }
+                    else if (personAccount is PlayerAccount player)
+                    {
+                        UpdatePlayerCommands(player);
+                    }
+                    else
+                    {
+                        UpdateShowmanCommands();
+                    }
                 }
-                else if (personAccount is PlayerAccount player)
+                finally
                 {
-                    UpdatePlayerCommands(player);
-                }
-                else
-                {
-                    UpdateShowmanCommands();
+                    ClientData.EndUpdatePersons();
                 }
             }
-
-            ClientData.OnAllPersonsChanged();
 
             if (!_client.Server.IsMain)
             {
@@ -1098,66 +1105,7 @@ namespace SICore
                     break;
 
                 case MessageParams.Config_DeleteTable:
-                    {
-                        if (mparams.Length < 3)
-                            break;
-
-                        var indexString = mparams[2];
-
-                        var me = ClientData.Me;
-
-                        if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
-                            break;
-
-                        PlayerAccount account = null;
-                        ViewerAccount newAccount = null;
-
-                        ClientData.BeginUpdatePersons();
-                        try
-                        {
-                            account = ClientData.Players[index];
-
-                            var clone = new List<PlayerAccount>(ClientData.Players);
-                            clone.RemoveAt(index);
-
-                            ClientData.Players = clone;
-
-                            UpdateAddTableCommand();
-
-                            if (account.Connected && account.IsHuman)
-                            {
-                                newAccount = new ViewerAccount(account) { Connected = true };
-
-                                var cloneV = new List<ViewerAccount>(ClientData.Viewers)
-                                {
-                                    newAccount
-                                };
-
-                                ClientData.Viewers = cloneV;
-                            }
-
-                            if (IsHost)
-                            {
-                                var canDelete = ClientData.Players.Count > 2;
-                                foreach (var player in ClientData.Players)
-                                {
-                                    player.Delete.CanBeExecuted = canDelete;
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            ClientData.EndUpdatePersons();
-                        }
-
-                        if (account == me && newAccount != null)
-                        {
-                            // Необходимо самого себя перевести в зрители
-                            SwitchToNewType(GameRole.Viewer, newAccount, me);
-                        }
-
-                        UpdateDeleteTableCommand();
-                    }
+                    OnConfigDeleteTable(mparams);
                     break;
 
                 case MessageParams.Config_Set:
@@ -1165,113 +1113,7 @@ namespace SICore
                     break;
 
                 case MessageParams.Config_ChangeType:
-                    {
-                        if (mparams.Length < 7)
-                            break;
-
-                        var personType = mparams[2];
-                        var indexString = mparams[3];
-                        var newTypeHuman = mparams[4] == "+";
-                        var newName = mparams[5];
-                        var newSex = mparams[6] == "+";
-
-                        var me = ClientData.Me;
-
-                        PersonAccount account;
-                        var isPlayer = personType == "player";
-                        if (isPlayer)
-                        {
-                            if (!int.TryParse(indexString, out var index) || index < 0 || index >= ClientData.Players.Count)
-                            {
-                                break;
-                            }
-
-                            account = ClientData.Players[index];
-                        }
-                        else
-                        {
-                            account = ClientData.ShowMan;
-                        }
-
-                        if (account.IsHuman == newTypeHuman)
-                        {
-                            break;
-                        }
-
-                        if (newTypeHuman)
-                        {
-                            account.IsHuman = true;
-                            account.Name = " ";
-                            account.Picture = "";
-                            account.Connected = false;
-                            account.Ready = false;
-                        }
-                        else
-                        {
-                            ClientData.BeginUpdatePersons();
-                            ViewerAccount newAccount = null;
-                            try
-                            {
-                                if (account.Connected)
-                                {
-                                    var clone = new List<ViewerAccount>(ClientData.Viewers);
-                                    newAccount = new ViewerAccount(account) { Connected = true };
-
-                                    clone.Add(newAccount);
-
-                                    ClientData.Viewers = clone;
-                                }
-                                else if (account == ClientData.Me)
-                                {
-                                    throw new InvalidOperationException("I am not connected!");
-                                }
-
-                                //if (isPlayer)
-                                //{
-                                //    var newAcc = new PlayerAccount(newName, newSex, true, false) { IsHuman = false, IsExtendedMode = this.IsHost };
-
-                                //    newAcc.Free = new CustomCommand(Free_Executed) { CanBeExecuted = account.IsHuman && account.Connected };
-                                //    newAcc.Replace = new CustomCommand(arg => Replace_Executed(account, arg)) { CanBeExecuted = true };
-                                //    newAcc.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = this.ClientData.Players.Count > 2 };
-                                //    newAcc.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
-
-                                //    var cloneP = new List<PlayerAccount>(this.ClientData.Players);
-                                //    cloneP[index] = newAcc;
-
-                                //    this.ClientData.Players = cloneP;
-                                //}
-                                //else
-                                //{
-                                //    var showman = new PersonAccount(newName, newSex, true, false) { IsHuman = false, IsShowman = true, IsExtendedMode = this.IsHost };
-
-                                //    showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.Connected };
-                                //    showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
-                                //    showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
-
-                                //    this.ClientData.ShowMan = showman;
-                                //}
-
-                                account.IsHuman = false;
-                                account.Name = newName;
-                                account.IsMale = newSex;
-                                account.Picture = "";
-                                account.Connected = true;
-                                account.Ready = false;
-                            }
-                            finally
-                            {
-                                ClientData.EndUpdatePersons();
-                            }
-
-                            if (account == me)
-                            {
-                                // Необходимо самого себя перевести в зрители
-                                SwitchToNewType(GameRole.Viewer, newAccount, me);
-                            }
-
-                            UpdateDeleteTableCommand();
-                        }
-                    }
+                    OnConfigChangeType(mparams);
                     break;
             }
 
@@ -1281,6 +1123,202 @@ namespace SICore
             }
 
             UpdateShowmanCommands();
+        }
+
+        private void OnConfigChangeType(string[] mparams)
+        {
+            if (mparams.Length < 7)
+            {
+                return;
+            }
+
+            var personType = mparams[2];
+            var indexString = mparams[3];
+            var newTypeHuman = mparams[4] == "+";
+            var newName = mparams[5];
+            var newSex = mparams[6] == "+";
+
+            var me = ClientData.Me;
+
+            PersonAccount account;
+            var isPlayer = personType == "player";
+            if (isPlayer)
+            {
+                if (!int.TryParse(indexString, out var index) || index < 0 || index >= ClientData.Players.Count)
+                {
+                    return;
+                }
+
+                account = ClientData.Players[index];
+            }
+            else
+            {
+                account = ClientData.ShowMan;
+            }
+
+            if (account.IsHuman == newTypeHuman)
+            {
+                return;
+            }
+
+            if (newTypeHuman)
+            {
+                ClientData.BeginUpdatePersons();
+
+                try
+                {
+                    if (account.Name == ClientData.Name /* for computer accounts being deleted */)
+                    {
+                        var clone = new List<ViewerAccount>(ClientData.Viewers);
+                        var newAccount = new ViewerAccount(account) { Connected = true };
+
+                        clone.Add(newAccount);
+
+                        ClientData.Viewers = clone;
+                    }
+
+                    account.IsHuman = true;
+                    account.Name = Constants.FreePlace;
+                    account.Picture = "";
+                    account.Connected = false;
+                    account.Ready = false;
+                }
+                finally
+                {
+                    ClientData.EndUpdatePersons();
+                }
+            }
+            else
+            {
+                ClientData.BeginUpdatePersons();
+                ViewerAccount newAccount = null;
+                try
+                {
+                    if (account.Connected)
+                    {
+                        var clone = new List<ViewerAccount>(ClientData.Viewers);
+                        newAccount = new ViewerAccount(account) { Connected = true };
+
+                        clone.Add(newAccount);
+
+                        ClientData.Viewers = clone;
+                    }
+                    else if (account == ClientData.Me)
+                    {
+                        throw new InvalidOperationException("I am not connected!");
+                    }
+
+                    //if (isPlayer)
+                    //{
+                    //    var newAcc = new PlayerAccount(newName, newSex, true, false) { IsHuman = false, IsExtendedMode = this.IsHost };
+
+                    //    newAcc.Free = new CustomCommand(Free_Executed) { CanBeExecuted = account.IsHuman && account.Connected };
+                    //    newAcc.Replace = new CustomCommand(arg => Replace_Executed(account, arg)) { CanBeExecuted = true };
+                    //    newAcc.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = this.ClientData.Players.Count > 2 };
+                    //    newAcc.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
+
+                    //    var cloneP = new List<PlayerAccount>(this.ClientData.Players);
+                    //    cloneP[index] = newAcc;
+
+                    //    this.ClientData.Players = cloneP;
+                    //}
+                    //else
+                    //{
+                    //    var showman = new PersonAccount(newName, newSex, true, false) { IsHuman = false, IsShowman = true, IsExtendedMode = this.IsHost };
+
+                    //    showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.Connected };
+                    //    showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
+                    //    showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
+
+                    //    this.ClientData.ShowMan = showman;
+                    //}
+
+                    account.IsHuman = false;
+                    account.Name = newName;
+                    account.IsMale = newSex;
+                    account.Picture = "";
+                    account.Connected = true;
+                    account.Ready = false;
+                }
+                finally
+                {
+                    ClientData.EndUpdatePersons();
+                }
+
+                if (account == me)
+                {
+                    // Необходимо самого себя перевести в зрители
+                    SwitchToNewType(GameRole.Viewer, newAccount, me);
+                }
+
+                UpdateDeleteTableCommand();
+            }
+        }
+
+        private void OnConfigDeleteTable(string[] mparams)
+        {
+            if (mparams.Length < 3)
+            {
+                return;
+            }
+
+            var indexString = mparams[2];
+
+            var me = ClientData.Me;
+
+            if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+            {
+                return;
+            }
+
+            PlayerAccount account = null;
+            ViewerAccount newAccount = null;
+
+            ClientData.BeginUpdatePersons();
+            try
+            {
+                account = ClientData.Players[index];
+
+                var clone = new List<PlayerAccount>(ClientData.Players);
+                clone.RemoveAt(index);
+
+                ClientData.Players = clone;
+
+                UpdateAddTableCommand();
+
+                if (account.Connected && account.IsHuman || account.Name == ClientData.Name /* for computer accounts being deleted */)
+                {
+                    newAccount = new ViewerAccount(account) { Connected = true };
+
+                    var cloneV = new List<ViewerAccount>(ClientData.Viewers)
+                    {
+                        newAccount
+                    };
+
+                    ClientData.Viewers = cloneV;
+                }
+
+                if (IsHost)
+                {
+                    var canDelete = ClientData.Players.Count > 2;
+                    foreach (var player in ClientData.Players)
+                    {
+                        player.Delete.CanBeExecuted = canDelete;
+                    }
+                }
+            }
+            finally
+            {
+                ClientData.EndUpdatePersons();
+            }
+
+            if (account == me && newAccount != null)
+            {
+                // Необходимо самого себя перевести в зрители
+                SwitchToNewType(GameRole.Viewer, newAccount, me);
+            }
+
+            UpdateDeleteTableCommand();
         }
 
         private PersonAccount GetAccountByType(bool isPlayer, string indexString)
@@ -1308,7 +1346,7 @@ namespace SICore
             var personType = mparams[2];
             var indexString = mparams[3];
             var replacer = mparams[4];
-            var replacerSex = mparams[5] == "+";
+            var replacerIsMale = mparams[5] == "+";
 
             var isPlayer = personType == "player";
 
@@ -1323,8 +1361,27 @@ namespace SICore
 
             if (!account.IsHuman)
             {
-                account.Name = replacer;
-                account.IsMale = replacerSex;
+                ClientData.BeginUpdatePersons();
+
+                try
+                {
+                    if (account.Name == ClientData.Name /* for computer accounts being deleted */)
+                    {
+                        var clone = new List<ViewerAccount>(ClientData.Viewers);
+                        var newAccount = new ViewerAccount(account) { Connected = true };
+
+                        clone.Add(newAccount);
+
+                        ClientData.Viewers = clone;
+                    }
+
+                    account.Name = replacer;
+                    account.IsMale = replacerIsMale;
+                }
+                finally
+                {
+                    ClientData.EndUpdatePersons();
+                }
             }
             else
             {
@@ -1881,6 +1938,14 @@ namespace SICore
         public void Rename(string name)
         {
             _client.Name = name;
+
+            if (ClientData.AllPersons.TryGetValue(ClientData.Name, out var viewerAccount))
+            {
+                viewerAccount.Name = name;
+                ClientData.AllPersons[name] = viewerAccount;
+                ClientData.AllPersons.Remove(ClientData.Name);
+            }
+
             ClientData.Name = name;
         }
 

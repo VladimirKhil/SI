@@ -330,10 +330,10 @@ namespace SICore
 
                     _data.OpenedFiles.Add(filename);
 
-                    foreach (var item in _data.AllPersons.ToArray())
+                    foreach (var person in _data.AllPersons.Keys)
                     {
                         var msg2 = new StringBuilder(msg.ToString());
-                        if (_actor.Client.CurrentServer.Contains(item.Name))
+                        if (_actor.Client.CurrentServer.Contains(person))
                         {
                             msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(localUri ?? uri);
                         }
@@ -342,7 +342,7 @@ namespace SICore
                             msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                         }
 
-                        _actor.SendMessage(msg2.ToString(), item.Name);
+                        _actor.SendMessage(msg2.ToString(), person);
                     }
                 }
             }
@@ -951,7 +951,11 @@ namespace SICore
             }
             else if (stakersCount == 0)
             {
-                throw new Exception($"stakersCount == 0 ({_data.OrderHistory})!");
+                AddHistory("Skipping question");
+                Engine.SkipQuestion();
+                ScheduleExecution(Tasks.MoveNext, 10);
+
+                return true;
             }
 
             ScheduleExecution(Tasks.AskStake, 5);
@@ -2472,7 +2476,9 @@ namespace SICore
             for (int i = 0; i < _data.Players.Count; i++)
             {
                 if (!_actor.Client.CurrentServer.IsOnlineInternal(_data.Players[i].Name))
+                {
                     _actor.ChangePersonType("player", i.ToString());
+                }
             }
 
             _actor.StartGame();
@@ -3674,10 +3680,10 @@ namespace SICore
                     {
                         var uri = _data.Share.CreateURI(packageLogo.Substring(1), () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
 
-                        foreach (var item in _data.AllPersons.ToArray())
+                        foreach (var person in _data.AllPersons.Keys)
                         {
                             var msg2 = new StringBuilder(msg.ToString());
-                            if (_actor.Client.CurrentServer.Contains(item.Name))
+                            if (_actor.Client.CurrentServer.Contains(person))
                             {
                                 msg2.Append(uri);
                             }
@@ -3686,7 +3692,7 @@ namespace SICore
                                 msg2.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                             }
 
-                            _actor.SendMessage(msg2.ToString(), item.Name);
+                            _actor.SendMessage(msg2.ToString(), person);
                         }
                     }
                 }

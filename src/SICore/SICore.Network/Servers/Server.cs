@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,15 @@ namespace SICore.Network.Servers
     /// </summary>
     public abstract class Server : IServer
     {
+        private const char AnonymousSenderPrefix = '\n';
+
+        private readonly ServerConfiguration _serverConfiguration;
+
         /// <summary>
         /// Список доступных клиентов
         /// </summary>
         protected List<IClient> _clients = new List<IClient>();
+
         protected object _clientsSync = new object();
 
         public object ClientsSync => _clientsSync;
@@ -35,6 +41,8 @@ namespace SICore.Network.Servers
         public event Action<Exception, bool> Error;
 
         public event Action<Message> SerializationError;
+
+        protected event Action<Message> MessageReceived;
 
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
@@ -68,8 +76,9 @@ namespace SICore.Network.Servers
 
         protected readonly INetworkLocalizer _localizer;
 
-        protected Server(INetworkLocalizer localizer)
+        protected Server(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
         {
+            _serverConfiguration = serverConfiguration;
             _localizer = localizer;
         }
 
@@ -116,10 +125,6 @@ namespace SICore.Network.Servers
             }
         }
 
-        protected event Action<Message> MessageReceived;
-
-        private const char AnonymousSenderPrefix = '\n';
-
         /// <summary>
         /// Получено сообщение от внешнего сервера
         /// </summary>
@@ -129,10 +134,11 @@ namespace SICore.Network.Servers
         {
             try
             {
-                
                 string sender = m.Sender, receiver = m.Receiver;
                 if (string.IsNullOrEmpty(receiver))
+                {
                     receiver = IsMain ? NetworkConstants.GameName : NetworkConstants.Everybody;
+                }
 
                 var emptySender = string.IsNullOrEmpty(sender);
 
@@ -140,7 +146,7 @@ namespace SICore.Network.Servers
                 {
                     if (!IsMain)
                     {
-                        OnError(new Exception(_localizer[nameof(R.UnknownSenderMessage)] + ": " + m.Text), true);
+                        OnError(new Exception($"{_localizer[nameof(R.UnknownSenderMessage)]}: {m.Text}"), true);
                         return;
                     }
 
@@ -157,9 +163,18 @@ namespace SICore.Network.Servers
                     }
                 }
 
-                if (sender != m.Sender || receiver != m.Receiver)
+                var messageText = m.Text;
+                if (!m.IsSystem)
                 {
-                    m = new Message(m.Text, sender, receiver, m.IsSystem, m.IsPrivate);
+                    if (messageText.Length > _serverConfiguration.MaxChatMessageLength)
+                    {
+                        messageText = messageText.Substring(0, _serverConfiguration.MaxChatMessageLength);
+                    }
+                }
+
+                if (sender != m.Sender || receiver != m.Receiver || messageText != m.Text)
+                {
+                    m = new Message(messageText, sender, receiver, m.IsSystem, m.IsPrivate);
                 }
 
                 ProcessIncomingMessage(m);
@@ -222,7 +237,9 @@ namespace SICore.Network.Servers
                 foreach (var client in _clients)
                 {
                     if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
+                    {
                         client.AddIncomingMessage(message);
+                    }
                 }
             }
 

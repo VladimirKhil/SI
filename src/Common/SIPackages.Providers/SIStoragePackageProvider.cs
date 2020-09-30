@@ -9,14 +9,14 @@ namespace SIPackages.Providers
 {
     public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     {
-        private readonly Services.SI.SIStorageService _service;
+        private readonly Services.SI.ISIStorageServiceClient _siStorageServiceClient;
         private readonly HashSet<string> _downloadedFiles = new HashSet<string>();
         private readonly string _storageOriginsPath;
         private readonly string _storageUrl;
 
         public SIStoragePackageProvider(string serverAddress, string storageOriginsPath, string storageUrl)
         {
-            _service = new Services.SI.SIStorageService(serverAddress);
+            _siStorageServiceClient = new Services.SI.SIStorageServiceClient(serverAddress);
             _storageOriginsPath = storageOriginsPath;
             _storageUrl = storageUrl;
         }
@@ -87,6 +87,6 @@ namespace SIPackages.Providers
             }
         }
 
-        public async Task<IEnumerable<string>> GetPackagesAsync() => await _service.GetPackagesByTagAsync();
+        public async Task<IEnumerable<string>> GetPackagesAsync() => await _siStorageServiceClient.GetPackagesByTagAsync();
     }
 }
