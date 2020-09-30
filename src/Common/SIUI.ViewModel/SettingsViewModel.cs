@@ -91,6 +91,10 @@ namespace SIUI.ViewModel
 
         public string TableBackColorString => _model.TableBackColorString;
 
+        public string TableGridColorString => _model.TableGridColorString;
+
+        public string AnswererColorString => _model.AnswererColorString;
+
         public string TableFontFamily
         {
             get { return _model.TableFontFamily; }
@@ -123,20 +127,28 @@ namespace SIUI.ViewModel
             QuestionLineSpacing = uiSettings.QuestionLineSpacing;
             _model.TableColorString = uiSettings.TableColorString;
             _model.TableBackColorString = uiSettings.TableBackColorString;
+            _model.TableGridColorString = uiSettings.TableGridColorString;
+            _model.AnswererColorString = uiSettings.AnswererColorString;
             _model.ShowScore = uiSettings.ShowScore;
             _model.KeyboardControl = uiSettings.KeyboardControl;
             _model.Animate3D = uiSettings.Animate3D;
             _model.LogoUri = uiSettings.LogoUri;
+            _model.BackgroundImageUri = uiSettings.BackgroundImageUri;
+            _model.BackgroundVideoUri = uiSettings.BackgroundVideoUri;
         }
 
         public void Reset()
         {
             _model.TableColorString = Settings.DefaultTableColorString;
             _model.TableBackColorString = Settings.DefaultTableBackColorString;
+            _model.TableGridColorString = Settings.DefaultTableGridColorString;
+            _model.AnswererColorString = Settings.DefaultAnswererColorString;
             QuestionLineSpacing = Settings.DefaultQuestionLineSpacing;
             TableFontFamily = Settings.DefaultTableFontFamily;
             _model.Animate3D = true;
             _model.LogoUri = "";
+            _model.BackgroundImageUri = Settings.DefaultBackgroundImageUri;
+            _model.BackgroundVideoUri = Settings.DefaultBackgroundVideoUri;
         }
     }
 }

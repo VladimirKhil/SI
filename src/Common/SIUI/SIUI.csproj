@@ -58,16 +58,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\ImageController.cs" />
+    <Compile Include="Behaviors\LoopBehavior.cs" />
     <Compile Include="Behaviors\MediaController.cs" />
     <Compile Include="Behaviors\HyperlinkBehavior.cs" />
     <Compile Include="Behaviors\QuestionReading.cs" />
     <Compile Include="Converters\Adder.cs" />
     <Compile Include="Converters\ColorConverter.cs" />
+    <Compile Include="Converters\ColorToBrushConverter.cs" />
+    <Compile Include="Converters\FirstNotNullConverter.cs" />
     <Compile Include="Converters\FontConverter.cs" />
     <Compile Include="Converters\HeightToThicknessConverter.cs" />
     <Compile Include="Converters\LengthToDurationConverter.cs" />
     <Compile Include="Converters\LogoConverter.cs" />
     <Compile Include="Converters\Multiplier.cs" />
+    <Compile Include="Converters\NotNullOrEmptyConverter.cs" />
     <Compile Include="Converters\PressedBottomRowHeightConverter.cs" />
     <Compile Include="Converters\PressedTopRowHeightConverter.cs" />
     <Compile Include="Converters\UriToImageSourceConverter.cs" />
@@ -121,7 +125,6 @@
   <ItemGroup>
     <Resource Include="Resources\logo.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -43,9 +43,13 @@ namespace SImulator.ViewModel
                 currentSettings.QuestionLineSpacing = defaultUISettings.QuestionLineSpacing;
                 currentSettings.Model.TableColorString = defaultUISettings.TableColorString;
                 currentSettings.Model.TableBackColorString = defaultUISettings.TableBackColorString;
+                currentSettings.Model.TableGridColorString = defaultUISettings.TableGridColorString;
+                currentSettings.Model.AnswererColorString = defaultUISettings.AnswererColorString;
                 currentSettings.TableFontFamily = defaultUISettings.TableFontFamily;
                 Model.VideoUrl = defaultSettings.VideoUrl;
                 currentSettings.Model.LogoUri = defaultUISettings.LogoUri;
+                currentSettings.Model.BackgroundImageUri = defaultUISettings.BackgroundImageUri;
+                currentSettings.Model.BackgroundVideoUri = defaultUISettings.BackgroundVideoUri;
                 Model.ShowRight = defaultSettings.ShowRight;
                 Model.ShowTextNoFalstart = defaultSettings.ShowTextNoFalstart;
 

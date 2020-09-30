@@ -234,20 +234,13 @@ namespace SImulator.Implementation
             return null;
         }
 
-        public override Task<string> AskSelectLogo()
+        public override Task<string> AskSelectFile(string header)
         {
-            var dialog = new OpenFileDialog() { Title = "Выберите изображение-заставку" };
+            var dialog = new OpenFileDialog { Title = header };
             if (dialog.ShowDialog().Value)
+            {
                 return Task.FromResult(dialog.FileName);
-
-            return Task.FromResult<string>(null);
-        }
-
-        public override Task<string> AskSelectVideo()
-        {
-            var dialog = new OpenFileDialog() { Title = "Выберите заставочный видеофайл" };
-            if (dialog.ShowDialog().Value)
-                return Task.FromResult(dialog.FileName);
+            }
 
             return Task.FromResult<string>(null);
         }

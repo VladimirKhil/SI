@@ -36,8 +36,7 @@ namespace SImulator.ViewModel.PlatformSpecific
 
         public abstract Task<IPackageSource> AskSelectPackage(object arg);
         public abstract string AskSelectColor();
-        public abstract Task<string> AskSelectLogo();
-        public abstract Task<string> AskSelectVideo();
+        public abstract Task<string> AskSelectFile(string header);
         public abstract string AskSelectLogsFolder();
         public abstract Task<bool> AskStopGame();
 

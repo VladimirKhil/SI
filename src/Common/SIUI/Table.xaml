@@ -26,6 +26,14 @@
                     <localc:FontConverter x:Key="FontConverter" />
                     <localc:PressedBottomRowHeightConverter x:Key="PressedBottomRowHeightConverter"/>
                     <localc:PressedTopRowHeightConverter x:Key="PressedTopRowHeightConverter"/>
+                    <localc:NotNullOrEmptyConverter x:Key="NotNullOrEmptyConverter" />
+
+                    <DataTemplate x:Key="EmptyDataTemplate" />
+
+                    <RadialGradientBrush x:Key="DefaultBackground">
+                        <GradientStop Color="{Binding Settings.Model.TableBackColorString, Converter={StaticResource ColorConverter}}" Offset="0" />
+                        <GradientStop Color="{Binding Settings.Model.TableBackColorString}" Offset="1" />
+                    </RadialGradientBrush>
 
                     <Storyboard x:Key="QSelection">
                         <ColorAnimation Storyboard.TargetProperty="(Control.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Duration="0:0:0.05" From="Transparent" To="Cyan" AutoReverse="True" RepeatBehavior="12x" />
@@ -334,7 +342,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
                                     </Grid.RowDefinitions>
-                                    <Border Grid.Row="1" Background="#DD1D1F77" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <Border Grid.Row="1" Background="{Binding Settings.Model.AnswererColorString}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                         <ContentControl>
                                             <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding ActivePlayer}" />
                                         </ContentControl>
@@ -613,7 +621,38 @@
             <GradientStop Color="{Binding Settings.Model.TableBackColorString}" Offset="1" />
         </RadialGradientBrush>
     </UserControl.Background>
-    <ContentControl FontFamily="{Binding Settings.TableFontFamily, Converter={StaticResource FontConverter}}" Name="main"
+    <Grid>
+        <ContentControl HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                        Content="{Binding}">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource NotNullOrEmptyConverter}}" Value="true">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <Image Stretch="UniformToFill" Source="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource UriConverter}}" />
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Settings.Model.BackgroundVideoUri, Converter={StaticResource NotNullOrEmptyConverter}}" Value="true">
+                            <Setter Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <MediaElement lb:LoopBehavior.IsAttached="True" Stretch="UniformToFill" Source="{Binding Settings.Model.BackgroundVideoUri}" />
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+
+        <ContentControl FontFamily="{Binding Settings.TableFontFamily, Converter={StaticResource FontConverter}}" Name="main"
                     Content="{Binding}" IsEnabled="{Binding Enabled}"
                     ContentTemplate="{Binding TStage, Converter={StaticResource TableSelector}}" />
+    </Grid>
 </UserControl>

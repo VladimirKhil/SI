@@ -12,7 +12,11 @@ namespace SIUI.ViewModel.Core
         public const string DefaultTableFontFamily = "_Default";
         public const string DefaultTableColorString = "#FFFFE682";
         public const string DefaultTableBackColorString = "#FF000451";
+        public const string DefaultTableGridColorString = null;
+        public const string DefaultAnswererColorString = "#DD1D1F77";
         public const double DefaultQuestionLineSpacing = 1.5;
+        public const string DefaultBackgroundImageUri = null;
+        public const string DefaultBackgroundVideoUri = null;
 
         private string _tableFontFamily = DefaultTableFontFamily;
 
@@ -45,6 +49,28 @@ namespace SIUI.ViewModel.Core
         {
             get { return _tableBackColorString; }
             set { if (_tableBackColorString != value) { _tableBackColorString = value; OnPropertyChanged(); } }
+        }
+
+        private string _tableGridColorString = DefaultTableGridColorString;
+
+        [XmlAttribute]
+        [DefaultValue(DefaultTableGridColorString)]
+        [DataMember]
+        public string TableGridColorString
+        {
+            get { return _tableGridColorString; }
+            set { if (_tableGridColorString != value) { _tableGridColorString = value; OnPropertyChanged(); } }
+        }
+
+        private string _answererColorString = DefaultAnswererColorString;
+
+        [XmlAttribute]
+        [DefaultValue(DefaultAnswererColorString)]
+        [DataMember]
+        public string AnswererColorString
+        {
+            get { return _answererColorString; }
+            set { if (_answererColorString != value) { _answererColorString = value; OnPropertyChanged(); } }
         }
 
         private double _questionLineSpacing = DefaultQuestionLineSpacing;
@@ -112,6 +138,48 @@ namespace SIUI.ViewModel.Core
             }
         }
 
+        private string _backgroundImageUri = DefaultBackgroundImageUri;
+
+        /// <summary>
+        /// Изображение-фон
+        /// </summary>
+        [DefaultValue(DefaultBackgroundImageUri)]
+        [XmlAttribute]
+        [DataMember]
+        public string BackgroundImageUri
+        {
+            get { return _backgroundImageUri; }
+            set
+            {
+                if (_backgroundImageUri != value)
+                {
+                    _backgroundImageUri = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _backgroundVideoUri = DefaultBackgroundVideoUri;
+
+        /// <summary>
+        /// Видеофайл-фон
+        /// </summary>
+        [DefaultValue(DefaultBackgroundVideoUri)]
+        [XmlAttribute]
+        [DataMember]
+        public string BackgroundVideoUri
+        {
+            get { return _backgroundVideoUri; }
+            set
+            {
+                if (_backgroundVideoUri != value)
+                {
+                    _backgroundVideoUri = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -125,10 +193,14 @@ namespace SIUI.ViewModel.Core
             QuestionLineSpacing = uiSettings._questionLineSpacing;
             TableColorString = uiSettings._tableColorString;
             TableBackColorString = uiSettings._tableBackColorString;
+            TableGridColorString = uiSettings.TableGridColorString;
+            AnswererColorString = uiSettings.AnswererColorString;
             ShowScore = uiSettings._showScore;
             KeyboardControl = uiSettings._keyboardControl;
             Animate3D = uiSettings._animate3D;
             LogoUri = uiSettings._logoUri;
+            BackgroundImageUri = uiSettings.BackgroundImageUri;
+            BackgroundVideoUri = uiSettings.BackgroundVideoUri;
         }
     }
 }

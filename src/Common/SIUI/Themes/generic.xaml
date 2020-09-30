@@ -4,6 +4,8 @@
 
     <localc:Adder x:Key="Adder" />
     <localc:Multiplier x:Key="multiplier" />
+    <localc:FirstNotNullConverter x:Key="FirstNotNullConverter" />
+    <localc:ColorToBrushConverter x:Key="BrushConverter" />
 
     <DropShadowEffect x:Key="Shadow" ShadowDepth="1" BlurRadius="4" Opacity="1" />
 
@@ -21,7 +23,16 @@
 
     <Style TargetType="{x:Type Border}" x:Key="SIBorder">
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource FirstNotNullConverter}">
+                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"
+                             Path="DataContext.Settings.Model.TableGridColorString"
+                             Converter="{StaticResource BrushConverter}"/>
+                    <Binding RelativeSource="{RelativeSource Self}" Path="(TextBlock.Foreground)" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="{x:Type TextBlock}" x:Key="SIText">
@@ -47,6 +58,15 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="TextBlock.Foreground" Value="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=FrameworkElement}, Path=(TextBlock.Foreground)}" />
-        <Setter Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource FirstNotNullConverter}">
+                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=UserControl}"
+                             Path="DataContext.Settings.Model.TableGridColorString"
+                             Converter="{StaticResource BrushConverter}"/>
+                    <Binding RelativeSource="{RelativeSource Self}" Path="(TextBlock.Foreground)" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

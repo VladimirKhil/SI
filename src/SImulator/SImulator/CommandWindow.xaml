@@ -17,7 +17,7 @@
         xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
         SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
         Icon="Images/logo.png"
-        Closing="Window_Closing" Height="500" Width="755" MinHeight="500" MinWidth="755"
+        Closing="Window_Closing" Height="600" Width="755" MinHeight="600" MinWidth="755"
         lb:CommandWindowBehavior.IsAttached="True"
         Background="{StaticResource MainBackground}">
     <Window.Resources>
@@ -770,6 +770,26 @@
                         </Button>
                     </StackPanel>
                     <StackPanel Margin="0,0,5,0">
+                        <TextBlock Style="{StaticResource Header}" Text="Цвет сетки" />
+                        <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.TableGridColorString}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Margin="5,0,0,0">
+                        <TextBlock Style="{StaticResource Header}" Text="Цвет фона отвечающего игрока" />
+                        <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="3" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.AnswererColorString}" />
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </Button>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="Шрифт" />
                         <ComboBox HorizontalAlignment="Stretch" Width="Auto" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SettingsViewModel.SIUISettings.TableFontFamily}">
                             <ComboBox.ItemTemplate>
@@ -800,6 +820,16 @@
                 <DockPanel>
                     <Button Margin="5,0,4,0" Command="{Binding SelectVideoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                     <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding Settings.VideoUrl}" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource Header}" Text="Изображение-фон" />
+                <DockPanel>
+                    <Button Margin="5,0,4,0" Command="{Binding SelectBackgroundImageFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundImageUri}" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource Header}" Text="Видеофайл-фон" />
+                <DockPanel>
+                    <Button Margin="5,0,4,0" Command="{Binding SelectBackgroundVideoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundVideoUri}" />
                 </DockPanel>
                 <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="1" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
             </StackPanel>

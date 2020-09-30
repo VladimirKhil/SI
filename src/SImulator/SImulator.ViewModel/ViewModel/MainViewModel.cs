@@ -44,6 +44,8 @@ namespace SImulator.ViewModel
 
         private readonly SimpleCommand _selectPackage;
         private readonly SimpleCommand _selectVideo;
+        private readonly SimpleCommand _selectBackgroundImageFile;
+        private readonly SimpleCommand _selectBackgroundVideoFile;
         private readonly SimpleCommand _selectLogsFolder;
 
         private readonly SimpleUICommand _listen;
@@ -59,6 +61,8 @@ namespace SImulator.ViewModel
 
         public ICommand SelectPackage => _selectPackage;
         public ICommand SelectVideoFile => _selectVideo;
+        public ICommand SelectBackgroundImageFile => _selectBackgroundImageFile;
+        public ICommand SelectBackgroundVideoFile => _selectBackgroundVideoFile;
         public ICommand SelectLogoFile { get; private set; }
         public ICommand SelectLogsFolder => _selectLogsFolder;
 
@@ -234,6 +238,8 @@ namespace SImulator.ViewModel
             _selectPackage = new SimpleCommand(SelectPackage_Executed);
             SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
             _selectVideo = new SimpleCommand(SelectVideo_Executed);
+            _selectBackgroundImageFile = new SimpleCommand(SelectBackgroundImageFile_Executed);
+            _selectBackgroundVideoFile = new SimpleCommand(SelectBackgroundVideoFile_Executed);
             _selectLogsFolder = new SimpleCommand(SelectLogsFolder_Executed);
 
             _refresh = new SimpleCommand(Refresh_Executed);
@@ -301,15 +307,31 @@ namespace SImulator.ViewModel
 
         private void SelectColor_Executed(object arg)
         {
+            if (!int.TryParse(arg?.ToString(), out var colorMode) || colorMode < 0 || colorMode > 3)
+            {
+                return;
+            }
+
             var color = PlatformManager.Instance.AskSelectColor();
             if (color == null)
                 return;
 
             var settings = Settings.SIUISettings;
-            if (Convert.ToInt32(arg) == 0)
-                settings.TableColorString = color;
-            else
-                settings.TableBackColorString = color;
+            switch (colorMode)
+            {
+                case 0:
+                    settings.TableColorString = color;
+                    break;
+                case 1:
+                    settings.TableBackColorString = color;
+                    break;
+                case 2:
+                    settings.TableGridColorString = color;
+                    break;
+                case 3:
+                    settings.AnswererColorString = color;
+                    break;
+            }
         }
 
         private void MyDefault_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -524,16 +546,38 @@ namespace SImulator.ViewModel
 
         private async void SelectLogoFile_Executed(object arg)
         {
-            var logoUri = await PlatformManager.Instance.AskSelectLogo();
+            var logoUri = await PlatformManager.Instance.AskSelectFile("Выберите изображение-заставку");
             if (logoUri != null)
+            {
                 Settings.SIUISettings.LogoUri = logoUri;
+            }
         }
 
         private async void SelectVideo_Executed(object arg)
         {
-            var videoUrl = await PlatformManager.Instance.AskSelectVideo();
+            var videoUrl = await PlatformManager.Instance.AskSelectFile("Выберите заставочный видеофайл");
             if (videoUrl != null)
+            {
                 Settings.VideoUrl = videoUrl;
+            }
+        }
+
+        private async void SelectBackgroundImageFile_Executed(object arg)
+        {
+            var imageUrl = await PlatformManager.Instance.AskSelectFile("Выберите изображение-фон");
+            if (imageUrl != null)
+            {
+                Settings.SIUISettings.BackgroundImageUri = imageUrl;
+            }
+        }
+
+        private async void SelectBackgroundVideoFile_Executed(object arg)
+        {
+            var videoUrl = await PlatformManager.Instance.AskSelectFile("Выберите видеофайл-фон");
+            if (videoUrl != null)
+            {
+                Settings.SIUISettings.BackgroundVideoUri = videoUrl;
+            }
         }
 
         private void SelectLogsFolder_Executed(object arg)
