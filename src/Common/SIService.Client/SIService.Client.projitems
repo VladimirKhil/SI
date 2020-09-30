@@ -10,11 +10,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\ISIStorageServiceClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\NamedObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\NewServerInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\Package.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\SIStorageService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\SIStorageServiceClient.cs" />
   </ItemGroup>
 </Project>

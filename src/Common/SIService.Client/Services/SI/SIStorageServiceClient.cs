@@ -163,18 +163,5 @@ namespace Services.SI
                 throw new Exception($"SIStorage exception accessing uri {_serverUri}/{request}: {exc.ErrorCode}", exc);
             }
         }
-
-        public async Task SendGameReportAsync(GameResult gameResult, CancellationToken cancellationToken = default)
-        {
-            var sb = new StringBuilder();
-            using (var writer = new StringWriter(sb))
-            {
-                Serializer.Serialize(writer, gameResult);
-            }
-
-            var content = new StringContent(sb.ToString(), Encoding.UTF8, "application/json");
-
-            _ = await Client.PostAsync($"{_serverUri}/GameReport", content, cancellationToken);
-        }
     }
 }
