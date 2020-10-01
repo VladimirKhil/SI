@@ -61,6 +61,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Упрощённая.
+        /// </summary>
+        internal static string GameModes_Sport {
+            get {
+                return ResourceManager.GetString("GameModes_Sport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Классическая.
+        /// </summary>
+        internal static string GameModes_Tv {
+            get {
+                return ResourceManager.GetString("GameModes_Tv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка при сохранении настроек программы.
         /// </summary>
         internal static string SavingSettingsError {
