@@ -187,6 +187,14 @@ namespace SImulator.ViewModel
             set { _activeQuestion = value; OnPropertyChanged(); }
         }
 
+        private Theme _activeTheme;
+
+        public Theme ActiveTheme
+        {
+            get { return _activeTheme; }
+            set { _activeTheme = value; OnPropertyChanged(); }
+        }
+
         private int _mediaProgress;
         private bool _mediaProgressBlock = false;
 
@@ -841,6 +849,8 @@ namespace SImulator.ViewModel
 
             LocalInfo.Text = "Тема: " + theme.Name;
             LocalInfo.TStage = TableStage.Theme;
+
+            ActiveTheme = theme;
         }
 
         private void Engine_EndGame()
@@ -1281,6 +1291,7 @@ namespace SImulator.ViewModel
 
         private void Engine_PrepareFinalQuestion(Theme theme, Question question)
         {
+            ActiveTheme = theme;
             ActiveQuestion = question;
         }
 
@@ -1399,7 +1410,10 @@ namespace SImulator.ViewModel
 
         private async void Engine_QuestionText(string text, IMedia sound)
         {
-            UserInterface.SetText(Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart ? text : ""); // Если не с фальстартами, то текст вопроса не выводится
+            // Если без фальстартов, то выведем тему и стоимость
+            var displayedText = Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart ? text
+                : $"{ActiveTheme?.Name}\n{ActiveQuestion?.Price}";
+            UserInterface.SetText(displayedText);
 
             UserInterface.SetQuestionContentType(QuestionContentType.Text);
 
@@ -1432,6 +1446,7 @@ namespace SImulator.ViewModel
         {
             _answeringHistory.Push(null);
 
+            ActiveTheme = theme;
             ActiveQuestion = question;
 
             LogScore();
