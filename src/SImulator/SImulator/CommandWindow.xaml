@@ -403,6 +403,12 @@
             </TaskbarItemInfo.ThumbButtonInfos>
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding AddRight}" Key="Add" />
+        <KeyBinding Command="{Binding AddRight}" Key="OemPlus" />
+        <KeyBinding Command="{Binding AddWrong}" Key="Subtract" />
+        <KeyBinding Command="{Binding AddWrong}" Key="OemMinus" />
+    </Window.InputBindings>
     <TabControl TabStripPlacement="Left" Background="White" BorderThickness="1,0,0,0" Padding="6,4,4,4" Margin="-2,0,0,0">
         <TabItem Header="Старт" IsSelected="{Binding Transition, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:ModeTransition.ModeratorToStart}, Mode=OneWay}" Visibility="{Binding Mode, Converter={StaticResource StartView}}">
             <Grid Margin="2,2,0,0">

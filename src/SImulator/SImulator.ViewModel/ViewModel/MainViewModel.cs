@@ -95,6 +95,10 @@ namespace SImulator.ViewModel
             set { if (_activePlayerButtonCommand != value) { _activePlayerButtonCommand = value; OnPropertyChanged(); } }
         }
 
+        public ICommand AddRight { get; private set; }
+
+        public ICommand AddWrong { get; private set; }
+
         private IPackageSource _packageSource;
 
         /// <summary>
@@ -260,6 +264,9 @@ namespace SImulator.ViewModel
             AddPlayer = new SimpleCommand(AddPlayer_Executed);
             RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
 
+            AddRight = new SimpleCommand(AddRight_Executed);
+            AddWrong = new SimpleCommand(AddWrong_Executed);
+
             ActiveListenCommand = _listen;
             ActivePlayerButtonCommand = _addPlayerButton;
 
@@ -294,6 +301,16 @@ namespace SImulator.ViewModel
                 return;
 
             Players.Remove(player);
+        }
+
+        private void AddRight_Executed(object arg)
+        {
+            _game.AddRight.Execute(null);
+        }
+
+        private void AddWrong_Executed(object arg)
+        {
+            _game.AddWrong.Execute(null);
         }
 
         private void NavigateToSite_Executed(object arg)

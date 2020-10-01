@@ -53,6 +53,7 @@ namespace SImulator.ViewModel
         private bool _mediaStopped;
 
         private PlayerInfo _selectedPlayer = null;
+
         private readonly List<PlayerInfo> _selectedPlayers = new List<PlayerInfo>();
         private readonly Dictionary<Guid, PlayerInfo> _playersTable = new Dictionary<Guid, PlayerInfo>();
 
@@ -721,7 +722,14 @@ namespace SImulator.ViewModel
         private void AddRight_Executed(object arg)
         {
             if (!(arg is PlayerInfo player))
-                return;
+            {
+                if (_selectedPlayer == null)
+                {
+                    return;
+                }
+
+                player = _selectedPlayer;
+            }
 
             player.Right++;
             player.Sum += Price;
@@ -745,7 +753,14 @@ namespace SImulator.ViewModel
         private void AddWrong_Executed(object arg)
         {
             if (!(arg is PlayerInfo player))
-                return;
+            {
+                if (_selectedPlayer == null)
+                {
+                    return;
+                }
+
+                player = _selectedPlayer;
+            }
 
             player.Wrong++;
 
