@@ -21,7 +21,7 @@ namespace SImulator.ViewModel.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<string> AskSelectLogo()
+        public override Task<string> AskSelectFile(string header)
         {
             throw new NotImplementedException();
         }
@@ -32,11 +32,6 @@ namespace SImulator.ViewModel.Tests
         }
 
         public override Task<IPackageSource> AskSelectPackage(object arg)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<string> AskSelectVideo()
         {
             throw new NotImplementedException();
         }

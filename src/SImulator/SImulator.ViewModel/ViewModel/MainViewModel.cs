@@ -47,6 +47,7 @@ namespace SImulator.ViewModel
         private readonly SimpleCommand _selectBackgroundImageFile;
         private readonly SimpleCommand _selectBackgroundVideoFile;
         private readonly SimpleCommand _selectLogsFolder;
+        private readonly SimpleCommand _selectAudioFile;
 
         private readonly SimpleUICommand _listen;
         private readonly SimpleUICommand _stopListen;
@@ -65,6 +66,7 @@ namespace SImulator.ViewModel
         public ICommand SelectBackgroundVideoFile => _selectBackgroundVideoFile;
         public ICommand SelectLogoFile { get; private set; }
         public ICommand SelectLogsFolder => _selectLogsFolder;
+        public ICommand SelectAudioFile => _selectAudioFile;
 
         public ICommand DeletePlayerKey => _removePlayerButton;
 
@@ -241,6 +243,7 @@ namespace SImulator.ViewModel
             _selectBackgroundImageFile = new SimpleCommand(SelectBackgroundImageFile_Executed);
             _selectBackgroundVideoFile = new SimpleCommand(SelectBackgroundVideoFile_Executed);
             _selectLogsFolder = new SimpleCommand(SelectLogsFolder_Executed);
+            _selectAudioFile = new SimpleCommand(SelectAudioFile_Executed);
 
             _refresh = new SimpleCommand(Refresh_Executed);
 
@@ -585,6 +588,63 @@ namespace SImulator.ViewModel
             var folder = PlatformManager.Instance.AskSelectLogsFolder();
             if (folder != null)
                 Settings.LogsFolder = folder;
+        }
+
+        private async void SelectAudioFile_Executed(object arg)
+        {
+            if (!int.TryParse(arg?.ToString(), out var fileId))
+            {
+                return;
+            }
+
+            var fileUri = await PlatformManager.Instance.AskSelectFile("Выберите аудиофайл");
+            if (fileUri == null)
+            {
+                return;
+            }
+
+            switch (fileId)
+            {
+                case 0:
+                    Settings.Sounds.BeginGame = fileUri;
+                    break;
+
+                case 1:
+                    Settings.Sounds.GameThemes = fileUri;
+                    break;
+
+                case 2:
+                    Settings.Sounds.QuestionSelected = fileUri;
+                    break;
+
+                case 3:
+                    Settings.Sounds.PlayerPressed = fileUri;
+                    break;
+
+                case 4:
+                    Settings.Sounds.SecretQuestion = fileUri;
+                    break;
+
+                case 5:
+                    Settings.Sounds.StakeQuestion = fileUri;
+                    break;
+
+                case 6:
+                    Settings.Sounds.NoRiskQuestion = fileUri;
+                    break;
+
+                case 7:
+                    Settings.Sounds.AnswerRight = fileUri;
+                    break;
+
+                case 8:
+                    Settings.Sounds.AnswerWrong = fileUri;
+                    break;
+
+                case 9:
+                    Settings.Sounds.NoAnswer = fileUri;
+                    break;
+            }
         }
 
         private void Refresh_Executed(object arg)

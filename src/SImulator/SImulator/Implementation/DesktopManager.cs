@@ -22,6 +22,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using Screen = System.Windows.Forms.Screen;
+using SIUI.ViewModel.Core;
 
 namespace SImulator.Implementation
 {
@@ -283,7 +284,17 @@ namespace SImulator.Implementation
                 return;
             }
 
-            var source = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds", name);
+            if (!Uri.TryCreate(name, UriKind.RelativeOrAbsolute, out var uri))
+            {
+                return;
+            }
+
+            var source = uri.IsAbsoluteUri && uri.IsFile ? name : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds", name);
+
+            if (uri.IsAbsoluteUri && uri.IsFile && !File.Exists(source))
+            {
+                return;
+            }
 
             if (_mediaTimeline == null)
             {

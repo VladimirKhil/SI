@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace SImulator.ViewModel.Model
 {
-    public sealed class AppSettings : INotifyPropertyChanged 
+    public sealed class AppSettings : INotifyPropertyChanged
     {
         #region Settings
 
@@ -599,6 +599,8 @@ namespace SImulator.ViewModel.Model
                 }
             }
         }
+
+        public SoundsSettings Sounds { get; set; } = new SoundsSettings();
 
         #endregion
 

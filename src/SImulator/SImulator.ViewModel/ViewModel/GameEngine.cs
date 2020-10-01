@@ -457,7 +457,7 @@ namespace SImulator.ViewModel
                         QuestionTime++;
                         if (QuestionTime >= QuestionTimeMax)
                         {
-                            UserInterface.SetSound(Sounds.NoAnswer);
+                            UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
                             StopQuestionTimer_Executed(null);
                             ActiveQuestionCommand = null;
 
@@ -718,6 +718,8 @@ namespace SImulator.ViewModel
             player.Right++;
             player.Sum += Price;
 
+            UserInterface.SetSound(Settings.Model.Sounds.AnswerRight);
+
             _logger.Write("{0} +{1}", player.Name, Price);
 
             _answeringHistory.Push(Tuple.Create(player, Price, true));
@@ -741,6 +743,8 @@ namespace SImulator.ViewModel
 
             var substract = Settings.Model.SubstractOnWrong ? Price : 0;
             player.Sum -= substract;
+
+            UserInterface.SetSound(Settings.Model.Sounds.AnswerWrong);
 
             _logger.Write("{0} -{1}", player.Name, substract);
 
@@ -919,7 +923,9 @@ namespace SImulator.ViewModel
                 UserInterface.SetQuestionContentType(QuestionContentType.Video);
             }
             else
-                UserInterface.SetSound(Sounds.BeginGame);
+            {
+                UserInterface.SetSound(Settings.Model.Sounds.BeginGame);
+            }
 
             LocalInfo.TStage = TableStage.Sign;
         }
@@ -928,6 +934,8 @@ namespace SImulator.ViewModel
         {
             UserInterface.SetGameThemes(themes);
             LocalInfo.TStage = TableStage.GameThemes;
+
+            UserInterface.SetSound(Settings.Model.Sounds.GameThemes);
         }
 
         private void Engine_Round(Round round)
@@ -1431,6 +1439,7 @@ namespace SImulator.ViewModel
 
             if (question.Type.Name == QuestionTypes.Simple)
             {
+                UserInterface.SetSound(Settings.Model.Sounds.QuestionSelected);
                 UserInterface.PlaySimpleSelection(themeIndex, questionIndex);
             }
             else
@@ -1440,20 +1449,20 @@ namespace SImulator.ViewModel
                 {
                     case QuestionTypes.Cat:
                     case QuestionTypes.BagCat:
-                        UserInterface.SetSound(Sounds.SecretQuestion);
+                        UserInterface.SetSound(Settings.Model.Sounds.SecretQuestion);
                         UserInterface.SetText("ВОПРОС С СЕКРЕТОМ");
                         _logger.Write("ВОПРОС С СЕКРЕТОМ");
                         setActive = false;
                         break;
 
                     case QuestionTypes.Auction:
-                        UserInterface.SetSound(Sounds.StakeQuestion);
+                        UserInterface.SetSound(Settings.Model.Sounds.StakeQuestion);
                         UserInterface.SetText("ВОПРОС СО СТАВКОЙ");
                         _logger.Write("ВОПРОС СО СТАВКОЙ");
                         break;
 
                     case QuestionTypes.Sponsored:
-                        // UserInterface.SetSound(Sounds.NoRiskQuestion); // TODO
+                        UserInterface.SetSound(Settings.Model.Sounds.NoRiskQuestion);
                         UserInterface.SetText("ВОПРОС БЕЗ РИСКА");
                         _logger.Write("ВОПРОС БЕЗ РИСКА");
                         setActive = false;
@@ -1566,7 +1575,7 @@ namespace SImulator.ViewModel
 
             try
             {
-                UserInterface.SetSound(Sounds.PlayerPressed);
+                UserInterface.SetSound(Settings.Model.Sounds.PlayerPressed);
                 UserInterface.SetPlayer(index);
             }
             catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)

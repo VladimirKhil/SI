@@ -105,16 +105,7 @@ namespace SIUI.ViewModel
             set { _playerIndex = value; OnPropertyChanged(nameof(ActivePlayer)); }
         }
 
-        public string ActivePlayer
-        {
-            get
-            {
-                if (_playerIndex < 0 || _playerIndex >= Players.Count)
-                    return "";
-
-                return Players[_playerIndex].Name;
-            }
-        }
+        public string ActivePlayer => _playerIndex < 0 || _playerIndex >= Players.Count ? "" : Players[_playerIndex].Name;
 
         /// <summary>
         /// Игроки, проигравшие кнопку

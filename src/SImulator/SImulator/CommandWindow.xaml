@@ -1014,6 +1014,63 @@
                 </StackPanel>
             </StackPanel>
         </TabItem>
+        <TabItem Header="Звуки" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="2,2,0,0">
+                    <TextBlock Style="{StaticResource Header}" Text="Начало игры" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="0" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.BeginGame}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Темы игры" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="1" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.GameThemes}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Выбор вопроса" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="2" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.QuestionSelected}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Нажатие на кнопку" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="3" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.PlayerPressed}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Вопрос с секретом" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="4" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.SecretQuestion}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Вопрос со ставкой" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="5" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.StakeQuestion}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Вопрос без риска" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="6" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoRiskQuestion}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Правильный ответ" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="7" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerRight}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Неверный ответ" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="8" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerWrong}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Нет ответа" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="9" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoAnswer}" />
+                    </DockPanel>
+                    <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="8" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
         <TabItem Header="О программе">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">

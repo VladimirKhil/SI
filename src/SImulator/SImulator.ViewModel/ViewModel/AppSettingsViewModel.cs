@@ -37,6 +37,7 @@ namespace SImulator.ViewModel
             var design = arg == null || arg.ToString() == "1";
             var rules = arg == null || arg.ToString() == "2";
             var buttons = arg == null || arg.ToString() == "4";
+            var sounds = arg == null || arg.ToString() == "8";
 
             if (design)
             {
@@ -80,6 +81,20 @@ namespace SImulator.ViewModel
             if (buttons)
             {
                 currentSettings.Model.KeyboardControl = defaultUISettings.KeyboardControl;
+            }
+
+            if (sounds)
+            {
+                Model.Sounds.BeginGame = defaultSettings.Sounds.BeginGame;
+                Model.Sounds.GameThemes = defaultSettings.Sounds.GameThemes;
+                Model.Sounds.QuestionSelected = defaultSettings.Sounds.QuestionSelected;
+                Model.Sounds.PlayerPressed = defaultSettings.Sounds.PlayerPressed;
+                Model.Sounds.NoRiskQuestion = defaultSettings.Sounds.NoRiskQuestion;
+                Model.Sounds.SecretQuestion = defaultSettings.Sounds.SecretQuestion;
+                Model.Sounds.StakeQuestion = defaultSettings.Sounds.StakeQuestion;
+                Model.Sounds.AnswerRight = defaultSettings.Sounds.AnswerRight;
+                Model.Sounds.AnswerWrong = defaultSettings.Sounds.AnswerWrong;
+                Model.Sounds.NoAnswer = defaultSettings.Sounds.NoAnswer;
             }
         }
     }
