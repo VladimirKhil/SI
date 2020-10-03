@@ -77,5 +77,23 @@ namespace SImulator.ViewModel.Properties {
                 return ResourceManager.GetString("Error", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Папка лицензий не найдена!.
+        /// </summary>
+        internal static string NoLicensesFolder {
+            get {
+                return ResourceManager.GetString("NoLicensesFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка при открытии папки лицензий: {0}.
+        /// </summary>
+        internal static string OpenLicensesError {
+            get {
+                return ResourceManager.GetString("OpenLicensesError", resourceCulture);
+            }
+        }
     }
 }

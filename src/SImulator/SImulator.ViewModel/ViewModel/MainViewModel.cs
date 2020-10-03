@@ -16,6 +16,8 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.IO;
+using System.Diagnostics;
 
 namespace SImulator.ViewModel
 {
@@ -98,6 +100,8 @@ namespace SImulator.ViewModel
         public ICommand AddRight { get; private set; }
 
         public ICommand AddWrong { get; private set; }
+
+        public ICommand OpenLicensesFolder { get; private set; }
 
         private IPackageSource _packageSource;
 
@@ -267,6 +271,8 @@ namespace SImulator.ViewModel
             AddRight = new SimpleCommand(AddRight_Executed);
             AddWrong = new SimpleCommand(AddWrong_Executed);
 
+            OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
+
             ActiveListenCommand = _listen;
             ActivePlayerButtonCommand = _addPlayerButton;
 
@@ -311,6 +317,25 @@ namespace SImulator.ViewModel
         private void AddWrong_Executed(object arg)
         {
             _game.AddWrong.Execute(null);
+        }
+
+        private void OpenLicensesFolder_Executed(object arg)
+        {
+            var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "licenses");
+            if (!Directory.Exists(licensesFolder))
+            {
+                PlatformManager.Instance.ShowMessage(Resources.NoLicensesFolder);
+                return;
+            }
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(licensesFolder));
+            }
+            catch (Exception exc)
+            {
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), true);
+            }
         }
 
         private void NavigateToSite_Executed(object arg)
