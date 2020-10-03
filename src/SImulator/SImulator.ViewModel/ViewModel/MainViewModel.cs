@@ -686,6 +686,26 @@ namespace SImulator.ViewModel
                 case 9:
                     Settings.Sounds.NoAnswer = fileUri;
                     break;
+
+                case 10:
+                    Settings.Sounds.RoundBegin = fileUri;
+                    break;
+
+                case 11:
+                    Settings.Sounds.RoundThemes = fileUri;
+                    break;
+
+                case 12:
+                    Settings.Sounds.RoundTimeout = fileUri;
+                    break;
+
+                case 13:
+                    Settings.Sounds.FinalDelete = fileUri;
+                    break;
+
+                case 14:
+                    Settings.Sounds.FinalThink = fileUri;
+                    break;
             }
         }
 

@@ -278,9 +278,7 @@ namespace SImulator.Implementation
         {
             if (string.IsNullOrEmpty(name))
             {
-                if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
-                    _mediaClock.Controller.Stop();
-
+                StopSound();
                 return;
             }
 
@@ -293,6 +291,7 @@ namespace SImulator.Implementation
 
             if (uri.IsAbsoluteUri && uri.IsFile && !File.Exists(source))
             {
+                StopSound();
                 return;
             }
 
@@ -304,8 +303,7 @@ namespace SImulator.Implementation
             }
             else
             {
-                if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
-                    _mediaClock.Controller.Stop();
+                StopSound();
             }
 
             _mediaTimeline.Source = new Uri(source, UriKind.RelativeOrAbsolute);
@@ -313,6 +311,12 @@ namespace SImulator.Implementation
             _player.Clock = _mediaClock;
 
             _mediaClock.Controller.Begin();
+        }
+
+        private void StopSound()
+        {
+            if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
+                _mediaClock.Controller.Stop();
         }
 
         public override ILogger CreateLogger(string folder)

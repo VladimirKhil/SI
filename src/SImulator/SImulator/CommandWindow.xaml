@@ -1033,6 +1033,16 @@
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="1" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.GameThemes}" />
                     </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Начало раунда" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="10" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundBegin}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Темы раунда" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="11" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundThemes}" />
+                    </DockPanel>
                     <TextBlock Style="{StaticResource Header}" Text="Выбор вопроса" />
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="2" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
@@ -1073,6 +1083,21 @@
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="9" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoAnswer}" />
                     </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Окончание времени раунда" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="12" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundTimeout}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Удаление темы в финале" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="13" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.FinalDelete}" />
+                    </DockPanel>
+                    <TextBlock Style="{StaticResource Header}" Text="Размышление в финале" />
+                    <DockPanel>
+                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="14" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.FinalThink}" />
+                    </DockPanel>
                     <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="8" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
                 </StackPanel>
             </ScrollViewer>
@@ -1093,7 +1118,7 @@
                     </DockPanel>
                     <TextBlock><Hyperlink Command="{Binding OpenLicensesFolder}"><LineBreak />Лицензии используемых компонентов</Hyperlink></TextBlock>
                     <TextBlock Margin="1,1,5,1" TextWrapping="Wrap"><LineBreak />Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
-                    <LineBreak /><LineBreak />Программа распространяется бесплатно. Возможна разработка аналогичных систем на её основе за дополнительную плату.
+                    <LineBreak /><LineBreak />Программа распространяется бесплатно.
                     <LineBreak /><LineBreak />Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
                     <LineBreak /><LineBreak />Программа поставляется «как есть». Автор не даёт никаких гарантий, что работа Программы будет соответствовать ожиданиям Пользователя. Автор не обязан исправлять Программу при возникновении данного несоответствия. Автор не несёт ответственности за ущерб, причинённый использованием данной Программы.
                     <LineBreak /><LineBreak />Устанавливая и используя Программу, вы автоматически принимаете данное Соглашение. Вы можете передать права на использование Программы третьему лицу при условии его согласия с данным Соглашением. Если вы не согласны с каким-либо условием данного Соглашения, вы не имеете права использовать данную Программу.

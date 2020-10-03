@@ -87,6 +87,8 @@ namespace SImulator.ViewModel
             {
                 Model.Sounds.BeginGame = defaultSettings.Sounds.BeginGame;
                 Model.Sounds.GameThemes = defaultSettings.Sounds.GameThemes;
+                Model.Sounds.RoundBegin = defaultSettings.Sounds.RoundBegin;
+                Model.Sounds.RoundThemes = defaultSettings.Sounds.RoundThemes;
                 Model.Sounds.QuestionSelected = defaultSettings.Sounds.QuestionSelected;
                 Model.Sounds.PlayerPressed = defaultSettings.Sounds.PlayerPressed;
                 Model.Sounds.NoRiskQuestion = defaultSettings.Sounds.NoRiskQuestion;
@@ -95,6 +97,9 @@ namespace SImulator.ViewModel
                 Model.Sounds.AnswerRight = defaultSettings.Sounds.AnswerRight;
                 Model.Sounds.AnswerWrong = defaultSettings.Sounds.AnswerWrong;
                 Model.Sounds.NoAnswer = defaultSettings.Sounds.NoAnswer;
+                Model.Sounds.RoundTimeout = defaultSettings.Sounds.RoundTimeout;
+                Model.Sounds.FinalDelete = defaultSettings.Sounds.FinalDelete;
+                Model.Sounds.FinalThink = defaultSettings.Sounds.FinalThink;
             }
         }
     }

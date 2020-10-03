@@ -11,6 +11,12 @@ namespace SImulator.ViewModel.Model
         private string _gameThemes = "";
         public string GameThemes { get => _gameThemes; set { _gameThemes = value; OnPropertyChanged(); } }
 
+        private string _roundBegin = "round_begin.mp3";
+        public string RoundBegin { get => _roundBegin; set { _roundBegin = value; OnPropertyChanged(); } }
+
+        private string _roundThemes = "round_themes.mp3";
+        public string RoundThemes { get => _roundThemes; set { _roundThemes = value; OnPropertyChanged(); } }
+
         private string _questionSelected = "";
         public string QuestionSelected { get => _questionSelected; set { _questionSelected = value; OnPropertyChanged(); } }
 
@@ -34,6 +40,15 @@ namespace SImulator.ViewModel.Model
 
         private string _noAnswer = "question_noanswers.mp3";
         public string NoAnswer { get => _noAnswer; set { _noAnswer = value; OnPropertyChanged(); } }
+
+        private string _roundTimeout = "round_timeout.mp3";
+        public string RoundTimeout { get => _roundTimeout; set { _roundTimeout = value; OnPropertyChanged(); } }
+
+        private string _finalDelete = "final_delete.mp3";
+        public string FinalDelete { get => _finalDelete; set { _finalDelete = value; OnPropertyChanged(); } }
+
+        private string _finalThink = "final_think.mp3";
+        public string FinalThink { get => _finalThink; set { _finalThink = value; OnPropertyChanged(); } }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

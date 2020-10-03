@@ -248,7 +248,7 @@ namespace SIEngine
                     OnSound();
                     if (!_useAnswerMarker)
                     {
-                        OnSimpleAnswer(_activeQuestion.Right.Count > 0 ? _activeQuestion.Right[0] : "Ответ не задан!");
+                        OnSimpleAnswer(_activeQuestion.Right.Count > 0 ? _activeQuestion.Right[0] : "-");
                     }
                     else
                     {

@@ -180,6 +180,7 @@ namespace SIEngine
         public event Action<int> ThemeSelected;
         public event Action<Theme, Question> PrepareFinalQuestion;
 
+        [Obsolete]
         public event Action<string> Sound;
 
         public event Action<string> Error;
@@ -257,6 +258,7 @@ namespace SIEngine
 
         protected void OnPrepareFinalQuestion(Theme theme, Question question) => PrepareFinalQuestion?.Invoke(theme, question);
 
+        [Obsolete]
         protected void OnSound(string name = "") => Sound?.Invoke(name);
 
         protected void OnError(string error) => Error?.Invoke(error);

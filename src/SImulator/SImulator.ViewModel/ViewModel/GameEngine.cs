@@ -180,6 +180,8 @@ namespace SImulator.ViewModel
             set { _questionTimeMax = value; OnPropertyChanged(); }
         }
 
+        private Round _activeRound;
+
         private Question _activeQuestion;
 
         public Question ActiveQuestion
@@ -334,9 +336,8 @@ namespace SImulator.ViewModel
             _engine.NextQuestion += Engine_NextQuestion;
             _engine.RoundEmpty += Engine_RoundEmpty;
             _engine.FinalThemes += Engine_FinalThemes;
-            _engine.ThemeSelected += Engine_Theme;
+            _engine.ThemeSelected += Engine_ThemeSelected;
             _engine.PrepareFinalQuestion += Engine_PrepareFinalQuestion;
-            _engine.Sound += Engine_Sound;
             _engine.Error += OnError;
             _engine.EndGame += Engine_EndGame;
 
@@ -965,14 +966,14 @@ namespace SImulator.ViewModel
 
         private void Engine_Round(Round round)
         {
-            if (round == null)
-                throw new ArgumentNullException(nameof(round));
+            _activeRound = round ?? throw new ArgumentNullException(nameof(round));
 
             if (UserInterface == null)
                 return;
 
             UserInterface.SetText(round.Name);
             UserInterface.SetStage(TableStage.Round);
+            UserInterface.SetSound(Settings.Model.Sounds.RoundBegin);
             LocalInfo.TStage = TableStage.Round;
 
             _logger.Write("\r\nРаунд {0}", round.Name);
@@ -1008,6 +1009,7 @@ namespace SImulator.ViewModel
             }
 
             UserInterface.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
+            UserInterface.SetSound(Settings.Model.Sounds.RoundThemes);
             ShowingRoundThemes = true;
             LocalInfo.TStage = TableStage.RoundTable;
         }
@@ -1033,7 +1035,10 @@ namespace SImulator.ViewModel
         private void Engine_WaitTry(Question question, bool final)
         {
             if (final)
+            {
+                UserInterface.SetSound(Settings.Model.Sounds.FinalThink);
                 return;
+            }
 
             if (question.Type.Name == QuestionTypes.Simple)
             {
@@ -1062,6 +1067,7 @@ namespace SImulator.ViewModel
                 _buttonManager.Stop();
 
             UserInterface.SetQuestionStyle(QuestionStyle.Normal);
+            UserInterface.SetSound("");
         }
 
         private void Engine_RoundEmpty()
@@ -1082,6 +1088,7 @@ namespace SImulator.ViewModel
 
         private void Engine_RoundTimeout()
         {
+            UserInterface.SetSound(Settings.Model.Sounds.RoundTimeout);
             _logger.Write("Время раунда вышло.");
         }
 
@@ -1125,6 +1132,7 @@ namespace SImulator.ViewModel
             }
 
             UserInterface.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
+            UserInterface.SetSound("");
             LocalInfo.TStage = TableStage.Final;
         }
 
@@ -1132,11 +1140,7 @@ namespace SImulator.ViewModel
         {
             UserInterface.SetText(answer);
             UserInterface.SetStage(TableStage.Answer);
-        }
-
-        private void Engine_Sound(string name = "")
-        {
-            UserInterface.SetSound(name);
+            UserInterface.SetSound("");
         }
 
         /// <summary>
@@ -1202,9 +1206,10 @@ namespace SImulator.ViewModel
 
         #endregion
 
-        private void Engine_Theme(int themeIndex)
+        private void Engine_ThemeSelected(int themeIndex)
         {
             UserInterface.PlaySelection(themeIndex);
+            UserInterface.SetSound(Settings.Model.Sounds.FinalDelete);
         }
 
         private void UpdateNextCommand()
@@ -1308,6 +1313,8 @@ namespace SImulator.ViewModel
         {
             ActiveTheme = theme;
             ActiveQuestion = question;
+
+            UserInterface.SetSound("");
         }
 
         /// <summary>
@@ -1335,6 +1342,7 @@ namespace SImulator.ViewModel
         private void Engine_NextRound(bool showSign)
         {
             ActiveRoundCommand = null;
+            UserInterface.SetSound("");
 
             if (showSign)
                 UserInterface.SetStage(TableStage.Sign);
@@ -1426,8 +1434,9 @@ namespace SImulator.ViewModel
         private async void Engine_QuestionText(string text, IMedia sound)
         {
             // Если без фальстартов, то выведем тему и стоимость
-            var displayedText = Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart ? text
+            var displayedText = Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart || _activeRound?.Type == RoundTypes.Final ? text
                 : $"{ActiveTheme?.Name}\n{ActiveQuestion?.Price}";
+
             UserInterface.SetText(displayedText);
 
             UserInterface.SetQuestionContentType(QuestionContentType.Text);
