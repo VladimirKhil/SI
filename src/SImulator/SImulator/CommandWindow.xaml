@@ -899,6 +899,20 @@
                     <CheckBox IsChecked="{Binding PlaySpecials}">Играть спецвопросы</CheckBox>
                     <CheckBox Margin="5,0,0,0" IsChecked="{Binding ShowLostButtonPlayers}">Показывать игроков, проигравших кнопку</CheckBox>
                 </UniformGrid>
+                <Expander Header="Псевдонимы спецвопросов" IsExpanded="False" DataContext="{Binding SettingsViewModel.Model}" IsEnabled="{Binding PlaySpecials}">
+                    <Grid Margin="3" Background="LightGray">
+                        <UniformGrid Columns="2" Margin="3">
+                            <TextBlock FontWeight="Bold">Название</TextBlock>
+                            <TextBlock FontWeight="Bold">Псевдоним</TextBlock>
+                            <TextBlock>Вопрос со ставкой</TextBlock>
+                            <TextBox HorizontalAlignment="Stretch" Width="Auto" Text="{Binding SpecialsAliases.StakeQuestionAlias, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                            <TextBlock>Вопрос с секретом</TextBlock>
+                            <TextBox HorizontalAlignment="Stretch" Width="Auto" Text="{Binding SpecialsAliases.SecretQuestionAlias, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                            <TextBlock>Вопрос без риска</TextBlock>
+                            <TextBox HorizontalAlignment="Stretch" Width="Auto" Text="{Binding SpecialsAliases.NoRiskQuestionAlias, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        </UniformGrid>
+                    </Grid>
+                </Expander>
                 <CheckBox IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" IsChecked="{Binding Settings.SaveLogs}" Margin="0,5">Сохранять логи в папку:</CheckBox>
                 <DockPanel IsEnabled="{Binding Settings.SaveLogs}">
                     <Button Margin="5,0,4,0" Command="{Binding SelectLogsFolder}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>

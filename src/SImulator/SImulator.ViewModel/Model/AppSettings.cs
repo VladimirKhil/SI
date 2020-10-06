@@ -602,6 +602,8 @@ namespace SImulator.ViewModel.Model
 
         public SoundsSettings Sounds { get; set; } = new SoundsSettings();
 
+        public SpecialsAliases SpecialsAliases { get; set; } = new SpecialsAliases();
+
         #endregion
 
         public void Save(Stream stream, XmlSerializer serializer = null)

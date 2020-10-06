@@ -76,6 +76,10 @@ namespace SImulator.ViewModel
                 Model.PlaySpecials = defaultSettings.PlaySpecials;
                 Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
                 Model.GameMode = defaultSettings.GameMode;
+
+                Model.SpecialsAliases.StakeQuestionAlias = defaultSettings.SpecialsAliases.StakeQuestionAlias;
+                Model.SpecialsAliases.SecretQuestionAlias = defaultSettings.SpecialsAliases.SecretQuestionAlias;
+                Model.SpecialsAliases.NoRiskQuestionAlias = defaultSettings.SpecialsAliases.NoRiskQuestionAlias;
             }
 
             if (buttons)

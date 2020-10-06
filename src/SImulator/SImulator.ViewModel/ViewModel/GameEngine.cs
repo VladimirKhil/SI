@@ -1489,21 +1489,18 @@ namespace SImulator.ViewModel
                     case QuestionTypes.Cat:
                     case QuestionTypes.BagCat:
                         UserInterface.SetSound(Settings.Model.Sounds.SecretQuestion);
-                        UserInterface.SetText("ВОПРОС С СЕКРЕТОМ");
-                        _logger.Write("ВОПРОС С СЕКРЕТОМ");
+                        PrintQuestionType("ВОПРОС С СЕКРЕТОМ", Settings.Model.SpecialsAliases.SecretQuestionAlias);
                         setActive = false;
                         break;
 
                     case QuestionTypes.Auction:
                         UserInterface.SetSound(Settings.Model.Sounds.StakeQuestion);
-                        UserInterface.SetText("ВОПРОС СО СТАВКОЙ");
-                        _logger.Write("ВОПРОС СО СТАВКОЙ");
+                        PrintQuestionType("ВОПРОС СО СТАВКОЙ", Settings.Model.SpecialsAliases.StakeQuestionAlias);
                         break;
 
                     case QuestionTypes.Sponsored:
                         UserInterface.SetSound(Settings.Model.Sounds.NoRiskQuestion);
-                        UserInterface.SetText("ВОПРОС БЕЗ РИСКА");
-                        _logger.Write("ВОПРОС БЕЗ РИСКА");
+                        PrintQuestionType("ВОПРОС БЕЗ РИСКА", Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                         setActive = false;
                         break;
 
@@ -1518,6 +1515,14 @@ namespace SImulator.ViewModel
 
             _logger.Write(question.Scenario.ToString());
             Price = question.Price;
+        }
+
+        private void PrintQuestionType(string originalTypeName, string aliasName)
+        {
+            var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
+
+            UserInterface.SetText(actualName);
+            _logger.Write(actualName);
         }
 
         private void OnError(string error)
