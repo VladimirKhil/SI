@@ -17,7 +17,7 @@ namespace SICore
         /// <summary>
         /// Глобальный генератор случайных чисел
         /// </summary>
-        public static Random Rand = new Random();
+        public static readonly Random Rand = new Random();
 
         /// <summary>
         /// Информация, используемая табло

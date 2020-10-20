@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SIData;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -348,15 +349,9 @@ namespace SICore
             }
         }
 
-        internal void UpdatePlayers()
-        {
-            OnPropertyChanged(nameof(Players));
-        }
+        internal void UpdatePlayers() => OnPropertyChanged(nameof(Players));
 
-        internal void UpdateViewers()
-        {
-            OnPropertyChanged(nameof(Viewers));
-        }
+        internal void UpdateViewers() => OnPropertyChanged(nameof(Viewers));
 
         private PersonAccount[] _mainPersons = Array.Empty<PersonAccount>();
 
@@ -395,10 +390,10 @@ namespace SICore
 
         private bool _isUpdating = false;
 
-        internal void BeginUpdatePersons()
+        internal void BeginUpdatePersons(string reason = null)
         {
             _isUpdating = true;
-            _personsUpdateHistory.Append("Before: ").Append(PrintPersons());
+            _personsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
         }
 
         internal void EndUpdatePersons()
@@ -409,16 +404,13 @@ namespace SICore
             OnAllPersonsChanged();
         }
 
-        private string PrintPersons()
-        {
-            var result = new StringBuilder();
+        private string PrintPersons() => new StringBuilder()
+            .Append("Showman: ").Append(PrintAccount(ShowMan)).AppendLine()
+            .Append("Players: ").Append(string.Join(", ", Players.Select(PrintAccount))).AppendLine()
+            .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
+            .ToString();
 
-            result.Append("Showman: ").Append(ShowMan?.Name).AppendLine();
-            result.Append("Players: ").Append(string.Join(", ", Players.Select(p => p.Name))).AppendLine();
-            result.Append("Viewers: ").Append(string.Join(", ", Viewers.Select(v => v.Name))).AppendLine();
-
-            return result.ToString();
-        }
+        private static string PrintAccount(ViewerAccount viewerAccount) => $"{viewerAccount?.Name}:{viewerAccount?.Connected}";
 
         public ViewerData()
         {

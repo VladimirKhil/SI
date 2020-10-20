@@ -33,5 +33,6 @@
         /// Игрок получил или потерял деньги
         /// </summary>
         void PersonAnswered(int playerIndex, bool isRight);
+        void StartThink();
     }
 }

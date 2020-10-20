@@ -194,5 +194,10 @@ namespace SICore
 
             _data.BackLink.OnFlash(false);
         }
+
+        public void StartThink()
+        {
+            
+        }
     }
 }

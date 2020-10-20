@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -20,8 +18,6 @@ namespace SICore
     /// </summary>
     internal sealed class PlayerComputerLogic : ViewerComputerLogic<Player>, IPlayer
     {
-        private Timer _thinkingTimer;
-
         private ComputerAccount _account;
 
         /// <summary>
@@ -31,7 +27,6 @@ namespace SICore
         public PlayerComputerLogic(Player client, ViewerData data, ComputerAccount account)
             : base(client, data)
         {
-            _thinkingTimer = new Timer(Think, null, Timeout.Infinite, Timeout.Infinite);
             _account = account;
         }
 
@@ -78,92 +73,16 @@ namespace SICore
                     StakeTask();
                     break;
 
+                case PlayerTasks.PressButton:
+                    PressButton();
+                    break;
+
                 default:
                     break;
             }
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (_thinkingTimer != null)
-            {
-                _thinkingTimer.Dispose();
-                _thinkingTimer = null;
-            }
-
-            base.Dispose(disposing);
-        }
-
-        private async void Think(object state)
-        {
-            try
-            {
-                var playerData = _data.PlayerDataExtensions;
-
-                if (playerData.RealSpeed > 0)
-                {
-                    playerData.RealSpeed--;
-                    return;
-                }
-
-                var r = Data.Rand.Next(playerData.Difficulty) + 1;
-                // Жмёт на кнопку
-                if (r < playerData.RealBrave)
-                {
-                    // Знает
-                    if (r < _account.F)
-                    {
-                        playerData.KnowsAnswer = true;
-                        playerData.IsSure = true;
-
-                        if (playerData.LongThink)
-                        {
-                            ScheduleExecution(PlayerTasks.Answer, 1);
-                            _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                        }
-                    }
-                    // Угадывает
-                    else if (!playerData.LongThink)
-                    {
-                        playerData.IsSure = false;
-                        var s = Data.Rand.Next(100);
-
-                        if (s < (int)(Math.Exp(1 - ((double)r) / _account.F) * 100))
-                            playerData.KnowsAnswer = true;
-                        else
-                            playerData.KnowsAnswer = false;
-                    }
-                    else if (playerData.BestBrave > r)
-                        playerData.BestBrave = r;
-
-                    if (!playerData.LongThink)
-                        playerData.ReadyToPress = true;
-                }
-
-                if (playerData.LongThink && ((double)playerData.BestBrave / _account.F <= 1.3 || GetTimePercentage(2) > 95))
-                {
-                    playerData.IsSure = false;
-                    var ran = Data.Rand.Next(100);
-                    if (ran < (int)(Math.Exp(1 - ((double)playerData.BestBrave) / _account.F) * 100))
-                        playerData.KnowsAnswer = true;
-                    else
-                        playerData.KnowsAnswer = false;
-
-                    ScheduleExecution(PlayerTasks.Answer, 1);
-                    _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                }
-                else if (playerData.MyTry && playerData.ReadyToPress && !_data.TInfo.Pause)
-                {
-                    var delay = Data.Rand.Next(4);
-                    await Task.Delay(delay * 100); // Дадим возможность обжать
-                    _actor.PressGameButton();
-                }
-            }
-            catch (Exception exc)
-            {
-                _data.BackLink.SendError(exc);
-            }
-        }
+        private void PressButton() => _actor.PressGameButton();
 
         public override void SetInfo(IAccountInfo data)
         {
@@ -191,7 +110,7 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при расчёте финальной ставки компьютерного игрока. Описание ошибки: {0}\r\nЗначения параметров.\r\n" +
+                _data.SystemLog.AppendFormat("Final stake calculation error: {0}\r\nParameter values:\r\n" +
                     "sums = {1}. myIndex = {2}. Style = {3}",
                     exc, string.Join(", ", sums), myIndex2, _account.Style).AppendLine();
             }
@@ -335,18 +254,23 @@ namespace SICore
             {
                 var ans = new StringBuilder(Messages.Answer).Append(Message.ArgsSeparatorChar);
 
-                if (_data.PlayerDataExtensions.KnowsAnswer)
-                    ans.Append("RIGHT").Append(Message.ArgsSeparatorChar);
-                else
-                    ans.Append("WRONG").Append(Message.ArgsSeparatorChar);
+                ans.Append(_data.PlayerDataExtensions.KnowsAnswer ? "RIGHT" : "WRONG").Append(Message.ArgsSeparatorChar);
 
                 if (_data.Stage == GameStage.Round)
+                {
                     if (_data.PlayerDataExtensions.IsSure)
+                    {
                         ans.Append(string.Format(ResourceHelper.GetString(_actor.LO[nameof(R.Sure)]), _data.Me.IsMale ? "" : "a"));
+                    }
                     else
+                    {
                         ans.Append(ResourceHelper.GetString(_actor.LO[nameof(R.NotSure)]));
+                    }
+                }
                 else
+                {
                     ans.Append('#');
+                }
 
                 _actor.SendMessage(ans.ToString());
             }
@@ -779,6 +703,7 @@ namespace SICore
                         result[i].Max = newVal;
                     i++;
                 }
+
                 pMax = 0;
                 if (pMin <= 0)
                     pMin = 50;
@@ -786,7 +711,9 @@ namespace SICore
 
             totalL = 0;
             foreach (var interval in result)
+            {
                 totalL += interval.Length;
+            }
 
             int square = (pMin + pMax) * totalL / 2;
             ran = Data.Rand.Next(square);
@@ -809,11 +736,13 @@ namespace SICore
                     round = (int)Math.Floor(stake / 100.0) * 100;
 
                 foreach (Interval interval in result)
+                {
                     if (round >= interval.Min && round <= interval.Max)
                     {
                         stake = round;
                         break;
                     }
+                }
 
                 i++;
             }
@@ -839,19 +768,13 @@ namespace SICore
         /// <returns></returns>
         private bool IsCritical()
         {
-            int numQu = 0;
+            int numQu;
             lock (_data.TInfoLock)
             {
-                for (int i = 0; i < _data.TInfo.RoundInfo.Count; i++)
-                    for (int j = 0; j < _data.TInfo.RoundInfo[i].Questions.Count; j++)
-                        if (_data.TInfo.RoundInfo[i].Questions[j].IsActive())
-                            numQu++;
+                numQu = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
             }
-            
-            if ((numQu <= _account.Nq || GetTimePercentage(0) < 100 - 10 * _account.Nq / 3) && _actor.MySum < _account.Part * _actor.BigSum / 100)
-                return true;
 
-            return false;
+            return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3) && _actor.MySum < _account.Part * _actor.BigSum / 100;
         }
 
         /// <summary>
@@ -928,12 +851,16 @@ namespace SICore
             {
                 playerData.RealBrave += playerData.DeltaBrave;
                 if (playerData.DeltaBrave < 5)
+                {
                     playerData.DeltaBrave++;
+                }
             }
 
             // Критическая ситуация
             if (IsCritical())
+            {
                 playerData.RealBrave += 10;
+            }
         }
 
         /// <summary>
@@ -1223,11 +1150,13 @@ namespace SICore
                     sum1 = bestSum;
                     sum2 = mySum;
                 }
+
                 points.Add(new DirPoint(sum1 / l - sum2 - (leader ? 1 : 0) * (smart ? -1 : 1), smart));
                 points.Add(new DirPoint(sum2 - sum1 / l + (leader ? 1 : 0) * (smart ? -1 : 1), !smart));
                 points.Add(new DirPoint(l * sum2 - sum1 - 100 + (leader ? 1 : 0) * (smart ? -1 : 1), !smart));
                 points.Add(new DirPoint(sum1 - l * sum2 - 100 - (leader ? 1 : 0) * (smart ? -1 : 1), smart));
             }
+
             points.Add(new DirPoint(maxStake, false));
             points.Add(new DirPoint(maxStake, true));
             if (maxStake > mySum)
@@ -1235,6 +1164,7 @@ namespace SICore
                 points.Add(new DirPoint(mySum, false));
                 points.Add(new DirPoint(mySum, true));
             }
+
             points.Sort(new IntervalComparer());
             int pCount = points.Count;
 
@@ -1509,41 +1439,59 @@ namespace SICore
         /// </summary>
         override public void SetAtom(string[] mparams)
         {
-            var playerData = _data.PlayerDataExtensions;
-
             base.SetAtom(mparams);
+
+            var playerData = _data.PlayerDataExtensions;
 
             if (playerData.IsQuestionInProgress)
             {
                 playerData.IsQuestionInProgress = false;
 
-                playerData.CanAnswer = false;
-                playerData.Difficulty = 0;
-                playerData.LongThink = true;
-                if (_data.Stage == GameStage.Round)
-                {
-                    if (_data.QuestionType == QuestionTypes.Simple)
-                        playerData.LongThink = false;
-
-                    if (playerData.MyTry)
-                        playerData.Difficulty = 6500;
-                    else
-                        playerData.Difficulty = 13000;
-
-                    playerData.Difficulty *= (_data.QuestionIndex + 1);
-                    if (_data.QuestionType == QuestionTypes.Auction || _data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat || _data.QuestionType == QuestionTypes.Sponsored)
-                        playerData.Difficulty *= 2;
-                }
-                else
-                    playerData.Difficulty = 50000;
-
-                _thinkingTimer.Change(100, 100);
-                playerData.RealSpeed = (_account.S + 1) * 10;
-                playerData.BestBrave = 10000;
-                playerData.KnowsAnswer = false;
-                playerData.IsSure = false;
-                playerData.ReadyToPress = false;
+                CalculateAnsweringStrategy(playerData);
             }
+        }
+
+        private void CalculateAnsweringStrategy(PlayerData playerData)
+        {
+            var shortThink = _data.Stage == GameStage.Round && _data.QuestionType == QuestionTypes.Simple;
+            var difficulty = _data.Stage == GameStage.Round ? _data.QuestionIndex + 1 : 3 /* final question get 3rd degree of complexity */;
+            var playerLag = _account.S * 10;
+
+            var playerStrength = (double)_account.F;
+
+            if (shortThink)
+            {
+                playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
+
+                var riskRateLimit = (int)(100 * Math.Min(1, playerStrength / playerData.RealBrave));
+                var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
+
+                playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)Data.Rand.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+
+                playerData.ReadyToPress = playerData.IsSure || Data.Rand.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+            }
+            else
+            {
+                playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
+                playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.5;
+
+                playerData.RealSpeed = Math.Max(1, playerLag + (int)Data.Rand.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
+            }
+        }
+
+        /// <summary>
+        /// Можно нажимать на кнопку
+        /// </summary>
+        public void StartThink()
+        {
+            if (!_data.PlayerDataExtensions.ReadyToPress)
+            {
+                return;
+            }
+
+            ScheduleExecution(PlayerTasks.PressButton, _data.PlayerDataExtensions.RealSpeed);
+            _data.PlayerDataExtensions.RealSpeed /= 2; // Повторные попытки выполняются быстрее
         }
 
         /// <summary>
@@ -1551,7 +1499,7 @@ namespace SICore
         /// </summary>
         public void EndThink()
         {
-            _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            _data.PlayerDataExtensions.RealBrave++;
         }
 
         /// <summary>
@@ -1565,7 +1513,7 @@ namespace SICore
             }
             else
             {
-                _data.PlayerDataExtensions.CanAnswer = true;
+                ScheduleExecution(PlayerTasks.Answer, _data.PlayerDataExtensions.RealSpeed);
             }
         }
 

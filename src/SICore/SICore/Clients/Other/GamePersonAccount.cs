@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace SICore
 {
-    public class GamePersonAccount : Account
+    public class GamePersonAccount : ViewerAccount
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _ready = false;

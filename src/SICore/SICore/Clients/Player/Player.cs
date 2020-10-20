@@ -18,6 +18,9 @@ namespace SICore
     {
         private readonly object _readyLock = new object();
 
+        private bool _buttonDisabledByGame = false;
+        private bool _buttonDisabledByTimer = false;
+
         /// <summary>
         /// Создание клиента
         /// </summary>
@@ -131,7 +134,7 @@ namespace SICore
             try
             {
                 await Task.Delay(ClientData.ButtonBlockingTime * 1000);
-                buttonDisabledByTimer = false;
+                _buttonDisabledByTimer = false;
                 EnableGameButton();
             }
             catch (Exception exc)
@@ -249,7 +252,7 @@ namespace SICore
                     case Messages.Atom:
                         if (ClientData.QuestionType == QuestionTypes.Simple)
                         {
-                            buttonDisabledByGame = false;
+                            _buttonDisabledByGame = false;
                             EnableGameButton();
 
                             if (!ClientData.FalseStart)
@@ -264,15 +267,16 @@ namespace SICore
 
                     case Messages.YouTry:
                         ClientData.PlayerDataExtensions.MyTry = true;
-                        buttonDisabledByGame = false;
+                        _buttonDisabledByGame = false;
                         EnableGameButton();
+                        _logic.StartThink();
                         break;
 
                     case Messages.EndTry:
                         ClientData.PlayerDataExtensions.MyTry = false;
                         DisableGameButton();
 
-                        if (mparams[1] == "A")
+                        if (mparams[1] == MessageParams.EndTry_All)
                         {
                             _logic.EndThink();
 
@@ -304,7 +308,7 @@ namespace SICore
                         break;
 
                     case Messages.CatCost:
-                        ClientData.PersonDataExtensions.StakeInfo = new StakeInfo()
+                        ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
                         {
                             Minimum = int.Parse(mparams[1]),
                             Maximum = int.Parse(mparams[2]),
@@ -325,7 +329,7 @@ namespace SICore
                             ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
                         }
 
-                        ClientData.PersonDataExtensions.StakeInfo = new StakeInfo()
+                        ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
                         {
                             Minimum = int.Parse(mparams[5]),
                             Maximum = ((PlayerAccount)ClientData.Me).Sum,
@@ -450,22 +454,19 @@ namespace SICore
             }
         }
 
-        private bool buttonDisabledByGame = false;
-        private bool buttonDisabledByTimer = false;
-
         private void DisableGameButton(bool byGame = true)
         {
             ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = false;
 
             if (byGame)
-                buttonDisabledByGame = true;
+                _buttonDisabledByGame = true;
             else
-                buttonDisabledByTimer = true;
+                _buttonDisabledByTimer = true;
         }
 
         private void EnableGameButton()
         {
-            if (!buttonDisabledByGame && !buttonDisabledByTimer)
+            if (!_buttonDisabledByGame && !_buttonDisabledByTimer)
             {
                 ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = true;
             }

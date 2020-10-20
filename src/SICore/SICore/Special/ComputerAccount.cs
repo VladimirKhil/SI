@@ -548,7 +548,8 @@ namespace SICore
         {
             var culture = localizer.Culture.TwoLetterISOLanguageName;
 
-            return StoredPersons.Players.Select(player => new ComputerAccount(player)
+            return StoredPersons.Players
+                .Select(player => new ComputerAccount(player)
                 {
                     Name = player.Names.ContainsKey(culture) ? player.Names[culture] : "-",
                     IsMale = player.IsMale,

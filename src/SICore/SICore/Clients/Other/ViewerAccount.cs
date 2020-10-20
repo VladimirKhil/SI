@@ -20,8 +20,8 @@ namespace SICore
             set { if (_connected != value) { _connected = value; OnPropertyChanged(); } }
         }
 
-        public ViewerAccount(string name, bool sex, bool connected)
-            : base(name, sex)
+        public ViewerAccount(string name, bool isMale, bool connected)
+            : base(name, isMale)
         {
             _connected = connected;
         }

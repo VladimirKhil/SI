@@ -96,10 +96,10 @@ namespace SIData
         {
         }
 
-        public Account(string name, bool sex)
+        public Account(string name, bool isMale)
         {
             _name = name;
-            _isMale = sex;
+            _isMale = isMale;
         }
 
         public Account(Account account)

@@ -99,6 +99,8 @@ namespace SICore
                     {
                         result = showman;
                     }
+
+                    ClientData.ShowMan.Connected = true;
                 }
 
                 for (int i = 0; i < settings.Players.Length; i++)
@@ -118,6 +120,8 @@ namespace SICore
                         {
                             result = player;
                         }
+
+                        ClientData.Players[i].Connected = true;
                     }
                 }
 
@@ -133,6 +137,8 @@ namespace SICore
                         var viewer = new SimpleViewer(viewerClient, settings.Viewers[i], isHost, backLink, LO);
                         viewerClient.ConnectTo(_client.Server);
                         result = viewer;
+
+                        ClientData.Viewers[i].Connected = true;
                     }
                 }
             }
@@ -142,12 +148,12 @@ namespace SICore
             }
 
             _logic.Run(document);
-            foreach (var item in _client.Server.AllClients)
+            foreach (var personName in ClientData.AllPersons.Keys)
             {
-                if (item == NetworkConstants.GameName)
+                if (personName == NetworkConstants.GameName)
                     continue;
 
-                Inform(item);
+                Inform(personName);
             }
 
             return result;
@@ -232,13 +238,13 @@ namespace SICore
             SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
         }
 
-        private void AppendAccountExt(Account account, StringBuilder info)
+        private void AppendAccountExt(ViewerAccount account, StringBuilder info)
         {
             info.Append(account.Name);
             info.Append(Message.ArgsSeparatorChar);
             info.Append(account.IsMale ? '+' : '-');
             info.Append(Message.ArgsSeparatorChar);
-            info.Append(_client.Server.IsOnlineString(account.Name));
+            info.Append(account.Connected ? '+' : '-');
             info.Append(Message.ArgsSeparatorChar);
             info.Append(account.IsHuman ? '+' : '-');
             info.Append(Message.ArgsSeparatorChar);
@@ -333,7 +339,7 @@ namespace SICore
         {
             var result = new List<ConnectionPersonData>
             {
-                new ConnectionPersonData { Name = ClientData.ShowMan.Name, Role = GameRole.Showman, IsOnline = _client.Server.IsOnline(ClientData.ShowMan.Name) }
+                new ConnectionPersonData { Name = ClientData.ShowMan.Name, Role = GameRole.Showman, IsOnline = ClientData.ShowMan.Connected }
             };
 
             for (int i = 0; i < ClientData.Players.Count; i++)
@@ -342,7 +348,7 @@ namespace SICore
                 {
                     Name = ClientData.Players[i].Name,
                     Role = GameRole.Player,
-                    IsOnline = _client.Server.IsOnline(ClientData.Players[i].Name)
+                    IsOnline = ClientData.Players[i].Connected
                 });
             }
 
@@ -352,7 +358,7 @@ namespace SICore
                 {
                     Name = ClientData.Viewers[i].Name,
                     Role = GameRole.Viewer,
-                    IsOnline = _client.Server.IsOnline(ClientData.Viewers[i].Name)
+                    IsOnline = ClientData.Viewers[i].Connected
                 });
             }
 
@@ -381,11 +387,11 @@ namespace SICore
                 }
 
                 var index = -1;
-                IEnumerable<Account> accountsToSearch = null;
+                IEnumerable<ViewerAccount> accountsToSearch = null;
                 switch (role)
                 {
                     case GameRole.Showman:
-                        accountsToSearch = new Account[1] { ClientData.ShowMan };
+                        accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
                         break;
 
                     case GameRole.Player:
@@ -412,7 +418,7 @@ namespace SICore
                         break;
 
                     default: // Viewer
-                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account { Name = Constants.FreePlace, IsHuman = true } });
+                        accountsToSearch = ClientData.Viewers.Concat(new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
                         break;
                 }
 
@@ -503,20 +509,20 @@ namespace SICore
                             res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players.Count);
 
                             res.Append(Message.ArgsSeparatorChar).Append(ClientData.ShowMan.Name);
-                            res.Append(Message.ArgsSeparatorChar).Append(_client.Server.IsOnline(ClientData.ShowMan.Name) ? '+' : '-');
+                            res.Append(Message.ArgsSeparatorChar).Append(ClientData.ShowMan.Connected ? '+' : '-');
                             res.Append(Message.ArgsSeparatorChar).Append('-');
 
                             for (int i = 0; i < ClientData.Players.Count; i++)
                             {
                                 res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].Name);
-                                res.Append(Message.ArgsSeparatorChar).Append(_client.Server.IsOnline(ClientData.Players[i].Name) ? '+' : '-');
+                                res.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].Connected ? '+' : '-');
                                 res.Append(Message.ArgsSeparatorChar).Append('-');
                             }
 
                             for (int i = 0; i < ClientData.Viewers.Count; i++)
                             {
                                 res.Append(Message.ArgsSeparatorChar).Append(ClientData.Viewers[i].Name);
-                                res.Append(Message.ArgsSeparatorChar).Append(_client.Server.IsOnline(ClientData.Viewers[i].Name) ? '+' : '-');
+                                res.Append(Message.ArgsSeparatorChar).Append(ClientData.Viewers[i].Connected ? '+' : '-');
                                 res.Append(Message.ArgsSeparatorChar).Append('-');
                             }
 
@@ -552,11 +558,11 @@ namespace SICore
                                 }
 
                                 var index = -1;
-                                IEnumerable<Account> accountsToSearch = null;
+                                IEnumerable<ViewerAccount> accountsToSearch = null;
                                 switch (role)
                                 {
                                     case "showman":
-                                        accountsToSearch = new Account[1] { ClientData.ShowMan };
+                                        accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
                                         break;
 
                                     case "player":
@@ -583,7 +589,7 @@ namespace SICore
                                         break;
 
                                     default:
-                                        accountsToSearch = ClientData.Viewers.Concat(new Account[] { new Account { Name = Constants.FreePlace, IsHuman = true } });
+                                        accountsToSearch = ClientData.Viewers.Concat(new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
                                         break;
                                 }
 
@@ -641,6 +647,8 @@ namespace SICore
                                 SpecialReplic(res.ToString());
 
                                 SendMessageWithArgs(Messages.Disconnected, account.Name);
+
+                                account.Connected = false;
 
                                 if (ClientData.Viewers.Contains(account))
                                 {
@@ -766,14 +774,20 @@ namespace SICore
                                 }
 
                                 if (found)
+                                {
                                     SendMessage(res.ToString());
+                                }
 
                                 if (readyAll)
+                                {
                                     StartGame();
+                                }
                                 else if (ClientData.Settings.IsAutomatic)
                                 {
-                                    if (ClientData.Players.All(player => _client.Server.IsOnline(player.Name)))
+                                    if (ClientData.Players.All(player => player.Connected))
+                                    {
                                         StartGame();
+                                    }
                                 }
 
                                 #endregion
@@ -1710,7 +1724,7 @@ namespace SICore
                 return;
             }
 
-            var newAccount = new Account { IsHuman = true, Name = Constants.FreePlace };
+            var newAccount = new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true };
 
             ClientData.BeginUpdatePersons();
 
@@ -1755,7 +1769,7 @@ namespace SICore
             }
 
             var account = ClientData.Players[index];
-            var isOnline = _client.Server.IsOnline(account.Name);
+            var isOnline = account.Connected;
 
             if (ClientData.Stage != GameStage.Before && account.IsHuman && isOnline)
             {
@@ -2065,8 +2079,10 @@ namespace SICore
                 account = ClientData.ShowMan;
             }
 
-            if (!_client.Server.IsOnline(account.Name) || !account.IsHuman)
+            if (!account.Connected || !account.IsHuman)
+            {
                 return;
+            }
 
             var newAccount = new Account { IsHuman = true, Name = Constants.FreePlace };
 
@@ -2094,7 +2110,9 @@ namespace SICore
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
-                    SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
+                {
+                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                }
             }
 
             SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
@@ -2205,7 +2223,7 @@ namespace SICore
         {
             int otherIndex = -1;
             // На кого заменяем
-            Account otherAccount = null;
+            ViewerAccount otherAccount = null;
 
             ClientData.BeginUpdatePersons();
 
@@ -2216,7 +2234,8 @@ namespace SICore
                     otherAccount = ClientData.ShowMan;
                     ClientData.ShowMan = new GamePersonAccount(account)
                     {
-                        Ready = account.Ready
+                        Ready = account.Ready,
+                        Connected = account.Connected
                     };
                 }
                 else
@@ -2228,7 +2247,8 @@ namespace SICore
                             otherAccount = ClientData.Players[i];
                             ClientData.Players[i] = new GamePlayerAccount(account)
                             {
-                                Ready = account.Ready
+                                Ready = account.Ready,
+                                Connected = account.Connected
                             };
                             otherIndex = i;
                             break;
@@ -2237,15 +2257,15 @@ namespace SICore
 
                     if (otherIndex == -1)
                     {
-                        for (int i = 0; i < ClientData.Viewers.Count; i++)
+                        for (var i = 0; i < ClientData.Viewers.Count; i++)
                         {
                             if (ClientData.Viewers[i].Name == replacer)
                             {
                                 otherAccount = ClientData.Viewers[i];
                                 otherIndex = i;
-                                if (_client.Server.IsOnline(account.Name))
+                                if (account.Connected)
                                 {
-                                    ClientData.Viewers[i] = new Account(account);
+                                    ClientData.Viewers[i] = new ViewerAccount(account) { Connected = true };
                                 }
                                 else
                                 {
@@ -2257,24 +2277,30 @@ namespace SICore
                     }
 
                     if (otherIndex == -1)
+                    {
                         return;
+                    }
                 }
 
                 // Живой персонаж меняется на другого живого
                 var otherPerson = otherAccount as GamePersonAccount;
                 if (isPlayer)
                 {
-                    ClientData.Players[index] = new GamePlayerAccount(otherAccount);
+                    ClientData.Players[index] = new GamePlayerAccount(otherAccount) { Connected = otherAccount.Connected };
 
                     if (otherPerson != null)
+                    {
                         ClientData.Players[index].Ready = otherPerson.Ready;
+                    }
                 }
                 else
                 {
-                    ClientData.ShowMan = new GamePersonAccount(otherAccount);
+                    ClientData.ShowMan = new GamePersonAccount(otherAccount) { Connected = otherAccount.Connected };
 
                     if (otherPerson != null)
+                    {
                         ClientData.ShowMan.Ready = otherPerson.Ready;
+                    }
                 }
 
                 InformPicture(otherAccount);
@@ -2317,17 +2343,19 @@ namespace SICore
             var oldName = account.Name;
 
             var newType = !account.IsHuman;
-            ClientData.BeginUpdatePersons();
             string newName = "";
             bool newSex = true;
 
             Account newAcc = null;
 
+            ClientData.BeginUpdatePersons();
+
             try
             {
-                var isOnline = _client.Server.IsOnline(account.Name);
-                if (isOnline && account.IsHuman)
+                if (account.Connected && account.IsHuman)
+                {
                     ClientData.Viewers.Add(account);
+                }
 
                 if (!account.IsHuman)
                 {
@@ -2337,6 +2365,7 @@ namespace SICore
                     newName = account.Name = Constants.FreePlace;
                     account.Picture = "";
                     account.Ready = false;
+                    account.Connected = false;
                 }
                 else if (isPlayer)
                 {
@@ -2362,7 +2391,9 @@ namespace SICore
 
                     var rand = Data.Rand.Next(DefaultPlayers.Length - visited.Count - 1);
                     while (visited.Contains(rand))
+                    {
                         rand++;
+                    }
 
                     var compPlayer = DefaultPlayers[rand];
                     var newAccount = new GamePlayerAccount(account);
@@ -2372,6 +2403,7 @@ namespace SICore
                     newName = newAccount.Name = compPlayer.Name;
                     newSex = newAccount.IsMale = compPlayer.IsMale;
                     newAccount.Picture = compPlayer.Picture;
+                    newAccount.Connected = true;
 
                     ClientData.Players[index] = newAccount;
 
@@ -2400,6 +2432,7 @@ namespace SICore
                     newName = newAccount.Name = DefaultShowmans[0].Name;
                     newSex = newAccount.IsMale = true;
                     newAccount.Picture = DefaultShowmans[0].Picture;
+                    newAccount.Connected = true;
 
                     ClientData.ShowMan = newAccount;
 
@@ -2422,7 +2455,9 @@ namespace SICore
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
-                    SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name));
+                {
+                    SendMessage($"{Messages.Ready}\n{item.Name}");
+                }
             }
 
             SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newSex ? '+' : '-');
@@ -2446,9 +2481,9 @@ namespace SICore
             _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
         }
 
-        private bool? CheckAccount(Message message, string role, string name, string sex, ref bool found, int index, Account account)
+        private bool? CheckAccount(Message message, string role, string name, string sex, ref bool found, int index, ViewerAccount account)
         {
-            if (_client.Server.IsOnline(account.Name))
+            if (account.Connected)
             {
                 return null;
             }
@@ -2462,6 +2497,7 @@ namespace SICore
                 account.Name = name;
                 account.IsMale = sex == "m";
                 account.Picture = "";
+                account.Connected = true;
 
                 lock (_client.Server.ConnectionsSync)
                 {
@@ -2482,18 +2518,12 @@ namespace SICore
 
                 if (append)
                 {
-                    ClientData.Viewers.Add(new ViewerAccount(account));
-                    ClientData.OnAllPersonsChanged();
+                    ClientData.Viewers.Add(new ViewerAccount(account) { Connected = account.Connected });
                 }
 
-                var sb = new StringBuilder();
-                if (account.IsMale)
-                    sb.Append(LO[nameof(R.Connected_Male)] + " ");
-                else
-                    sb.Append(LO[nameof(R.Connected_Female)] + " ");
+                ClientData.OnAllPersonsChanged();
 
-                sb.Append(name);
-                SpecialReplic(sb.ToString());
+                SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
 
                 SendMessage(Messages.Accepted, name);
                 SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
@@ -2504,15 +2534,12 @@ namespace SICore
             return true;
         }
 
-        private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, Account account,
+        private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, ViewerAccount account,
             Action connectionAuthenticator)
         {
-            if (_client.Server.IsOnline(account.Name))
+            if (account.Connected)
             {
-                if (account.Name == name)
-                    return false;
-
-                return null;
+                return account.Name == name ? false : (bool?)null;
             }
 
             found = true;
@@ -2522,18 +2549,16 @@ namespace SICore
             account.Name = name;
             account.IsMale = sex == "m";
             account.Picture = "";
+            account.Connected = true;
 
             if (append)
             {
-                ClientData.Viewers.Add(new ViewerAccount(account));
-                ClientData.OnAllPersonsChanged();
+                ClientData.Viewers.Add(new ViewerAccount(account) { Connected = account.Connected });
             }
 
-            var sb = new StringBuilder();
-            sb.Append(LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)] + " ");
+            ClientData.OnAllPersonsChanged();
 
-            sb.Append(name);
-            SpecialReplic(sb.ToString());
+            SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
 
             SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
 
@@ -2548,14 +2573,11 @@ namespace SICore
 
         private void InformPicture(Account account)
         {
-            lock (_client.Server.ClientsSync)
+            foreach (var personName in ClientData.AllPersons.Keys)
             {
-                foreach (var item in _client.Server.AllClients)
+                if (account.Name != personName && personName != NetworkConstants.GameName)
                 {
-                    if (account.Name != item && item != NetworkConstants.GameName)
-                    {
-                        InformPicture(account, item);
-                    }
+                    InformPicture(account, personName);
                 }
             }
         }

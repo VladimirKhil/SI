@@ -62,7 +62,6 @@ namespace SICore
         /// Можно ли думать над вопросом до истечения времени
         /// </summary>
         internal bool LongThink { get; set; }
-        internal bool CanAnswer { get; set; }
 
         /// <summary>
         /// Знает ли ответ
@@ -114,7 +113,7 @@ namespace SICore
         private bool myTry;
 
         /// <summary>
-        /// Можно жать на кнопку
+        /// Можно жать на кнопку (чтобы при игре без фальстартов компьютерные игроки соображали помедленнее)
         /// </summary>
         public bool MyTry
         {

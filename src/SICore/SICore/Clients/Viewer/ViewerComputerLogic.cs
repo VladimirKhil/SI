@@ -21,13 +21,13 @@ namespace SICore
             public int PauseTime { get; set; } = -1;
         }
 
-        protected TimerInfo[] timersInfo = new TimerInfo[] { new TimerInfo(), new TimerInfo(), new TimerInfo() };
+        private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new TimerInfo(), new TimerInfo(), new TimerInfo() };
 
         protected int GetTimePercentage(int timerIndex)
         {
             var now = DateTime.UtcNow;
 
-            var timer = timersInfo[timerIndex];
+            var timer = _timersInfo[timerIndex];
             if (!timer.IsEnabled)
             {
                 return timer.PauseTime > -1 ? 100 * timer.PauseTime / timer.MaxTime : 0;
@@ -201,61 +201,61 @@ namespace SICore
                 case "GO":
                     var maxTime = int.Parse(arg);
                     var now = DateTime.UtcNow;
-                    timersInfo[timerIndex].IsEnabled = true;
-                    timersInfo[timerIndex].StartTime = now;
-                    timersInfo[timerIndex].EndTime = now.AddMilliseconds(maxTime * 100);
-                    timersInfo[timerIndex].MaxTime = maxTime;
+                    _timersInfo[timerIndex].IsEnabled = true;
+                    _timersInfo[timerIndex].StartTime = now;
+                    _timersInfo[timerIndex].EndTime = now.AddMilliseconds(maxTime * 100);
+                    _timersInfo[timerIndex].MaxTime = maxTime;
                     break;
 
                 case "STOP":
-                    timersInfo[timerIndex].IsEnabled = false;
-                    timersInfo[timerIndex].PauseTime = -1;
+                    _timersInfo[timerIndex].IsEnabled = false;
+                    _timersInfo[timerIndex].PauseTime = -1;
                     break;
 
                 case "PAUSE":
                     var currentTime = int.Parse(arg);
 
-                    timersInfo[timerIndex].IsEnabled = false;
-                    timersInfo[timerIndex].PauseTime = currentTime;
+                    _timersInfo[timerIndex].IsEnabled = false;
+                    _timersInfo[timerIndex].PauseTime = currentTime;
                     break;
 
                 case "USER_PAUSE":
                     var currentTime2 = int.Parse(arg);
 
-                    timersInfo[timerIndex].IsUserEnabled = false;
-                    if (timersInfo[timerIndex].IsEnabled)
+                    _timersInfo[timerIndex].IsUserEnabled = false;
+                    if (_timersInfo[timerIndex].IsEnabled)
                     {
-                        timersInfo[timerIndex].PauseTime = currentTime2;
+                        _timersInfo[timerIndex].PauseTime = currentTime2;
                     }
                     break;
 
                 case "RESUME":
-                    timersInfo[timerIndex].IsEnabled = true;
-                    if (!timersInfo[timerIndex].IsUserEnabled)
+                    _timersInfo[timerIndex].IsEnabled = true;
+                    if (!_timersInfo[timerIndex].IsUserEnabled)
                     {
                         return;
                     }
 
                     var now2 = DateTime.UtcNow;
-                    timersInfo[timerIndex].EndTime = now2.AddMilliseconds((timersInfo[timerIndex].MaxTime - timersInfo[timerIndex].PauseTime) * 100);
-                    timersInfo[timerIndex].StartTime = timersInfo[timerIndex].EndTime.AddMilliseconds(-timersInfo[timerIndex].MaxTime * 100);
+                    _timersInfo[timerIndex].EndTime = now2.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
+                    _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
                     break;
 
                 case "USER_RESUME":
-                    timersInfo[timerIndex].IsUserEnabled = true;
-                    if (!timersInfo[timerIndex].IsEnabled || timersInfo[timerIndex].PauseTime == -1)
+                    _timersInfo[timerIndex].IsUserEnabled = true;
+                    if (!_timersInfo[timerIndex].IsEnabled || _timersInfo[timerIndex].PauseTime == -1)
                     {
                         return;
                     }
 
                     var now3 = DateTime.UtcNow;
-                    timersInfo[timerIndex].EndTime = now3.AddMilliseconds((timersInfo[timerIndex].MaxTime - timersInfo[timerIndex].PauseTime) * 100);
-                    timersInfo[timerIndex].StartTime = timersInfo[timerIndex].EndTime.AddMilliseconds(-timersInfo[timerIndex].MaxTime * 100);
+                    _timersInfo[timerIndex].EndTime = now3.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
+                    _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
                     break;
 
                 case "MAXTIME":
                     var maxTime2 = int.Parse(arg);
-                    timersInfo[timerIndex].MaxTime = maxTime2;
+                    _timersInfo[timerIndex].MaxTime = maxTime2;
                     break;
             }
         }

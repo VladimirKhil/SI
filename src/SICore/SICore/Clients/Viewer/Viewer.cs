@@ -620,7 +620,7 @@ namespace SICore
                         {
                             #region Try
 
-                            if (mparams.Length > 1 && mparams[1] == "NF")
+                            if (mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished)
                             {
                                 // Здесь можно не показывать рамку
                                 if (!ClientData.BackLink.ShowBorderOnFalseStart)
@@ -857,7 +857,7 @@ namespace SICore
 
             if (ClientData.AllPersons.TryGetValue(name, out var person))
             {
-                ClientData.BeginUpdatePersons();
+                ClientData.BeginUpdatePersons($"Disconnected {name}");
 
                 try
                 {
@@ -1009,7 +1009,7 @@ namespace SICore
             switch (mparams[1])
             {
                 case MessageParams.Config_AddTable:
-                    ClientData.BeginUpdatePersons();
+                    ClientData.BeginUpdatePersons($"Config_AddTable {string.Join(" ", mparams)}");
                     try
                     {
                         var account = new PlayerAccount(mparams[2], mparams[3] == "+", mparams[4] == "+", ClientData.Stage != GameStage.Before)
@@ -1051,7 +1051,9 @@ namespace SICore
                 case MessageParams.Config_Free:
                     {
                         if (mparams.Length < 4)
+                        {
                             break;
+                        }
 
                         var personType = mparams[2];
                         var indexString = mparams[3];
@@ -1064,7 +1066,9 @@ namespace SICore
                         if (isPlayer)
                         {
                             if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
+                            {
                                 break;
+                            }
 
                             account = ClientData.Players[index];
                         }
@@ -1078,7 +1082,7 @@ namespace SICore
 
                         clone.Add(newAccount);
 
-                        ClientData.BeginUpdatePersons();
+                        ClientData.BeginUpdatePersons($"Config_Free {string.Join(" ", mparams)}");
                         try
                         {
                             ClientData.Viewers = clone;
@@ -1163,7 +1167,7 @@ namespace SICore
 
             if (newTypeHuman)
             {
-                ClientData.BeginUpdatePersons();
+                ClientData.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
 
                 try
                 {
@@ -1190,7 +1194,7 @@ namespace SICore
             }
             else
             {
-                ClientData.BeginUpdatePersons();
+                ClientData.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
                 ViewerAccount newAccount = null;
                 try
                 {
@@ -1274,7 +1278,7 @@ namespace SICore
             PlayerAccount account = null;
             ViewerAccount newAccount = null;
 
-            ClientData.BeginUpdatePersons();
+            ClientData.BeginUpdatePersons($"Config_DeleteTable {string.Join(" ", mparams)}");
             try
             {
                 account = ClientData.Players[index];
@@ -1354,14 +1358,14 @@ namespace SICore
 
             // Кого заменяем
             var account = GetAccountByType(isPlayer, indexString);
-            if (account == null)
+            if (account == null || account.Name == replacer)
             {
                 return;
             }
 
             if (!account.IsHuman)
             {
-                ClientData.BeginUpdatePersons();
+                ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
 
                 try
                 {
@@ -1395,7 +1399,7 @@ namespace SICore
                 ViewerAccount other = null;
                 GameRole role = GameRole.Viewer;
 
-                ClientData.BeginUpdatePersons();
+                ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
                 try
                 {
                     if (isPlayer && ClientData.ShowMan.Name == replacer)
@@ -1592,7 +1596,7 @@ namespace SICore
             var gameStarted = ClientData.Stage != GameStage.Before;
 
             int mIndex = 2;
-            ClientData.BeginUpdatePersons();
+            ClientData.BeginUpdatePersons($"ProcessInfo {string.Join(" ", mparams)}");
             try
             {
                 ClientData.ShowMan = new PersonAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+", gameStarted)
@@ -1763,7 +1767,7 @@ namespace SICore
 
         private void InsertPerson(string role, Account account, int index)
         {
-            ClientData.BeginUpdatePersons();
+            ClientData.BeginUpdatePersons($"InsertPerson {role} {account.Name} {index}");
 
             try
             {
@@ -1775,13 +1779,18 @@ namespace SICore
                         break;
 
                     case "player":
+                        var playersWereUpdated = false;
                         while (index >= ClientData.Players.Count)
                         {
                             var p = new PlayerAccount(Constants.FreePlace, true, false, ClientData.Stage != GameStage.Before) { IsHuman = true, Ready = false, IsExtendedMode = IsHost };
 
                             CreatePlayerCommands(p);
-
                             ClientData.Players.Add(p);
+                            playersWereUpdated = true;
+                        }
+
+                        if (playersWereUpdated)
+                        {
                             ClientData.UpdatePlayers();
                         }
 
@@ -1798,6 +1807,12 @@ namespace SICore
 
                     default:
                         var viewer = new ViewerAccount(account) { IsHuman = true, Connected = true };
+
+                        if (ClientData.Viewers.Any(v => v.Name == viewer.Name))
+                        {
+                            throw new Exception($"Duplicate viewer name: \"{viewer.Name}\"!");
+                        }
+
                         ClientData.Viewers.Add(viewer);
                         ClientData.UpdateViewers();
                         break;

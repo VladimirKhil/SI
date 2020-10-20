@@ -431,8 +431,8 @@ namespace SICore
             if (atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio)
             {
                 _data.HaveViewedAtom = _data.Viewers.Count
-                    + _data.Players.Where(pa => pa.IsHuman && _actor.Client.CurrentServer.IsOnline(pa.Name)).Count()
-                    + (_data.ShowMan.IsHuman && _actor.Client.CurrentServer.IsOnline(_data.ShowMan.Name) ? 1 : 0);
+                    + _data.Players.Where(pa => pa.IsHuman && pa.Connected).Count()
+                    + (_data.ShowMan.IsHuman && _data.ShowMan.Connected ? 1 : 0);
 
                 // TODO: если всё так тормозит, что за 2 минуты аудио/видео ни у кого не прогружается,
                 // что происходит при игре с фальстартами и без?
@@ -1112,7 +1112,7 @@ namespace SICore
 
             if (!ClientData.Settings.AppSettings.FalseStart)
             {
-                _actor.SendMessageWithArgs(Messages.Try, "NF");
+                _actor.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
             }
 
             if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
@@ -1133,13 +1133,7 @@ namespace SICore
                 ScheduleExecution(Tasks.MoveNext, _data.AtomTime, force: true);
             }
 
-            for (var i = 0; i < _data.Players.Count; i++)
-            {
-                if (_data.Players[i].CanPress)
-                {
-                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
-                }
-            }
+            SendTryToPlayers();
 
             _data.Decision = DecisionType.Pressing;
         }
@@ -1262,7 +1256,7 @@ namespace SICore
         internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
             SetTask((int)task, arg);
-            if (_data.Settings.AppSettings.Managed && !force && _actor.Client.CurrentServer.IsOnline(_data.HostName))
+            if (_data.Settings.AppSettings.Managed && !force && _data.AllPersons.ContainsKey(_data.HostName))
             {
                 IsRunning = false;
                 return;
@@ -1793,7 +1787,7 @@ namespace SICore
                 else
                 {
                     _actor.SendMessage(s, _data.Answerer.Name);
-                    if (!_actor.Client.CurrentServer.IsOnline(_data.Answerer.Name))
+                    if (!_data.Answerer.Connected)
                     {
                         waitTime = 20;
                     }
@@ -1890,9 +1884,9 @@ namespace SICore
         {
             if (!IsFinalRound())
             {
-                var isSpecial = _data.Type.Name == QuestionTypes.Auction || _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat || _data.Type.Name == QuestionTypes.Sponsored;
+                var isSpecial = IsSpecialQuestion();
 
-                foreach (var player in _data.Players.ToArray())
+                foreach (var player in _data.Players)
                 {
                     player.CanPress = !isSpecial;
                 }
@@ -1906,7 +1900,9 @@ namespace SICore
                     if (type == QuestionTypes.Simple)
                     {
                         _data.Decision = DecisionType.Pressing;
-                        _actor.SendMessageWithArgs(Messages.Try, "NF");
+                        _actor.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
+
+                        SendTryToPlayers();
                     }
                 }
             }
@@ -1923,7 +1919,7 @@ namespace SICore
 
             if (!IsSpecialQuestion())
             {
-                _actor.SendMessageWithArgs(Messages.EndTry, "A"); // Timer 1 STOP
+                _actor.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
             }
 
             _data.AnnounceAnswer = true;
@@ -2244,13 +2240,7 @@ namespace SICore
                 _actor.SendMessage(Messages.Try);
             }
 
-            for (var i = 0; i < _data.Players.Count; i++)
-            {
-                if (_data.Players[i].CanPress)
-                {
-                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
-                }
-            }
+            SendTryToPlayers();
 
             var maxTime = _data.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
 
@@ -2260,6 +2250,17 @@ namespace SICore
             _data.Decision = DecisionType.Pressing;
 
             ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);
+        }
+
+        private void SendTryToPlayers()
+        {
+            for (var i = 0; i < _data.Players.Count; i++)
+            {
+                if (_data.Players[i].CanPress)
+                {
+                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
+                }
+            }
         }
 
         private void WaitChoose()
@@ -2475,7 +2476,7 @@ namespace SICore
             // Заполняем пустые слоты ботами
             for (int i = 0; i < _data.Players.Count; i++)
             {
-                if (!_actor.Client.CurrentServer.IsOnlineInternal(_data.Players[i].Name))
+                if (!_data.Players[i].Connected)
                 {
                     _actor.ChangePersonType("player", i.ToString());
                 }
@@ -2691,7 +2692,7 @@ namespace SICore
 
                 if (_data.IsOralNow)
                     _actor.SendMessage(message, _data.ShowMan.Name);
-                else if (!_actor.Client.CurrentServer.IsOnline(_data.Chooser.Name))
+                else if (!_data.Chooser.Connected)
                     time = 20;
 
                 _actor.SendMessage(message, _data.Chooser.Name);
@@ -2718,7 +2719,7 @@ namespace SICore
             _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
             if (_data.IsOralNow)
                 _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
-            else if (!_actor.Client.CurrentServer.IsOnline(_data.Chooser.Name))
+            else if (!_data.Chooser.Connected)
                 waitTime = 20;
             
             _actor.SendMessage(msg.ToString(), _data.Chooser.Name);
@@ -3022,7 +3023,7 @@ namespace SICore
             {
                 _actor.SendMessage(message, _data.ShowMan.Name);
             }
-            else if (!_actor.Client.CurrentServer.IsOnline(_data.ActivePlayer.Name))
+            else if (!_data.ActivePlayer.Connected)
             {
                 waitTime = 20;
             }
@@ -3342,7 +3343,7 @@ namespace SICore
                 else
                 {
                     _actor.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
-                    if (!_actor.Client.CurrentServer.IsOnline(_data.ActivePlayer.Name))
+                    if (!_data.ActivePlayer.Connected)
                     {
                         waitTime = 20;
                     }

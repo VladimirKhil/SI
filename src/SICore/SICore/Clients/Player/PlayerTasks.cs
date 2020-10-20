@@ -10,6 +10,7 @@
         ChooseFinal,
         FinalStake,
         AnswerRight,
-        AnswerWrong
+        AnswerWrong,
+        PressButton
     }
 }

@@ -143,6 +143,11 @@ namespace SICore.Connections
                     await writer.WriteAsync(new ReadOnlyMemory<byte>(_buffer, 0, bytesRead));
                     //writer.Advance(bytesRead);
                 }
+                catch (ObjectDisposedException)
+                {
+                    // Normal dispose
+                    break;
+                }
                 catch (Exception ex)
                 {
                     OnError(ex, true);

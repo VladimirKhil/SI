@@ -342,7 +342,10 @@ namespace SICore
 
         public void OnAllPersonsChanged()
         {
-            AllPersons = new Account[] { _showMan }.Concat(Players).Concat(Viewers)
+            AllPersons = new ViewerAccount[] { _showMan }
+                .Concat(Players)
+                .Concat(Viewers)
+                .Where(a => a.Connected)
                 .ToDictionary(a => a.Name);
         }
 
@@ -354,7 +357,7 @@ namespace SICore
         /// <summary>
         /// Зрители
         /// </summary>
-        public List<Account> Viewers { get; } = new List<Account>();
+        public List<ViewerAccount> Viewers { get; } = new List<ViewerAccount>();
 
         private GamePersonAccount[] _mainPersons = Array.Empty<GamePersonAccount>();
 
@@ -374,12 +377,12 @@ namespace SICore
             }
         }
 
-        private Dictionary<string, Account> _allPersons = new Dictionary<string, Account>();
+        private Dictionary<string, ViewerAccount> _allPersons = new Dictionary<string, ViewerAccount>();
 
         /// <summary>
         /// Все участники
         /// </summary>
-        internal Dictionary<string, Account> AllPersons
+        internal Dictionary<string, ViewerAccount> AllPersons
         {
             get => _allPersons;
             private set

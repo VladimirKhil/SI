@@ -76,7 +76,7 @@ namespace SICore.Connections
         {
             var connectionIdHeader = connectionId != null ? $"\nConnectionId: {connectionId}" : "";
 
-            var upgradeText = $"GET / HTTP/1.1\nHost: {serverAddress}\nConnection: Upgrade{connectionIdHeader}\nUpgrade: sigame\n\n"; // TODO: sigame2
+            var upgradeText = $"GET / HTTP/1.1\nHost: {serverAddress}\nConnection: Upgrade{connectionIdHeader}\nUpgrade: sigame2\n\n";
             var bytes = Encoding.UTF8.GetBytes(upgradeText);
             await _tcpClient.GetStream().WriteAsync(bytes, 0, bytes.Length);
 

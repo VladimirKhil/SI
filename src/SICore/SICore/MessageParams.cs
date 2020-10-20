@@ -39,8 +39,18 @@ namespace SICore
         public const string Config_ChangeType = "CHANGETYPE";
 
         /// <summary>
+        /// Истекло время на нажатие кнопки
+        /// </summary>
+        public const string EndTry_All = "A";
+
+        /// <summary>
         /// Обновление игровой конфигурации
         /// </summary>
         public const string Info_Update = "UPDATE";
+
+        /// <summary>
+        /// Можно жать на кнопку, но вопрос ещё не окончен
+        /// </summary>
+        public const string Try_NotFinished = "NF";
     }
 }
