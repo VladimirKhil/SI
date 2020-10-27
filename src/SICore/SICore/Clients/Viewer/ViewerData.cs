@@ -295,7 +295,7 @@ namespace SICore
         
         public void OnAllPersonsChanged()
         {
-            _personsUpdateHistory.Append("Update: ").Append(PrintPersons()).AppendLine();
+            PersonsUpdateHistory.Append("Update: ").Append(PrintPersons()).AppendLine();
 
             var accounts = new List<ViewerAccount>();
             if (_showMan != null)
@@ -311,12 +311,12 @@ namespace SICore
             }
             catch (ArgumentException exc)
             {
-                throw new Exception($"OnAllPersonsChanged error: {_personsUpdateHistory}", exc);
+                throw new Exception($"OnAllPersonsChanged error: {PersonsUpdateHistory}", exc);
             }
 
             if (!AllPersons.ContainsKey(Name))
             {
-                throw new Exception($"!AllPersons.ContainsKey({Name})! {string.Join(",", AllPersons.Keys)} {_personsUpdateHistory}");
+                throw new Exception($"!AllPersons.ContainsKey({Name})! {string.Join(",", AllPersons.Keys)} {PersonsUpdateHistory}");
             }
         }
 
@@ -386,14 +386,14 @@ namespace SICore
             }
         }
 
-        private StringBuilder _personsUpdateHistory = new StringBuilder();
+        public StringBuilder PersonsUpdateHistory { get; } = new StringBuilder();
 
         private bool _isUpdating = false;
 
         internal void BeginUpdatePersons(string reason = null)
         {
             _isUpdating = true;
-            _personsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
+            PersonsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
         }
 
         internal void EndUpdatePersons()

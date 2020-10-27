@@ -969,6 +969,11 @@ namespace SICore
                 return false;
             }
 
+            if (_data.Answerer == null)
+            {
+                throw new Exception("_data.Answerer == null");
+            }
+
             StopWaiting();
 
             var answerResult = new AnswerResult { PlayerIndex = _data.AnswererIndex };

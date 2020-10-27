@@ -21,6 +21,6 @@ namespace SICore.Network.Contracts
         void OnError(Exception exc, bool isWarning);
         void ReplaceInfo(string name, IAccountInfo computerAccount);
 
-        event Action<Message> SerializationError;
+        event Action<Message, Exception> SerializationError;
     }
 }

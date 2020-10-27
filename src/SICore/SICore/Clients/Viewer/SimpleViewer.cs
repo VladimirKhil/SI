@@ -15,8 +15,8 @@ namespace SICore
         /// <param name="isHuman">Человек ли</param>
         /// <param name="isHost">Является ли владельцем сервера</param>
         /// <param name="form">Форма для интерфейса (если не человек, то null)</param>
-        public SimpleViewer(Client client, Account personData, bool isHost, IGameManager backLink, ILocalizer localizer, ViewerData data = null)
-            : base(client, personData, isHost, backLink, localizer, data)
+        public SimpleViewer(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
+            : base(client, personData, isHost, localizer, data)
         {
             
         }

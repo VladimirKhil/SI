@@ -387,5 +387,28 @@ namespace Notions
 
             return res.ToString();
         }
+
+        /// <summary>
+        /// Correctly shortens the string. Respects character surrogates.
+        /// </summary>
+        /// <param name="s">The string to shorten.</param>
+        /// <param name="maxLength">Maximum allowed string length.</param>
+        /// <returns>If string length is less than or equal to {maxLength}, returns original string.
+        /// Otherwise returnes substring of {s} which length is less than {maxLength}</returns>
+        public static string Shorten(this string s, int maxLength)
+        {
+            if (maxLength == 0 || s.Length == 0)
+            {
+                return "";
+            }
+
+            if (s.Length <= maxLength)
+            {
+                return s;
+            }
+
+            // Surrogates have high component first
+            return s.Substring(0, maxLength - (char.IsHighSurrogate(s[maxLength - 1]) ? 1 : 0));
+        }
     }
 }

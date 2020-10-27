@@ -26,6 +26,8 @@ namespace SICore
 
         public TableInfoViewModel TInfo { get; }
 
+        public bool CanSwitchType => true;
+
         protected ViewerHumanLogic(P client, ViewerData data)
             : base(client, data)
         {

@@ -25,7 +25,7 @@ namespace SICore
         /// <summary>
         /// Данные клиента
         /// </summary>
-        public D ClientData { get; set; }
+        public D ClientData { get; private set; }
 
         public L Logic => _logic;
 
@@ -36,11 +36,10 @@ namespace SICore
 
         public ILocalizer LO { get; protected set; }
 
-        protected Actor(Client client, Account personData, IGameManager manager, ILocalizer localizer, D data = null)
+        protected Actor(Client client, Account personData, ILocalizer localizer, D data)
         {
             _client = client;
-            ClientData = data ?? new D();
-            ClientData.BackLink = manager;
+            ClientData = data;
             _logic = CreateLogic(personData);
             _client.MessageReceived += OnMessageReceived;
             _client.Disposed += Dispose;

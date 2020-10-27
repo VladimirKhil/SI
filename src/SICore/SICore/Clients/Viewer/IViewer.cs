@@ -11,6 +11,8 @@ namespace SICore
     {
         TableInfoViewModel TInfo { get; }
 
+        bool CanSwitchType { get; }
+
         /// <summary>
         /// Получение сообщений
         /// </summary>

@@ -27,8 +27,8 @@ namespace SICore
         /// <param name="personData">Данные игрока</param>
         /// <param name="isHost">Является ли владельцем игры</param>
         /// <param name="form">Имеет ли форму для вывода</param>
-        public Player(Client client, Account personData, bool isHost, IGameManager backLink, ILocalizer localizer, ViewerData data = null)
-            : base(client, personData, isHost, backLink, localizer, data)
+        public Player(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
+            : base(client, personData, isHost, localizer, data)
         {
             ClientData.PlayerDataExtensions.PressGameButton = new CustomCommand(arg =>
             {

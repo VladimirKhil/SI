@@ -11,6 +11,8 @@ namespace SICore
     internal abstract class ViewerComputerLogic<C> : Logic<C, ViewerData>, IViewer
         where C : IViewerClient
     {
+        public bool CanSwitchType => false;
+
         protected sealed class TimerInfo
         {
             public bool IsEnabled { get; set; }

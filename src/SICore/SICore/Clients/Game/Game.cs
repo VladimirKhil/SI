@@ -31,6 +31,8 @@ namespace SICore
         public event Action<string> DisconnectRequested;
         public event Action<string, int, int> AdShown;
 
+        private readonly GameActions _gameActions;
+
         internal void OnStageChanged(GameStages stage, string stageName)
         {
             StageChanged?.Invoke(stage, stageName);
@@ -46,10 +48,13 @@ namespace SICore
         public ComputerAccount[] DefaultPlayers { get; set; }
         public ComputerAccount[] DefaultShowmans { get; set; }
 
-        public Game(Client client, string documentPath)
-            : base(client, null, null, null)
+        public Game(Client client, string documentPath, ILocalizer localizer, GameData gameData)
+            : base(client, null, localizer, gameData)
         {
-            ClientData.DocumentPath = documentPath;
+            gameData.DocumentPath = documentPath;
+            gameData.Share.Error += Share_Error;
+
+            _gameActions = new GameActions(_client, ClientData, LO);
         }
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData);
@@ -69,116 +74,47 @@ namespace SICore
         /// Запуск игры
         /// </summary>
         /// <param name="settings">Настройки</param>
-        public IViewerClient Run(IGameSettingsCore<AppSettingsCore> settings, SIDocument document, IGameManager backLink, IShare share, bool createHost = true)
+        public void Run(SIDocument document)
         {
-            ClientData.Settings = settings;
-            ClientData.HostName = settings.HumanPlayerName;
-            ClientData.BackLink = backLink;
-            ClientData.Share = share;
-            ClientData.Share.Error += Share_Error;
-
             Client.CurrentServer.SerializationError += CurrentServer_SerializationError;
-
-            LO = new Localizer(settings.AppSettings.Culture);
-
-            var isHost = createHost && ClientData.HostName == settings.Showman.Name;
-            IViewerClient result = null;
-
-            ClientData.BeginUpdatePersons();
-
-            try
-            {
-                ClientData.ShowMan = new GamePersonAccount(settings.Showman);
-                if (!settings.Showman.IsHuman || isHost)
-                {
-                    var showmanClient = new Client(settings.Showman.Name);
-                    var showman = new Showman(showmanClient, settings.Showman, isHost, backLink, LO);
-                    showmanClient.ConnectTo(_client.Server);
-
-                    if (isHost)
-                    {
-                        result = showman;
-                    }
-
-                    ClientData.ShowMan.Connected = true;
-                }
-
-                for (int i = 0; i < settings.Players.Length; i++)
-                {
-                    ClientData.Players.Add(new GamePlayerAccount(settings.Players[i]));
-                    var name = settings.Players[i].Name;
-                    var human = settings.Players[i].IsHuman;
-                    isHost = createHost && ClientData.HostName == name;
-
-                    if (!human || isHost)
-                    {
-                        var playerClient = new Client(settings.Players[i].Name);
-                        var player = new Player(playerClient, settings.Players[i], isHost, backLink, LO);
-                        playerClient.ConnectTo(_client.Server);
-
-                        if (isHost)
-                        {
-                            result = player;
-                        }
-
-                        ClientData.Players[i].Connected = true;
-                    }
-                }
-
-                for (int i = 0; i < settings.Viewers.Length; i++)
-                {
-                    ClientData.Viewers.Add(new ViewerAccount(settings.Viewers[i]));
-                    var name = settings.Viewers[i].Name;
-                    isHost = createHost && ClientData.HostName == name;
-
-                    if (isHost)
-                    {
-                        var viewerClient = new Client(settings.Viewers[i].Name);
-                        var viewer = new SimpleViewer(viewerClient, settings.Viewers[i], isHost, backLink, LO);
-                        viewerClient.ConnectTo(_client.Server);
-                        result = viewer;
-
-                        ClientData.Viewers[i].Connected = true;
-                    }
-                }
-            }
-            finally
-            {
-                ClientData.EndUpdatePersons();
-            }
 
             _logic.Run(document);
             foreach (var personName in ClientData.AllPersons.Keys)
             {
                 if (personName == NetworkConstants.GameName)
+                {
                     continue;
+                }
 
                 Inform(personName);
             }
-
-            return result;
         }
 
-        private void CurrentServer_SerializationError(Message message)
+        private void CurrentServer_SerializationError(Message message, Exception exc)
         {
             // Это случается при выводе частичного текста. Пытаемся поймать
             try
             {
                 var fullText = ClientData.Text ?? "";
-                var errorMessage = new StringBuilder(Convert.ToBase64String(Encoding.UTF8.GetBytes(fullText)))
+                var errorMessage = new StringBuilder("SerializaionError: ")
+                    .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(fullText)))
                     .Append('\n')
                     .Append(ClientData.TextLength)
+                    .Append('\n')
+                    .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Sender)))
+                    .Append('\n')
+                    .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Receiver)))
                     .Append('\n')
                     .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(message.Text)))
                     .Append('\n')
                     .Append((message.Text ?? "").Length)
                     .Append(' ').Append(ClientData.Settings.AppSettings.ReadingSpeed);
 
-                _client.Server.OnError(new Exception(errorMessage.ToString()), true);
+                _client.Server.OnError(new Exception(errorMessage.ToString(), exc), true);
             }
-            catch (Exception exc)
+            catch (Exception e)
             {
-                _client.Server.OnError(exc, true);
+                _client.Server.OnError(e, true);
             }
         }
 
@@ -1826,6 +1762,7 @@ namespace SICore
 
         private void PlanExecution(Tasks task, double taskTime, int arg = 0)
         {
+            Logic.AddHistory($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
             if (ClientData.TInfo.Pause)
             {
                 Logic.UpdatePausedTask((int)task, arg, (int)taskTime);
@@ -1858,9 +1795,10 @@ namespace SICore
                 // Сбросим индекс отвечающего
                 ClientData.AnswererIndex = -1;
 
-                Logic.AddHistory($"AnswererIndex dropped");
-
                 var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
+
+                Logic.AddHistory($"AnswererIndex dropped; nextTask = {nextTask};" +
+                    $" ClientData.Decision = {ClientData.Decision}; Logic.IsFinalRound() = {Logic.IsFinalRound()}");
 
                 if (ClientData.Decision == DecisionType.Answering && !Logic.IsFinalRound())
                 {
@@ -2210,7 +2148,9 @@ namespace SICore
                 }
 
                 if (!found)
+                {
                     return;
+                }
             }
             else
             {
@@ -2229,7 +2169,7 @@ namespace SICore
 
             try
             {
-                if (ClientData.ShowMan.Name == replacer)
+                if (ClientData.ShowMan.Name == replacer && ClientData.ShowMan.IsHuman)
                 {
                     otherAccount = ClientData.ShowMan;
                     ClientData.ShowMan = new GamePersonAccount(account)
@@ -2240,9 +2180,9 @@ namespace SICore
                 }
                 else
                 {
-                    for (int i = 0; i < ClientData.Players.Count; i++)
+                    for (var i = 0; i < ClientData.Players.Count; i++)
                     {
-                        if (ClientData.Players[i].Name == replacer)
+                        if (ClientData.Players[i].Name == replacer && ClientData.Players[i].IsHuman)
                         {
                             otherAccount = ClientData.Players[i];
                             ClientData.Players[i] = new GamePlayerAccount(account)
@@ -2250,6 +2190,7 @@ namespace SICore
                                 Ready = account.Ready,
                                 Connected = account.Connected
                             };
+
                             otherIndex = i;
                             break;
                         }
@@ -2259,7 +2200,7 @@ namespace SICore
                     {
                         for (var i = 0; i < ClientData.Viewers.Count; i++)
                         {
-                            if (ClientData.Viewers[i].Name == replacer)
+                            if (ClientData.Viewers[i].Name == replacer) // always IsHuman
                             {
                                 otherAccount = ClientData.Viewers[i];
                                 otherIndex = i;
@@ -2318,7 +2259,7 @@ namespace SICore
 
             if (!ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
             {
-                Trace.TraceWarning("ChangePersonType: host == null");
+                ClientData.BackLink.LogWarning("ChangePersonType: host == null");
                 return;
             }
 
@@ -2332,11 +2273,13 @@ namespace SICore
                 account = ClientData.Players[index];
             }
             else
+            {
                 account = ClientData.ShowMan;
+            }
 
             if (account == null)
             {
-                Trace.TraceWarning("ChangePersonType: account == null");
+                ClientData.BackLink.LogWarning("ChangePersonType: account == null");
                 return;
             }
 
@@ -2344,7 +2287,7 @@ namespace SICore
 
             var newType = !account.IsHuman;
             string newName = "";
-            bool newSex = true;
+            bool newIsMale = true;
 
             Account newAcc = null;
 
@@ -2370,7 +2313,9 @@ namespace SICore
                 else if (isPlayer)
                 {
                     if (DefaultPlayers == null)
+                    {
                         return;
+                    }
 
                     var visited = new List<int>();
 
@@ -2389,6 +2334,9 @@ namespace SICore
                         }
                     }
 
+                    ClientData.BackLink.LogWarning($"Selecting computer player. DefaultPlayers.Length = {DefaultPlayers.Length};" +
+                        $" visited.Count = {visited.Count}");
+
                     var rand = Data.Rand.Next(DefaultPlayers.Length - visited.Count - 1);
                     while (visited.Contains(rand))
                     {
@@ -2401,14 +2349,14 @@ namespace SICore
 
                     newAccount.IsHuman = false;
                     newName = newAccount.Name = compPlayer.Name;
-                    newSex = newAccount.IsMale = compPlayer.IsMale;
+                    newIsMale = newAccount.IsMale = compPlayer.IsMale;
                     newAccount.Picture = compPlayer.Picture;
                     newAccount.Connected = true;
 
                     ClientData.Players[index] = newAccount;
 
                     var playerClient = new Client(newAccount.Name);
-                    var player = new Player(playerClient, compPlayer, false, ClientData.BackLink, LO);
+                    var player = new Player(playerClient, compPlayer, false, LO, new ViewerData { BackLink = ClientData.BackLink });
                     playerClient.ConnectToAsync(_client.Server).ContinueWith(t =>
                     {
                         lock (ClientData.TaskLock)
@@ -2421,8 +2369,7 @@ namespace SICore
                 {
                     if (ClientData.BackLink == null)
                     {
-                        Trace.TraceWarning("ChangePersonType: this.ClientData.BackLink == null");
-                        return;
+                        throw new InvalidOperationException("ChangePersonType: this.ClientData.BackLink == null");
                     }
 
                     var newAccount = new GamePersonAccount(account);
@@ -2430,14 +2377,14 @@ namespace SICore
 
                     newAccount.IsHuman = false;
                     newName = newAccount.Name = DefaultShowmans[0].Name;
-                    newSex = newAccount.IsMale = true;
+                    newIsMale = newAccount.IsMale = true;
                     newAccount.Picture = DefaultShowmans[0].Picture;
                     newAccount.Connected = true;
 
                     ClientData.ShowMan = newAccount;
 
                     var showmanClient = new Client(newAccount.Name);
-                    var showman = new Showman(showmanClient, newAccount, false, ClientData.BackLink, LO);
+                    var showman = new Showman(showmanClient, newAccount, false, LO, new ViewerData { BackLink = ClientData.BackLink });
                     showmanClient.ConnectToAsync(_client.Server).ContinueWith(t =>
                     {
                         lock (ClientData.TaskLock)
@@ -2460,7 +2407,7 @@ namespace SICore
                 }
             }
 
-            SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newSex ? '+' : '-');
+            SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
             var newTypeString = newType ? LO[nameof(R.Human)] : LO[nameof(R.Computer)];
             SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], host.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\"");
 

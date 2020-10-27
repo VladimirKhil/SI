@@ -269,7 +269,7 @@ namespace SICore.Connections
             }
             catch (Exception exc)
             {
-                OnError(exc, true);
+                OnError(new Exception($"Deserialization error of text: {Encoding.UTF8.GetString(data)}", exc), true);
             }
 
             msg = default;

@@ -1,7 +1,6 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Connections;
 using SICore.Network.Clients;
-using SICore.Network.Contracts;
 using SIData;
 using System;
 using System.Collections.Generic;
@@ -16,8 +15,8 @@ namespace SICore
     {
         private readonly object _readyLock = new object();
 
-        public Showman(Client client, Account personData, bool isHost, IGameManager backLink, ILocalizer localizer, ViewerData data = null)
-            : base(client, personData, isHost, backLink, localizer, data)
+        public Showman(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
+            : base(client, personData, isHost, localizer, data)
         {
             if (personData.IsHuman)
                 _logic = new ShowmanHumanLogic(this, ClientData);
@@ -58,7 +57,7 @@ namespace SICore
 
             ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
-            ClientData.PersonDataExtensions.AreAnswersShown = backLink.AreAnswersShown;
+            ClientData.PersonDataExtensions.AreAnswersShown = data.BackLink.AreAnswersShown;
             ClientData.PropertyChanged += ClientData_PropertyChanged;
 
             ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>

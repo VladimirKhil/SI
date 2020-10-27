@@ -1,4 +1,5 @@
-﻿using SICore.Connections;
+﻿using Notions;
+using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
@@ -40,7 +41,7 @@ namespace SICore.Network.Servers
 
         public event Action<Exception, bool> Error;
 
-        public event Action<Message> SerializationError;
+        public event Action<Message, Exception> SerializationError;
 
         protected event Action<Message> MessageReceived;
 
@@ -166,10 +167,7 @@ namespace SICore.Network.Servers
                 var messageText = m.Text;
                 if (!m.IsSystem)
                 {
-                    if (messageText.Length > _serverConfiguration.MaxChatMessageLength)
-                    {
-                        messageText = messageText.Substring(0, _serverConfiguration.MaxChatMessageLength);
-                    }
+                    messageText = messageText.Shorten(_serverConfiguration.MaxChatMessageLength);
                 }
 
                 if (sender != m.Sender || receiver != m.Receiver || messageText != m.Text)
@@ -303,7 +301,7 @@ namespace SICore.Network.Servers
             client.SendingMessage += Client_SendingMessage;
         }
 
-        private void Connection_SerializationError(Message message) => SerializationError?.Invoke(message);
+        private void Connection_SerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
         public void DeleteClient(string name)
         {

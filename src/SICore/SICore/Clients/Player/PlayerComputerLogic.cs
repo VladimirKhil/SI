@@ -1464,12 +1464,19 @@ namespace SICore
                 playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
                 var riskRateLimit = (int)(100 * Math.Min(1, playerStrength / playerData.RealBrave));
-                var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
+                try
+                {
+                    var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
 
-                playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength * riskRate / (difficulty + 1);
-                playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)Data.Rand.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+                    playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                    playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)Data.Rand.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
 
-                playerData.ReadyToPress = playerData.IsSure || Data.Rand.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+                    playerData.ReadyToPress = playerData.IsSure || Data.Rand.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+                }
+                catch (ArgumentOutOfRangeException exc)
+                {
+                    throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}", exc);
+                }
             }
             else
             {

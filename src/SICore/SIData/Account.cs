@@ -110,10 +110,7 @@ namespace SIData
             _isHuman = account._isHuman;
         }
 
-        public override string ToString()
-        {
-            return _name;
-        }
+        public override string ToString() => _name;
 
         /// <summary>
         /// Изменилось значение свойства

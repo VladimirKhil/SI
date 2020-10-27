@@ -49,7 +49,7 @@ namespace SICore.Connections
         /// </summary>
         public event Action<Exception, bool> Error;
 
-        public event Action<Message> SerializationError;
+        public event Action<Message, Exception> SerializationError;
 
         public string UserName { get; set; } = Guid.NewGuid().ToString();
 
@@ -97,7 +97,7 @@ namespace SICore.Connections
 
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
-        protected void OnSerializationError(Message message) => SerializationError?.Invoke(message);
+        protected void OnSerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
         protected abstract void Dispose(bool disposing);
 

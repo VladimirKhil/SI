@@ -174,7 +174,7 @@ namespace SICore.Connections
             }
             catch (ArgumentException e) when (e.Message.Contains("surrogate") || e.Message.Contains("is an invalid character"))
             {
-                OnSerializationError(message);
+                OnSerializationError(message, e);
             }
             catch (Exception e)
             {

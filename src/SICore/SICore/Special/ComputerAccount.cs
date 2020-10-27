@@ -487,10 +487,7 @@ namespace SICore
             return S.CompareTo(other.S);
         }
 
-        public int CompareTo(object obj)
-        {
-            return -1;
-        }
+        public int CompareTo(object obj) => -1;
 
         public void LoadInfo(ComputerAccount item)
         {

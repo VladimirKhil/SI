@@ -23,6 +23,7 @@
     <PackageReference Include="System.Threading.Channels" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\SICore.Connections\SICore.Connections.csproj" />
   </ItemGroup>
   <ItemGroup>
