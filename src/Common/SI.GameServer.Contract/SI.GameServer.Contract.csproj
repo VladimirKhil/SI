@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <Version>7.4.1</Version>
+    <Company>Svoyak-soft</Company>
+    <Copyright>Copyright © Svoyak-soft 2018 - 2020</Copyright>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIEngine\SIEngine.csproj" />
+    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
+  </ItemGroup>
+
+</Project>

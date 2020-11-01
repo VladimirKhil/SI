@@ -19,3 +19,6 @@
 * *SIUI* - модель и отображение игрового табло
 * *SImulator* - модель и отображение СИмулятора (приложения для игры при помощи проектора)
 * *SIQuester* - модель и отображение редактора вопросов SIGame
+* *SIGame* - модель и отображение игры SIGame
+
+Файл src/SIGame/SIGame.ViewModel/dlls/System.Speech.dll взят из Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.1.

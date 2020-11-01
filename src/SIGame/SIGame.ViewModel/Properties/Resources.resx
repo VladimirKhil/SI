@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="About_Version" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="Any" xml:space="preserve">
+    <value>Любой</value>
+  </data>
+  <data name="App_Name" xml:space="preserve">
+    <value>SIGame</value>
+  </data>
+  <data name="BadPackage" xml:space="preserve">
+    <value>Данный пакет не может быть использован для игры на сервере!</value>
+  </data>
+  <data name="CreatedGameNotFound" xml:space="preserve">
+    <value>Не удалось обнаружить созданную игру!</value>
+  </data>
+  <data name="Creating" xml:space="preserve">
+    <value>Создание игры…</value>
+  </data>
+  <data name="GameConnectionTimeout" xml:space="preserve">
+    <value>Истекло ожидание подключения к серверу</value>
+  </data>
+  <data name="GameCreationError_BadPackage" xml:space="preserve">
+    <value>Плохой пакет вопросов!</value>
+  </data>
+  <data name="GameCreationError_DuplicateName" xml:space="preserve">
+    <value>Игра с таким именем уже существует!</value>
+  </data>
+  <data name="GameCreationError_NoPackage" xml:space="preserve">
+    <value>Не удалось создать игру на сервере, так как не был обнаружен игровой пакет!</value>
+  </data>
+  <data name="GameCreationError_ObsoleteVersion" xml:space="preserve">
+    <value>Ваша версия игры устарела. Обновите игру</value>
+  </data>
+  <data name="GameCreationError_ServerError" xml:space="preserve">
+    <value>Не удалось создать игру на сервере из-за ошибки на сервере!</value>
+  </data>
+  <data name="GameCreationError_ServerMaintainance" xml:space="preserve">
+    <value>Производится обслуживание сервера! Пожалуйста, подключитесь через некоторое время. Приносим извинения за доставленные неудобства.</value>
+  </data>
+  <data name="GameCreationError_ServerNotReady" xml:space="preserve">
+    <value>Сервер не готов начать игру</value>
+  </data>
+  <data name="GameCreationError_TooManyGames" xml:space="preserve">
+    <value>Превышено максимальное количество запущенных игр на сервере! Пожалуйста, подождите.</value>
+  </data>
+  <data name="GameCreationError_UnknownReason" xml:space="preserve">
+    <value>Не удалось создать игру по неизвестной причине!</value>
+  </data>
+  <data name="GameEntering" xml:space="preserve">
+    <value>Вход в игру…</value>
+  </data>
+  <data name="GamesFilter_All" xml:space="preserve">
+    <value>Все</value>
+  </data>
+  <data name="GamesFilter_New" xml:space="preserve">
+    <value>Новые</value>
+  </data>
+  <data name="GamesFilter_NoPassword" xml:space="preserve">
+    <value>Без пароля</value>
+  </data>
+  <data name="GamesFilter_Sport" xml:space="preserve">
+    <value>Упрощённые</value>
+  </data>
+  <data name="GamesFilter_Tv" xml:space="preserve">
+    <value>Классические</value>
+  </data>
+  <data name="LoginForbidden" xml:space="preserve">
+    <value>На сервере запрещено использование такого логина!</value>
+  </data>
+  <data name="LostConnection" xml:space="preserve">
+    <value>Соединение с сервером разорвано!</value>
+  </data>
+  <data name="MainMenu_About" xml:space="preserve">
+    <value>Об игре</value>
+  </data>
+  <data name="MainMenu_BestPlayers" xml:space="preserve">
+    <value>Лучшие игроки</value>
+  </data>
+  <data name="MainMenu_Exit" xml:space="preserve">
+    <value>Выход</value>
+  </data>
+  <data name="MainMenu_NetworkGame" xml:space="preserve">
+    <value>Игра по сети</value>
+  </data>
+  <data name="MainMenu_OnlineGame" xml:space="preserve">
+    <value>Игра онлайн</value>
+  </data>
+  <data name="MainMenu_SingleGame" xml:space="preserve">
+    <value>Одиночная игра</value>
+  </data>
+  <data name="New" xml:space="preserve">
+    <value>Новый</value>
+  </data>
+  <data name="OnlineUserConflict" xml:space="preserve">
+    <value>Пользователь с таким именем уже вошёл на сервер!</value>
+  </data>
+  <data name="PackageCheck" xml:space="preserve">
+    <value>Проверка пакета…</value>
+  </data>
+  <data name="Preparing" xml:space="preserve">
+    <value>Подготовка…</value>
+  </data>
+  <data name="SendingPackageToServer" xml:space="preserve">
+    <value>Отправка пакета на сервер…</value>
+  </data>
+  <data name="SIStorage" xml:space="preserve">
+    <value>Библиотека вопросов</value>
+  </data>
+  <data name="SIStorageCallError" xml:space="preserve">
+    <value>Ошибка обращения к Библиотеке</value>
+  </data>
+  <data name="SIStorageError" xml:space="preserve">
+    <value>Ошибка работы с Библиотекой вопросов</value>
+  </data>
+  <data name="TimeSettings_ChoosingFinalTheme" xml:space="preserve">
+    <value>Время на выбор темы в финальном раунде</value>
+  </data>
+  <data name="TimeSettings_ChoosingQuestion" xml:space="preserve">
+    <value>Время для выбора игроком вопроса</value>
+  </data>
+  <data name="TimeSettings_FinalThinking" xml:space="preserve">
+    <value>Время на обдумывание в финале</value>
+  </data>
+  <data name="TimeSettings_GivingCat" xml:space="preserve">
+    <value>Время на размышление на отдачу Вопроса с секретом</value>
+  </data>
+  <data name="TimeSettings_MakingStake" xml:space="preserve">
+    <value>Время на размышление над ставкой на Вопросе со ставкой и финале</value>
+  </data>
+  <data name="TimeSettings_PrintingAnswer" xml:space="preserve">
+    <value>Время на ввод ответа после нажатия кнопки</value>
+  </data>
+  <data name="TimeSettings_Round" xml:space="preserve">
+    <value>Время раунда</value>
+  </data>
+  <data name="TimeSettings_ShowmanDecisions" xml:space="preserve">
+    <value>Время на принятие решений ведущим</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnQuestion" xml:space="preserve">
+    <value>Время для размышления над вопросом</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnSpecial" xml:space="preserve">
+    <value>Время на размышление над спецвопросом</value>
+  </data>
+  <data name="UploadPackageTimeout" xml:space="preserve">
+    <value>Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла.</value>
+  </data>
+  <data name="AlreadyExists" xml:space="preserve">
+    <value>Участник с таким именем уже существует!</value>
+  </data>
+  <data name="BirthDateRequired" xml:space="preserve">
+    <value>Необходимо задать дату рождения!</value>
+  </data>
+  <data name="ChangeAccount" xml:space="preserve">
+    <value>Изменение аккаунта</value>
+  </data>
+  <data name="CommentSiteError" xml:space="preserve">
+    <value>Ошибка при переходе на сайт для комментирования. Убедитесь, что у вас настроен браузер по умолчанию.</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="DeleteConfirm" xml:space="preserve">
+    <value>Вы действительно хотите удалить участника '{0}'?</value>
+  </data>
+  <data name="ErrorMovingToSite" xml:space="preserve">
+    <value>Возникла ошибка при переходе на сайт {0}. Убедитесь, что у вас настроен браузер по умолчанию.</value>
+  </data>
+  <data name="ExportOk" xml:space="preserve">
+    <value>Экспорт успешно выполнен!</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>Слишком большой файл!</value>
+  </data>
+  <data name="GameClosedCauseEverybodyLeft" xml:space="preserve">
+    <value>Сервер завершил игру из-за отключения участников</value>
+  </data>
+  <data name="GameEngineError" xml:space="preserve">
+    <value>Ошибка игрового движка</value>
+  </data>
+  <data name="GameNameRequired" xml:space="preserve">
+    <value>Необходимо задать название игры</value>
+  </data>
+  <data name="ImportOk" xml:space="preserve">
+    <value>Импорт успешно выполнен!</value>
+  </data>
+  <data name="IsDouble" xml:space="preserve">
+    <value>{0} встречается как минимум дважды!</value>
+  </data>
+  <data name="LinkError" xml:space="preserve">
+    <value>Ошибка при переходе по ссылке. Убедитесь, что у вас настроен браузер по умолчанию.</value>
+  </data>
+  <data name="LogsMovingError" xml:space="preserve">
+    <value>Не удалось перенести логи</value>
+  </data>
+  <data name="NameRequired" xml:space="preserve">
+    <value>Необходимо указать имя участника!</value>
+  </data>
+  <data name="NewAccount" xml:space="preserve">
+    <value>Новый аккаунт</value>
+  </data>
+  <data name="NewGame" xml:space="preserve">
+    <value>Новая игра</value>
+  </data>
+  <data name="NewPlayer" xml:space="preserve">
+    <value>Новый компьютерный игрок</value>
+  </data>
+  <data name="NewShowman" xml:space="preserve">
+    <value>Новый ведущий</value>
+  </data>
+  <data name="NoLogsFolder" xml:space="preserve">
+    <value>Папка логов не существует!</value>
+  </data>
+  <data name="OpenLogsError" xml:space="preserve">
+    <value>Ошибка при открытии папки логов: {0}</value>
+  </data>
+  <data name="PlayerDeleteConfirm" xml:space="preserve">
+    <value>Вы действительно хотите удалить компьютерного игрока {0}?</value>
+  </data>
+  <data name="PlayerExists" xml:space="preserve">
+    <value>Такой игрок уже есть!</value>
+  </data>
+  <data name="PlayerNameRequired" xml:space="preserve">
+    <value>Игроку необходимо задать имя!</value>
+  </data>
+  <data name="PortNumberRequired" xml:space="preserve">
+    <value>Необходимо задать номер порта</value>
+  </data>
+  <data name="RejoinError" xml:space="preserve">
+    <value>Соединение было установлено, но внезапно разорвалось!</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="SettingsReset" xml:space="preserve">
+    <value>Настройки возвращены к значениям по умолчанию!</value>
+  </data>
+  <data name="ShomanNameRequired" xml:space="preserve">
+    <value>Ведущему необходимо задать имя!</value>
+  </data>
+  <data name="ShowmanDeleteConfirm" xml:space="preserve">
+    <value>Вы действительно хотите удалить ведущего {0}?</value>
+  </data>
+  <data name="SiteNavigationError" xml:space="preserve">
+    <value>Возникла ошибка при переходе на сайт ({0}). Убедитесь, что у вас настроен браузер по умолчанию.</value>
+  </data>
+  <data name="WrongAddressFormat" xml:space="preserve">
+    <value>Неверный формат адреса</value>
+  </data>
+  <data name="ComputerPlayer" xml:space="preserve">
+    <value>Компьютерный игрок</value>
+  </data>
+  <data name="VKThemesError" xml:space="preserve">
+    <value>Возникла ошибка при переходе на сайт ({0}). Убедитесь, что у вас настроен браузер по умолчанию.</value>
+  </data>
+  <data name="GameRule_IgnoreWrong" xml:space="preserve">
+    <value>право на ошибку</value>
+  </data>
+  <data name="GameRule_NoFalseStart" xml:space="preserve">
+    <value>без фальстартов</value>
+  </data>
+  <data name="GameRule_Oral" xml:space="preserve">
+    <value>устная</value>
+  </data>
+  <data name="GameRule_Sport" xml:space="preserve">
+    <value>спортивная</value>
+  </data>
+  <data name="GameStage_Created" xml:space="preserve">
+    <value>Создана</value>
+  </data>
+  <data name="GameStage_Final" xml:space="preserve">
+    <value>Финал</value>
+  </data>
+  <data name="GameStage_Finished" xml:space="preserve">
+    <value>Игра окончена</value>
+  </data>
+  <data name="GameStage_Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
+  <data name="GameStage_Started" xml:space="preserve">
+    <value>Начата</value>
+  </data>
+  <data name="ObsoleClient" xml:space="preserve">
+    <value>Ваша версия игры устарела. Необходимо обновить её</value>
+  </data>
+  <data name="Online_Login_Hint" xml:space="preserve">
+    <value>Попробуйте отключить брандмауэр или файервол. Возможно, дело в VPN или прокси-сервере</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Следующий</value>
+  </data>
+  <data name="RandomThemes" xml:space="preserve">
+    <value>Случайный набор тем</value>
+  </data>
+  <data name="FeedbackLink" xml:space="preserve">
+    <value>https://vk.com/topic-135725718_34967839</value>
+  </data>
+  <data name="GroupLink" xml:space="preserve">
+    <value>https://vk.com/si_game</value>
+  </data>
+  <data name="ThemesLink" xml:space="preserve">
+    <value>https://vk.com/topic-135725718_34975471</value>
+  </data>
+  <data name="Error_SendingReport" xml:space="preserve">
+    <value>Не удалось подключиться к серверу при отправке отчёта об игре. Отчёт будет отправлен позднее.</value>
+  </data>
+  <data name="Error_UploadingAvatar" xml:space="preserve">
+    <value>Не удалось загрузить аватар по адресу</value>
+  </data>
+  <data name="CannotGetServerAddress" xml:space="preserve">
+    <value>Не удалось определить адрес сервера!</value>
+  </data>
+  <data name="GameModes_Sport_Hint" xml:space="preserve">
+    <value>Вопросы задаются по очереди</value>
+  </data>
+  <data name="GameModes_Tv_Hint" xml:space="preserve">
+    <value>Выбор вопросов из таблицы, спецвопросы и финал</value>
+  </data>
+  <data name="OnlineGameAddress" xml:space="preserve">
+    <value>Адрес игры</value>
+  </data>
+  <data name="RandomServerThemes" xml:space="preserve">
+    <value>Случайный набор тем сервера</value>
+  </data>
+  <data name="GameCreationError_JoinError" xml:space="preserve">
+    <value>Ошибка подключения</value>
+  </data>
+  <data name="GameCreationError_WrongSettings" xml:space="preserve">
+    <value>Неверные настройки игры</value>
+  </data>
+  <data name="TimeSettings_MediaDelay" xml:space="preserve">
+    <value>Время на паузу для медиаконтента</value>
+  </data>
+  <data name="TimeSettings_RightAnswer" xml:space="preserve">
+    <value>Время на вывод правильного ответа</value>
+  </data>
+  <data name="ServerConnectionError" xml:space="preserve">
+    <value>Соединение с сервером потеряно!</value>
+  </data>
+  <data name="Mixed" xml:space="preserve">
+    <value>Разные</value>
+  </data>
+  <data name="RoundTrailing" xml:space="preserve">
+    <value>{0}-й раунд</value>
+  </data>
+  <data name="News" xml:space="preserve">
+    <value>Новости</value>
+  </data>
+  <data name="ReconnectedMessage" xml:space="preserve">
+    <value>Соединение восстановлено.</value>
+  </data>
+  <data name="ReconnectingMessage" xml:space="preserve">
+    <value>Разрыв соединения, переподключаемся...</value>
+  </data>
+  <data name="PackageNotSelected" xml:space="preserve">
+    <value>пакет не выбран</value>
+  </data>
+  <data name="NoLicensesFolder" xml:space="preserve">
+    <value>Папка лицензий не существует!</value>
+  </data>
+  <data name="OpenLicensesError" xml:space="preserve">
+    <value>Ошибка при открытии папки лицензий: {0}</value>
+  </data>
+</root>
