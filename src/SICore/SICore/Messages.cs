@@ -51,12 +51,12 @@
         public const string Cancel = "CANCEL";
 
         /// <summary>
-        /// Кот в мешке
+        /// Вопрос с секретом
         /// </summary>
         public const string Cat = "CAT";
 
         /// <summary>
-        /// Стоимость Кота в мешке
+        /// Стоимость Вопроса с секретом
         /// </summary>
         public const string CatCost = "CATCOST";
 

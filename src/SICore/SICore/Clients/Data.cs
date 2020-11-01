@@ -15,21 +15,30 @@ namespace SICore
         public IGameManager BackLink { get; set; }
 
         /// <summary>
-        /// Глобальный генератор случайных чисел
+        /// Глобальный генератор случайных чисел. Он создаётся на каждого клиента отдельно, поскольку не потокобезопасен
         /// </summary>
-        public static readonly Random Rand = new Random();
+        public Random Rand { get; } = new Random();
 
         /// <summary>
         /// Информация, используемая табло
         /// </summary>
         public TableInfo TInfo { get; } = new TableInfo();
+
         public object TInfoLock { get; } = new object();
 
-        public int PrevoiusTheme = -1, PreviousQuest = -1;
+        public int PrevoiusTheme { get; set; } = -1;
+        
+        public int PreviousQuest { get; set; } = -1;
+
         /// <summary>
-        /// Выбор игрока
+        /// Выбранная тема
         /// </summary>
-        public int ThemeIndex = -1, QuestionIndex = -1;
+        public int ThemeIndex { get; set; } = -1;
+        
+        /// <summary>
+        /// Выбранный вопрос
+        /// </summary>
+        public int QuestionIndex { get; set; } = -1;
 
         /// <summary>
         /// Объект синхронизации для choiceTheme и choiceQuest
@@ -77,12 +86,14 @@ namespace SICore
             set { if (_thinkingTime != value) { _thinkingTime = value; OnPropertyChanged(); } }
         }
 
-        internal int CurPriceRight, CurPriceWrong = 0;
+        internal int CurPriceRight { get; set; }
+        
+        internal int CurPriceWrong { get; set; }
 
         /// <summary>
         /// Информация о системных ошибках в игре, которые неплохо бы отправлять автору, но которые не приводят к краху системы
         /// </summary>
-        public StringBuilder SystemLog { get; set; } = new StringBuilder();
+        public StringBuilder SystemLog { get; } = new StringBuilder();
 
         public virtual void OnAddString(string person, string text, LogMode mode)
         {

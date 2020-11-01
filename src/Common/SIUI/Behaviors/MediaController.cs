@@ -25,10 +25,10 @@ namespace SIUI.Behaviors
             DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(MediaController), new PropertyMetadata(false, OnIsAttachedChanged));
 
         [DllImport("winmm.dll")]
-        public static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+        private static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
 
         [DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-        public static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
+        private static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
 
         private static readonly DependencyPropertyDescriptor SourceDescriptor = 
             DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));

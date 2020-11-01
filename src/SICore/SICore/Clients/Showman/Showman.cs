@@ -18,13 +18,8 @@ namespace SICore
         public Showman(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
             : base(client, personData, isHost, localizer, data)
         {
-            if (personData.IsHuman)
-                _logic = new ShowmanHumanLogic(this, ClientData);
-            else
-                _logic = new ShowmanComputerLogic(this, ClientData);
-
-            ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { SendMessage(Messages.IsRight, "+"); ClearSelections(); });
-            ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { SendMessage(Messages.IsRight, "-"); ClearSelections(); });
+            ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "+"); ClearSelections(); });
+            ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "-"); ClearSelections(); });
 
             ClientData.ShowmanDataExtensions.ChangeSums = new CustomCommand(arg =>
             {
@@ -49,7 +44,7 @@ namespace SICore
 
             ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Change, ClientData.ShowmanDataExtensions.SelectedPlayer.First, ClientData.ShowmanDataExtensions.SelectedPlayer.Second);
+                _viewerActions.SendMessageWithArgs(Messages.Change, ClientData.ShowmanDataExtensions.SelectedPlayer.First, ClientData.ShowmanDataExtensions.SelectedPlayer.Second);
                 ClearSelections();
             });
 
@@ -62,31 +57,31 @@ namespace SICore
 
             ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
+                _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
                 ClearSelections();
             });
 
             ClientData.PersonDataExtensions.SendNominal = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 0);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
                 ClearSelections();
             });
 
             ClientData.PersonDataExtensions.SendStake = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
                 ClearSelections();
             });
 
             ClientData.PersonDataExtensions.SendPass = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 2);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
                 ClearSelections();
             });
 
             ClientData.PersonDataExtensions.SendVabank = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 3);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
                 ClearSelections();
             });
         }
@@ -94,14 +89,16 @@ namespace SICore
         protected override IShowman CreateLogic(Account personData)
         {
             return personData.IsHuman ?
-                (IShowman)new ShowmanHumanLogic(this, ClientData) :
-                new ShowmanComputerLogic(this, ClientData);
+                (IShowman)new ShowmanHumanLogic(ClientData, _viewerActions, LO) :
+                new ShowmanComputerLogic(ClientData, _viewerActions);
         }
 
-        void ClientData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ClientData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PersonData.AreAnswersShown))
+            {
                 ClientData.BackLink.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
+            }
         }
 
         private void Manage_Executed(object arg)
@@ -128,8 +125,8 @@ namespace SICore
 
             lock (_readyLock)
             {
-                var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand = new CustomCommand(arg => SendMessage(Messages.Ready));
-                ((PersonAccount)ClientData.Me).BeUnReadyCommand = new CustomCommand(arg => SendMessage(Messages.Ready, "-"));
+                var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
+                ((PersonAccount)ClientData.Me).BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
                 _logic.OnInitialized();
 
                 if (ClientData.AutoReady)
@@ -164,7 +161,7 @@ namespace SICore
                             {
                                 ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
                                 int num = i;
-                                ClientData.Players[i].SelectionCallback = player => { SendMessageWithArgs(Messages.First, num); ClearSelections(); };
+                                ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.First, num); ClearSelections(); };
                             }
 
                             if (ClientData.Speaker != null)
@@ -185,7 +182,7 @@ namespace SICore
                             {
                                 ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
                                 int num = i;
-                                ClientData.Players[i].SelectionCallback = player => { SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
+                                ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Next, num); ClearSelections(); };
                             }
 
                             if (ClientData.Speaker != null)
@@ -244,7 +241,7 @@ namespace SICore
                             {
                                 ClientData.Players[i].CanBeSelected = i + 1 < mparams.Length && mparams[i + 1] == "+";
                                 int num = i;
-                                ClientData.Players[i].SelectionCallback = player => { SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
+                                ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.NextDelete, num); ClearSelections(); };
                             }
 
                             if (ClientData.Speaker != null)
@@ -290,7 +287,7 @@ namespace SICore
                         {
                             ClientData.Players[i].CanBeSelected = mparams[i + 1] == "+";
                             int num = i;
-                            ClientData.Players[i].SelectionCallback = player => { SendMessageWithArgs(Messages.Cat, num); ClearSelections(); };
+                            ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); ClearSelections(); };
                         }
 
                         ClientData.Hint = LO[nameof(R.HintSelectCatPlayerForPlayer)];

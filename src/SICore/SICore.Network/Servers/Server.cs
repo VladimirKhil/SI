@@ -28,8 +28,6 @@ namespace SICore.Network.Servers
 
         protected object _clientsSync = new object();
 
-        public object ClientsSync => _clientsSync;
-
         protected object _connectionsSync = new object();
 
         public object ConnectionsSync => _connectionsSync;

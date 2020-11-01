@@ -8,9 +8,10 @@ namespace SICore
     /// <summary>
     /// Логика зрителя-компьютера
     /// </summary>
-    internal abstract class ViewerComputerLogic<C> : Logic<C, ViewerData>, IViewer
-        where C : IViewerClient
+    internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
     {
+        protected readonly ViewerActions _viewerActions;
+
         public bool CanSwitchType => false;
 
         protected sealed class TimerInfo
@@ -38,10 +39,10 @@ namespace SICore
             return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
         }
 
-        internal ViewerComputerLogic(C client, ViewerData data)
-            : base(client, data)
+        internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions)
+            : base(data)
         {
-            
+            _viewerActions = viewerActions;
         }
 
         public void ReceiveText(Message m)
@@ -200,7 +201,7 @@ namespace SICore
         {
             switch (timerCommand)
             {
-                case "GO":
+                case MessageParams.Timer_Go:
                     var maxTime = int.Parse(arg);
                     var now = DateTime.UtcNow;
                     _timersInfo[timerIndex].IsEnabled = true;
@@ -287,9 +288,11 @@ namespace SICore
             
         }
 
-        public SIUI.ViewModel.TableInfoViewModel TInfo
+        public void OnReplic(string personCode, string text)
         {
-            get { return null; }
+            
         }
+
+        public SIUI.ViewModel.TableInfoViewModel TInfo => null;
     }
 }

@@ -743,4 +743,7 @@
   <data name="MediaLoadError" xml:space="preserve">
     <value>Ошибка загрузки медиа</value>
   </data>
+  <data name="SureFemaleEnding" xml:space="preserve">
+    <value>а</value>
+  </data>
 </root>

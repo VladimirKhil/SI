@@ -9,17 +9,10 @@ namespace SICore
     /// <summary>
     /// Логика клиента
     /// </summary>
-    /// <typeparam name="A">Тип клиента</typeparam>
     /// <typeparam name="D">Тип данных клиента</typeparam>
-    public abstract class Logic<A, D> : IDisposable, ILogic
-        where A : IActor
+    public abstract class Logic<D> : IDisposable, ILogic
         where D : Data
     {
-        /// <summary>
-        /// Сам клиент
-        /// </summary>
-        protected readonly A _actor;
-
         /// <summary>
         /// Данные
         /// </summary>
@@ -41,9 +34,8 @@ namespace SICore
 
         internal IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 
-        internal Logic(A actor, D data)
+        internal Logic(D data)
         {
-            _actor = actor;
             _data = data ?? throw new ArgumentNullException(nameof(data));
             _taskTimer = new Timer(TaskTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         }
@@ -197,7 +189,7 @@ namespace SICore
             }
         }
 
-        protected static int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition)
+        protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition)
         {
             var goodItems = list
                 .Select((item, index) => new { Item = item, Index = index })
@@ -212,7 +204,7 @@ namespace SICore
             return goodItems[ind].Index;
         }
 
-        protected static int SelectRandomOnIndex<T>(IEnumerable<T> list, Predicate<int> condition)
+        protected int SelectRandomOnIndex<T>(IEnumerable<T> list, Predicate<int> condition)
         {
             var goodItems = list
                 .Select((item, index) => new { Item = item, Index = index })
@@ -225,6 +217,19 @@ namespace SICore
         public virtual void SetInfo(IAccountInfo accountInfo)
         {
             
+        }
+
+        /// <summary>
+        /// Получить случайную строку ресурса
+        /// </summary>
+        /// <param name="resource">Строки ресурса, разделённые точкой с запятой</param>
+        /// <returns>Одна из строк ресурса (случайная)</returns>
+        public string GetRandomString(string resource)
+        {
+            var resources = resource.Split(';');
+            var index = Data.Rand.Next(resources.Length);
+
+            return resources[index];
         }
     }
 }

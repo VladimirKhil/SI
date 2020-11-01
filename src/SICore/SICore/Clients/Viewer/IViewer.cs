@@ -137,5 +137,6 @@ namespace SICore
         void OnPackageLogo(string v);
         void OnPersonApellated(int playerIndex);
         void OnPersonPass(int playerIndex);
+        void OnReplic(string personCode, string text);
     }
 }

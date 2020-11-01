@@ -22,6 +22,8 @@ namespace SICore
     public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         where L : class, IViewer
     {
+        protected readonly ViewerActions _viewerActions;
+
         /// <summary>
         /// Является ли владельцем сервера
         /// </summary>
@@ -38,8 +40,6 @@ namespace SICore
         public ViewerData MyData => ClientData;
 
         public string Avatar { get; set; }
-        public string ServerPublicPackageUrl { get; set; }
-        public string[] ContentPublicBaseUrls { get; set; }
 
         public event Action PersonConnected;
         public event Action PersonDisconnected;
@@ -60,7 +60,7 @@ namespace SICore
             ClientData.AddTable = new CustomCommand(AddTable_Executed) { CanBeExecuted = IsHost };
             ClientData.DeleteTable = new CustomCommand(DeleteTable_Executed) { CanBeExecuted = IsHost };
 
-            ClientData.AtomViewed = new CustomCommand(arg => SendMessage(Messages.Atom));
+            ClientData.AtomViewed = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Atom));
         }
 
         private void ChangeType_Executed(object arg)
@@ -68,7 +68,7 @@ namespace SICore
             var account = (PersonAccount)arg;
             var player = account as PlayerAccount;
 
-            SendMessage(Messages.Config, MessageParams.Config_ChangeType, player != null ? "player" : "showman", player != null ? ClientData.Players.IndexOf(player).ToString() : "");
+            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_ChangeType, player != null ? Constants.Player : Constants.Showman, player != null ? ClientData.Players.IndexOf(player).ToString() : "");
         }
 
         private void Replace_Executed(PersonAccount person, object arg)
@@ -92,7 +92,7 @@ namespace SICore
                 index = "";
             }
 
-            SendMessage(Messages.Config, MessageParams.Config_Set, player != null ? "player" : "showman", index, account.Name);
+            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_Set, player != null ? Constants.Player : Constants.Showman, index, account.Name);
         }
 
         private void Free_Executed(object arg)
@@ -114,14 +114,14 @@ namespace SICore
                 indexString = index.ToString();
             }
 
-            SendMessage(Messages.Config, MessageParams.Config_Free, player != null ? "player" : "showman", indexString);
+            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_Free, player != null ? Constants.Player : Constants.Showman, indexString);
         }
 
         private void Delete_Executed(object arg)
         {
             var player = (PlayerAccount)arg;
 
-            SendMessage(Messages.Config, MessageParams.Config_DeleteTable, ClientData.Players.IndexOf(player).ToString());
+            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_DeleteTable, ClientData.Players.IndexOf(player).ToString());
         }
 
         /// <summary>
@@ -138,15 +138,15 @@ namespace SICore
                 throw new ArgumentNullException(nameof(personData));
             }
 
+            _viewerActions = new ViewerActions(client, data, localizer);
+            _logic = CreateLogic(personData);
+
             Initialize(isHost);
 
             ClientData.Picture = personData.Picture;
         }
 
-        public void Move(object arg)
-        {
-            SendMessageWithArgs(Messages.Move, arg);
-        }
+        public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 
         private void Kick_Executed(object arg)
         {
@@ -165,7 +165,7 @@ namespace SICore
                 return;
             }
 
-            SendMessage(Messages.Kick, person.Name);
+            _viewerActions.SendMessage(Messages.Kick, person.Name);
         }
 
         private void Ban_Executed(object arg)
@@ -185,18 +185,12 @@ namespace SICore
                 return;
             }
 
-            SendMessage(Messages.Ban, person.Name);
+            _viewerActions.SendMessage(Messages.Ban, person.Name);
         }
 
-        private void ForceStart_Executed(object arg)
-        {
-            SendMessage(Messages.Start);
-        }
+        private void ForceStart_Executed(object arg) => _viewerActions.SendMessage(Messages.Start);
 
-        private void AddTable_Executed(object arg)
-        {
-            SendMessage(Messages.Config, MessageParams.Config_AddTable);
-        }
+        private void AddTable_Executed(object arg) => _viewerActions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
         private void DeleteTable_Executed(object arg)
         {
@@ -207,7 +201,7 @@ namespace SICore
                 int num = i;
                 player.SelectionCallback = p =>
                 {
-                    SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, num);
+                    _viewerActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, num);
                     Clear();
                 };
             }
@@ -359,6 +353,9 @@ namespace SICore
                         }
                     case Messages.Print:
                         OnPrint(mparams);
+                        break;
+                    case Messages.Replic:
+                        OnReplic(mparams);
                         break;
                     case Messages.Pause:
                         {
@@ -989,19 +986,26 @@ namespace SICore
 
         private void OnPrint(string[] mparams)
         {
-            var s = new StringBuilder();
 
-            for (var i = 0; i < mparams.Length - 1; i++)
+        }
+
+        private void OnReplic(string[] mparams)
+        {
+            var personCode = mparams[1];
+
+            var text = new StringBuilder();
+
+            for (var i = 2; i < mparams.Length; i++)
             {
-                if (s.Length > 0)
+                if (text.Length > 0)
                 {
-                    s.Append(Message.ArgsSeparatorChar);
+                    text.Append(Message.ArgsSeparatorChar);
                 }
 
-                s.Append(mparams[i + 1]);
+                text.Append(mparams[i]);
             }
 
-            _logic.Print(s.ToString());
+            _logic.OnReplic(personCode, text.ToString().Trim());
         }
 
         private void ProcessConfig(string[] mparams)
@@ -1092,7 +1096,7 @@ namespace SICore
 
             PersonAccount account;
 
-            var isPlayer = personType == "player";
+            var isPlayer = personType == Constants.Player;
             if (isPlayer)
             {
                 if (!int.TryParse(indexString, out int index) || index < 0 || index >= ClientData.Players.Count)
@@ -1152,7 +1156,7 @@ namespace SICore
             var me = ClientData.Me;
 
             PersonAccount account;
-            var isPlayer = personType == "player";
+            var isPlayer = personType == Constants.Player;
             if (isPlayer)
             {
                 if (!int.TryParse(indexString, out var index) || index < 0 || index >= ClientData.Players.Count)
@@ -1334,7 +1338,7 @@ namespace SICore
             var replacer = mparams[4];
             var replacerIsMale = mparams[5] == "+";
 
-            var isPlayer = personType == "player";
+            var isPlayer = personType == Constants.Player;
 
             var me = ClientData.Me;
 
@@ -1571,8 +1575,6 @@ namespace SICore
             }
 
             viewer.Avatar = Avatar;
-            viewer.ServerPublicPackageUrl = ServerPublicPackageUrl;
-            viewer.ContentPublicBaseUrls = ContentPublicBaseUrls;
             // TODO: Больше ничего не надо переносить в новый IViewerClient?
 
             viewer.Init();
@@ -1771,12 +1773,12 @@ namespace SICore
             {
                 switch (role)
                 {
-                    case "showman":
+                    case Constants.Showman:
                         ClientData.ShowMan = new PersonAccount(account) { IsHuman = true, Connected = true, Ready = false, GameStarted = ClientData.Stage != GameStage.Before, IsShowman = true, IsExtendedMode = IsHost };
                         CreateShowmanCommands();
                         break;
 
-                    case "player":
+                    case Constants.Player:
                         var playersWereUpdated = false;
                         while (index >= ClientData.Players.Count)
                         {
@@ -1874,29 +1876,7 @@ namespace SICore
             _logic.ReceiveText(new Message(text, _client.Name, whom, false, isPrivate));
         }
 
-        /// <summary>
-        /// Отправить сообщение всем
-        /// </summary>
-        /// <param name="text">Текст сообщения</param>
-        public void SendMessage(string text)
-        {
-            _client.SendMessage(text, receiver: NetworkConstants.GameName);
-        }
-
-        public void SendMessage(params string[] args)
-        {
-            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
-        }
-
-        public void SendMessageWithArgs(params object[] args)
-        {
-            _client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
-        }
-
-        public void Pause()
-        {
-            SendMessage(Messages.Pause, ClientData.TInfo.Pause ? "-" : "+");
-        }
+        public void Pause() => _viewerActions.SendMessage(Messages.Pause, ClientData.TInfo.Pause ? "-" : "+");
 
         /// <summary>
         /// Выдаёт информацию о расположении своей картинки
@@ -1906,7 +1886,7 @@ namespace SICore
         {
             if (Avatar != null)
             {
-                SendMessage(Messages.Picture, Avatar);
+                _viewerActions.SendMessage(Messages.Picture, Avatar);
                 return;
             }
 
@@ -1937,35 +1917,25 @@ namespace SICore
                     if (data == null)
                         return;
 
-                    SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
+                    _viewerActions.SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
                 }
                 else
-                    SendMessage(Messages.Picture, ClientData.Picture);
+                {
+                    _viewerActions.SendMessage(Messages.Picture, ClientData.Picture);
+                }
             }
         }
 
         /// <summary>
         /// Получить информацию об игре
         /// </summary>
-        public void GetInfo() => SendMessage(Messages.Info);
-
-        public void Rename(string name)
-        {
-            _client.Name = name;
-
-            if (ClientData.AllPersons.TryGetValue(ClientData.Name, out var viewerAccount))
-            {
-                viewerAccount.Name = name;
-                ClientData.AllPersons[name] = viewerAccount;
-                ClientData.AllPersons.Remove(ClientData.Name);
-            }
-
-            ClientData.Name = name;
-        }
+        public void GetInfo() => _viewerActions.SendMessage(Messages.Info);
 
         public virtual void Init()
         {
             ClientData.IsPlayer = false;
         }
+
+        public void Rename(string name) => _viewerActions.Rename(name);
     }
 }

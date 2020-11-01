@@ -40,7 +40,7 @@ namespace SICore
         {
             _client = client;
             ClientData = data;
-            _logic = CreateLogic(personData);
+
             _client.MessageReceived += OnMessageReceived;
             _client.Disposed += Dispose;
             _client.InfoReplaced += Client_InfoReplaced;

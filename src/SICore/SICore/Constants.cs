@@ -26,6 +26,24 @@
         /// </summary>
         public const int MaxPlayers = 12;
 
+        /// <summary>
+        /// Интервал запуска автоматической игры
+        /// </summary>
         public const int AutomaticGameStartDuration = 300;
+
+        /// <summary>
+        /// Ведущий
+        /// </summary>
+        public const string Showman = "showman";
+
+        /// <summary>
+        /// Игрок
+        /// </summary>
+        public const string Player = "player";
+
+        /// <summary>
+        /// Место для подстановки ответа
+        /// </summary>
+        public const string AnswerPlaceholder = "#";
     }
 }

@@ -16,7 +16,7 @@ namespace SICore
     /// <summary>
     /// Логика игрока-компьютера
     /// </summary>
-    internal sealed class PlayerComputerLogic : ViewerComputerLogic<Player>, IPlayer
+    internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     {
         private ComputerAccount _account;
 
@@ -24,8 +24,8 @@ namespace SICore
         /// Создание логики
         /// </summary>
         /// <param name="client">Текущий клиент</param>
-        public PlayerComputerLogic(Player client, ViewerData data, ComputerAccount account)
-            : base(client, data)
+        public PlayerComputerLogic(ViewerData data, ComputerAccount account, ViewerActions viewerActions)
+            : base(data, viewerActions)
         {
             _account = account;
         }
@@ -82,21 +82,21 @@ namespace SICore
             }
         }
 
-        private void PressButton() => _actor.PressGameButton();
+        private void PressButton() => _viewerActions.PressGameButton();
 
         public override void SetInfo(IAccountInfo data)
         {
             var account = (ComputerAccount)data; // TODO: fix bad design
-            _actor.Rename(account.Name);
+            _viewerActions.Rename(account.Name);
 
             _account = account;
             _data.Picture = account.Picture;
             _data.PlayerDataExtensions.RealBrave = _account.B0;
         }
 
-        private void AnswerRight() => _actor.SendMessage(Messages.IsRight, "+");
+        private void AnswerRight() => _viewerActions.SendMessage(Messages.IsRight, "+");
 
-        private void AnswerWrong() => _actor.SendMessage(Messages.IsRight, "-");
+        private void AnswerWrong() => _viewerActions.SendMessage(Messages.IsRight, "-");
 
         private void FinalStakeTask()
         {
@@ -106,7 +106,7 @@ namespace SICore
             try
             {
                 var stake = MakeFinalStake(sums, myIndex2, _account.Style);
-                _actor.SendMessageWithArgs(Messages.FinalStake, stake);
+                _viewerActions.SendMessageWithArgs(Messages.FinalStake, stake);
             }
             catch (Exception exc)
             {
@@ -123,7 +123,7 @@ namespace SICore
                 lock (_data.TInfoLock)
                 {
                     var choice = SelectRandom(_data.TInfo.RoundInfo, theme => theme.Name != null);
-                    _actor.SendMessageWithArgs(Messages.Delete, choice);
+                    _viewerActions.SendMessageWithArgs(Messages.Delete, choice);
                 }
             }
             catch (Exception exc)
@@ -149,7 +149,7 @@ namespace SICore
                 if (stakeMode == StakeMode.Sum)
                     msg.Append(Message.ArgsSeparatorChar).Append(stakeSum);
 
-                _actor.SendMessage(msg.ToString());
+                _viewerActions.SendMessage(msg.ToString());
             }
             catch (Exception exc)
             {
@@ -186,11 +186,11 @@ namespace SICore
                 }
 
                 int price = _data.PersonDataExtensions.StakeInfo.Minimum + var * _data.PersonDataExtensions.StakeInfo.Step;
-                _actor.SendMessage(Messages.CatCost, price.ToString());
+                _viewerActions.SendMessage(Messages.CatCost, price.ToString());
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при выборе стоимости Кота. Описание ошибки: {0}", exc).AppendLine();
+                _data.SystemLog.AppendFormat("Ошибка при выборе стоимости Вопроса с секретом. Описание ошибки: {0}", exc).AppendLine();
             }
         }
 
@@ -207,7 +207,7 @@ namespace SICore
                     {
                         for (var i = 0; i < _data.Players.Count; i++)
                         {
-                            if (_data.Players[i].Name == _actor.Client.Name && _data.Players[i].CanBeSelected)
+                            if (_data.Players[i].Name == _viewerActions.Client.Name && _data.Players[i].CanBeSelected)
                             {
                                 choice = i;
                                 break;
@@ -215,12 +215,12 @@ namespace SICore
                         }
                     }
 
-                    // Кота - сильнейшему
+                    // Вопрос с секретом - сильнейшему
                     if (choice == -1)
                     {
                         for (var i = 0; i < _data.Players.Count; i++)
                         {
-                            if (_data.Players[i].Sum == _actor.BigSum && _data.Players[i].CanBeSelected)
+                            if (_data.Players[i].Sum == ClientData.BigSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
                             {
                                 choice = i;
                                 break;
@@ -232,7 +232,7 @@ namespace SICore
                 {
                     for (var i = 0; i < _data.Players.Count; i++)
                     {
-                        if (_data.Players[i].Sum == _actor.SmallSum && _data.Players[i].CanBeSelected)
+                        if (_data.Players[i].Sum == ClientData.SmallSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
                         {
                             choice = i;
                             break;
@@ -240,11 +240,11 @@ namespace SICore
                     }
                 }
 
-                _actor.SendMessageWithArgs(Messages.Cat, choice);
+                _viewerActions.SendMessageWithArgs(Messages.Cat, choice);
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при выборе Кота. Описание ошибки: {0}", exc).AppendLine();
+                _data.SystemLog.AppendFormat("Ошибка при выборе Вопроса с секретом. Описание ошибки: {0}", exc).AppendLine();
             }
         }
 
@@ -252,27 +252,28 @@ namespace SICore
         {
             try
             {
-                var ans = new StringBuilder(Messages.Answer).Append(Message.ArgsSeparatorChar);
-
-                ans.Append(_data.PlayerDataExtensions.KnowsAnswer ? "RIGHT" : "WRONG").Append(Message.ArgsSeparatorChar);
+                var ans = new StringBuilder(Messages.Answer)
+                    .Append(Message.ArgsSeparatorChar)
+                    .Append(_data.PlayerDataExtensions.KnowsAnswer ? MessageParams.Answer_Right : MessageParams.Answer_Wrong)
+                    .Append(Message.ArgsSeparatorChar);
 
                 if (_data.Stage == GameStage.Round)
                 {
                     if (_data.PlayerDataExtensions.IsSure)
                     {
-                        ans.Append(string.Format(ResourceHelper.GetString(_actor.LO[nameof(R.Sure)]), _data.Me.IsMale ? "" : "a"));
+                        ans.Append(string.Format(GetRandomString(_viewerActions.LO[nameof(R.Sure)]), _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
                     }
                     else
                     {
-                        ans.Append(ResourceHelper.GetString(_actor.LO[nameof(R.NotSure)]));
+                        ans.Append(GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
                     }
                 }
                 else
                 {
-                    ans.Append('#');
+                    ans.Append(Constants.AnswerPlaceholder);
                 }
 
-                _actor.SendMessage(ans.ToString());
+                _viewerActions.SendMessage(ans.ToString());
             }
             catch (Exception exc)
             {
@@ -293,12 +294,12 @@ namespace SICore
             int nv1 = myInfo.V1, nv4 = myInfo.V4, nv5 = myInfo.V5, nv6 = myInfo.V6, nv7 = myInfo.V7;
             var np2 = myInfo.P2;
 
-            if (myInfo.Style == PlayerStyle.Agressive && _actor.MySum < 2 * _actor.BigSum)
+            if (myInfo.Style == PlayerStyle.Agressive && ClientData.MySum() < 2 * ClientData.BigSum(_viewerActions.Client))
             {
                 nv1 = nv4 = nv5 = nv6 = 0;
                 nv7 = 100;
             }
-            else if (myInfo.Style == PlayerStyle.Normal && _actor.MySum < _actor.BigSum)
+            else if (myInfo.Style == PlayerStyle.Normal && ClientData.MySum() < ClientData.BigSum(_viewerActions.Client))
             {
                 nv1 = nv4 = nv5 = nv6 = 0;
                 nv7 = 80;
@@ -460,7 +461,9 @@ namespace SICore
                             do if (canSelectQuestion[++quest]) k--; while (k >= 0);
                         }
                         else if (r < nv4 + nv5 + nv6)
+                        {
                             quest = _data.QuestionIndex;
+                        }
                         else if (r < nv4 + nv5 + nv6 + nv7)
                         {
                             // Выбор вопроса согласно приоритету
@@ -492,7 +495,7 @@ namespace SICore
             }
         }
 
-        internal static int MakeFinalStake(int[] sums, int myIndex, PlayerStyle style)
+        internal int MakeFinalStake(int[] sums, int myIndex, PlayerStyle style)
         {
             var res = new List<Interval>();
             var ops = new List<int>();
@@ -547,7 +550,7 @@ namespace SICore
         /// <param name="myIndex">Номер участника</param>
         /// <param name="lastStakerIndex">Индекс последнего ставящего</param>
         /// <param name="style">Стиль участника</param>
-        internal static StakeMode MakeStake(int questNum, int[] sums, int myIndex, int lastStakerIndex, PlayerStyle style, bool[] vars, int N1, int N5, int B1, int B5, bool isCritical, int minCost, out int stakeSum)
+        internal StakeMode MakeStake(int questNum, int[] sums, int myIndex, int lastStakerIndex, PlayerStyle style, bool[] vars, int N1, int N5, int B1, int B5, bool isCritical, int minCost, out int stakeSum)
         {
             int i = 0;
             int ran = 0, stake = 0;
@@ -774,7 +777,7 @@ namespace SICore
                 numQu = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
             }
 
-            return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3) && _actor.MySum < _account.Part * _actor.BigSum / 100;
+            return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3) && ClientData.MySum() < _account.Part * ClientData.BigSum(_viewerActions.Client) / 100;
         }
 
         /// <summary>
@@ -789,12 +792,12 @@ namespace SICore
 
             var playerData = _data.PlayerDataExtensions;
 
-            if (_actor.MySum < -2000) // Отрицательная сумма -> смелость падает
+            if (ClientData.MySum() < -2000) // Отрицательная сумма -> смелость падает
                 if (playerData.RealBrave >= _account.F + 80)
                     playerData.RealBrave -= 80;
                 else
                     playerData.RealBrave = _account.F;
-            else if (_actor.MySum < 0)
+            else if (ClientData.MySum() < 0)
                 if (playerData.RealBrave >= _account.F + 10)
                     playerData.RealBrave -= 10;
                 else
@@ -805,7 +808,7 @@ namespace SICore
                 EndThink();
             }
 
-            var me = _data.Players[playerIndex].Name == _actor.Client.Name;
+            var me = _data.Players[playerIndex].Name == _viewerActions.Client.Name;
 
             if (me && isRight) // Ответил верно
             {
@@ -1092,7 +1095,7 @@ namespace SICore
         /// <param name="canPass">Возможен ли пас в качестве варианта ставок</param>
         /// <param name="stakerSum">Сумма на счёте ставящего при возможности паса (иначе 0)</param>
         /// <param name="result">Паретооптимальное множество ставок</param>
-        internal static void StakeDecisions(PlayerStyle style, int mySum, int bestSum, int minStake, int maxStake, double p, ref List<Interval> pass, ref List<Interval> plus100, ref List<Interval> max, bool canPass, int stakerSum, ref List<IntervalProbability> result)
+        internal void StakeDecisions(PlayerStyle style, int mySum, int bestSum, int minStake, int maxStake, double p, ref List<Interval> pass, ref List<Interval> plus100, ref List<Interval> max, bool canPass, int stakerSum, ref List<IntervalProbability> result)
         {
             // Для всех возможных ставок определим наиболее вероятные ответы соперника
 
@@ -1418,7 +1421,7 @@ namespace SICore
                 lock (_data.TInfoLock)
                 {
                     SelectQuestion(out int i, out int j);
-                    _actor.SendMessageWithArgs(Messages.Choice, i, j);
+                    _viewerActions.SendMessageWithArgs(Messages.Choice, i, j);
                 }
             }
             catch (Exception exc)
@@ -1463,7 +1466,7 @@ namespace SICore
             {
                 playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
-                var riskRateLimit = (int)(100 * Math.Min(1, playerStrength / playerData.RealBrave));
+                var riskRateLimit = (int)(100 * Math.Max(0, Math.Min(1, playerStrength / playerData.RealBrave)));
                 try
                 {
                     var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
@@ -1512,25 +1515,13 @@ namespace SICore
         /// <summary>
         /// Необходимо отвечать
         /// </summary>
-        public void Answer()
-        {
-            if (_data.QuestionType == QuestionTypes.Simple)
-            {
-                ScheduleExecution(PlayerTasks.Answer, 10 + Data.Rand.Next(10));
-            }
-            else
-            {
-                ScheduleExecution(PlayerTasks.Answer, _data.PlayerDataExtensions.RealSpeed);
-            }
-        }
+        public void Answer() => ScheduleExecution(PlayerTasks.Answer,
+            _data.QuestionType == QuestionTypes.Simple ? 10 + Data.Rand.Next(10) : _data.PlayerDataExtensions.RealSpeed);
 
         /// <summary>
-        /// Необходимо отдать кота
+        /// Необходимо отдать Вопрос с секретом
         /// </summary>
-        public void Cat()
-        {
-            ScheduleExecution(PlayerTasks.Cat, 10 + Data.Rand.Next(10));
-        }
+        public void Cat() => ScheduleExecution(PlayerTasks.Cat, 10 + Data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо сделать ставку
@@ -1548,7 +1539,7 @@ namespace SICore
         public void FinalStake() => ScheduleExecution(PlayerTasks.FinalStake, 10 + Data.Rand.Next(20));
 
         /// <summary>
-        /// Необходимо выбрать стоимость кота
+        /// Необходимо выбрать стоимость Вопроса с секретом
         /// </summary>
         public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
@@ -1572,10 +1563,10 @@ namespace SICore
         {
             if (_account == null && _data.Players != null)
             {
-                var acc = _data.Players.FirstOrDefault(account => account.Name == _actor.Client.Name);
+                var acc = _data.Players.FirstOrDefault(account => account.Name == _viewerActions.Client.Name);
                 if (acc != null)
                 {
-                    _account = new ComputerAccount(_actor.Client.Name, acc.IsMale);
+                    _account = new ComputerAccount(_viewerActions.Client.Name, acc.IsMale);
                     _account.SetPicture(_data.BackLink.PhotoUri);
                 }
             }

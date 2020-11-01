@@ -24,18 +24,22 @@ namespace SICore
     /// <summary>
     /// Логика игры
     /// </summary>
-    public sealed class GameLogic : Logic<Game, GameData>, SIEngine.IEngineSettingsProvider
+    public sealed class GameLogic : Logic<GameData>, SIEngine.IEngineSettingsProvider
     {
         private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
         private const int MaxAnswerLength = 250;
 
+        private readonly Game _actor;
+        private readonly GameActions _gameActions;
+
         public SIEngine.EngineBase Engine { get; private set; }
 
-        public GameLogic(Game client, GameData data)
-            : base(client, data)
+        public GameLogic(Game game, GameData data, GameActions gameActions)
+            : base(data)
         {
-
+            _actor = game;
+            _gameActions = gameActions;
         }
 
         internal void Run(SIDocument document)
@@ -85,7 +89,7 @@ namespace SICore
                 ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
                 _data.TimerStartTime[2] = DateTime.UtcNow;
 
-                _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", Constants.AutomaticGameStartDuration, -2);
+                _actor.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
             }
         }
 
@@ -105,7 +109,7 @@ namespace SICore
 
         private void Engine_GameThemes(string[] gameThemes)
         {
-            _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.GameThemes)]));
+            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.GameThemes)]));
 
             var msg = new StringBuilder();
             msg.Append(Messages.GameThemes).Append(Message.ArgsSeparatorChar).Append(string.Join(Message.ArgsSeparator, gameThemes));
@@ -136,7 +140,7 @@ namespace SICore
                 _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
             }
 
-            _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.RoundThemes)]));
+            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.RoundThemes)]));
 
             lock (_data.TabloInformStageLock)
             {
@@ -176,7 +180,7 @@ namespace SICore
             }
 
             _data.IsQuestionPlaying = false;
-            ScheduleExecution(Tasks.AskFirst, 19 * _data.TInfo.RoundInfo.Count + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.AskFirst, 19 * _data.TInfo.RoundInfo.Count + ClientData.Rand.Next(10));
         }
 
         /// <summary>
@@ -455,7 +459,7 @@ namespace SICore
                 else if (_data.Type.Name != QuestionTypes.Simple)
                     ScheduleExecution(Tasks.AskAnswer, 1, force: true);
                 else
-                    ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : Data.Rand.Next(10)), force: true); // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
+                    ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : ClientData.Rand.Next(10)), force: true); // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
             }
             else
             {
@@ -576,14 +580,14 @@ namespace SICore
 
         void Engine_RoundEmpty()
         {
-            _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.AllQuestions)]));
+            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.AllQuestions)]));
             FinishRound();
         }
 
         void Engine_RoundTimeout()
         {
             _actor.SendMessage(Messages.Timeout);
-            _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.AllTime)]));
+            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.AllTime)]));
             FinishRound();
         }
 
@@ -594,7 +598,7 @@ namespace SICore
             _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
             _data.ThemeDeleters.Reset(true);
 
-            ScheduleExecution(Tasks.MoveNext, 20 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.MoveNext, 20 + ClientData.Rand.Next(10));
         }
 
         private void Engine_WaitDelete() => ExecuteTask((int)Tasks.AskToDelete, 0);
@@ -623,7 +627,7 @@ namespace SICore
             _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
 
             _data.Theme = theme;
-            var str = ResourceHelper.GetString(_actor.LO[nameof(R.PlayTheme)]);
+            var str = GetRandomString(_actor.LO[nameof(R.PlayTheme)]);
             str += " " + theme.Name;
             _actor.ShowmanReplic(str);
 
@@ -642,7 +646,7 @@ namespace SICore
                 _data.GameResultInfo.Results.Add(new PersonResult { Name = _data.Players[i].Name, Sum = _data.Players[i].Sum });
             }
 
-            ScheduleExecution(Tasks.Winner, 15 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.Winner, 15 + ClientData.Rand.Next(10));
         }
 
         protected override void Dispose(bool disposing)
@@ -808,7 +812,7 @@ namespace SICore
                         _actor.ShowmanReplic(_actor.LO[nameof(R.ThankYou)]);
 
                         var questionsCount = _data.Theme.Questions.Count;
-                        _data.QuestionIndex = Data.Rand.Next(questionsCount); // А то в отчётах об игре встречаются глюки
+                        _data.QuestionIndex = ClientData.Rand.Next(questionsCount); // А то в отчётах об игре встречаются глюки
                         _data.Question = _data.Theme.Questions[_data.QuestionIndex];
 
                         ScheduleExecution(Tasks.QuestionType, 10, 1);
@@ -984,7 +988,7 @@ namespace SICore
                 answerResult.IsRight = true;
                 var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Auction ? nameof(R.Bravo) : nameof(R.Right);
                 
-                var s = new StringBuilder(ResourceHelper.GetString(_actor.LO[showmanReplic]));
+                var s = new StringBuilder(GetRandomString(_actor.LO[showmanReplic]));
 
                 var canonicalAnswer = _data.Question.GetRightAnswers().FirstOrDefault();
                 var isAnswerCanonical = canonicalAnswer != null && _data.Answerer.Answer.Simplify().Contains(canonicalAnswer.Simplify());
@@ -1044,7 +1048,7 @@ namespace SICore
                 var s = new StringBuilder();
                 if (_data.Answerer.Answer != _actor.LO[nameof(R.IDontKnow)])
                 {
-                    s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.Wrong)]));
+                    s.Append(GetRandomString(_actor.LO[nameof(R.Wrong)]));
                 }
 
                 if (_data.Settings.AppSettings.IgnoreWrong)
@@ -1122,6 +1126,11 @@ namespace SICore
 
             if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
             {
+                if (!ClientData.Settings.AppSettings.FalseStart)
+                {
+                    _actor.SendMessage(Messages.Resume); // Для возобновления мультимедиа
+                }
+
                 ScheduleExecution(Tasks.AskToTry, 10, force: true);
                 return;
             }
@@ -1184,7 +1193,7 @@ namespace SICore
 
             StopWaiting();
 
-            var msg = $"{ResourceHelper.GetString(_actor.LO[nameof(R.InformChooser)])} {_data.Chooser.Name}";
+            var msg = $"{GetRandomString(_actor.LO[nameof(R.InformChooser)])} {_data.Chooser.Name}";
             _actor.ShowmanReplic(msg);
 
             _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
@@ -1205,7 +1214,7 @@ namespace SICore
         private void RunRoundTimer()
         {
             _data.TimerStartTime[0] = DateTime.UtcNow;
-            _actor.SendMessageWithArgs(Messages.Timer, 0, "GO", _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
+            _actor.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
         }
 
         private bool OnDecisionAnswering()
@@ -1235,7 +1244,7 @@ namespace SICore
 
             StopWaiting();
 
-            var s = ResourceHelper.GetString(_actor.LO[nameof(R.LetsSee)]);
+            var s = GetRandomString(_actor.LO[nameof(R.LetsSee)]);
             _actor.ShowmanReplic(s);
 
             _data.ThemeDeleters.Reset(false);
@@ -1455,7 +1464,7 @@ namespace SICore
                             break;
 
                         case Tasks.PrintAuct:
-                            PrintAuct();
+                            PrintStakeQuestion();
                             break;
 
                         case Tasks.AskStake:
@@ -1715,7 +1724,7 @@ namespace SICore
                 .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(_actor.LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, _actor.LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
             _actor.ShowmanReplic(msg.ToString());
 
-            ScheduleExecution(Tasks.PrintQue, 15 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.PrintQue, 15 + ClientData.Rand.Next(10));
         }
 
         private void WaitNext(Tasks task)
@@ -1728,7 +1737,7 @@ namespace SICore
             if (playerIndex == -1) // Ведущий не принял решения
             {
                 var candidates = _data.Players.Where(p => p.Flag).ToArray();
-                var index = Data.Rand.Next(candidates.Length);
+                var index = ClientData.Rand.Next(candidates.Length);
                 var newPlayerIndex = _data.Players.IndexOf(candidates[index]);
                 if (task == Tasks.WaitNext)
                 {
@@ -2003,7 +2012,7 @@ namespace SICore
 
         private void AskFinalStake()
         {
-            var s = ResourceHelper.GetString(_actor.LO[nameof(R.MakeStake)]);
+            var s = GetRandomString(_actor.LO[nameof(R.MakeStake)]);
             _actor.ShowmanReplic(s);
 
             _data.NumOfStakers = 0;
@@ -2062,7 +2071,7 @@ namespace SICore
                     _actor.ShowmanReplic(_actor.LO[nameof(R.NobodyInFinal)]);
                     if (Engine.MoveNextRound())
                     {
-                        ScheduleExecution(Tasks.MoveNext, 15 + Data.Rand.Next(10), 1);
+                        ScheduleExecution(Tasks.MoveNext, 15 + ClientData.Rand.Next(10), 1);
                     }
 
                     return;
@@ -2086,7 +2095,7 @@ namespace SICore
             else
             {
                 _actor.InformStage(name: _data.Round.Name);
-                _actor.ShowmanReplic($"{ResourceHelper.GetString(_actor.LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
+                _actor.ShowmanReplic($"{GetRandomString(_actor.LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
                 ScheduleExecution(Tasks.Round, 10, 2);
             }
@@ -2104,7 +2113,7 @@ namespace SICore
                     if (_data.Players[i].Sum == big)
                     {
                         var s = new StringBuilder(_data.Players[i].Name).Append(", ");
-                        s.Append(ResourceHelper.GetString(_actor.LO[nameof(R.YouWin)]));
+                        s.Append(GetRandomString(_actor.LO[nameof(R.YouWin)]));
                         _actor.ShowmanReplic(s.ToString());
                         _actor.SendMessageWithArgs(Messages.Winner, i);
                         break;
@@ -2117,7 +2126,7 @@ namespace SICore
                 _actor.SendMessageWithArgs(Messages.Winner, -1);
             }
 
-            ScheduleExecution(Tasks.GoodLuck, 20 + Data.Rand.Next(10));
+            ScheduleExecution(Tasks.GoodLuck, 20 + ClientData.Rand.Next(10));
         }
 
         private void PrintSponsored(int arg)
@@ -2195,7 +2204,7 @@ namespace SICore
 
             if (isCat)
             {
-                PrintCatInfo();
+                PrintSecretQuestionInfo();
                 taskTime += 25;
             }
 
@@ -2210,14 +2219,16 @@ namespace SICore
             }
         }
 
-        private void PrintAuct()
+        private void PrintStakeQuestion()
         {
-            _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.YouGetAuction)]));
+            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.YouGetAuction)]));
+
+            var nominal = _data.Question.Price;
 
             _data.Order = new int[_data.Players.Count];
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                _data.Players[i].StakeMaking = true;
+                _data.Players[i].StakeMaking = i == _data.ChooserIndex || _data.Players[i].Sum > nominal;
                 _data.Order[i] = -1;
             }
 
@@ -2285,7 +2296,7 @@ namespace SICore
             }
 
             // Случайный выбор номера темы
-            var k1 = Data.Rand.Next(numberOfThemes);
+            var k1 = ClientData.Rand.Next(numberOfThemes);
             var i = -1;
 
             do if (canChooseTheme[++i]) k1--; while (k1 >= 0);
@@ -2294,7 +2305,7 @@ namespace SICore
             var numberOfQuestions = theme.Questions.Count(QuestionHelper.IsActive);
 
             // Случайный выбор номера вопроса
-            var k2 = Data.Rand.Next(numberOfQuestions);
+            var k2 = ClientData.Rand.Next(numberOfQuestions);
             var j = -1;
             do if (theme.Questions[++j].IsActive()) k2--; while (k2 >= 0);
 
@@ -2370,16 +2381,16 @@ namespace SICore
                 // Реакция согласно типу вопроса
                 if (_data.Type.Name == QuestionTypes.Auction)
                 {
-                    ScheduleExecution(Tasks.PrintAuct, 8 + Data.Rand.Next(10), force: true);
+                    ScheduleExecution(Tasks.PrintAuct, 8 + ClientData.Rand.Next(10), force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
                 {
-                    ScheduleExecution(Tasks.PrintCat, 8 + Data.Rand.Next(10), 1, force: true);
+                    ScheduleExecution(Tasks.PrintCat, 8 + ClientData.Rand.Next(10), 1, force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Sponsored)
                 {
                     // Вопрос без риска
-                    ScheduleExecution(Tasks.PrintSponsored, 8 + Data.Rand.Next(10), 1, force: true);
+                    ScheduleExecution(Tasks.PrintSponsored, 8 + ClientData.Rand.Next(10), 1, force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Simple)
                 {
@@ -2483,7 +2494,7 @@ namespace SICore
             {
                 if (!_data.Players[i].Connected)
                 {
-                    _actor.ChangePersonType("player", i.ToString());
+                    _actor.ChangePersonType(Constants.Player, i.ToString(), null);
                 }
             }
 
@@ -2672,7 +2683,7 @@ namespace SICore
                 throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
             }
 
-            msg.Append(ResourceHelper.GetString(_actor.LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
+            msg.Append(GetRandomString(_actor.LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
 
             _actor.ShowmanReplic(msg.ToString());
 
@@ -2757,7 +2768,7 @@ namespace SICore
                     }
                 }
 
-                ScheduleExecution(Tasks.PrintCat, 15 + Data.Rand.Next(10), arg);
+                ScheduleExecution(Tasks.PrintCat, 15 + ClientData.Rand.Next(10), arg);
             }
             else if (arg == 2)
             {
@@ -2790,13 +2801,13 @@ namespace SICore
                 else
                 {
                     _actor.ShowmanReplic($"{_data.Chooser.Name}, {_actor.LO[nameof(R.GiveCat)]}");
-                    ScheduleExecution(Tasks.AskCat, 10 + Data.Rand.Next(10), force: true);
+                    ScheduleExecution(Tasks.AskCat, 10 + ClientData.Rand.Next(10), force: true);
                 }
             }
             else if (arg == 3)
             {
-                PrintCatInfo();
-                ScheduleExecution(Tasks.PrintCat, 20 + Data.Rand.Next(10), 2);
+                PrintSecretQuestionInfo();
+                ScheduleExecution(Tasks.PrintCat, 20 + ClientData.Rand.Next(10), 2);
             }
         }
 
@@ -2961,7 +2972,7 @@ namespace SICore
                 _actor.SendMessage(msg.ToString(), _data.Answerer.Name);
             }
 
-            _actor.ShowmanReplic(_data.Answerer.Name + ResourceHelper.GetString(_actor.LO[nameof(R.YourAnswer)]));
+            _actor.ShowmanReplic(_data.Answerer.Name + GetRandomString(_actor.LO[nameof(R.YourAnswer)]));
 
             _data.Answerer.Answer = "";
 
@@ -3016,7 +3027,7 @@ namespace SICore
         {
             var msg = new StringBuilder(_data.ActivePlayer.Name)
                 .Append(", ")
-                .Append(ResourceHelper.GetString(_actor.LO[nameof(R.DeleteTheme)]));
+                .Append(GetRandomString(_actor.LO[nameof(R.DeleteTheme)]));
 
             _actor.ShowmanReplic(msg.ToString());
 
@@ -3243,7 +3254,7 @@ namespace SICore
                 }
 
                 var others = _data.Players.Where((p, index) => index != _data.Order[_data.OrderIndex]); // Те, кто сейчас не делают ставку
-                if (others.All(p => !p.StakeMaking)) // Остальные не могут ставить
+                if (others.All(p => !p.StakeMaking) && _data.StakerIndex > -1) // Остальные не могут ставить
                 {
                     // Нельзя повысить ставку
                     ScheduleExecution(Tasks.PrintAuctPlayer, 10);
@@ -3318,7 +3329,7 @@ namespace SICore
 
                 var stakeMsg = new StringBuilder(_data.ActivePlayer.Name)
                     .Append(", ")
-                    .Append(ResourceHelper.GetString(_actor.LO[nameof(R.YourStake)]));
+                    .Append(GetRandomString(_actor.LO[nameof(R.YourStake)]));
 
                 _actor.ShowmanReplic(stakeMsg.ToString());
 
@@ -3665,7 +3676,7 @@ namespace SICore
             _data.IsWaiting = isWaiting;
             _data.Decision = decision;
 
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "GO", time, person);
+            _actor.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
         }
 
         private void ProcessPackage(Package package, int arg)
@@ -3832,7 +3843,7 @@ namespace SICore
 
                 if (!skipRoundAnnounce)
                 {
-                    _actor.ShowmanReplic(ResourceHelper.GetString(_actor.LO[nameof(R.WeBeginRound)]) + " " + round.Name + "!");
+                    _actor.ShowmanReplic($"{GetRandomString(_actor.LO[nameof(R.WeBeginRound)])} {round.Name}!");
                     _actor.SystemReplic(" "); // new line
                     _actor.SystemReplic(round.Name);
                 }
@@ -3858,7 +3869,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 3)
@@ -3872,7 +3885,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             if (arg == 4)
@@ -3885,7 +3900,9 @@ namespace SICore
                     _actor.ShowmanReplic(res.ToString());
                 }
                 else
+                {
                     arg++;
+                }
             }
 
             var adShown = false;
@@ -3927,11 +3944,11 @@ namespace SICore
 
             if (arg < 5)
             {
-                ScheduleExecution(Tasks.Round, baseTime + Data.Rand.Next(10), arg + 1);
+                ScheduleExecution(Tasks.Round, baseTime + ClientData.Rand.Next(10), arg + 1);
             }
             else if (informed)
             {
-                ScheduleExecution(Tasks.MoveNext, (adShown ? 60 : 20) + Data.Rand.Next(10));
+                ScheduleExecution(Tasks.MoveNext, (adShown ? 60 : 20) + ClientData.Rand.Next(10));
             }
             else
             {
@@ -3943,13 +3960,13 @@ namespace SICore
         {
             var nonUsedNumbers = new List<int>();
             var maxQuestionsInTheme = round.Themes.Max(theme => theme.Questions.Count);
-            var leavedCats = 1 + Data.Rand.Next(3);
-            var leavedAucts = 1 + Data.Rand.Next(3);
-            var leavedSponsored = Data.Rand.Next(2);
-            for (int ti = 0; ti < round.Themes.Count; ti++)
+            var leavedSecrets = 1 + ClientData.Rand.Next(3);
+            var leavedStakes = 1 + ClientData.Rand.Next(3);
+            var leavedNoRisk = ClientData.Rand.Next(2);
+            for (var ti = 0; ti < round.Themes.Count; ti++)
             {
                 var theme = round.Themes[ti];
-                for (int qi = 0; qi < theme.Questions.Count; qi++)
+                for (var qi = 0; qi < theme.Questions.Count; qi++)
                 {
                     var quest = theme.Questions[qi];
                     if (quest.Type.Name != QuestionTypes.Cat && quest.Type.Name != QuestionTypes.BagCat)
@@ -3959,39 +3976,39 @@ namespace SICore
                     }
                     else
                     {
-                        leavedCats--;
+                        leavedSecrets--;
                     }
                 }
             }
 
-            while (nonUsedNumbers.Count > 0 && leavedSponsored > 0)
+            while (nonUsedNumbers.Count > 0 && leavedNoRisk > 0)
             {
-                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var num = ClientData.Rand.Next(nonUsedNumbers.Count);
                 var val = nonUsedNumbers[num];
                 nonUsedNumbers.RemoveAt(num);
-                leavedSponsored--;
+                leavedNoRisk--;
                 var ti = val / maxQuestionsInTheme;
                 var qi = val % maxQuestionsInTheme;
                 round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Sponsored;
             }
 
-            while (nonUsedNumbers.Count > 0 && leavedAucts > 0)
+            while (nonUsedNumbers.Count > 0 && leavedStakes > 0)
             {
-                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var num = ClientData.Rand.Next(nonUsedNumbers.Count);
                 var val = nonUsedNumbers[num];
                 nonUsedNumbers.RemoveAt(num);
-                leavedAucts--;
+                leavedStakes--;
                 var ti = val / maxQuestionsInTheme;
                 var qi = val % maxQuestionsInTheme;
                 round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Auction;
             }
 
-            while (nonUsedNumbers.Count > 0 && leavedCats > 0)
+            while (nonUsedNumbers.Count > 0 && leavedSecrets > 0)
             {
-                var num = Data.Rand.Next(nonUsedNumbers.Count);
+                var num = ClientData.Rand.Next(nonUsedNumbers.Count);
                 var val = nonUsedNumbers[num];
                 nonUsedNumbers.RemoveAt(num);
-                leavedCats--;
+                leavedSecrets--;
                 var ti = val / maxQuestionsInTheme;
                 var qi = val % maxQuestionsInTheme;
                 var quest = round.Themes[ti].Questions[qi];
@@ -3999,15 +4016,15 @@ namespace SICore
 
                 quest.Type[QuestionTypeParams.Cat_Theme] = round.Themes[ti].Name;
 
-                quest.Type[QuestionTypeParams.Cat_Cost] = GenerateRandomSecretQuestionCost(quest);
+                quest.Type[QuestionTypeParams.Cat_Cost] = GenerateRandomSecretQuestionCost();
 
-                int var = Data.Rand.Next(2);
+                int var = ClientData.Rand.Next(2);
                 if (var == 0)
                     quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_True;
                 else
                     quest.Type[QuestionTypeParams.BagCat_Self] = QuestionTypeParams.BagCat_Self_Value_False;
 
-                var = Data.Rand.Next(100);
+                var = ClientData.Rand.Next(100);
                 if (var < 30)
                     quest.Type[QuestionTypeParams.BagCat_Knows] = QuestionTypeParams.BagCat_Knows_Value_Before;
                 else if (var < 90)
@@ -4017,13 +4034,13 @@ namespace SICore
             }
         }
 
-        private static string GenerateRandomSecretQuestionCost(Question quest)
+        private string GenerateRandomSecretQuestionCost()
         {
-            int var = Data.Rand.Next(3);
+            int var = ClientData.Rand.Next(3);
             if (var == 0)
             {
                 // 100 - 2000
-                return ((Data.Rand.Next(20) + 1) * 100).ToString();
+                return ((ClientData.Rand.Next(20) + 1) * 100).ToString();
             }
 
             if (var == 1)
@@ -4031,12 +4048,12 @@ namespace SICore
                 return "0";
             }
 
-            var sumMin = (Data.Rand.Next(10) + 1) * 100;
-            var sumMax = sumMin + (Data.Rand.Next(10) + 1) * 100;
+            var sumMin = (ClientData.Rand.Next(10) + 1) * 100;
+            var sumMax = sumMin + (ClientData.Rand.Next(10) + 1) * 100;
             var maxSteps = (sumMax - sumMin) / 100;
 
             var possibleSteps = Enumerable.Range(1, maxSteps).Where(step => maxSteps % step == 0).ToArray();
-            var stepIndex = Data.Rand.Next(possibleSteps.Length);
+            var stepIndex = ClientData.Rand.Next(possibleSteps.Length);
             var steps = possibleSteps[stepIndex];
 
             var str = new StringBuilder().AppendFormat("[{0};{1}]", sumMin, sumMax);
@@ -4049,23 +4066,23 @@ namespace SICore
         }
 
         /// <summary>
-        /// Вывести информацию о Коте
+        /// Вывести информацию о Вопросе с секретом
         /// </summary>
-        private void PrintCatInfo()
+        private void PrintSecretQuestionInfo()
         {
-            var s = new StringBuilder(_actor.LO[nameof(R.Theme)]).Append(": ");
-            var catTheme = _data.Type[QuestionTypeParams.Cat_Theme];
-            if (string.IsNullOrEmpty(catTheme))
-                s.Append(_data.Theme.Name);
-            else
-                s.Append(catTheme);
+            var questionTheme = _data.Type[QuestionTypeParams.Cat_Theme];
+            
+            var s = new StringBuilder(_actor.LO[nameof(R.Theme)])
+                .Append(": ")
+                .Append(string.IsNullOrEmpty(questionTheme) ? _data.Theme.Name : questionTheme)
+                .AppendFormat(", {0}: ", _actor.LO[nameof(R.Cost)]);
 
-            s.AppendFormat(", {0}: ", _actor.LO[nameof(R.Cost)]);
             var cost = _data.Type[QuestionTypeParams.Cat_Cost];
+
             string add;
-            if (int.TryParse(cost, out _data.CurPriceRight) && _data.CurPriceRight > 0)
+            if (int.TryParse(cost, out var questionPrice) && questionPrice > 0)
             {
-                _data.CurPriceWrong = _data.CurPriceRight;
+                _data.CurPriceWrong = _data.CurPriceRight = questionPrice;
 
                 _data.CatInfo = new BagCatInfo
                 {

@@ -10,11 +10,7 @@ namespace SICore
         public DirPoint(double value, bool direction)
         {
             Direction = direction;
-
-            if (direction)
-                Value = ((int)Math.Ceiling(value / 100) * 100);
-            else
-                Value = ((int)Math.Floor(value / 100) * 100);
+            Value = direction ? (int)Math.Ceiling(value / 100) * 100 : (int)Math.Floor(value / 100) * 100;
         }
 
         /// <summary>

@@ -14,6 +14,10 @@ namespace SICore
     /// </summary>
     public sealed class ViewerData : Data
     {
+        public string ServerAddress { get; set; }
+        public string ServerPublicUrl { get; set; }
+        public string[] ContentPublicUrls { get; set; }
+
         private DialogModes _dialogMode = DialogModes.None;
 
         public DialogModes DialogMode

@@ -3,7 +3,7 @@
 namespace SICore
 {
     /// <summary>
-    /// Зритель Своей игры
+    /// Зритель SIGame
     /// </summary>
     public interface IViewerClient : IActor
     {
@@ -18,8 +18,6 @@ namespace SICore
 
         IViewer MyLogic { get; }
         string Avatar { get; set; }
-        string ServerPublicPackageUrl { get; set; }
-        string[] ContentPublicBaseUrls { get; set; }
 
         event Action PersonConnected;
         event Action PersonDisconnected;
@@ -29,8 +27,6 @@ namespace SICore
 
         void Pause();
 
-        void Rename(string name);
-
         void Init();
 
         event Action<IViewerClient> Switch;
@@ -39,5 +35,6 @@ namespace SICore
 
         void RecreateCommands();
         void Move(object arg);
+        void Rename(string name);
     }
 }

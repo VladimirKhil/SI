@@ -1604,6 +1604,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на а.
+        /// </summary>
+        public static string SureFemaleEnding {
+            get {
+                return ResourceManager.GetString("SureFemaleEnding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Благодарю вас! Внимание, вопрос!.
         /// </summary>
         public static string ThankYou {

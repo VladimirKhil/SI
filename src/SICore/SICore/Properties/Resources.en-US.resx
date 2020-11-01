@@ -741,4 +741,7 @@
   <data name="MediaLoadError" xml:space="preserve">
     <value>Media load error</value>
   </data>
+  <data name="SureFemaleEnding" xml:space="preserve">
+    <value />
+  </data>
 </root>

@@ -10,8 +10,6 @@ namespace SICore.Network.Contracts
     public interface IServer : IDisposable
     {
         bool IsMain { get; }
-
-        object ClientsSync { get; }
         object ConnectionsSync { get; }
 
         void AddClient(IClient client);

@@ -1,4 +1,5 @@
-﻿using SICore.Clients.Viewer;
+﻿using SICore.BusinessLogic;
+using SICore.Clients.Viewer;
 using SICore.Connections;
 using SICore.Network;
 using SIData;
@@ -19,18 +20,23 @@ namespace SICore
     /// <summary>
     /// Логика зрителя-человека
     /// </summary>
-    public abstract class ViewerHumanLogic<P> : Logic<P, ViewerData>, IViewer
-        where P : IViewerClient
+    public class ViewerHumanLogic : Logic<ViewerData>, IViewer
     {
         private bool _disposed = false;
+
+        protected readonly ViewerActions _viewerActions;
+        protected readonly ILocalizer LO;
 
         public TableInfoViewModel TInfo { get; }
 
         public bool CanSwitchType => true;
 
-        protected ViewerHumanLogic(P client, ViewerData data)
-            : base(client, data)
+        public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
+            : base(data)
         {
+            _viewerActions = viewerActions;
+            LO = localizer;
+
             TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
 
             TInfo.PropertyChanged += TInfo_PropertyChanged;
@@ -44,14 +50,14 @@ namespace SICore
             string error;
             if (exc is NotSupportedException)
             {
-                error = $"{_actor.LO[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
+                error = $"{LO[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
             }
             else
             {
                 error = exc.ToString();
             }
 
-            _data.OnAddString(null, $"{_actor.LO[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
+            _data.OnAddString(null, $"{LO[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
         }
 
         private void TInfo_Ready(object sender, EventArgs e)
@@ -78,22 +84,26 @@ namespace SICore
             }
         }
 
-        void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(TableInfoViewModel.TStage))
             {
                 if (TInfo.TStage == TableStage.RoundTable)
+                {
                     _data.BackLink.PlaySound();
+                }
             }
         }
 
         #region ViewerInterface Members
 
-        virtual public void ReceiveText(Message m)
+        public virtual void ReceiveText(Message m)
         {
             _data.AddToChat(m);
             if (_data.BackLink.MakeLogs)
+            {
                 AddToFileLog(m);
+            }
         }
 
         private static readonly XmlReaderSettings ReaderSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
@@ -102,6 +112,7 @@ namespace SICore
         /// Вывод текста в протокол и в форму
         /// </summary>
         /// <param name="text">Выводимый текст</param>
+        [Obsolete("Use OnReplic instead")]
         virtual public void Print(string text)
         {
             var chatMessageBuilder = new StringBuilder();
@@ -130,7 +141,7 @@ namespace SICore
             }
             catch (XmlException exc)
             {
-                throw new Exception($"{_actor.LO[nameof(R.StringParseError)]} {text}.", exc);
+                throw new Exception($"{LO[nameof(R.StringParseError)]} {text}.", exc);
             }
 
             var toFormStr = chatMessageBuilder.ToString();
@@ -162,6 +173,63 @@ namespace SICore
             }
         }
 
+        public void OnReplic(string personCode, string text)
+        {
+            var (chat, forceChat, log) = OnReplicCore(personCode, text);
+
+            if (chat != null && (forceChat || _data.BackLink.TranslateGameToChat))
+            {
+                _data.OnAddString(null, chat, LogMode.Protocol);
+            }
+
+            if (log != null && _data.BackLink.MakeLogs)
+            {
+                AddToFileLog(log + "<br />");
+            }
+        }
+
+        private (string chat, bool forceChat, string log) OnReplicCore(string personCode, string text)
+        {
+            if (personCode == ReplicCodes.Showman.ToString())
+            {
+                if (_data.Speaker != null)
+                {
+                    _data.Speaker.Replic = "";
+                }
+
+                _data.Speaker = _data.ShowMan;
+                _data.Speaker.Replic = text;
+
+                return ($"{_data.Speaker.Name}: {text}", false,
+                    $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
+            }
+
+            if (personCode.StartsWith(ReplicCodes.Player.ToString()) && personCode.Length > 1)
+            {
+                var indexString = personCode.Substring(1);
+                if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
+                {
+                    if (_data.Speaker != null)
+                    {
+                        _data.Speaker.Replic = "";
+                    }
+
+                    _data.Speaker = _data.Players[index];
+                    _data.Speaker.Replic = text;
+
+                    return ($"{_data.Speaker.Name}: {text}", false,
+                        $"<span style=\"color: {GetColorByPlayerIndex(index)}; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
+                }
+            }
+
+            if (personCode != ReplicCodes.Special.ToString())
+            {
+                return (null, false, $"<span style=\"font-style: italic\">{text}</span>");
+            }
+
+            return ("* " + text, true, $"<span style=\"font-style: italic; font-weight: bold\">{text}</span>");
+        }
+
         internal void AddToFileLog(Message message) =>
             AddToFileLog($"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> <span style=\"font-weight: bold\">{message.Text}</span><br />");
 
@@ -173,7 +241,7 @@ namespace SICore
                 {
                     try
                     {
-                        var stream = _data.BackLink.CreateLog(_actor.Client.Name, out var path);
+                        var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out var path);
                         _data.ProtocolPath = path;
                         _data.ProtocolWriter = new StreamWriter(stream);
                         _data.ProtocolWriter.Write(text);
@@ -191,7 +259,7 @@ namespace SICore
                 }
                 catch (IOException exc)
                 {
-                    _data.OnAddString(null, _actor.LO[nameof(R.ErrorWritingLogToDisc)] + ": " + exc.Message, LogMode.Log);
+                    _data.OnAddString(null, LO[nameof(R.ErrorWritingLogToDisc)] + ": " + exc.Message, LogMode.Log);
                     try
                     {
                         _data.ProtocolWriter.Dispose();
@@ -204,6 +272,27 @@ namespace SICore
                     _data.ProtocolPath = null;
                     _data.ProtocolWriter = null;
                 }
+            }
+        }
+
+        private static string GetColorByPlayerIndex(int playerIndex)
+        {
+            switch (playerIndex)
+            {
+                case 0:
+                    return "#EF21A9";
+                case 1:
+                    return "#0BE6CF";
+                case 2:
+                    return "#FF0000";
+                case 3:
+                    return "#EF21A9";
+                case 4:
+                    return "#00FF00";
+                case 5:
+                    return "#0000FF";
+                default:
+                    return "#00FFFF";
             }
         }
 
@@ -220,7 +309,7 @@ namespace SICore
                     logMessageBuilder.AppendFormat("<span style=\"color: #646464; font-weight: bold\">{0}: </span>", content);
                     break;
 
-                case "player":
+                case Constants.Player:
                     {
                         isPrintable = true;
 
@@ -242,17 +331,17 @@ namespace SICore
                             s = "<span style=\"color: #00FFFF; font-weight:bold\">";
                         else
                         {
-                            _data.SystemLog.AppendLine(_actor.LO[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
+                            _data.SystemLog.AppendLine(LO[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
                             return;
                         }
 
-                        var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + _actor.LO[nameof(R.UnknownPerson)] + ">";
+                        var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + LO[nameof(R.UnknownPerson)] + ">";
                         chatMessageBuilder.AppendFormat("{0}: ", playerName);
                         logMessageBuilder.AppendFormat("{0}{1}: </span>", s, playerName);
                     }
                     break;
 
-                case "showman":
+                case Constants.Showman:
                     isPrintable = true;
                     chatMessageBuilder.AppendFormat("{0}: ", content);
                     logMessageBuilder.AppendFormat("<span style=\"color: #0AEA2A; font-weight: bold\">{0}: </span>", content);
@@ -295,10 +384,10 @@ namespace SICore
                     {
                         try
                         {
-                            var stream = _data.BackLink.CreateLog(_actor.Client.Name, out string path);
+                            var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out string path);
                             _data.ProtocolPath = path;
                             _data.ProtocolWriter = new StreamWriter(stream);
-                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _actor.LO[nameof(R.LogTitle)] + "</title></head><body style=\"font-face: Verdana\">");
+                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + LO[nameof(R.LogTitle)] + "</title></head><body style=\"font-face: Verdana\">");
                         }
                         catch (IOException)
                         {
@@ -314,7 +403,7 @@ namespace SICore
                         }
                     }
 
-                    Print(ReplicManager.Special($"{_actor.LO[nameof(R.GameStarted)]} {DateTime.Now}"));
+                    Print(ReplicManager.Special($"{LO[nameof(R.GameStarted)]} {DateTime.Now}"));
                     break;
 
                 case GameStage.Round:
@@ -335,7 +424,7 @@ namespace SICore
                     if (_data.ProtocolWriter != null)
                         _data.ProtocolWriter.Write("</body></html>");
                     else
-                        _data.OnAddString(null, _actor.LO[nameof(R.ErrorWritingLogs)], LogMode.Chat);
+                        _data.OnAddString(null, LO[nameof(R.ErrorWritingLogs)], LogMode.Chat);
                     break;
 
                 default:
@@ -454,7 +543,7 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _actor.Client.CurrentServer.OnError(exc, false);
+                _viewerActions.Client.CurrentServer.OnError(exc, false);
             }
         }
 
@@ -547,7 +636,7 @@ namespace SICore
                             uri = mparams[3];
                             if (uri.Contains(Constants.GameHost))
                             {
-                                var address = _actor.Connector.ServerAddress;
+                                var address = ClientData.ServerAddress;
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
                                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
@@ -556,11 +645,11 @@ namespace SICore
                             }
                             else if (uri.Contains(Constants.ServerHost))
                             {
-                                uri = uri.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
+                                uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
                             }
                             else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
                             {
-                                TInfo.Text = string.Format(_actor.LO[nameof(R.ExternalLink)], uri);
+                                TInfo.Text = string.Format(LO[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
                                 return;
@@ -575,7 +664,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        var warningMessage = string.Format(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
+                        var warningMessage = string.Format(LO[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
 
                         TInfo.QuestionContentType = QuestionContentType.Text;
                         TInfo.Sound = false;
@@ -610,8 +699,8 @@ namespace SICore
             }
         }
 
-        private bool ExternalUrlOk(string uri) => 
-            _actor.ContentPublicBaseUrls != null && _actor.ContentPublicBaseUrls.Any(publicUrl => uri.StartsWith(publicUrl));
+        private bool ExternalUrlOk(string uri) =>
+            ClientData.ContentPublicUrls != null && ClientData.ContentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
         virtual public void SetSecondAtom(string[] mparams)
         {
@@ -627,7 +716,7 @@ namespace SICore
                             uri = mparams[3];
                             if (uri.Contains(Constants.GameHost))
                             {
-                                var address = _actor.Connector.ServerAddress;
+                                var address = ClientData.ServerAddress;
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
                                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
@@ -636,11 +725,11 @@ namespace SICore
                             }
                             else if (uri.Contains(Constants.ServerHost))
                             {
-                                uri = uri.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
+                                uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
                             }
                             else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
                             {
-                                TInfo.Text = string.Format(_actor.LO[nameof(R.ExternalLink)], uri);
+                                TInfo.Text = string.Format(LO[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
                             }
@@ -654,7 +743,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        Print(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                        Print(LO[nameof(R.HttpsProtocolIsNotSupported)]);
                         return;
                     }
 
@@ -758,7 +847,7 @@ namespace SICore
         {
             if (_data.QuestionType == QuestionTypes.Auction)
             {
-                TInfo.Text = _actor.LO[nameof(R.Label_Auction)];
+                TInfo.Text = LO[nameof(R.Label_Auction)];
 
                 lock (TInfo.RoundInfoLock)
                 {
@@ -773,7 +862,7 @@ namespace SICore
             }
             else if (_data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat)
             {
-                TInfo.Text = _actor.LO[nameof(R.Label_CatInBag)];
+                TInfo.Text = LO[nameof(R.Label_CatInBag)];
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -787,7 +876,7 @@ namespace SICore
             }
             else if (_data.QuestionType == QuestionTypes.Sponsored)
             {
-                TInfo.Text = _actor.LO[nameof(R.Label_Sponsored)];
+                TInfo.Text = LO[nameof(R.Label_Sponsored)];
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -879,9 +968,9 @@ namespace SICore
         {
             if (path.Contains(Constants.GameHost))
             {
-                if (_actor.Connector != null && !string.IsNullOrWhiteSpace(_actor.Connector.ServerAddress))
+                if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
                 {
-                    var remoteUri = _actor.Connector.ServerAddress;
+                    var remoteUri = ClientData.ServerAddress;
                     if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri hostUri))
                     {
                         account.Picture = path.Replace(Constants.GameHost, hostUri.Host);
@@ -895,9 +984,9 @@ namespace SICore
             }
             else if (path.Contains(Constants.ServerHost))
             {
-                if (_actor.Connector != null && !string.IsNullOrWhiteSpace(_actor.Connector.ServerAddress))
+                if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
                 {
-                    account.Picture = path.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
+                    account.Picture = path.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
                 }
             }
             else
@@ -913,7 +1002,7 @@ namespace SICore
         {
             try
             {
-                Print(ReplicManager.Special(_actor.LO[nameof(R.TryReconnect)]));
+                Print(ReplicManager.Special(LO[nameof(R.TryReconnect)]));
 
                 var result = await connector.ReconnectToServer();
                 if (!result)
@@ -922,7 +1011,7 @@ namespace SICore
                     return;
                 }
 
-                Print(ReplicManager.Special(_actor.LO[nameof(R.ReconnectOK)]));
+                Print(ReplicManager.Special(LO[nameof(R.ReconnectOK)]));
                 await connector.RejoinGame();
 
                 if (!string.IsNullOrEmpty(connector.Error))
@@ -933,7 +1022,7 @@ namespace SICore
                         Print(ReplicManager.Special(connector.Error));
                 }
                 else
-                    Print(ReplicManager.Special(_actor.LO[nameof(R.ReconnectEntered)]));
+                    Print(ReplicManager.Special(LO[nameof(R.ReconnectEntered)]));
             }
             catch (Exception exc)
             {
@@ -1002,7 +1091,7 @@ namespace SICore
         public async void PrintGreeting()
         {
             await Task.Delay(1000);
-            _data.OnAddString(null, _actor.LO[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            _data.OnAddString(null, LO[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
         }
 
         public void OnTimeChanged()
@@ -1019,38 +1108,45 @@ namespace SICore
 
             if (timerIndex == 2)
             {
-                if (timerCommand == "GO")
+                switch (timerCommand)
                 {
-                    if (person != null && int.TryParse(person, out int personIndex))
-                    {
-                        if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
-                            || _data.DialogMode == DialogModes.None)
+                    case MessageParams.Timer_Go:
                         {
-                            if (personIndex == -1)
+                            if (person != null && int.TryParse(person, out int personIndex))
                             {
-                                _data.ShowMan.IsDeciding = true;
+                                if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
+                                    || _data.DialogMode == DialogModes.None)
+                                {
+                                    if (personIndex == -1)
+                                    {
+                                        _data.ShowMan.IsDeciding = true;
+                                    }
+                                    else if (personIndex > -1 && personIndex < _data.Players.Count)
+                                    {
+                                        _data.Players[personIndex].IsDeciding = true;
+                                    }
+                                }
+
+                                if (personIndex == -2)
+                                {
+                                    _data.ShowMainTimer = true;
+                                }
                             }
-                            else if (personIndex > -1 && personIndex < _data.Players.Count)
-                            {
-                                _data.Players[personIndex].IsDeciding = true;
-                            }
+
+                            break;
                         }
 
-                        if (personIndex == -2)
+                    case "STOP":
                         {
-                            _data.ShowMainTimer = true;
-                        }
-                    }
-                }
-                else if (timerCommand == "STOP")
-                {
-                    _data.ShowMan.IsDeciding = false;
-                    foreach (var player in _data.Players)
-                    {
-                        player.IsDeciding = false;
-                    }
+                            _data.ShowMan.IsDeciding = false;
+                            foreach (var player in _data.Players)
+                            {
+                                player.IsDeciding = false;
+                            }
 
-                    _data.ShowMainTimer = false;
+                            _data.ShowMainTimer = false;
+                            break;
+                        }
                 }
             }
         }
@@ -1061,7 +1157,7 @@ namespace SICore
 
             if (uri.Contains(Constants.GameHost))
             {
-                var address = _actor.Connector.ServerAddress;
+                var address = ClientData.ServerAddress;
                 if (!string.IsNullOrWhiteSpace(address))
                 {
                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
@@ -1070,7 +1166,7 @@ namespace SICore
             }
             else if (uri.Contains(Constants.ServerHost))
             {
-                uri = uri.Replace(Constants.ServerHost, _actor.ServerPublicPackageUrl ?? _actor.Connector.ServerAddress);
+                uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
             }
 
             if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out Uri mediaUri))
@@ -1080,7 +1176,7 @@ namespace SICore
 
             if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
             {
-                Print(_actor.LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                Print(LO[nameof(R.HttpsProtocolIsNotSupported)]);
                 return;
             }
 

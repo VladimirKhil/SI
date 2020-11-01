@@ -284,20 +284,21 @@ namespace SICore
         /// <summary>
         /// Играется ли вопрос
         /// </summary>
-        internal bool IsQuestionPlaying { get; set; } = false;
+        internal bool IsQuestionPlaying { get; set; }
 
-        internal int TabloInformStage = 0;
-        internal object TabloInformStageLock = new object();
+        internal int TabloInformStage { get; set; }
+
+        internal object TabloInformStageLock { get; } = new object();
 
         /// <summary>
         /// Количество ставящих в финале
         /// </summary>
-        internal int NumOfStakers = 0;
+        internal int NumOfStakers { get; set; }
 
         /// <summary>
         /// Прав ли игрок
         /// </summary>
-        internal bool PlayerIsRight = false;
+        internal bool PlayerIsRight { get; set; }
 
         /// <summary>
         /// История ответов на вопрос (применяется при апелляции)

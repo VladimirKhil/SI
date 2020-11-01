@@ -6,10 +6,10 @@ namespace SICore
     /// <summary>
     /// Логика ведущего-компьютера
     /// </summary>
-    internal sealed class ShowmanComputerLogic : ViewerComputerLogic<Showman>, IShowman
+    internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
     {
-        public ShowmanComputerLogic(Showman client, ViewerData data)
-            : base(client, data)
+        public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions)
+            : base(data, viewerActions)
         {
             
         }
@@ -47,9 +47,11 @@ namespace SICore
             int num = _data.Players.Count(p => p.CanBeSelected);
             int i = Data.Rand.Next(num);
             while (i < _data.Players.Count && !_data.Players[i].CanBeSelected)
+            {
                 i++;
+            }
 
-            _actor.SendMessage(message, i.ToString());
+            _viewerActions.SendMessage(message, i.ToString());
         }
 
         private void AnswerNextToDelete() => SelectPlayer(Messages.NextDelete);
@@ -66,13 +68,12 @@ namespace SICore
             {
                 right = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, s);
                 if (right)
+                {
                     break;
+                }
             }
 
-            if (right)
-                _actor.SendMessage(Messages.IsRight, "+");
-            else
-                _actor.SendMessage(Messages.IsRight, "-");
+            _viewerActions.SendMessage(Messages.IsRight, right ? "+" : "-");
         }
 
         #region ShowmanInterface Members

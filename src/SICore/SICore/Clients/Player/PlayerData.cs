@@ -78,19 +78,22 @@ namespace SICore
         /// </summary>
         internal bool ReadyToPress { get; set; } = false;
 
+        private int _realBrave = 0;
+
         /// <summary>
         /// Текущая величина смелости
         /// </summary>
-        internal int RealBrave { get; set; } = 0;
+        internal int RealBrave { get => _realBrave; set { _realBrave = Math.Max(0, value); } }
 
+        /// <summary>
+        /// Скорость изменения смелости
+        /// </summary>
         internal int DeltaBrave { get; set; } = 0;
 
         /// <summary>
         /// Текущая скорость реакции
         /// </summary>
         internal int RealSpeed { get; set; } = 0;
-
-        internal int BestBrave { get; set; } = 0;
 
         /// <summary>
         /// Продолжается ли чтение вопроса

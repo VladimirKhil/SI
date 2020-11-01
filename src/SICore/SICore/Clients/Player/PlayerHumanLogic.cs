@@ -1,4 +1,5 @@
-﻿using SICore.Properties;
+﻿using SICore.BusinessLogic;
+using SICore.Properties;
 using SIData;
 using SIUI.ViewModel;
 using System;
@@ -10,10 +11,10 @@ namespace SICore
     /// <summary>
     /// Логика игрока-человека
     /// </summary>
-    internal sealed class PlayerHumanLogic : ViewerHumanLogic<Player>, IPlayer
+    internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayer
     {
-        public PlayerHumanLogic(Player client, ViewerData data)
-            : base(client, data)
+        public PlayerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
+            : base(data, viewerActions, localizer)
         {
             TInfo.QuestionSelected += PlayerClient_QuestionSelected;
             TInfo.ThemeSelected += PlayerClient_ThemeSelected;
@@ -38,7 +39,7 @@ namespace SICore
 
         public void PersonAnswered(int playerIndex, bool isRight)
         {
-            if (_data.Stage == GameStage.Final && _data.Players[playerIndex].Name == _actor.Client.Name || isRight)
+            if (_data.Stage == GameStage.Final && _data.Players[playerIndex].Name == _viewerActions.Client.Name || isRight)
             {
                 _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.NumApps > 0;
                 _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
@@ -68,7 +69,7 @@ namespace SICore
         public void Stake()
         {
             _data.DialogMode = DialogModes.Stake;
-            _data.Hint = _actor.LO[nameof(R.HintMakeAStake)];
+            _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
             ((PlayerAccount)ClientData.Me).IsDeciding = false;
             _data.BackLink.OnFlash();
         }
@@ -90,7 +91,7 @@ namespace SICore
 
         public void CatCost()
         {
-            _data.Hint = _actor.LO[nameof(R.HintChooseCatPrice)];
+            _data.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
             _data.DialogMode = DialogModes.CatCost;
             ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
@@ -127,8 +128,8 @@ namespace SICore
             {
                 await Task.Delay(2000);
 
-                AddLog(string.Format(_actor.LO[nameof(R.Hint)], _data.BackLink.GameButtonKey));
-                AddLog(_actor.LO[nameof(R.PressButton)] + Environment.NewLine);
+                AddLog(string.Format(_viewerActions.LO[nameof(R.Hint)], _data.BackLink.GameButtonKey));
+                AddLog(_viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine);
             }
             catch (ObjectDisposedException)
             {
@@ -145,29 +146,38 @@ namespace SICore
 
         }
 
-        void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
+        private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
         {
-            for (int i = 0; i < TInfo.RoundInfo.Count; i++)
+            var found = false;
+            for (var i = 0; i < TInfo.RoundInfo.Count; i++)
             {
-                for (int j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
+                for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
                 {
                     if (TInfo.RoundInfo[i].Questions[j] == question)
                     {
-                        _actor.SendMessageWithArgs(Messages.Choice, i, j);
+                        found = true;
+                        _viewerActions.SendMessageWithArgs(Messages.Choice, i, j);
+                        break;
                     }
+                }
+
+                if (found)
+                {
+                    break;
                 }
             }
 
             Clear();
         }
 
-        void PlayerClient_ThemeSelected(ThemeInfoViewModel theme)
+        private void PlayerClient_ThemeSelected(ThemeInfoViewModel theme)
         {
             for (int i = 0; i < TInfo.RoundInfo.Count; i++)
             {
                 if (TInfo.RoundInfo[i] == theme)
                 {
-                    _actor.SendMessageWithArgs(Messages.Delete, i);
+                    _viewerActions.SendMessageWithArgs(Messages.Delete, i);
+                    break;
                 }
             }
 

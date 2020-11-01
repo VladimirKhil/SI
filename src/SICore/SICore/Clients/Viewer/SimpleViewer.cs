@@ -10,11 +10,6 @@ namespace SICore
         /// <summary>
         /// Запуск клиента
         /// </summary>
-        /// <param name="name">Имя</param>
-        /// <param name="password">Пароль (необязателен)</param>
-        /// <param name="isHuman">Человек ли</param>
-        /// <param name="isHost">Является ли владельцем сервера</param>
-        /// <param name="form">Форма для интерфейса (если не человек, то null)</param>
         public SimpleViewer(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
             : base(client, personData, isHost, localizer, data)
         {
@@ -29,8 +24,8 @@ namespace SICore
             }
 
             return personData.IsHuman ?
-                (IViewer)new SimpleViewerHumanLogic(this, ClientData) :
-                new SimpleViewerComputerLogic(this, ClientData);
+                (IViewer)new ViewerHumanLogic(ClientData, _viewerActions, LO) :
+                new ViewerComputerLogic(ClientData, _viewerActions);
         }
     }
 }

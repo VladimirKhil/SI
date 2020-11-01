@@ -4,7 +4,6 @@ using SIData;
 using SIPackages.Core;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
@@ -32,68 +31,68 @@ namespace SICore
         {
             ClientData.PlayerDataExtensions.PressGameButton = new CustomCommand(arg =>
             {
-                SendMessage(Messages.I);
+                _viewerActions.SendMessage(Messages.I);
                 DisableGameButton(false);
                 ReleaseGameButtonAsync();
             }) { CanBeExecuted = true };
 
-            ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
+            ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
             ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
+                _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
                 Clear();
             });
 
             ClientData.PersonDataExtensions.SendNominal = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 0);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 0);
                 Clear();
             });
 
             ClientData.PersonDataExtensions.SendStake = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 1, ClientData.PersonDataExtensions.StakeInfo.Stake);
                 Clear();
             });
 
             ClientData.PersonDataExtensions.SendPass = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 2);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 2);
                 Clear();
             });
 
             ClientData.PersonDataExtensions.SendVabank = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.Stake, 3);
+                _viewerActions.SendMessageWithArgs(Messages.Stake, 3);
                 Clear();
             });
 
             ClientData.PersonDataExtensions.SendFinalStake = new CustomCommand(arg =>
             {
-                SendMessageWithArgs(Messages.FinalStake, ClientData.PersonDataExtensions.StakeInfo.Stake);
+                _viewerActions.SendMessageWithArgs(Messages.FinalStake, ClientData.PersonDataExtensions.StakeInfo.Stake);
                 Clear();
             });
 
             ClientData.PlayerDataExtensions.Apellate = new CustomCommand(arg =>
             {
                 ClientData.PlayerDataExtensions.NumApps--;
-                SendMessage(Messages.Apellate, arg.ToString());
+                _viewerActions.SendMessage(Messages.Apellate, arg.ToString());
             }) { CanBeExecuted = false };
 
             ClientData.PlayerDataExtensions.Pass = new CustomCommand(arg =>
             {
-                SendMessage(Messages.Pass);
+                _viewerActions.SendMessage(Messages.Pass);
             })
             { CanBeExecuted = false };
 
-            ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { SendMessage(Messages.IsRight, "+"); Clear(); });
-            ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { SendMessage(Messages.IsRight, "-"); Clear(); });
+            ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "+"); Clear(); });
+            ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "-"); Clear(); });
 
             ClientData.PlayerDataExtensions.Report.Title = LO[nameof(R.ReportTitle)];
             ClientData.PlayerDataExtensions.Report.Subtitle = LO[nameof(R.ReportTip)];
 
-            ClientData.PlayerDataExtensions.Report.SendReport = new CustomCommand(arg => { SendMessage(Messages.Report, "ACCEPT", ClientData.SystemLog.ToString() + ClientData.PlayerDataExtensions.Report.Comment); Clear(); });
-            ClientData.PlayerDataExtensions.Report.SendNoReport = new CustomCommand(arg => { SendMessage(Messages.Report, "DECLINE"); Clear(); });
+            ClientData.PlayerDataExtensions.Report.SendReport = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Report, "ACCEPT", ClientData.SystemLog.ToString() + ClientData.PlayerDataExtensions.Report.Comment); Clear(); });
+            ClientData.PlayerDataExtensions.Report.SendNoReport = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Report, "DECLINE"); Clear(); });
 
             ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
         }
@@ -101,8 +100,8 @@ namespace SICore
         protected override IPlayer CreateLogic(Account personData)
         {
             return personData.IsHuman ?
-                (IPlayer)new PlayerHumanLogic(this, ClientData) :
-                new PlayerComputerLogic(this, ClientData, (ComputerAccount)personData);
+                (IPlayer)new PlayerHumanLogic(ClientData, _viewerActions, LO) :
+                new PlayerComputerLogic(ClientData, (ComputerAccount)personData, _viewerActions);
         }
 
         public override void Dispose(bool disposing)
@@ -155,8 +154,8 @@ namespace SICore
             {
                 if (ClientData.Me is PersonAccount personAccount)
                 {
-                    var readyCommand = personAccount.BeReadyCommand = new CustomCommand(arg => SendMessage(Messages.Ready));
-                    personAccount.BeUnReadyCommand = new CustomCommand(arg => SendMessage(Messages.Ready, "-"));
+                    var readyCommand = personAccount.BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
+                    personAccount.BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
                     _logic.OnInitialized();
 
                     if (ClientData.AutoReady)
@@ -299,7 +298,7 @@ namespace SICore
                         {
                             ClientData.Players[i].CanBeSelected = mparams[i + 1] == "+";
                             int num = i;
-                            ClientData.Players[i].SelectionCallback = player => { SendMessageWithArgs(Messages.Cat, num); Clear(); };
+                            ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); Clear(); };
                         }
 
                         ClientData.Hint = LO[nameof(R.HintSelectCatPlayer)];
@@ -471,55 +470,5 @@ namespace SICore
                 ClientData.PlayerDataExtensions.PressGameButton.CanBeExecuted = true;
             }
         }
-
-        /// <summary>
-        /// Сумма ближайшего преследователя
-        /// </summary>
-        public int BigSum
-        {
-            get
-            {
-                return ClientData.Players.Where(player => player.Name != _client.Name).Max(player => player.Sum);
-            }
-        }
-
-        /// <summary>
-        /// Сумма дальнего преследователя
-        /// </summary>
-        public int SmallSum
-        {
-            get
-            {
-                return ClientData.Players.Where(player => player.Name != _client.Name).Min(player => player.Sum);
-            }
-        }
-
-        /// <summary>
-        /// Собственный счёт
-        /// </summary>
-        public int MySum
-        {
-            get
-            {
-                return ((PlayerAccount)ClientData.Me).Sum;
-            }
-        }
-
-        /// <summary>
-        /// Жмёт на игровую кнопку
-        /// </summary>
-        internal void PressGameButton()
-        {
-            SendMessage(Messages.I);
-        }
-
-        ///// <summary>
-        ///// Апеллирует
-        ///// </summary>
-        //internal void Apellate()
-        //{
-        //    SendMessage(Messages.Apellate);
-        //    this.ClientData.NumApps--;
-        //}
     }
 }

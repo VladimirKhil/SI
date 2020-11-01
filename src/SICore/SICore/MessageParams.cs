@@ -9,6 +9,16 @@ namespace SICore
     public static class MessageParams
     {
         /// <summary>
+        /// Правильный ответ
+        /// </summary>
+        public const string Answer_Right = "RIGHT";
+
+        /// <summary>
+        /// Неверный ответ
+        /// </summary>
+        public const string Answer_Wrong = "WRONG";
+
+        /// <summary>
         /// Адрес расположения единицы сценария
         /// </summary>
         public const string Atom_Uri = "URI";
@@ -47,6 +57,11 @@ namespace SICore
         /// Обновление игровой конфигурации
         /// </summary>
         public const string Info_Update = "UPDATE";
+
+        /// <summary>
+        /// Запуск таймера
+        /// </summary>
+        public const string Timer_Go = "GO";
 
         /// <summary>
         /// Можно жать на кнопку, но вопрос ещё не окончен
