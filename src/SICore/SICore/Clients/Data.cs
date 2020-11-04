@@ -95,6 +95,10 @@ namespace SICore
         /// </summary>
         public StringBuilder SystemLog { get; } = new StringBuilder();
 
+        public StringBuilder PersonsUpdateHistory { get; } = new StringBuilder();
+
+        protected static string PrintAccount(ViewerAccount viewerAccount) => $"{viewerAccount?.Name}:{viewerAccount?.IsConnected}";
+
         public virtual void OnAddString(string person, string text, LogMode mode)
         {
         }

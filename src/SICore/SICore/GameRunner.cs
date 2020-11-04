@@ -57,7 +57,7 @@ namespace SICore
             var isHost = _createHost && gameData.HostName == _settings.Showman.Name;
             IViewerClient host = null;
 
-            gameData.BeginUpdatePersons();
+            gameData.BeginUpdatePersons("Start");
 
             try
             {
@@ -73,7 +73,7 @@ namespace SICore
                         host = showman;
                     }
 
-                    gameData.ShowMan.Connected = true;
+                    gameData.ShowMan.IsConnected = true;
                 }
 
                 for (int i = 0; i < _settings.Players.Length; i++)
@@ -94,7 +94,7 @@ namespace SICore
                             host = player;
                         }
 
-                        gameData.Players[i].Connected = true;
+                        gameData.Players[i].IsConnected = true;
                     }
                 }
 
@@ -111,7 +111,7 @@ namespace SICore
                         viewerClient.ConnectTo(_server);
                         host = viewer;
 
-                        gameData.Viewers[i].Connected = true;
+                        gameData.Viewers[i].IsConnected = true;
                     }
                 }
             }

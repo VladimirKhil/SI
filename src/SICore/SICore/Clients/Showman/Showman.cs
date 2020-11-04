@@ -195,44 +195,10 @@ namespace SICore
 
                             #endregion
                         }
-                    case Messages.IsRight:
-                        {
-                            #region IsRight
-
-                            ClientData.PersonDataExtensions.Answer = mparams[1];
-                            var right = new List<string>();
-
-                            int L = mparams.Length;
-
-                            for (int i = 2; i < L; i++)
-                                right.Add(mparams[i]);
-
-                            ClientData.PersonDataExtensions.Right = right.ToArray();
-                            break;
-
-                            #endregion
-                        }
-                    case Messages.Wrong:
-                        {
-                            #region Wrong
-                            var wrong = new List<string>();
-
-                            int L = mparams.Length;
-
-                            for (int i = 1; i < L; i++)
-                                wrong.Add(mparams[i]);
-
-                            ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
-
-                            _logic.IsRight();
-
-                            ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
-                            ClientData.DialogMode = DialogModes.AnswerValidation;
-                            ((PersonAccount)ClientData.Me).IsDeciding = false;
-                            break;
-
-                            #endregion
-                        }
+                    case Messages.Validation:
+                    case "VALIDATIION": // Obsolete
+                        OnValidation(mparams);
+                        break;
                     case Messages.FirstDelete:
                         {
                             #region FirstDelete
@@ -352,6 +318,34 @@ namespace SICore
             {
                 throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
             }
+        }
+
+        private void OnValidation(string[] mparams)
+        {
+            var name = mparams[1];
+            ClientData.PersonDataExtensions.Answer = mparams[2];
+            _logic.IsRight();
+            int.TryParse(mparams[4], out var rightAnswersCount);
+            rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
+
+            var right = new List<string>();
+            for (int i = 0; i < rightAnswersCount; i++)
+            {
+                right.Add(mparams[5 + i]);
+            }
+
+            var wrong = new List<string>();
+            for (int i = 5 + rightAnswersCount; i < mparams.Length; i++)
+            {
+                wrong.Add(mparams[i]);
+            }
+
+            ClientData.PersonDataExtensions.Right = right.ToArray();
+            ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
+
+            ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
+            ClientData.DialogMode = DialogModes.AnswerValidation;
+            ((PersonAccount)ClientData.Me).IsDeciding = false;
         }
 
         private void ClearSelections(bool full = false)

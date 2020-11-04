@@ -90,8 +90,8 @@ namespace SICore
             set { if (delete != value) { delete = value; OnPropertyChanged(); } }
         }
 
-        public PlayerAccount(string name, bool sex, bool connected, bool gameStarted)
-            : base(name, sex, connected, gameStarted)
+        public PlayerAccount(string name, bool isMale, bool connected, bool gameStarted)
+            : base(name, isMale, connected, gameStarted)
         {
             Init();
         }

@@ -388,7 +388,7 @@
         /// <summary>
         /// Необходимо провалидировать ответ игрока
         /// </summary>
-        public const string Validation = "VALIDATIION";
+        public const string Validation = "VALIDATION";
 
         /// <summary>
         /// Победитель

@@ -435,8 +435,8 @@ namespace SICore
             if (atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio)
             {
                 _data.HaveViewedAtom = _data.Viewers.Count
-                    + _data.Players.Where(pa => pa.IsHuman && pa.Connected).Count()
-                    + (_data.ShowMan.IsHuman && _data.ShowMan.Connected ? 1 : 0);
+                    + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
+                    + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
 
                 // TODO: если всё так тормозит, что за 2 минуты аудио/видео ни у кого не прогружается,
                 // что происходит при игре с фальстартами и без?
@@ -1801,7 +1801,7 @@ namespace SICore
                 else
                 {
                     _actor.SendMessage(s, _data.Answerer.Name);
-                    if (!_data.Answerer.Connected)
+                    if (!_data.Answerer.IsConnected)
                     {
                         waitTime = 20;
                     }
@@ -2492,7 +2492,7 @@ namespace SICore
             // Заполняем пустые слоты ботами
             for (int i = 0; i < _data.Players.Count; i++)
             {
-                if (!_data.Players[i].Connected)
+                if (!_data.Players[i].IsConnected)
                 {
                     _actor.ChangePersonType(Constants.Player, i.ToString(), null);
                 }
@@ -2708,7 +2708,7 @@ namespace SICore
 
                 if (_data.IsOralNow)
                     _actor.SendMessage(message, _data.ShowMan.Name);
-                else if (!_data.Chooser.Connected)
+                else if (!_data.Chooser.IsConnected)
                     time = 20;
 
                 _actor.SendMessage(message, _data.Chooser.Name);
@@ -2735,7 +2735,7 @@ namespace SICore
             _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
             if (_data.IsOralNow)
                 _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
-            else if (!_data.Chooser.Connected)
+            else if (!_data.Chooser.IsConnected)
                 waitTime = 20;
             
             _actor.SendMessage(msg.ToString(), _data.Chooser.Name);
@@ -2909,14 +2909,27 @@ namespace SICore
             _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
             _actor.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
+            _actor.SendMessage(BuildValidationMessageOld(_data.Answerer.Name, answer), _data.ShowMan.Name);
         }
 
         private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
         {
-            var rightAnswers = _data.Question.GetRightAnswers();
+            var rightAnswers = _data.Question.Right;
             var wrongAnswers = _data.Question.Wrong;
 
             return new MessageBuilder(Messages.Validation, name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
+                .AddRange(rightAnswers)
+                .AddRange(wrongAnswers)
+                .Build();
+        }
+
+        [Obsolete]
+        private string BuildValidationMessageOld(string name, string answer, bool isCheckingForTheRight = true)
+        {
+            var rightAnswers = _data.Question.GetRightAnswers();
+            var wrongAnswers = _data.Question.Wrong;
+
+            return new MessageBuilder("VALIDATIION", name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
                 .AddRange(rightAnswers)
                 .AddRange(wrongAnswers)
                 .Build();
@@ -3039,7 +3052,7 @@ namespace SICore
             {
                 _actor.SendMessage(message, _data.ShowMan.Name);
             }
-            else if (!_data.ActivePlayer.Connected)
+            else if (!_data.ActivePlayer.IsConnected)
             {
                 waitTime = 20;
             }
@@ -3359,7 +3372,7 @@ namespace SICore
                 else
                 {
                     _actor.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
-                    if (!_data.ActivePlayer.Connected)
+                    if (!_data.ActivePlayer.IsConnected)
                     {
                         waitTime = 20;
                     }
@@ -3429,6 +3442,7 @@ namespace SICore
             _actor.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
             var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
+            var validationMessageOld = BuildValidationMessageOld(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
@@ -3457,6 +3471,7 @@ namespace SICore
                     _actor.SendMessage(msg.ToString(), _data.Players[i].Name);
 
                     _actor.SendMessage(validationMessage, _data.Players[i].Name);
+                    _actor.SendMessage(validationMessageOld, _data.Players[i].Name);
                 }
             }
 

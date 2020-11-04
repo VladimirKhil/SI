@@ -334,20 +334,32 @@ namespace SICore
                 _showMan = value;
                 OnPropertyChanged();
                 if (_isUpdating)
+                {
                     return;
+                }
+
+                BackLink?.LogWarning("Unreachable code? " + Environment.StackTrace);
 
                 OnMainPersonsChanged();
                 OnAllPersonsChanged();
             }
         }
 
+        private string PrintPersons() => new StringBuilder()
+            .Append("Showman: ").Append(PrintAccount(ShowMan)).AppendLine()
+            .Append("Players: ").Append(string.Join(", ", Players.Select(PrintAccount))).AppendLine()
+            .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
+            .ToString();
+
         public void OnAllPersonsChanged()
         {
             AllPersons = new ViewerAccount[] { _showMan }
                 .Concat(Players)
                 .Concat(Viewers)
-                .Where(a => a.Connected)
+                .Where(a => a.IsConnected)
                 .ToDictionary(a => a.Name);
+
+            PersonsUpdateHistory.Append($"Update: ").Append(PrintPersons());
         }
 
         public void OnMainPersonsChanged()
@@ -395,9 +407,11 @@ namespace SICore
 
         private bool _isUpdating = false;
 
-        internal void BeginUpdatePersons()
+        internal void BeginUpdatePersons(string reason)
         {
             _isUpdating = true;
+
+            PersonsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
         }
 
         internal void EndUpdatePersons()

@@ -9,21 +9,21 @@ namespace SICore
     public class ViewerAccount : Account
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool _connected = false;
+        private bool _isConnected = false;
 
         /// <summary>
         /// В игре ли
         /// </summary>
-        public bool Connected
+        public bool IsConnected
         {
-            get { return _connected; }
-            set { if (_connected != value) { _connected = value; OnPropertyChanged(); } }
+            get { return _isConnected; }
+            set { if (_isConnected != value) { _isConnected = value; OnPropertyChanged(); } }
         }
 
-        public ViewerAccount(string name, bool isMale, bool connected)
+        public ViewerAccount(string name, bool isMale, bool isConnected)
             : base(name, isMale)
         {
-            _connected = connected;
+            _isConnected = isConnected;
         }
 
         public ViewerAccount(Account account)

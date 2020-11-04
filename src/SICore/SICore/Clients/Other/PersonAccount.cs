@@ -149,8 +149,8 @@ namespace SICore
             }
         }
         
-        public PersonAccount(string name, bool sex, bool connected, bool gameStarted)
-            : base(name, sex, connected)
+        public PersonAccount(string name, bool isMale, bool connected, bool gameStarted)
+            : base(name, isMale, connected)
         {
             _gameStarted = gameStarted;
         }

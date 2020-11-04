@@ -197,7 +197,7 @@ namespace SICore
             for (int i = 0; i < ClientData.Players.Count; i++)
             {
                 var player = ClientData.Players[i];
-                player.CanBeSelected = ClientData.Stage == GameStage.Before || !player.Connected || !player.IsHuman;
+                player.CanBeSelected = ClientData.Stage == GameStage.Before || !player.IsConnected || !player.IsHuman;
                 int num = i;
                 player.SelectionCallback = p =>
                 {
@@ -858,7 +858,7 @@ namespace SICore
 
                 try
                 {
-                    person.Connected = false;
+                    person.IsConnected = false;
                     person.Name = Constants.FreePlace;
                     person.Picture = "";
 
@@ -1056,9 +1056,9 @@ namespace SICore
                 CreatePlayerCommands(account);
 
                 var clone = new List<PlayerAccount>(ClientData.Players)
-                        {
-                            account
-                        };
+                {
+                    account
+                };
 
                 ClientData.Players = clone;
 
@@ -1112,7 +1112,7 @@ namespace SICore
             }
 
             var clone = new List<ViewerAccount>(ClientData.Viewers);
-            var newAccount = new ViewerAccount(account) { Connected = true };
+            var newAccount = new ViewerAccount(account) { IsConnected = true };
 
             clone.Add(newAccount);
 
@@ -1122,7 +1122,7 @@ namespace SICore
                 ClientData.Viewers = clone;
 
                 account.Name = Constants.FreePlace;
-                account.Connected = false;
+                account.IsConnected = false;
                 account.Ready = false;
                 account.Picture = "";
             }
@@ -1185,7 +1185,7 @@ namespace SICore
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
                         var clone = new List<ViewerAccount>(ClientData.Viewers);
-                        var newAccount = new ViewerAccount(account) { Connected = true };
+                        var newAccount = new ViewerAccount(account) { IsConnected = true };
 
                         clone.Add(newAccount);
 
@@ -1195,7 +1195,7 @@ namespace SICore
                     account.IsHuman = true;
                     account.Name = Constants.FreePlace;
                     account.Picture = "";
-                    account.Connected = false;
+                    account.IsConnected = false;
                     account.Ready = false;
                 }
                 finally
@@ -1209,10 +1209,10 @@ namespace SICore
                 ViewerAccount newAccount = null;
                 try
                 {
-                    if (account.Connected)
+                    if (account.IsConnected)
                     {
                         var clone = new List<ViewerAccount>(ClientData.Viewers);
-                        newAccount = new ViewerAccount(account) { Connected = true };
+                        newAccount = new ViewerAccount(account) { IsConnected = true };
 
                         clone.Add(newAccount);
 
@@ -1227,7 +1227,7 @@ namespace SICore
                     account.Name = newName;
                     account.IsMale = newSex;
                     account.Picture = "";
-                    account.Connected = true;
+                    account.IsConnected = true;
                     account.Ready = false;
                 }
                 finally
@@ -1276,9 +1276,9 @@ namespace SICore
 
                 UpdateAddTableCommand();
 
-                if (account.Connected && account.IsHuman || account.Name == ClientData.Name /* for computer accounts being deleted */)
+                if (account.IsConnected && account.IsHuman || account.Name == ClientData.Name /* for computer accounts being deleted */)
                 {
-                    newAccount = new ViewerAccount(account) { Connected = true };
+                    newAccount = new ViewerAccount(account) { IsConnected = true };
 
                     var cloneV = new List<ViewerAccount>(ClientData.Viewers)
                     {
@@ -1358,7 +1358,7 @@ namespace SICore
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
                         var clone = new List<ViewerAccount>(ClientData.Viewers);
-                        var newAccount = new ViewerAccount(account) { Connected = true };
+                        var newAccount = new ViewerAccount(account) { IsConnected = true };
 
                         clone.Add(newAccount);
 
@@ -1379,7 +1379,7 @@ namespace SICore
                 var sex = account.IsMale;
                 var picture = account.Picture;
                 var ready = account.Ready;
-                var isOnline = account.Connected;
+                var isOnline = account.IsConnected;
 
                 // Кто садится на его место
                 ViewerAccount other = null;
@@ -1399,13 +1399,13 @@ namespace SICore
                         account.IsMale = showman.IsMale;
                         account.Picture = showman.Picture;
                         account.Ready = showman.Ready;
-                        account.Connected = showman.Connected;
+                        account.IsConnected = showman.IsConnected;
 
                         showman.Name = name;
                         showman.IsMale = sex;
                         showman.Picture = picture;
                         showman.Ready = ready;
-                        showman.Connected = isOnline;
+                        showman.IsConnected = isOnline;
                     }
                     else
                     {
@@ -1421,13 +1421,13 @@ namespace SICore
                                 account.IsMale = item.IsMale;
                                 account.Picture = item.Picture;
                                 account.Ready = item.Ready;
-                                account.Connected = item.Connected;
+                                account.IsConnected = item.IsConnected;
 
                                 item.Name = name;
                                 item.IsMale = sex;
                                 item.Picture = picture;
                                 item.Ready = ready;
-                                item.Connected = isOnline;
+                                item.IsConnected = isOnline;
 
                                 found = true;
                                 break;
@@ -1458,7 +1458,7 @@ namespace SICore
                                     {
                                         // место было пустым, зрителя нужо удалить
                                         ClientData.Viewers.Remove(item);
-                                        account.Connected = true;
+                                        account.IsConnected = true;
                                     }
 
                                     found = true;
@@ -1527,7 +1527,7 @@ namespace SICore
 
             if (!_logic.CanSwitchType)
             {
-                static string printAccount(ViewerAccount acc) => $"{acc.Name} {acc.IsHuman} {acc.IsMale} {acc.Connected}";
+                static string printAccount(ViewerAccount acc) => $"{acc.Name} {acc.IsHuman} {acc.IsMale} {acc.IsConnected}";
 
                 var info = new StringBuilder()
                     .Append("Showman: ").Append(ClientData.ShowMan?.Name).AppendLine()
@@ -1623,9 +1623,19 @@ namespace SICore
                 var newViewers = new List<ViewerAccount>();
                 for (int i = 0; i < numOfViewers; i++)
                 {
-                    newViewers.Add(new ViewerAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+")
+                    var viewerName = mparams[mIndex++];
+                    var isMale = mparams[mIndex++] == "+";
+                    var isConnected = mparams[mIndex++] == "+";
+                    var isHuman = mparams[mIndex++] == "+";
+
+                    if (!isConnected)
                     {
-                        IsHuman = mparams[mIndex++] == "+"
+                        continue; // Viewer cannot be disconnected. There is something wrong on server side
+                    }
+
+                    newViewers.Add(new ViewerAccount(viewerName, isMale, isConnected)
+                    {
+                        IsHuman = isHuman
                     });
 
                     mIndex++; // пропускаем Ready
@@ -1689,7 +1699,7 @@ namespace SICore
                 return;
             }
 
-            ClientData.DeleteTable.CanBeExecuted = IsHost && ClientData.Players.Count > 2 && (ClientData.Stage == GameStage.Before || ClientData.Players.Any(p => !p.Connected || !p.IsHuman));
+            ClientData.DeleteTable.CanBeExecuted = IsHost && ClientData.Players.Count > 2 && (ClientData.Stage == GameStage.Before || ClientData.Players.Any(p => !p.IsConnected || !p.IsHuman));
         }
 
         private void UpdateAddTableCommand()
@@ -1716,14 +1726,14 @@ namespace SICore
         {
             var showman = ClientData.ShowMan;
 
-            showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.Connected };
+            showman.Free = new CustomCommand(Free_Executed) { CanBeExecuted = showman.IsHuman && showman.IsConnected };
             showman.Replace = new CustomCommand(arg => Replace_Executed(showman, arg)) { CanBeExecuted = showman.IsHuman };
             showman.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
         }
 
         private void CreatePlayerCommands(PlayerAccount player)
         {
-            player.Free = new CustomCommand(Free_Executed) { CanBeExecuted = player.IsHuman && player.Connected };
+            player.Free = new CustomCommand(Free_Executed) { CanBeExecuted = player.IsHuman && player.IsConnected };
             player.Replace = new CustomCommand(arg => Replace_Executed(player, arg)) { CanBeExecuted = true };
             player.Delete = new CustomCommand(Delete_Executed) { CanBeExecuted = ClientData.Players.Count > 2 };
             player.ChangeType = new CustomCommand(ChangeType_Executed) { CanBeExecuted = true };
@@ -1733,7 +1743,7 @@ namespace SICore
 
         private void UpdatePlayerCommands(PlayerAccount player)
         {
-            player.Free.CanBeExecuted = player.IsHuman && player.Connected;
+            player.Free.CanBeExecuted = player.IsHuman && player.IsConnected;
             UpdateOthers(player);
 
             player.Replace.CanBeExecuted = player.Others.Any();
@@ -1756,7 +1766,7 @@ namespace SICore
             if (showman == null || showman.Free == null)
                 return;
 
-            showman.Free.CanBeExecuted = showman.IsHuman && showman.Connected;
+            showman.Free.CanBeExecuted = showman.IsHuman && showman.IsConnected;
 
             showman.Others = showman.IsHuman ?
                     MyData.AllPersons.Values.Where(p => p.IsHuman).Except(new ViewerAccount[] { showman }).ToArray()
@@ -1774,7 +1784,7 @@ namespace SICore
                 switch (role)
                 {
                     case Constants.Showman:
-                        ClientData.ShowMan = new PersonAccount(account) { IsHuman = true, Connected = true, Ready = false, GameStarted = ClientData.Stage != GameStage.Before, IsShowman = true, IsExtendedMode = IsHost };
+                        ClientData.ShowMan = new PersonAccount(account) { IsHuman = true, IsConnected = true, Ready = false, GameStarted = ClientData.Stage != GameStage.Before, IsShowman = true, IsExtendedMode = IsHost };
                         CreateShowmanCommands();
                         break;
 
@@ -1800,18 +1810,18 @@ namespace SICore
                         player.Picture = account.Picture;
                         player.IsMale = account.IsMale;
                         player.IsHuman = true;
-                        player.Connected = true;
+                        player.IsConnected = true;
                         player.Ready = false;
                         player.GameStarted = ClientData.Stage != GameStage.Before;
                         break;
 
                     default:
-                        var viewer = new ViewerAccount(account) { IsHuman = true, Connected = true };
+                        var viewer = new ViewerAccount(account) { IsHuman = true, IsConnected = true };
 
                         var existingViewer = ClientData.Viewers.FirstOrDefault(v => v.Name == viewer.Name);
                         if (existingViewer != null)
                         {
-                            throw new Exception($"Duplicate viewer name: \"{viewer.Name}\" ({existingViewer.Connected})!\n" + ClientData.PersonsUpdateHistory);
+                            throw new Exception($"Duplicate viewer name: \"{viewer.Name}\" ({existingViewer.IsConnected})!\n" + ClientData.PersonsUpdateHistory);
                         }
 
                         ClientData.Viewers.Add(viewer);

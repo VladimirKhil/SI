@@ -310,7 +310,7 @@ namespace SICore
             try
             {
                 AllPersons = accounts.Concat(_players).Concat(_viewers)
-                    .Where(account => account.Connected)
+                    .Where(account => account.IsConnected)
                     .ToDictionary(account => account.Name);
             }
             catch (ArgumentException exc)
@@ -390,8 +390,6 @@ namespace SICore
             }
         }
 
-        public StringBuilder PersonsUpdateHistory { get; } = new StringBuilder();
-
         private bool _isUpdating = false;
 
         internal void BeginUpdatePersons(string reason = null)
@@ -413,8 +411,6 @@ namespace SICore
             .Append("Players: ").Append(string.Join(", ", Players.Select(PrintAccount))).AppendLine()
             .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
             .ToString();
-
-        private static string PrintAccount(ViewerAccount viewerAccount) => $"{viewerAccount?.Name}:{viewerAccount?.Connected}";
 
         public ViewerData()
         {
