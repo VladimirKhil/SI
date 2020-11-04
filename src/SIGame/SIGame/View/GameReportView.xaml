@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="SIGame.GameReportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SIGame"
+             mc:Ignorable="d" xmlns:my="clr-namespace:SIGame.Converters" Width="500"
+             Loaded="UserControl_Loaded" FontSize="16">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" MinHeight="100" MaxHeight="300" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="90" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.ColumnSpan="2" Name="textBlock1" Text="{Binding Title}" Margin="5" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="2" Name="textBlock2" Text="{Binding Subtitle}" Grid.ColumnSpan="2" Margin="5" TextWrapping="Wrap" />
+        <TextBox Grid.ColumnSpan="2" Grid.Row="3" Padding="5,1" Name="tbComments" Text="{Binding Path=Comment}" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" />
+        <TextBox Grid.ColumnSpan="2" Grid.Row="1" Padding="5,1" Name="textBox2" IsReadOnly="True" Background="LightGray" Text="{Binding Report}" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" />
+        <Button Style="{StaticResource SIButton}" Content="Отправить отчёт" Grid.Row="4" Padding="30,6" Command="{Binding SendReport}" FontSize="25" />
+        <Button Style="{StaticResource SIButton}" Content="Не отправлять" Grid.Column="1" Grid.Row="4" Name="button2" Margin="-1,0,0,0"  Padding="30,6" Command="{Binding SendNoReport}" FontSize="25" />
+    </Grid>
+</UserControl>

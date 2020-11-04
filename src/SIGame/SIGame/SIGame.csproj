@@ -1,0 +1,700 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A0D6E5F2-C486-465F-8B4B-368083E29B68}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SIGame</RootNamespace>
+    <AssemblyName>SIGame</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>game.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SIGame.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="PresentationFramework.Aero2" />
+    <Reference Include="ReachFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Speech" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack">
+      <Version>3.1.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="Microsoft.Owin" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Nowin" Version="0.26.0" />
+    <PackageReference Include="Owin" Version="1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Behaviors\BindingProxy.cs" />
+    <Compile Include="Behaviors\Dragger.cs" />
+    <Compile Include="Behaviors\DropDownBehavior.cs" />
+    <Compile Include="Behaviors\FadeOutBehaviour.cs" />
+    <Compile Include="Behaviors\FocusOnShown.cs" />
+    <Compile Include="Behaviors\FrameBehavior.cs" />
+    <Compile Include="Behaviors\ImageLoader.cs" />
+    <Compile Include="Behaviors\NavigationService.cs" />
+    <Compile Include="Behaviors\PasswordHelper.cs" />
+    <Compile Include="Behaviors\PlayerTableBehavior.cs" />
+    <Compile Include="Controls\DropDownButton.cs" />
+    <Compile Include="Controls\FolderBrowser.cs" />
+    <Compile Include="Controls\NumericTextBox.cs" />
+    <Compile Include="Controls\UniformGridWithOrientation.cs" />
+    <Compile Include="Converters\AccountTypeToBooleanConverter.cs" />
+    <Compile Include="Converters\AuctionStakesConverter.cs" />
+    <Compile Include="Converters\BackgroundConverter.cs" />
+    <Compile Include="Converters\BooleanToCollapsedConverter.cs" />
+    <Compile Include="Converters\BooleanToHiddenConverter.cs" />
+    <Compile Include="Converters\BooleanToWindowStyleConverter.cs" />
+    <Compile Include="Converters\ChangeTypeConverter.cs" />
+    <Compile Include="Converters\DateTimeConverter.cs" />
+    <Compile Include="Converters\DialogPositionConverter.cs" />
+    <Compile Include="Converters\EqualityToWeightConverter.cs" />
+    <Compile Include="Converters\LanguageConverter.cs" />
+    <Compile Include="Converters\MainBackgroundConverter.cs" />
+    <Compile Include="Converters\NotSetConverter.cs" />
+    <Compile Include="Converters\NotToCheckedConverter.cs" />
+    <Compile Include="Converters\PlayedPackageConverter.cs" />
+    <Compile Include="Converters\RequiredToColorConverter.cs" />
+    <Compile Include="Converters\ReverseTimeConverter.cs" />
+    <Compile Include="Converters\SortDirectionConverter.cs" />
+    <Compile Include="Converters\SortModeConverter.cs" />
+    <Compile Include="Converters\TrimConverter.cs" />
+    <Compile Include="Converters\UriConverter.cs" />
+    <Compile Include="Converters\ViewConverter.cs" />
+    <Compile Include="Converters\EnumConverter.cs" />
+    <Compile Include="Converters\EqualityConverter.cs" />
+    <Compile Include="Converters\EqualNumberToVisibilityConverter.cs" />
+    <Compile Include="Converters\FontFamilyConverter.cs" />
+    <Compile Include="Converters\GreaterThanConverter.cs" />
+    <Compile Include="Converters\ImageConverter.cs" />
+    <Compile Include="Converters\IsBeforeGameConverter.cs" />
+    <Compile Include="Converters\IsNullToBooleanConverter.cs" />
+    <Compile Include="Converters\IsPlayerConverter.cs" />
+    <Compile Include="Converters\IsRoleConverter.cs" />
+    <Compile Include="Converters\IsTypeConverter.cs" />
+    <Compile Include="Converters\ListFilterConverter.cs" />
+    <Compile Include="Converters\MarginConverter.cs" />
+    <Compile Include="Converters\Multiplier.cs" />
+    <Compile Include="Converters\NotNullToVisibilityConverter.cs" />
+    <Compile Include="Converters\PersonsConverter.cs" />
+    <Compile Include="Converters\PlayerIndiciesConverter.cs" />
+    <Compile Include="Converters\PlusOneConverter.cs" />
+    <Compile Include="Converters\RowHeightConverter.cs" />
+    <Compile Include="Converters\SexConverter.cs" />
+    <Compile Include="Converters\SpeedConverter.cs" />
+    <Compile Include="Converters\StrengthConverter.cs" />
+    <Compile Include="Converters\ToStringConverter.cs" />
+    <Compile Include="Converters\TransformConverter.cs" />
+    <Compile Include="Implementation\AnimatableTimer.cs" />
+    <Compile Include="Implementation\DesktopManager.cs" />
+    <Compile Include="Selectors\DictionaryTemplateSelector.cs" />
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
+    <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
+    <None Include="licenses\Newtonsoft.Json.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\Nowin.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Compile Include="View\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AccountView.xaml.cs">
+      <DependentUpon>AccountView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AnswerValidationView.xaml.cs">
+      <DependentUpon>AnswerValidationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AnswerView.xaml.cs">
+      <DependentUpon>AnswerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AppSettingsPage.xaml.cs">
+      <DependentUpon>AppSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\BestPersonsView.xaml.cs">
+      <DependentUpon>BestPersonsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ChangeSumView.xaml.cs">
+      <DependentUpon>ChangeSumView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ComputerAccountView.xaml.cs">
+      <DependentUpon>ComputerAccountView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DesignSettingsPage.xaml.cs">
+      <DependentUpon>DesignSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DraggerList.xaml.cs">
+      <DependentUpon>DraggerList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GameChat.xaml.cs">
+      <DependentUpon>GameChat.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ManageSettingsPage.xaml.cs">
+      <DependentUpon>ManageSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewGameView.xaml.cs">
+      <DependentUpon>NewGameView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GameReportView.xaml.cs">
+      <DependentUpon>GameReportView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginView.xaml.cs">
+      <DependentUpon>LoginView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MainMenuView.xaml.cs">
+      <DependentUpon>MainMenuView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\RulesSettingsPage.xaml.cs">
+      <DependentUpon>RulesSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SINetworkView.xaml.cs">
+      <DependentUpon>SINetworkView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SIOnlineView.xaml.cs">
+      <DependentUpon>SIOnlineView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SIStorageView.xaml.cs">
+      <DependentUpon>SIStorageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PersonView.xaml.cs">
+      <DependentUpon>PersonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SimpleStakeView.xaml.cs">
+      <DependentUpon>SimpleStakeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\StakeView.xaml.cs">
+      <DependentUpon>StakeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\Studia.xaml.cs">
+      <DependentUpon>Studia.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\StudiaCommandPanel.xaml.cs">
+      <DependentUpon>StudiaCommandPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ThemeSettingsPage.xaml.cs">
+      <DependentUpon>ThemeSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\TimeSettingsPage.xaml.cs">
+      <DependentUpon>TimeSettingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WinAPI\Flasher.cs" />
+    <Page Include="View\AboutView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\AccountView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\AnswerValidationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\AnswerView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\AppSettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\BestPersonsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ChangeSumView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ComputerAccountView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\DesignSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DraggerList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\GameChat.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ManageSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewGameView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\GameReportView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoginView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MainMenuView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MainView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\RulesSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SINetworkView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SIOnlineView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SIStorageView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\PersonView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SimpleStakeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\StakeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\Studia.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\StudiaCommandPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ThemeSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\TimeSettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="app.manifest" />
+    <None Include="Data\1.siq" />
+    <None Include="Data\2.1.siq" />
+    <None Include="Data\2.2.siq" />
+    <None Include="Data\2.3.siq" />
+    <None Include="Data\pack1-07.siq" />
+    <None Include="Data\pack2-07.siq" />
+    <None Include="Data\pack3-07.siq" />
+    <None Include="Data\Pack3_0.siq" />
+    <None Include="Data\Pack3_1.siq" />
+    <None Include="Data\Pack3_2.siq" />
+    <None Include="Data\pack4-07.siq" />
+    <None Include="Data\pack5-07.siq" />
+    <None Include="Data\pack6-07.siq" />
+    <None Include="Data\pack7-07.siq" />
+    <None Include="Data\pack8-07.siq" />
+    <None Include="Data\Package4_1.siq" />
+    <None Include="Data\Package4_2.siq" />
+    <None Include="Data\Package4_3.siq" />
+    <None Include="Data\Package4_4.siq" />
+    <None Include="Data\Package5_1.siq" />
+    <None Include="Data\Package5_10.siq" />
+    <None Include="Data\Package5_11.siq" />
+    <None Include="Data\Package5_12.siq" />
+    <None Include="Data\Package5_2.siq" />
+    <None Include="Data\Package5_3.siq" />
+    <None Include="Data\Package5_4.siq" />
+    <None Include="Data\Package5_5.siq" />
+    <None Include="Data\Package5_6.siq" />
+    <None Include="Data\Package5_7.siq" />
+    <None Include="Data\Package5_8.siq" />
+    <None Include="Data\Package5_9.siq" />
+    <None Include="Data\Package_2010_1.siq" />
+    <None Include="Data\Package_2010_10.siq" />
+    <None Include="Data\Package_2010_11.siq" />
+    <None Include="Data\Package_2010_12.siq" />
+    <None Include="Data\Package_2010_13.siq" />
+    <None Include="Data\Package_2010_14.siq" />
+    <None Include="Data\Package_2010_15.siq" />
+    <None Include="Data\Package_2010_16.siq" />
+    <None Include="Data\Package_2010_17.siq" />
+    <None Include="Data\Package_2010_18.siq" />
+    <None Include="Data\Package_2010_19.siq" />
+    <None Include="Data\Package_2010_2.siq" />
+    <None Include="Data\Package_2010_20.siq" />
+    <None Include="Data\Package_2010_21.siq" />
+    <None Include="Data\Package_2010_22.siq" />
+    <None Include="Data\Package_2010_23.siq" />
+    <None Include="Data\Package_2010_3.siq" />
+    <None Include="Data\Package_2010_4.siq" />
+    <None Include="Data\Package_2010_5.siq" />
+    <None Include="Data\Package_2010_6.siq" />
+    <None Include="Data\Package_2010_7.siq" />
+    <None Include="Data\Package_2010_8.siq" />
+    <None Include="Data\Package_2010_9.siq" />
+    <None Include="Data\packf-07.siq" />
+    <None Include="Data\pack_kot.siq" />
+    <None Include="Data\Petrov_questions.siq" />
+    <None Include="key.snk" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj">
+      <Project>{a2a1ad64-4a7c-4b98-9705-c06f24143eb2}</Project>
+      <Name>Notions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj">
+      <Project>{e96e4d68-9120-4f82-83d8-c015ce226108}</Project>
+      <Name>SIEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj">
+      <Project>{64800b25-8ac1-4484-8793-c9c46ece1a6a}</Project>
+      <Name>SIPackages.Providers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj">
+      <Project>{0b3642f4-8288-48ab-aa8d-f429497f5d8a}</Project>
+      <Name>SIUI.ViewModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj">
+      <Project>{78c96549-6ea8-4236-b026-6eca55d9ec3a}</Project>
+      <Name>SIUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SICore\SICore.Connections\SICore.Connections.csproj">
+      <Project>{6670624c-afe6-4ebd-9ae9-7c6cd35e8a95}</Project>
+      <Name>SICore.Connections</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SICore\SICore.Network\SICore.Network.csproj">
+      <Project>{da875628-7f08-4f8a-9f6e-6ad244a43c86}</Project>
+      <Name>SICore.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj">
+      <Project>{aed0e264-9367-41d1-aa00-804c83483366}</Project>
+      <Name>SICore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\SICore\SIData\SIData.csproj">
+      <Project>{6a4537b0-17ad-401c-b6c7-836269c3e5a3}</Project>
+      <Name>SIData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SIGame.ViewModel\SIGame.ViewModel.csproj">
+      <Project>{c0c3c720-ca5e-405d-8759-52c35134f79a}</Project>
+      <Name>SIGame.ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Клиентский профиль Microsoft .NET Framework 4 %28x86 и x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>Клиентский профиль .NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Установщик Windows 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\vk_logo.png" />
+    <Resource Include="Resources\qlogo.png" />
+    <Resource Include="Resources\avatar-f.png" />
+    <Resource Include="Resources\avatar-m.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GameData\Logs\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sigame_logo.png" />
+    <None Include="Resources\sigame_logo_no_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\main_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\game.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="game.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\game.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameData\Photo\Ada_Lovelace.jpg" />
+    <None Include="GameData\Photo\Agatha_Christie.jpg" />
+    <None Include="GameData\Photo\Albert_Einstein.jpg" />
+    <None Include="GameData\Photo\Aristotle.jpg" />
+    <None Include="GameData\Photo\Carl_Gustav_Jung.jpg" />
+    <None Include="GameData\Photo\Dmitriy_Mendeleev.jpg" />
+    <None Include="GameData\Photo\Fedor_Dostoevskiy.jpg" />
+    <None Include="GameData\Photo\Francis_Bacon.jpg" />
+    <None Include="GameData\Photo\Franz_Kafka.jpg" />
+    <None Include="GameData\Photo\Galileo.jpg" />
+    <None Include="GameData\Photo\Giordano_Bruno.jpg" />
+    <None Include="GameData\Photo\Goethe.jpg" />
+    <None Include="GameData\Photo\Heisenberg.jpg" />
+    <None Include="GameData\Photo\Heraclite.JPG" />
+    <None Include="GameData\Photo\Hypatia_Alexandria.jpg" />
+    <None Include="GameData\Photo\IsaacNewton.jpg" />
+    <None Include="GameData\Photo\Johannes_Kepler.jpg" />
+    <None Include="GameData\Photo\Kant.jpg" />
+    <None Include="GameData\Photo\Konfuzius.jpg" />
+    <None Include="GameData\Photo\Lao_Tzu.jpg" />
+    <None Include="GameData\Photo\Leonardo.jpg" />
+    <None Include="GameData\Photo\Leo_Tolstoy.jpg" />
+    <None Include="GameData\Photo\Lise_Meitner.jpg" />
+    <None Include="GameData\Photo\Marie_Curie.jpg" />
+    <None Include="GameData\Photo\Mikhail_Lomonosov.jpg" />
+    <None Include="GameData\Photo\Nicholas_of_Cusa.jpg" />
+    <None Include="GameData\Photo\Niels_Bohr.jpg" />
+    <None Include="GameData\Photo\Nietzsche.jpg" />
+    <None Include="GameData\Photo\Nikolaus_Kopernikus.jpg" />
+    <None Include="GameData\Photo\Paracelsus.jpg" />
+    <None Include="GameData\Photo\Pierre_de_Fermat.jpg" />
+    <None Include="GameData\Photo\Platon.jpg" />
+    <None Include="GameData\Photo\Pythagoras.jpg" />
+    <None Include="GameData\Photo\Rene_Descartes.jpg" />
+    <None Include="GameData\Photo\Sofja_Kovalevskaja.jpg" />
+    <None Include="GameData\Photo\Stephen_Hawking.jpg" />
+    <None Include="GameData\Photo\Tesla.jpg" />
+    <None Include="GameData\Photo\Thomas-Aquinas.jpg" />
+    <None Include="GameData\Photo\Thomas_Edison.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\studia.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\fb_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="licenses\Owin.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sounds\answer_wrong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_big.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_final.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_small.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\final_delete.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\final_think.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_noanswers.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_norisk.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_secret.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_stake.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_begin.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_themes.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_timeout.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -104,7 +104,7 @@ namespace SIQuester
                     directoryInfo.Create();
                 }
 
-                var service = new Services.SI.SIStorageService();
+                var service = new Services.SI.SIStorageServiceClient();
                 var packages = await service.GetPackagesAsync();
                 using (var client = new HttpClient())
                 {

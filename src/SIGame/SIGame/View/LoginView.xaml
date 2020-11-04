@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="SIGame.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lp="clr-namespace:SIGame.Properties"
+             mc:Ignorable="d" Width="400"
+             FontSize="16" FocusManager.FocusedElement="{Binding ElementName=tbLogin}">
+    <StackPanel>
+        <TextBlock FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Text="{x:Static lp:Resources.Entrance}" />
+        <DockPanel Margin="10,20,10,0">
+            <TextBlock Text="{x:Static lp:Resources.Login}" DockPanel.Dock="Left" />
+            <TextBox Name="tbLogin" Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" MaxLength="30">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding Enter}" />
+                </TextBox.InputBindings>
+            </TextBox>
+        </DockPanel>
+        <DockPanel Margin="10,20,0,0">
+            <Button Style="{StaticResource SIButton}" DockPanel.Dock="Right" Command="{Binding Enter}" Content="{x:Static lp:Resources.Logon}" Padding="20,5" FontSize="22" />
+            <TextBlock Text="{Binding Error}" Margin="0,0,10,5" Foreground="#FFC10000" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+            <Button Content="…" Width="40" ToolTip="{x:Static lp:Resources.ShowMore}" Command="{Binding ShowFullError}" Style="{StaticResource SIButton}" Visibility="{Binding FullError,Converter={StaticResource NotNullToVisibilityConverter1}}" />
+        </DockPanel>
+    </StackPanel>
+</UserControl>

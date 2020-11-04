@@ -1,0 +1,123 @@
+﻿<Page x:Class="SIGame.View.ThemeSettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SIGame.View"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:lp="clr-namespace:SIGame.Properties"
+             xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:localc="clr-namespace:SIGame.Converters"
+             Title="{x:Static lp:Resources.AppTheme}"
+      FontSize="20">
+    <Page.Resources>
+        <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="25" />
+        </Style>
+
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+
+        <Style x:Key="GameButtonSetter" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource WhiteButton}">
+            <Setter Property="Content" Value="{Binding Model.GameButtonKey2, Converter={StaticResource ToStringConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Content" Value="Нажмите клавишу" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <localc:FontFamilyConverter x:Key="FontFamilyConverter1" />
+    </Page.Resources>
+    <StackPanel DataContext="{Binding Settings.ThemeSettings}" Margin="10,5" IsEnabled="{Binding IsEditable}">
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableFont}" />
+        <ComboBox Foreground="White" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SIUISettings.TableFontFamily}" Style="{StaticResource ComboBoxStyle}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type sys:String}">
+                    <TextBlock Text="{Binding Converter={StaticResource FontFamilyConverter1}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableColor}" />
+        <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Rectangle>
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding Model.UISettings.TableColorString}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </Button>
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableBackground}" />
+        <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Rectangle>
+                <Rectangle.Fill>
+                    <SolidColorBrush Color="{Binding Model.UISettings.TableBackColorString}" />
+                </Rectangle.Fill>
+            </Rectangle>
+        </Button>
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.LineHeight}" />
+        <ComboBox Style="{StaticResource ComboBoxStyle}" Foreground="White" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}" SelectedItem="{Binding SIUISettings.QuestionLineSpacing}" />
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.MainBackground}" />
+        <TextBox Text="{Binding Model.CustomMainBackgroundUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectCustomMainBackground}" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearCustomMainBackground}" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.StudiaBackground}" />
+        <TextBox Text="{Binding Model.CustomBackgroundUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectCustomBackground}" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearCustomBackground}" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_MainMenu}" />
+        <TextBox Text="{Binding Model.SoundMainMenuUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundMainMenuUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundMainMenuUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_BeginRound}" />
+        <TextBox Text="{Binding Model.SoundBeginRoundUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundBeginRoundUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundBeginRoundUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_RoundThemes}" />
+        <TextBox Text="{Binding Model.SoundRoundThemesUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundRoundThemesUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundRoundThemesUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_NoAnswer}" />
+        <TextBox Text="{Binding Model.SoundNoAnswerUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundNoAnswerUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundNoAnswerUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_StakeQuestion}" />
+        <TextBox Text="{Binding Model.SoundQuestionStakeUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundQuestionStakeUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundQuestionStakeUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_SecretQuestion}" />
+        <TextBox Text="{Binding Model.SoundQuestionGiveUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundQuestionGiveUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundQuestionGiveUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_NoRiskQuestion}" />
+        <TextBox Text="{Binding Model.SoundQuestionNoRiskUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundQuestionNoRiskUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundQuestionNoRiskUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_FinalQuestion}" />
+        <TextBox Text="{Binding Model.SoundFinalThinkUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundFinalThinkUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundFinalThinkUri" Content="{x:Static lp:Resources.Clear}"></Button>
+
+        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_RoundTimeout}" />
+        <TextBox Text="{Binding Model.SoundTimeoutUri}" Margin="0,5" Padding="1" />
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundTimeoutUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
+        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundTimeoutUri" Content="{x:Static lp:Resources.Clear}"></Button>
+    </StackPanel>
+</Page>

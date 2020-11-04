@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="SIGame.DraggerList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:SIGame"
+             xmlns:lb="clr-namespace:SIGame.Behaviors"
+             MouseLeave="List_MouseLeave"
+             mc:Ignorable="d" Background="#00FFFFFF"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <ItemsControl ItemsSource="{Binding}" Height="Auto" Width="Auto" Name="list" PreviewMouseLeftButtonDown="List_PreviewMouseLeftButtonDown"
+                  PreviewMouseMove="List_PreviewMouseMove" PreviewMouseLeftButtonUp="List_PreviewMouseLeftButtonUp">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Border Name="b" BorderThickness="1" Background="#FFBDD6FF" VerticalAlignment="Stretch" Cursor="Hand">
+                    <TextBlock Margin="5,4" Text="{Binding}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" FontWeight="Bold" Foreground="Black" />
+                </Border>
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="b" Property="Background" Value="#FF7BADFF" />
+                    </Trigger>
+                    <Trigger Property="lb:Dragger.IsDragged" Value="True">
+                        <Setter Property="RenderTransform">
+                            <Setter.Value>
+                                <TranslateTransform Y="0" X="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ContentPresenter, AncestorLevel=1}, Path=(lb:Dragger.DragPosition)}" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Opacity" Value="0.5" />
+                        <Setter Property="Panel.ZIndex" Value="100" />
+                    </Trigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

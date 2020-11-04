@@ -49,10 +49,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIGame.ViewModel.Web", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIGame.ViewModel", "src\SIGame\SIGame.ViewModel\SIGame.ViewModel.csproj", "{B992988A-31C6-44FD-8719-47144AE78BB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIGame", "src\SIGame\SIGame\SIGame.csproj", "{A0D6E5F2-C486-465F-8B4B-368083E29B68}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Common\SIService.Client\SIService.Client.projitems*{099e79ad-4a07-464e-bc5e-fe2b25b6b398}*SharedItemsImports = 5
 		src\Common\SIService.Client\SIService.Client.projitems*{7a17ca96-9f06-407b-8640-1ef9b5698055}*SharedItemsImports = 5
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{a0d6e5f2-c486-465f-8b4b-368083e29b68}*SharedItemsImports = 4
 		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{b992988a-31c6-44fd-8719-47144ae78bb8}*SharedItemsImports = 5
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
@@ -126,6 +129,10 @@ Global
 		{B992988A-31C6-44FD-8719-47144AE78BB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B992988A-31C6-44FD-8719-47144AE78BB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B992988A-31C6-44FD-8719-47144AE78BB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0D6E5F2-C486-465F-8B4B-368083E29B68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0D6E5F2-C486-465F-8B4B-368083E29B68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0D6E5F2-C486-465F-8B4B-368083E29B68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0D6E5F2-C486-465F-8B4B-368083E29B68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -152,6 +159,7 @@ Global
 		{7C4E3527-C9CF-4F36-A65E-72480B3BF281} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{E8ACF215-C1BB-4A73-AD3C-B4A9F8030A65} = {F806503B-43D4-473F-AAF7-4297E54EBE66}
 		{B992988A-31C6-44FD-8719-47144AE78BB8} = {F806503B-43D4-473F-AAF7-4297E54EBE66}
+		{A0D6E5F2-C486-465F-8B4B-368083E29B68} = {15089A1F-44DF-4B42-83B3-313E024F07BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7AA90B-4EDB-45F7-A42F-7DE847C4386A}

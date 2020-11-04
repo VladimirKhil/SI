@@ -1,0 +1,102 @@
+﻿<Page x:Class="SIGame.View.RulesSettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SIGame"
+      xmlns:localc="clr-namespace:SIGame.Converters"
+      xmlns:lp="clr-namespace:SIGame.Properties"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:e="clr-namespace:SIEngine;assembly=SIEngine"
+      mc:Ignorable="d" 
+      d:DesignHeight="1130.26" d:DesignWidth="1960.521"
+      Title="{x:Static lp:Resources.GameRules}" FontSize="20">
+
+    <Page.Resources>
+        <ObjectDataProvider x:Key="GameModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="e:GameModes"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type e:GameModes}" />
+
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="Width" Value="Auto" />
+        </Style>
+        <Style TargetType="{x:Type local:NumericTextBox}" BasedOn="{StaticResource {x:Type TextBox}}" />
+
+        <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="25" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="#aaaaaa" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="HeaderBox" TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <localc:NotToCheckedConverter x:Key="NotToCheckedConverter" />
+    </Page.Resources>
+
+    <StackPanel DataContext="{Binding Settings}" Margin="10,5" IsEnabled="{Binding IsEditable}">
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}" VerticalAlignment="Center" FontSize="20" Margin="5,10" TextWrapping="Wrap" />
+        <TextBlock Text="{x:Static lp:Resources.GameType}" Style="{StaticResource Header}" />
+        <ComboBox Style="{StaticResource ComboBoxStyle}" Foreground="White" ItemsSource="{Binding Source={StaticResource GameModes}}" SelectedValue="{Binding GameMode}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource GameModesConverter}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{Binding GameModeHint}" TextWrapping="Wrap" />
+        
+        <CheckBox IsChecked="{Binding Model.Oral}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.OralGame}" />
+        </CheckBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.OralGame_Hint}" />
+        <CheckBox IsChecked="{Binding Model.FalseStart}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.FalseStart}" />
+        </CheckBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.DenyPressWhileReading}" />
+        <CheckBox IsChecked="{Binding Model.PartialText}" Style="{StaticResource HeaderBox}" IsEnabled="{Binding Model.FalseStart, Converter={StaticResource NotToCheckedConverter}}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PartialQuestions}" />
+        </CheckBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.PartialQuestions_Hint}" />
+        <CheckBox IsChecked="{Binding Model.HintShowman}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.HintShowman}" />
+        </CheckBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.AnswersAtBottom}" />
+        <CheckBox IsChecked="{Binding Model.Managed}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ManagedGame}" />
+        </CheckBox>
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.ManagedGame_Hint}" />
+        <CheckBox IsChecked="{Binding Model.IgnoreWrong}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.NoPenaltyForWrongAnswer}" />
+        </CheckBox>
+
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ReadingSpeed}" />
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.CharactersPerSecond}" />
+        <DockPanel>
+            <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" Width="60" Margin="5,0,0,0" Padding="1" Text="{Binding Model.ReadingSpeed, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" />
+            <Slider Value="{Binding Model.ReadingSpeed}" Margin="-5,0,0,0" Maximum="100" Minimum="1" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <CheckBox IsChecked="{Binding Model.Managed}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.RandomSpecials}" />
+        </CheckBox>
+
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RandomRoundsCount}" />
+        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,5,0,0" Padding="1" Text="{Binding Model.RandomRoundsCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="6" />
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RandomThemesCount}" />
+        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,5,0,0" Padding="1" Text="{Binding Model.RandomThemesCount, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="12" />
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BaseCostForRandomPackage}" />
+        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,5,0,0" Padding="1" Text="{Binding Model.RandomQuestionsBasePrice, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="1000" />
+    </StackPanel>
+</Page>

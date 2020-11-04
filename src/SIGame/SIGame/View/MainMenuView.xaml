@@ -1,0 +1,29 @@
+﻿<Page x:Class="SIGame.MainMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:lp="clr-namespace:SIGame.Properties"
+      mc:Ignorable="d" FontSize="20" Title="{x:Static lp:Resources.Options}">
+    <Page.Resources>
+        <Style TargetType="Hyperlink">
+            <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+            <Setter Property="TextDecorations" Value="None"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="#FFFFF2BD"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Page.Resources>
+    <StackPanel>
+        <TextBlock Style="{StaticResource CommonText}" Margin="40,20,20,20" FontSize="24" LineHeight="70" LineStackingStrategy="BlockLineHeight">
+            <Hyperlink NavigateUri="AppSettingsPage.xaml"><Run Text="{x:Static lp:Resources.Application}" /></Hyperlink><LineBreak />
+            <Hyperlink NavigateUri="ThemeSettingsPage.xaml"><Run Text="{x:Static lp:Resources.AppTheme}" /></Hyperlink><LineBreak />
+            <Hyperlink NavigateUri="DesignSettingsPage.xaml"><Run Text="{x:Static lp:Resources.Other}" /></Hyperlink><LineBreak />
+            <Hyperlink NavigateUri="TimeSettingsPage.xaml"><Run Text="{x:Static lp:Resources.Time}" /></Hyperlink><LineBreak />
+            <Hyperlink NavigateUri="RulesSettingsPage.xaml"><Run Text="{x:Static lp:Resources.GameRules}" /></Hyperlink><LineBreak />
+            <Hyperlink NavigateUri="ManageSettingsPage.xaml"><Run Text="{x:Static lp:Resources.SettingsManagement}" /></Hyperlink>
+        </TextBlock>
+    </StackPanel>
+</Page>

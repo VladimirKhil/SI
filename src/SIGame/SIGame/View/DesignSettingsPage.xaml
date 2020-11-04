@@ -1,0 +1,64 @@
+﻿<Page x:Class="SIGame.View.DesignSettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d" 
+      d:DesignHeight="875.942" d:DesignWidth="529.153"
+      Title="{x:Static lp:Resources.Other}"
+      xmlns:lp="clr-namespace:SIGame.Properties"
+      xmlns:local="clr-namespace:SIGame"
+      FontSize="20">
+
+    <Page.Resources>
+        <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="25" />
+        </Style>
+
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Margin" Value="0,5" />
+        </Style>
+
+        <Style x:Key="GameButtonSetter" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource WhiteButton}">
+            <Setter Property="Content" Value="{Binding Model.GameButtonKey2, Converter={StaticResource ToStringConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Content" Value="Нажмите клавишу" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="HeaderBox" TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Page.Resources>
+
+    <StackPanel DataContext="{Binding Settings}" Margin="10,5">
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameButtonKey}" />
+        <ToggleButton Style="{StaticResource GameButtonSetter}" Padding="18,6" Margin="0,3" PreviewKeyDown="ToggleButton_KeyDown" LostKeyboardFocus="ToggleButton_LostKeyboardFocus" />
+        <CheckBox IsEnabled="{Binding IsEditable}" IsChecked="{Binding Model.MakeLogs}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.WriteLogs}" />
+        </CheckBox>
+        <Button IsEnabled="{Binding IsEditable}" Style="{StaticResource WhiteButton}" Margin="0,3" Padding="18,6" Content="{x:Static lp:Resources.Move}" Command="{Binding MoveLogs}" />
+        <CheckBox IsChecked="{Binding Model.TranslateGameToChat}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.TranslateToChat}" />
+        </CheckBox>
+        <CheckBox IsChecked="{Binding Model.UISettings.Animate3D}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowAnimations}" />
+        </CheckBox>
+        <CheckBox IsChecked="{Binding Model.ShowBorderOnFalseStart}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowBorderOnFalseStart}" />
+        </CheckBox>
+
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.MediaPort}" />
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.LocalNetworkOnly}" />
+        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" Text="{Binding Model.MultimediaPort}" Minimum="1" Maximum="32000" Padding="1" />
+
+    </StackPanel>
+</Page>

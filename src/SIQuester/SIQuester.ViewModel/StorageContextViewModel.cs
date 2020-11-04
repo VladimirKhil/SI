@@ -1,18 +1,15 @@
 ﻿using Services.SI;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel
 {
     public sealed class StorageContextViewModel : INotifyPropertyChanged
     {
-        private readonly SIStorageService _siStorageService;
+        private readonly SIStorageServiceClient _siStorageService;
 
         private string[] _publishers;
 
@@ -61,7 +58,7 @@ namespace SIQuester.ViewModel
 
         public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
-        public StorageContextViewModel(SIStorageService siStorageService)
+        public StorageContextViewModel(SIStorageServiceClient siStorageService)
         {
             _siStorageService = siStorageService;
         }

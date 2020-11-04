@@ -116,7 +116,7 @@ namespace SIQuester.ViewModel
             SetSettings = new SimpleCommand(SetSettings_Executed);
             SearchFolder = new SimpleCommand(SearchFolder_Executed);
 
-            _storageContextViewModel = new StorageContextViewModel(new Services.SI.SIStorageService());
+            _storageContextViewModel = new StorageContextViewModel(new Services.SI.SIStorageServiceClient());
             _storageContextViewModel.Load();
 
             AddCommandBinding(ApplicationCommands.New, New_Executed);

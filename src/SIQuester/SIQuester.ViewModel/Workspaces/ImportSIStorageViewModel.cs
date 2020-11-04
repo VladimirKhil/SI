@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows.Data;
-using System.ComponentModel;
-using SIQuester.Model;
-using System.ServiceModel;
-using System.Net;
-using SIQuester.ViewModel.Core;
-using Services.SI.ViewModel;
+﻿using Services.SI.ViewModel;
 using SIQuester.ViewModel.Properties;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel
 {

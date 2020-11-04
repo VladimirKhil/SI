@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Services.SI
 {
-    interface ISIStorageServiceClient
+    public interface ISIStorageServiceClient
     {
         Task<string[]> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default);
     }

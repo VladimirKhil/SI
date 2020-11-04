@@ -1,0 +1,272 @@
+﻿<UserControl x:Class="SIGame.StudiaCommandPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SIGame"
+             xmlns:lp="clr-namespace:SIGame.Properties"
+             xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="FadeColor" Color="#FFD8D5A0" />
+        <SolidColorBrush x:Key="OverColor" Color="#FFFFFFDB" />
+
+        <Style TargetType="{x:Type ButtonBase}">
+            <Setter Property="Foreground" Value="{StaticResource FadeColor}" />
+            <Setter Property="Background" Value="#AA555555" />
+            <Setter Property="Margin" Value="-1,-1,0,0" />
+            <Setter Property="Padding" Value="3" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ButtonBase}">
+                        <Border BorderBrush="{StaticResource MainColor}" Background="{TemplateBinding Background}" BorderThickness="1">
+                            <ContentPresenter VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" uib:FillManager.Fill="True" FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Focusable" Value="False" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ButtonBase}}">
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsMouseOver" Value="True" />
+                        <Condition Property="IsChecked" Value="False" />
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type ButtonBase}}">
+            <Style.Triggers>
+                <Trigger Property="Command" Value="{x:Null}">
+                    <Setter Property="IsEnabled" Value="False" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="local:DropDownButton" BasedOn="{StaticResource {x:Type ButtonBase}}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Content" Value="{x:Static lp:Resources.Pause}" />
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Content" Value="{x:Static lp:Resources.Continue}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <ControlTemplate x:Key="GameButtonTemplate" TargetType="{x:Type Button}">
+            <Border Name="Bd" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="#77000000" CornerRadius="10" BorderThickness="1">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Offset="0" Color="#FFFF7F7F" />
+                        <GradientStop Offset="0.5" Color="#FFFF1A1A" />
+                        <GradientStop Offset="0.5" Color="#FFEB0000" />
+                        <GradientStop Offset="1" Color="#FF690000" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border Name="BdI" BorderThickness="0" CornerRadius="10" Opacity="0">
+                    <Border.Background>
+                        <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
+                            <GradientStop Offset="0" Color="#EEFFFF00" />
+                            <GradientStop Offset="0.5" Color="#99FF0000" />
+                            <GradientStop Offset="0.8" Color="#33FF0000" />
+                        </RadialGradientBrush>
+                    </Border.Background>
+                </Border>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)" To="#77666666" Duration="0:0:0.0" />
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" To="#77666666" Duration="0:0:0.0" />
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" To="#77666666" Duration="0:0:0.0" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)" Duration="0:0:0.0" />
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" Duration="0:0:0.0" />
+                                <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)" Duration="0:0:0.0" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                    <Setter TargetName="BdI" Property="Opacity" Value="1" />
+                </Trigger>
+                <EventTrigger RoutedEvent="Control.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="Opacity" To="0.6" Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Control.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="Opacity" Duration="0:0:0.5" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Button.Click">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" To="#AAFFDD00" Duration="0:0:0.2" />
+                            <ColorAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)" BeginTime="0:0:0.4" Duration="0:0:0.2" />
+                            <ThicknessAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Margin)" To="-7" Duration="0:0:0.2" />
+                            <ThicknessAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Margin)" BeginTime="0:0:0.4" Duration="0:0:0.2" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="GameButton" TargetType="{x:Type Button}">
+            <Setter Property="Template" Value="{StaticResource GameButtonTemplate}"/>
+        </Style>
+
+        <Storyboard x:Key="gameSB">
+            <DoubleAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Opacity" To="1.0" Duration="0:0:0.2" />
+            <DoubleAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Opacity" BeginTime="0:0:0.4" Duration="0:0:0.2" />
+            <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" To="0" Duration="0:0:0.2" />
+            <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" BeginTime="0:0:0.4" Duration="0:0:0.2" />
+        </Storyboard>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26*" />
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="0*" />
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="8*" />
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="1" Grid.ColumnSpan="2" ToolTip="{x:Static lp:Resources.Forward}" Content="▶" Command="{Binding Move}" CommandParameter="1" MaxWidth="100" />
+
+        <Button Grid.Row="3" Grid.ColumnSpan="3" Margin="5" x:Name="gameButton" Style="{StaticResource GameButton}" Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}" Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="10" Opacity="0">
+            <Border.Background>
+                <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
+                    <GradientStop Offset="0" Color="#EEFFFF00" />
+                    <GradientStop Offset="0.5" Color="#AAFFDD00" />
+                    <GradientStop Offset="0.8" Color="#33FF0000" />
+                </RadialGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <Button Grid.Row="4" ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Right}" CommandParameter="+"/>
+        <Button Grid.Row="4" Grid.Column="1" ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Wrong}" CommandParameter="-" />
+
+        <Button Grid.Row="4" Grid.ColumnSpan="2" Command="{Binding Data.PlayerDataExtensions.Pass}" Content="{x:Static lp:Resources.Pass}" />
+
+        <local:DropDownButton Grid.Row="4" Content="{x:Static lp:Resources.Manage}" ToolTip="{x:Static lp:Resources.Manage_Hint}" Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
+            <local:DropDownButton.DropDown>
+                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21">
+                    <ContextMenu.Resources>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="#FF999999" />
+                            <Setter Property="Padding" Value="40,10" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type MenuItem}">
+                                        <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                            <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsHighlighted" Value="True">
+                                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
+                                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Resources>
+                    <MenuItem Header="{x:Static lp:Resources.PreviousRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="-2" />
+                    <MenuItem Header="{x:Static lp:Resources.NextRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="2" />
+                    <ContextMenu.Template>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="0" HorizontalAlignment="Center" />
+                            </Border>
+                        </ControlTemplate>
+                    </ContextMenu.Template>
+                </ContextMenu>
+            </local:DropDownButton.DropDown>
+        </local:DropDownButton>
+        <Button Grid.Row="4" Grid.Column="1" Command="{Binding Data.ShowmanDataExtensions.ChangeSums}" Content="{x:Static lp:Resources.Sums}" ToolTip="{x:Static lp:Resources.Sums_Hint}" />
+
+        <ToggleButton Grid.Row="5" Style="{StaticResource PauseButton}" IsChecked="{Binding IsPaused}" Command="{Binding ChangePauseInGame}" />
+        <local:DropDownButton Grid.Row="5" Grid.Column="1" Content="{x:Static lp:Resources.Exit}">
+            <local:DropDownButton.DropDown>
+                <ContextMenu Placement="Relative" HorizontalOffset="100" VerticalOffset="-128">
+                    <MenuItem Header="{x:Static lp:Resources.Exit_Button}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="40,2" FontSize="21" Command="{Binding EndGame}">
+                        <MenuItem.Template>
+                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                    <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsHighlighted" Value="True">
+                                        <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
+                                        <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </MenuItem.Template>
+                    </MenuItem>
+                    <ContextMenu.Template>
+                        <ControlTemplate TargetType="ContextMenu">
+                            <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock FontSize="18" Text="{x:Static lp:Resources.ExitPrompt}" Margin="20,20,20,0" HorizontalAlignment="Center" />
+                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="HasDropShadow" Value="true">
+                                    <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </ContextMenu.Template>
+                </ContextMenu>
+            </local:DropDownButton.DropDown>
+        </local:DropDownButton>
+    </Grid>
+</UserControl>

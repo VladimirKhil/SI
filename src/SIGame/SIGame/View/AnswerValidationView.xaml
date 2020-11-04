@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="SIGame.AnswerValidationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:lc="clr-namespace:SIGame.Converters"
+             xmlns:lp="clr-namespace:SIGame.Properties"
+             mc:Ignorable="d" Width="544">
+    <UserControl.Resources>
+        <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Grid Background="#FFA1C2DE">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{TemplateBinding Header}" Margin="5,5,0,0" FontSize="18" />
+                            <ContentPresenter Grid.Row="1" Margin="5" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="ItemTemplate" DataType="{x:Type sys:String}">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" />
+        </DataTemplate>
+        <lc:TrimConverter x:Key="trim" MaxLength="250" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox Grid.ColumnSpan="2" Header="{x:Static lp:Resources.Validate_IsTrue}" Margin="0,5,0,5">
+            <TextBlock Text="{Binding Answer, Converter={StaticResource trim}}" FontSize="15" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+        </GroupBox>
+        <Grid Margin="0,0,0,5" Background="#FFA1C2DE" Grid.Row="1" Grid.ColumnSpan="2" Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Text="{x:Static lp:Resources.RightAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="13" />
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Right}" VerticalAlignment="Stretch" Height="Auto" Margin="5" ItemTemplate="{StaticResource ItemTemplate}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Left" />
+            </ScrollViewer>
+            <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.WrongAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="13" />
+            <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Wrong}" VerticalAlignment="Stretch" Height="Auto" Margin="5" ItemTemplate="{StaticResource ItemTemplate}" />
+            </ScrollViewer>
+        </Grid>
+        <ToggleButton IsChecked="{Binding AreAnswersShown}" Width="34" Height="34" Margin="0,5,0,0" Style="{StaticResource SIButtonSimple}"
+                      BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="15"
+                      Grid.ColumnSpan="2">👁</ToggleButton>
+        <Button Style="{StaticResource SIButton}" Command="{Binding IsRight}" Grid.Row="2" Content="{x:Static lp:Resources.Yes}" FontSize="25" Padding="30,8" />
+        <Button Style="{StaticResource SIButton}" Command="{Binding IsWrong}" Grid.Row="2" Grid.Column="1" Margin="-1,0,0,0" Content="{x:Static lp:Resources.No}" FontSize="25" Padding="30,8"/>
+    </Grid>
+</UserControl>
