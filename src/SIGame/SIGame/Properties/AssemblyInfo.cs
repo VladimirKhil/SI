@@ -3,18 +3,7 @@ using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
-
-// Управление общими сведениями о сборке осуществляется с помощью 
-// набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
-// связанные со сборкой.
-[assembly: AssemblyTitle("SIGame")]
-[assembly: AssemblyDescription("Quizz game")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Svoyak-soft")]
-[assembly: AssemblyProduct("SIGame")]
-[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2002-2020")]
 [assembly: AssemblyTrademark("SIGame")]
-[assembly: AssemblyCulture("")]
 
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
 // для COM-компонентов.  Если требуется обратиться к типу в этой сборке через 
@@ -38,17 +27,3 @@ using System.Windows;
     //(используется, если ресурс не найден на странице, 
     // в приложении или в каких-либо словарях ресурсов для конкретной темы)
 )]
-
-
-// Сведения о версии сборки состоят из следующих четырех значений:
-//
-//      Основной номер версии
-//      Дополнительный номер версии 
-//      Номер построения
-//      Редакция
-//
-// Можно задать все значения или принять номер построения и номер редакции по умолчанию, 
-// используя "*", как показано ниже:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("7.4.1.0")]
-[assembly: AssemblyFileVersion("7.4.1.0")]
