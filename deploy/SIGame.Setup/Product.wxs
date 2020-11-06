@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+  
+  <!-- При обновлении нужно повысить ProductVersion и задать новый GUID для ProductCode -->
+  
+  <?define Manufacturer="Свояк-софт" ?>
+  <?define ProductName="SIGame" ?>
+  <?define ProductNameR="SIGame" ?>
+  <?define ManufacturerEn="Svoyak-soft" ?>
+  <?define ProductNameEn="SIGame" ?>
+  <?define ProductVersion="!(bind.FileVersion.$(var.SIGame.TargetFileName))" ?>
+  <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
+  <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
+    
+	<Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+
+		<MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
+		<MediaTemplate EmbedCab="yes" />
+
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED" />
+    
+    <Icon Id="AppIcon" SourceFile="$(var.SIGame.ProjectDir)Resources\game.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    
+    <Property Id="WixShellExecTarget" Value="[#SIGame.exe]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+      
+    <InstallExecuteSequence>
+      <LaunchConditions After="AppSearch" />
+      <FindRelatedProducts After="LaunchConditions" />
+
+      <Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
+    </InstallExecuteSequence>
+
+    <InstallUISequence>
+      <LaunchConditions After="AppSearch" />
+      <FindRelatedProducts After="LaunchConditions" />
+    </InstallUISequence>
+      
+		<Feature Id="ProductFeature" Title="SIGame.Setup" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="Sounds" />
+      <ComponentGroupRef Id="Data" />
+      <ComponentGroupRef Id="Photo" />
+      <ComponentGroupRef Id="en-US" />
+      <ComponentGroupRef Id="Manufacturer" />
+      <ComponentGroupRef Id="ManufacturerProgramMenu" />
+      <ComponentGroupRef Id="ApplicationProgramMenu" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="LocalAppDataFolder">
+        <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
+          <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
+            <Directory Id="DataFolder" Name="Data" />
+            <Directory Id="PhotoFolder" Name="Photo" />
+            <Directory Id="SoundsFolder" Name="Sounds" />
+            <Directory Id="EnUSFolder" Name="en-US" />
+          </Directory>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
+          <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
+        </Directory>
+      </Directory>
+		</Directory>
+	</Fragment>
+  
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
+			<Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
+        <File Id="SIGame.exe" Source="$(var.SIGame.TargetDir)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes">
+          <netfx:NativeImage Id="ngen_SIWindows.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
+        </File>
+      </Component>
+      <Component Guid="{167EE7C2-7628-4983-8E15-C1CFEE780BE7}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Notions.dll" />
+      </Component>
+      <Component Guid="{87AED8E4-25E6-4429-8304-D3AB3CAFB32C}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.ViewModel.dll" />
+      </Component>
+      <Component Guid="{C119C5BD-BB1D-4B1D-84F1-FF73F81943BA}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.ViewModel.Web.dll" />
+      </Component>
+      <Component Guid="{500F1B75-BE85-40B2-8B3F-F5F4CB33F6D7}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SI.GameServer.Contract.dll" />
+      </Component>
+      <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIData.dll" />
+      </Component>
+      <Component Guid="{1101A59A-404B-46B1-BDA6-8BB31BF4AAAE}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIPackages.dll" />
+      </Component>
+      <Component Guid="{0702D285-1EFC-412A-B540-6FEE5C942AF4}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIPackages.Providers.dll" />
+      </Component>
+      <Component Guid="{1DF6FBDC-4653-4E25-B6D6-1E38CFA7BE5E}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.Connections.dll" />
+      </Component>
+      <Component Guid="{C8947FDD-EF8D-4A1C-BFB5-8A169F649D68}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.Network.dll" />
+      </Component>
+      <Component Guid="{219205CD-7DAC-4d05-A0E6-3D1B9CC4D740}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.dll" />
+      </Component>
+      <Component Guid="{D09DE4D2-6225-4AFE-90DB-DC947C40069E}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.dll" />
+      </Component>
+      <Component Guid="a790beab-c8bc-404c-a5f1-8dec6ccb8797">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.Model.dll" />
+      </Component>
+      <Component Guid="{65C79A94-7A7F-4222-BE21-91EE350CC65F}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.ViewModel.dll" />
+      </Component>
+      <Component Guid="{8EDCB71D-59DE-4E24-92EC-0156A3978AC9}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIEngine.dll" />
+      </Component>
+      <Component Guid="{B3BF9084-2D54-4A54-A86B-FCF54598AE60}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Newtonsoft.Json.dll" />
+      </Component>
+      <!--<Component Guid="{A442A50E-F965-4694-9832-2EC2F3AE1C07}" >
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNet.SignalR.Client.dll" />
+      </Component>-->
+      <Component Guid="{FEE0F556-6F68-4B46-8045-30D85290FE65}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Owin.dll" />
+      </Component>
+      <Component Guid="{8689EEE7-74AC-4DCC-8D12-180CC83C0616}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Owin.dll" />
+      </Component>
+      <Component Guid="{A4D28677-6A9A-44C3-8C54-401A480A80F8}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Owin.Hosting.dll" />
+      </Component>
+      <Component Guid="{AFE71CDE-73F3-4C8A-885E-27C1216060C9}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Nowin.dll" />
+      </Component>
+      <Component Guid="{A068AC71-795F-40BA-BF7A-D9521FDFF6F4}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Web.Http.dll" />
+      </Component>
+      <Component Guid="{12352896-D582-4C26-8F9E-2DC63169A9F7}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Net.Http.Formatting.dll" />
+      </Component>
+      <Component Guid="{AEEB4B3B-4111-4DD2-949B-BB21D1C6CAD3}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Web.Http.Owin.dll" />
+      </Component>      
+      <Component Guid="{6E7C3879-8707-435D-95AA-287892D571E1}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)netstandard.dll" />
+      </Component>
+      <Component Guid="{8025836A-9446-44E2-B53D-3BD058364484}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.ComponentModel.Annotations.dll" />
+      </Component>
+      <Component Guid="{157658FF-73CE-4A3A-9FD3-891720C4C1A6}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Net.Http.dll" />
+      </Component>
+      <Component Guid="{8CC48776-AD53-4F9F-BD04-C539B4D6751D}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.IO.Compression.dll" />
+      </Component>
+      <Component Guid="{C975A012-4DCF-4C55-B17D-CE24C65203C6}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)MessagePack.dll" />
+      </Component>
+      <Component Guid="{B5849F24-704F-4FEC-B94E-8D8CF470BF2F}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Client.Core.dll" />
+      </Component>
+      <Component Guid="{77704068-7FE8-47FF-A15C-02FE26511498}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Client.dll" />
+      </Component>
+      <Component Guid="{C42BCC89-04F2-4E84-86B2-9C505515B257}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Common.dll" />
+      </Component>
+      <Component Guid="{8C7B0B7B-6E01-4366-8987-9804AD06CEF0}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Protocols.Json.dll" />
+      </Component>
+      <Component Guid="{D9195365-DD44-4E72-A2A2-312412EC1143}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll" />
+      </Component>
+      <Component Guid="{4F610C9A-4881-4E9E-A171-142BE1C975AB}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Connections.Client.dll" />
+      </Component>
+      <Component Guid="{7B1E130D-7821-44D7-BF7D-AEE7AF6142CB}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Connections.Common.dll" />
+      </Component>
+      <Component Guid="{4C3BF8FE-B37C-4BC7-AAA6-83C18ED4298E}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Connections.Abstractions.dll" />
+      </Component>
+      <Component Guid="{566D33D0-64F4-4848-B048-0054B1BDD1C2}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+      </Component>
+      <Component Guid="{F3A7B8BE-2F28-4240-B5E0-55D13E31D4E5}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.DependencyInjection.dll" />
+      </Component>
+      <Component Guid="{40CEEB87-5A62-4C14-A37A-9AABD471F71D}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Logging.dll" />
+      </Component>
+      <Component Guid="{515F8215-01CB-4390-A79E-5BAFE6B38D71}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Options.dll" />
+      </Component>
+      <Component Guid="{70DB8822-DC91-441F-98AC-2E323E4C1DFD}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" />
+      </Component>
+      <Component Guid="{A23F1518-9028-42D3-B726-AF236E52B1EF}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Primitives.dll" />
+      </Component>
+      <Component Guid="{9AA13937-D2CF-4B5C-8CB9-1CC5375134AB}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Memory.dll" />
+      </Component>
+      <Component Guid="{8C835CDA-93F5-40CD-BB0A-D8DE4DF8D1E0}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.IO.Pipelines.dll" />
+      </Component>
+      <Component Guid="{341398A4-696B-47FD-875A-08FE2578B1FA}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Features.dll" />
+      </Component>
+      <Component Guid="{1AF6371D-0B3C-454F-925F-02BBDA4CF333}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Buffers.dll" />
+      </Component>
+      <Component Guid="{DD74790E-DA13-4BAC-B30E-E959EB39C9FD}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
+      </Component>
+      <Component Guid="{850B75C6-FC7B-40CA-B352-F67647A5A3B5}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.Tasks.Extensions.dll" />
+      </Component>
+      <Component Guid="{E9B02733-B44D-4B3C-90CD-74754D123671}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
+      </Component>
+      <Component Guid="{9C053E13-3008-4514-B286-5C8D85E0CA30}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.dll" />
+      </Component>
+      <Component Guid="{EA533CC4-BACB-4077-8EED-F392C6762DBD}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Numerics.Vectors.dll" />
+      </Component>
+      <Component Guid="{534FF525-17C6-4B16-926A-08DAE91A57B9}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.ValueTuple.dll" />
+      </Component>
+      <Component Guid="{1EB0115D-F79C-4FCD-93D6-D8FD34F2D7E4}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Json.dll" />
+      </Component>
+      <Component Guid="{AC9853E0-02DD-4A07-99D4-577F4595F52F}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" />
+      </Component>
+      <Component Guid="{1B3E665C-B81D-40A5-BE05-29B79464322E}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.Channels.dll" />
+      </Component>
+      <Component Guid="{D2A5182E-487B-4CD7-8864-25FCB8C1878B}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Encodings.Web.dll" />
+      </Component>
+
+      <Component Guid="{8EA68229-9AF1-4B33-8845-573E5794D0F6}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.dll" />
+      </Component>
+      <Component Guid="{76D15DE4-2863-4AFA-A716-64ED5A6684C6}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Diagnostics.Debug.dll" />
+      </Component>
+      <Component Guid="{CFD3CBB7-0FF1-437B-81FB-31FE111D017E}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Diagnostics.Tracing.dll" />
+      </Component>
+      
+      <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
+      </Component>
+      <Component Guid="{ADDF321D-6B06-412B-8096-3911FF966799}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_en.xps" />
+      </Component>
+      <Component Guid="{6E88EA98-D6AE-48D1-AA49-86B9BA2FDED9}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.exe.config" />
+      </Component>
+      <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
+        <RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
+                  Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
+      
+        <RemoveFolder Id="INSTALLLOCATION" On="uninstall" />
+      </Component>
+		</ComponentGroup>
+	</Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Sounds" Directory="SoundsFolder">
+      <Component Guid="{EF9D30F5-E0D1-4FA3-804D-457DE26A50D9}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\answer_wrong.mp3" />
+      </Component>
+      <Component Guid="{A873406C-CA1E-4CA1-B0FC-7A72641D734E}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_big.mp3" />
+      </Component>
+      <Component Guid="{1721D402-43DB-41D2-A2CA-2F7B16170FDB}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_final.mp3" />
+      </Component>
+      <Component Guid="{E46DD86B-CF44-48F5-88A9-0E14DD9AEBBF}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\applause_small.mp3" />
+      </Component>
+      <Component Guid="{96B1C9DD-4EAA-4FCD-B4D9-85193171BDBC}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_delete.mp3" />
+      </Component>
+      <Component Guid="{178DE808-AD34-4904-B111-8A95249ADC15}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\final_think.mp3" />
+      </Component>
+      <Component Guid="{33C45400-75EA-4F12-9EB0-D7ABB5C0241E}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\main_menu.mp3" />
+      </Component>
+      <Component Guid="{10714BC6-FC21-4B52-8D26-F6F0813451EE}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_noanswers.mp3" />
+      </Component>
+      <Component Guid="{5EB5004F-78C9-45B4-85F1-28E6CDE8D5E7}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_norisk.mp3" />
+      </Component>
+      <Component Guid="{AC36F52B-5E1D-4D5E-B0A3-43F2C2696710}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_secret.mp3" />
+      </Component>
+      <Component Guid="{E4DAA723-5B4D-45AC-9C9A-226F627B78A1}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\question_stake.mp3" />
+      </Component>
+      <Component Guid="{06D59D9F-73E5-4C3D-84E9-9EE629C58ECD}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_begin.mp3" />
+      </Component>
+      <Component Guid="{32FE94AC-C41B-4308-9935-520F731F4B14}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_themes.mp3" />
+      </Component>
+      <Component Guid="{7A1DF457-3427-4E4E-9C8A-AB1E25A65AFA}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Sounds\round_timeout.mp3" />
+      </Component>
+      <Component Id="SoundsReg" Guid="{3A0CEBB8-61F3-48B1-A071-25C7300F0F3A}">
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="sounds" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="SoundsFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Data" Directory="DataFolder">
+      <Component Guid="{A9734969-7E81-4631-830E-925288919228}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\1.siq" />
+      </Component>
+      <Component Guid="{A61A3EE2-6862-4DC5-96E6-662F19FAD1CD}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_1.siq" />
+      </Component>
+      <Component Guid="{7BACD631-74EE-4505-BEBB-B98B3958A3C2}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Package4_4.siq" />
+      </Component>
+      <Component Guid="{1784a44d-2095-4efd-8eda-3b6c6048f15b}">
+        <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)Data\Petrov_questions.siq" />
+      </Component>
+      <Component Id="DataReg" Guid="{6B5B8AF7-A7D7-4879-AB0D-55EC9E4B9B63}">
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="data" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="DataFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Photo" Directory="PhotoFolder">
+      <Component Guid="{57610553-951D-4D96-BB2B-B67BD427D352}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Ada_Lovelace.jpg" />
+      </Component>
+      <Component Guid="{DABB6B40-88C4-4F7E-9857-B36D0E353B2B}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Agatha_Christie.jpg" />
+      </Component>
+      <Component Guid="{A997AE24-C347-4A5B-9690-CA2B3E7EDF9E}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Albert_Einstein.jpg" />
+      </Component>
+      <Component Guid="{FEC06960-101F-4C55-ABF5-39B0D1CDEFF0}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Aristotle.jpg" />
+      </Component>
+      <Component Guid="{039C624E-5FCB-4A01-944B-DF33865F7591}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Carl_Gustav_Jung.jpg" />
+      </Component>
+      <Component Guid="{0D14E7D7-9AA3-4DB4-9BAE-7AFB0475BB33}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Dmitriy_Mendeleev.jpg" />
+      </Component>
+      <Component Guid="{20B86AD8-C20F-4CB8-9A5A-3DB60EF37DE0}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Fedor_Dostoevskiy.jpg" />
+      </Component>
+      <Component Guid="{E1F7AB32-A2DD-4512-8C9C-B5467ACD4C04}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Francis_Bacon.jpg" />
+      </Component>
+      <Component Guid="{9656B804-FC84-45FA-997C-48144E46215A}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Franz_Kafka.jpg" />
+      </Component>
+      <Component Guid="{FCE8B57B-60F9-4C52-AF2D-FCF09AC8EB2B}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Galileo.jpg" />
+      </Component>
+      <Component Guid="{A2A43D07-6832-44E0-A048-D93B49D0C8CF}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Giordano_Bruno.jpg" />
+      </Component>
+      <Component Guid="{077494F5-1BF5-4170-AF93-C822B30603A6}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Goethe.jpg" />
+      </Component>
+      <Component Guid="{D36A0121-500A-4583-BAEE-93B527EBF8D0}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Heisenberg.jpg" />
+      </Component>
+      <Component Guid="{116B53ED-E24E-4834-8EF1-FD0B85709B03}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Heraclite.JPG" />
+      </Component>
+      <Component Guid="{76875170-DBC2-4467-835A-EDCFA2D00C54}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Hypatia_Alexandria.jpg" />
+      </Component>
+      <Component Guid="{6254515D-87BD-4FE5-8E79-699D45128A4F}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\IsaacNewton.jpg" />
+      </Component>
+      <Component Guid="{b1bc338e-5e3e-44fc-af86-ac7cb5e9584a}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Johannes_Kepler.jpg" />
+      </Component>
+      <Component Guid="{D873FB66-3BEE-47D3-9DE7-06596A0732F7}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Kant.jpg" />
+      </Component>
+      <Component Guid="{60DBEB11-BCF6-4C4C-B748-766C525FD512}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Konfuzius.jpg" />
+      </Component>
+      <Component Guid="{9A3065CB-D07B-40A2-A103-AEE08E707455}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Lao_Tzu.jpg" />
+      </Component>
+      <Component Guid="{B9FAFCEB-7E42-4022-81AF-3D35AC725D97}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Leo_Tolstoy.jpg" />
+      </Component>
+      <Component Guid="{48819E5B-71DB-46AB-B130-AFBEADC69D09}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Leonardo.jpg" />
+      </Component>
+      <Component Guid="{8FA80B29-A084-49B7-A61C-8B3B3E7EF0C7}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Lise_Meitner.jpg" />
+      </Component>
+      <Component Guid="{5625CA05-090A-4DD2-A5B2-D84CEEFC40CD}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Marie_Curie.jpg" />
+      </Component>
+      <Component Guid="{BF6DFEB7-2A83-4ECE-822C-6700A4A41B95}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Mikhail_Lomonosov.jpg" />
+      </Component>
+      <Component Guid="{4FB91D8D-4EEC-4E32-80AE-D1B8FE24711E}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nicholas_of_Cusa.jpg" />
+      </Component>
+      <Component Guid="{EB3A0016-746E-4D16-BDAE-DA56AE0D1180}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Niels_Bohr.jpg" />
+      </Component>
+      <Component Guid="{F36C3DCE-2C02-4176-A50D-05E7A7B44509}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nietzsche.jpg" />
+      </Component>
+      <Component Guid="{9CECA5F5-6D54-4B66-8A22-6F276CFF7C58}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nikolaus_Kopernikus.jpg" />
+      </Component>
+      <Component Guid="{CC0B9528-1FE9-450E-B14E-E69CB41091CA}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Paracelsus.jpg" />
+      </Component>
+      <Component Guid="{724F15FD-EB63-4B83-A0EE-7F0D6B487C23}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Pierre_de_Fermat.jpg" />
+      </Component>
+      <Component Guid="{E18DE7A2-056C-4A92-9E3E-7E036D1BC036}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Platon.jpg" />
+      </Component>
+      <Component Guid="{88CF0D33-8854-4AC7-851B-E0059FE8AB75}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Pythagoras.jpg" />
+      </Component>
+      <Component Guid="{47984D92-0415-405E-A9CB-9953917402CE}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Rene_Descartes.jpg" />
+      </Component>
+      <Component Guid="{99b23839-d723-4ead-9c92-a07d14e731d5}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Sofja_Kovalevskaja.jpg" />
+      </Component>
+      <Component Guid="{9de09681-1222-486a-ba3f-247c3e2f2d49}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Stephen_Hawking.jpg" />
+      </Component>
+      <Component Guid="{f02cf796-6a86-41ab-a0aa-affad26920f3}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Tesla.jpg" />
+      </Component>
+      <Component Guid="{c8b61361-c65d-4525-b2de-403f7fa4d384}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Thomas-Aquinas.jpg" />
+      </Component>
+      <Component Guid="{48f921b0-a835-4e9d-ac38-72da6e5ce61c}">
+        <File KeyPath="yes" Source="$(var.DataPath)Photo\Thomas_Edison.jpg" />
+      </Component>
+      <Component Id="PhotoReg" Guid="{BD55FEB7-998C-4AAE-A511-A2F8DEA4685C}">
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="photo" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="PhotoFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="en-US" Directory="EnUSFolder">
+      <Component Guid="{AF1C76BA-6755-4595-9111-7CC3A18121B0}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SICore.resources.dll" />
+      </Component>
+      <Component Guid="{8A21D5F5-52F1-4814-84DB-F6F9EE56972D}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SIGame.resources.dll" />
+      </Component>
+      <Component Guid="{311C7F73-5C13-4A2F-90C7-C2C7F55695B1}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SIGame.ViewModel.resources.dll" />
+      </Component>
+      <Component Id="EnUSReg" Guid="{6330E7F5-82E8-4231-92A6-80AC07E11954}">
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="enUS" Type="integer" Value="1" KeyPath="yes" />
+        <RemoveFolder Id="EnUSFolder" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">
+      <Component Guid="{7645299A-FFA6-4673-BEB8-E1D9194622A3}">
+        <RemoveFolder Id="ManufacturerFolder" On="uninstall" />
+        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ManufacturerProgramMenu" Directory="ManufacturerProgramMenuFolder">
+      <Component Id="ManufacturerProgramMenuFolderComponent" Guid="c4b72e17-fe0c-4faa-a6eb-b1f503e7e95c">
+        <RemoveFolder Id="ManufacturerProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ApplicationProgramMenu" Directory="ApplicationProgramMenuFolder">
+      <Component Id="ApplicationShortcut" Guid="cddf1179-a271-4b78-9eed-7bf9944e2cfb">
+        <Shortcut Id="Shortcut" Name="$(var.ProductName)" Target="[INSTALLLOCATION]SIGame.exe" WorkingDirectory="INSTALLLOCATION" />
+        <RemoveFolder Id="ApplicationProgramMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="installed2" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
