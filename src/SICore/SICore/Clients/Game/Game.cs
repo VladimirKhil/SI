@@ -52,7 +52,7 @@ namespace SICore
             _gameActions = new GameActions(_client, ClientData, LO);
         }
 
-        protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions);
+        protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
 
         public override void Dispose(bool disposing)
         {
@@ -147,7 +147,7 @@ namespace SICore
 
             var msg = info.ToString().Substring(0, info.Length - 1);
 
-            SendMessage(msg, person);
+            _gameActions.SendMessage(msg, person);
 
             // Сообщим об адресах картинок
             if (person != NetworkConstants.Everybody)
@@ -167,12 +167,12 @@ namespace SICore
                 }
             }
 
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed), person);
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-"), person);
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton), person);
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed), person);
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-"), person);
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton), person);
 
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
-            SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
+            _gameActions.SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
         }
 
         private void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -187,40 +187,6 @@ namespace SICore
             info.Append(Message.ArgsSeparatorChar);
 
             info.Append(account is GamePersonAccount person && person.Ready ? '+' : '-');
-        }
-
-        /// <summary>
-        /// Выдача информации о счёте
-        /// </summary>
-        /// <param name="person">Кому выдаётся</param>
-        public void InformSums(string person = NetworkConstants.Everybody)
-        {
-            var message = new StringBuilder(Messages.Sums);
-            for (var i = 0; i < ClientData.Players.Count; i++)
-            {
-                message.Append(Message.ArgsSeparatorChar).Append(ClientData.Players[i].Sum);
-            }
-
-            SendMessage(message.ToString(), person);
-        }
-
-        /// <summary>
-        /// Объявить суммы
-        /// </summary>
-        public void AnnounceSums()
-        {
-            var s = new StringBuilder(LO[nameof(R.Score)]).Append(": ");
-            var total = ClientData.Players.Count;
-            for (var i = 0; i < total; i++)
-            {
-                s.Append(Notion.FormatNumber(ClientData.Players[i].Sum));
-                if (i < total - 1)
-                {
-                    s.Append("; ");
-                }
-            }
-
-            SystemReplic(s.ToString());
         }
 
         public string GetSums()
@@ -238,38 +204,6 @@ namespace SICore
             }
 
             return s.ToString();
-        }
-
-        /// <summary>
-        /// Выдача информации о состоянии игры
-        /// </summary>
-        public void InformStage(string person = NetworkConstants.Everybody, string name = null) =>
-            SendMessage(string.Join(Message.ArgsSeparator, Messages.Stage, ClientData.Stage.ToString(), name ?? ""), person);
-
-        internal void InformRoundThemes(string person = NetworkConstants.Everybody, bool play = true)
-        {
-            var msg = new StringBuilder(Messages.RoundThemes).Append(Message.ArgsSeparatorChar).Append(play ? '+' : '-').Append(Message.ArgsSeparatorChar).Append(string.Join(Message.ArgsSeparator, ClientData.TInfo.RoundInfo.Select(info => info.Name)));
-            SendMessage(msg.ToString(), person);
-        }
-
-        /// <summary>
-        /// Информация о табло
-        /// </summary>
-        public void InformTablo(string receiver = NetworkConstants.Everybody)
-        {
-            var message2 = new StringBuilder(Messages.Table);
-
-            for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
-            {
-                for (int j = 0; j < ClientData.TInfo.RoundInfo[i].Questions.Count; j++)
-                {
-                    message2.Append(Message.ArgsSeparatorChar);
-                    message2.Append(ClientData.TInfo.RoundInfo[i].Questions[j].Price);
-                }
-                message2.Append(Message.ArgsSeparatorChar); // Новый формат сообщения предусматривает разделение вопросов одной темы
-            }
-
-            SendMessage(message2.ToString(), receiver);
         }
 
         public ConnectionPersonData[] GetInfo()
@@ -463,7 +397,7 @@ namespace SICore
                                 res.Append(Message.ArgsSeparatorChar).Append('-');
                             }
 
-                            SendMessage(res.ToString(), message.Sender);
+                            _gameActions.SendMessage(res.ToString(), message.Sender);
 
                             #endregion
                             break;
@@ -473,13 +407,13 @@ namespace SICore
                             {
                                 if (args.Length < 4)
                                 {
-                                    SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongConnectionParameters)], message.Sender);
+                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongConnectionParameters)], message.Sender);
                                     return;
                                 }
 
                                 if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && (args.Length < 6 || ClientData.Settings.NetworkGamePassword != args[5]))
                                 {
-                                    SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
+                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
                                     return;
                                 }
 
@@ -490,7 +424,7 @@ namespace SICore
                                 // Подсоединение к игре
                                 if (ClientData.AllPersons.ContainsKey(name))
                                 {
-                                    SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
+                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
                                     return;
                                 }
 
@@ -518,7 +452,7 @@ namespace SICore
 
                                             if (index < 0 || index >= ClientData.Players.Count)
                                             {
-                                                SendMessage(string.Join(Message.ArgsSeparator, SystemMessages.Refuse, LO[nameof(R.PositionNotFoundByIndex)]), message.Sender);
+                                                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, SystemMessages.Refuse, LO[nameof(R.PositionNotFoundByIndex)]), message.Sender);
                                                 return;
                                             }
                                         }
@@ -561,7 +495,7 @@ namespace SICore
 
                                 if (!found)
                                 {
-                                    SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.NoFreePlaceForName)], message.Sender);
+                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.NoFreePlaceForName)], message.Sender);
                                 }
                             }
                             #endregion
@@ -581,9 +515,9 @@ namespace SICore
                                     .Append(' ')
                                     .Append(account.Name);
 
-                                SpecialReplic(res.ToString());
+                                _gameActions.SpecialReplic(res.ToString());
 
-                                SendMessageWithArgs(Messages.Disconnected, account.Name);
+                                _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
 
                                 account.IsConnected = false;
 
@@ -625,12 +559,12 @@ namespace SICore
                             {
                                 if (item.Ready)
                                 {
-                                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
                                 }
                             }
 
-                            InformStage(message.Sender);
-                            InformSums(message.Sender);
+                            _gameActions.InformStage(message.Sender);
+                            _gameActions.InformSums(message.Sender);
 
                             if (ClientData.Stage == GameStage.Round)
                             {
@@ -638,10 +572,10 @@ namespace SICore
                                 {
                                     if (ClientData.TabloInformStage > 0)
                                     {
-                                        InformRoundThemes(message.Sender, false);
+                                        _gameActions.InformRoundThemes(message.Sender, false);
                                         if (ClientData.TabloInformStage > 1)
                                         {
-                                            InformTablo(message.Sender);
+                                            _gameActions.InformTablo(message.Sender);
                                         }
                                     }
                                 }
@@ -652,7 +586,7 @@ namespace SICore
 
                                 if (leftTimeBeforeStart > 0)
                                 {
-                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), message.Sender);
+                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), message.Sender);
                                 }
                             }
 
@@ -712,7 +646,7 @@ namespace SICore
 
                                 if (found)
                                 {
-                                    SendMessage(res.ToString());
+                                    _gameActions.SendMessage(res.ToString());
                                 }
 
                                 if (readyAll)
@@ -751,8 +685,8 @@ namespace SICore
                                         var imageData = Convert.FromBase64String(args[2]);
                                         if (imageData.Length > 1024 * 1024)
                                         {
-                                            SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.Special(LO[nameof(R.AvatarTooBig)])), message.Sender);
-                                            SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.AvatarTooBig)]);
+                                            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.Special(LO[nameof(R.AvatarTooBig)])), message.Sender);
+                                            _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.AvatarTooBig)]);
                                             return;
                                         }
 
@@ -802,7 +736,7 @@ namespace SICore
                                     }
 
                                     if (ClientData.IsOralNow)
-                                        SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
+                                        _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
                                             ClientData.Chooser.Name : ClientData.ShowMan.Name);
 
                                     _logic.Stop(StopReason.Decision);
@@ -885,7 +819,7 @@ namespace SICore
                                         ClientData.AnswererIndex = index;
 
                                         if (ClientData.IsOralNow)
-                                            SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
+                                            _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
                                                 ClientData.Chooser.Name : ClientData.ShowMan.Name);
 
                                         _logic.Stop(StopReason.Decision);
@@ -945,7 +879,7 @@ namespace SICore
 
                                 if (ClientData.IsOralNow)
                                 {
-                                    SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
+                                    _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
                                         ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
                                 }
 
@@ -987,7 +921,7 @@ namespace SICore
 
                                         if (ClientData.IsOralNow)
                                         {
-                                            SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
+                                            _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
                                                 ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
                                         }
 
@@ -1014,7 +948,7 @@ namespace SICore
                                             player.FinalStake = finalStake;
                                             ClientData.NumOfStakers--;
 
-                                            SendMessageWithArgs(Messages.PersonFinalStake, i);
+                                            _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                                         }
 
                                         break;
@@ -1098,20 +1032,20 @@ namespace SICore
 
                                 if (per.Name == message.Sender)
                                 {
-                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotKickYouself)])), message.Sender);
-                                    SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotKickYouself)]);
+                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotKickYouself)])), message.Sender);
+                                    _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotKickYouself)]);
                                     return;
                                 }
 
                                 if (!per.IsHuman)
                                 {
-                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotKickBots)])), message.Sender);
-                                    SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotKickBots)]);
+                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotKickBots)])), message.Sender);
+                                    _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotKickBots)]);
                                     return;
                                 }
 
                                 MasterServer.Kick(person);
-                                SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, person));
+                                _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, person));
                                 OnDisconnectRequested(person);
                             }
                             break;
@@ -1128,20 +1062,20 @@ namespace SICore
 
                                 if (per.Name == message.Sender)
                                 {
-                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotBanYourself)])), message.Sender);
-                                    SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotBanYourself)]);
+                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotBanYourself)])), message.Sender);
+                                    _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotBanYourself)]);
                                     return;
                                 }
 
                                 if (!per.IsHuman)
                                 {
-                                    SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotBanBots)])), message.Sender);
-                                    SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotBanBots)]);
+                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Print, ReplicManager.System(LO[nameof(R.CannotBanBots)])), message.Sender);
+                                    _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.System.ToString(), LO[nameof(R.CannotBanBots)]);
                                     return;
                                 }
 
                                 MasterServer.Kick(person, true);
-                                SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, person));
+                                _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, person));
                                 OnDisconnectRequested(person);
                             }
                             break;
@@ -1203,8 +1137,8 @@ namespace SICore
             var player = ClientData.Players[playerIndex - 1];
             player.Sum = sum;
 
-            SpecialReplic($"{ClientData.ShowMan.Name} {LO[nameof(R.Change1)]} {player.Name}{LO[nameof(R.Change3)]} {Notion.FormatNumber(player.Sum)}");
-            InformSums();
+            _gameActions.SpecialReplic($"{ClientData.ShowMan.Name} {LO[nameof(R.Change1)]} {player.Name}{LO[nameof(R.Change3)]} {Notion.FormatNumber(player.Sum)}");
+            _gameActions.InformSums();
 
             _logic.AddHistory($"Sum change: {playerIndex - 1} = {sum}");
         }
@@ -1301,7 +1235,7 @@ namespace SICore
                 }
 
                 _logic.Stop(StopReason.Pause);
-                SpecialReplic(LO[nameof(R.PauseInGame)]);
+                _gameActions.SpecialReplic(LO[nameof(R.PauseInGame)]);
             }
             else
             {
@@ -1343,10 +1277,10 @@ namespace SICore
                     }
                 }
 
-                SpecialReplic(LO[nameof(R.GameResumed)]);
+                _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
             }
 
-            SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
+            _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
         }
 
         private void OnAtom()
@@ -1383,7 +1317,7 @@ namespace SICore
                     if (ClientData.Players[i].Name == message.Sender && ClientData.Players[i].InGame)
                     {
                         ClientData.AnswererIndex = i;
-                        SendMessageWithArgs(Messages.PersonFinalAnswer, i);
+                        _gameActions.SendMessageWithArgs(Messages.PersonFinalAnswer, i);
                         break;
                     }
                 }
@@ -1500,7 +1434,7 @@ namespace SICore
                         ClientData.AppellationAnswersRightReceivedCount += args[1] == "+" ? 1 : 0;
                         ClientData.Players[i].Flag = false;
                         ClientData.AppellationAnswersReceivedCount++;
-                        SendMessageWithArgs(Messages.PersonApellated, i);
+                        _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
                     }
                 }
 
@@ -1524,7 +1458,7 @@ namespace SICore
                 if (player.Name == message.Sender && player.CanPress)
                 {
                     player.CanPress = false;
-                    SendMessageWithArgs(Messages.Pass, i);
+                    _gameActions.SendMessageWithArgs(Messages.Pass, i);
                     break;
                 }
             }
@@ -1547,7 +1481,7 @@ namespace SICore
                         if (ClientData.Answerer != player)
                         {
                             player.LastBadTryTime = DateTime.UtcNow;
-                            SendMessageWithArgs(Messages.WrongTry, i);
+                            _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
                         }
 
                         break;
@@ -1683,7 +1617,7 @@ namespace SICore
             foreach (var item in ClientData.MainPersons)
             {
                 if (item.Ready)
-                    SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
+                    _gameActions.SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
             }
 
             var info = new StringBuilder(Messages.Config).Append(Message.ArgsSeparatorChar)
@@ -1691,8 +1625,8 @@ namespace SICore
 
             AppendAccountExt(newAccount, info);
 
-            SendMessage(info.ToString());
-            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Added)], host.IsMale)} {LO[nameof(R.NewGameTable)]}");
+            _gameActions.SendMessage(info.ToString());
+            _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Added)], host.IsMale)} {LO[nameof(R.NewGameTable)]}");
             OnPersonsChanged();
         }
 
@@ -1747,12 +1681,12 @@ namespace SICore
             {
                 if (item.Ready)
                 {
-                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
                 }
             }
 
-            SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
-            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}");
+            _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
+            _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Deleted)], host.IsMale)} {LO[nameof(R.GameTableNumber)]} {index + 1}");
 
             if (ClientData.Stage == GameStage.Before)
             {
@@ -1813,7 +1747,7 @@ namespace SICore
 
                     if (ClientData.IsOralNow)
                     {
-                        SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                        _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     }
 
                     PlanExecution(Tasks.ContinueQuestion, 1);
@@ -1922,7 +1856,7 @@ namespace SICore
 
                         if (ClientData.IsOralNow || ClientData.Decision == DecisionType.NextPersonStakeMaking)
                         {
-                            SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                         }
 
                         PlanExecution(Tasks.AskStake, 20);
@@ -1931,7 +1865,7 @@ namespace SICore
                 else if (ClientData.Decision == DecisionType.NextPersonStakeMaking)
                 {
                     Logic.StopWaiting();
-                    SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     PlanExecution(Tasks.AskStake, 20);
                 }
             }
@@ -1981,7 +1915,7 @@ namespace SICore
             {
                 case DecisionType.StarterChoosing:
                     // Спросим заново
-                    SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     _logic.StopWaiting();
                     PlanExecution(Tasks.AskFirst, 20);
                     break;
@@ -2055,12 +1989,12 @@ namespace SICore
             {
                 if (item.Ready)
                 {
-                    SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
                 }
             }
 
-            SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
-            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}");
+            _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Free, args[2], args[3]);
+            _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Free)], host.IsMale)} {account.Name} {LO[nameof(R.FromTable)]}");
 
             OnPersonsChanged();
         }
@@ -2114,12 +2048,12 @@ namespace SICore
             {
                 if (item.Ready)
                 {
-                    SendMessage($"{Messages.Ready}{Message.ArgsSeparatorChar}{item.Name}", message.Sender);
+                    _gameActions.SendMessage($"{Messages.Ready}{Message.ArgsSeparatorChar}{item.Name}", message.Sender);
                 }
             }
 
-            SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
-            SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}");
+            _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
+            _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}");
 
             InformPicture(account);
             OnPersonsChanged();
@@ -2402,16 +2336,16 @@ namespace SICore
             {
                 if (item.Ready)
                 {
-                    SendMessage($"{Messages.Ready}\n{item.Name}");
+                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}");
                 }
             }
 
-            SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
+            _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_ChangeType, personType, index, newType ? '+' : '-', newName, newIsMale ? '+' : '-');
 
             if (responsePerson != null)
             {
                 var newTypeString = newType ? LO[nameof(R.Human)] : LO[nameof(R.Computer)];
-                SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], responsePerson.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\"");
+                _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Changed)], responsePerson.IsMale)} {LO[nameof(R.PersonType)]} {oldName} {LO[nameof(R.To)]} \"{newTypeString}\"");
             }
 
             if (newAcc != null)
@@ -2426,7 +2360,7 @@ namespace SICore
         {
             ClientData.Stage = GameStage.Begin;
             OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
-            InformStage();
+            _gameActions.InformStage();
             ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
             _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
         }
@@ -2473,10 +2407,10 @@ namespace SICore
 
                 ClientData.OnAllPersonsChanged();
 
-                SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
+                _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
 
-                SendMessage(Messages.Accepted, name);
-                SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
+                _gameActions.SendMessage(Messages.Accepted, name);
+                _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
 
                 OnPersonsChanged();
             }
@@ -2508,9 +2442,9 @@ namespace SICore
 
             ClientData.OnAllPersonsChanged();
 
-            SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
+            _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
 
-            SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
+            _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
 
             connectionAuthenticator();
 
@@ -2542,7 +2476,7 @@ namespace SICore
             var link = CreateUri(account.Name, account.Picture, receiver);
             if (link != null)
             {
-                SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
+                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Picture, account.Name, link), receiver);
             }
         }
 
@@ -2590,101 +2524,5 @@ namespace SICore
                 return file;
             }
         }
-
-        /// <summary>
-        /// Вывод в протокол
-        /// </summary>
-        /// <param name="text">Текст</param>
-        public void Print(string text) => SendMessageWithArgs(Messages.Print, text);
-
-        internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
-
-        internal void SpecialReplic(string text) => UserMessage(MessageTypes.Special, text);
-
-        internal void ShowmanReplic(string text) => UserMessage(MessageTypes.Replic, text, GameRole.Showman);
-
-        internal void PlayerReplic(int playerIndex, string text) => UserMessage(MessageTypes.Replic, text, GameRole.Player, playerIndex);
-
-        /// <summary>
-        /// Пользовательское сообщение
-        /// </summary>
-        /// <param name="messageType">Тип сообщения</param>
-        /// <param name="text">Текст сообщения</param>
-        /// <param name="personRole">Роль источника сообщения (для реплик)</param>
-        /// <param name="personIndex">Индекс источника сообщения (для реплик игроков)</param>
-        internal void UserMessage(MessageTypes messageType, string text, GameRole? personRole = null, int? personIndex = null)
-        {
-            switch (messageType)
-            {
-                case MessageTypes.System:
-                    Print(ReplicManager.System(text));
-                    break;
-
-                case MessageTypes.Special:
-                    Print(ReplicManager.Special(text));
-                    break;
-
-                case MessageTypes.Replic:
-                    if (!personRole.HasValue)
-                    {
-                        throw new ArgumentNullException(nameof(personRole));
-                    }
-
-                    switch (personRole.Value)
-                    {
-                        case GameRole.Viewer: // Не используется
-                            break;
-
-                        case GameRole.Player:
-                            if (!personIndex.HasValue)
-                            {
-                                throw new ArgumentNullException(nameof(personIndex));
-                            }
-
-                            Print(Player(personIndex.Value) + ReplicManager.Replic(text));
-                            break;
-
-                        case GameRole.Showman:
-                            Print(Showman() + ReplicManager.Replic(text));
-                            break;
-                    }
-
-                    break;
-            }
-
-            var person = messageType == MessageTypes.System ? ReplicCodes.System.ToString()
-                : messageType == MessageTypes.Special ? ReplicCodes.Special.ToString() :
-                (personRole == GameRole.Player ? ReplicCodes.Player + personIndex.Value.ToString() : ReplicCodes.Showman.ToString());
-
-            SendMessageWithArgs(Messages.Replic, person, text);
-        }
-
-        public void SendMessage(string text, string receiver = NetworkConstants.Everybody) => _client.SendMessage(text, true, receiver);
-
-        public void SendMessageWithArgs(params object[] args) => SendMessage(string.Join(Message.ArgsSeparator, args));
-
-        #region protocol_functions
-
-        /// <summary>
-        /// Зритель
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string Viewer(string s) => $"<viewer>{ReplicManager.Escape(s)}</viewer>";
-
-        /// <summary>
-        /// Игрок
-        /// </summary>
-        /// <param name="n">Номер игрока</param>
-        /// <returns></returns>
-        public static string Player(int n) => $"<player>{n}</player>";
-
-        /// <summary>
-        /// Ведущий
-        /// </summary>
-        /// <returns></returns>
-        public string Showman() => $"<showman>{ReplicManager.Escape(ClientData.ShowMan.Name)}</showman>";
-
-        #endregion
     }
 }

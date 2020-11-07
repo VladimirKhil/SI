@@ -62,6 +62,11 @@ namespace SICore
             }
         }
 
+        /// <summary>
+        /// Имя игрока, чей ответ валидируется
+        /// </summary>
+        public string ValidatorName { get; set; }
+
         private string _answer = "";
 
         /// <summary>

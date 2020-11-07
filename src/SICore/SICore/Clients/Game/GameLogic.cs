@@ -1,4 +1,5 @@
 ﻿using Notions;
+using SICore.BusinessLogic;
 using SICore.Clients.Game;
 using SICore.Connections;
 using SICore.Results;
@@ -32,14 +33,16 @@ namespace SICore
 
         private readonly Game _actor;
         private readonly GameActions _gameActions;
+        private readonly ILocalizer LO;
 
         public SIEngine.EngineBase Engine { get; private set; }
 
-        public GameLogic(Game game, GameData data, GameActions gameActions)
+        public GameLogic(Game game, GameData data, GameActions gameActions, ILocalizer localizer)
             : base(data)
         {
             _actor = game;
             _gameActions = gameActions;
+            LO = localizer;
         }
 
         internal void Run(SIDocument document)
@@ -89,7 +92,7 @@ namespace SICore
                 ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
                 _data.TimerStartTime[2] = DateTime.UtcNow;
 
-                _actor.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
+                _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
             }
         }
 
@@ -102,19 +105,19 @@ namespace SICore
                 _data.GameResultInfo.PackageName += Environment.NewLine + _data.Package.Info.Comments.Text.Substring(8);
             }
 
-            _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
 
             ProcessPackage(package, 1);
         }
 
         private void Engine_GameThemes(string[] gameThemes)
         {
-            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.GameThemes)]));
+            _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)]));
 
             var msg = new StringBuilder();
             msg.Append(Messages.GameThemes).Append(Message.ArgsSeparatorChar).Append(string.Join(Message.ArgsSeparator, gameThemes));
 
-            _actor.SendMessage(msg.ToString());
+            _gameActions.SendMessage(msg.ToString());
 
             ScheduleExecution(Tasks.MoveNext, 11 + 150 * gameThemes.Length / 18);
         }
@@ -140,11 +143,11 @@ namespace SICore
                 _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
             }
 
-            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.RoundThemes)]));
+            _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.RoundThemes)]));
 
             lock (_data.TabloInformStageLock)
             {
-                _actor.InformRoundThemes();
+                _gameActions.InformRoundThemes();
                 _data.TabloInformStage = 1;
             }
         }
@@ -175,7 +178,7 @@ namespace SICore
 
             lock (_data.TabloInformStageLock)
             {
-                _actor.InformTablo();
+                _gameActions.InformTablo();
                 _data.TabloInformStage = 2;
             }
 
@@ -202,14 +205,14 @@ namespace SICore
             _data.CurPriceRight = _data.CurPriceWrong = question.Price;
             _data.IsPlayingMedia = false;
             _data.IsPlayingMediaPaused = false;
-            _actor.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
-            _actor.SendMessageWithArgs(Messages.Question, question.Price);
+            _gameActions.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
+            _gameActions.SendMessageWithArgs(Messages.Question, question.Price);
 
             if (_data.Settings.AppSettings.HintShowman)
             {
                 var rightAnswers = question.GetRightAnswers();
-                var rightAnswer = rightAnswers.FirstOrDefault() ?? _actor.LO[nameof(R.NotSet)];
-                _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
+                var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
+                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
             }
 
             ScheduleExecution(Tasks.QuestionType, 10, 1, force: true);
@@ -217,17 +220,17 @@ namespace SICore
 
         private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
         {
-            _actor.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
+            _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
 
             if (_data.Settings.AppSettings.HintShowman)
             {
                 var rightAnswers = question.GetRightAnswers();
-                var rightAnswer = rightAnswers.FirstOrDefault() ?? _actor.LO[nameof(R.NotSet)];
-                _actor.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
+                var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
+                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
             }
 
             var s = new StringBuilder(theme.Name).Append(", ").Append(question.Price);
-            _actor.PlayerReplic(_data.ChooserIndex, s.ToString());
+            _gameActions.PlayerReplic(_data.ChooserIndex, s.ToString());
 
             _data.Theme = theme;
             _data.Question = question;
@@ -258,7 +261,7 @@ namespace SICore
 
             if (_data.IsPartial)
             {
-                _actor.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
+                _gameActions.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
 
                 _data.Text = text;
                 _data.TextLength = 0;
@@ -266,8 +269,8 @@ namespace SICore
             }
             else
             {
-                _actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
-                _actor.SystemReplic(text);
+                _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
+                _gameActions.SystemReplic(text);
             }
 
             if (sound != null)
@@ -292,8 +295,8 @@ namespace SICore
         private void Engine_QuestionOral(string oralText)
         {
             _data.IsPartial = false;
-            _actor.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, oralText);
-            _actor.ShowmanReplic(oralText);
+            _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, oralText);
+            _gameActions.ShowmanReplic(oralText);
             _data.QLength = oralText.Length;
         }
 
@@ -309,11 +312,11 @@ namespace SICore
                     if (Uri.TryCreate(link.Uri, UriKind.Absolute, out _))
                     {
                         msg.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(link.Uri);
-                        _actor.SendMessage(msg.ToString());
+                        _gameActions.SendMessage(msg.ToString());
                     }
                     else
                     {
-                        _actor.SendMessageWithArgs(isBackground ? Messages.Atom_Second : Messages.Atom, AtomTypes.Text, string.Format(_actor.LO[nameof(R.MediaNotFound)], link.Uri));
+                        _gameActions.SendMessageWithArgs(isBackground ? Messages.Atom_Second : Messages.Atom, AtomTypes.Text, string.Format(LO[nameof(R.MediaNotFound)], link.Uri));
                     }
                 }
                 else
@@ -337,7 +340,7 @@ namespace SICore
                     foreach (var person in _data.AllPersons.Keys)
                     {
                         var msg2 = new StringBuilder(msg.ToString());
-                        if (_actor.Client.CurrentServer.Contains(person))
+                        if (_gameActions.Client.CurrentServer.Contains(person))
                         {
                             msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(localUri ?? uri);
                         }
@@ -346,7 +349,7 @@ namespace SICore
                             msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                         }
 
-                        _actor.SendMessage(msg2.ToString(), person);
+                        _gameActions.SendMessage(msg2.ToString(), person);
                     }
                 }
             }
@@ -391,9 +394,9 @@ namespace SICore
                 if (last == null || !last.IsRight) // Верного ответа не было
                 {
                     var answer = _data.Question.Right.FirstOrDefault();
-                    var printedAnswer = answer != null ? $"{_actor.LO[nameof(R.RightAnswer)]}: {answer}" : _actor.LO[nameof(R.RightAnswerInOnTheScreen)];
+                    var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
 
-                    _actor.ShowmanReplic(printedAnswer);
+                    _gameActions.ShowmanReplic(printedAnswer);
                 }
 
                 _data.IsAnswer = false;
@@ -464,24 +467,24 @@ namespace SICore
             else
             {
                 ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-                _actor.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
+                _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
             }
         }
 
         private void Engine_SimpleAnswer(string answer)
         {
             if (answer == null)
-                answer = _actor.LO[nameof(R.AnswerNotSet)];
+                answer = LO[nameof(R.AnswerNotSet)];
 
             answer = answer.LeaveFirst(MaxAnswerLength);
 
             if (_data.AnnounceAnswer)
             {
-                var s = $"{_actor.LO[nameof(R.RightAnswer)]}: {answer}";
-                _actor.Print(_actor.Showman() + ReplicManager.OldReplic(s));
+                var s = $"{LO[nameof(R.RightAnswer)]}: {answer}";
+                _gameActions.Print(_gameActions.Showman() + ReplicManager.OldReplic(s));
             }
 
-            _actor.SendMessageWithArgs(Messages.RightAnswer, AtomTypes.Text, answer);
+            _gameActions.SendMessageWithArgs(Messages.RightAnswer, AtomTypes.Text, answer);
 
             _data.AllowAppellation = true;
             var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
@@ -499,7 +502,7 @@ namespace SICore
                     && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
                 {
                     // Завершение раунда по времени
-                    _actor.SendMessageWithArgs(Messages.Timer, 0, "STOP");
+                    _gameActions.SendMessageWithArgs(Messages.Timer, 0, "STOP");
 
                     Engine.SetTimeout();
                 }
@@ -557,9 +560,9 @@ namespace SICore
 
             _data.IsQuestionPlaying = false;
 
-            _actor.InformSums();
-            _actor.AnnounceSums();
-            _actor.SendMessage(Messages.Stop); // Timers STOP
+            _gameActions.InformSums();
+            _gameActions.AnnounceSums();
+            _gameActions.SendMessage(Messages.Stop); // Timers STOP
 
             _data.IsThinking = false;
 
@@ -580,14 +583,14 @@ namespace SICore
 
         void Engine_RoundEmpty()
         {
-            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.AllQuestions)]));
+            _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
             FinishRound();
         }
 
         void Engine_RoundTimeout()
         {
-            _actor.SendMessage(Messages.Timeout);
-            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.AllTime)]));
+            _gameActions.SendMessage(Messages.Timeout);
+            _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)]));
             FinishRound();
         }
 
@@ -614,11 +617,11 @@ namespace SICore
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
             }
 
-            _actor.SendMessageWithArgs(Messages.Out, themeIndex);
+            _gameActions.SendMessageWithArgs(Messages.Out, themeIndex);
 
             var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
             var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
-            _actor.PlayerReplic(playerIndex, themeName);
+            _gameActions.PlayerReplic(playerIndex, themeName);
         }
 
         private async void Engine_PrepareFinalQuestion(Theme theme, Question question)
@@ -627,9 +630,9 @@ namespace SICore
             _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
 
             _data.Theme = theme;
-            var str = GetRandomString(_actor.LO[nameof(R.PlayTheme)]);
+            var str = GetRandomString(LO[nameof(R.PlayTheme)]);
             str += " " + theme.Name;
-            _actor.ShowmanReplic(str);
+            _gameActions.ShowmanReplic(str);
 
             ScheduleExecution(Tasks.Theme, 10, 1);
         }
@@ -637,12 +640,12 @@ namespace SICore
         private void Engine_EndGame()
         {
             // Очищаем табло
-            _actor.SendMessage(Messages.Stop);
-            _actor.SystemReplic($"{_actor.LO[nameof(R.GameResults)]}: ");
+            _gameActions.SendMessage(Messages.Stop);
+            _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: ");
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                _actor.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}");
+                _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}");
                 _data.GameResultInfo.Results.Add(new PersonResult { Name = _data.Players[i].Name, Sum = _data.Players[i].Sum });
             }
 
@@ -741,11 +744,11 @@ namespace SICore
                         StopWaiting();
 
                         var s = _data.ChooserIndex == _data.AnswererIndex ?
-                            _actor.LO[nameof(R.ToMyself)] : _data.Answerer.Name;
-                        _actor.PlayerReplic(_data.ChooserIndex, s);
+                            LO[nameof(R.ToMyself)] : _data.Answerer.Name;
+                        _gameActions.PlayerReplic(_data.ChooserIndex, s);
 
                         _data.ChooserIndex = _data.AnswererIndex;
-                        _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
                         ScheduleExecution(Tasks.CatInfo, 10);
                         return true;
                     }
@@ -763,7 +766,7 @@ namespace SICore
                         StopWaiting();
 
                         _data.CurPriceWrong = _data.CurPriceRight;
-                        _actor.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
+                        _gameActions.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
 
                         ScheduleExecution(Tasks.AskCatCost, 20);
                         return true;
@@ -787,7 +790,7 @@ namespace SICore
                     {
                         StopWaiting();
 
-                        _actor.ShowmanReplic(_actor.LO[nameof(R.ThemeDeletes)] + " " + _data.Players[_data.ThemeDeleters.Current.PlayerIndex].Name);
+                        _gameActions.ShowmanReplic(LO[nameof(R.ThemeDeletes)] + " " + _data.Players[_data.ThemeDeleters.Current.PlayerIndex].Name);
 
                         _data.ThemeDeleters.MoveBack();
 
@@ -809,7 +812,7 @@ namespace SICore
                     {
                         StopWaiting();
 
-                        _actor.ShowmanReplic(_actor.LO[nameof(R.ThankYou)]);
+                        _gameActions.ShowmanReplic(LO[nameof(R.ThankYou)]);
 
                         var questionsCount = _data.Theme.Questions.Count;
                         _data.QuestionIndex = ClientData.Rand.Next(questionsCount); // А то в отчётах об игре встречаются глюки
@@ -888,24 +891,24 @@ namespace SICore
 
             if (_data.StakeType == StakeMode.Nominal)
             {
-                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Nominal)]);
+                _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Nominal)]);
                 _data.Stake = _data.CurPriceRight;
                 _data.StakerIndex = playerIndex;
             }
             else if (_data.StakeType == StakeMode.Sum)
             {
-                _actor.PlayerReplic(playerIndex, Notion.FormatNumber(_data.StakeSum));
+                _gameActions.PlayerReplic(playerIndex, Notion.FormatNumber(_data.StakeSum));
                 _data.Stake = _data.StakeSum;
                 _data.StakerIndex = playerIndex;
             }
             else if (_data.StakeType == StakeMode.Pass)
             {
-                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.Pass)]);
+                _gameActions.PlayerReplic(playerIndex, LO[nameof(R.Pass)]);
                 _data.Players[playerIndex].StakeMaking = false;
             }
             else
             {
-                _actor.PlayerReplic(playerIndex, _actor.LO[nameof(R.VaBank)]);
+                _gameActions.PlayerReplic(playerIndex, LO[nameof(R.VaBank)]);
                 _data.Stake = _data.Players[playerIndex].Sum;
                 _data.StakerIndex = playerIndex;
                 _data.AllIn = true;
@@ -920,7 +923,7 @@ namespace SICore
                 stakeMessage.Add(_data.Stake);
             }
 
-            _actor.SendMessage(stakeMessage.Build());
+            _gameActions.SendMessage(stakeMessage.Build());
 
             if (_data.StakeType != StakeMode.Pass)
             {
@@ -930,7 +933,7 @@ namespace SICore
                     if (i != _data.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
                     {
                         player.StakeMaking = false;
-                        _actor.SendMessageWithArgs(Messages.PersonStake, i, 2);
+                        _gameActions.SendMessageWithArgs(Messages.PersonStake, i, 2);
                     }
                 }
             }
@@ -988,7 +991,7 @@ namespace SICore
                 answerResult.IsRight = true;
                 var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Auction ? nameof(R.Bravo) : nameof(R.Right);
                 
-                var s = new StringBuilder(GetRandomString(_actor.LO[showmanReplic]));
+                var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
                 var canonicalAnswer = _data.Question.GetRightAnswers().FirstOrDefault();
                 var isAnswerCanonical = canonicalAnswer != null && _data.Answerer.Answer.Simplify().Contains(canonicalAnswer.Simplify());
@@ -1001,7 +1004,7 @@ namespace SICore
                     }
 
                     s.AppendFormat(" (+{0})", _data.CurPriceRight.ToString().FormatNumber());
-                    _actor.ShowmanReplic(s.ToString());
+                    _gameActions.ShowmanReplic(s.ToString());
 
                     s = new StringBuilder(Messages.Person)
                         .Append(Message.ArgsSeparatorChar)
@@ -1010,18 +1013,18 @@ namespace SICore
                         .Append(_data.AnswererIndex)
                         .Append(Message.ArgsSeparatorChar).Append(_data.CurPriceRight);
 
-                    _actor.SendMessage(s.ToString());
+                    _gameActions.SendMessage(s.ToString());
 
                     _data.Answerer.Sum += _data.CurPriceRight;
                     _data.ChooserIndex = _data.AnswererIndex;
-                    _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-                    _actor.InformSums();
+                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                    _gameActions.InformSums();
 
                     _data.IsQuestionPlaying = false;
                     _data.AnnounceAnswer = false;
 
                     _data.IsThinking = false;
-                    _actor.SendMessageWithArgs(Messages.Timer, 1, "STOP");
+                    _gameActions.SendMessageWithArgs(Messages.Timer, 1, "STOP");
 
                     if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
                     {
@@ -1032,7 +1035,7 @@ namespace SICore
                 }
                 else
                 {
-                    _actor.ShowmanReplic(s.ToString());
+                    _gameActions.ShowmanReplic(s.ToString());
 
                     if (isAnswerCanonical)
                     {
@@ -1046,9 +1049,9 @@ namespace SICore
             else
             {
                 var s = new StringBuilder();
-                if (_data.Answerer.Answer != _actor.LO[nameof(R.IDontKnow)])
+                if (_data.Answerer.Answer != LO[nameof(R.IDontKnow)])
                 {
-                    s.Append(GetRandomString(_actor.LO[nameof(R.Wrong)]));
+                    s.Append(GetRandomString(LO[nameof(R.Wrong)]));
                 }
 
                 if (_data.Settings.AppSettings.IgnoreWrong)
@@ -1059,7 +1062,7 @@ namespace SICore
                 if (!IsFinalRound())
                 {
                     s.AppendFormat(" (-{0})", Notion.FormatNumber(_data.CurPriceWrong));
-                    _actor.ShowmanReplic(s.ToString());
+                    _gameActions.ShowmanReplic(s.ToString());
 
                     s = new StringBuilder(Messages.Person)
                         .Append(Message.ArgsSeparatorChar)
@@ -1069,11 +1072,11 @@ namespace SICore
                         .Append(Message.ArgsSeparatorChar)
                         .Append(_data.CurPriceWrong);
 
-                    _actor.SendMessage(s.ToString());
+                    _gameActions.SendMessage(s.ToString());
 
                     _data.Answerer.Sum -= _data.CurPriceWrong;
                     _data.Answerer.CanPress = false;
-                    _actor.InformSums();
+                    _gameActions.InformSums();
 
                     if (_data.Answerer.IsHuman)
                     {
@@ -1090,7 +1093,7 @@ namespace SICore
                 }
                 else
                 {
-                    _actor.ShowmanReplic(s.ToString());
+                    _gameActions.ShowmanReplic(s.ToString());
                     _data.PlayerIsRight = false;
 
                     ScheduleExecution(Tasks.AnnounceStake, 15);
@@ -1121,14 +1124,14 @@ namespace SICore
 
             if (!ClientData.Settings.AppSettings.FalseStart)
             {
-                _actor.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
+                _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
             }
 
             if (ClientData.Settings.AppSettings.FalseStart || ClientData.IsQuestionFinished)
             {
                 if (!ClientData.Settings.AppSettings.FalseStart)
                 {
-                    _actor.SendMessage(Messages.Resume); // Для возобновления мультимедиа
+                    _gameActions.SendMessage(Messages.Resume); // Для возобновления мультимедиа
                 }
 
                 ScheduleExecution(Tasks.AskToTry, 10, force: true);
@@ -1143,7 +1146,7 @@ namespace SICore
             else
             {
                 _data.IsPlayingMedia = _data.IsPlayingMediaPaused;
-                _actor.SendMessage(Messages.Resume);
+                _gameActions.SendMessage(Messages.Resume);
                 ScheduleExecution(Tasks.MoveNext, _data.AtomTime, force: true);
             }
 
@@ -1176,8 +1179,8 @@ namespace SICore
 
             StopWaiting();
 
-            var s = $"{_actor.LO[nameof(R.StakeMakes)]} {_data.Players[playerIndex].Name}";
-            _actor.ShowmanReplic(s);
+            var s = $"{LO[nameof(R.StakeMakes)]} {_data.Players[playerIndex].Name}";
+            _gameActions.ShowmanReplic(s);
 
             _data.OrderIndex--;
             ScheduleExecution(Tasks.AskStake, 10);
@@ -1193,10 +1196,10 @@ namespace SICore
 
             StopWaiting();
 
-            var msg = $"{GetRandomString(_actor.LO[nameof(R.InformChooser)])} {_data.Chooser.Name}";
-            _actor.ShowmanReplic(msg);
+            var msg = $"{GetRandomString(LO[nameof(R.InformChooser)])} {_data.Chooser.Name}";
+            _gameActions.ShowmanReplic(msg);
 
-            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
 
             var activeQuestionsCount = GetRoundActiveQuestionsCount();
 
@@ -1214,7 +1217,7 @@ namespace SICore
         private void RunRoundTimer()
         {
             _data.TimerStartTime[0] = DateTime.UtcNow;
-            _actor.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
+            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Go, _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10);
         }
 
         private bool OnDecisionAnswering()
@@ -1228,7 +1231,7 @@ namespace SICore
 
                 StopWaiting();
 
-                _actor.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
+                _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
 
                 if (_data.IsOralNow)
                 {
@@ -1244,8 +1247,8 @@ namespace SICore
 
             StopWaiting();
 
-            var s = GetRandomString(_actor.LO[nameof(R.LetsSee)]);
-            _actor.ShowmanReplic(s);
+            var s = GetRandomString(LO[nameof(R.LetsSee)]);
+            _gameActions.ShowmanReplic(s);
 
             _data.ThemeDeleters.Reset(false);
             ScheduleExecution(Tasks.Announce, 15);
@@ -1260,7 +1263,7 @@ namespace SICore
             _data.IsWaiting = false;
             _data.Decision = DecisionType.None;
 
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
         }
 
         private readonly Queue<string> _tasksHistory = new Queue<string>();
@@ -1342,7 +1345,7 @@ namespace SICore
                                             stop = Engine.MoveBackRound();
                                             if (stop)
                                             {
-                                                _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
+                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
                                             }
                                             else
                                             {
@@ -1380,7 +1383,7 @@ namespace SICore
                                             stop = Engine.MoveNextRound();
                                             if (stop)
                                             {
-                                                _actor.SpecialReplic(_actor.LO[nameof(R.ShowmanSwitchedToNextRound)]);
+                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToNextRound)]);
                                             }
                                             else
                                             {
@@ -1547,7 +1550,7 @@ namespace SICore
                         case Tasks.WaitRight:
                             #region WaitRight
 
-                            _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
 
                             if (_data.Answerer == null)
                             {
@@ -1633,11 +1636,11 @@ namespace SICore
                         case Tasks.GoodLuck:
                             #region GoodLuck
 
-                            _actor.ShowmanReplic(_actor.LO[nameof(R.GoodLuck)]);
+                            _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
 
                             _data.Stage = GameStage.After;
-                            _actor.OnStageChanged(GameStages.Finished, _actor.LO[nameof(R.StageFinished)]);
-                            _actor.InformStage();
+                            _actor.OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
+                            _gameActions.InformStage();
 
                             _data.ReportsCount = _data.Players.Count;
                             ScheduleExecution(Tasks.WaitReport, 10 * 60 * 5); // 5 минут
@@ -1645,11 +1648,11 @@ namespace SICore
 
                             _data.AcceptedReports = 0;
 
-                            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, _actor.LO);
+                            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, LO);
 
                             foreach (var item in _data.Players)
                             {
-                                _actor.SendMessage(Messages.Report + Message.ArgsSeparatorChar + reportString, item.Name);
+                                _gameActions.SendMessage(Messages.Report + Message.ArgsSeparatorChar + reportString, item.Name);
                             }
 
                             #endregion
@@ -1665,7 +1668,7 @@ namespace SICore
                     _data.BackLink.SendError(new Exception($"Task: {task}, param: {arg}, history: {string.Join(", ", _tasksHistory)}", exc));
                     ScheduleExecution(Tasks.NoTask, 10);
                     ClientData.MoveNextBlocked = true;
-                    _actor.SpecialReplic("Game ERROR");
+                    _gameActions.SpecialReplic("Game ERROR");
                 }
             }
         }
@@ -1677,10 +1680,10 @@ namespace SICore
                 throw new ArgumentException($"{nameof(_data.AnswererIndex)} == -1", nameof(_data.AnswererIndex));
             }
 
-            _actor.SendMessage(Messages.Cancel, _data.Answerer.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
             if (_data.IsOralNow)
             {
-                _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
             }
 
             _data.CurPriceRight = _data.CatInfo.Minimum;
@@ -1693,7 +1696,7 @@ namespace SICore
         {
             foreach (var item in _data.Players)
             {
-                _actor.SendMessage(Messages.Cancel, item.Name);
+                _gameActions.SendMessage(Messages.Cancel, item.Name);
             }
 
             _data.AppellationAnswersReceivedCount = _data.Players.Count - 1;
@@ -1718,19 +1721,19 @@ namespace SICore
             _data.CurPriceRight = _data.Stake;
             _data.CurPriceWrong = _data.Stake;
 
-            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
             var msg = new StringBuilder()
-                .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(_actor.LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, _actor.LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
-            _actor.ShowmanReplic(msg.ToString());
+                .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
+            _gameActions.ShowmanReplic(msg.ToString());
 
             ScheduleExecution(Tasks.PrintQue, 15 + ClientData.Rand.Next(10));
         }
 
         private void WaitNext(Tasks task)
         {
-            _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
 
             var playerIndex = task == Tasks.WaitNext ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters.Current.PlayerIndex;
 
@@ -1767,13 +1770,13 @@ namespace SICore
                 throw new ArgumentException($"{nameof(playerIndex)} {playerIndex} must be in [0; {_data.Players.Count - 1}]: {_data.OrderHistory}");
             }
 
-            _actor.SendMessage(Messages.Cancel, _data.Players[playerIndex].Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.Players[playerIndex].Name);
             if (_data.IsOralNow)
             {
-                _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
             }
 
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
             _data.StakeType = _data.StakeVariants[0] ? StakeMode.Nominal : StakeMode.Pass;
 
             OnDecision();
@@ -1788,7 +1791,7 @@ namespace SICore
 
             if (_data.CurPriceRight == -1)
             {
-                _actor.ShowmanReplic($"{_data.Answerer.Name}, {_actor.LO[nameof(R.PleaseChooseCatCost)]}");
+                _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.PleaseChooseCatCost)]}");
                 var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
 
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
@@ -1796,11 +1799,11 @@ namespace SICore
                 _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
                 if (_data.IsOralNow)
                 {
-                    _actor.SendMessage(s, _data.ShowMan.Name);
+                    _gameActions.SendMessage(s, _data.ShowMan.Name);
                 }
                 else
                 {
-                    _actor.SendMessage(s, _data.Answerer.Name);
+                    _gameActions.SendMessage(s, _data.Answerer.Name);
                     if (!_data.Answerer.IsConnected)
                     {
                         waitTime = 20;
@@ -1812,13 +1815,13 @@ namespace SICore
             }
             else if (_data.Type[QuestionTypeParams.BagCat_Knows] == QuestionTypeParams.BagCat_Knows_Value_Never)
             {
-                _actor.ShowmanReplic(_actor.LO[nameof(R.EasyCat)]);
-                _actor.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
+                _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
+                _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
 
                 _data.Answerer.Sum += _data.CurPriceRight;
                 _data.ChooserIndex = _data.AnswererIndex;
-                _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-                _actor.InformSums();
+                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                _gameActions.InformSums();
 
                 Engine.SkipQuestion();
                 ScheduleExecution(Tasks.MoveNext, 20, 1);
@@ -1826,15 +1829,15 @@ namespace SICore
             else
             {
                 _data.CurPriceWrong = _data.CurPriceRight;
-                _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-                _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
+                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
                 ScheduleExecution(Tasks.PrintQue, 2);
             }
         }
 
         private void WaitFirst()
         {
-            _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
 
             if (_data.ChooserIndex == -1)
             {
@@ -1859,9 +1862,9 @@ namespace SICore
                     return;
                 }
 
-                _actor.SendMessage(Messages.Cancel, _data.Answerer.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
 
-                _data.Answerer.Answer = _actor.LO[nameof(R.IDontKnow)];
+                _data.Answerer.Answer = LO[nameof(R.IDontKnow)];
                 _data.Answerer.AnswerIsWrong = true;
             }
             else
@@ -1870,10 +1873,10 @@ namespace SICore
                 {
                     if (_data.Players[i].InGame && string.IsNullOrEmpty(_data.Players[i].Answer))
                     {
-                        _data.Players[i].Answer = _actor.LO[nameof(R.IDontKnow)];
+                        _data.Players[i].Answer = LO[nameof(R.IDontKnow)];
                         _data.Players[i].AnswerIsWrong = true;
 
-                        _actor.SendMessage(Messages.Cancel, _data.Players[i].Name);
+                        _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
                     }
                 }
 
@@ -1885,9 +1888,9 @@ namespace SICore
 
         private void WaitCat()
         {
-            _actor.SendMessage(Messages.Cancel, _data.Chooser.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
             if (_data.IsOralNow)
-                _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
 
             _data.AnswererIndex = SelectRandomOnIndex(_data.Players, index => index != _data.ChooserIndex);
 
@@ -1914,7 +1917,7 @@ namespace SICore
                     if (type == QuestionTypes.Simple)
                     {
                         _data.Decision = DecisionType.Pressing;
-                        _actor.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
+                        _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
 
                         SendTryToPlayers();
                     }
@@ -1933,7 +1936,7 @@ namespace SICore
 
             if (!IsSpecialQuestion())
             {
-                _actor.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
+                _gameActions.SendMessageWithArgs(Messages.EndTry, MessageParams.EndTry_All); // Timer 1 STOP
             }
 
             _data.AnnounceAnswer = true;
@@ -1944,16 +1947,16 @@ namespace SICore
 
         private void WaitFinalStake()
         {
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 if (_data.Players[i].InGame && _data.Players[i].FinalStake == -1)
                 {
-                    _actor.SendMessage(Messages.Cancel, _data.Players[i].Name);
+                    _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
                     _data.Players[i].FinalStake = 1;
 
-                    _actor.SendMessageWithArgs(Messages.PersonFinalStake, i);
+                    _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
                 }
             }
 
@@ -1965,7 +1968,7 @@ namespace SICore
         {
             foreach (var item in _data.Players)
             {
-                _actor.SendMessage(Messages.Cancel, item.Name);
+                _gameActions.SendMessage(Messages.Cancel, item.Name);
             }
 
             if (_data.AcceptedReports > 0)
@@ -1985,8 +1988,8 @@ namespace SICore
             }
 
             var msg = new StringBuilder();
-            msg.AppendFormat("{0}: {1}", _actor.LO[nameof(R.Stake)], Notion.FormatNumber(_data.Answerer.FinalStake));
-            _actor.ShowmanReplic(msg.ToString());
+            msg.AppendFormat("{0}: {1}", LO[nameof(R.Stake)], Notion.FormatNumber(_data.Answerer.FinalStake));
+            _gameActions.ShowmanReplic(msg.ToString());
 
             msg = new StringBuilder(Messages.Person).Append(Message.ArgsSeparatorChar);
             if (_data.PlayerIsRight)
@@ -2002,18 +2005,18 @@ namespace SICore
 
             msg.Append(Message.ArgsSeparatorChar).Append(_data.AnswererIndex);
             msg.Append(Message.ArgsSeparatorChar).Append(_data.Answerer.FinalStake);
-            _actor.SendMessage(msg.ToString());
-            _actor.InformSums();
+            _gameActions.SendMessage(msg.ToString());
+            _gameActions.InformSums();
 
-            _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.Answerer.FinalStake);
+            _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.Answerer.FinalStake);
 
             ScheduleExecution(Tasks.Announce, 15);
         }
 
         private void AskFinalStake()
         {
-            var s = GetRandomString(_actor.LO[nameof(R.MakeStake)]);
-            _actor.ShowmanReplic(s);
+            var s = GetRandomString(LO[nameof(R.MakeStake)]);
+            _gameActions.ShowmanReplic(s);
 
             _data.NumOfStakers = 0;
             for (var i = 0; i < _data.Players.Count; i++)
@@ -2022,7 +2025,7 @@ namespace SICore
                 {
                     _data.Players[i].FinalStake = -1;
                     _data.NumOfStakers++;
-                    _actor.SendMessage(Messages.FinalStake, _data.Players[i].Name);
+                    _gameActions.SendMessage(Messages.FinalStake, _data.Players[i].Name);
                 }
             }
 
@@ -2033,11 +2036,11 @@ namespace SICore
 
         private void WaitDelete()
         {
-            _actor.SendMessage(Messages.Cancel, _data.ActivePlayer.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.ActivePlayer.Name);
             if (_data.IsOralNow)
-                _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
 
-            _actor.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
 
             _data.ThemeIndex = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
 
@@ -2065,10 +2068,10 @@ namespace SICore
                     }
                 }
 
-                _actor.SendMessage(s.ToString());
+                _gameActions.SendMessage(s.ToString());
                 if (!playFinal)
                 {
-                    _actor.ShowmanReplic(_actor.LO[nameof(R.NobodyInFinal)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
                     if (Engine.MoveNextRound())
                     {
                         ScheduleExecution(Tasks.MoveNext, 15 + ClientData.Rand.Next(10), 1);
@@ -2088,14 +2091,14 @@ namespace SICore
                 }
                 else
                 {
-                    _actor.ShowmanReplic(_data.Players[arg - 2].Name + " " + _actor.LO[nameof(R.NotInFinal)]);
+                    _gameActions.ShowmanReplic(_data.Players[arg - 2].Name + " " + LO[nameof(R.NotInFinal)]);
                     ScheduleExecution(Tasks.PrintFinal, 15, arg + 1);
                 }
             }
             else
             {
-                _actor.InformStage(name: _data.Round.Name);
-                _actor.ShowmanReplic($"{GetRandomString(_actor.LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
+                _gameActions.InformStage(name: _data.Round.Name);
+                _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
                 ScheduleExecution(Tasks.Round, 10, 2);
             }
@@ -2113,17 +2116,17 @@ namespace SICore
                     if (_data.Players[i].Sum == big)
                     {
                         var s = new StringBuilder(_data.Players[i].Name).Append(", ");
-                        s.Append(GetRandomString(_actor.LO[nameof(R.YouWin)]));
-                        _actor.ShowmanReplic(s.ToString());
-                        _actor.SendMessageWithArgs(Messages.Winner, i);
+                        s.Append(GetRandomString(LO[nameof(R.YouWin)]));
+                        _gameActions.ShowmanReplic(s.ToString());
+                        _gameActions.SendMessageWithArgs(Messages.Winner, i);
                         break;
                     }
                 }
             }
             else
             {
-                _actor.ShowmanReplic(_actor.LO[nameof(R.NoWinner)]);
-                _actor.SendMessageWithArgs(Messages.Winner, -1);
+                _gameActions.ShowmanReplic(LO[nameof(R.NoWinner)]);
+                _gameActions.SendMessageWithArgs(Messages.Winner, -1);
             }
 
             ScheduleExecution(Tasks.GoodLuck, 20 + ClientData.Rand.Next(10));
@@ -2138,20 +2141,20 @@ namespace SICore
                 _data.CurPriceRight *= 2;
                 _data.CurPriceWrong = 0;
                 _data.AnswererIndex = _data.ChooserIndex;
-                _actor.ShowmanReplic(_actor.LO[nameof(R.SponsoredQuestion)]);
+                _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
             }
             else if (arg == 2)
             {
                 // Покажем рекламу
-                var ad = ClientData.BackLink.GetAd(_actor.LO.Culture.TwoLetterISOLanguageName, out int adId);
+                var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
                 if (!string.IsNullOrEmpty(ad))
                 {
-                    var res = new StringBuilder(_actor.LO[nameof(R.Ads)] + ": ").Append(ad);
+                    var res = new StringBuilder(LO[nameof(R.Ads)] + ": ").Append(ad);
 
-                    _actor.ShowmanReplic(res.ToString());
-                    _actor.SpecialReplic(res.ToString());
+                    _gameActions.ShowmanReplic(res.ToString());
+                    _gameActions.SpecialReplic(res.ToString());
 
-                    _actor.SendMessageWithArgs(Messages.Ads, ad);
+                    _gameActions.SendMessageWithArgs(Messages.Ads, ad);
 #if !DEBUG
                     ClientData.MoveNextBlocked = true;
 #endif
@@ -2169,9 +2172,9 @@ namespace SICore
             else
             {
                 ClientData.MoveNextBlocked = false;
-                _actor.ShowmanReplic(_data.Chooser.Name + ", " + string.Format(_actor.LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight)));
-                _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
-                _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                _gameActions.ShowmanReplic(_data.Chooser.Name + ", " + string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight)));
+                _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
+                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
                 ScheduleExecution(Tasks.PrintQue, 10);
             }
         }
@@ -2214,14 +2217,14 @@ namespace SICore
             }
             else
             {
-                _actor.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
+                _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
                 ScheduleExecution(Tasks.PrintQue, taskTime);
             }
         }
 
         private void PrintStakeQuestion()
         {
-            _actor.ShowmanReplic(GetRandomString(_actor.LO[nameof(R.YouGetAuction)]));
+            _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
 
             var nominal = _data.Question.Price;
 
@@ -2253,7 +2256,7 @@ namespace SICore
         {
             if (_data.Settings.AppSettings.FalseStart)
             {
-                _actor.SendMessage(Messages.Try);
+                _gameActions.SendMessage(Messages.Try);
             }
 
             SendTryToPlayers();
@@ -2262,7 +2265,7 @@ namespace SICore
 
             _data.TimerStartTime[1] = DateTime.UtcNow;
             _data.IsThinking = true;
-            _actor.SendMessageWithArgs(Messages.Timer, 1, "RESUME");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 1, "RESUME");
             _data.Decision = DecisionType.Pressing;
 
             ScheduleExecution(Tasks.WaitTry, Math.Max(maxTime - _data.TimeThinking, 10), force: true);
@@ -2274,17 +2277,17 @@ namespace SICore
             {
                 if (_data.Players[i].CanPress)
                 {
-                    _actor.SendMessage(Messages.YouTry, _data.Players[i].Name);
+                    _gameActions.SendMessage(Messages.YouTry, _data.Players[i].Name);
                 }
             }
         }
 
         private void WaitChoose()
         {
-            _actor.SendMessage(Messages.Cancel, _data.Chooser.Name);
+            _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
             if (_data.IsOralNow)
             {
-                _actor.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+                _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
             }
 
             var canChooseTheme = _data.TInfo.RoundInfo.Select(t => t.Questions.Any(QuestionHelper.IsActive)).ToArray();
@@ -2323,14 +2326,14 @@ namespace SICore
             if (arg == 1)
             {
                 if (_data.Question == null)
-                    throw new Exception(string.Format(_actor.LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round.Type, _data.Settings.AppSettings.GameMode));
+                    throw new Exception(string.Format(LO[nameof(R.StrangeError)] + " {0} {1}", _data.Round.Type, _data.Settings.AppSettings.GameMode));
 
                 var authors = _data.PackageDoc.GetRealAuthors(_data.Question.Info.Authors);
                 if (authors.Length > 0)
                 {
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", authors));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfQuestion)], string.Join(", ", authors));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                     arg++;
@@ -2364,7 +2367,7 @@ namespace SICore
                     if (themeChanged)
                     {
                         // Нужно сказать, что тема будет другой
-                        _actor.ShowmanReplic(_actor.LO[nameof(R.QuestionWithSpecialTheme)] + ": " + catTheme);
+                        _gameActions.ShowmanReplic(LO[nameof(R.QuestionWithSpecialTheme)] + ": " + catTheme);
                         ScheduleExecution(Tasks.PrintQue, 20, force: true);
                         return;
                     }
@@ -2376,7 +2379,7 @@ namespace SICore
                 else
                     s.Append(QuestionTypes.Simple);
 
-                _actor.SendMessage(s.ToString());
+                _gameActions.SendMessage(s.ToString());
 
                 // Реакция согласно типу вопроса
                 if (_data.Type.Name == QuestionTypes.Auction)
@@ -2398,19 +2401,19 @@ namespace SICore
                 }
                 else // Неподдерживаемый игрой тип
                 {
-                    var sp = new StringBuilder(_actor.LO[nameof(R.UnknownType)]).Append(' ');
+                    var sp = new StringBuilder(LO[nameof(R.UnknownType)]).Append(' ');
                     sp.Append(_data.Type.Name);
                     if (_data.Type.Params.Count > 0)
                     {
-                        sp.Append(' ').Append(_actor.LO[nameof(R.WithParams)]);
+                        sp.Append(' ').Append(LO[nameof(R.WithParams)]);
                         foreach (var p in _data.Type.Params)
                             sp.Append(' ').Append(p);
                     }
 
-                    _actor.SpecialReplic(sp.ToString());
-                    _actor.SpecialReplic(_actor.LO[nameof(R.GameWillResume)]);
+                    _gameActions.SpecialReplic(sp.ToString());
+                    _gameActions.SpecialReplic(LO[nameof(R.GameWillResume)]);
 
-                    _actor.ShowmanReplic(_actor.LO[nameof(R.ManuallyPlayedQuestion)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.ManuallyPlayedQuestion)]);
 
                     Engine.SkipQuestion();
                     ScheduleExecution(Tasks.MoveNext, 150, 1);
@@ -2428,8 +2431,8 @@ namespace SICore
             var printingLength = Math.Min(text.Length - _data.TextLength, _data.Settings.AppSettings.ReadingSpeed / 2); // Число символов в секунду
             var subText = text.Substring(_data.TextLength, printingLength);
 
-            _actor.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
-            _actor.SystemReplic(subText);
+            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+            _gameActions.SystemReplic(subText);
 
             _data.TextLength += printingLength;
             if (_data.TextLength < text.Length)
@@ -2451,8 +2454,8 @@ namespace SICore
                 if (sources.Length > 0)
                 {
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfQuestion)], string.Join(", ", sources));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -2465,8 +2468,8 @@ namespace SICore
                 if (_data.Question.Info.Comments.Text.Length > 0)
                 {
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -2540,11 +2543,11 @@ namespace SICore
             }
 
             var msg = new StringBuilder()
-                .Append(_actor.LO[nameof(R.Answer)]).Append(' ')
+                .Append(LO[nameof(R.Answer)]).Append(' ')
                 .Append(_data.Answerer.Name).Append(": ")
                 .Append(_data.Answerer.Answer);
 
-            _actor.ShowmanReplic(msg.ToString());
+            _gameActions.ShowmanReplic(msg.ToString());
 
             ScheduleExecution(Tasks.AskRight, 20, force: true);
         }
@@ -2571,7 +2574,7 @@ namespace SICore
             ClientData.Decision = DecisionType.None;
             ClientData.Answerer.CanPress = false;
             _data.IsThinking = false;
-            _actor.SendMessageWithArgs(Messages.Timer, 1, "PAUSE", (int)ClientData.TimeThinking);
+            _gameActions.SendMessageWithArgs(Messages.Timer, 1, "PAUSE", (int)ClientData.TimeThinking);
 
             _data.IsDeferringAnswer = false;
             _data.IsPlayingMediaPaused = _data.IsPlayingMedia;
@@ -2588,19 +2591,19 @@ namespace SICore
             switch (arg)
             {
                 case 1:
-                    _actor.ShowmanReplic(_actor.LO[nameof(R.ShowmanGreeting)]);
+                    _gameActions.ShowmanReplic(LO[nameof(R.ShowmanGreeting)]);
                     var settings = ClientData.Settings.AppSettings;
                     nextArg = !settings.FalseStart || settings.Oral || settings.GameMode == SIEngine.GameModes.Sport || settings.IgnoreWrong || settings.Managed ? 2 : -1;
                     break;
 
                 case 2:
-                    _actor.ShowmanReplic(_actor.LO[nameof(R.GameRules)] + ": " + BuildRulesString(ClientData.Settings.AppSettings));
+                    _gameActions.ShowmanReplic(LO[nameof(R.GameRules)] + ": " + BuildRulesString(ClientData.Settings.AppSettings));
                     nextArg = -1;
                     extraTime = 20;
                     break;
 
                 default:
-                    _actor.SpecialReplic(_actor.LO[nameof(R.WrongGameState)] + " - " + Tasks.StartGame);
+                    _gameActions.SpecialReplic(LO[nameof(R.WrongGameState)] + " - " + Tasks.StartGame);
                     break;
             }
 
@@ -2619,7 +2622,7 @@ namespace SICore
                 if (sb.Length > 0)
                     sb.Append(", ");
 
-                sb.Append(_actor.LO[nameof(R.TypeSport)]);
+                sb.Append(LO[nameof(R.TypeSport)]);
             }
 
             if (!settings.FalseStart)
@@ -2627,7 +2630,7 @@ namespace SICore
                 if (sb.Length > 0)
                     sb.Append(", ");
 
-                sb.Append(_actor.LO[nameof(R.TypeNoFalseStart)]);
+                sb.Append(LO[nameof(R.TypeNoFalseStart)]);
             }
 
             if (settings.Oral)
@@ -2635,7 +2638,7 @@ namespace SICore
                 if (sb.Length > 0)
                     sb.Append(", ");
 
-                sb.Append(_actor.LO[nameof(R.TypeOral)]);
+                sb.Append(LO[nameof(R.TypeOral)]);
             }
 
             if (settings.IgnoreWrong)
@@ -2643,7 +2646,7 @@ namespace SICore
                 if (sb.Length > 0)
                     sb.Append(", ");
 
-                sb.Append(_actor.LO[nameof(R.TypeIgnoreWrong)]);
+                sb.Append(LO[nameof(R.TypeIgnoreWrong)]);
             }
 
             if (settings.Managed)
@@ -2651,7 +2654,7 @@ namespace SICore
                 if (sb.Length > 0)
                     sb.Append(", ");
 
-                sb.Append(_actor.LO[nameof(R.TypeManaged)]);
+                sb.Append(LO[nameof(R.TypeManaged)]);
             }
 
             return sb.ToString();
@@ -2661,16 +2664,16 @@ namespace SICore
         {
             _data.IsQuestionPlaying = true;
 
-            _actor.InformSums();
-            _actor.AnnounceSums();
-            _actor.SendMessage(Messages.ShowTable);
+            _gameActions.InformSums();
+            _gameActions.AnnounceSums();
+            _gameActions.SendMessage(Messages.ShowTable);
 
             if (_data.Chooser == null)
             {
                 throw new Exception("_data.Chooser == null");
             }
 
-            if (_actor.Client.CurrentServer == null)
+            if (_gameActions.Client.CurrentServer == null)
             {
                 throw new Exception("_actor.Client.CurrentServer == null");
             }
@@ -2683,9 +2686,9 @@ namespace SICore
                 throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
             }
 
-            msg.Append(GetRandomString(_actor.LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
+            msg.Append(GetRandomString(LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
 
-            _actor.ShowmanReplic(msg.ToString());
+            _gameActions.ShowmanReplic(msg.ToString());
 
             lock (_data.ChoiceLock)
             {
@@ -2707,11 +2710,11 @@ namespace SICore
                 _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
 
                 if (_data.IsOralNow)
-                    _actor.SendMessage(message, _data.ShowMan.Name);
+                    _gameActions.SendMessage(message, _data.ShowMan.Name);
                 else if (!_data.Chooser.IsConnected)
                     time = 20;
 
-                _actor.SendMessage(message, _data.Chooser.Name);
+                _gameActions.SendMessage(message, _data.Chooser.Name);
             }
             else
             {
@@ -2734,11 +2737,11 @@ namespace SICore
 
             _data.IsOralNow = _data.IsOral && _data.Chooser.IsHuman;
             if (_data.IsOralNow)
-                _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
             else if (!_data.Chooser.IsConnected)
                 waitTime = 20;
             
-            _actor.SendMessage(msg.ToString(), _data.Chooser.Name);
+            _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
 
             ScheduleExecution(Tasks.WaitCat, waitTime);
             WaitFor(DecisionType.CatGiving, waitTime, _data.ChooserIndex);
@@ -2748,13 +2751,13 @@ namespace SICore
         {
             if (arg == 1)
             {
-                var s = new StringBuilder(_actor.LO[nameof(R.YouReceiveCat)]);
+                var s = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
                 if (_data.Type[QuestionTypeParams.BagCat_Self] == QuestionTypeParams.BagCat_Self_Value_True)
                 {
-                    s.Append($". {_actor.LO[nameof(R.YouCanKeepCat)]}");
+                    s.Append($". {LO[nameof(R.YouCanKeepCat)]}");
                 }
 
-                _actor.ShowmanReplic(s.ToString());
+                _gameActions.ShowmanReplic(s.ToString());
                 if (_data.Type.Name == QuestionTypes.Cat)
                 {
                     arg++;
@@ -2791,16 +2794,16 @@ namespace SICore
                         if (_data.Players[i].Flag)
                         {
                             _data.ChooserIndex = _data.AnswererIndex = i;
-                            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                         }
                     }
 
-                    _actor.ShowmanReplic($"{_data.Answerer.Name}, {_actor.LO[nameof(R.CatIsYours)]}!");
+                    _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
                     ScheduleExecution(Tasks.CatInfo, 10);
                 }
                 else
                 {
-                    _actor.ShowmanReplic($"{_data.Chooser.Name}, {_actor.LO[nameof(R.GiveCat)]}");
+                    _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}");
                     ScheduleExecution(Tasks.AskCat, 10 + ClientData.Rand.Next(10), force: true);
                 }
             }
@@ -2854,7 +2857,7 @@ namespace SICore
                     msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
                 }
 
-                _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
                 ScheduleExecution(Tasks.WaitFirst, waitTime);
@@ -2898,7 +2901,7 @@ namespace SICore
                 msg.Append(Message.ArgsSeparatorChar).Append(right);
             }
 
-            _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
             msg = new StringBuilder(Messages.Wrong);
             foreach (var wrong in _data.Question.Wrong)
@@ -2906,10 +2909,10 @@ namespace SICore
                 msg.Append(Message.ArgsSeparatorChar).Append(wrong);
             }
 
-            _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
-            _actor.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
-            _actor.SendMessage(BuildValidationMessageOld(_data.Answerer.Name, answer), _data.ShowMan.Name);
+            _gameActions.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
+            _gameActions.SendMessage(BuildValidationMessageOld(_data.Answerer.Name, answer), _data.ShowMan.Name);
         }
 
         private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
@@ -2942,13 +2945,13 @@ namespace SICore
 
             if (IsFinalRound())
             {
-                _actor.ShowmanReplic(_actor.LO[nameof(R.StartThink)]);
+                _gameActions.ShowmanReplic(LO[nameof(R.StartThink)]);
                 for (var i = 0; i < _data.Players.Count; i++)
                 {
                     if (_data.Players[i].InGame)
                     {
                         _data.Players[i].Answer = "";
-                        _actor.SendMessage(Messages.Answer, _data.Players[i].Name);
+                        _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
                     }
                 }
 
@@ -2965,7 +2968,7 @@ namespace SICore
 
             if (_data.Question.Type.Name == QuestionTypes.Simple)
             {
-                _actor.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
+                _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
             }
 
             msg.Append(Messages.Answer);
@@ -2978,14 +2981,14 @@ namespace SICore
             if (_data.IsOralNow)
             {
                 // Ведущий принимает ответ устно
-                SendAnswersInfoToShowman($"({_actor.LO[nameof(R.AnswerIsOral)]})");
+                SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
             }
             else
             {
-                _actor.SendMessage(msg.ToString(), _data.Answerer.Name);
+                _gameActions.SendMessage(msg.ToString(), _data.Answerer.Name);
             }
 
-            _actor.ShowmanReplic(_data.Answerer.Name + GetRandomString(_actor.LO[nameof(R.YourAnswer)]));
+            _gameActions.ShowmanReplic(_data.Answerer.Name + GetRandomString(LO[nameof(R.YourAnswer)]));
 
             _data.Answerer.Answer = "";
 
@@ -3040,9 +3043,9 @@ namespace SICore
         {
             var msg = new StringBuilder(_data.ActivePlayer.Name)
                 .Append(", ")
-                .Append(GetRandomString(_actor.LO[nameof(R.DeleteTheme)]));
+                .Append(GetRandomString(LO[nameof(R.DeleteTheme)]));
 
-            _actor.ShowmanReplic(msg.ToString());
+            _gameActions.ShowmanReplic(msg.ToString());
 
             var message = string.Join(Message.ArgsSeparator, Messages.Choose, 2);
             _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
@@ -3050,14 +3053,14 @@ namespace SICore
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForChoosingFinalTheme * 10;
             if (_data.IsOralNow)
             {
-                _actor.SendMessage(message, _data.ShowMan.Name);
+                _gameActions.SendMessage(message, _data.ShowMan.Name);
             }
             else if (!_data.ActivePlayer.IsConnected)
             {
                 waitTime = 20;
             }
 
-            _actor.SendMessage(message, _data.ActivePlayer.Name);
+            _gameActions.SendMessage(message, _data.ActivePlayer.Name);
 
             _data.ThemeIndex = -1;
             ScheduleExecution(Tasks.WaitDelete, waitTime);
@@ -3073,7 +3076,7 @@ namespace SICore
                 msg.Append(Message.ArgsSeparatorChar).Append(good ? '+' : '-');
             }
 
-            _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+            _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
             ScheduleExecution(Tasks.WaitNextToDelete, waitTime);
@@ -3149,7 +3152,7 @@ namespace SICore
                                 _data.BackLink.SendError(new Exception("this.data.AnswererIndex == -1"), true);
                             }
 
-                            _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
                             ScheduleExecution(Tasks.PrintQue, 10, 1);
                             return false;
@@ -3178,7 +3181,7 @@ namespace SICore
                             msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
                         }
 
-                        _actor.SendMessage(msg.ToString(), _data.ShowMan.Name);
+                        _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
                         var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
                         ScheduleExecution(Tasks.WaitNext, time);
@@ -3288,7 +3291,7 @@ namespace SICore
                 if (_data.Stake != -1 && playerMoney <= _data.Stake) // Не может сделать ставку
                 {
                     activePlayer.StakeMaking = false;
-                    _actor.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
+                    _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
 
                     var stakersCount = _data.Players.Count(p => p.StakeMaking);
 
@@ -3318,14 +3321,14 @@ namespace SICore
                 if (_data.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
                 {
                     var s = new StringBuilder(activePlayer.Name)
-                        .Append(", ").Append(_actor.LO[nameof(R.YouCanSayOnly)])
-                        .Append(' ').Append(_actor.LO[nameof(R.Nominal)]);
+                        .Append(", ").Append(LO[nameof(R.YouCanSayOnly)])
+                        .Append(' ').Append(LO[nameof(R.Nominal)]);
 
-                    _actor.ShowmanReplic(s.ToString());
+                    _gameActions.ShowmanReplic(s.ToString());
 
                     _data.StakerIndex = playerIndex;
                     _data.Stake = cost;
-                    _actor.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
+                    _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
                     ScheduleExecution(Tasks.AskStake, 5);
                     return;
                 }
@@ -3342,9 +3345,9 @@ namespace SICore
 
                 var stakeMsg = new StringBuilder(_data.ActivePlayer.Name)
                     .Append(", ")
-                    .Append(GetRandomString(_actor.LO[nameof(R.YourStake)]));
+                    .Append(GetRandomString(LO[nameof(R.YourStake)]));
 
-                _actor.ShowmanReplic(stakeMsg.ToString());
+                _gameActions.ShowmanReplic(stakeMsg.ToString());
 
                 _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
@@ -3365,13 +3368,13 @@ namespace SICore
                 var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
                 if (_data.IsOralNow)
                 {
-                    _actor.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
+                    _gameActions.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
                     stakeMsg.Append(Message.ArgsSeparatorChar).Append(_data.ActivePlayer.Sum); // Ведущему укажем максимум
-                    _actor.SendMessage(stakeMsg.ToString(), _data.ShowMan.Name);
+                    _gameActions.SendMessage(stakeMsg.ToString(), _data.ShowMan.Name);
                 }
                 else
                 {
-                    _actor.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
+                    _gameActions.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
                     if (!_data.ActivePlayer.IsConnected)
                     {
                         waitTime = 20;
@@ -3432,14 +3435,14 @@ namespace SICore
             }
 
             var appelaer = _data.Players[_data.AppelaerIndex];
-            var given = _actor.LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
-            var apellationReplic = string.Format(_actor.LO[nameof(R.PleaseCheckApellation)], given);
+            var given = LO[appelaer.IsMale ? nameof(R.HeGave) : nameof(R.SheGave)];
+            var apellationReplic = string.Format(LO[nameof(R.PleaseCheckApellation)], given);
 
             string origin = _data.IsAppelationForRightAnswer
-                ? _actor.LO[nameof(R.IsApellating)]
-                : string.Format(_actor.LO[nameof(R.IsConsideringWrong)], appelaer.Name);
+                ? LO[nameof(R.IsApellating)]
+                : string.Format(LO[nameof(R.IsConsideringWrong)], appelaer.Name);
 
-            _actor.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
+            _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
             var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
             var validationMessageOld = BuildValidationMessageOld(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
@@ -3460,7 +3463,7 @@ namespace SICore
                         msg.AppendFormat("\n{0}", rightAnswer);
                     }
 
-                    _actor.SendMessage(msg.ToString(), _data.Players[i].Name);
+                    _gameActions.SendMessage(msg.ToString(), _data.Players[i].Name);
 
                     msg = new StringBuilder(Messages.Wrong).Append(Message.ArgsSeparator).Append(_data.IsAppelationForRightAnswer ? "+" : "-");
                     foreach (var wrong in _data.Question.Wrong)
@@ -3468,10 +3471,10 @@ namespace SICore
                         msg.AppendFormat("\n{0}", wrong);
                     }
 
-                    _actor.SendMessage(msg.ToString(), _data.Players[i].Name);
+                    _gameActions.SendMessage(msg.ToString(), _data.Players[i].Name);
 
-                    _actor.SendMessage(validationMessage, _data.Players[i].Name);
-                    _actor.SendMessage(validationMessageOld, _data.Players[i].Name);
+                    _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
+                    _gameActions.SendMessage(validationMessageOld, _data.Players[i].Name);
                 }
             }
 
@@ -3497,12 +3500,12 @@ namespace SICore
 
             if (dec && rightAns > 0 || !dec && rightAns < _data.AppellationAnswersReceivedCount)
             {
-                _actor.ShowmanReplic($"{_actor.LO[nameof(R.ApellationDenied)]}!");
+                _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
             }
             else
             {
                 // Осуществляем апелляцию
-                _actor.ShowmanReplic($"{_actor.LO[nameof(R.ApellationAccepted)]}!");
+                _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
 
                 if (_data.IsAppelationForRightAnswer)
                 {
@@ -3572,7 +3575,7 @@ namespace SICore
                                 if (Engine.CanMoveBack) // Не начало раунда
                                 {
                                     _data.ChooserIndex = index;
-                                    _actor.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                                 }
                             }
                         }
@@ -3590,8 +3593,8 @@ namespace SICore
                     }
                 }
 
-                _actor.InformSums();
-                _actor.AnnounceSums();
+                _gameActions.InformSums();
+                _gameActions.AnnounceSums();
             }
 
             AddHistory($"CheckAppellation resumed normally ({PrintOldTasks()})");
@@ -3604,8 +3607,8 @@ namespace SICore
 
             if (arg == -1)
             {
-                _actor.Print(_actor.Showman() + ReplicManager.OldReplic(_actor.LO[nameof(R.Theme)] + ": " + theme.Name));
-                _actor.SendMessageWithArgs(Messages.Theme, theme.Name);
+                _gameActions.Print(_gameActions.Showman() + ReplicManager.OldReplic(LO[nameof(R.Theme)] + ": " + theme.Name));
+                _gameActions.SendMessageWithArgs(Messages.Theme, theme.Name);
                 arg++;
             }
 
@@ -3616,8 +3619,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfTheme)], string.Join(", ", authors));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfTheme)], string.Join(", ", authors));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                     arg++;
@@ -3630,8 +3633,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfTheme)], string.Join(", ", sources));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfTheme)], string.Join(", ", sources));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                     arg++;
@@ -3643,8 +3646,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfTheme)], theme.Info.Comments.Text);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfTheme)], theme.Info.Comments.Text);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
             }
 
@@ -3691,7 +3694,7 @@ namespace SICore
             _data.IsWaiting = isWaiting;
             _data.Decision = decision;
 
-            _actor.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
         }
 
         private void ProcessPackage(Package package, int arg)
@@ -3703,7 +3706,7 @@ namespace SICore
             {
                 if (!isRandomPackage)
                 {
-                    _actor.ShowmanReplic(string.Format(OfObjectPropertyFormat, _actor.LO[nameof(R.PName)], _actor.LO[nameof(R.OfPackage)], package.Name));
+                    _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
 
                     var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
 
@@ -3715,7 +3718,7 @@ namespace SICore
                         foreach (var person in _data.AllPersons.Keys)
                         {
                             var msg2 = new StringBuilder(msg.ToString());
-                            if (_actor.Client.CurrentServer.Contains(person))
+                            if (_gameActions.Client.CurrentServer.Contains(person))
                             {
                                 msg2.Append(uri);
                             }
@@ -3724,7 +3727,7 @@ namespace SICore
                                 msg2.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                             }
 
-                            _actor.SendMessage(msg2.ToString(), person);
+                            _gameActions.SendMessage(msg2.ToString(), person);
                         }
                     }
                 }
@@ -3741,8 +3744,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfPackage)], string.Join(", ", authors));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfPackage)], string.Join(", ", authors));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3757,8 +3760,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfPackage)], string.Join(", ", sources));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfPackage)], string.Join(", ", sources));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3772,8 +3775,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfPackage)], package.Info.Comments.Text);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfPackage)], package.Info.Comments.Text);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3787,8 +3790,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.Restrictions)], _actor.LO[nameof(R.OfPackage)], package.Restriction);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.Restrictions)], LO[nameof(R.OfPackage)], package.Restriction);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3802,8 +3805,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.CreationDate)], _actor.LO[nameof(R.OfPackage)], package.Date);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.CreationDate)], LO[nameof(R.OfPackage)], package.Date);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3832,7 +3835,7 @@ namespace SICore
 
             if (arg == 1)
             {
-                _actor.InformSums();
+                _gameActions.InformSums();
 
                 _data.TabloInformStage = 0;
                 _data.IsRoundEnding = false;
@@ -3840,7 +3843,7 @@ namespace SICore
                 if (round.Type == RoundTypes.Final)
                 {
                     _data.Stage = GameStage.Final;
-                    _actor.OnStageChanged(GameStages.Final, _actor.LO[nameof(R.Final)]);
+                    _actor.OnStageChanged(GameStages.Final, LO[nameof(R.Final)]);
                     ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
                     return;
                 }
@@ -3854,13 +3857,13 @@ namespace SICore
                 var skipRoundAnnounce = isRandomPackage && (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport
                     && _data.Package.Rounds.Count == 2); // второй раунд - всегда финал
 
-                _actor.InformStage(name: skipRoundAnnounce ? "" : round.Name);
+                _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name);
 
                 if (!skipRoundAnnounce)
                 {
-                    _actor.ShowmanReplic($"{GetRandomString(_actor.LO[nameof(R.WeBeginRound)])} {round.Name}!");
-                    _actor.SystemReplic(" "); // new line
-                    _actor.SystemReplic(round.Name);
+                    _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {round.Name}!");
+                    _gameActions.SystemReplic(" "); // new line
+                    _gameActions.SystemReplic(round.Name);
                 }
                 else
                 {
@@ -3880,8 +3883,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PAuthors)], _actor.LO[nameof(R.OfRound)], string.Join(", ", authors));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PAuthors)], LO[nameof(R.OfRound)], string.Join(", ", authors));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3896,8 +3899,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PSources)], _actor.LO[nameof(R.OfRound)], string.Join(", ", sources));
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfRound)], string.Join(", ", sources));
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3911,8 +3914,8 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, _actor.LO[nameof(R.PComments)], _actor.LO[nameof(R.OfRound)], _data.Package.Info.Comments.Text);
-                    _actor.ShowmanReplic(res.ToString());
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfRound)], _data.Package.Info.Comments.Text);
+                    _gameActions.ShowmanReplic(res.ToString());
                 }
                 else
                 {
@@ -3927,16 +3930,16 @@ namespace SICore
                 // Покажем рекламу
                 try
                 {
-                    var ad = ClientData.BackLink.GetAd(_actor.LO.Culture.TwoLetterISOLanguageName, out int adId);
+                    var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
                     if (!string.IsNullOrEmpty(ad))
                     {
                         informed = true;
-                        var res = new StringBuilder(_actor.LO[nameof(R.Ads)]).Append(": ").Append(ad);
+                        var res = new StringBuilder(LO[nameof(R.Ads)]).Append(": ").Append(ad);
 
-                        _actor.ShowmanReplic(res.ToString());
-                        _actor.SpecialReplic(res.ToString());
+                        _gameActions.ShowmanReplic(res.ToString());
+                        _gameActions.SpecialReplic(res.ToString());
 
-                        _actor.SendMessageWithArgs(Messages.Ads, ad);
+                        _gameActions.SendMessageWithArgs(Messages.Ads, ad);
 
 #if !DEBUG
                         ClientData.MoveNextBlocked = true;
@@ -4087,10 +4090,10 @@ namespace SICore
         {
             var questionTheme = _data.Type[QuestionTypeParams.Cat_Theme];
             
-            var s = new StringBuilder(_actor.LO[nameof(R.Theme)])
+            var s = new StringBuilder(LO[nameof(R.Theme)])
                 .Append(": ")
                 .Append(string.IsNullOrEmpty(questionTheme) ? _data.Theme.Name : questionTheme)
-                .AppendFormat(", {0}: ", _actor.LO[nameof(R.Cost)]);
+                .AppendFormat(", {0}: ", LO[nameof(R.Cost)]);
 
             var cost = _data.Type[QuestionTypeParams.Cat_Cost];
 
@@ -4127,9 +4130,9 @@ namespace SICore
                         _data.CurPriceWrong = _data.CurPriceRight;
                     }
                     else if (_data.CatInfo.Step < _data.CatInfo.Maximum - _data.CatInfo.Minimum)
-                        add = _actor.LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Minimum) + " " + _actor.LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " " + _actor.LO[nameof(R.WithStepOf)] + " " + Notion.FormatNumber(_data.CatInfo.Step) + " (" + _actor.LO[nameof(R.YourChoice)] + ")";
+                        add = LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Minimum) + " " + LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " " + LO[nameof(R.WithStepOf)] + " " + Notion.FormatNumber(_data.CatInfo.Step) + " (" + LO[nameof(R.YourChoice)] + ")";
                     else
-                        add = Notion.FormatNumber(_data.CatInfo.Minimum) + " " + _actor.LO[nameof(R.Or)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " (" + _actor.LO[nameof(R.YourChoice)] + ")";
+                        add = Notion.FormatNumber(_data.CatInfo.Minimum) + " " + LO[nameof(R.Or)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " (" + LO[nameof(R.YourChoice)] + ")";
                 }
                 else
                 {
@@ -4158,13 +4161,13 @@ namespace SICore
                         _data.CurPriceWrong = _data.CurPriceRight;
                     }
                     else
-                        add = _actor.LO[nameof(R.MinMaxChoice)];
+                        add = LO[nameof(R.MinMaxChoice)];
                 }
             }
 
             s.Append(add);
 
-            _actor.ShowmanReplic(s.ToString());
+            _gameActions.ShowmanReplic(s.ToString());
         }
 
         public bool IsPressMode(bool isMultimediaQuestion)
