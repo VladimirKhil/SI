@@ -25,7 +25,7 @@
                 <Button Name="cb" Visibility="Hidden" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,2,0" Padding="0" Width="20" Height="20" Command="{Binding Close}" ToolTip="Закрыть" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                     <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L12,12M0,12L12,0" />
                 </Button>
-                <TextBlock MinWidth="80" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Header}" ToolTip="{Binding Path}" Margin="2,0,0,0" />
+                <TextBlock MinWidth="80" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Header}" ToolTip="{Binding ToolTip}" Margin="2,0,0,0" />
             </DockPanel>
             <DataTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -159,12 +159,12 @@
     <Window.InputBindings>
         <KeyBinding Gesture="CTRL+N" Command="ApplicationCommands.New" />
         <KeyBinding Gesture="CTRL+S" Command="{Binding ActiveDocument.Save}" />
-        <KeyBinding Gesture="SHIFT+CTRL+S" Command="{Binding SaveAllCommand}" />
+        <KeyBinding Gesture="SHIFT+CTRL+S" Command="{Binding SaveAll}" />
         <KeyBinding Gesture="CTRL+Z" Command="{Binding ActiveDocument.Undo}" />
         <KeyBinding Gesture="CTRL+Y" Command="{Binding ActiveDocument.Redo}" />
-        <KeyBinding Gesture="CTRL+X" Command="{Binding ActiveDocument.Cut}" />
-        <KeyBinding Gesture="CTRL+C" Command="{Binding ActiveDocument.Copy}" />
-        <KeyBinding Gesture="CTRL+V" Command="{Binding ActiveDocument.Paste}" />
+        <KeyBinding Gesture="CTRL+X" Command="ApplicationCommands.Cut" />
+        <KeyBinding Gesture="CTRL+C" Command="ApplicationCommands.Copy" />
+        <KeyBinding Gesture="CTRL+V" Command="ApplicationCommands.Paste" />
         <KeyBinding Key="Delete" Command="{Binding ActiveDocument.Delete}" />
     </Window.InputBindings>
     <Window.TaskbarItemInfo>

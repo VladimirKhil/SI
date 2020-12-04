@@ -145,7 +145,14 @@ namespace SIQuester
                 
                 preview.SetWindowIcon(Properties.Resources.Icon.GetHicon());
 
-                TaskbarManager.Instance.TabbedThumbnail.AddThumbnailPreview(preview);
+                try
+                {
+                    TaskbarManager.Instance.TabbedThumbnail.AddThumbnailPreview(preview);
+                }
+                catch (COMException exc)
+                {
+                    MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
             }
 
             tabControl1.SelectedItem = tabItem;

@@ -169,6 +169,25 @@ namespace SIQuester
             {
                 // Ничего не сделаешь
             }
+            else if (e.Exception is InvalidOperationException invalidOperationException
+                && (invalidOperationException.Message.Contains("Невозможно выполнить эту операцию, когда привязка отсоединена")
+                || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))
+            {
+                MessageBox.Show(invalidOperationException.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            else if (e.Exception.Message.Contains("System.Windows.Automation")
+                || e.Exception.Message.Contains("UIAutomationCore.dll")
+                || e.Exception.Message.Contains("UIAutomationTypes"))
+            {
+                MessageBox.Show(
+                    "Ошибка старта приложения, связанная с Windows Automation." +
+                    " Попробуйте установить обновления для своей операционной системы, для .NET Framework 4" +
+                    " или установить библиотеку API Windows Automation (ссылка находится на странице приложения).",
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
             else
             {
                 var exception = e.Exception;

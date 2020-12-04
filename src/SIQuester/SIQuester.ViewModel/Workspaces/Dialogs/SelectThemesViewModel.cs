@@ -1,11 +1,10 @@
-﻿using System;
+﻿using SIPackages;
+using SIPackages.Core;
+using SIQuester.ViewModel.Properties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Input;
-using SIQuester.ViewModel.Properties;
-using SIPackages;
-using SIPackages.Core;
 
 namespace SIQuester.ViewModel
 {
@@ -58,7 +57,10 @@ namespace SIQuester.ViewModel
         public SelectThemesViewModel(QDocument document)
         {
             _document = document;
-            Themes = _document.Document.Package.Rounds.SelectMany(round => round.Themes).Select(theme => new SelectableTheme(theme)).ToArray();
+            Themes = _document.Document.Package.Rounds
+                .SelectMany(round => round.Themes)
+                .Select(theme => new SelectableTheme(theme))
+                .ToArray();
 
             Select = new SimpleCommand(Select_Executed);
             Select2 = new SimpleCommand(Select2_Executed);
@@ -95,22 +97,29 @@ namespace SIQuester.ViewModel
 
         private async void Select2_Executed(object arg)
         {
-            var authors = _document.Document.Package.Info.Authors;
-            var newDocument = SIDocument.Create(_document.Document.Package.Name, authors.Count > 0 ? authors[0] : Resources.Empty);
-            var mainRound = newDocument.Package.CreateRound(RoundTypes.Standart, Resources.ThemesCollection);
-
-            var allthemes = Themes.Where(st => st.IsSelected).Select(st => st.Theme);
-
-            foreach (var theme in allthemes)
+            try
             {
-                var newTheme = theme.Clone();
-                mainRound.Themes.Add(newTheme);
+                var authors = _document.Document.Package.Info.Authors;
+                var newDocument = SIDocument.Create(_document.Document.Package.Name, authors.Count > 0 ? authors[0] : Resources.Empty);
+                var mainRound = newDocument.Package.CreateRound(RoundTypes.Standart, Resources.ThemesCollection);
 
-                // Выгрузим с собой необходимые коллекции
-                await _document.Document.CopyCollections(newDocument, theme);
+                var allthemes = Themes.Where(st => st.IsSelected).Select(st => st.Theme);
+
+                foreach (var theme in allthemes)
+                {
+                    var newTheme = theme.Clone();
+                    mainRound.Themes.Add(newTheme);
+
+                    // Выгрузим с собой необходимые коллекции
+                    await _document.Document.CopyCollections(newDocument, theme);
+                }
+
+                OnNewItem(new QDocument(newDocument, _document.StorageContext) { FileName = newDocument.Package.Name });
             }
-
-            OnNewItem(new QDocument(newDocument, _document.StorageContext) { FileName = newDocument.Package.Name });
+            catch (Exception exc)
+            {
+                _document.OnError(exc);
+            }
         }
     }
 }

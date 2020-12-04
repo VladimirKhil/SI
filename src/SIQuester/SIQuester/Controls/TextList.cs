@@ -345,6 +345,7 @@ namespace SIQuester
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
+
             if (ItemsSource.Count == 0
                 || SelectionLength == 0 && (e.Key == Key.Back && offset == 0
                         || e.Key == Key.Delete && offset == _infos[index]._length)
@@ -446,7 +447,21 @@ namespace SIQuester
                 index++;
             }
 
-            return offset - length;
+            var result = offset - length;
+
+            if (index < 0 || index >= _infos.Count)
+            {
+                throw new InvalidOperationException(
+                    $"_infos = {string.Join(";", _infos.Select(info => info._length))}, offset = {offset}, index = {index}, result = {result}");
+            }
+
+            if (index < 0 || index >= ItemsSource.Count)
+            {
+                throw new InvalidOperationException(
+                    $"_infos = {string.Join(";", _infos.Select(info => info._length))}, ItemsSource.Count = {ItemsSource.Count}, offset = {offset}, index = {index}, result = {result}");
+            }
+
+            return result;
         }
 
         /// <summary>

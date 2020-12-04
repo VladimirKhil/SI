@@ -1,16 +1,13 @@
-﻿using System;
+﻿using Lingware.Spard.Expressions;
+using SIQuester.Model;
+using SIQuester.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Controls;
-using System.ComponentModel;
-using SIQuester.ViewModel;
-using System.Windows.Media;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Diagnostics;
-using SIQuester.Model;
-using Lingware.Spard.Expressions;
+using System.Windows.Media;
 
 namespace SIQuester
 {

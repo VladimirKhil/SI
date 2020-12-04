@@ -13,7 +13,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester.ViewModel", "src\SIQuester\SIQuester.ViewModel\SIQuester.ViewModel.csproj", "{8B3640F3-9547-4B76-874D-7FA2E75AD679}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIQuester", "src\SIQuester\SIQuester\SIQuester.csproj", "{D689345A-26EB-432D-8442-67E1DE287FE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIQuester", "src\SIQuester\SIQuester\SIQuester.csproj", "{D689345A-26EB-432D-8442-67E1DE287FE9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QTxtConverter", "src\SIQuester\QTxtConverter\QTxtConverter.csproj", "{00D18FE2-2E27-40E2-9EFC-4482069A2F2D}"
 EndProject
@@ -35,8 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{29A5EB8A-6B8
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
-		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 4
+		src\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 5
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 5
 		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection

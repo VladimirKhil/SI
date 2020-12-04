@@ -27,6 +27,11 @@ namespace SIQuester.ViewModel
 
         public void Select()
         {
+            if (Storage.CurrentPackage == null)
+            {
+                return;
+            }
+
             async Task<QDocument> loader()
             {
                 var packageUri = await Storage.LoadSelectedPackageUriAsync();

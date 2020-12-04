@@ -90,12 +90,12 @@ namespace SIQuester
             }
         }
 
-        void DocumentView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void DocumentView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             PreviewMouseMove -= MainWindow_PreviewMouseMove;
         }
 
-        void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void MainWindow_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             FrameworkElement host;
 
@@ -642,6 +642,12 @@ namespace SIQuester
         internal static void RecountPrices(ThemeViewModel theme)
         {
             var round = theme.OwnerRound;
+
+            if (round == null || round.Model == null || round.OwnerPackage?.Rounds == null)
+            {
+                return;
+            }
+
             var coef = round.Model.Type == RoundTypes.Final ? 0 : round.OwnerPackage.Rounds.IndexOf(round) + 1;
 
             for (int i = 0; i < theme.Questions.Count; i++)

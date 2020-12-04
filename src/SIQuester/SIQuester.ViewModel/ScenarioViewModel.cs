@@ -404,6 +404,11 @@ namespace SIQuester.ViewModel
                 return;
             }
 
+            if (document == null)
+            {
+                return;
+            }
+
             var collection = document.Images;
             if (mediaType == AtomTypes.Audio)
                 collection = document.Audio;

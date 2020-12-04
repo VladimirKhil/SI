@@ -117,6 +117,12 @@ namespace SIQuester.ViewModel
                 return;
 
             var document = OwnerDocument;
+
+            if (document == null)
+            {
+                return;
+            }
+
             document.BeginChange();
 
             try
@@ -139,6 +145,12 @@ namespace SIQuester.ViewModel
             var index = _currentPosition;
 
             var document = OwnerDocument;
+
+            if (document == null)
+            {
+                return;
+            }
+
             document.BeginChange();
 
             try

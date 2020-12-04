@@ -1,10 +1,6 @@
 ﻿using SIQuester.ViewModel.Commands;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
@@ -21,6 +17,10 @@ namespace SIQuester.ViewModel
         /// Название рабочей области
         /// </summary>
         public abstract string Header { get; }
+        /// <summary>
+        /// Подсказка рабочей области
+        /// </summary>
+        public virtual string ToolTip { get; } = null;
 
         /// <summary>
         /// Ошибка, возникшая в момент выполнения какой-либо операции

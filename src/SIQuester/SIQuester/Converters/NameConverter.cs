@@ -11,7 +11,9 @@ namespace SIQuester.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var namedObject = (NamedObject)value;
-            return namedObject.ID == -1 ? Resources.PublishersNotSet : namedObject.ID == -2 ? Resources.PublishersAll : namedObject.Name;
+            return namedObject == null || namedObject.ID == -1
+                ? Resources.PublishersNotSet
+                : namedObject.ID == -2 ? Resources.PublishersAll : namedObject.Name;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

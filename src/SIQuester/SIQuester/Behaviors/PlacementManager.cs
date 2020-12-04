@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -11,19 +7,19 @@ namespace SIQuester.Behaviors
 {
     public static class PlacementManager
     {
-        public static FrameworkElement GetPlacementTarget(DependencyObject obj)
+        public static UIElement GetPlacementTarget(DependencyObject obj)
         {
-            return (FrameworkElement)obj.GetValue(PlacementTargetProperty);
+            return (UIElement)obj.GetValue(PlacementTargetProperty);
         }
 
-        public static void SetPlacementTarget(DependencyObject obj, FrameworkElement value)
+        public static void SetPlacementTarget(DependencyObject obj, UIElement value)
         {
             obj.SetValue(PlacementTargetProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for PlacementTarget.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PlacementTargetProperty =
-            DependencyProperty.RegisterAttached("PlacementTarget", typeof(FrameworkElement), typeof(PlacementManager), new PropertyMetadata(null, OnPlacementTargetChanged));
+            DependencyProperty.RegisterAttached("PlacementTarget", typeof(UIElement), typeof(PlacementManager), new PropertyMetadata(null, OnPlacementTargetChanged));
 
         public static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

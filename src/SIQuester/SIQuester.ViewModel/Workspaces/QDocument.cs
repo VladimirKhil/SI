@@ -36,6 +36,7 @@ namespace SIQuester.ViewModel
         public static object ActivatedObject { get; set; }
 
         private const int MaxUndoListCount = 100;
+
         private bool _changed = false;
         private readonly Stack<IChange> _undoList = new Stack<IChange>();
         private readonly Stack<IChange> _redoList = new Stack<IChange>();
@@ -451,28 +452,31 @@ namespace SIQuester.ViewModel
 
         public PackageViewModel[] Packages => new PackageViewModel[] { Package };
 
-        private string path = null;
+        private string _path = null;
 
         /// <summary>
         /// Путь к файлу пакета
         /// </summary>
         public string Path
         {
-            get { return path; }
+            get => _path;
             set
             {
-                if (path != value)
+                if (_path != value)
                 {
-                    path = value;
+                    _path = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(Header));
+                    OnPropertyChanged(nameof(ToolTip));
                 }
             }
         }
 
+        public override string ToolTip => _path;
+
         private bool NeedSave()
         {
-            return Changed || string.IsNullOrEmpty(path);
+            return Changed || string.IsNullOrEmpty(_path);
         }
 
         private static string EncodePath(string path)
@@ -529,7 +533,7 @@ namespace SIQuester.ViewModel
         {
             if (temp)
             {
-                if (_changed && _lastChangedTime > _lastSavedTime && this.path.Length > 0)
+                if (_changed && _lastChangedTime > _lastSavedTime && this._path.Length > 0)
                 {
                     lock (Sync)
                     {
@@ -545,7 +549,7 @@ namespace SIQuester.ViewModel
                         var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester");
                         Directory.CreateDirectory(path);
 
-                        var tempName = System.IO.Path.Combine(path, EncodePath(this.path));
+                        var tempName = System.IO.Path.Combine(path, EncodePath(this._path));
                         using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
                         {
 
@@ -1466,7 +1470,7 @@ namespace SIQuester.ViewModel
                     File.Delete(OriginalPath);
                     OriginalPath = null;
                 }
-                else if (path.Length > 0)
+                else if (_path.Length > 0)
                     await SaveInternal();
                 else
                     await SaveAs();
@@ -1783,14 +1787,14 @@ namespace SIQuester.ViewModel
                 var testStream = File.Open(tempPath, FileMode.Open, FileAccess.Read);
                 using (SIDocument.Load(testStream)) { }
 
-                File.Copy(tempPath, path, true);
+                File.Copy(tempPath, _path, true);
                 File.Delete(tempPath);
 
                 Changed = false;
 
-                ClearTempFile(path);
+                ClearTempFile(_path);
 
-                var stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+                var stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
                 Document.ResetTo(stream);
             }
             finally
@@ -1820,14 +1824,14 @@ namespace SIQuester.ViewModel
                     await Video.Commit(Document.Video);
 
                 Document.Dispose();
-                ClearTempFile(this.path);
+                ClearTempFile(this._path);
 
                 Path = path;
                 Changed = false;
 
-                FileName = System.IO.Path.GetFileNameWithoutExtension(this.path);
+                FileName = System.IO.Path.GetFileNameWithoutExtension(this._path);
 
-                stream = File.Open(this.path, FileMode.Open, FileAccess.ReadWrite);
+                stream = File.Open(this._path, FileMode.Open, FileAccess.ReadWrite);
                 Document.ResetTo(stream);
             }
             catch (Exception exc)
@@ -2588,7 +2592,7 @@ namespace SIQuester.ViewModel
                 Document = null;
             }
 
-            ClearTempFile(path);
+            ClearTempFile(_path);
 
             if (OriginalPath != null)
             {
