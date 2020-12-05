@@ -1,7 +1,7 @@
-﻿using System.Windows;
+﻿using SIQuester.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using SIQuester.ViewModel;
 
 namespace SIQuester
 {

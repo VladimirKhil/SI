@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Notions;
 using System.Collections.Generic;
-using System.Text;
-using Notions;
 
 namespace QTxtConverter
 {

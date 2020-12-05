@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Controls;
-using System.Windows;
-using SIPackages;
-using SIPackages.Core;
+﻿using SIPackages;
 using SIQuester.ViewModel;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SIQuester.Selectors
 {

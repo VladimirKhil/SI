@@ -2479,7 +2479,7 @@ namespace SIQuester.ViewModel
 
                     for (int j = 0; j < 15; j++)
                     {
-                        int price = 0;
+                        int price;
                         if (j == 0) price = 500;
                         else if (j == 1) price = 1000;
                         else if (j == 2) price = 2000;

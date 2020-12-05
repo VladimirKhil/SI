@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SIQuester.Model;
+using System;
 using System.Net;
-using System.Xml;
-using SIQuester.Model;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace SIQuester
 {

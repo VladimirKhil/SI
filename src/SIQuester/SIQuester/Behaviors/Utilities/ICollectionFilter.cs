@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Data;
+﻿using System.Windows.Data;
 
 namespace SIQuester.Utilities
 {
     /// <summary>
-    /// Объект, который можно использовать для фильтрования коллекций
+    /// Объект, который можно использовать для фильтрации коллекций
     /// </summary>
     public interface ICollectionFilter
     {

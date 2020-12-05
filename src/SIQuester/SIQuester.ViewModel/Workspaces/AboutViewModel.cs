@@ -33,8 +33,6 @@ namespace SIQuester.ViewModel
         /// Перейти на сайт программы
         /// </summary>
         public ICommand OpenSite { get; private set; }
-        public ICommand OpenIcons { get; private set; }
-        public ICommand OpenIcons2 { get; private set; }
 
         private string _licenses;
 
@@ -51,13 +49,11 @@ namespace SIQuester.ViewModel
         public AboutViewModel()
         {
             OpenSite = new SimpleCommand(arg => GoToUrl("http://vladimirkhil.com/si/siquester"));
-            OpenIcons = new SimpleCommand(arg => GoToUrl("http://www.famfamfam.com/lab/icons/silk"));
-            OpenIcons2 = new SimpleCommand(arg => GoToUrl("http://modernuiicons.com"));
 
             LoadLicenses();
         }
 
-        private async void LoadLicenses()
+        private void LoadLicenses()
         {
             try
             {

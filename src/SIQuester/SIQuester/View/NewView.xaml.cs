@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SIQuester.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SIQuester
 {
@@ -26,7 +16,7 @@ namespace SIQuester
 
         private void ListView_DoubleClick(object sender, RoutedEventArgs e)
         {
-            ((SIQuester.ViewModel.NewViewModel)DataContext).Create.Execute(null);
+            ((NewViewModel)DataContext).Create.Execute(null);
         }
     }
 }

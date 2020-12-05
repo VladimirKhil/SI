@@ -5,15 +5,14 @@
     xmlns:siqcv="clr-namespace:SIQuester.Converters"
     xmlns:vm1="clr-namespace:SIQuester.ViewModel"
     xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    Title="SIQuester" Height="450" Width="746"
-    EnableDWMDropShadow="True"
+    Title="SIQuester"
+    Height="450"
+    Width="746"
+    TitleCharacterCasing="Normal" TitleBarHeight="25"
     Name="main" WindowState="Maximized" Icon="Resources/logo.png" Closed="Main_Closed" Closing="Main_Closing"
     Loaded="Main_Loaded"
     SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
-    SizeChanged="Main_SizeChanged" TitleCaps="False" TitlebarHeight="25"
-    WindowMinButtonStyle="{StaticResource TitleButton}"
-    WindowMaxButtonStyle="{StaticResource TitleButton}"
-    WindowCloseButtonStyle="{StaticResource TitleButton}"
+    SizeChanged="Main_SizeChanged"
     PreviewKeyDown="Main_PreviewKeyDown">
     <Window.Resources>
         <siqcv:UnionConverter x:Key="UnionConverter" />
@@ -182,6 +181,12 @@
             </Grid>
         </DataTemplate>
     </metro:MetroWindow.IconTemplate>
+    <metro:MetroWindow.WindowButtonCommands>
+        <metro:WindowButtonCommands
+            LightMaxButtonStyle="{StaticResource TitleButton}"
+            LightMinButtonStyle="{StaticResource TitleButton}"
+            LightCloseButtonStyle="{StaticResource TitleButton}" />
+    </metro:MetroWindow.WindowButtonCommands>
     <metro:MetroWindow.LeftWindowCommands>
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
             <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Новый… (Ctrl+N)" Command="ApplicationCommands.New">

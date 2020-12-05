@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Windows.Input;
-using System.Windows.Data;
-using System.ComponentModel;
-using System.Windows;
-using SIQuester.Model;
-using SIPackages;
-using System.Collections.ObjectModel;
+﻿using SIPackages;
 using SIPackages.Core;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {

@@ -3,7 +3,6 @@ using SIPackages.Core;
 using SIQuester.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace SIQuester.ViewModel.PlatformSpecific

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SIQuester.ViewModel;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
-using SIQuester.ViewModel;
 
 namespace SIQuester.Model
 {

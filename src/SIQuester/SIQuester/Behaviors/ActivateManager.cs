@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SIQuester.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
-using SIQuester.ViewModel;
 
 namespace SIQuester
 {

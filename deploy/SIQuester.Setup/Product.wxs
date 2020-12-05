@@ -178,6 +178,9 @@
       <Component Guid="{930943B4-D03E-40C3-8196-B966C21EB6C1}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\Modern UI Icons.license.txt" />
       </Component>
+      <Component Guid="{61EE4A7F-8729-4ABE-8BF8-4C2293620BE3}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)licenses\WindowsAPICodePack.LICENSE.txt" />
+      </Component>
       <Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
         <File KeyPath="yes" Source="$(var.SIQuester.ProjectDir)..\..\..\LICENSE" />
       </Component>

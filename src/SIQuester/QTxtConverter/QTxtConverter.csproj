@@ -10,7 +10,7 @@
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
     <Company>Svoyak-soft</Company>
-    <Version>5.6.1</Version>
+    <Version>5.6.2</Version>
     <Copyright>Copyright © Svoyak-soft 2009 - 2020</Copyright>
   </PropertyGroup>
   <ItemGroup>

@@ -1,19 +1,14 @@
-﻿using System;
+﻿using SIPackages.Core;
+using SIQuester.Model;
+using SIQuester.ViewModel.PlatformSpecific;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Input;
-using System.Windows.Documents;
 using System.Diagnostics;
 using System.IO;
-using System.Xml;
-using Notions;
-using SIQuester.Model;
-using SIQuester.ViewModel.Properties;
-using SIPackages.Core;
-using SIPackages;
-using SIQuester.ViewModel.PlatformSpecific;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Collections;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using SIQuester.Model;
-using SIQuester.ViewModel.PlatformSpecific;
-using SIQuester.ViewModel.Properties;
 
 namespace SIQuester
 {

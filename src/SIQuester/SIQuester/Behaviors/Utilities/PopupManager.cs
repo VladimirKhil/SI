@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Media;
-using SIQuester.ViewModel;
 
 namespace SIQuester.Utilities
 {

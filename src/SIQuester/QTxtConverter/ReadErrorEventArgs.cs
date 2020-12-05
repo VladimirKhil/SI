@@ -1,8 +1,6 @@
 ﻿using Lingware.Spard.Common;
 using Lingware.Spard.Expressions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QTxtConverter
 {

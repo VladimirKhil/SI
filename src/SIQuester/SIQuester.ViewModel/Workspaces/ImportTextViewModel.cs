@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Lingware.Spard.Expressions;
+using QTxtConverter;
+using SIPackages;
+using SIQuester.Model;
+using SIQuester.ViewModel.Core;
+using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
-using System.Collections.ObjectModel;
-using QTxtConverter;
-using System.Threading.Tasks;
 using System.Threading;
-using SIQuester.Model;
-using SIQuester.ViewModel.Properties;
-using SIPackages;
-using SIQuester.ViewModel.Core;
-using Lingware.Spard.Expressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
-using SIQuester.ViewModel.PlatformSpecific;
 
 namespace SIQuester.ViewModel
 {

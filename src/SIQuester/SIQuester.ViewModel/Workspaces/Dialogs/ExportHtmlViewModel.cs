@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SIQuester.Model;
+using System;
+using System.IO;
 using System.Windows.Input;
 using System.Xml;
-using System.IO;
-using SIQuester.Model;
 
 namespace SIQuester.ViewModel
 {

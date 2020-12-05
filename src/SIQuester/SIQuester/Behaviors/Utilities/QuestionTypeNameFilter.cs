@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SIQuester.Utilities
+﻿namespace SIQuester.Utilities
 {
     public sealed class QuestionTypeNameFilter: ICollectionFilter
     {

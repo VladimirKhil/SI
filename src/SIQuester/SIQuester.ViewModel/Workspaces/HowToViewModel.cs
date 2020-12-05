@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SIQuester.ViewModel.PlatformSpecific;
+﻿using SIQuester.ViewModel.PlatformSpecific;
 using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel

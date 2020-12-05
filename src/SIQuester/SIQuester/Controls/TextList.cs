@@ -1,18 +1,16 @@
-﻿using System;
+﻿using SIQuester.Utilities;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Windows.Controls;
-using System.Collections;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
-using System.ComponentModel;
-using System.Windows.Markup;
-using System.Windows.Documents;
-using System.Diagnostics;
 using System.Windows.Input;
-using System.Collections.Specialized;
-using SIQuester.Utilities;
+using System.Windows.Markup;
 
 namespace SIQuester
 {
@@ -579,7 +577,6 @@ namespace SIQuester
                 var text = new StringBuilder();
                 _infos.Clear();
                 int index = 0;
-                var colors = new List<Tuple<int, int>>();
                 var isFirst = true;
                 foreach (var item in Items.Cast<string>())
                 {

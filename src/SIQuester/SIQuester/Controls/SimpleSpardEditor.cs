@@ -362,9 +362,9 @@ namespace SIQuester
             }
             else
             {
-                if (expr is Instruction instruct && instruct.Argument is StringValue)
+                if (expr is Instruction instruct && instruct.Argument is StringValue stringValueInner)
                 {
-                    var stringValue = (StringValue)instruct.Argument;
+                    var stringValue = stringValueInner;
                     var value = stringValue.Value;
 
                     stringValue.Value = value.Substring(0, leftIndex) + text + value.Substring(leftIndex);
@@ -631,9 +631,9 @@ namespace SIQuester
                     toInsert = new InlineUIContainer(new TextBlock(run), pointer);
                 }
             }
-            else if (child is Set) // <Line>
+            else if (child is Set set) // <Line>
             {
-                GetSetDisplayData((Set)child, out string text, out SolidColorBrush color, out _);
+                GetSetDisplayData(set, out string text, out SolidColorBrush color, out _);
 
                 if (text == "\n")
                     toInsert = new LineBreak(pointer);
@@ -798,11 +798,11 @@ namespace SIQuester
             var newOps = sequence.OperandsArray.Where(ex => !exprs.Contains(ex));
             var first = inlines[0];
             var last = inlines[inlines.Length - 1];
-            if (first.PreviousInline is Run && last.NextInline is Run)
+            if (first.PreviousInline is Run && last.NextInline is Run run2)
             {
                 var prev = GetExpression(first.PreviousInline);
 
-                ((StringValue)((Instruction)prev).Argument).Value += ((Run)last.NextInline).Text;
+                ((StringValue)((Instruction)prev).Argument).Value += run2.Text;
 
                 newOps = newOps.Where(ex => ex != GetExpression(last.NextInline)).ToArray();
                 _indexTable.Remove(last.NextInline);

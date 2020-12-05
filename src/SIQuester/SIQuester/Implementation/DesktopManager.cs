@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Notions;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.Properties;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.PlatformSpecific;
 using System;
@@ -11,14 +13,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.Windows.Xps.Packaging;
 using System.Windows.Xps.Serialization;
-using Notions;
-using SIQuester.Properties;
-using System.Windows.Shell;
 
 namespace SIQuester.Implementation
 {

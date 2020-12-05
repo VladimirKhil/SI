@@ -32,8 +32,7 @@
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Svoyak-soft 2005 - 2020</Copyright>
-    <AssemblyVersion>5.6.1.0</AssemblyVersion>
-    <FileVersion>5.6.1.0</FileVersion>
+    <Version>5.6.2</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -54,14 +53,6 @@
       <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
-      <HintPath>dlls\Microsoft.WindowsAPICodePack.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
-      <HintPath>dlls\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="ReachFramework" />
     <Reference Include="System.AddIn" />
@@ -75,9 +66,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="MahApps.Metro" Version="1.5.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.2" />
   </ItemGroup>
   <ItemGroup>
     <None Include="licenses\MahApps.Metro.LICENSE">
@@ -92,8 +84,6 @@
     <None Include="Properties\DataSources\System.Uri.datasource" />
     <Resource Include="Resources\Entypo.ttf" />
     <None Include="site.url" />
-    <Content Include="dlls\Microsoft.WindowsAPICodePack.dll" />
-    <Content Include="dlls\Microsoft.WindowsAPICodePack.Shell.dll" />
     <Content Include="Help.xps">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

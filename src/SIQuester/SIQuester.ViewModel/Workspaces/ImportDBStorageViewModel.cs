@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Notions;
-using System.Xml;
-using SIQuester.ViewModel.Properties;
+﻿using Notions;
 using SIPackages;
 using SIPackages.Core;
-using SIQuester.ViewModel.Core;
+using SIQuester.ViewModel.Properties;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace SIQuester.ViewModel
 {
@@ -139,10 +137,10 @@ namespace SIQuester.ViewModel
                 theme.Info.Comments.Text = themeComments.ToString();
 
                 bool final = true;
-                Question quest = null;
                 var qText = new StringBuilder();
                 i--;
 
+                Question quest;
                 #region questionsReading
 
                 while (++i < text.Length)

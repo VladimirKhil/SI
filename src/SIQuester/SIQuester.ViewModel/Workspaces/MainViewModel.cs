@@ -1,24 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.Windows.Input;
-using System.Windows.Data;
-using Microsoft.Win32;
-using System.Windows;
-using System.Xml;
-using Notions;
-using System.Diagnostics;
-using System.IO;
+﻿using SIPackages;
+using SIPackages.Core;
 using SIQuester.Model;
-using SIQuester.ViewModel.Properties;
-using SIPackages;
-using System.Collections.ObjectModel;
 using SIQuester.ViewModel.Core;
 using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using SIPackages.Core;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
@@ -249,12 +244,12 @@ namespace SIQuester.ViewModel
             DocList.Add(new AboutViewModel());
         }
 
-        void MainViewModel_CurrentChanged(object sender, EventArgs e)
+        private void MainViewModel_CurrentChanged(object sender, EventArgs e)
         {
             ActiveDocument = CollectionViewSource.GetDefaultView(DocList).CurrentItem as QDocument;
         }
 
-        void DocList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void DocList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -293,18 +288,18 @@ namespace SIQuester.ViewModel
             }
         }
 
-        void Item_NewDoc(WorkspaceViewModel doc)
+        private void Item_NewDoc(WorkspaceViewModel doc)
         {
             DocList.Add(doc);
         }
 
-        void Item_Closed(WorkspaceViewModel doc)
+        private void Item_Closed(WorkspaceViewModel doc)
         {
             doc.Dispose();
             DocList.Remove(doc);
         }
 
-        void CheckSaveAllCanBeExecuted(object sender, EventArgs e)
+        private void CheckSaveAllCanBeExecuted(object sender, EventArgs e)
         {
             SaveAll.CanBeExecuted = DocList.Count > 0;
         }
@@ -392,19 +387,31 @@ namespace SIQuester.ViewModel
                 catch (Exception exc)
                 {
                     if (stream != null)
+                    {
                         stream.Dispose();
-
-                    if (exc is FileNotFoundException)
-                        AppSettings.Default.History.Remove(path);
+                    }
 
                     if (exc is UnauthorizedAccessException && (new FileInfo(path).Attributes & FileAttributes.ReadOnly) > 0)
                     {
-                        throw new Exception(Resources.FileIsReadOnly);
+                        throw new Exception(Resources.FileIsReadOnly, exc);
                     }
 
                     throw exc;
                 }
-            });
+            }).ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    if (task.Exception.InnerException is FileNotFoundException)
+                    {
+                        AppSettings.Default.History.Remove(path);
+                    }
+
+                    throw task.Exception.InnerException;
+                }
+
+                return task.Result;
+            }, TaskScheduler.FromCurrentSynchronizationContext());
 
             DocList.Add(new DocumentLoaderViewModel(path, loader, () =>
             {

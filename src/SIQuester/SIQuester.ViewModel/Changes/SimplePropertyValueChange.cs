@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SIQuester
+﻿namespace SIQuester
 {
     internal sealed class SimplePropertyValueChange: IChange
     {
