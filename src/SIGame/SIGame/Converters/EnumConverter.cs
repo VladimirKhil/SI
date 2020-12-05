@@ -14,11 +14,15 @@ namespace SIGame.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value == null)
+            {
                 return null;
+            }
 
             var field = EnumType.GetField(value.ToString());
             if (field == null)
+            {
                 return value.ToString();
+            }
 
             var description = (DisplayAttribute)Attribute.GetCustomAttribute(field, typeof(DisplayAttribute));
 

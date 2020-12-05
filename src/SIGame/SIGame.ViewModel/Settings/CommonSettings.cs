@@ -24,7 +24,7 @@ namespace SIGame
         /// <summary>
         /// Имя производителя (англ.)
         /// </summary>
-        public const string ManufacturerEn = "Svoyak-soft";
+        public const string ManufacturerEn = "Khil-soft";
         /// <summary>
         /// Имя игры (англ.)
         /// </summary>

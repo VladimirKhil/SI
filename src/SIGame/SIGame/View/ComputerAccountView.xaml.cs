@@ -16,7 +16,11 @@ namespace SIGame
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            Keyboard.Focus(tbName);
+            try
+            {
+                Keyboard.Focus(tbName);
+            }
+            catch { }
         }
     }
 }

@@ -9,9 +9,10 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Product>Notions</Product>
     <Description>String processing functions</Description>
-    <Company>Svoyak-soft</Company>
-    <Version>2.8.1</Version>
-    <Copyright>Copyright © Svoyak-soft 2007 - 2020</Copyright>
+    <Company>Khil-soft</Company>
+    <Version>2.9.0</Version>
+    <Copyright>Copyright © Khil-soft 2007 - 2020</Copyright>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

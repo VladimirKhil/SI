@@ -3,10 +3,10 @@
   
   <!-- При обновлении нужно повысить ProductVersion и задать новый GUID для ProductCode -->
   
-  <?define Manufacturer="Свояк-софт" ?>
+  <?define Manufacturer="Хиль-софт" ?>
   <?define ProductName="SIGame" ?>
   <?define ProductNameR="SIGame" ?>
-  <?define ManufacturerEn="Svoyak-soft" ?>
+  <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIGame" ?>
   <?define ProductVersion="!(bind.FileVersion.$(var.SIGame.TargetFileName))" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
@@ -145,18 +145,9 @@
       </Component>
       <Component Guid="{AEEB4B3B-4111-4DD2-949B-BB21D1C6CAD3}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Web.Http.Owin.dll" />
-      </Component>      
-      <Component Guid="{6E7C3879-8707-435D-95AA-287892D571E1}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)netstandard.dll" />
       </Component>
       <Component Guid="{8025836A-9446-44E2-B53D-3BD058364484}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.ComponentModel.Annotations.dll" />
-      </Component>
-      <Component Guid="{157658FF-73CE-4A3A-9FD3-891720C4C1A6}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Net.Http.dll" />
-      </Component>
-      <Component Guid="{8CC48776-AD53-4F9F-BD04-C539B4D6751D}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.IO.Compression.dll" />
       </Component>
       <Component Guid="{C975A012-4DCF-4C55-B17D-CE24C65203C6}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)MessagePack.dll" />
@@ -215,17 +206,11 @@
       <Component Guid="{1AF6371D-0B3C-454F-925F-02BBDA4CF333}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Buffers.dll" />
       </Component>
-      <Component Guid="{DD74790E-DA13-4BAC-B30E-E959EB39C9FD}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.InteropServices.RuntimeInformation.dll" />
-      </Component>
       <Component Guid="{850B75C6-FC7B-40CA-B352-F67647A5A3B5}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.Tasks.Extensions.dll" />
       </Component>
       <Component Guid="{E9B02733-B44D-4B3C-90CD-74754D123671}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
-      </Component>
-      <Component Guid="{9C053E13-3008-4514-B286-5C8D85E0CA30}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.dll" />
       </Component>
       <Component Guid="{EA533CC4-BACB-4077-8EED-F392C6762DBD}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Numerics.Vectors.dll" />
@@ -245,17 +230,6 @@
       <Component Guid="{D2A5182E-487B-4CD7-8864-25FCB8C1878B}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Encodings.Web.dll" />
       </Component>
-
-      <Component Guid="{8EA68229-9AF1-4B33-8845-573E5794D0F6}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.dll" />
-      </Component>
-      <Component Guid="{76D15DE4-2863-4AFA-A716-64ED5A6684C6}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Diagnostics.Debug.dll" />
-      </Component>
-      <Component Guid="{CFD3CBB7-0FF1-437B-81FB-31FE111D017E}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Diagnostics.Tracing.dll" />
-      </Component>
-      
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
       </Component>

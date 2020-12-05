@@ -259,7 +259,7 @@ namespace SICore
                 }
                 catch (IOException exc)
                 {
-                    _data.OnAddString(null, LO[nameof(R.ErrorWritingLogToDisc)] + ": " + exc.Message, LogMode.Log);
+                    _data.OnAddString(null, $"{LO[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                     try
                     {
                         _data.ProtocolWriter.Dispose();
@@ -271,6 +271,10 @@ namespace SICore
 
                     _data.ProtocolPath = null;
                     _data.ProtocolWriter = null;
+                }
+                catch (EncoderFallbackException exc)
+                {
+                    _data.OnAddString(null, $"{LO[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 }
             }
         }

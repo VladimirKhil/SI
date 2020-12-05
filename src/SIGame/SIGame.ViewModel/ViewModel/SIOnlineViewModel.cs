@@ -341,7 +341,7 @@ namespace SIGame.ViewModel
             return Task.CompletedTask;
         }
 
-        private async Task GameServerClient_Reconnected(string message)
+        private Task GameServerClient_Reconnected(string message)
         {
             OnMessage(Resources.App_Name, Resources.ReconnectedMessage);
 
@@ -353,6 +353,8 @@ namespace SIGame.ViewModel
             {
                 Error = exc.Message;
             });
+
+            return Task.CompletedTask;
         }
 
         private void AddEmoji_Executed(object arg)

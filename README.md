@@ -1,6 +1,6 @@
 Набор проектов для SIGame
 
-Для компиляции вам понадобится Visual Studio 2019 и выше.
+Для компиляции вам понадобится Visual Studio 2019 и выше, а также .NET Framework 4.8 Developer Pack.
 
 # Решения
 

@@ -14,10 +14,11 @@ namespace SICore.Network.Clients
         /// <summary>
         /// Входящие сообщения
         /// </summary>
-        private readonly Channel<Message> _inMessages = Channel.CreateUnbounded<Message>(new UnboundedChannelOptions
-        {
-            SingleReader = true
-        });
+        private readonly Channel<Message> _inMessages = Channel.CreateUnbounded<Message>(
+            new UnboundedChannelOptions
+            {
+                SingleReader = true
+            });
 
         private bool _isDisposed;
 
@@ -38,6 +39,17 @@ namespace SICore.Network.Clients
         public Client(string name)
         {
             Name = name;
+
+            if (_inMessages == null)
+            {
+                throw new InvalidOperationException("_inMessages == null");
+            }
+
+            if (_inMessages.Reader == null)
+            {
+                throw new InvalidOperationException("_inMessages.Reader == null");
+            }
+
             WaitForMessages();
         }
 
@@ -86,9 +98,8 @@ namespace SICore.Network.Clients
             Server = server;
         }
 
-        public Task ConnectToAsync(IServer server)
-        {
-            return Task.Run(() =>
+        public Task ConnectToAsync(IServer server) =>
+            Task.Run(() =>
             {
                 try
                 {
@@ -99,7 +110,6 @@ namespace SICore.Network.Clients
                     Server.OnError(exc, false);
                 }
             });
-        }
 
         /// <summary>
         /// Отправка сообщения

@@ -7,10 +7,11 @@
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Vladimir Khil</Authors>
-    <Company>Svoyak-soft</Company>
-    <Version>7.4.1</Version>
+    <Company>Khil-soft</Company>
+    <Version>7.5.0</Version>
+    <LangVersion>8</LangVersion>
     <Description>SIGame web connector</Description>
-    <Copyright>Copyright © Svoyak-soft 2005 - 2020</Copyright>
+    <Copyright>Copyright © Khil-soft 2005 - 2020</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

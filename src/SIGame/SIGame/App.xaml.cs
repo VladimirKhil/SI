@@ -151,7 +151,7 @@ namespace SIGame
                 return;
             }
 
-            if (inner is System.Windows.Markup.XamlParseException || inner is NotImplementedException || inner is TypeInitializationException)
+            if (inner is System.Windows.Markup.XamlParseException || inner is NotImplementedException || inner is TypeInitializationException || inner is FileFormatException)
             {
                 MessageBox.Show($"{SIGame.Properties.Resources.Error_RuntimeBroken}: {inner.Message}", CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -169,6 +169,12 @@ namespace SIGame
                 return;
             }
 
+            if (inner is FileLoadException)
+            {
+                MessageBox.Show(inner.Message, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var message = e.Exception.ToString();
 
             if (message.Contains("System.Windows.Automation") || message.Contains("UIAutomationCore.dll") || message.Contains("UIAutomationTypes"))
@@ -177,7 +183,8 @@ namespace SIGame
                 return;
             }
 
-            if (message.Contains("ApplyTaskbarItemInfo"))
+            if (message.Contains("ApplyTaskbarItemInfo") || message.Contains("GetValueFromTemplatedParent") || message.Contains("IsBadSplitPosition")
+                || message.Contains("IKeyboardInputProvider.AcquireFocus") || message.Contains("ReleaseOnChannel") || message.Contains("ManifestSignedXml2.GetIdElement"))
             {
                 MessageBox.Show(SIGame.Properties.Resources.Error_OSBroken, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;

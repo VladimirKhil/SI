@@ -2,15 +2,15 @@
   <PropertyGroup>
     <ProductVersion>8.0.30703</ProductVersion>
     <ProjectGuid>{78C96549-6EA8-4236-B026-6ECA55D9EC3A}</ProjectGuid>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <AssemblyTitle>SIUI</AssemblyTitle>
-    <Company>Svoyak-soft</Company>
+    <Company>Khil-soft</Company>
     <Product>SIUI</Product>
     <Description>SIGame table ui</Description>
-    <Copyright>Copyright © Svoyak-soft 2010 - 2020</Copyright>
-    <AssemblyVersion>7.4.1.0</AssemblyVersion>
-    <FileVersion>7.4.1.0</FileVersion>
+    <Copyright>Copyright © Khil-soft 2010 - 2020</Copyright>
+    <Version>7.5.0</Version>
+    <LangVersion>8</LangVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

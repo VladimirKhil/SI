@@ -22,6 +22,7 @@
     <SuppressIces>ICE38;ICE57</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NetFx48.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -42,7 +43,7 @@
     <EmbeddedResource Include="WixUI_ru-ru.wxl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SIGame\SIGame.csproj">
+    <ProjectReference Include="..\..\src\SIGame\SIGame\SIGame.csproj">
       <Name>SIGame</Name>
       <Project>{a0d6e5f2-c486-465f-8b4b-368083e29b68}</Project>
       <Private>True</Private>

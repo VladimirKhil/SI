@@ -1,6 +1,8 @@
 ﻿using System.Windows.Input;
 using SIData;
 using SICore;
+using System;
+using SIGame.ViewModel.PlatformSpecific;
 
 namespace SIGame.ViewModel
 {
@@ -35,9 +37,18 @@ namespace SIGame.ViewModel
 
         private void SelectPicturePath_Executed(object arg)
         {
-            var avatar = PlatformSpecific.PlatformManager.Instance.SelectHumanAvatar();
-            if (avatar != null)
-                _model.Picture = avatar;
+            try
+            {
+                var avatar = PlatformManager.Instance.SelectHumanAvatar();
+                if (avatar != null)
+                {
+                    _model.Picture = avatar;
+                }
+            }
+            catch (Exception exc)
+            {
+                PlatformManager.Instance.ShowMessage(exc.Message, MessageType.Warning, true);
+            }
         }
     }
 }

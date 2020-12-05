@@ -4,7 +4,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <ProjectGuid>{A0D6E5F2-C486-465F-8B4B-368083E29B68}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -24,12 +24,12 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <AssemblyTitle>SIGame</AssemblyTitle>
-    <Company>Svoyak-soft</Company>
+    <Company>Khil-soft</Company>
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
-    <Copyright>Copyright © Svoyak-soft 2002-2020</Copyright>
-    <AssemblyVersion>7.4.1.0</AssemblyVersion>
-    <FileVersion>7.4.1.0</FileVersion>
+    <Copyright>Copyright © Khil-soft 2002-2020</Copyright>
+    <Version>7.5.0</Version>
+    <LangVersion>8</LangVersion>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -90,9 +90,6 @@
     <PackageReference Include="Owin" Version="1.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
