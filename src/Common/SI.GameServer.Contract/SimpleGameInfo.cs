@@ -4,7 +4,6 @@
     {
         public int GameID { get; set; }
         public string GameName { get; set; }
-
         public bool PasswordRequired { get; set; }
     }
 }
