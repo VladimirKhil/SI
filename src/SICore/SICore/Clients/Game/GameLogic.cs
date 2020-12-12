@@ -3445,7 +3445,7 @@ namespace SICore
             _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
             var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
-            var validationMessageOld = BuildValidationMessageOld(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
+            //var validationMessageOld = BuildValidationMessageOld(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
@@ -3474,7 +3474,7 @@ namespace SICore
                     _gameActions.SendMessage(msg.ToString(), _data.Players[i].Name);
 
                     _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
-                    _gameActions.SendMessage(validationMessageOld, _data.Players[i].Name);
+                    //_gameActions.SendMessage(validationMessageOld, _data.Players[i].Name);
                 }
             }
 
