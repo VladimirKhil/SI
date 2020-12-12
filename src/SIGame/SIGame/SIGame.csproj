@@ -61,7 +61,6 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
-  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="PresentationFramework.Aero2" />

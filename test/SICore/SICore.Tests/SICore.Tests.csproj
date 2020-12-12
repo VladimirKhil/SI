@@ -26,6 +26,4 @@
     <ProjectReference Include="..\..\..\src\SICore\SICore\SICore.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\..\src\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
-
 </Project>
