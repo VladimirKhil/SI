@@ -217,7 +217,7 @@ namespace SIGame.ViewModel
         {
             _model.ReadingSpeed = AppSettingsCore.DefaultReadingSpeed;
             _model.MultimediaPort = AppSettingsCore.DefaultMultimediaPort;
-            _model.TranslateGameToChat = false;
+            _model.TranslateGameToChat = true;
             _model.FalseStart = AppSettingsCore.DefaultFalseStart;
             _model.HintShowman = AppSettingsCore.DefaultHintShowman;
             _model.Oral = AppSettingsCore.DefaultOral;

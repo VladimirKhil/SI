@@ -74,7 +74,7 @@ namespace SIGame
         /// Транслировать ли игру в чат
         /// </summary>
         [XmlAttribute]
-        [DefaultValue(false)]
+        [DefaultValue(true)]
         public bool TranslateGameToChat
         {
             get { return _translateGameToChat; }
