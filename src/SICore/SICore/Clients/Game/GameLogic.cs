@@ -2912,7 +2912,7 @@ namespace SICore
             _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
             _gameActions.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
-            _gameActions.SendMessage(BuildValidationMessageOld(_data.Answerer.Name, answer), _data.ShowMan.Name);
+            //_gameActions.SendMessage(BuildValidationMessageOld(_data.Answerer.Name, answer), _data.ShowMan.Name);
         }
 
         private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
