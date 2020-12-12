@@ -598,7 +598,7 @@
     <value>ALL-IN!!!</value>
   </data>
   <data name="WeBeginRound" xml:space="preserve">
-    <value>Here we're starting! We're starting!</value>
+    <value>Here we're starting!; We're starting!</value>
   </data>
   <data name="With" xml:space="preserve">
     <value>with</value>
