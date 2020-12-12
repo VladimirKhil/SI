@@ -44,12 +44,11 @@ namespace SICore
         public Game(Client client, string documentPath, ILocalizer localizer, GameData gameData)
             : base(client, null, localizer, gameData)
         {
+            _gameActions = new GameActions(_client, ClientData, LO);
             _logic = CreateLogic(null);
 
             gameData.DocumentPath = documentPath;
             gameData.Share.Error += Share_Error;
-
-            _gameActions = new GameActions(_client, ClientData, LO);
         }
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
