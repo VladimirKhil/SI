@@ -176,40 +176,29 @@ namespace SICore
         /// <summary>
         /// Вывод сообщения в лог файл и в чат игры
         /// </summary>
-        /// <param name="replicCode">ReplicCodes код сообщения</param>
+        /// <param name="replicCode">ReplicCodes код сообщения или игрока</param>
         /// <param name="text">сообщение</param>
         public void OnReplic(string replicCode, string text)
         {
-            var (chat, forceChat, log) = OnReplicCore(replicCode, text);
-
-            if (chat != null && (forceChat || _data.BackLink.TranslateGameToChat))
-            {
-                _data.OnAddString(null, chat, LogMode.Protocol);
-            }
-
-            if (log != null && _data.BackLink.MakeLogs)
-            {
-                AddToFileLog(log + "<br />");
-            }
-        }
-
-        private (string chat, bool forceChat, string log) OnReplicCore(string replicCode, string text)
-        {
+            string logString = null;
             if (replicCode == ReplicCodes.Showman.ToString())
             {
+                // reset old speaker's replic
                 if (_data.Speaker != null)
                 {
                     _data.Speaker.Replic = "";
                 }
 
+                // add new replic to the current speaker
                 _data.Speaker = _data.ShowMan;
                 _data.Speaker.Replic = text;
 
-                return ($"{_data.Speaker.Name}: {text}", false,
-                    $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
-            }
+                logString = $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>";
 
-            if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
+                if (_data.BackLink.TranslateGameToChat)
+                    _data.AddToChat(new Message(text, _data.Speaker.Name));
+            }
+            else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
             {
                 var indexString = replicCode.Substring(1);
                 if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
@@ -222,17 +211,49 @@ namespace SICore
                     _data.Speaker = _data.Players[index];
                     _data.Speaker.Replic = text;
 
-                    return ($"{_data.Speaker.Name}: {text}", false,
-                        $"<span style=\"color: {GetColorByPlayerIndex(index)}; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
+                    logString = $"<span style=\"color: {GetColorByPlayerIndex(index)}; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>";
+
+                    if (_data.BackLink.TranslateGameToChat)
+                        _data.AddToChat(new Message(text, _data.Speaker.Name));
                 }
             }
-
-            if (replicCode != ReplicCodes.Special.ToString())
+            else if (replicCode == ReplicCodes.Special.ToString())
             {
-                return (null, false, $"<span style=\"font-style: italic\">{text}</span>");
+                logString = $"<span style=\"font-style: italic; font-weight: bold\">{text}</span>";
+                _data.OnAddString("* ", text, LogMode.Protocol);
+            }
+            else
+            {
+                // all other types of messages are printed only to logs
+                logString = $"<span style=\"font-style: italic\">{text}</span>";
             }
 
-            return ("* " + text, true, $"<span style=\"font-style: italic; font-weight: bold\">{text}</span>");
+            if (logString != null && _data.BackLink.MakeLogs)
+            {
+                logString += "<br/>";
+                AddToFileLog(logString);
+            }
+        }
+
+        private static string GetColorByPlayerIndex(int playerIndex)
+        {
+            switch (playerIndex)
+            {
+                case 0:
+                    return "#EF21A9";
+                case 1:
+                    return "#0BE6CF";
+                case 2:
+                    return "#FF0000";
+                case 3:
+                    return "#EF21A9";
+                case 4:
+                    return "#00FF00";
+                case 5:
+                    return "#0000FF";
+                default:
+                    return "#00FFFF";
+            }
         }
 
         internal void AddToFileLog(Message message) =>
@@ -281,27 +302,6 @@ namespace SICore
                 {
                     _data.OnAddString(null, $"{LO[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 }
-            }
-        }
-
-        private static string GetColorByPlayerIndex(int playerIndex)
-        {
-            switch (playerIndex)
-            {
-                case 0:
-                    return "#EF21A9";
-                case 1:
-                    return "#0BE6CF";
-                case 2:
-                    return "#FF0000";
-                case 3:
-                    return "#EF21A9";
-                case 4:
-                    return "#00FF00";
-                case 5:
-                    return "#0000FF";
-                default:
-                    return "#00FFFF";
             }
         }
 

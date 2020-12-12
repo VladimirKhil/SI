@@ -131,7 +131,7 @@ namespace SICore
         }
 
         /// <summary>
-        /// Файл протокола
+        /// Файл протокола (логов)
         /// </summary>
         public StreamWriter ProtocolWriter;
 
