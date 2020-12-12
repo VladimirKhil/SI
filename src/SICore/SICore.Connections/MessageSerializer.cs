@@ -1,11 +1,19 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Text;
 
 namespace SICore.Connections
 {
     internal static class MessageSerializer
     {
+        // Message buffer format:
+        // [0]: IsSystem | IsPrivate
+        // Sender
+        // Separator
+        // Receiver
+        // Separator
+        // Text
+        // 0
+
         private const byte Separator = (byte)'\n';
 
         public static int GetBufferSizeForMessage(Message message) =>
@@ -29,16 +37,31 @@ namespace SICore.Connections
 
         internal static Message DeserializeMessage(ReadOnlySequence<byte> buffer)
         {
+            if (buffer.Length < 1 + 2 + 1)
+            {
+                return Message.Empty;
+            }
+
             var data = buffer.Slice(0, 1).ToArray();
 
             var isSystem = (data[0] & 1) > 0;
             var isPrivate = (data[0] & 2) > 0;
 
             var position = buffer.PositionOf(Separator);
+            if (!position.HasValue)
+            {
+                return Message.Empty;
+            }
+
             var sender = Encoding.UTF8.GetString(buffer.Slice(1, position.Value).ToArray());
             buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
 
             position = buffer.PositionOf(Separator);
+            if (!position.HasValue)
+            {
+                return Message.Empty;
+            }
+
             var receiver = Encoding.UTF8.GetString(buffer.Slice(0, position.Value).ToArray());
             buffer = buffer.Slice(buffer.GetPosition(1, position.Value));
 

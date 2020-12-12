@@ -192,6 +192,11 @@ namespace SICore
         {
             if (personCode == ReplicCodes.Showman.ToString())
             {
+                if (_data.ShowMan == null)
+                {
+                    return (null, false, null);
+                }
+
                 if (_data.Speaker != null)
                 {
                     _data.Speaker.Replic = "";
@@ -200,7 +205,8 @@ namespace SICore
                 _data.Speaker = _data.ShowMan;
                 _data.Speaker.Replic = text;
 
-                return ($"{_data.Speaker.Name}: {text}", false,
+                return ($"{_data.Speaker.Name}: {text}",
+                    false,
                     $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
             }
 
@@ -217,7 +223,8 @@ namespace SICore
                     _data.Speaker = _data.Players[index];
                     _data.Speaker.Replic = text;
 
-                    return ($"{_data.Speaker.Name}: {text}", false,
+                    return ($"{_data.Speaker.Name}: {text}",
+                        false,
                         $"<span style=\"color: {GetColorByPlayerIndex(index)}; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
                 }
             }

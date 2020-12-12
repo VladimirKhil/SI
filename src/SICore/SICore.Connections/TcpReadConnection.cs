@@ -6,6 +6,7 @@ using System.IO.Pipelines;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -53,7 +54,7 @@ namespace SICore.Connections
             _logger = gameLogger;
         }
 
-        public async void StartRead(bool waitForUpgrade)
+        public async void StartRead(bool waitForUpgrade, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -65,8 +66,8 @@ namespace SICore.Connections
                 if (ProtocolVersion == 2)
                 {
                     var pipe = new Pipe();
-                    Task writing = FillPipeAsync(pipe.Writer);
-                    Task reading = ReadPipeAsync(pipe.Reader);
+                    var writing = FillPipeAsync(pipe.Writer, cancellationToken);
+                    var reading = ReadPipeAsync(pipe.Reader, cancellationToken);
 
                     await Task.WhenAll(reading, writing);
                     // Нормальное закрытие соединения
@@ -110,10 +111,14 @@ namespace SICore.Connections
             }
             catch (IOException)
             {
-                // Разрыв соединения
+                // Connection break
                 CloseCore(true, true);
             }
             catch (InvalidOperationException)
+            {
+                CloseCore(true, true);
+            }
+            catch (SocketException exc)
             {
                 CloseCore(true, true);
             }
@@ -124,23 +129,23 @@ namespace SICore.Connections
             }
         }
 
-        private async Task FillPipeAsync(PipeWriter writer)
+        private async Task FillPipeAsync(PipeWriter writer, CancellationToken cancellationToken = default)
         {
             var ns = _tcpClient.GetStream();
             ns.ReadTimeout = 20 * 1000;
 
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 //var memory = writer.GetMemory(_buffer.Length);
                 try
                 {
-                    var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length);
+                    var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken);
                     if (bytesRead < 1)
                     {
                         break;
                     }
 
-                    await writer.WriteAsync(new ReadOnlyMemory<byte>(_buffer, 0, bytesRead));
+                    await writer.WriteAsync(new ReadOnlyMemory<byte>(_buffer, 0, bytesRead), cancellationToken);
                     //writer.Advance(bytesRead);
                 }
                 catch (ObjectDisposedException)
@@ -154,7 +159,7 @@ namespace SICore.Connections
                     break;
                 }
 
-                var result = await writer.FlushAsync();
+                var result = await writer.FlushAsync(cancellationToken);
 
                 if (result.IsCompleted)
                 {
@@ -165,11 +170,11 @@ namespace SICore.Connections
             writer.Complete();
         }
 
-        private async Task ReadPipeAsync(PipeReader reader)
+        private async Task ReadPipeAsync(PipeReader reader, CancellationToken cancellationToken = default)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                var result = await reader.ReadAsync();
+                var result = await reader.ReadAsync(cancellationToken);
 
                 var buffer = result.Buffer;
                 SequencePosition? position;

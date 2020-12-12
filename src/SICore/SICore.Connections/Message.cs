@@ -20,6 +20,8 @@ namespace SICore.Connections
 
         private static readonly XmlWriterSettings Settings = new XmlWriterSettings();
 
+        internal static Message Empty = new Message();
+
         /// <summary>
         /// Текст сообщения
         /// </summary>

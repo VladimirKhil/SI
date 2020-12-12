@@ -18,7 +18,7 @@
 		<MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
 		<MediaTemplate EmbedCab="yes" />
 
-    <PropertyRef Id="WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED" />
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
     
     <Icon Id="AppIcon" SourceFile="$(var.SIGame.ProjectDir)Resources\game.ico" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />

@@ -22,6 +22,7 @@
     <SuppressIces>ICE38;ICE57</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NetFx48.wxs" />
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,5 +60,4 @@
 	</Target>
   <Target Name="AfterBuild">
   </Target>-->
-
 </Project>

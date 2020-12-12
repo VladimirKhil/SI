@@ -100,12 +100,13 @@ namespace SICore
 
                 for (int i = 0; i < _settings.Viewers.Length; i++)
                 {
-                    gameData.Viewers.Add(new ViewerAccount(_settings.Viewers[i]));
                     var name = _settings.Viewers[i].Name;
                     isHost = _createHost && gameData.HostName == name;
 
                     if (isHost)
                     {
+                        gameData.Viewers.Add(new ViewerAccount(_settings.Viewers[i]));
+                        
                         var viewerClient = new Client(_settings.Viewers[i].Name);
                         var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData { BackLink = _backLink });
                         viewerClient.ConnectTo(_server);
