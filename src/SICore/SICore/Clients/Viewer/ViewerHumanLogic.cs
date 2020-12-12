@@ -407,7 +407,8 @@ namespace SICore
                         }
                     }
 
-                    Print(ReplicManager.Special($"{LO[nameof(R.GameStarted)]} {DateTime.Now}"));
+                    //Print(ReplicManager.Special($"{LO[nameof(R.GameStarted)]} {DateTime.Now}"));
+                    OnReplic("l", $"{LO[nameof(R.GameStarted)]} {DateTime.Now}");
                     break;
 
                 case GameStage.Round:
@@ -747,7 +748,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        Print(LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                        OnReplic("t", LO[nameof(R.HttpsProtocolIsNotSupported)]);
                         return;
                     }
 
@@ -1006,7 +1007,7 @@ namespace SICore
         {
             try
             {
-                Print(ReplicManager.Special(LO[nameof(R.TryReconnect)]));
+                OnReplic("l", LO[nameof(R.TryReconnect)]);
 
                 var result = await connector.ReconnectToServer();
                 if (!result)
@@ -1015,7 +1016,7 @@ namespace SICore
                     return;
                 }
 
-                Print(ReplicManager.Special(LO[nameof(R.ReconnectOK)]));
+                OnReplic("l", LO[nameof(R.ReconnectOK)]);
                 await connector.RejoinGame();
 
                 if (!string.IsNullOrEmpty(connector.Error))
@@ -1023,10 +1024,10 @@ namespace SICore
                     if (connector.CanRetry)
                         AnotherTry(connector);
                     else
-                        Print(ReplicManager.Special(connector.Error));
+                        OnReplic("l", connector.Error);
                 }
                 else
-                    Print(ReplicManager.Special(LO[nameof(R.ReconnectEntered)]));
+                    OnReplic("l", LO[nameof(R.ReconnectEntered)]);
             }
             catch (Exception exc)
             {
@@ -1037,7 +1038,7 @@ namespace SICore
 
         private async void AnotherTry(IConnector connector)
         {
-            Print(ReplicManager.Special(connector.Error));
+            OnReplic("l", connector.Error);
             if (!_disposed)
             {
                 await Task.Delay(10000);
@@ -1180,7 +1181,7 @@ namespace SICore
 
             if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
             {
-                Print(LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                OnReplic("t", LO[nameof(R.HttpsProtocolIsNotSupported)]);
                 return;
             }
 
