@@ -41,8 +41,6 @@ namespace SICore.Network.Servers
 
         public event Action<Message, Exception> SerializationError;
 
-        protected event Action<Message> MessageReceived;
-
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
         protected abstract IEnumerable<IConnection> Connections { get; }
