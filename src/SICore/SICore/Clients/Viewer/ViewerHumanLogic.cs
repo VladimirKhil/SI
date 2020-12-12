@@ -176,11 +176,11 @@ namespace SICore
         /// <summary>
         /// Вывод сообщения в лог файл и в чат игры
         /// </summary>
-        /// <param name="personCode">ReplicCodes код сообщения</param>
+        /// <param name="replicCode">ReplicCodes код сообщения</param>
         /// <param name="text">сообщение</param>
-        public void OnReplic(string personCode, string text)
+        public void OnReplic(string replicCode, string text)
         {
-            var (chat, forceChat, log) = OnReplicCore(personCode, text);
+            var (chat, forceChat, log) = OnReplicCore(replicCode, text);
 
             if (chat != null && (forceChat || _data.BackLink.TranslateGameToChat))
             {
@@ -193,9 +193,9 @@ namespace SICore
             }
         }
 
-        private (string chat, bool forceChat, string log) OnReplicCore(string personCode, string text)
+        private (string chat, bool forceChat, string log) OnReplicCore(string replicCode, string text)
         {
-            if (personCode == ReplicCodes.Showman.ToString())
+            if (replicCode == ReplicCodes.Showman.ToString())
             {
                 if (_data.Speaker != null)
                 {
@@ -209,9 +209,9 @@ namespace SICore
                     $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>");
             }
 
-            if (personCode.StartsWith(ReplicCodes.Player.ToString()) && personCode.Length > 1)
+            if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
             {
-                var indexString = personCode.Substring(1);
+                var indexString = replicCode.Substring(1);
                 if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
                 {
                     if (_data.Speaker != null)
@@ -227,7 +227,7 @@ namespace SICore
                 }
             }
 
-            if (personCode != ReplicCodes.Special.ToString())
+            if (replicCode != ReplicCodes.Special.ToString())
             {
                 return (null, false, $"<span style=\"font-style: italic\">{text}</span>");
             }
