@@ -1196,7 +1196,7 @@ namespace SICore
 
             StopWaiting();
 
-            var msg = $"{GetRandomString(LO[nameof(R.InformChooser)])} {_data.Chooser.Name}";
+            var msg = string.Format(GetRandomString(LO[nameof(R.InformChooser)]), _data.Chooser.Name);
             _gameActions.ShowmanReplic(msg);
 
             _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);

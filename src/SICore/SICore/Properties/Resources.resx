@@ -198,7 +198,7 @@
     <value>Не знаю</value>
   </data>
   <data name="InformChooser" xml:space="preserve">
-    <value>Игру начнёт;Игру будет начинать</value>
+    <value>Игру начнёт {0};Игру будет начинать {0}</value>
   </data>
   <data name="ItsShowmanIs" xml:space="preserve">
     <value>Её ведущий — </value>

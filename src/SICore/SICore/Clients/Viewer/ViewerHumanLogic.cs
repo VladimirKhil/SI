@@ -173,6 +173,11 @@ namespace SICore
             }
         }
 
+        /// <summary>
+        /// Вывод сообщения в лог файл и в чат игры
+        /// </summary>
+        /// <param name="personCode">ReplicCodes код сообщения</param>
+        /// <param name="text">сообщение</param>
         public void OnReplic(string personCode, string text)
         {
             var (chat, forceChat, log) = OnReplicCore(personCode, text);

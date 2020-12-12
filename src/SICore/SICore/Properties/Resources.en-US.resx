@@ -313,7 +313,7 @@
     <value>I don't know</value>
   </data>
   <data name="InformChooser" xml:space="preserve">
-    <value>{player} will start the game; {player} is starting the game</value>
+    <value>{0} will start the game; {0} is starting the game</value>
   </data>
   <data name="IsApellating" xml:space="preserve">
     <value>is apellating his own answer</value>
