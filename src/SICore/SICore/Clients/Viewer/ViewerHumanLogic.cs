@@ -164,7 +164,7 @@ namespace SICore
 
             if (_data.BackLink.TranslateGameToChat || special)
             {
-                _data.OnAddString(null, toFormStr, LogMode.Protocol);
+                _data.OnAddString(null, toFormStr.Trim(), LogMode.Protocol);
             }
 
             if (_data.BackLink.MakeLogs)
