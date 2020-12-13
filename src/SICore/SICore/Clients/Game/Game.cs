@@ -121,7 +121,9 @@ namespace SICore
         private void Inform(string person = NetworkConstants.Everybody)
         {
             var info = new StringBuilder(Messages.Info2)
-                .Append(Message.ArgsSeparatorChar).Append(ClientData.Players.Count).Append(Message.ArgsSeparatorChar);
+                .Append(Message.ArgsSeparatorChar)
+                .Append(ClientData.Players.Count)
+                .Append(Message.ArgsSeparatorChar);
 
             AppendAccountExt(ClientData.ShowMan, info);
             info.Append(Message.ArgsSeparatorChar);
@@ -962,53 +964,7 @@ namespace SICore
                             break;
 
                         case Messages.Apellate:
-                            if (ClientData.AllowAppellation)
-                            {
-                                #region Appellate
-
-                                ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
-                                ClientData.AppellationSource = message.Sender;
-
-                                ClientData.AppelaerIndex = -1;
-                                if (ClientData.IsAppelationForRightAnswer)
-                                {
-                                    for (var i = 0; i < ClientData.Players.Count; i++)
-                                    {
-                                        if (ClientData.Players[i].Name == message.Sender)
-                                        {
-                                            var count = ClientData.QuestionHistory.Count;
-                                            for (var j = 0; j < count; j++)
-                                            {
-                                                var index = ClientData.QuestionHistory[j].PlayerIndex;
-                                                if (index == i)
-                                                {
-                                                    if (!ClientData.QuestionHistory[j].IsRight)
-                                                        ClientData.AppelaerIndex = index;
-
-                                                    break;
-                                                }
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    // Утверждение, что ответ неверен
-                                    var count = ClientData.QuestionHistory.Count;
-                                    if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
-                                        ClientData.AppelaerIndex = ClientData.QuestionHistory[count - 1].PlayerIndex;
-                                }
-
-                                if (ClientData.AppelaerIndex != -1)
-                                {
-                                    // Начата процедура апелляции
-                                    ClientData.AllowAppellation = false;
-                                    _logic.Stop(StopReason.Appellation);
-                                }
-
-                                #endregion
-                            }
+                            OnApellation(message, args);
                             break;
 
                         case Messages.Change:
@@ -1097,6 +1053,65 @@ namespace SICore
                 {
                     Share_Error(new Exception(message.Text, exc));
                 }
+            }
+        }
+
+        private void OnApellation(Message message, string[] args)
+        {
+            if (!ClientData.AllowAppellation)
+            {
+                return;
+            }
+
+            ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
+            ClientData.AppellationSource = message.Sender;
+
+            ClientData.AppelaerIndex = -1;
+            if (ClientData.IsAppelationForRightAnswer)
+            {
+                for (var i = 0; i < ClientData.Players.Count; i++)
+                {
+                    if (ClientData.Players[i].Name == message.Sender)
+                    {
+                        for (var j = 0; j < ClientData.QuestionHistory.Count; j++)
+                        {
+                            var index = ClientData.QuestionHistory[j].PlayerIndex;
+                            if (index == i)
+                            {
+                                if (!ClientData.QuestionHistory[j].IsRight)
+                                {
+                                    ClientData.AppelaerIndex = index;
+                                }
+
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (!ClientData.Players.Any(player => player.Name == message.Sender))
+                {
+                    // Апеллировать могут только игроки
+                    return;
+                }
+
+                // Утверждение, что ответ неверен
+                var count = ClientData.QuestionHistory.Count;
+                if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
+                {
+                    ClientData.AppelaerIndex = ClientData.QuestionHistory[count - 1].PlayerIndex;
+                }
+            }
+
+            if (ClientData.AppelaerIndex != -1)
+            {
+                // Начата процедура апелляции
+                ClientData.AllowAppellation = false;
+                _logic.Stop(StopReason.Appellation);
             }
         }
 

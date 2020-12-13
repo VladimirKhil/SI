@@ -22,6 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Bundle.wxs" />
+    <Compile Include="NetFx48.wxs" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">
@@ -50,9 +51,14 @@
   <ItemGroup>
     <Content Include="HyperlinkTheme.xml" />
     <Content Include="License.rtf" />
+    <Content Include="Resources\logo.ico" />
+    <Content Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HyperlinkTheme_ru-ru.wxl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--

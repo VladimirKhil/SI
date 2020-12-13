@@ -6,11 +6,11 @@
           Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
           Version="!(bind.packageVersion.SIQuester.Setup)" Manufacturer="Свояк-софт"
           UpgradeCode="31CC22C7-17EC-4D88-88F5-2E3EB1A1FA7C"
-          IconSourceFile="$(var.SolutionDir)SIQuester\Resources\logo.ico">
+          IconSourceFile="Resources\logo.ico">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
       <bal:WixStandardBootstrapperApplication LicenseUrl=""
                                               LocalizationFile="HyperlinkTheme_ru-ru.wxl" 
-                                              LogoFile="$(var.SolutionDir)SIQuester\Resources\logo.png"
+                                              LogoFile="Resources\logo.png"
                                               ThemeFile="HyperlinkTheme.xml"
                                               SuppressOptionsUI="yes" />
     </BootstrapperApplicationRef>
@@ -23,7 +23,7 @@
     </bal:Condition>
       
 		<Chain>
-          <PackageGroupRef Id="NetFx461Web" />
+          <PackageGroupRef Id="NetFx48Web" />
           <MsiPackage Id="SIQuester.Setup" DisplayName="SIQuester"
                       SourceFile="$(var.SIQuester.Setup.TargetPath)" />
 		</Chain>

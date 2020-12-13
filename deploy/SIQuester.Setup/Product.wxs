@@ -18,7 +18,7 @@
 		<MajorUpgrade DowngradeErrorMessage="Уже установлена более поздняя версия $(var.ProductNameR). Установка будет прекращена." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
 		<MediaTemplate EmbedCab="yes" />
 
-    <PropertyRef Id="WIX_IS_NETFRAMEWORK_461_OR_LATER_INSTALLED" />
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
     
     <Icon Id="AppIcon" SourceFile="$(var.SIQuester.ProjectDir)Resources\logo.ico" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />
@@ -101,47 +101,11 @@
       <Component Guid="{8719608C-AC17-4252-94A7-A00C1B9DE46C}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)MahApps.Metro.dll" />
       </Component>
-      <Component Guid="{F0265FA9-8E3A-44ED-9A1E-554F02597BDB}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Windows.Interactivity.dll" />
-      </Component>
       <Component Guid="{0497682E-D9CD-4CB0-8D0B-5B1247A98C08}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Newtonsoft.Json.dll" />
       </Component>
       <Component Guid="{BE062A3B-5687-4676-9F5B-710AFB837C5F}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Net.Http.Formatting.dll" />
-      </Component>
-      <Component Guid="{6710D08D-43F3-467C-8C17-15E7E2791217}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)netstandard.dll" />
-      </Component>
-      <Component Guid="{4F526FA0-C8FB-4DF3-B35E-C3E6794E8870}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Net.Http.dll" />
-      </Component>
-      <Component Guid="{7EA2B930-DD62-421F-A02C-A0A8928FB372}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.IO.Compression.dll" />
-      </Component>
-        <Component Guid="{EE5826EA-A2C6-4A4A-B05B-54B1F4983471}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Runtime.dll" />
-      </Component>
-      <Component Guid="{27B28849-9199-4A88-9F69-7112F9AA1C38}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Collections.dll" />
-      </Component>
-      <Component Guid="{E36141CF-C5CF-4D2C-BF7A-5552F8F67835}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.IO.dll" />
-      </Component>
-      <Component Guid="{CA9A79FE-39F1-4498-BADE-EE32406A9C60}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Linq.dll" />
-      </Component>
-      <Component Guid="{A6EE3080-F3AC-416D-838F-118302482876}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Runtime.Extensions.dll" />
-      </Component>
-      <Component Guid="{3007F14C-F43C-46F3-9193-2048ADA7D83D}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Threading.dll" />
-      </Component>
-      <Component Guid="{7CDB917F-55B0-48DE-B4D7-0E16F452FB5C}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Diagnostics.Debug.dll" />
-      </Component>
-      <Component Guid="{849DFD6E-4A9A-4094-83FB-55D4694BE1E3}">
-        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)System.Runtime.Numerics.dll" />
       </Component>
       <Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Help.xps" />

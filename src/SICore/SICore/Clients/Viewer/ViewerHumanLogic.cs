@@ -183,6 +183,11 @@ namespace SICore
             string logString = null;
             if (replicCode == ReplicCodes.Showman.ToString())
             {
+                
+                if (_data.ShowMan == null)
+                {
+                    return;
+                }
                 // reset old speaker's replic
                 if (_data.Speaker != null)
                 {

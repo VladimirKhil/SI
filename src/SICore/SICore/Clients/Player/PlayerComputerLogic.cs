@@ -1478,7 +1478,7 @@ namespace SICore
                 }
                 catch (ArgumentOutOfRangeException exc)
                 {
-                    throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}", exc);
+                    throw new Exception($"CalculateAnsweringStrategy: riskRateLimit = {riskRateLimit}, playerStrength = {playerStrength}, playerData.RealBrave = {playerData.RealBrave}", exc);
                 }
             }
             else

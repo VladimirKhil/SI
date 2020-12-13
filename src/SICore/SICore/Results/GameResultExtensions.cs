@@ -25,21 +25,21 @@ namespace SICore.Results
         public static string ToString(this GameResult gameResult, SIDocument doc, ILocalizer localizer)
         {
             var result = new StringBuilder();
-            result.AppendFormat(DescriptionFormat, localizer[R.PackageName], gameResult.PackageName).AppendLine().AppendLine();
-            result.Append(localizer[R.GameResults]).AppendLine(":");
+            result.AppendFormat(DescriptionFormat, localizer[nameof(R.PackageName)], gameResult.PackageName).AppendLine().AppendLine();
+            result.Append(localizer[nameof(R.GameResults)]).AppendLine(":");
 
             foreach (var item in gameResult.Results)
             {
                 result.AppendFormat(DescriptionFormat, item.Name, item.Sum).AppendLine();
             }
 
-            result.AppendLine().Append(localizer[R.ApellatedAnswers]).AppendLine(":");
-            PrintCollection(doc, gameResult.ApellatedQuestions, result, localizer[R.Apellation], localizer);
+            result.AppendLine().Append(localizer[nameof(R.ApellatedAnswers)]).AppendLine(":");
+            PrintCollection(doc, gameResult.ApellatedQuestions, result, localizer[nameof(R.Apellation)], localizer);
 
-            result.AppendLine().Append(localizer[R.WrongAnswers]).AppendLine(":");
-            PrintCollection(doc, gameResult.WrongVersions, result, localizer[R.WrongAns], localizer);
+            result.AppendLine().Append(localizer[nameof(R.WrongAnswers)]).AppendLine(":");
+            PrintCollection(doc, gameResult.WrongVersions, result, localizer[nameof(R.WrongAns)], localizer);
 
-            result.AppendLine().Append(localizer[R.ErrorMessages]).AppendLine(":");
+            result.AppendLine().Append(localizer[nameof(R.ErrorMessages)]).AppendLine(":");
             result.AppendLine(gameResult.ErrorLog);
 
             return result.ToString().Replace(Environment.NewLine, "\r");
@@ -71,9 +71,9 @@ namespace SICore.Results
 
                 var quest = theme.Questions[answerInfo.Question];
 
-                result.AppendFormat(DescriptionFormat, localizer[R.Question], quest.Scenario.ToString()).AppendLine();
+                result.AppendFormat(DescriptionFormat, localizer[nameof(R.Question)], quest.Scenario.ToString()).AppendLine();
                 var right = quest.GetRightAnswers();
-                result.AppendFormat(DescriptionFormat, localizer[R.Answer], right.FirstOrDefault()).AppendLine();
+                result.AppendFormat(DescriptionFormat, localizer[nameof(R.Answer)], right.FirstOrDefault()).AppendLine();
                 result.AppendFormat(DescriptionFormat, answerTitle, answerInfo.Answer).AppendLine();
 
                 result.AppendLine();

@@ -56,8 +56,8 @@ namespace SICore
             Engine.Round += Engine_Round;
             Engine.RoundThemes += Engine_RoundThemes;
             Engine.Theme += Engine_Theme;
-            Engine.Question += Engine_Question;
-            Engine.QuestionSelected += Engine_QuestionSelected;
+            Engine.Question += Engine_Question; // Вопрос в упрощённой версии
+            Engine.QuestionSelected += Engine_QuestionSelected; // Вопрос в классической версии
 
             Engine.QuestionText += Engine_QuestionText;
             Engine.QuestionOral += Engine_QuestionOral;
@@ -205,8 +205,11 @@ namespace SICore
             _data.CurPriceRight = _data.CurPriceWrong = question.Price;
             _data.IsPlayingMedia = false;
             _data.IsPlayingMediaPaused = false;
+
             _gameActions.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
             _gameActions.SendMessageWithArgs(Messages.Question, question.Price);
+
+            _data.QuestionHistory.Clear();
 
             if (_data.Settings.AppSettings.HintShowman)
             {

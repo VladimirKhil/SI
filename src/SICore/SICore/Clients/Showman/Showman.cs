@@ -322,7 +322,7 @@ namespace SICore
 
         private void OnValidation(string[] mparams)
         {
-            var name = mparams[1];
+            ClientData.PersonDataExtensions.ValidatorName = mparams[1];
             ClientData.PersonDataExtensions.Answer = mparams[2];
             _logic.IsRight();
             int.TryParse(mparams[4], out var rightAnswersCount);
