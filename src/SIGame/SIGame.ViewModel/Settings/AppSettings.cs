@@ -68,13 +68,13 @@ namespace SIGame
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool _translateGameToChat = true;
+        private bool _translateGameToChat = false;
 
         /// <summary>
         /// Транслировать ли игру в чат
         /// </summary>
         [XmlAttribute]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool TranslateGameToChat
         {
             get { return _translateGameToChat; }
