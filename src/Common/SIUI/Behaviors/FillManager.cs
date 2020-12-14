@@ -173,7 +173,10 @@ namespace SIUI.Behaviors
                 return;
             }
 
-            var ft = new FormattedText(textBlock.Text, CultureInfo.CurrentUICulture, textBlock.FlowDirection, new Typeface(textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch), 1.0, textBlock.Foreground) { TextAlignment = textBlock.TextAlignment, Trimming = textBlock.TextTrimming };
+            var ft = new FormattedText(textBlock.Text, CultureInfo.CurrentUICulture, textBlock.FlowDirection, 
+                new Typeface(textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch),
+                1.0, textBlock.Foreground, 1.0)
+                { TextAlignment = textBlock.TextAlignment, Trimming = textBlock.TextTrimming };
 
             var lineHeight = GetInterlinyage(textBlock);
             if (lineHeight < textBlock.FontFamily.LineSpacing)

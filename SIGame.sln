@@ -25,7 +25,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "desktop", "desktop", "{15089A1F-44DF-4B42-83B3-313E024F07BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIUI", "src\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI", "src\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sicore", "sicore", "{C4457E87-27E4-45E3-ADF9-01BA5E9D5771}"
 EndProject
@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIGame.ViewModel.Web", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIGame.ViewModel", "src\SIGame\SIGame.ViewModel\SIGame.ViewModel.csproj", "{B992988A-31C6-44FD-8719-47144AE78BB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIGame", "src\SIGame\SIGame\SIGame.csproj", "{A0D6E5F2-C486-465F-8B4B-368083E29B68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIGame", "src\SIGame\SIGame\SIGame.csproj", "{A0D6E5F2-C486-465F-8B4B-368083E29B68}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{194A3EEE-066C-42E7-940A-6FA9EA9A969D}"
 EndProject
@@ -62,8 +62,6 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Common\SIService.Client\SIService.Client.projitems*{099e79ad-4a07-464e-bc5e-fe2b25b6b398}*SharedItemsImports = 5
-		src\Common\SIService.Client\SIService.Client.projitems*{7a17ca96-9f06-407b-8640-1ef9b5698055}*SharedItemsImports = 5
-		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{a0d6e5f2-c486-465f-8b4b-368083e29b68}*SharedItemsImports = 5
 		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{b992988a-31c6-44fd-8719-47144ae78bb8}*SharedItemsImports = 5
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13

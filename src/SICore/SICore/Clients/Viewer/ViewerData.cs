@@ -131,7 +131,7 @@ namespace SICore
         }
 
         /// <summary>
-        /// Файл протокола
+        /// Файл протокола (логов)
         /// </summary>
         public StreamWriter ProtocolWriter;
 
@@ -425,9 +425,14 @@ namespace SICore
 
         private readonly List<string> _chatTable = new List<string>();
 
+        /// <summary>
+        /// Add mesage to the game chat
+        /// </summary>
+        /// <param name="message"></param>
         internal void AddToChat(Message message)
         {
             var index = _chatTable.IndexOf(message.Sender);
+            // if user is not present in user list, add him
             if (index == -1)
             {
                 _chatTable.Add(message.Sender);

@@ -136,13 +136,13 @@
     <value>The answer should be given orally</value>
   </data>
   <data name="AnswerNotSet" xml:space="preserve">
-    <value>The answer is not set</value>
+    <value>Answer is not defined</value>
   </data>
   <data name="ApellationAccepted" xml:space="preserve">
-    <value>The apellation is accepted</value>
+    <value>Apellation was accepted</value>
   </data>
   <data name="ApellationDenied" xml:space="preserve">
-    <value>The apellation is denied</value>
+    <value>Apellation was denied</value>
   </data>
   <data name="Banned" xml:space="preserve">
     <value>{0} has kicked and banned {1}</value>
@@ -163,7 +163,7 @@
     <value>You can't kick yourself</value>
   </data>
   <data name="CatIsYours" xml:space="preserve">
-    <value>The question is yours</value>
+    <value>You are getting this question</value>
   </data>
   <data name="Change1" xml:space="preserve">
     <value>Has changed the score</value>
@@ -190,13 +190,13 @@
     <value>Has connected</value>
   </data>
   <data name="Cost" xml:space="preserve">
-    <value>The cost</value>
+    <value>Cost</value>
   </data>
   <data name="CreationDate" xml:space="preserve">
-    <value>The date of creation</value>
+    <value>Date of creation</value>
   </data>
   <data name="DeleteTheme" xml:space="preserve">
-    <value>Remove the theme you don't like;remove one of the themes, please</value>
+    <value>Remove a theme you don't like;remove one of the themes, please</value>
   </data>
   <data name="Disconnected_Female" xml:space="preserve">
     <value>Has disconnected</value>
@@ -205,7 +205,7 @@
     <value>Has disconnected</value>
   </data>
   <data name="EasyCat" xml:space="preserve">
-    <value>There's no question here! The money is just added to your score! Congratulations!</value>
+    <value>There's no question here! The money was just added to your score! Congratulations!</value>
   </data>
   <data name="Final" xml:space="preserve">
     <value>Final</value>
@@ -223,7 +223,7 @@
     <value>Game results</value>
   </data>
   <data name="GameResumed" xml:space="preserve">
-    <value>The game is resumed</value>
+    <value>The game has resumed</value>
   </data>
   <data name="GameRules" xml:space="preserve">
     <value>Game rules</value>
@@ -232,13 +232,13 @@
     <value>The game has started</value>
   </data>
   <data name="GameTableNumber" xml:space="preserve">
-    <value>The game table number</value>
+    <value>Game table number</value>
   </data>
   <data name="GameThemes" xml:space="preserve">
-    <value>Here are the themes of today's game; I offer the themes of today's game for your attention</value>
+    <value>Here are the themes of today's game; I offer these themes of today's game for your attention</value>
   </data>
   <data name="GameWillResume" xml:space="preserve">
-    <value>The game will skip the question, the host can play it himself (taking a pause). The game will resume in 15 seconds</value>
+    <value>The game will skip this question, host can play it himself (taking a pause). Game will resume in 15 seconds</value>
   </data>
   <data name="GiveCat" xml:space="preserve">
     <value>Who would you like to give the question to?</value>
@@ -250,7 +250,7 @@
     <value>Good evening!</value>
   </data>
   <data name="GoodLuck" xml:space="preserve">
-    <value>Thank you for the attention. We wish you good luck, see you soon, good bye!</value>
+    <value>Thank you for your attention. We wish you good luck, see you soon, good bye!</value>
   </data>
   <data name="GoodMorning" xml:space="preserve">
     <value>Good morning!</value>
@@ -262,10 +262,10 @@
     <value>, greetings!</value>
   </data>
   <data name="HeGave" xml:space="preserve">
-    <value>he game</value>
+    <value>he gave</value>
   </data>
   <data name="Hint" xml:space="preserve">
-    <value>Hint: you can press the game button at any point of the screen using the right button of the mouse or the {0} key</value>
+    <value>Hint: you can press the answer button at any point of the screen using right mouse button or {0} key</value>
   </data>
   <data name="HintChangeSum" xml:space="preserve">
     <value>Change the sum</value>
@@ -283,25 +283,25 @@
     <value>Make a bet</value>
   </data>
   <data name="HintSelectCatPlayer" xml:space="preserve">
-    <value>Select the player to give him the question</value>
+    <value>Select a player to give the question to</value>
   </data>
   <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
-    <value>Select the player who is given the question</value>
+    <value>Select a player who the question will be given to</value>
   </data>
   <data name="HintSelectPlayerForSumChange" xml:space="preserve">
-    <value>Select the player to change the score</value>
+    <value>Select a player to change his score</value>
   </data>
   <data name="HintSelectQuestion" xml:space="preserve">
-    <value>Select the question on the board</value>
+    <value>Select a question on the board</value>
   </data>
   <data name="HintSelectStaker" xml:space="preserve">
-    <value>Select the player who is making the bet</value>
+    <value>Select a player who is making a bet</value>
   </data>
   <data name="HintSelectStarter" xml:space="preserve">
-    <value>Select the player who is starting the round</value>
+    <value>Select a player who is starting the round</value>
   </data>
   <data name="HintSelectTheme" xml:space="preserve">
-    <value>Remove the theme on the board</value>
+    <value>Remove a theme on the board</value>
   </data>
   <data name="HintThemeDeleter" xml:space="preserve">
     <value>Select the player who is removing the theme</value>
@@ -313,7 +313,7 @@
     <value>I don't know</value>
   </data>
   <data name="InformChooser" xml:space="preserve">
-    <value>{player} will start the game; {player} is starting the game</value>
+    <value>{0} will start the game; {0} is starting the game</value>
   </data>
   <data name="IsApellating" xml:space="preserve">
     <value>is apellating his own answer</value>
@@ -340,7 +340,7 @@
     <value>This question will be played manually (while pauses). The game will resume in 15 seconds</value>
   </data>
   <data name="MinMaxChoice" xml:space="preserve">
-    <value>The minimum and the maximum in the round (on the choice)</value>
+    <value>The minimum and the maximum in the round (your choice)</value>
   </data>
   <data name="Mixed" xml:space="preserve">
     <value>Mixed</value>
@@ -352,10 +352,10 @@
     <value>No answer</value>
   </data>
   <data name="NobodyInFinal" xml:space="preserve">
-    <value>We could have the final round now, but none of the players has reached it!</value>
+    <value>We could have had the final round now, but none of the players reached it!</value>
   </data>
   <data name="NoFreePlaceForName" xml:space="preserve">
-    <value>There's no free space with such name1</value>
+    <value>There's no empty space for user with such name!</value>
   </data>
   <data name="Nominal" xml:space="preserve">
     <value>Nominal</value>
@@ -400,7 +400,7 @@
     <value>At the fourth table</value>
   </data>
   <data name="OnTheNinethTable" xml:space="preserve">
-    <value>At the nineth table</value>
+    <value>At the ninth table</value>
   </data>
   <data name="OnTheSecondTable" xml:space="preserve">
     <value>At the second table</value>
@@ -424,7 +424,7 @@
     <value>The game is paused...</value>
   </data>
   <data name="PAuthors" xml:space="preserve">
-    <value>The authors</value>
+    <value>Authors</value>
   </data>
   <data name="PComments" xml:space="preserve">
     <value>Comments</value>
@@ -433,13 +433,13 @@
     <value>player's type</value>
   </data>
   <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
-    <value>There is already a player with the nickname {0} in the game</value>
+    <value>There already is a player with nickname {0} in the game</value>
   </data>
   <data name="PlaceIsOccupied" xml:space="preserve">
     <value>The place is already occupied!</value>
   </data>
   <data name="PlayTheme" xml:space="preserve">
-    <value>So, we are taking the theme; We are taking the theme</value>
+    <value>So, we are taking theme; We are taking theme</value>
   </data>
   <data name="PleaseCheckApellation" xml:space="preserve">
     <value>Dear players, please, check whether the answer of {0} was correct</value>
@@ -451,7 +451,7 @@
     <value>Name</value>
   </data>
   <data name="PositionNotFoundByIndex" xml:space="preserve">
-    <value>The position with such number is not found</value>
+    <value>Position with such number was not found</value>
   </data>
   <data name="PressButton" xml:space="preserve">
     <value>Please, press the button right after the frame around the board appears</value>
@@ -463,16 +463,16 @@
     <value>Sources</value>
   </data>
   <data name="QuestionWithSpecialTheme" xml:space="preserve">
-    <value>A question for the special theme</value>
+    <value>A question with a special theme</value>
   </data>
   <data name="RandomThemes" xml:space="preserve">
     <value>Random theme set</value>
   </data>
   <data name="ReconnectEntered" xml:space="preserve">
-    <value>The reconnection is successful!</value>
+    <value>Reconnection was successful!</value>
   </data>
   <data name="ReconnectOK" xml:space="preserve">
-    <value>The reconnection is established...</value>
+    <value>Connection was established...</value>
   </data>
   <data name="Restrictions" xml:space="preserve">
     <value>Restrictions</value>
@@ -490,7 +490,7 @@
     <value>Round</value>
   </data>
   <data name="RoundThemes" xml:space="preserve">
-    <value>The round themes are; Here are the themes of the round</value>
+    <value>Round themes are; Here are the themes of the round</value>
   </data>
   <data name="Score" xml:space="preserve">
     <value>The score</value>
@@ -516,14 +516,11 @@
   <data name="ShowmanGreeting" xml:space="preserve">
     <value>Greetings, ladies and gentlement, this is SIGame!</value>
   </data>
-  <data name="ShowmanName" xml:space="preserve">
-    <value>P.B. Kuleshov</value>
-  </data>
   <data name="ShowmanSwitchedToNextRound" xml:space="preserve">
-    <value>The host has switched the game into the next round</value>
+    <value>Host has switched the game into the next round</value>
   </data>
   <data name="ShowmanSwitchedToPreviousRound" xml:space="preserve">
-    <value>The host has switched the game into the previous round</value>
+    <value>Host has switched the game into the previous round</value>
   </data>
   <data name="ShowmanWaiting" xml:space="preserve">
     <value>Waiting for the host's decision...</value>
@@ -532,7 +529,7 @@
     <value>You got a Question withour risk!</value>
   </data>
   <data name="SponsoredQuestionInfo" xml:space="preserve">
-    <value>the question if only for you. If you answer correctly, you'll earn {0} points, but you will lose nothing if your answer is not correct!</value>
+    <value>This question is only for you. If you answer correctly, you'll earn {0} points, otherwise you loose nothing!</value>
   </data>
   <data name="StageFinished" xml:space="preserve">
     <value>The game is over</value>
@@ -541,7 +538,7 @@
     <value>Bet</value>
   </data>
   <data name="StakeMakes" xml:space="preserve">
-    <value>Is making the bet</value>
+    <value>Is making a bet</value>
   </data>
   <data name="StakeTo" xml:space="preserve">
     <value>to</value>
@@ -553,16 +550,16 @@
     <value>Strange error</value>
   </data>
   <data name="Sure" xml:space="preserve">
-    <value>I presum, it's#; The answer is #!;It's obviously #; The answer is #;It's # as far as I can guess;It's # for no doubt; i'm sure it's #; It's clearly #;It's # for sure;It's #I think</value>
+    <value>I presume, it's #; The answer is #!;It's obviously #; The answer is #;It's # as far as I can guess;It's # for no doubt; i'm sure it's #; It's clearly #;It's # for sure;It's #I think</value>
   </data>
   <data name="ThankYou" xml:space="preserve">
     <value>Thank you! Pay attention to the board!</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>The theme</value>
+    <value>Theme</value>
   </data>
   <data name="ThemeDeletes" xml:space="preserve">
-    <value>Is removing the theme</value>
+    <value>Is removing a theme</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>to</value>
@@ -577,13 +574,13 @@
     <value>Trying to reconnect...</value>
   </data>
   <data name="TypeIgnoreWrong" xml:space="preserve">
-    <value>margin for error</value>
+    <value>Right for a mistake</value>
   </data>
   <data name="TypeManaged" xml:space="preserve">
-    <value>manageable</value>
+    <value>managable</value>
   </data>
   <data name="TypeNoFalseStart" xml:space="preserve">
-    <value>with no false starts</value>
+    <value>no false starts</value>
   </data>
   <data name="TypeOral" xml:space="preserve">
     <value>oral</value>
@@ -598,7 +595,7 @@
     <value>ALL-IN!!!</value>
   </data>
   <data name="WeBeginRound" xml:space="preserve">
-    <value>Here we're starting! We're starting!</value>
+    <value>Here we go!; We're starting!</value>
   </data>
   <data name="With" xml:space="preserve">
     <value>with</value>
@@ -628,7 +625,7 @@
     <value>you can say only</value>
   </data>
   <data name="YouGetAuction" xml:space="preserve">
-    <value>You get an Question with stake</value>
+    <value>You get Question with a stake</value>
   </data>
   <data name="YourAnswer" xml:space="preserve">
     <value>, what's your answer?; your answer is..?;?;, answer, please!;, I'm waiting for your answer;, please, answer the question</value>
@@ -637,13 +634,13 @@
     <value>on the choice</value>
   </data>
   <data name="YouReceiveCat" xml:space="preserve">
-    <value>You got a Question with secret! You should give the question to another player</value>
+    <value>You got Question with a secret! You should give the question to another player</value>
   </data>
   <data name="YourStake" xml:space="preserve">
     <value>what's your bet?;make your bet</value>
   </data>
   <data name="YouWin" xml:space="preserve">
-    <value>Congratulations, you're the winner!; My congratulation!; Congratulations on the victory!</value>
+    <value>Congratulations, you're the winner!; My congratulations!; Congratulations on the victory!</value>
   </data>
   <data name="StringParseError" xml:space="preserve">
     <value>String parse error</value>
@@ -664,10 +661,10 @@
     <value>Media {0} load error. Https protocol is not supported!</value>
   </data>
   <data name="Label_Auction" xml:space="preserve">
-    <value>QUESTION WITH STAKE</value>
+    <value>QUESTION WITH A STAKE</value>
   </data>
   <data name="Label_CatInBag" xml:space="preserve">
-    <value>QUESTION WITH SECRET</value>
+    <value>QUESTION WITH A SECRET</value>
   </data>
   <data name="Label_Sponsored" xml:space="preserve">
     <value>QUESTION WITHOUT RISK</value>
@@ -685,7 +682,7 @@
     <value>until</value>
   </data>
   <data name="AvatarTooBig" xml:space="preserve">
-    <value>Your avatar is bigger than 1 MB. Other players would not see it</value>
+    <value>Your avatar is bigger than 1 MB. Other players will not see it</value>
   </data>
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Message from unknown sender</value>
@@ -733,7 +730,7 @@
     <value>Wrong answers</value>
   </data>
   <data name="MediaNotFound" xml:space="preserve">
-    <value>File {0} not found in game package!</value>
+    <value>File {0} was not found in the game package!</value>
   </data>
   <data name="MediaFileNotSupported" xml:space="preserve">
     <value>Media file is not supported</value>

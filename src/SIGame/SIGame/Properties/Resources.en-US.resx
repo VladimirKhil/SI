@@ -178,7 +178,7 @@
     <value>Avatar...</value>
   </data>
   <data name="BaseCostForRandomPackage" xml:space="preserve">
-    <value>Base cost for a random pack</value>
+    <value>Base cost of a question in a random pack</value>
   </data>
   <data name="BirthDate" xml:space="preserve">
     <value>Date of birth</value>
@@ -220,7 +220,7 @@
     <value>Critical questions count for mobilization</value>
   </data>
   <data name="CriticalSumPartition" xml:space="preserve">
-    <value>Critical sum partition for mobilization</value>
+    <value>Critical score partition for mobilization</value>
   </data>
   <data name="DefaultSettingsWillBeUsed" xml:space="preserve">
     <value>Default settings will be used</value>
@@ -232,7 +232,7 @@
     <value>Descending</value>
   </data>
   <data name="DenyPressWhileReading" xml:space="preserve">
-    <value>You cannot press the button during the question reading</value>
+    <value>You cannot press the button during question reading</value>
   </data>
   <data name="Donate" xml:space="preserve">
     <value>Donate...</value>
@@ -367,7 +367,7 @@
     <value>Managed game</value>
   </data>
   <data name="ManagedGame_Hint" xml:space="preserve">
-    <value>The game goes on only when you preess "Next"</value>
+    <value>The game continues only when you preess "Next"</value>
   </data>
   <data name="Management" xml:space="preserve">
     <value>Management</value>
@@ -520,7 +520,7 @@
     <value>Russian</value>
   </data>
   <data name="SeacrhForUpdates" xml:space="preserve">
-    <value>Searching updates</value>
+    <value>Searching for updates</value>
   </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
@@ -628,13 +628,13 @@
     <value>Works for all the participants</value>
   </data>
   <data name="SumChange" xml:space="preserve">
-    <value>Sum change</value>
+    <value>Score change</value>
   </data>
   <data name="Sums" xml:space="preserve">
-    <value>Sum change</value>
+    <value>Score</value>
   </data>
   <data name="Sums_Hint" xml:space="preserve">
-    <value>Change sums of the players</value>
+    <value>Change scores of the players</value>
   </data>
   <data name="TableBackground" xml:space="preserve">
     <value>Table background color</value>
@@ -907,13 +907,13 @@
     <value>Profile</value>
   </data>
   <data name="Strength_High" xml:space="preserve">
-    <value>Strength: high</value>
+    <value>Difficulty: high</value>
   </data>
   <data name="Strength_Low" xml:space="preserve">
-    <value>Strength: low</value>
+    <value>Difficulty: low</value>
   </data>
   <data name="Strength_Middle" xml:space="preserve">
-    <value>Strength: middle</value>
+    <value>Difficulty: normal</value>
   </data>
   <data name="XpsHelp" xml:space="preserve">
     <value>help</value>

@@ -11,7 +11,11 @@ namespace SIGame.Tests
 
 		public TimerState State => throw new NotImplementedException();
 
-		public event Action<IAnimatableTimer> TimeChanged;
+		public event Action<IAnimatableTimer> TimeChanged
+		{
+			add { }
+			remove { }
+		}
 
 		public void Pause(int currentTime, bool byUser)
 		{
