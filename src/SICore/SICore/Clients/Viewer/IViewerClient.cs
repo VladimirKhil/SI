@@ -33,6 +33,8 @@ namespace SICore
         event Action StageChanged;
         event Action<string> Ad;
 
+        event Action OnIsHostChanged;
+
         void RecreateCommands();
         void Move(object arg);
         void Rename(string name);

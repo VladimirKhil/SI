@@ -26,9 +26,9 @@ namespace SICore
             set { _dialogMode = value; OnPropertyChanged(); }
         }
 
-        private ICommand _atomViewed;
+        private CustomCommand _atomViewed;
 
-        public ICommand AtomViewed
+        public CustomCommand AtomViewed
         {
             get { return _atomViewed; }
             set
@@ -43,9 +43,9 @@ namespace SICore
 
         public string ProtocolPath { get; set; }
 
-        private ICommand _kick;
+        private CustomCommand _kick;
 
-        public ICommand Kick
+        public CustomCommand Kick
         {
             get { return _kick; }
             set
@@ -58,9 +58,9 @@ namespace SICore
             }
         }
 
-        private ICommand _ban;
+        private CustomCommand _ban;
 
-        public ICommand Ban
+        public CustomCommand Ban
         {
             get { return _ban; }
             set
@@ -296,7 +296,7 @@ namespace SICore
                 }
             }
         }
-        
+
         public void OnAllPersonsChanged()
         {
             PersonsUpdateHistory.Append("Update: ").Append(PrintPersons()).AppendLine();
@@ -459,8 +459,22 @@ namespace SICore
             }
         }
 
+        private string _questionCaption;
+
+        public string QuestionCaption
+        {
+            get { return _questionCaption; }
+            set { _questionCaption = value; OnPropertyChanged(); }
+        }
+
         public string PackageId { get; internal set; }
         public int ButtonBlockingTime { get; internal set; } = 3;
+        public string ThemeName { get; internal set; }
+
+        /// <summary>
+        /// Имя хоста
+        /// </summary>
+        public string HostName { get; internal set; }
 
         internal event Action AutoReadyChanged;
 

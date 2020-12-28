@@ -24,10 +24,48 @@ namespace SICore
     {
         protected readonly ViewerActions _viewerActions;
 
+        public event Action OnIsHostChanged;
+
+        private bool _isHost;
+
         /// <summary>
         /// Является ли владельцем сервера
         /// </summary>
-        public bool IsHost { get; private set; }
+        public bool IsHost
+        {
+            get => _isHost;
+            private set
+            {
+                if (_isHost != value)
+                {
+                    _isHost = value;
+                    OnIsHostChanged?.Invoke();
+
+                    if (ClientData.Kick != null)
+                    {
+                        ClientData.Kick.CanBeExecuted = IsHost;
+                    }
+
+                    if (ClientData.Ban != null)
+                    {
+                        ClientData.Ban.CanBeExecuted = IsHost;
+                    }
+
+                    if (ClientData.ForceStart != null)
+                    {
+                        ClientData.ForceStart.CanBeExecuted = IsHost;
+                    }
+
+                    foreach (var account in MyData.MainPersons)
+                    {
+                        account.IsExtendedMode = IsHost;
+                    }
+
+                    UpdateAddTableCommand();
+                    UpdateDeleteTableCommand();
+                }
+            }
+        }
 
         public IConnector Connector { get; set; }
 
@@ -266,6 +304,7 @@ namespace SICore
                             break;
                         }
                         #endregion
+
                     case SystemMessages.Disconnect:
                         #region Disconnect
                         {
@@ -276,6 +315,7 @@ namespace SICore
                             break;
                         }
                         #endregion
+
                     case Messages.Disconnected:
                         OnDisconnected(mparams);
                         break;
@@ -286,7 +326,9 @@ namespace SICore
 
                     case Messages.Config:
                         if (ClientData.Me == null)
+                        {
                             break;
+                        }
 
                         ProcessConfig(mparams);
                         break;
@@ -302,6 +344,7 @@ namespace SICore
                             break;
                             #endregion
                         }
+
                     case Messages.ButtonBlockingTime:
                         if (mparams.Length > 1)
                         {
@@ -311,6 +354,23 @@ namespace SICore
                             }
                         }
                         break;
+
+                    case Messages.Hostname:
+                        if (mparams.Length > 1)
+                        {
+                            ClientData.HostName = mparams[1];
+                            IsHost = _client.Name == ClientData.HostName;
+                            if (mparams.Length > 2) // Хост был кем-то изменён
+                            {
+                                _logic.OnReplic(
+                                    ReplicCodes.Special.ToString(),
+                                    string.Format(LO[nameof(R.HostChanged)],
+                                        mparams[2].Length > 0 ? mparams[2] : LO[nameof(R.ByGame)],
+                                        mparams[1]));
+                            }
+                        }
+                        break;
+
                     case Messages.PackageId:
                         {
                             if (mparams.Length > 1)
@@ -319,11 +379,11 @@ namespace SICore
                             }
                             break;
                         }
+
                     case Messages.PackageLogo:
-                        {
-                            _logic.OnPackageLogo(mparams[1]);
-                            break;
-                        }
+                        _logic.OnPackageLogo(mparams[1]);
+                        break;
+
                     case Messages.FalseStart:
                         {
                             if (mparams.Length > 1)
@@ -351,12 +411,15 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.Print:
                         OnPrint(mparams);
                         break;
+
                     case Messages.Replic:
                         OnReplic(mparams);
                         break;
+
                     case Messages.Pause:
                         {
                             #region Pause
@@ -380,6 +443,7 @@ namespace SICore
 
                             #endregion
                         }
+
                     case Messages.Sums:
                         {
                             #region Sums
@@ -397,6 +461,7 @@ namespace SICore
 
                             #endregion
                         }
+
                     case Messages.Ready:
                         {
                             #region Ready
@@ -427,6 +492,7 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.Stage:
                         {
                             #region Stage
@@ -445,6 +511,8 @@ namespace SICore
 
                                 ClientData.ForceStart.CanBeExecuted = false;
                             }
+
+                            ClientData.QuestionCaption = null;
 
                             switch (ClientData.Stage)
                             {
@@ -476,6 +544,7 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.Timer:
                         {
                             var timerIndex = int.Parse(mparams[1]);
@@ -486,6 +555,7 @@ namespace SICore
 
                             break;
                         }
+
                     case Messages.GameThemes:
                         {
                             #region GameThemes
@@ -501,13 +571,25 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.RoundThemes:
                         OnRoundThemes(mparams);
                         break;
 
                     case Messages.Theme:
+                        if (mparams.Length > 1)
+                        {
+                            OnThemeOrQuestion(mparams);
+                            ClientData.ThemeName = mparams[1];
+                        }
+                        break;
+
                     case Messages.Question:
-                        OnThemeOrQuestion(mparams);
+                        if (mparams.Length > 1)
+                        {
+                            OnThemeOrQuestion(mparams);
+                            ClientData.QuestionCaption = $"{ClientData.ThemeName}, {mparams[1]}";
+                        }
                         break;
 
                     case Messages.Table:
@@ -563,7 +645,12 @@ namespace SICore
 
                                 if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
                                     && ClientData.QuestionIndex > -1 && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
-                                    ClientData.CurPriceRight = ClientData.CurPriceWrong = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions[ClientData.QuestionIndex].Price;
+                                {
+                                    var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
+                                    var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
+                                    ClientData.CurPriceRight = ClientData.CurPriceWrong = selectedQuestion.Price;
+                                    ClientData.QuestionCaption = $"{selectedTheme.Name}, {selectedQuestion.Price}";
+                                }
                             }
 
                             foreach (var player in ClientData.Players.ToArray())
@@ -578,6 +665,14 @@ namespace SICore
                             #endregion
                             break;
                         }
+
+                    case Messages.QuestionCaption:
+                        if (mparams.Length > 1)
+                        {
+                            ClientData.QuestionCaption = mparams[1];
+                        }
+                        break;
+
                     case Messages.QType:
                         {
                             #region QType
@@ -607,6 +702,7 @@ namespace SICore
 
                     case Messages.RightAnswer:
                         _logic.SetRight(mparams[2]);
+                        ClientData.QuestionCaption = null;
                         break;
 
                     case Messages.Resume:
@@ -695,11 +791,11 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.Pass:
-                        {
-                            _logic.OnPersonPass(int.Parse(mparams[1]));
-                            break;
-                        }
+                        _logic.OnPersonPass(int.Parse(mparams[1]));
+                        break;
+
                     case Messages.PersonFinalAnswer:
                         {
                             if (mparams.Length > 1 && int.TryParse(mparams[1], out int playerIndex))
@@ -1065,15 +1161,12 @@ namespace SICore
                 UpdateAddTableCommand();
                 UpdateDeleteTableCommand();
 
-                if (IsHost)
-                {
-                    UpdatePlayerCommands(account);
+                UpdatePlayerCommands(account);
 
-                    var canDelete = ClientData.Players.Count > 2;
-                    foreach (var player in ClientData.Players)
-                    {
-                        player.Delete.CanBeExecuted = canDelete;
-                    }
+                var canDelete = ClientData.Players.Count > 2;
+                foreach (var player in ClientData.Players)
+                {
+                    player.Delete.CanBeExecuted = canDelete;
                 }
             }
             finally
@@ -1288,13 +1381,10 @@ namespace SICore
                     ClientData.Viewers = cloneV;
                 }
 
-                if (IsHost)
+                var canDelete = ClientData.Players.Count > 2;
+                foreach (var player in ClientData.Players)
                 {
-                    var canDelete = ClientData.Players.Count > 2;
-                    foreach (var player in ClientData.Players)
-                    {
-                        player.Delete.CanBeExecuted = canDelete;
-                    }
+                    player.Delete.CanBeExecuted = canDelete;
                 }
             }
             finally

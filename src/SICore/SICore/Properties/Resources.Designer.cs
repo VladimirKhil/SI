@@ -196,6 +196,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на игрой.
+        /// </summary>
+        public static string ByGame {
+            get {
+                return ResourceManager.GetString("ByGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Компьютерных участников нельзя забанить!.
         /// </summary>
         public static string CannotBanBots {
@@ -736,6 +745,15 @@ namespace SICore.Properties {
         public static string HintThemeDeleter {
             get {
                 return ResourceManager.GetString("HintThemeDeleter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Хост игры был изменён {0} на {1}.
+        /// </summary>
+        public static string HostChanged {
+            get {
+                return ResourceManager.GetString("HostChanged", resourceCulture);
             }
         }
         

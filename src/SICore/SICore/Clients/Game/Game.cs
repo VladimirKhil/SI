@@ -174,6 +174,8 @@ namespace SICore
 
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
             _gameActions.SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
+
+            _gameActions.SendMessageWithArgs(Messages.Hostname, ClientData.HostName);
         }
 
         private void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -525,7 +527,6 @@ namespace SICore
                                 if (ClientData.Viewers.Contains(account))
                                 {
                                     ClientData.Viewers.Remove(account);
-                                    ClientData.OnAllPersonsChanged();
                                 }
                                 else
                                 {
@@ -541,10 +542,20 @@ namespace SICore
                                     }
                                 }
 
-                                if (args[1] == ClientData.HostName && ClientData.Settings.AppSettings.Managed && !_logic.IsRunning)
+                                ClientData.OnAllPersonsChanged();
+
+                                if (args[1] == ClientData.HostName)
                                 {
-                                    ClientData.MoveDirection = 1; // Дальше
-                                    _logic.Stop(StopReason.Move);
+                                    // Необходимо назначить нового хоста, если это возможно.
+                                    // Хост назначается случайный образом
+
+                                    SelectNewHost();
+
+                                    if (ClientData.Settings.AppSettings.Managed && !_logic.IsRunning)
+                                    {
+                                        ClientData.MoveDirection = 1; // Дальше
+                                        _logic.Stop(StopReason.Move);
+                                    }
                                 }
 
                                 OnPersonsChanged(false, withError);
@@ -1054,6 +1065,49 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             }
+        }
+
+        private void SelectNewHost()
+        {
+            static bool canBeHost(ViewerAccount account) => account.IsHuman && account.IsConnected;
+
+            string newHostName = null;
+            if (canBeHost(ClientData.ShowMan))
+            {
+                newHostName = ClientData.ShowMan.Name;
+            }
+            else
+            {
+                var availablePlayers = ClientData.Players
+                    .Where(canBeHost)
+                    .ToArray();
+
+                if (availablePlayers.Length > 0)
+                {
+                    var index = ClientData.Rand.Next(availablePlayers.Length);
+                    newHostName = availablePlayers[index].Name;
+                }
+                else
+                {
+                    var availableViewers = ClientData.Viewers
+                       .Where(canBeHost)
+                       .ToArray();
+
+                    if (availableViewers.Length > 0)
+                    {
+                        var index = ClientData.Rand.Next(availableViewers.Length);
+                        newHostName = availableViewers[index].Name;
+                    }
+                }
+            }
+
+            if (newHostName == null)
+            {
+                return;
+            }
+
+            ClientData.HostName = newHostName;
+            _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName, "" /* by game */);
         }
 
         private void OnApellation(Message message, string[] args)
@@ -1821,8 +1875,11 @@ namespace SICore
             var currentOrder = ClientData.Order;
             if (currentOrder != null && ClientData.Type != null && ClientData.Type.Name == QuestionTypes.Auction)
             {
-                ClientData.OrderHistory.Append("Before ").Append(playerIndex).Append(' ')
-                    .Append(string.Join(",", currentOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
+                ClientData.OrderHistory.Append("Before ")
+                    .Append(playerIndex)
+                    .Append(' ').Append(string.Join(",", currentOrder))
+                    .AppendFormat(" {0}", ClientData.OrderIndex)
+                    .AppendLine();
 
                 var newOrder = new int[ClientData.Players.Count];
 
@@ -1873,14 +1930,15 @@ namespace SICore
                             _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                         }
 
-                        PlanExecution(Tasks.AskStake, 20);
+                        ContinueMakingStakes();
                     }
                 }
                 else if (ClientData.Decision == DecisionType.NextPersonStakeMaking)
                 {
                     Logic.StopWaiting();
                     _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
-                    PlanExecution(Tasks.AskStake, 20);
+
+                    ContinueMakingStakes();
                 }
             }
 
@@ -1933,6 +1991,31 @@ namespace SICore
                     _logic.StopWaiting();
                     PlanExecution(Tasks.AskFirst, 20);
                     break;
+            }
+        }
+
+        private void ContinueMakingStakes()
+        {
+            if (ClientData.Players.Count(p => p.StakeMaking) == 1)
+            {
+                for (var i = 0; i < ClientData.Players.Count; i++)
+                {
+                    if (ClientData.Players[i].StakeMaking)
+                    {
+                        ClientData.StakerIndex = i;
+                    }
+                }
+
+                if (ClientData.Stake == -1)
+                {
+                    ClientData.Stake = ClientData.CurPriceRight;
+                }
+
+                PlanExecution(Tasks.PrintAuctPlayer, 10);
+            }
+            else
+            {
+                PlanExecution(Tasks.AskStake, 20);
             }
         }
 

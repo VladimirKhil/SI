@@ -746,4 +746,10 @@
   <data name="SureFemaleEnding" xml:space="preserve">
     <value>а</value>
   </data>
+  <data name="ByGame" xml:space="preserve">
+    <value>игрой</value>
+  </data>
+  <data name="HostChanged" xml:space="preserve">
+    <value>Хост игры был изменён {0} на {1}</value>
+  </data>
 </root>

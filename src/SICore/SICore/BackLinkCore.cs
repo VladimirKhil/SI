@@ -1,6 +1,4 @@
-﻿using Services.SI;
-using SICore.Results;
-using SIUI.ViewModel;
+﻿using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;

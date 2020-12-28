@@ -161,6 +161,11 @@
         public const string Hint = "HINT";
 
         /// <summary>
+        /// Имя хоста
+        /// </summary>
+        public const string Hostname = "HOSTNAME";
+
+        /// <summary>
         /// Нажатие на кнопку
         /// </summary>
         public const string I = "I";
@@ -304,6 +309,11 @@
         /// Вопрос
         /// </summary>
         public const string Question = "QUESTION";
+
+        /// <summary>
+        /// Заголовок вопроса
+        /// </summary>
+        public const string QuestionCaption = "QUESTIONCAPTION";
 
         /// <summary>
         /// Реплика игры/участника

@@ -3,7 +3,6 @@ using SICore.BusinessLogic;
 using SICore.Clients.Game;
 using SICore.Connections;
 using SICore.Results;
-using SICore.Special;
 using SICore.Utils;
 using SIData;
 using SIPackages;
@@ -630,12 +629,12 @@ namespace SICore
         private async void Engine_PrepareFinalQuestion(Theme theme, Question question)
         {
             await Task.Delay(1500);
-            _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
 
+            _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
             _data.Theme = theme;
-            var str = GetRandomString(LO[nameof(R.PlayTheme)]);
-            str += " " + theme.Name;
-            _gameActions.ShowmanReplic(str);
+
+            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {theme.Name}");
+            _gameActions.SendMessageWithArgs(Messages.QuestionCaption, theme.Name);
 
             ScheduleExecution(Tasks.Theme, 10, 1);
         }
@@ -4092,11 +4091,14 @@ namespace SICore
         private void PrintSecretQuestionInfo()
         {
             var questionTheme = _data.Type[QuestionTypeParams.Cat_Theme];
-            
+            var actualTheme = string.IsNullOrEmpty(questionTheme) ? _data.Theme.Name : questionTheme;
+
             var s = new StringBuilder(LO[nameof(R.Theme)])
                 .Append(": ")
-                .Append(string.IsNullOrEmpty(questionTheme) ? _data.Theme.Name : questionTheme)
+                .Append(actualTheme)
                 .AppendFormat(", {0}: ", LO[nameof(R.Cost)]);
+
+            _gameActions.SendMessageWithArgs(Messages.QuestionCaption, actualTheme);
 
             var cost = _data.Type[QuestionTypeParams.Cat_Cost];
 
@@ -4133,26 +4135,34 @@ namespace SICore
                         _data.CurPriceWrong = _data.CurPriceRight;
                     }
                     else if (_data.CatInfo.Step < _data.CatInfo.Maximum - _data.CatInfo.Minimum)
-                        add = LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Minimum) + " " + LO[nameof(R.From)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " " + LO[nameof(R.WithStepOf)] + " " + Notion.FormatNumber(_data.CatInfo.Step) + " (" + LO[nameof(R.YourChoice)] + ")";
+                    {
+                        add = $"{LO[nameof(R.From)]} {Notion.FormatNumber(_data.CatInfo.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(_data.CatInfo.Maximum)} {LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(_data.CatInfo.Step)} ({LO[nameof(R.YourChoice)]})";
+                    }
                     else
-                        add = Notion.FormatNumber(_data.CatInfo.Minimum) + " " + LO[nameof(R.Or)] + " " + Notion.FormatNumber(_data.CatInfo.Maximum) + " (" + LO[nameof(R.YourChoice)] + ")";
+                    {
+                        add = $"{Notion.FormatNumber(_data.CatInfo.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(_data.CatInfo.Maximum)} ({LO[nameof(R.YourChoice)]})";
+                    }
                 }
                 else
                 {
                     var catInfo = _data.CatInfo = new BagCatInfo();
 
-                    catInfo.Minimum = _data.Round.Themes[0].Questions[0].Price;
-                    catInfo.Maximum = catInfo.Minimum;
+                    catInfo.Minimum = -1;
+                    catInfo.Maximum = 0;
                     foreach (var theme in _data.Round.Themes)
                     {
                         foreach (var quest in theme.Questions)
                         {
                             var price = quest.Price;
-                            if (price < catInfo.Minimum)
+                            if (price < catInfo.Minimum || catInfo.Minimum == -1)
+                            {
                                 catInfo.Minimum = price;
+                            }
 
                             if (price > catInfo.Maximum)
+                            {
                                 catInfo.Maximum = price;
+                            }
                         }
                     }
 
@@ -4164,7 +4174,9 @@ namespace SICore
                         _data.CurPriceWrong = _data.CurPriceRight;
                     }
                     else
+                    {
                         add = LO[nameof(R.MinMaxChoice)];
+                    }
                 }
             }
 

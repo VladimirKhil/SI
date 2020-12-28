@@ -417,8 +417,7 @@ namespace SICore
                         }
                     }
 
-                    //Print(ReplicManager.Special($"{LO[nameof(R.GameStarted)]} {DateTime.Now}"));
-                    OnReplic("l", $"{LO[nameof(R.GameStarted)]} {DateTime.Now}");
+                    OnReplic(ReplicCodes.Special.ToString(), $"{LO[nameof(R.GameStarted)]} {DateTime.Now}");
                     break;
 
                 case GameStage.Round:
@@ -758,7 +757,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        OnReplic("t", LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                        OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.HttpsProtocolIsNotSupported)]);
                         return;
                     }
 
@@ -1017,7 +1016,7 @@ namespace SICore
         {
             try
             {
-                OnReplic("l", LO[nameof(R.TryReconnect)]);
+                OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.TryReconnect)]);
 
                 var result = await connector.ReconnectToServer();
                 if (!result)
@@ -1026,7 +1025,7 @@ namespace SICore
                     return;
                 }
 
-                OnReplic("l", LO[nameof(R.ReconnectOK)]);
+                OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.ReconnectOK)]);
                 await connector.RejoinGame();
 
                 if (!string.IsNullOrEmpty(connector.Error))
@@ -1034,10 +1033,10 @@ namespace SICore
                     if (connector.CanRetry)
                         AnotherTry(connector);
                     else
-                        OnReplic("l", connector.Error);
+                        OnReplic(ReplicCodes.Special.ToString(), connector.Error);
                 }
                 else
-                    OnReplic("l", LO[nameof(R.ReconnectEntered)]);
+                    OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.ReconnectEntered)]);
             }
             catch (Exception exc)
             {
@@ -1048,7 +1047,7 @@ namespace SICore
 
         private async void AnotherTry(IConnector connector)
         {
-            OnReplic("l", connector.Error);
+            OnReplic(ReplicCodes.Special.ToString(), connector.Error);
             if (!_disposed)
             {
                 await Task.Delay(10000);
@@ -1191,7 +1190,7 @@ namespace SICore
 
             if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
             {
-                OnReplic("t", LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.HttpsProtocolIsNotSupported)]);
                 return;
             }
 

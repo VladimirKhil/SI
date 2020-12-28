@@ -48,19 +48,6 @@ namespace SIData
         }
 
         /// <summary>
-        /// Для обратной совместимости (название переменной не позволяет понять, чему соответсвуют true и false)
-        /// </summary>
-        [Obsolete]
-        [XmlAttribute]
-        [DefaultValue(true)]
-        [DataMember]
-        public bool Sex
-        {
-            get => IsMale;
-            set { IsMale = value; }
-        }
-
-        /// <summary>
         /// Адрес картинки
         /// </summary>
         [XmlAttribute]

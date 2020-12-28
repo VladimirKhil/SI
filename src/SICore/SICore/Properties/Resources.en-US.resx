@@ -741,4 +741,10 @@
   <data name="SureFemaleEnding" xml:space="preserve">
     <value />
   </data>
+  <data name="ByGame" xml:space="preserve">
+    <value>by game</value>
+  </data>
+  <data name="HostChanged" xml:space="preserve">
+    <value>Game host was set {0} to {1}</value>
+  </data>
 </root>
