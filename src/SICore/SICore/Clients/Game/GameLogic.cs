@@ -15,7 +15,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
@@ -267,7 +266,7 @@ namespace SICore
 
                 _data.Text = text;
                 _data.TextLength = 0;
-                ExecuteTask((int)Tasks.PrintPartial, 0);
+                ScheduleExecution(Tasks.PrintPartial, 1);
             }
             else
             {
@@ -606,7 +605,7 @@ namespace SICore
             ScheduleExecution(Tasks.MoveNext, 20 + ClientData.Rand.Next(10));
         }
 
-        private void Engine_WaitDelete() => ExecuteTask((int)Tasks.AskToDelete, 0);
+        private void Engine_WaitDelete() => ScheduleExecution(Tasks.AskToDelete, 1);
 
         private void Engine_ThemeDeleted(int themeIndex)
         {
@@ -616,6 +615,7 @@ namespace SICore
                     .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})"))).Append(' ')
                     .Append(_data.ThemeIndex).Append(' ')
                     .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
+
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
             }
 
@@ -654,38 +654,26 @@ namespace SICore
             ScheduleExecution(Tasks.Winner, 15 + ClientData.Rand.Next(10));
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            var locked = Monitor.TryEnter(ClientData.TaskLock, TimeSpan.FromSeconds(5.0));
-            if (!locked)
-            {
-                ClientData.BackLink.OnError(new Exception($"Cannot lock {nameof(ClientData.TaskLock)}!"));
-            }
-
-            if (_data.AcceptedReports > 0)
-            {
-                _data.AcceptedReports = 0;
-                _data.BackLink.SaveReport(_data.GameResultInfo);
-            }
-
-            try
-            {
-                if (Engine != null)
+        protected override async ValueTask DisposeAsync(bool disposing) =>
+            await ClientData.TaskLock.TryLockAsync(
+                () =>
                 {
-                    Engine.Dispose();
-                    Engine = null;
-                }
+                    if (_data.AcceptedReports > 0)
+                    {
+                        _data.AcceptedReports = 0;
+                        _data.BackLink.SaveReport(_data.GameResultInfo);
+                    }
 
-                base.Dispose(disposing);
-            }
-            finally
-            {
-                if (locked)
-                {
-                    Monitor.Exit(ClientData.TaskLock);
-                }
-            }
-        }
+                    if (Engine != null)
+                    {
+                        Engine.Dispose();
+                        Engine = null;
+                    }
+
+                    return base.DisposeAsync(disposing);
+                },
+                5000,
+                true);
 
         internal override void Stop(StopReason reason)
         {
@@ -1294,7 +1282,7 @@ namespace SICore
         {
             var task = (Tasks)taskId;
 
-            lock (ClientData.TaskLock)
+            ClientData.TaskLock.WithLock(() =>
             {
                 try
                 {
@@ -1672,7 +1660,7 @@ namespace SICore
                     ClientData.MoveNextBlocked = true;
                     _gameActions.SpecialReplic("Game ERROR");
                 }
-            }
+            });
         }
 
         private void WaitCatCost()

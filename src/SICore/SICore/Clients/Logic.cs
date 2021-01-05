@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SICore
 {
@@ -10,7 +11,7 @@ namespace SICore
     /// Логика клиента
     /// </summary>
     /// <typeparam name="D">Тип данных клиента</typeparam>
-    public abstract class Logic<D> : IDisposable, ILogic
+    public abstract class Logic<D> : ILogic
         where D : Data
     {
         /// <summary>
@@ -126,7 +127,7 @@ namespace SICore
 
         #region IDisposable Members
 
-        protected virtual void Dispose(bool disposing)
+        protected virtual ValueTask DisposeAsync(bool disposing)
         {
             var locked = Monitor.TryEnter(_taskTimerLock, TimeSpan.FromSeconds(5.0));
             if (!locked)
@@ -149,11 +150,13 @@ namespace SICore
                     Monitor.Exit(_taskTimerLock);
                 }
             }
+
+            return default;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await DisposeAsync(true);
             GC.SuppressFinalize(this);
         }
 
@@ -162,6 +165,7 @@ namespace SICore
         protected void SetTask(int task, int taskArgument)
         {
             CurrentTask = task;
+
             _taskArgument = taskArgument;
         }
 
@@ -169,8 +173,8 @@ namespace SICore
         /// Выполнить действие через заданный промежуток времени
         /// </summary>
         /// <param name="task">Действие</param>
+        /// <param name="taskArgument">Параметр действия</param>
         /// <param name="taskTime">Промежуток времени</param>
-        /// <param name="taskParam">Параметр действия</param>
         protected void ScheduleExecution(int task, int taskArgument, double taskTime)
         {
             SetTask(task, taskArgument);

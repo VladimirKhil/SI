@@ -1,5 +1,6 @@
 ﻿using SICore.Connections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SICore.Network.Contracts
 {
@@ -7,6 +8,6 @@ namespace SICore.Network.Contracts
     {
         IEnumerable<IConnection> ExternalServers { get; }
 
-        void Kick(string name, bool ban = false);
+        ValueTask KickAsync(string name, bool ban = false);
     }
 }

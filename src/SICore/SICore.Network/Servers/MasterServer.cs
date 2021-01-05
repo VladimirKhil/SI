@@ -3,8 +3,6 @@ using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -21,7 +19,7 @@ namespace SICore.Network.Servers
         /// Остальные серверы
         /// </summary>
         protected List<IConnection> _connections = new List<IConnection>();
-
+        
         private readonly Dictionary<string, DateTime> _banned = new Dictionary<string, DateTime>();
 
         public override bool IsMain => true;
@@ -39,7 +37,7 @@ namespace SICore.Network.Servers
 
         }
 
-        public override bool AddConnection(IConnection connection)
+        public override async ValueTask<bool> AddConnectionAsync(IConnection connection)
         {
             if (_isDisposed)
             {
@@ -50,56 +48,61 @@ namespace SICore.Network.Servers
 
             if (_banned.TryGetValue(address, out DateTime date) && date > DateTime.UtcNow)
             {
-                connection.SendMessage(
+                await connection.SendMessageAsync(
                     new Message(
                         $"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{(date == DateTime.MaxValue ? "" : ($" {_localizer[nameof(R.Until)]} " + date.ToString(_localizer.Culture)))}\r\n",
-                        NetworkConstants.GameName
-                    )
+                        NetworkConstants.GameName)
                 );
 
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await Task.Delay(4000);
-                        connection.Dispose();
-                    }
-                    catch (Exception exc)
-                    {
-                        OnError(exc, true);
-                    }
-                });
-
+                DropConnection(connection);
                 return false;
             }
 
-            base.AddConnection(connection);
+            await base.AddConnectionAsync(connection);
 
-            lock (_connectionsSync)
+            await ConnectionsLock.WithLockAsync(() =>
             {
                 _connections.Add(connection);
-            }
+            });
 
             return true;
         }
 
-        public override void RemoveConnection(IConnection connection, bool withError)
+        /// <summary>
+        /// Waits and kills the connection. A wait is needed to prevent the client flooding.
+        /// </summary>
+        /// <remarks>It must be performed in a separate thread (`async void`) not to slow down the common connections listener.</remarks>
+        /// <param name="connection">Connection to kill.</param>
+        private async void DropConnection(IConnection connection)
         {
-            lock (_connectionsSync)
+            try
+            {
+                await Task.Delay(4000);
+                await connection.DisposeAsync();
+            }
+            catch (Exception exc)
+            {
+                OnError(exc, true);
+            }
+        }
+
+        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
+        {
+            await ConnectionsLock.WithLockAsync(() =>
             {
                 if (_connections.Contains(connection))
                 {
                     _connections.Remove(connection);
                 }
-            }
+            });
 
-            base.RemoveConnection(connection, withError);
+            await base.RemoveConnectionAsync(connection, withError);
         }
 
-        public void Kick(string name, bool ban = false)
+        public async ValueTask KickAsync(string name, bool ban = false)
         {
             IConnection connectionToClose = null;
-            lock (_connectionsSync)
+            await ConnectionsLock.WithLockAsync(() =>
             {
                 foreach (var connection in _connections)
                 {
@@ -115,7 +118,7 @@ namespace SICore.Network.Servers
                         break;
                     }
                 }
-            }
+            });
 
             if (connectionToClose != null)
             {
@@ -123,40 +126,30 @@ namespace SICore.Network.Servers
             }
         }
 
-        protected override void Dispose(bool disposing)
+        protected override async ValueTask DisposeAsync(bool disposing)
         {
             if (_isDisposed)
             {
                 return;
             }
 
-            var getLock = Monitor.TryEnter(_connectionsSync, 5000);
-            if (!getLock)
-            {
-                Trace.TraceError($"Cannot get {nameof(_connectionsSync)} in Dispose()!");
-            }
-
-            try
-            {
-                foreach (var connection in _connections)
+            await ConnectionsLock.TryLockAsync(
+                async () =>
                 {
-                    ClearListeners(connection);
-                    connection.Dispose();
-                }
+                    foreach (var connection in _connections)
+                    {
+                        ClearListeners(connection);
+                        await connection.DisposeAsync();
+                    }
 
-                _connections.Clear();
-            }
-            finally
-            {
-                if (getLock)
-                {
-                    Monitor.Exit(_connectionsSync);
-                }
-            }
+                    _connections.Clear();
+                },
+                5000,
+                true);
 
             _isDisposed = true;
 
-            base.Dispose(disposing);
+            await base.DisposeAsync(disposing);
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SICore.Connections
 {
     /// <summary>
-    /// Базовый класс для всех внешних серверов
+    /// Базовый класс для всех внешних подключений
     /// </summary>
     public abstract class ConnectionBase : IConnection
     {
@@ -50,12 +51,17 @@ namespace SICore.Connections
         public event Action<Exception, bool> Error;
 
         public event Action<Message, Exception> SerializationError;
+        public event Action Reconnecting;
+        public event Action Reconnected;
+
+        protected void OnReconnecting() => Reconnecting?.Invoke();
+        protected void OnReconnected() => Reconnected?.Invoke();
 
         public string UserName { get; set; } = Guid.NewGuid().ToString();
 
         public int GameId { get; set; }
 
-        public abstract void SendMessage(Message m);
+        public abstract ValueTask SendMessageAsync(Message m);
 
         public virtual void Close()
         {
@@ -83,7 +89,7 @@ namespace SICore.Connections
 
         protected void OnConnectionClose(bool withError)
         {
-            System.Threading.Tasks.Task.Run(() =>
+            Task.Run(() =>
             {
                 ConnectionClose?.Invoke(this, withError);
             }).ContinueWith(task =>
@@ -99,11 +105,11 @@ namespace SICore.Connections
 
         protected void OnSerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
-        protected abstract void Dispose(bool disposing);
+        protected abstract ValueTask DisposeAsync(bool disposing);
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await DisposeAsync(true);
             GC.SuppressFinalize(this);
         }
     }

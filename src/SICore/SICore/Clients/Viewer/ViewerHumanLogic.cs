@@ -953,11 +953,11 @@ namespace SICore
             _data.Sound = Sounds.RoundTimeout;
         }
 
-        protected override void Dispose(bool disposing)
+        protected override ValueTask DisposeAsync(bool disposing)
         {
             if (_disposed)
             {
-                return;
+                return default;
             }
 
             _disposed = true;
@@ -970,7 +970,7 @@ namespace SICore
 
             _data.BackLink.ClearTempFile();
 
-            base.Dispose(disposing);
+            return base.DisposeAsync(disposing);
         }
 
         public void FinalThink()

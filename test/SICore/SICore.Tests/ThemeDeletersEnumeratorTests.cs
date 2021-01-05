@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
 using SICore.Clients.Game;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SICore.Tests
 {

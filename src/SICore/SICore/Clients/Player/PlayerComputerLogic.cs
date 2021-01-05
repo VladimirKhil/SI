@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -1466,7 +1467,10 @@ namespace SICore
             {
                 playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
-                var riskRateLimit = (int)(100 * Math.Max(0, Math.Min(1, playerStrength / playerData.RealBrave)));
+                var riskRateLimit = playerData.RealBrave > 0
+                    ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / playerData.RealBrave)))
+                    : 100;
+
                 try
                 {
                     var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too

@@ -3,10 +3,9 @@ using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -24,13 +23,9 @@ namespace SICore.Network.Servers
         /// <summary>
         /// Список доступных клиентов
         /// </summary>
-        protected List<IClient> _clients = new List<IClient>();
+        private readonly ConcurrentDictionary<string, IClient> _clients = new ConcurrentDictionary<string, IClient>();
 
-        protected object _clientsSync = new object();
-
-        protected object _connectionsSync = new object();
-
-        public object ConnectionsSync => _connectionsSync;
+        public Lock ConnectionsLock { get; } = new Lock(nameof(ConnectionsLock));
 
         /// <summary>
         /// Является ли сервер главным
@@ -41,24 +36,30 @@ namespace SICore.Network.Servers
 
         public event Action<Message, Exception> SerializationError;
 
+        public event Action Reconnecting;
+        public event Action Reconnected;
+
+        protected void OnReconnecting() => Reconnecting?.Invoke();
+        protected void OnReconnected() => Reconnected?.Invoke();
+
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
         protected abstract IEnumerable<IConnection> Connections { get; }
 
-        public virtual bool AddConnection(IConnection connection)
+        public virtual ValueTask<bool> AddConnectionAsync(IConnection connection)
         {
             connection.MessageReceived += Connection_MessageReceived;
             connection.ConnectionClose += Connection_ConnectionClosed;
             connection.Error += OnError;
             connection.SerializationError += Connection_SerializationError;
 
-            return true;
+            return new ValueTask<bool>(true);
         }
 
-        public virtual void RemoveConnection(IConnection connection, bool withError)
+        public virtual async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
         {
             ClearListeners(connection);
-            connection.Dispose();
+            await connection.DisposeAsync();
 
             ConnectionClosed?.Invoke(withError);
         }
@@ -81,11 +82,11 @@ namespace SICore.Network.Servers
 
         public event Action<bool> ConnectionClosed;
 
-        protected void Connection_ConnectionClosed(IConnection connection, bool withError)
+        protected async void Connection_ConnectionClosed(IConnection connection, bool withError)
         {
             try
             {
-                RemoveConnection(connection, withError);
+                await RemoveConnectionAsync(connection, withError);
             }
             catch (Exception exc)
             {
@@ -106,18 +107,15 @@ namespace SICore.Network.Servers
                 if (clientName != null)
                 {
                     var m = new Message(string.Join(Message.ArgsSeparator, SystemMessages.Disconnect, clientName, (withError ? "+" : "-")), "", NetworkConstants.GameName);
-                    ProcessOutgoingMessage(m);
+                    await ProcessOutgoingMessageAsync(m);
                 }
             }
             else
             {
-                lock (_clientsSync)
+                foreach (var client in _clients.Values)
                 {
-                    foreach (var client in _clients)
-                    {
-                        var m = new Message(SystemMessages.Disconnect, "", client.Name);
-                        ProcessOutgoingMessage(m);
-                    }
+                    var m = new Message(SystemMessages.Disconnect, "", client.Name);
+                    await ProcessOutgoingMessageAsync(m);
                 }
             }
         }
@@ -127,7 +125,7 @@ namespace SICore.Network.Servers
         /// </summary>
         /// <param name="connection">Сервер, от которого пришло сообщение</param>
         /// <param name="m">Присланное сообщение</param>
-        private void Connection_MessageReceived(IConnection connection, Message m)
+        private async void Connection_MessageReceived(IConnection connection, Message m)
         {
             try
             {
@@ -171,7 +169,7 @@ namespace SICore.Network.Servers
                     m = new Message(messageText, sender, receiver, m.IsSystem, m.IsPrivate);
                 }
 
-                ProcessIncomingMessage(m);
+                await ProcessIncomingMessageAsync(m);
             }
             catch (Exception exc)
             {
@@ -179,23 +177,20 @@ namespace SICore.Network.Servers
             }
         }
 
-        private void ProcessIncomingMessage(Message message)
+        private async ValueTask ProcessIncomingMessageAsync(Message message)
         {
-            lock (_clientsSync)
+            foreach (var client in _clients.Values)
             {
-                foreach (var client in _clients)
+                if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
                 {
-                    if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
-                    {
-                        client.AddIncomingMessage(message);
-                    }
+                    client.AddIncomingMessage(message);
                 }
             }
 
             if (IsMain)
             {
                 // Надо переслать это сообщение остальным
-                lock (_connectionsSync)
+                await ConnectionsLock.WithLockAsync(async () =>
                 {
                     foreach (var connection in Connections)
                     {
@@ -204,40 +199,39 @@ namespace SICore.Network.Servers
                         if (IsMain)
                         {
                             send = (connection.UserName != message.Sender)
-                                && ((connection.UserName == message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
+                                && ((connection.UserName == message.Receiver)
+                                || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
                         }
                         else
                         {
                             lock (connection.ClientsSync)
                             {
                                 send = !connection.Clients.Contains(message.Sender)
-                                    && (connection.Clients.Contains(message.Receiver) || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
+                                    && (connection.Clients.Contains(message.Receiver)
+                                    || message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated);
                             }
                         }
 
                         if (send)
                         {
-                            connection.SendMessage(message);
+                            await connection.SendMessageAsync(message);
                         }
                     }
-                }
+                });
             }
         }
 
-        private void ProcessOutgoingMessage(Message message)
+        private async ValueTask ProcessOutgoingMessageAsync(Message message)
         {
-            lock (_clientsSync)
+            foreach (var client in _clients.Values)
             {
-                foreach (var client in _clients)
+                if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
                 {
-                    if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
-                    {
-                        client.AddIncomingMessage(message);
-                    }
+                    client.AddIncomingMessage(message);
                 }
             }
 
-            lock (_connectionsSync)
+            await ConnectionsLock.WithLockAsync(async () =>
             {
                 foreach (var connection in Connections)
                 {
@@ -246,32 +240,28 @@ namespace SICore.Network.Servers
                     if (IsMain)
                     {
                         send = (connection.UserName != message.Sender)
-                            && (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated || (connection.UserName == message.Receiver));
+                            && (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
+                            || (connection.UserName == message.Receiver));
                     }
                     else
                     {
                         lock (connection.ClientsSync)
                         {
                             send = !connection.Clients.Contains(message.Sender) &&
-                                (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated || connection.Clients.Contains(message.Receiver));
+                                (message.Receiver == NetworkConstants.Everybody && connection.IsAuthenticated
+                                || connection.Clients.Contains(message.Receiver));
                         }
                     }
 
                     if (send)
                     {
-                        connection.SendMessage(message);
+                        await connection.SendMessageAsync(message);
                     }
                 }
-            }
+            });
         }
 
-        public bool Contains(string name)
-        {
-            lock (_clientsSync)
-            {
-                return _clients.Exists(c => c.Name == name);
-            }
-        }
+        public bool Contains(string name) => _clients.ContainsKey(name);
 
         /// <summary>
         /// Добавление нового клиента
@@ -279,70 +269,30 @@ namespace SICore.Network.Servers
         /// <param name="client">Добавляемый клиент</param>
         public void AddClient(IClient client)
         {
-            lock (_clientsSync)
+            if (_clients.Values.Contains(client))
             {
-                if (_clients.Contains(client))
-                {
-                    return;
-                }
-
-                if (_clients.Any(c => c.Name == client.Name))
-                {
-                    throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
-                }
-
-                _clients.Add(client);
+                return;
             }
+
+            if (_clients.ContainsKey(client.Name))
+            {
+                throw new Exception(_localizer[nameof(R.ClientWithThisNameAlreadyExists)]);
+            }
+
+            _clients.AddOrUpdate(client.Name, client, (key, oldValue) => oldValue);
 
             client.SendingMessage += Client_SendingMessage;
         }
 
         private void Connection_SerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
-        public void DeleteClient(string name)
-        {
-            lock (_clientsSync)
-            {
-                foreach (var client in _clients)
-                {
-                    if (client.Name == name)
-                    {
-                        _clients.Remove(client);
-                        client.SendingMessage -= Client_SendingMessage;
-                        client.Dispose();
-                        break;
-                    }
-                }
-            }
-        }
-
-        public Task DeleteClientAsync(string name)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    DeleteClient(name);
-                }
-                catch (Exception exc)
-                {
-                    OnError(exc, false);
-                }
-            });
-        }
+        public bool DeleteClient(string name) => _clients.TryRemove(name, out _);
 
         public void ReplaceInfo(string name, IAccountInfo computerAccount)
         {
-            lock (_clientsSync)
+            if (_clients.TryGetValue(name, out var client))
             {
-                foreach (var client in _clients)
-                {
-                    if (client.Name == name)
-                    {
-                        client.ReplaceInfo(computerAccount);
-                        break;
-                    }
-                }
+                client.ReplaceInfo(computerAccount);
             }
         }
 
@@ -350,65 +300,52 @@ namespace SICore.Network.Servers
         /// Клиент отправляет сообщение
         /// </summary>
         /// <param name="obj">Отправляемое сообщение</param>
-        private void Client_SendingMessage(IClient sender, Message m)
+        private async void Client_SendingMessage(IClient sender, Message m)
         {
             if (string.IsNullOrWhiteSpace(m.Receiver))
+            {
                 return;
+            }
 
             if (m.Receiver[0] == AnonymousSenderPrefix)
             {
-                IConnection connection;
                 // Анонимное сообщение (серверу)
-                lock (_connectionsSync)
-                {
-                    connection = Connections.FirstOrDefault(conn => conn.Id == m.Receiver.Substring(1));
-                }
+                var connection = await ConnectionsLock.WithLockAsync(() =>
+                    Connections.FirstOrDefault(conn => conn.Id == m.Receiver.Substring(1)));
 
                 if (connection != null)
                 {
-                    connection.SendMessage(new Message(m.Text, m.Sender, NetworkConstants.Everybody, m.IsSystem, m.IsPrivate));
+                    await connection.SendMessageAsync(
+                        new Message(m.Text, m.Sender, NetworkConstants.Everybody, m.IsSystem, m.IsPrivate));
                 }
             }
             else
             {
-                ProcessOutgoingMessage(m);
+                await ProcessOutgoingMessageAsync(m);
             }
         }
 
         /// <summary>
         /// Закрытие сервера
         /// </summary>
-        protected virtual void Dispose(bool disposing)
+        protected virtual ValueTask DisposeAsync(bool disposing)
         {
-            IClient[] clientArray;
-            var getLock = Monitor.TryEnter(_clientsSync, 5000);
-            if (!getLock)
-            {
-                Trace.TraceError($"Cannot get {nameof(_clientsSync)} in Dispose()!");
-            }
-
-            try
-            {
-                clientArray = _clients.ToArray();
-                _clients.Clear();
-            }
-            finally
-            {
-                if (getLock)
-                {
-                    Monitor.Exit(_clientsSync);
-                }
-            }
+            var clientArray = _clients.Values.ToArray();
+            _clients.Clear();
 
             foreach (var client in clientArray)
             {
                 client.Dispose();
             }
+
+            ConnectionsLock.Dispose();
+
+            return default;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await DisposeAsync(true);
             GC.SuppressFinalize(this);
         }
     }

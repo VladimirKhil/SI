@@ -57,12 +57,6 @@ namespace SICore
             }
         }
 
-        internal int Difficulty { get; set; }
-        /// <summary>
-        /// Можно ли думать над вопросом до истечения времени
-        /// </summary>
-        internal bool LongThink { get; set; }
-
         /// <summary>
         /// Знает ли ответ
         /// </summary>
@@ -103,9 +97,9 @@ namespace SICore
         /// <summary>
         /// Отчёт об игре
         /// </summary>
-        public SIReport Report { get; set; }
+        public SIReport Report { get; set; } = new SIReport();
 
-        private int _numApps;
+        private int _numApps = int.MaxValue;
 
         public int NumApps
         {
@@ -113,21 +107,15 @@ namespace SICore
             set { _numApps = value; OnPropertyChanged(); }
         }
 
-        private bool myTry;
+        private bool _myTry;
 
         /// <summary>
         /// Можно жать на кнопку (чтобы при игре без фальстартов компьютерные игроки соображали помедленнее)
         /// </summary>
         public bool MyTry
         {
-            get { return myTry; }
-            set { myTry = value; OnPropertyChanged(); }
-        }
-
-        public PlayerData()
-        {
-            _numApps = int.MaxValue;
-            Report = new SIReport();
+            get { return _myTry; }
+            set { _myTry = value; OnPropertyChanged(); }
         }
 
         public event Action PressButton;

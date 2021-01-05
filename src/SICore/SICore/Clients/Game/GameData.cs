@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Game;
+using SICore.Network;
 using SICore.Results;
 using SIData;
 using SIPackages;
@@ -428,7 +429,7 @@ namespace SICore
         public bool AnnounceAnswer { get; set; }
         public bool AllowAppellation { get; set; }
 
-        public object TaskLock { get; } = new object();
+        internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
 
         public IShare Share { get; set; }
 

@@ -267,7 +267,7 @@ namespace SICore
         /// </summary>
         public PersonAccount ShowMan
         {
-            get { return _showMan; }
+            get => _showMan;
             set
             {
                 _showMan = value;

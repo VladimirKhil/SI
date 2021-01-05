@@ -4,6 +4,7 @@ using SICore.Network.Clients;
 using SIData;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -137,9 +138,9 @@ namespace SICore
         /// <summary>
         /// Получение сообщения
         /// </summary>
-        protected override void OnSystemMessageReceived(string[] mparams)
+        protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
         {
-            base.OnSystemMessageReceived(mparams);
+            await base.OnSystemMessageReceivedAsync(mparams);
 
             try
             {

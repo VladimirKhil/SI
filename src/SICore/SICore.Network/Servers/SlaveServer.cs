@@ -10,10 +10,7 @@ namespace SICore.Network.Servers
     {
         public IConnection HostServer { get; set; }
 
-        public override bool IsMain
-        {
-            get { return false; }
-        }
+        public override bool IsMain => false;
 
         protected override IEnumerable<IConnection> Connections
         {
@@ -32,48 +29,55 @@ namespace SICore.Network.Servers
 
         }
 
-        public override bool AddConnection(IConnection externalServer)
-        {
-            lock (_connectionsSync)
-            {
-                if (HostServer != null && HostServer != externalServer)
+        public override ValueTask<bool> AddConnectionAsync(IConnection connection) =>
+            ConnectionsLock.WithLockAsync(async () =>
                 {
-                    RemoveConnection(HostServer, false);
-                }
+                    if (HostServer != null && HostServer != connection)
+                    {
+                        await RemoveConnectionAsync(HostServer, false);
+                    }
 
-                HostServer = externalServer;
+                    HostServer = connection;
 
-                return base.AddConnection(externalServer);
-            }
-        }
+                    connection.Reconnecting += OnReconnecting;
+                    connection.Reconnected += OnReconnected;
 
-        public override void RemoveConnection(IConnection connection, bool withError)
+                    return await base.AddConnectionAsync(connection);
+                });
+
+        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
         {
-            lock (_connectionsSync)
+            await ConnectionsLock.WithLockAsync(() =>
             {
                 if (HostServer == connection)
                 {
+                    connection.Reconnecting -= OnReconnecting;
+                    connection.Reconnected -= OnReconnected;
+
                     HostServer = null;
                 }
-            }
+            });
 
-            base.RemoveConnection(connection, withError);
+            await base.RemoveConnectionAsync(connection, withError);
         }
 
-        public abstract Task Connect(bool upgrade);
+        public abstract ValueTask ConnectAsync(bool upgrade);
 
-        protected override void Dispose(bool disposing)
+        protected override async ValueTask DisposeAsync(bool disposing)
         {
-            lock (_connectionsSync)
-            {
-                if (HostServer != null)
+            await ConnectionsLock.TryLockAsync(
+                async () =>
                 {
-                    HostServer.Dispose();
-                    HostServer = null;
-                }
-            }
+                    if (HostServer != null)
+                    {
+                        await HostServer.DisposeAsync();
+                        HostServer = null;
+                    }
+                },
+                5000,
+                true);
 
-            base.Dispose(disposing);
+            await base.DisposeAsync(disposing);
         }
     }
 }

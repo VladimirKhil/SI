@@ -182,11 +182,15 @@ namespace SICore.Connections
             }
         }
 
-        private void SendPing(object state)
+        /// <summary>
+        /// Pings the server.
+        /// </summary>
+        /// <remarks>Not Async because it is called by the timer.</remarks>
+        private async void SendPing(object state)
         {
             if (DateTime.UtcNow.Subtract(_lastMessageTime).TotalSeconds > 30)
             {
-                SendMessage(new Message(PingMessage, UserName));
+                await SendMessageAsync(new Message(PingMessage, UserName));
             }
         }
 
@@ -194,7 +198,7 @@ namespace SICore.Connections
         /// Оправка сообщения на внешний сервер
         /// </summary>
         /// <param name="m">Отправляемое сообщение</param>
-        public override void SendMessage(Message m) => _outMessages.Writer.TryWrite(m);
+        public override ValueTask SendMessageAsync(Message m) => _outMessages.Writer.WriteAsync(m);
 
         public override void Close()
         {
@@ -207,11 +211,11 @@ namespace SICore.Connections
             }
         }
 
-        protected override void Dispose(bool disposing)
+        protected override ValueTask DisposeAsync(bool disposing)
         {
             if (_isDisposed)
             {
-                return;
+                return default;
             }
 
             try
@@ -226,6 +230,8 @@ namespace SICore.Connections
             _isDisposed = true;
 
             CloseCore(false);
+
+            return default;
         }
     }
 }

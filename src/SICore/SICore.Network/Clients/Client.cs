@@ -69,7 +69,10 @@ namespace SICore.Network.Clients
                 {
                     while (_inMessages.Reader.TryRead(out var message))
                     {
-                        MessageReceived?.Invoke(message);
+                        if (MessageReceived != null)
+                        {
+                            await MessageReceived.Invoke(message);
+                        }
                     }
                 }
             }
@@ -98,19 +101,6 @@ namespace SICore.Network.Clients
             Server = server;
         }
 
-        public Task ConnectToAsync(IServer server) =>
-            Task.Run(() =>
-            {
-                try
-                {
-                    ConnectTo(server);
-                }
-                catch (Exception exc)
-                {
-                    Server.OnError(exc, false);
-                }
-            });
-
         /// <summary>
         /// Отправка сообщения
         /// </summary>
@@ -126,8 +116,9 @@ namespace SICore.Network.Clients
         /// <summary>
         /// Получение сообщения. Гарантируется обработка сообщений строго по одному в том порядке, в котором они были получены
         /// </summary>
-        public event Action<Message> MessageReceived;
-        public event Action Disposed;
+        public event Func<Message, ValueTask> MessageReceived;
+
+        public event Func<ValueTask> Disposed;
 
         public void Dispose()
         {

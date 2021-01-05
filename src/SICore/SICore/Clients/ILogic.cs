@@ -6,7 +6,7 @@ namespace SICore
     /// <summary>
     /// Логика участника игры (человека или компьютера)
     /// </summary>
-    public interface ILogic : IDisposable
+    public interface ILogic : IAsyncDisposable
     {
         void AddLog(string s);
 

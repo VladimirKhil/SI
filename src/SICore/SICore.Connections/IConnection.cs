@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SICore.Connections
 {
     /// <summary>
     /// Ссылка на внешнее подключение
     /// </summary>
-    public interface IConnection: IDisposable
+    public interface IConnection: IAsyncDisposable
     {
         object ClientsSync { get; }
         string ConnectionId { get; }
@@ -19,7 +20,10 @@ namespace SICore.Connections
         event Action<Exception, bool> Error;
         event Action<Message, Exception> SerializationError;
 
-        void SendMessage(Message m);
+        event Action Reconnecting;
+        event Action Reconnected;
+
+        ValueTask SendMessageAsync(Message m);
         void Close();
 
         string RemoteAddress { get; }

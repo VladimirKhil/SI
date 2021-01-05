@@ -5,6 +5,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers
@@ -74,7 +75,7 @@ namespace SICore.Network.Servers
                 try
                 {
                     var tcpClient = await _listener.AcceptTcpClientAsync();
-                    AddConnection(tcpClient);
+                    await AddConnectionAsync(tcpClient);
 
                     lock (_listenerSync)
                     {
@@ -93,7 +94,7 @@ namespace SICore.Network.Servers
             }
         }
 
-        protected override void Dispose(bool disposing)
+        protected override ValueTask DisposeAsync(bool disposing)
         {
             lock (_listenerSync)
             {
@@ -109,13 +110,13 @@ namespace SICore.Network.Servers
                 }
             }
 
-            base.Dispose(disposing);
+            return base.DisposeAsync(disposing);
         }
 
-        public void AddConnection(TcpClient tcpClient)
+        public async Task AddConnectionAsync(TcpClient tcpClient)
         {
             var connection = new Connection(tcpClient, null);
-            AddConnection(connection);
+            await AddConnectionAsync(connection);
             connection.StartRead(false);
         }
     }

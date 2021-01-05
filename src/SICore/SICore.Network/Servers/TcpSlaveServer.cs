@@ -3,9 +3,7 @@ using SICore.Connections.Errors;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -30,7 +28,7 @@ namespace SICore.Network.Servers
             _port = port;
         }
 
-        public async override Task Connect(bool upgrade)
+        public async override ValueTask ConnectAsync(bool upgrade)
         {
             var tcp = new TcpClient
             {
@@ -46,6 +44,7 @@ namespace SICore.Network.Servers
             }
 
             var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
+
             if (upgrade)
             {
                 try
@@ -58,7 +57,8 @@ namespace SICore.Network.Servers
                 }
             }
 
-            AddConnection(connection);
+            await AddConnectionAsync(connection);
+
             connection.StartRead(false);
         }
     }

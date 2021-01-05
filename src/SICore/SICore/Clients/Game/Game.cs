@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -53,7 +54,7 @@ namespace SICore
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
 
-        public override void Dispose(bool disposing)
+        public override ValueTask DisposeAsync(bool disposing)
         {
             if (ClientData.Share != null)
             {
@@ -61,7 +62,7 @@ namespace SICore
                 ClientData.Share.Dispose();
             }
 
-            base.Dispose(disposing);
+            return base.DisposeAsync(disposing);
         }
 
         /// <summary>
@@ -242,22 +243,24 @@ namespace SICore
         /// <summary>
         /// Присоединить участника к игре
         /// </summary>
-        public bool Join(string name, bool isMale, GameRole role, string password, Action connectionAuthenticator, out string message)
-        {
-            lock (ClientData.TaskLock)
+        public (bool, string) Join(
+            string name,
+            bool isMale,
+            GameRole role,
+            string password,
+            Action connectionAuthenticator) =>
+            ClientData.TaskLock.WithLock(() =>
             {
                 if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
                     && ClientData.Settings.NetworkGamePassword != password)
                 {
-                    message = LO[nameof(R.WrongPassword)];
-                    return false;
+                    return (false, LO[nameof(R.WrongPassword)]);
                 }
 
                 // Подсоединение к игре
                 if (ClientData.AllPersons.ContainsKey(name))
                 {
-                    message = string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name);
-                    return false;
+                    return (false, string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name));
                 }
 
                 var index = -1;
@@ -284,8 +287,7 @@ namespace SICore
 
                             if (index < 0)
                             {
-                                message = LO[nameof(R.PositionNotFoundByIndex)];
-                                return false;
+                                return (false, LO[nameof(R.PositionNotFoundByIndex)]);
                             }
                         }
 
@@ -309,8 +311,7 @@ namespace SICore
                     {
                         if (!result.Value)
                         {
-                            message = LO[nameof(R.PlaceIsOccupied)];
-                            return false;
+                            return (false, LO[nameof(R.PlaceIsOccupied)]);
                         }
                         else
                         {
@@ -330,8 +331,7 @@ namespace SICore
                         {
                             if (!result.Value)
                             {
-                                message = LO[nameof(R.PlaceIsOccupied)];
-                                return false;
+                                return (false, LO[nameof(R.PlaceIsOccupied)]);
                             }
                             else
                             {
@@ -344,21 +344,17 @@ namespace SICore
 
                 if (!found)
                 {
-                    message = LO[nameof(R.NoFreePlaceForName)];
-                    return false;
+                    return (false, LO[nameof(R.NoFreePlaceForName)]);
                 }
 
-                message = "";
-                return true;
-            }
-        }
+                return (true, "");
+            });
 
         /// <summary>
         /// Получение сообщения
         /// </summary>
-        public override void OnMessageReceived(Message message)
-        {
-            lock (ClientData.TaskLock)
+        public override ValueTask OnMessageReceivedAsync(Message message) =>
+            ClientData.TaskLock.WithLockAsync(async () =>
             {
                 if (string.IsNullOrEmpty(message.Text))
                 {
@@ -473,19 +469,24 @@ namespace SICore
                                 {
                                     var accounts = accountsToSearch.ToArray();
 
-                                    var result = CheckAccount(message, role, name, sex, ref found, index, accounts[index]);
+                                    var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, accounts[index]);
                                     if (result.HasValue)
                                     {
                                         if (!result.Value)
                                             return;
                                     }
+
+                                    found |= foundLocal;
                                 }
                                 else
                                 {
                                     foreach (var item in accountsToSearch)
                                     {
                                         index++;
-                                        var result = CheckAccount(message, role, name, sex, ref found, index, item);
+                                        var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, item);
+
+                                        found |= foundLocal;
+
                                         if (result.HasValue)
                                         {
                                             if (!result.Value)
@@ -498,7 +499,7 @@ namespace SICore
 
                                 if (!found)
                                 {
-                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.NoFreePlaceForName)], message.Sender);
+                                    _gameActions.SendMessage($"{SystemMessages.Refuse}{Message.ArgsSeparatorChar}{LO[nameof(R.NoFreePlaceForName)]}", message.Sender);
                                 }
                             }
                             #endregion
@@ -802,7 +803,7 @@ namespace SICore
                             if (ClientData.IsWaiting && ClientData.Decision == DecisionType.NextPersonStakeMaking && message.Sender == ClientData.ShowMan.Name)
                             {
                                 #region Next
-                                
+
                                 if (args.Length > 1 && int.TryParse(args[1], out int n) && n > -1 && n < ClientData.Players.Count)
                                 {
                                     if (ClientData.Players[n].Flag)
@@ -1010,7 +1011,7 @@ namespace SICore
                                     return;
                                 }
 
-                                MasterServer.Kick(person);
+                                await MasterServer.KickAsync(person);
                                 _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, person));
                                 OnDisconnectRequested(person);
                             }
@@ -1040,7 +1041,7 @@ namespace SICore
                                     return;
                                 }
 
-                                MasterServer.Kick(person, true);
+                                await MasterServer.KickAsync(person, true);
                                 _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, person));
                                 OnDisconnectRequested(person);
                             }
@@ -1064,8 +1065,7 @@ namespace SICore
                 {
                     Share_Error(new Exception(message.Text, exc));
                 }
-            }
-        }
+            });
 
         private void SelectNewHost()
         {
@@ -1742,7 +1742,7 @@ namespace SICore
             if (!account.IsHuman)
             {
                 // Удалить клиента компьютерного игрока
-                _client.Server.DeleteClientAsync(account.Name);
+                _client.Server.DeleteClient(account.Name);
             }
 
             foreach (var item in ClientData.MainPersons)
@@ -2335,7 +2335,7 @@ namespace SICore
 
                 if (!account.IsHuman)
                 {
-                    _client.Server.DeleteClientAsync(account.Name);
+                    _client.Server.DeleteClient(account.Name);
 
                     account.IsHuman = true;
                     newName = account.Name = Constants.FreePlace;
@@ -2387,13 +2387,9 @@ namespace SICore
 
                     var playerClient = new Client(newAccount.Name);
                     var player = new Player(playerClient, compPlayer, false, LO, new ViewerData { BackLink = ClientData.BackLink });
-                    playerClient.ConnectToAsync(_client.Server).ContinueWith(t =>
-                    {
-                        lock (ClientData.TaskLock)
-                        {
-                            Inform(newAccount.Name);
-                        }
-                    });
+
+                    playerClient.ConnectTo(_client.Server);
+                    Inform(newAccount.Name);
                 }
                 else
                 {
@@ -2415,13 +2411,9 @@ namespace SICore
 
                     var showmanClient = new Client(newAccount.Name);
                     var showman = new Showman(showmanClient, newAccount, false, LO, new ViewerData { BackLink = ClientData.BackLink });
-                    showmanClient.ConnectToAsync(_client.Server).ContinueWith(t =>
-                    {
-                        lock (ClientData.TaskLock)
-                        {
-                            Inform(newAccount.Name);
-                        }
-                    });
+
+                    showmanClient.ConnectTo(_client.Server);
+                    Inform(newAccount.Name);
                 }
             }
             finally
@@ -2462,39 +2454,49 @@ namespace SICore
             _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
         }
 
-        private bool? CheckAccount(Message message, string role, string name, string sex, ref bool found, int index, ViewerAccount account)
+        private async Task<(bool?, bool)> CheckAccountAsync(
+            Message message,
+            string role,
+            string name,
+            string sex,
+            int index,
+            ViewerAccount account)
         {
             if (account.IsConnected)
             {
-                return null;
+                return (null, false);
             }
 
             if (account.Name == name || account.Name == Constants.FreePlace)
             {
-                found = true;
-
-                IConnection extServ = null;
                 var append = role == "viewer" && account.Name == Constants.FreePlace;
                 account.Name = name;
                 account.IsMale = sex == "m";
                 account.Picture = "";
                 account.IsConnected = true;
 
-                lock (_client.Server.ConnectionsSync)
+                var connectionFound = await _client.Server.ConnectionsLock.WithLockAsync(() =>
                 {
-                    extServ = MasterServer.ExternalServers.Where(serv => serv.Id == message.Sender.Substring(1)).FirstOrDefault();
-                    if (extServ == null)
+                    var connection = MasterServer.ExternalServers.Where(serv => serv.Id == message.Sender.Substring(1)).FirstOrDefault();
+                    if (connection == null)
                     {
                         return false;
                     }
 
-                    lock (extServ.ClientsSync)
+                    lock (connection.ClientsSync)
                     {
-                        extServ.Clients.Add(name);
+                        connection.Clients.Add(name);
                     }
 
-                    extServ.IsAuthenticated = true;
-                    extServ.UserName = name;
+                    connection.IsAuthenticated = true;
+                    connection.UserName = name;
+
+                    return true;
+                });
+
+                if (!connectionFound)
+                {
+                    return (false, true);
                 }
 
                 if (append)
@@ -2512,7 +2514,7 @@ namespace SICore
                 OnPersonsChanged();
             }
 
-            return true;
+            return (true, true);
         }
 
         private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, ViewerAccount account,

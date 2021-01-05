@@ -264,7 +264,7 @@ namespace SICore
         /// Обработка полученного системного сообщения
         /// </summary>
         /// <param name="mparams">Параметры сообщения</param>
-        protected virtual void OnSystemMessageReceived(string[] mparams)
+        protected virtual async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
         {
             try
             {
@@ -280,17 +280,17 @@ namespace SICore
 
                             if (!_client.Server.IsMain)
                             {
-                                lock (_client.Server.ConnectionsSync)
+                                await _client.Server.ConnectionsLock.WithLockAsync(() =>
                                 {
-                                    var externalServer = ((ISlaveServer)_client.Server).HostServer;
-                                    if (externalServer != null)
+                                    var currentConnection = ((ISlaveServer)_client.Server).HostServer;
+                                    if (currentConnection != null)
                                     {
-                                        lock (externalServer.ClientsSync)
+                                        lock (currentConnection.ClientsSync)
                                         {
-                                            externalServer.Clients.Add(mparams[3]);
+                                            currentConnection.Clients.Add(mparams[3]);
                                         }
                                     }
-                                }
+                                });
                             }
 
                             var account = new Account(mparams[3], mparams[4] == "m");
@@ -317,11 +317,11 @@ namespace SICore
                         #endregion
 
                     case Messages.Disconnected:
-                        OnDisconnected(mparams);
+                        await OnDisconnectedAsync(mparams);
                         break;
 
                     case Messages.Info2:
-                        ProcessInfo(mparams);
+                        await ProcessInfoAsync(mparams);
                         break;
 
                     case Messages.Config:
@@ -330,7 +330,7 @@ namespace SICore
                             break;
                         }
 
-                        ProcessConfig(mparams);
+                        await ProcessConfigAsync(mparams);
                         break;
 
                     case Messages.ReadingSpeed:
@@ -939,7 +939,7 @@ namespace SICore
             }
         }
 
-        private void OnDisconnected(string[] mparams)
+        private async ValueTask OnDisconnectedAsync(string[] mparams)
         {
             if (mparams.Length < 2)
             {
@@ -985,20 +985,20 @@ namespace SICore
 
             if (!_client.Server.IsMain)
             {
-                lock (_client.Server.ConnectionsSync)
+                await _client.Server.ConnectionsLock.WithLockAsync(() =>
                 {
-                    var externalServer = ((ISlaveServer)_client.Server).HostServer;
-                    if (externalServer != null)
+                    var currentConnection = ((ISlaveServer)_client.Server).HostServer;
+                    if (currentConnection != null)
                     {
-                        lock (externalServer.ClientsSync)
+                        lock (currentConnection.ClientsSync)
                         {
-                            if (externalServer.Clients.Contains(name))
+                            if (currentConnection.Clients.Contains(name))
                             {
-                                externalServer.Clients.Remove(name);
+                                currentConnection.Clients.Remove(name);
                             }
                         }
                     }
-                }
+                });
             }
 
             PersonDisconnected?.Invoke();
@@ -1104,7 +1104,7 @@ namespace SICore
             _logic.OnReplic(personCode, text.ToString().Trim());
         }
 
-        private void ProcessConfig(string[] mparams)
+        private async ValueTask ProcessConfigAsync(string[] mparams)
         {
             switch (mparams[1])
             {
@@ -1113,19 +1113,19 @@ namespace SICore
                     break;
 
                 case MessageParams.Config_Free:
-                    OnConfigFree(mparams);
+                    await OnConfigFreeAsync(mparams);
                     break;
 
                 case MessageParams.Config_DeleteTable:
-                    OnConfigDeleteTable(mparams);
+                    await OnConfigDeleteTableAsync(mparams);
                     break;
 
                 case MessageParams.Config_Set:
-                    OnConfigSet(mparams);
+                    await OnConfigSetAsync(mparams);
                     break;
 
                 case MessageParams.Config_ChangeType:
-                    OnConfigChangeType(mparams);
+                    await OnConfigChangeTypeAsync(mparams);
                     break;
             }
 
@@ -1175,7 +1175,7 @@ namespace SICore
             }
         }
 
-        private void OnConfigFree(string[] mparams)
+        private async ValueTask OnConfigFreeAsync(string[] mparams)
         {
             if (mparams.Length < 4)
             {
@@ -1227,13 +1227,13 @@ namespace SICore
             if (account == me)
             {
                 // Необходимо самого себя перевести в зрители
-                SwitchToNewType(GameRole.Viewer, newAccount, me);
+                await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
             }
 
             UpdateDeleteTableCommand();
         }
 
-        private void OnConfigChangeType(string[] mparams)
+        private async ValueTask OnConfigChangeTypeAsync(string[] mparams)
         {
             if (mparams.Length < 7)
             {
@@ -1331,14 +1331,14 @@ namespace SICore
                 if (account == me)
                 {
                     // Необходимо самого себя перевести в зрители
-                    SwitchToNewType(GameRole.Viewer, newAccount, me);
+                    await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
                 }
 
                 UpdateDeleteTableCommand();
             }
         }
 
-        private void OnConfigDeleteTable(string[] mparams)
+        private async ValueTask OnConfigDeleteTableAsync(string[] mparams)
         {
             if (mparams.Length < 3)
             {
@@ -1395,7 +1395,7 @@ namespace SICore
             if (account == me && newAccount != null && _logic.CanSwitchType)
             {
                 // Необходимо самого себя перевести в зрители
-                SwitchToNewType(GameRole.Viewer, newAccount, me);
+                await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
             }
 
             UpdateDeleteTableCommand();
@@ -1416,7 +1416,7 @@ namespace SICore
             return ClientData.ShowMan;
         }
 
-        private void OnConfigSet(string[] mparams)
+        private async ValueTask OnConfigSetAsync(string[] mparams)
         {
             if (mparams.Length < 6)
             {
@@ -1568,7 +1568,7 @@ namespace SICore
                     var newRole = isPlayer ? GameRole.Player : GameRole.Showman;
                     if (newRole != role)
                     {
-                        SwitchToNewType(role, other, me);
+                        await SwitchToNewTypeAsync(role, other, me);
                     }
                     else
                     {
@@ -1586,7 +1586,7 @@ namespace SICore
                     var newRole = isPlayer ? GameRole.Player : GameRole.Showman;
                     if (newRole != role)
                     {
-                        SwitchToNewType(newRole, account, me);
+                        await SwitchToNewTypeAsync(newRole, account, me);
                     }
                     else
                     {
@@ -1608,7 +1608,7 @@ namespace SICore
         /// Сменить тип своего аккаунта
         /// </summary>
         /// <param name="role">Целевой тип</param>
-        private void SwitchToNewType(GameRole role, ViewerAccount newAccount, ViewerAccount oldAccount)
+        private async ValueTask SwitchToNewTypeAsync(GameRole role, ViewerAccount newAccount, ViewerAccount oldAccount)
         {
             if (newAccount == null)
             {
@@ -1669,7 +1669,7 @@ namespace SICore
 
             viewer.Init();
 
-            Dispose();
+            await DisposeAsync();
 
             viewer.RecreateCommands();
 
@@ -1678,7 +1678,7 @@ namespace SICore
             SendPicture();
         }
 
-        private void ProcessInfo(string[] mparams)
+        private async ValueTask ProcessInfoAsync(string[] mparams)
         {
             int.TryParse(mparams[1], out int numOfPlayers);
             int numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
@@ -1761,17 +1761,17 @@ namespace SICore
                 {
                     if (item != ClientData.Me && item.Name != NetworkConstants.GameName)
                     {
-                        lock (_client.Server.ConnectionsSync)
+                        await _client.Server.ConnectionsLock.WithLockAsync(() =>
                         {
-                            var externalServer = ((ISlaveServer)_client.Server).HostServer;
-                            if (externalServer != null)
+                            var connection = ((ISlaveServer)_client.Server).HostServer;
+                            if (connection != null)
                             {
-                                lock (externalServer.ClientsSync)
+                                lock (connection.ClientsSync)
                                 {
-                                    externalServer.Clients.Add(item.Name);
+                                    connection.Clients.Add(item.Name);
                                 }
                             }
-                        }
+                        });
                     }
                 }
             }
@@ -1938,11 +1938,11 @@ namespace SICore
         /// <summary>
         /// Получение сообщения
         /// </summary>
-        public override void OnMessageReceived(Message message)
+        public override async ValueTask OnMessageReceivedAsync(Message message)
         {
             if (message.IsSystem)
             {
-                OnSystemMessageReceived(message.Text.Split('\n'));
+                await OnSystemMessageReceivedAsync(message.Text.Split('\n'));
             }
             else
             {

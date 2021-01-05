@@ -104,11 +104,11 @@ namespace SICore
                 new PlayerComputerLogic(ClientData, (ComputerAccount)personData, _viewerActions);
         }
 
-        public override void Dispose(bool disposing)
+        public override ValueTask DisposeAsync(bool disposing)
         {
             ClientData.AutoReadyChanged -= ClientData_AutoReadyChanged;
 
-            base.Dispose(disposing);
+            return base.DisposeAsync(disposing);
         }
 
         private void ClientData_AutoReadyChanged()
@@ -173,9 +173,9 @@ namespace SICore
         /// <summary>
         /// Получение системного сообщения
         /// </summary>
-        protected override void OnSystemMessageReceived(string[] mparams)
+        protected override async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
         {
-            base.OnSystemMessageReceived(mparams);
+            await base.OnSystemMessageReceivedAsync(mparams);
 
             try
             {

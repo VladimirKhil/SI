@@ -4,6 +4,7 @@ using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SIData;
 using System;
+using System.Threading.Tasks;
 
 namespace SICore
 {
@@ -31,7 +32,7 @@ namespace SICore
 
         public IClient Client => _client;
 
-        public abstract void OnMessageReceived(Message message);
+        public abstract ValueTask OnMessageReceivedAsync(Message message);
         protected abstract L CreateLogic(Account personData);
 
         public ILocalizer LO { get; protected set; }
@@ -41,35 +42,29 @@ namespace SICore
             _client = client;
             ClientData = data;
 
-            _client.MessageReceived += OnMessageReceived;
-            _client.Disposed += Dispose;
+            _client.MessageReceived += OnMessageReceivedAsync;
+            _client.Disposed += DisposeAsync;
             _client.InfoReplaced += Client_InfoReplaced;
 
-            LO = localizer;// ?? throw new ArgumentNullException(nameof(localizer));
+            LO = localizer;
         }
 
-        private void Client_InfoReplaced(IAccountInfo data)
-        {
-            _logic.SetInfo(data);
-        }
+        private void Client_InfoReplaced(IAccountInfo data) => _logic.SetInfo(data);
 
-        public void AddLog(string s)
-        {
-            _logic.AddLog(s);
-        }
+        public void AddLog(string s) => _logic.AddLog(s);
 
-        public virtual void Dispose(bool disposing)
+        public virtual async ValueTask DisposeAsync(bool disposing)
         {
-            _client.MessageReceived -= OnMessageReceived;
-            _client.Disposed -= Dispose;
+            _client.MessageReceived -= OnMessageReceivedAsync;
+            _client.Disposed -= DisposeAsync;
             _client.InfoReplaced -= Client_InfoReplaced;
 
-            _logic.Dispose();
+            await _logic.DisposeAsync();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            Dispose(true);
+            await DisposeAsync(true);
             GC.SuppressFinalize(this);
         }
     }

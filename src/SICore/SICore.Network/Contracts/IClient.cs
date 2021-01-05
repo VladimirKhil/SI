@@ -33,6 +33,7 @@ namespace SICore.Network.Contracts
         /// </summary>
         /// <param name="s">Сервер, к которому подключается клиент</param>
         void ConnectTo(IServer s);
+
         void ReplaceInfo(IAccountInfo computerAccount);
     }
 }

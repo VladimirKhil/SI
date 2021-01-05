@@ -8,7 +8,7 @@ using SIPackages;
 namespace SICore
 {
     /// <summary>
-    /// Creates and runs new game
+    /// Creates and runs new game.
     /// </summary>
     public sealed class GameRunner
     {

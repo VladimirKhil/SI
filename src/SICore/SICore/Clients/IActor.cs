@@ -4,7 +4,7 @@ using System;
 
 namespace SICore
 {
-    public interface IActor: IDisposable
+    public interface IActor: IAsyncDisposable
     {
         IClient Client { get; }
 
