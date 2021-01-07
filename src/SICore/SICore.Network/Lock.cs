@@ -44,7 +44,7 @@ namespace SICore.Network
 
         public T WithLock<T>(Func<T> func, CancellationToken cancellationToken = default)
         {
-            _semaphore.WaitAsync(cancellationToken);
+            _semaphore.Wait(cancellationToken);
             try
             {
                 return func();

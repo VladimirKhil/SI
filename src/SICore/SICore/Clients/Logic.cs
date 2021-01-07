@@ -44,16 +44,18 @@ namespace SICore
         // TODO: PERF
         private void TaskTimer_Elapsed(object state)
         {
-            if (CurrentTask != -1)
+            if (CurrentTask == -1)
             {
-                try
-                {
-                    ExecuteTask(CurrentTask, _taskArgument);
-                }
-                catch (Exception exc)
-                {
-                    _data.BackLink.SendError(exc);
-                }
+                return;
+            }
+
+            try
+            {
+                ExecuteTask(CurrentTask, _taskArgument);
+            }
+            catch (Exception exc)
+            {
+                _data.BackLink.SendError(exc);
             }
         }
 

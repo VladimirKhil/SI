@@ -47,7 +47,7 @@ namespace SICore
             var gameData = new GameData
             {
                 Settings = _settings,
-                HostName = _settings.HumanPlayerName,
+                HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
                 BackLink = _backLink,
                 Share = _share
             };

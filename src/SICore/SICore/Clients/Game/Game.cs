@@ -54,15 +54,15 @@ namespace SICore
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
 
-        public override ValueTask DisposeAsync(bool disposing)
+        public override async ValueTask DisposeAsync(bool disposing)
         {
-            if (ClientData.Share != null)
-            {
-                ClientData.Share.Error -= Share_Error;
-                ClientData.Share.Dispose();
-            }
+            ClientData.Share.Error -= Share_Error;
+            ClientData.Share.Dispose();
 
-            return base.DisposeAsync(disposing);
+            // Logic must be disposed before TaskLock
+            await base.DisposeAsync(disposing);
+
+            ClientData.TaskLock.Dispose();
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace SICore
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
             _gameActions.SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
 
-            _gameActions.SendMessageWithArgs(Messages.Hostname, ClientData.HostName);
+            _gameActions.SendMessageWithArgs(Messages.Hostname, ClientData.HostName ?? "");
         }
 
         private void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -1101,13 +1101,13 @@ namespace SICore
                 }
             }
 
-            if (newHostName == null)
-            {
-                return;
-            }
+            UpdateHostName(newHostName);
+        }
 
+        private void UpdateHostName(string newHostName)
+        {
             ClientData.HostName = newHostName;
-            _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName, "" /* by game */);
+            _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", "" /* by game */);
         }
 
         private void OnApellation(Message message, string[] args)
@@ -2511,6 +2511,11 @@ namespace SICore
                 _gameActions.SendMessage(Messages.Accepted, name);
                 _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
 
+                if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
+                {
+                    UpdateHostName(name);
+                }
+
                 OnPersonsChanged();
             }
 
@@ -2542,8 +2547,12 @@ namespace SICore
             ClientData.OnAllPersonsChanged();
 
             _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
-
             _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
+
+            if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)
+            {
+                UpdateHostName(name);
+            }
 
             connectionAuthenticator();
 

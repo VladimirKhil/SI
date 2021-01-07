@@ -221,7 +221,7 @@ namespace SICore.Network.Servers
             }
         }
 
-        private async ValueTask ProcessOutgoingMessageAsync(Message message)
+        private ValueTask ProcessOutgoingMessageAsync(Message message)
         {
             foreach (var client in _clients.Values)
             {
@@ -231,7 +231,7 @@ namespace SICore.Network.Servers
                 }
             }
 
-            await ConnectionsLock.WithLockAsync(async () =>
+            return ConnectionsLock.WithLockAsync(async () =>
             {
                 foreach (var connection in Connections)
                 {
@@ -307,21 +307,28 @@ namespace SICore.Network.Servers
                 return;
             }
 
-            if (m.Receiver[0] == AnonymousSenderPrefix)
+            try
             {
-                // Анонимное сообщение (серверу)
-                var connection = await ConnectionsLock.WithLockAsync(() =>
-                    Connections.FirstOrDefault(conn => conn.Id == m.Receiver.Substring(1)));
-
-                if (connection != null)
+                if (m.Receiver[0] == AnonymousSenderPrefix)
                 {
-                    await connection.SendMessageAsync(
-                        new Message(m.Text, m.Sender, NetworkConstants.Everybody, m.IsSystem, m.IsPrivate));
+                    // Анонимное сообщение (серверу)
+                    var connection = await ConnectionsLock.WithLockAsync(() =>
+                        Connections.FirstOrDefault(conn => conn.Id == m.Receiver.Substring(1)));
+
+                    if (connection != null)
+                    {
+                        await connection.SendMessageAsync(
+                            new Message(m.Text, m.Sender, NetworkConstants.Everybody, m.IsSystem, m.IsPrivate));
+                    }
+                }
+                else
+                {
+                    await ProcessOutgoingMessageAsync(m);
                 }
             }
-            else
+            catch (ObjectDisposedException)
             {
-                await ProcessOutgoingMessageAsync(m);
+
             }
         }
 

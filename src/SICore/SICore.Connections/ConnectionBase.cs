@@ -89,16 +89,14 @@ namespace SICore.Connections
 
         protected void OnConnectionClose(bool withError)
         {
-            Task.Run(() =>
+            try
             {
                 ConnectionClose?.Invoke(this, withError);
-            }).ContinueWith(task =>
+            }
+            catch (Exception exc)
             {
-                if (task.IsFaulted)
-                {
-                    OnError(task.Exception.InnerException, true);
-                }
-            });
+                OnError(exc, true);
+            }
         }
 
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);

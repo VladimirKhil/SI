@@ -53,13 +53,13 @@ namespace SICore
 
         public void AddLog(string s) => _logic.AddLog(s);
 
-        public virtual async ValueTask DisposeAsync(bool disposing)
+        public virtual ValueTask DisposeAsync(bool disposing)
         {
             _client.MessageReceived -= OnMessageReceivedAsync;
             _client.Disposed -= DisposeAsync;
             _client.InfoReplaced -= Client_InfoReplaced;
 
-            await _logic.DisposeAsync();
+            return _logic.DisposeAsync();
         }
 
         public async ValueTask DisposeAsync()
