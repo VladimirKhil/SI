@@ -43,10 +43,22 @@ namespace SICore
             ClientData = data;
 
             _client.MessageReceived += OnMessageReceivedAsync;
-            _client.Disposed += DisposeAsync;
+            _client.Disposed += Client_Disposed;
             _client.InfoReplaced += Client_InfoReplaced;
 
             LO = localizer;
+        }
+
+        private async void Client_Disposed()
+        {
+            try
+            {
+                await DisposeAsync();
+            }
+            catch (Exception exc)
+            {
+                Client.CurrentServer.OnError(exc, true);
+            }
         }
 
         private void Client_InfoReplaced(IAccountInfo data) => _logic.SetInfo(data);
@@ -56,7 +68,7 @@ namespace SICore
         public virtual ValueTask DisposeAsync(bool disposing)
         {
             _client.MessageReceived -= OnMessageReceivedAsync;
-            _client.Disposed -= DisposeAsync;
+            _client.Disposed -= Client_Disposed;
             _client.InfoReplaced -= Client_InfoReplaced;
 
             return _logic.DisposeAsync();

@@ -16,7 +16,7 @@ namespace SICore.Network.Contracts
 
         void AddClient(IClient client);
 
-        bool DeleteClient(string name);
+        void DeleteClient(string name);
 
         bool Contains(string name);
 

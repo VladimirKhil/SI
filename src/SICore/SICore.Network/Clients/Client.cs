@@ -118,7 +118,7 @@ namespace SICore.Network.Clients
         /// </summary>
         public event Func<Message, ValueTask> MessageReceived;
 
-        public event Func<ValueTask> Disposed;
+        public event Action Disposed;
 
         public void Dispose()
         {

@@ -286,7 +286,13 @@ namespace SICore.Network.Servers
 
         private void Connection_SerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
-        public bool DeleteClient(string name) => _clients.TryRemove(name, out _);
+        public void DeleteClient(string name)
+        {
+            if (_clients.TryRemove(name, out var client))
+            {
+                client.Dispose();
+            }
+        }
 
         public void ReplaceInfo(string name, IAccountInfo computerAccount)
         {

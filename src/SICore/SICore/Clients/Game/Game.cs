@@ -1629,7 +1629,7 @@ namespace SICore
                 return;
             }
 
-            if (!ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
+            if (ClientData.HostName == null || !ClientData.AllPersons.TryGetValue(ClientData.HostName, out var host))
             {
                 return;
             }
@@ -1680,12 +1680,6 @@ namespace SICore
             finally
             {
                 ClientData.EndUpdatePersons();
-            }
-
-            foreach (var item in ClientData.MainPersons)
-            {
-                if (item.Ready)
-                    _gameActions.SendMessage(string.Format("{0}\n{1}", Messages.Ready, item.Name), message.Sender);
             }
 
             var info = new StringBuilder(Messages.Config).Append(Message.ArgsSeparatorChar)
@@ -1743,14 +1737,6 @@ namespace SICore
             {
                 // Удалить клиента компьютерного игрока
                 _client.Server.DeleteClient(account.Name);
-            }
-
-            foreach (var item in ClientData.MainPersons)
-            {
-                if (item.Ready)
-                {
-                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
-                }
             }
 
             _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);

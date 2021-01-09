@@ -1277,12 +1277,7 @@ namespace SICore
                 {
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
-                        var clone = new List<ViewerAccount>(ClientData.Viewers);
-                        var newAccount = new ViewerAccount(account) { IsConnected = true };
-
-                        clone.Add(newAccount);
-
-                        ClientData.Viewers = clone;
+                        throw new InvalidOperationException("Computer account should never receive this");
                     }
 
                     account.IsHuman = true;
@@ -1369,7 +1364,12 @@ namespace SICore
 
                 UpdateAddTableCommand();
 
-                if (account.IsConnected && account.IsHuman || account.Name == ClientData.Name /* for computer accounts being deleted */)
+                if (!account.IsHuman && account.Name == ClientData.Name /* for computer accounts being deleted */)
+                {
+                    throw new InvalidOperationException("Computer account should never receive this");
+                }
+
+                if (account.IsConnected && account.IsHuman)
                 {
                     newAccount = new ViewerAccount(account) { IsConnected = true };
 
@@ -1447,12 +1447,7 @@ namespace SICore
                 {
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
-                        var clone = new List<ViewerAccount>(ClientData.Viewers);
-                        var newAccount = new ViewerAccount(account) { IsConnected = true };
-
-                        clone.Add(newAccount);
-
-                        ClientData.Viewers = clone;
+                        throw new InvalidOperationException("Computer account should never receive this");
                     }
 
                     account.Name = replacer;

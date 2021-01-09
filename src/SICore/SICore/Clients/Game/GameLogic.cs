@@ -1263,7 +1263,7 @@ namespace SICore
         internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
             SetTask((int)task, arg);
-            if (_data.Settings.AppSettings.Managed && !force && _data.AllPersons.ContainsKey(_data.HostName))
+            if (_data.Settings.AppSettings.Managed && !force && _data.HostName != null && _data.AllPersons.ContainsKey(_data.HostName))
             {
                 IsRunning = false;
                 return;

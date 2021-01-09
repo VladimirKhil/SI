@@ -354,11 +354,18 @@ namespace SICore
 
         public void OnAllPersonsChanged()
         {
-            AllPersons = new ViewerAccount[] { _showMan }
-                .Concat(Players)
-                .Concat(Viewers)
-                .Where(a => a.IsConnected)
-                .ToDictionary(a => a.Name);
+            try
+            {
+                AllPersons = new ViewerAccount[] { _showMan }
+                    .Concat(Players)
+                    .Concat(Viewers)
+                    .Where(a => a.IsConnected)
+                    .ToDictionary(a => a.Name);
+            }
+            catch (ArgumentException exc)
+            {
+                throw new Exception($"OnAllPersonsChanged error: {PersonsUpdateHistory}", exc);
+            }
 
             PersonsUpdateHistory.Append($"Update: ").Append(PrintPersons());
         }
