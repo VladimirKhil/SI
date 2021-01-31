@@ -34,19 +34,5 @@ namespace SICore
         /// Жмёт на игровую кнопку
         /// </summary>
         internal void PressGameButton() => SendMessage(Messages.I);
-
-        public void Rename(string name)
-        {
-            Client.Name = name;
-
-            if (_viewerData.AllPersons.TryGetValue(_viewerData.Name, out var viewerAccount))
-            {
-                viewerAccount.Name = name;
-                _viewerData.AllPersons[name] = viewerAccount;
-                _viewerData.AllPersons.Remove(_viewerData.Name);
-            }
-
-            _viewerData.Name = name;
-        }
     }
 }

@@ -39,17 +39,26 @@ namespace SICore
 
         private IMasterServer MasterServer => (IMasterServer)_client.Server;
 
-        public ComputerAccount[] DefaultPlayers { get; set; }
-        public ComputerAccount[] DefaultShowmans { get; set; }
+        private readonly ComputerAccount[] _defaultPlayers;
+        private readonly ComputerAccount[] _defaultShowmans;
 
-        public Game(Client client, string documentPath, ILocalizer localizer, GameData gameData)
-            : base(client, null, localizer, gameData)
+        public Game(
+            Client client,
+            string documentPath,
+            ILocalizer localizer,
+            GameData gameData,
+            ComputerAccount[] defaultPlayers,
+            ComputerAccount[] defaultShowmans)
+            : base(client, localizer, gameData)
         {
             _gameActions = new GameActions(_client, ClientData, LO);
             _logic = CreateLogic(null);
 
             gameData.DocumentPath = documentPath;
             gameData.Share.Error += Share_Error;
+
+            _defaultPlayers = defaultPlayers ?? throw new ArgumentNullException(nameof(defaultPlayers));
+            _defaultShowmans = defaultShowmans ?? throw new ArgumentNullException(nameof(defaultShowmans));
         }
 
         protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
@@ -402,107 +411,7 @@ namespace SICore
                             break;
 
                         case Messages.Connect:
-                            #region Connect
-                            {
-                                if (args.Length < 4)
-                                {
-                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongConnectionParameters)], message.Sender);
-                                    return;
-                                }
-
-                                if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && (args.Length < 6 || ClientData.Settings.NetworkGamePassword != args[5]))
-                                {
-                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
-                                    return;
-                                }
-
-                                var role = args[1];
-                                var name = args[2];
-                                var sex = args[3];
-
-                                // Подсоединение к игре
-                                if (ClientData.AllPersons.ContainsKey(name))
-                                {
-                                    _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
-                                    return;
-                                }
-
-                                var index = -1;
-                                IEnumerable<ViewerAccount> accountsToSearch = null;
-                                switch (role)
-                                {
-                                    case Constants.Showman:
-                                        accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
-                                        break;
-
-                                    case Constants.Player:
-                                        accountsToSearch = ClientData.Players;
-                                        if (ClientData.HostName == name) // Подключение организатора
-                                        {
-                                            var defaultPlayers = ClientData.Settings.Players;
-                                            for (int i = 0; i < defaultPlayers.Length; i++)
-                                            {
-                                                if (defaultPlayers[i].Name == name)
-                                                {
-                                                    index = i;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (index < 0 || index >= ClientData.Players.Count)
-                                            {
-                                                _gameActions.SendMessage(string.Join(Message.ArgsSeparator, SystemMessages.Refuse, LO[nameof(R.PositionNotFoundByIndex)]), message.Sender);
-                                                return;
-                                            }
-                                        }
-
-                                        break;
-
-                                    default:
-                                        accountsToSearch = ClientData.Viewers.Concat(new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
-                                        break;
-                                }
-
-                                var found = false;
-
-                                if (index > -1)
-                                {
-                                    var accounts = accountsToSearch.ToArray();
-
-                                    var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, accounts[index]);
-                                    if (result.HasValue)
-                                    {
-                                        if (!result.Value)
-                                            return;
-                                    }
-
-                                    found |= foundLocal;
-                                }
-                                else
-                                {
-                                    foreach (var item in accountsToSearch)
-                                    {
-                                        index++;
-                                        var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, item);
-
-                                        found |= foundLocal;
-
-                                        if (result.HasValue)
-                                        {
-                                            if (!result.Value)
-                                                return;
-                                            else
-                                                break;
-                                        }
-                                    }
-                                }
-
-                                if (!found)
-                                {
-                                    _gameActions.SendMessage($"{SystemMessages.Refuse}{Message.ArgsSeparatorChar}{LO[nameof(R.NoFreePlaceForName)]}", message.Sender);
-                                }
-                            }
-                            #endregion
+                            await OnConnectAsync(message, args);
                             break;
 
                         case SystemMessages.Disconnect:
@@ -1066,6 +975,113 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             });
+
+        private async ValueTask OnConnectAsync(Message message, string[] args)
+        {
+            if (args.Length < 4)
+            {
+                _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongConnectionParameters)], message.Sender);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && (args.Length < 6 || ClientData.Settings.NetworkGamePassword != args[5]))
+            {
+                _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
+                return;
+            }
+
+            var role = args[1];
+            var name = args[2];
+            var sex = args[3];
+
+            // Подсоединение к игре
+            if (ClientData.AllPersons.ContainsKey(name))
+            {
+                _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + string.Format(LO[nameof(R.PersonWithSuchNameIsAlreadyInGame)], name), message.Sender);
+                return;
+            }
+
+            var index = -1;
+            IEnumerable<ViewerAccount> accountsToSearch;
+            switch (role)
+            {
+                case Constants.Showman:
+                    accountsToSearch = new ViewerAccount[1] { ClientData.ShowMan };
+                    break;
+
+                case Constants.Player:
+                    accountsToSearch = ClientData.Players;
+                    if (ClientData.HostName == name) // Подключение организатора
+                    {
+                        var defaultPlayers = ClientData.Settings.Players;
+                        for (var i = 0; i < defaultPlayers.Length; i++)
+                        {
+                            if (defaultPlayers[i].Name == name)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index < 0 || index >= ClientData.Players.Count)
+                        {
+                            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, SystemMessages.Refuse, LO[nameof(R.PositionNotFoundByIndex)]), message.Sender);
+                            return;
+                        }
+                    }
+
+                    break;
+
+                default:
+                    accountsToSearch = ClientData.Viewers.Concat(new ViewerAccount[] { new ViewerAccount(Constants.FreePlace, false, false) { IsHuman = true } });
+                    break;
+            }
+
+            var found = false;
+
+            if (index > -1)
+            {
+                var accounts = accountsToSearch.ToArray();
+
+                var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, accounts[index]);
+                if (result.HasValue)
+                {
+                    if (!result.Value)
+                    {
+                        return;
+                    }
+                }
+
+                found |= foundLocal;
+            }
+            else
+            {
+                foreach (var item in accountsToSearch)
+                {
+                    index++;
+                    var (result, foundLocal) = await CheckAccountAsync(message, role, name, sex, index, item);
+
+                    found |= foundLocal;
+
+                    if (result.HasValue)
+                    {
+                        if (!result.Value)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                _gameActions.SendMessage($"{SystemMessages.Refuse}{Message.ArgsSeparatorChar}{LO[nameof(R.NoFreePlaceForName)]}", message.Sender);
+            }
+        }
 
         private void SelectNewHost()
         {
@@ -1736,7 +1752,14 @@ namespace SICore
             if (!account.IsHuman)
             {
                 // Удалить клиента компьютерного игрока
-                _client.Server.DeleteClient(account.Name);
+                if (!_client.Server.DeleteClient(account.Name))
+                {
+                    _client.Server.OnError(new Exception($"Cannot delete client {account.Name}"), true);
+                }
+                else if (_client.Server.Contains(account.Name))
+                {
+                    _client.Server.OnError(new Exception($"Client {account.Name} was deleted but is still present on the server!"), true);
+                }
             }
 
             _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, index);
@@ -2103,7 +2126,9 @@ namespace SICore
                 var indexStr = args[3];
 
                 if (!int.TryParse(indexStr, out index) || index < 0 || index >= ClientData.Players.Count)
+                {
                     return;
+                }
 
                 account = ClientData.Players[index];
             }
@@ -2113,6 +2138,8 @@ namespace SICore
             }
 
             var oldName = account.Name;
+            GamePersonAccount newAccount;
+
             if (!account.IsHuman)
             {
                 if (ClientData.AllPersons.ContainsKey(replacer))
@@ -2120,66 +2147,51 @@ namespace SICore
                     return;
                 }
 
-                SetComputerPerson(isPlayer, account, replacer);
+                newAccount = isPlayer
+                    ? ReplaceComputerPlayer(index, account.Name, replacer)
+                    : ReplaceComputerShowman(account.Name, replacer);
             }
             else
             {
                 SetHumanPerson(isPlayer, account, replacer, index);
-            }
-
-            foreach (var item in ClientData.MainPersons)
-            {
-                if (item.Ready)
-                {
-                    _gameActions.SendMessage($"{Messages.Ready}{Message.ArgsSeparatorChar}{item.Name}", message.Sender);
-                }
+                newAccount = account;
             }
 
             _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
             _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}");
 
-            InformPicture(account);
+            InformPicture(newAccount);
             OnPersonsChanged();
         }
 
-        internal void SetComputerPerson(bool isPlayer, GamePersonAccount account, string replacer)
+        internal GamePersonAccount ReplaceComputerShowman(string oldName, string replacer)
         {
-            // Компьютерный персонаж меняется на другого компьютерного
-            if (isPlayer)
+            for (var j = 0; j < _defaultShowmans.Length; j++)
             {
-                if (DefaultPlayers == null)
+                if (_defaultShowmans[j].Name == replacer)
                 {
-                    return;
-                }
-
-                var found = false;
-                for (int j = 0; j < DefaultPlayers.Length; j++)
-                {
-                    if (DefaultPlayers[j].Name == replacer)
-                    {
-                        var name = account.Name;
-
-                        account.Name = replacer;
-                        account.IsMale = DefaultPlayers[j].IsMale;
-                        account.Picture = DefaultPlayers[j].Picture;
-
-                        _client.Server.ReplaceInfo(name, DefaultPlayers[j]);
-
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found)
-                {
-                    return;
+                    _client.Server.DeleteClient(oldName);
+                    return CreateNewComputerShowman(_defaultShowmans[j]);
                 }
             }
-            else
+
+            _client.Server.OnError(new Exception($"Default showman with name {replacer} not found"), true);
+            return null;
+        }
+
+        internal GamePlayerAccount ReplaceComputerPlayer(int index, string oldName, string replacer)
+        {
+            for (var j = 0; j < _defaultPlayers.Length; j++)
             {
-                account.Name = replacer;
-                account.Picture = ClientData.BackLink.GetPhotoUri(account.Name);
+                if (_defaultPlayers[j].Name == replacer)
+                {
+                    _client.Server.DeleteClient(oldName);
+                    return CreateNewComputerPlayer(index, _defaultPlayers[j]);
+                }
             }
+
+            _client.Server.OnError(new Exception($"Default player with name {replacer} not found"), true);
+            return null;
         }
 
         internal void SetHumanPerson(bool isPlayer, GamePersonAccount account, string replacer, int index)
@@ -2321,7 +2333,14 @@ namespace SICore
 
                 if (!account.IsHuman)
                 {
-                    _client.Server.DeleteClient(account.Name);
+                    if (!_client.Server.DeleteClient(account.Name))
+                    {
+                        _client.Server.OnError(new Exception($"Cannot delete client {account.Name}"), true);
+                    }
+                    else if (_client.Server.Contains(account.Name))
+                    {
+                        _client.Server.OnError(new Exception($"Client {account.Name} was deleted but is still present on the server!"), true);
+                    }
 
                     account.IsHuman = true;
                     newName = account.Name = Constants.FreePlace;
@@ -2331,7 +2350,7 @@ namespace SICore
                 }
                 else if (isPlayer)
                 {
-                    if (DefaultPlayers == null)
+                    if (_defaultPlayers == null)
                     {
                         return;
                     }
@@ -2342,9 +2361,9 @@ namespace SICore
                     {
                         if (i != index && !ClientData.Players[i].IsHuman)
                         {
-                            for (var j = 0; j < DefaultPlayers.Length; j++)
+                            for (var j = 0; j < _defaultPlayers.Length; j++)
                             {
-                                if (DefaultPlayers[j].Name == ClientData.Players[i].Name)
+                                if (_defaultPlayers[j].Name == ClientData.Players[i].Name)
                                 {
                                     visited.Add(j);
                                     break;
@@ -2353,53 +2372,22 @@ namespace SICore
                         }
                     }
 
-                    var rand = ClientData.Rand.Next(DefaultPlayers.Length - visited.Count - 1);
+                    var rand = ClientData.Rand.Next(_defaultPlayers.Length - visited.Count - 1);
                     while (visited.Contains(rand))
                     {
                         rand++;
                     }
 
-                    var compPlayer = DefaultPlayers[rand];
-                    var newAccount = new GamePlayerAccount(account);
-                    newAcc = newAccount;
-
-                    newAccount.IsHuman = false;
-                    newName = newAccount.Name = compPlayer.Name;
-                    newIsMale = newAccount.IsMale = compPlayer.IsMale;
-                    newAccount.Picture = compPlayer.Picture;
-                    newAccount.IsConnected = true;
-
-                    ClientData.Players[index] = newAccount;
-
-                    var playerClient = new Client(newAccount.Name);
-                    var player = new Player(playerClient, compPlayer, false, LO, new ViewerData { BackLink = ClientData.BackLink });
-
-                    playerClient.ConnectTo(_client.Server);
-                    Inform(newAccount.Name);
+                    var compPlayer = _defaultPlayers[rand];
+                    newAcc = CreateNewComputerPlayer(index, compPlayer);
+                    newName = newAcc.Name;
+                    newIsMale = newAcc.IsMale;
                 }
                 else
                 {
-                    if (ClientData.BackLink == null)
-                    {
-                        throw new InvalidOperationException("ChangePersonType: this.ClientData.BackLink == null");
-                    }
-
-                    var newAccount = new GamePersonAccount(account);
-                    newAcc = newAccount;
-
-                    newAccount.IsHuman = false;
-                    newName = newAccount.Name = DefaultShowmans[0].Name;
-                    newIsMale = newAccount.IsMale = true;
-                    newAccount.Picture = DefaultShowmans[0].Picture;
-                    newAccount.IsConnected = true;
-
-                    ClientData.ShowMan = newAccount;
-
-                    var showmanClient = new Client(newAccount.Name);
-                    var showman = new Showman(showmanClient, newAccount, false, LO, new ViewerData { BackLink = ClientData.BackLink });
-
-                    showmanClient.ConnectTo(_client.Server);
-                    Inform(newAccount.Name);
+                    newAcc = CreateNewComputerShowman(_defaultShowmans[0]);
+                    newName = newAcc.Name;
+                    newIsMale = newAcc.IsMale;
                 }
             }
             finally
@@ -2431,16 +2419,68 @@ namespace SICore
             OnPersonsChanged();
         }
 
+        private GamePlayerAccount CreateNewComputerPlayer(int index, ComputerAccount account)
+        {
+            var newAccount = new GamePlayerAccount
+            {
+                IsHuman = false,
+                Name = account.Name,
+                IsMale = account.IsMale,
+                Picture = account.Picture,
+                IsConnected = true
+            };
+
+            ClientData.Players[index] = newAccount;
+
+            var playerClient = new Client(newAccount.Name);
+            var player = new Player(playerClient, account, false, LO, new ViewerData { BackLink = ClientData.BackLink });
+
+            playerClient.ConnectTo(_client.Server);
+            Inform(newAccount.Name);
+
+            return newAccount;
+        }
+
+        private GamePersonAccount CreateNewComputerShowman(ComputerAccount account)
+        {
+            if (ClientData.BackLink == null)
+            {
+                throw new InvalidOperationException($"{nameof(CreateNewComputerShowman)}: this.ClientData.BackLink == null");
+            }
+
+            var newAccount = new GamePersonAccount
+            {
+                IsHuman = false,
+                Name = account.Name,
+                IsMale = account.IsMale,
+                Picture = account.Picture,
+                IsConnected = true
+            };
+
+            ClientData.ShowMan = newAccount;
+
+            var showmanClient = new Client(newAccount.Name);
+            var showman = new Showman(showmanClient, account, false, LO, new ViewerData { BackLink = ClientData.BackLink });
+
+            showmanClient.ConnectTo(_client.Server);
+            Inform(newAccount.Name);
+
+            return newAccount;
+        }
+
         internal void StartGame()
         {
             ClientData.Stage = GameStage.Begin;
+
             OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
             _gameActions.InformStage();
+
             ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
+
             _logic.ScheduleExecution(Tasks.StartGame, 1, 1);
         }
 
-        private async Task<(bool?, bool)> CheckAccountAsync(
+        private async Task<(bool? Result, bool Found)> CheckAccountAsync(
             Message message,
             string role,
             string name,
@@ -2455,15 +2495,9 @@ namespace SICore
 
             if (account.Name == name || account.Name == Constants.FreePlace)
             {
-                var append = role == "viewer" && account.Name == Constants.FreePlace;
-                account.Name = name;
-                account.IsMale = sex == "m";
-                account.Picture = "";
-                account.IsConnected = true;
-
                 var connectionFound = await _client.Server.ConnectionsLock.WithLockAsync(() =>
                 {
-                    var connection = MasterServer.ExternalServers.Where(serv => serv.Id == message.Sender.Substring(1)).FirstOrDefault();
+                    var connection = MasterServer.Connections.Where(conn => conn.Id == message.Sender.Substring(1)).FirstOrDefault();
                     if (connection == null)
                     {
                         return false;
@@ -2485,12 +2519,25 @@ namespace SICore
                     return (false, true);
                 }
 
-                if (append)
-                {
-                    ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
-                }
+                ClientData.BeginUpdatePersons($"Connected {name} as {role} as {index}");
 
-                ClientData.OnAllPersonsChanged();
+                try
+                {
+                    var append = role == "viewer" && account.Name == Constants.FreePlace;
+                    account.Name = name;
+                    account.IsMale = sex == "m";
+                    account.Picture = "";
+                    account.IsConnected = true;
+
+                    if (append)
+                    {
+                        ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
+                    }
+                }
+                finally
+                {
+                    ClientData.EndUpdatePersons();
+                }
 
                 _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
 
@@ -2508,7 +2555,13 @@ namespace SICore
             return (true, true);
         }
 
-        private bool? CheckAccountNew(string role, string name, string sex, ref bool found, int index, ViewerAccount account,
+        private bool? CheckAccountNew(
+            string role,
+            string name,
+            string sex,
+            ref bool found,
+            int index,
+            ViewerAccount account,
             Action connectionAuthenticator)
         {
             if (account.IsConnected)
@@ -2518,19 +2571,26 @@ namespace SICore
 
             found = true;
 
-            var append = role == "viewer" && account.Name == Constants.FreePlace;
+            ClientData.BeginUpdatePersons($"Connected {name} as {role} as {index}");
 
-            account.Name = name;
-            account.IsMale = sex == "m";
-            account.Picture = "";
-            account.IsConnected = true;
-
-            if (append)
+            try
             {
-                ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
-            }
+                var append = role == "viewer" && account.Name == Constants.FreePlace;
 
-            ClientData.OnAllPersonsChanged();
+                account.Name = name;
+                account.IsMale = sex == "m";
+                account.Picture = "";
+                account.IsConnected = true;
+
+                if (append)
+                {
+                    ClientData.Viewers.Add(new ViewerAccount(account) { IsConnected = account.IsConnected });
+                }
+            }
+            finally
+            {
+                ClientData.EndUpdatePersons();
+            }
 
             _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
             _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");

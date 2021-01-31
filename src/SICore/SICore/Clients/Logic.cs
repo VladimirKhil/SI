@@ -1,4 +1,5 @@
-﻿using SICore.Network.Contracts;
+﻿using SICore.Network;
+using SICore.Network.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,9 @@ namespace SICore
         private Timer _taskTimer = null;
         private int _taskArgument = -1;
         private readonly Stack<Tuple<int, int, int>> _oldTasks = new Stack<Tuple<int, int, int>>();
-        private readonly object _taskTimerLock = new object();
+        
+        private readonly Lock _taskTimerLock = new Lock(nameof(_taskTimerLock));
+        
         private DateTime _finishingTime;
 
         internal int CurrentTask { get; private set; } = -1;
@@ -59,16 +62,14 @@ namespace SICore
             }
         }
 
-        protected internal void ExecuteImmediate()
-        {
-            lock (_taskTimerLock)
+        protected internal void ExecuteImmediate() =>
+            _taskTimerLock.WithLock(() =>
             {
                 if (_taskTimer != null)
                 {
                     _taskTimer.Change(10, Timeout.Infinite);
                 }
-            }
-        }
+            });
 
         protected StopReason _stopReason = StopReason.None;
 
@@ -129,31 +130,20 @@ namespace SICore
 
         #region IDisposable Members
 
-        protected virtual ValueTask DisposeAsync(bool disposing)
+        protected virtual async ValueTask DisposeAsync(bool disposing)
         {
-            var locked = Monitor.TryEnter(_taskTimerLock, TimeSpan.FromSeconds(5.0));
-            if (!locked)
-            {
-                ClientData.BackLink.OnError(new Exception($"Cannot lock {nameof(_taskTimerLock)}!"));
-            }
-
-            try
-            {
-                if (_taskTimer != null)
+            await _taskTimerLock.TryLockAsync(
+                () =>
                 {
-                    _taskTimer.Dispose();
-                    _taskTimer = null;
-                }
-            }
-            finally
-            {
-                if (locked)
-                {
-                    Monitor.Exit(_taskTimerLock);
-                }
-            }
+                    if (_taskTimer != null)
+                    {
+                        _taskTimer.Dispose();
+                        _taskTimer = null;
+                    }
+                },
+                5000);
 
-            return default;
+            _taskTimerLock.Dispose();
         }
 
         public async ValueTask DisposeAsync()
@@ -183,17 +173,15 @@ namespace SICore
             RunTaskTimer(taskTime);
         }
 
-        protected void RunTaskTimer(double taskTime)
-        {
-            lock (_taskTimerLock)
+        protected void RunTaskTimer(double taskTime) =>
+            _taskTimerLock.WithLock(() =>
             {
                 if (_taskTimer != null && taskTime > 0 && taskTime < 10 * 60 * 10) // 10 min
                 {
                     _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
                     _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
                 }
-            }
-        }
+            });
 
         protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition)
         {
@@ -218,11 +206,6 @@ namespace SICore
 
             var ind = Data.Rand.Next(goodItems.Length);
             return goodItems[ind].Index;
-        }
-
-        public virtual void SetInfo(IAccountInfo accountInfo)
-        {
-            
         }
 
         /// <summary>

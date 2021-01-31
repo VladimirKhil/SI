@@ -89,6 +89,8 @@ namespace SICore
 
             ClientData.Name = _client.Name;
 
+            ClientData.EventLog.Append($"Initial name {ClientData.Name}");
+
             ClientData.MessageSending = msg => Say(msg);
 
             ClientData.Kick = new CustomCommand(Kick_Executed) { CanBeExecuted = IsHost };
@@ -165,11 +167,8 @@ namespace SICore
         /// <summary>
         /// Упрощённый клиент (используется в качестве предка)
         /// </summary>
-        /// <param name="name">Имя</param>
-        /// <param name="password">Пароль</param>
-        /// <param name="isHost">Является ли владельцем сервера</param>
         protected Viewer(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
-            : base(client, personData, localizer, data)
+            : base(client, localizer, data)
         {
             if (personData == null)
             {
@@ -1277,7 +1276,7 @@ namespace SICore
                 {
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
-                        throw new InvalidOperationException("Computer account should never receive this");
+                        ThrowComputerAccountError();
                     }
 
                     account.IsHuman = true;
@@ -1333,6 +1332,9 @@ namespace SICore
             }
         }
 
+        private void ThrowComputerAccountError() =>
+            throw new InvalidOperationException($"Computer account should never receive this\n{ClientData.EventLog}");
+
         private async ValueTask OnConfigDeleteTableAsync(string[] mparams)
         {
             if (mparams.Length < 3)
@@ -1366,7 +1368,7 @@ namespace SICore
 
                 if (!account.IsHuman && account.Name == ClientData.Name /* for computer accounts being deleted */)
                 {
-                    throw new InvalidOperationException("Computer account should never receive this");
+                    ThrowComputerAccountError();
                 }
 
                 if (account.IsConnected && account.IsHuman)
@@ -1447,7 +1449,7 @@ namespace SICore
                 {
                     if (account.Name == ClientData.Name /* for computer accounts being deleted */)
                     {
-                        throw new InvalidOperationException("Computer account should never receive this");
+                        ThrowComputerAccountError();
                     }
 
                     account.Name = replacer;
@@ -2030,7 +2032,5 @@ namespace SICore
         {
             ClientData.IsPlayer = false;
         }
-
-        public void Rename(string name) => _viewerActions.Rename(name);
     }
 }

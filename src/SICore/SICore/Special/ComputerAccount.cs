@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Notions;
 using SICore.BusinessLogic;
-using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
 using SIData;
 using System;
@@ -17,7 +16,7 @@ namespace SICore
     /// Информация о компьютерном игроке
     /// </summary>
     [DataContract]
-    public class ComputerAccount : Account, IAccountInfo, IComparable<ComputerAccount>, IComparable
+    public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparable
     {
         public void SetPicture(string photoUri)
         {

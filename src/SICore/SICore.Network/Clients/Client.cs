@@ -141,10 +141,6 @@ namespace SICore.Network.Clients
             Disposed?.Invoke();
         }
 
-        public event Action<IAccountInfo> InfoReplaced;
-
-        public void ReplaceInfo(IAccountInfo computerAccount) => InfoReplaced?.Invoke(computerAccount);
-
         public event Action<IClient, Message> SendingMessage;
     }
 }

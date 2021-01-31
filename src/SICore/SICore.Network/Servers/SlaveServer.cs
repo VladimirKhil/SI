@@ -12,7 +12,7 @@ namespace SICore.Network.Servers
 
         public override bool IsMain => false;
 
-        protected override IEnumerable<IConnection> Connections
+        public override IEnumerable<IConnection> Connections
         {
             get
             {

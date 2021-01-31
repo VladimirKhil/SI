@@ -31,5 +31,10 @@ namespace SICore
         {
 
         }
+
+        public ViewerAccount()
+        {
+
+        }
     }
 }

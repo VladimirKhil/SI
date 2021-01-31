@@ -24,5 +24,10 @@ namespace SICore
         {
 
         }
+
+        public GamePersonAccount()
+        {
+
+        }
     }
 }

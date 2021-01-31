@@ -24,12 +24,7 @@ namespace SICore.Network.Servers
 
         public override bool IsMain => true;
 
-        /// <summary>
-        /// Остальные серверы
-        /// </summary>
-        public IEnumerable<IConnection> ExternalServers => _connections;
-
-        protected override IEnumerable<IConnection> Connections => _connections;
+        public override IEnumerable<IConnection> Connections => _connections;
 
         public MasterServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
             : base(serverConfiguration, localizer)

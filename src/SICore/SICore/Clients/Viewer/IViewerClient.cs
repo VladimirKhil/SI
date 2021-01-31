@@ -37,6 +37,5 @@ namespace SICore
 
         void RecreateCommands();
         void Move(object arg);
-        void Rename(string name);
     }
 }

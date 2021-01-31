@@ -44,7 +44,7 @@ namespace SICore.Network.Servers
 
         public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
 
-        protected abstract IEnumerable<IConnection> Connections { get; }
+        public abstract IEnumerable<IConnection> Connections { get; }
 
         public virtual ValueTask<bool> AddConnectionAsync(IConnection connection)
         {
@@ -225,7 +225,8 @@ namespace SICore.Network.Servers
         {
             foreach (var client in _clients.Values)
             {
-                if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
+                if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody
+                    || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
                 {
                     client.AddIncomingMessage(message);
                 }
@@ -286,20 +287,15 @@ namespace SICore.Network.Servers
 
         private void Connection_SerializationError(Message message, Exception exc) => SerializationError?.Invoke(message, exc);
 
-        public void DeleteClient(string name)
+        public bool DeleteClient(string name)
         {
             if (_clients.TryRemove(name, out var client))
             {
                 client.Dispose();
+                return true;
             }
-        }
 
-        public void ReplaceInfo(string name, IAccountInfo computerAccount)
-        {
-            if (_clients.TryGetValue(name, out var client))
-            {
-                client.ReplaceInfo(computerAccount);
-            }
+            return false;
         }
 
         /// <summary>

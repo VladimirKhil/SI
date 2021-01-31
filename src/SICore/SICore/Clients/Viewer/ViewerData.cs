@@ -1,11 +1,9 @@
 ﻿using SICore.Connections;
-using SIData;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Windows.Input;
 
 namespace SICore
 {
@@ -416,11 +414,15 @@ namespace SICore
         {
             Winner = -1;
 
-            SendMessageCommand = new CustomCommand(item =>
+            SendMessageCommand = new CustomCommand(
+                item =>
+                {
+                    MessageSending?.Invoke(PrintedText);
+                    PrintedText = "";
+                })
             {
-                MessageSending?.Invoke(PrintedText);
-                PrintedText = "";
-            }) { CanBeExecuted = false };
+                CanBeExecuted = false
+            };
         }
 
         private readonly List<string> _chatTable = new List<string>();

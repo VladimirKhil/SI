@@ -37,14 +37,13 @@ namespace SICore
 
         public ILocalizer LO { get; protected set; }
 
-        protected Actor(Client client, Account personData, ILocalizer localizer, D data)
+        protected Actor(Client client, ILocalizer localizer, D data)
         {
             _client = client;
             ClientData = data;
 
             _client.MessageReceived += OnMessageReceivedAsync;
             _client.Disposed += Client_Disposed;
-            _client.InfoReplaced += Client_InfoReplaced;
 
             LO = localizer;
         }
@@ -54,6 +53,8 @@ namespace SICore
             try
             {
                 await DisposeAsync();
+
+                ClientData.EventLog.Append("Client disposed");
             }
             catch (Exception exc)
             {
@@ -61,15 +62,12 @@ namespace SICore
             }
         }
 
-        private void Client_InfoReplaced(IAccountInfo data) => _logic.SetInfo(data);
-
         public void AddLog(string s) => _logic.AddLog(s);
 
         public virtual ValueTask DisposeAsync(bool disposing)
         {
             _client.MessageReceived -= OnMessageReceivedAsync;
             _client.Disposed -= Client_Disposed;
-            _client.InfoReplaced -= Client_InfoReplaced;
 
             return _logic.DisposeAsync();
         }

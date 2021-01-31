@@ -21,7 +21,8 @@ namespace SICore
         private readonly ComputerAccount[] _defaultShowmans;
         private readonly bool _createHost;
 
-        public GameRunner(Server server,
+        public GameRunner(
+            Server server,
             IGameSettingsCore<AppSettingsCore> settings,
             SIDocument document,
             IGameManager backLink,
@@ -121,12 +122,7 @@ namespace SICore
                 gameData.EndUpdatePersons();
             }
 
-            var game = new Game(client, null, localizer, gameData)
-            {
-                DefaultPlayers = _defaultPlayers,
-                DefaultShowmans = _defaultShowmans
-            };
-
+            var game = new Game(client, null, localizer, gameData, _defaultPlayers, _defaultShowmans);
             client.ConnectTo(_server);
 
             game.Run(_document);

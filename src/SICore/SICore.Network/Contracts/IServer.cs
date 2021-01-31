@@ -1,7 +1,6 @@
 ﻿using SICore.Connections;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SICore.Network.Contracts
 {
@@ -12,17 +11,17 @@ namespace SICore.Network.Contracts
     {
         bool IsMain { get; }
 
+        IEnumerable<IConnection> Connections { get; }
+
         Lock ConnectionsLock { get; }
 
         void AddClient(IClient client);
 
-        void DeleteClient(string name);
+        bool DeleteClient(string name);
 
         bool Contains(string name);
 
         void OnError(Exception exc, bool isWarning);
-
-        void ReplaceInfo(string name, IAccountInfo computerAccount);
 
         event Action<Message, Exception> SerializationError;
     }

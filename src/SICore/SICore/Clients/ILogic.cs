@@ -11,7 +11,5 @@ namespace SICore
         void AddLog(string s);
 
         Data Data { get; }
-
-        void SetInfo(IAccountInfo accountInfo);
     }
 }

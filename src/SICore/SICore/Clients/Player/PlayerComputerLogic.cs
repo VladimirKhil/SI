@@ -85,16 +85,6 @@ namespace SICore
 
         private void PressButton() => _viewerActions.PressGameButton();
 
-        public override void SetInfo(IAccountInfo data)
-        {
-            var account = (ComputerAccount)data; // TODO: fix bad design
-            _viewerActions.Rename(account.Name);
-
-            _account = account;
-            _data.Picture = account.Picture;
-            _data.PlayerDataExtensions.RealBrave = _account.B0;
-        }
-
         private void AnswerRight() => _viewerActions.SendMessage(Messages.IsRight, "+");
 
         private void AnswerWrong() => _viewerActions.SendMessage(Messages.IsRight, "-");

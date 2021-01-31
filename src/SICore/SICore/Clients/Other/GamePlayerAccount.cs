@@ -81,5 +81,10 @@ namespace SICore
         {
             
         }
+
+        public GamePlayerAccount()
+        {
+
+        }
     }
 }
