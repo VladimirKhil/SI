@@ -31,7 +31,7 @@
         <Border Margin="20,20,40,0" BorderBrush="#FF111111" BorderThickness="0" VerticalAlignment="Top" Grid.RowSpan="8">
             <Image Stretch="Fill" Source="/SIGame;component/Resources/game.jpg" />
         </Border>
-        <TextBlock Grid.Column="1" Grid.Row="1" Text="2002 — 2020 гг." />
+        <TextBlock Grid.Column="1" Grid.Row="1" Text="2002 — 2021 гг." />
         <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding AppVersion}" />
         <TextBlock Grid.Column="1" Grid.Row="3" Text="{x:Static lp:Resources.About_Author}" />
         <TextBlock Grid.Column="1" Grid.Row="4" Text="{x:Static lp:Resources.About_Design}" />
