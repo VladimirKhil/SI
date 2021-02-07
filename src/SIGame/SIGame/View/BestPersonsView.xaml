@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="500" FontSize="18">
+             mc:Ignorable="d" Width="500" FontSize="18" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <UserControl.Resources>
         <DropShadowEffect x:Key="SimpleEffect" ShadowDepth="1" BlurRadius="0" />
         <Style x:Key="basic" TargetType="TextBlock">

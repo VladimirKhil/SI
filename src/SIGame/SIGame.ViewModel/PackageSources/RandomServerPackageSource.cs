@@ -1,5 +1,6 @@
 ﻿using SIGame.ViewModel.Properties;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
@@ -15,9 +16,11 @@ namespace SIGame.ViewModel.PackageSources
 
         public override bool RandomSpecials => true;
 
-        public override Task<(string, bool)> GetPackageFileAsync() => throw new NotImplementedException();
+        public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
-        public override Task<byte[]> GetPackageHashAsync() => Task.FromResult(Array.Empty<byte>());
+        public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(Array.Empty<byte>());
 
         public override string GetPackageName() => "";
     }

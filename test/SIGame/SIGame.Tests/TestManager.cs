@@ -16,10 +16,6 @@ namespace SIGame.Tests
 
 		public override bool Ask(string text) => throw new NotImplementedException();
 
-		public override Action<T> ExecuteOnUIThread<T>(Action<T> action) => action;
-
-		public override Action<T1, T2> ExecuteOnUIThread<T1, T2>(Action<T1, T2> action) => action;
-
 		public override string GetKeyName(int key) => key.ToString();
 
 		public override void PlaySound(string sound = null, double speed = 1, bool loop = false)
@@ -85,7 +81,7 @@ namespace SIGame.Tests
 			return new AnimatableTimerMock();
 		}
 
-		public override Action ExecuteOnUIThread(Action action)
+		public override void ExecuteOnUIThread(Action action)
 		{
 			throw new NotImplementedException();
 		}

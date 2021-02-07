@@ -3,25 +3,14 @@ using System.Windows.Controls;
 
 namespace SIGame
 {
-    public class DropDownButton : Button
+    public sealed class DropDownButton : Button
     {
         public static readonly DependencyProperty DropDownProperty = DependencyProperty.Register("DropDown", typeof(ContextMenu), typeof(DropDownButton), new UIPropertyMetadata(null));
 
         public ContextMenu DropDown
         {
-            get
-            {
-                return (ContextMenu)GetValue(DropDownProperty);
-            }
-            set
-            {
-                SetValue(DropDownProperty, value);
-            }
-        }
-
-        public DropDownButton()
-        {
-
+            get => (ContextMenu)GetValue(DropDownProperty);
+            set => SetValue(DropDownProperty, value);
         }
 
         protected override void OnClick()
@@ -32,6 +21,5 @@ namespace SIGame
                 DropDown.IsOpen = true;
             }
         }
-
     }
 }

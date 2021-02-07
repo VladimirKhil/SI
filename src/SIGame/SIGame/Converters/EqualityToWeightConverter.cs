@@ -12,7 +12,7 @@ namespace SIGame.Converters
             var left = values[0] as string;
             var right = values[1] as string;
 
-            return left == right && left != null ? FontWeights.Bold : FontWeights.Normal;
+            return left == right && left != null ? FontWeights.Bold : FontWeights.Light;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

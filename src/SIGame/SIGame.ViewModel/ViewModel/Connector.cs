@@ -19,42 +19,42 @@ namespace SIGame.ViewModel
 
         public Connector(SlaveServer server, Client client)
         {
-            this._server = server;
-            this._client = client;
+            _server = server;
+            _client = client;
 
-            client.MessageReceived += ProcessMessage;
+            client.MessageReceived += ProcessMessageAsync;
         }
 
-        public Task<string[]> GetGameInfo()
+        public Task<string[]> GetGameInfoAsync()
         {
             _tcs = new TaskCompletionSource<string[]>();
 
-            lock (_server.ConnectionsSync)
+            _server.ConnectionsLock.WithLock(async () =>
             {
-                _server.HostServer.SendMessage(new Message(Messages.GameInfo, "", ""));
-            }
+                await _server.HostServer.SendMessageAsync(new Message(Messages.GameInfo, "", ""));
+            });
 
             return _tcs.Task;
         }
 
-        public Task<string[]> JoinGame(string command)
+        public Task<string[]> JoinGameAsync(string command)
         {
             _tcs = new TaskCompletionSource<string[]>();
 
             var m = new Message(command, "", "");
-            lock (_server.ConnectionsSync)
+            _server.ConnectionsLock.WithLock(async () =>
             {
-                _server.HostServer.SendMessage(m);
-            }
+                await _server.HostServer.SendMessageAsync(m);
+            });
 
             return _tcs.Task;
         }
 
-        private void ProcessMessage(Message m)
+        private ValueTask ProcessMessageAsync(Message m)
         {
             var text = m.Text?.Split(Message.ArgsSeparatorChar);
             if (text?.Length == 0)
-                return;
+                return default;
 
             if (_tcs2 != null)
             {
@@ -88,27 +88,29 @@ namespace SIGame.ViewModel
                         break;
                 }
             }
+
+            return default;
         }
 
         public void Dispose()
         {
-            _client.MessageReceived -= ProcessMessage;
+            _client.MessageReceived -= ProcessMessageAsync;
         }
 
-        internal Task<bool> SetGameID(int gameID)
+        internal Task<bool> SetGameIdAsync(int gameId)
         {
             _tcs2 = new TaskCompletionSource<bool>();
 
             var ct = new CancellationTokenSource(10000);
             ct.Token.Register(() => _tcs2.TrySetCanceled(), useSynchronizationContext: false);
 
-            lock (_server.ConnectionsSync)
+            _server.ConnectionsLock.WithLock(async () =>
             {
                 if (_server.HostServer != null)
                 {
-                    _server.HostServer.SendMessage(new Message(Messages.Game + Message.ArgsSeparatorChar + gameID, "", ""));
+                    await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
                 }
-            }
+            });
 
             return _tcs2.Task;
         }

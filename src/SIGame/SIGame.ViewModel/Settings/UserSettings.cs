@@ -57,6 +57,17 @@ namespace SIGame
             set { _sound = value; OnPropertyChanged(); }
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _mainMenuSound = false;
+
+        [XmlAttribute]
+        [DefaultValue(false)]
+        public bool MainMenuSound
+        {
+            get { return _mainMenuSound; }
+            set { _mainMenuSound = value; OnPropertyChanged(); }
+        }
+
         private double _volume = 25;
 
         /// <summary>
@@ -249,6 +260,9 @@ namespace SIGame
                 }
             }
         }
+
+        [XmlIgnore]
+        public string GameServerUri { get; set; }
 
         #endregion
 

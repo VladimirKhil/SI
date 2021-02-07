@@ -4,22 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="400"
-             FontSize="16" FocusManager.FocusedElement="{Binding ElementName=tbLogin}">
+             mc:Ignorable="d" Width="473" Height="262"
+             FontSize="16" FocusManager.FocusedElement="{Binding ElementName=tbLogin}"
+             FontFamily="/SIGame;component/Fonts/#Phenomena">
     <StackPanel>
-        <TextBlock FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" Text="{x:Static lp:Resources.Entrance}" />
-        <DockPanel Margin="10,20,10,0">
-            <TextBlock Text="{x:Static lp:Resources.Login}" DockPanel.Dock="Left" />
-            <TextBox Name="tbLogin" Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" Margin="20,0,0,0" MaxLength="30">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter" Command="{Binding Enter}" />
-                </TextBox.InputBindings>
-            </TextBox>
-        </DockPanel>
-        <DockPanel Margin="10,20,0,0">
-            <Button Style="{StaticResource SIButton}" DockPanel.Dock="Right" Command="{Binding Enter}" Content="{x:Static lp:Resources.Logon}" Padding="20,5" FontSize="22" />
-            <TextBlock Text="{Binding Error}" Margin="0,0,10,5" Foreground="#FFC10000" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
-            <Button Content="…" Width="40" ToolTip="{x:Static lp:Resources.ShowMore}" Command="{Binding ShowFullError}" Style="{StaticResource SIButton}" Visibility="{Binding FullError,Converter={StaticResource NotNullToVisibilityConverter1}}" />
-        </DockPanel>
+        <TextBlock FontSize="19" HorizontalAlignment="Center" Text="{x:Static lp:Resources.Entrance}"
+                   Foreground="{StaticResource MainColor}" />
+        <TextBlock FontSize="19" Foreground="{StaticResource MainColor}" Margin="0,23,0,0" HorizontalAlignment="Center">
+            <Run Text="{x:Static lp:Resources.Login}" />
+            <Run Text=":" />
+        </TextBlock>
+        <TextBox Name="tbLogin" Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" Margin="0,18,0,0" MaxLength="30"
+                 Width="360" Height="23" FontSize="15" HorizontalAlignment="Center" FontWeight="Light">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Enter}" />
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button Style="{StaticResource SIButton}" Command="{Binding Enter}" Content="{x:Static lp:Resources.Logon}"
+                Padding="20,5" Margin="0,45,0,0" FontSize="19" Width="132" Height="35" BorderThickness="2" />
+        <ContentControl HorizontalAlignment="Center" Height="70">
+            <TextBlock Text="{Binding Error}" FontSize="15" Margin="0,20,10,5" Foreground="#FFC10000" TextWrapping="Wrap"
+                    TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+        </ContentControl>
     </StackPanel>
 </UserControl>

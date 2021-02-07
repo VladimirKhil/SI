@@ -8,10 +8,16 @@
       Title="{x:Static lp:Resources.Other}"
       xmlns:lp="clr-namespace:SIGame.Properties"
       xmlns:local="clr-namespace:SIGame"
-      FontSize="20">
+      FontSize="20" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
 
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
+            <Setter Property="Margin" Value="0,30,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="25" />
+        </Style>
+
+        <Style x:Key="CheckText" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,30,0,0" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="FontSize" Value="25" />
@@ -33,7 +39,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="HeaderBox" TargetType="CheckBox">
+        <Style x:Key="HeaderBox" TargetType="CheckBox" BasedOn="{StaticResource CheckBoxBase}">
             <Setter Property="Margin" Value="0,30,0,0" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
@@ -43,22 +49,22 @@
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GameButtonKey}" />
         <ToggleButton Style="{StaticResource GameButtonSetter}" Padding="18,6" Margin="0,3" PreviewKeyDown="ToggleButton_KeyDown" LostKeyboardFocus="ToggleButton_LostKeyboardFocus" />
         <CheckBox IsEnabled="{Binding IsEditable}" IsChecked="{Binding Model.MakeLogs}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.WriteLogs}" />
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.WriteLogs}" />
         </CheckBox>
         <Button IsEnabled="{Binding IsEditable}" Style="{StaticResource WhiteButton}" Margin="0,3" Padding="18,6" Content="{x:Static lp:Resources.Move}" Command="{Binding MoveLogs}" />
         <CheckBox IsChecked="{Binding Model.TranslateGameToChat}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.TranslateToChat}" />
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.TranslateToChat}" />
         </CheckBox>
         <CheckBox IsChecked="{Binding Model.UISettings.Animate3D}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowAnimations}" />
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowAnimations}" />
         </CheckBox>
         <CheckBox IsChecked="{Binding Model.ShowBorderOnFalseStart}" Style="{StaticResource HeaderBox}">
-            <TextBlock Style="{StaticResource Header}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowBorderOnFalseStart}" />
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowBorderOnFalseStart}" />
         </CheckBox>
 
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.MediaPort}" />
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.LocalNetworkOnly}" />
-        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" Text="{Binding Model.MultimediaPort}" Minimum="1" Maximum="32000" Padding="1" />
+        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" Text="{Binding Model.MultimediaPort}" Minimum="1" Maximum="32000" FontWeight="Light" Padding="1" />
 
     </StackPanel>
 </Page>

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="527" FontSize="16">
+             mc:Ignorable="d" Width="650" FontSize="22" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <UserControl.Resources>
         <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -28,15 +28,14 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Border Margin="12" BorderBrush="#FF111111" BorderThickness="0" VerticalAlignment="Top" Grid.RowSpan="8">
+        <Border Margin="20,20,40,0" BorderBrush="#FF111111" BorderThickness="0" VerticalAlignment="Top" Grid.RowSpan="8">
             <Image Stretch="Fill" Source="/SIGame;component/Resources/game.jpg" />
         </Border>
         <TextBlock Grid.Column="1" Grid.Row="1" Text="2002 — 2020 гг." />
         <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding AppVersion}" />
         <TextBlock Grid.Column="1" Grid.Row="3" Text="{x:Static lp:Resources.About_Author}" />
         <TextBlock Grid.Column="1" Grid.Row="4" Text="{x:Static lp:Resources.About_Design}" />
-        <TextBlock Grid.Column="1" Grid.Row="5">
-            <Run Text="{x:Static lp:Resources.About_Composer}" /><Run>: </Run>
+        <TextBlock Grid.Column="1" Grid.Row="5"><Run Text="{x:Static lp:Resources.About_Composer}" /><Run>: </Run>
             <Hyperlink NavigateUri="https://soundcloud.com/vladislav-hoshenko" TargetName="_blank" Command="{Binding NavigateComposer}">
                 Vlad Hoshenko
             </Hyperlink>
@@ -53,7 +52,7 @@
                 <Run Text="{x:Static lp:Resources.About_Site}" />
             </Hyperlink>
         </TextBlock>
-        <TextBlock Grid.Column="1" Grid.Row="8" Margin="-2,0,0,10">
+        <TextBlock Grid.Column="1" Grid.Row="8" Margin="-2,0,0,20">
             <Hyperlink Command="{Binding OpenLicenses}">
                 <Run Text="{x:Static lp:Resources.Licenses}" />
             </Hyperlink>

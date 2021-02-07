@@ -1,8 +1,12 @@
-﻿using SICore;
+﻿using SI.GameServer.Client;
+using SICore;
+using SICore.Network;
+using SICore.Network.Clients;
+using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Implementation;
 using SIGame.ViewModel.Properties;
-using SIGame.ViewModel.ViewModel.Data;
 using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
@@ -17,7 +21,11 @@ namespace SIGame.ViewModel
 {
     public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
+        private const bool UseSignalRConnection = true;
+
         private SI.GameServer.Contract.HostInfo _gamesHostInfo;
+
+        public string ServerName => _gamesHostInfo?.Name ?? "SIGame";
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -25,7 +33,7 @@ namespace SIGame.ViewModel
 
         public GameInfo CurrentGame
         {
-            get { return _currentGame; }
+            get => _currentGame;
             set
             {
                 if (_currentGame != value)
@@ -44,7 +52,7 @@ namespace SIGame.ViewModel
 
         public bool CanJoin
         {
-            get { return _canJoin; }
+            get => _canJoin;
             set
             {
                 if (_canJoin != value)
@@ -54,11 +62,9 @@ namespace SIGame.ViewModel
                 }
             }
         }
-        
-        private void CheckJoin()
-        {
+
+        private void CheckJoin() =>
             CanJoin = _currentGame != null && (!_currentGame.PasswordRequired || !string.IsNullOrEmpty(_password));
-        }
 
         public CustomCommand Cancel { get; set; }
 
@@ -66,12 +72,13 @@ namespace SIGame.ViewModel
 
         public GamesFilter GamesFilter
         {
-            get { return _userSettings.GamesFilter; }
+            get => _userSettings.GamesFilter;
             set
             {
                 if (_userSettings.GamesFilter != value)
                 {
                     _userSettings.GamesFilter = value;
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(GamesFilterValue));
 
@@ -143,7 +150,7 @@ namespace SIGame.ViewModel
 
         public bool IsNew
         {
-            get { return (GamesFilter & GamesFilter.New) > 0; }
+            get => (GamesFilter & GamesFilter.New) > 0;
             set
             {
                 if (value)
@@ -155,7 +162,7 @@ namespace SIGame.ViewModel
 
         public bool IsSport
         {
-            get { return (GamesFilter & GamesFilter.Sport) > 0; }
+            get => (GamesFilter & GamesFilter.Sport) > 0;
             set
             {
                 if (value)
@@ -167,7 +174,7 @@ namespace SIGame.ViewModel
 
         public bool IsTv
         {
-            get { return (GamesFilter & GamesFilter.Tv) > 0; }
+            get => (GamesFilter & GamesFilter.Tv) > 0;
             set
             {
                 if (value)
@@ -179,7 +186,7 @@ namespace SIGame.ViewModel
 
         public bool IsNoPassword
         {
-            get { return (GamesFilter & GamesFilter.NoPassword) > 0; }
+            get => (GamesFilter & GamesFilter.NoPassword) > 0;
             set
             {
                 if (value)
@@ -200,7 +207,7 @@ namespace SIGame.ViewModel
 
         public string Password
         {
-            get { return _password; }
+            get => _password;
             set
             {
                 if (_password != value)
@@ -216,7 +223,7 @@ namespace SIGame.ViewModel
 
         public bool ShowSearchBox
         {
-            get { return _showSearchBox; }
+            get => _showSearchBox;
             set
             {
                 if (_showSearchBox != value)
@@ -236,7 +243,7 @@ namespace SIGame.ViewModel
 
         public string SearchFilter
         {
-            get { return _searchFilter; }
+            get => _searchFilter;
             set
             {
                 if (_searchFilter != value)
@@ -256,7 +263,7 @@ namespace SIGame.ViewModel
 
         public bool ShowProgress
         {
-            get { return _showProgress; }
+            get => _showProgress;
             set
             {
                 if (_showProgress != value)
@@ -266,12 +273,12 @@ namespace SIGame.ViewModel
                 }
             }
         }
-        
+
         private int _uploadProgress;
 
         public int UploadProgress
         {
-            get { return _uploadProgress; }
+            get => _uploadProgress;
             set
             {
                 if (_uploadProgress != value)
@@ -282,13 +289,13 @@ namespace SIGame.ViewModel
             }
         }
 
-        public string[] Emoji { get; } = new string[] { "😃", "😁", "😪", "🎄", "🎓" };
+        public string[] Emoji { get; } = new string[] { "😃", "😁", "😪", "🎄", "🎓", "💥", "🦄", "🍋", "🍄", "🔥", "❤️", "✨", "🎅", "🎁", "☃️", "🦌" };
 
         private string _chatText;
 
         public string ChatText
         {
-            get { return _chatText; }
+            get => _chatText;
             set
             {
                 if (_chatText != value)
@@ -297,6 +304,12 @@ namespace SIGame.ViewModel
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public bool IsChatShown
+        {
+            get => _userSettings.GameSettings.AppSettings.IsChatShown;
+            set { _userSettings.GameSettings.AppSettings.IsChatShown = value; OnPropertyChanged(); }
         }
 
         protected override string PackagesPublicBaseUrl => _gamesHostInfo.PackagesPublicBaseUrl;
@@ -312,10 +325,15 @@ namespace SIGame.ViewModel
 
         private readonly object _usersLock = new object();
         
-        public SIOnlineViewModel(ConnectionData connectionData, IGameServerClient gameServerclient, CommonSettings commonSettings, UserSettings userSettings)
+        public SIOnlineViewModel(
+            ConnectionData connectionData,
+            IGameServerClient gameServerClient,
+            CommonSettings commonSettings,
+            UserSettings userSettings)
             : base(connectionData, commonSettings, userSettings)
         {
-            _gameServerClient = gameServerclient;
+            _gameServerClient = gameServerClient;
+
             _gameServerClient.GameCreated += GameServerClient_GameCreated;
             _gameServerClient.GameDeleted += GameServerClient_GameDeleted;
             _gameServerClient.GameChanged += GameServerClient_GameChanged;
@@ -330,7 +348,7 @@ namespace SIGame.ViewModel
 
             _gameServerClient.UploadProgress += GameServerClient_UploadProgress;
 
-            ServerAddress = _gameServerClient.ServerAddress;
+            ServerAddress = _gameServerClient.ServiceUri;
 
             AddEmoji = new CustomCommand(AddEmoji_Executed);
         }
@@ -338,6 +356,7 @@ namespace SIGame.ViewModel
         private Task GameServerClient_Reconnecting(Exception exc)
         {
             OnMessage(Resources.App_Name, $"{Resources.ReconnectingMessage} {exc?.Message}");
+
             return Task.CompletedTask;
         }
 
@@ -347,8 +366,8 @@ namespace SIGame.ViewModel
 
             UI.Execute(async () =>
             {
-                await ReloadGamesAsync();
-                await ReloadUsersAsync();
+                await ReloadGamesAsync(_cancellationTokenSource.Token);
+                await ReloadUsersAsync(_cancellationTokenSource.Token);
             }, exc =>
             {
                 Error = exc.Message;
@@ -357,20 +376,16 @@ namespace SIGame.ViewModel
             return Task.CompletedTask;
         }
 
-        private void AddEmoji_Executed(object arg)
-        {
-            ChatText += arg.ToString();
-        }
+        private void AddEmoji_Executed(object arg) => ChatText += arg.ToString();
 
-        private void GameServerClient_UploadProgress(int progress)
-        {
-            UploadProgress = progress;
-        }
+        private void GameServerClient_UploadProgress(int progress) => UploadProgress = progress;
 
         private Task GameServerClient_Closed(Exception exception)
         {
-            PlatformSpecific.PlatformManager.Instance.ShowMessage($"{Resources.LostConnection}: {exception?.Message}",
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                $"{Resources.LostConnection}: {exception?.Message}",
                 PlatformSpecific.MessageType.Warning);
+
             Cancel.Execute(null);
 
             return Task.CompletedTask;
@@ -378,10 +393,7 @@ namespace SIGame.ViewModel
 
         public event Action<string, string> Message;
 
-        private void OnMessage(string userName, string message)
-        {
-            Message?.Invoke(userName, message);
-        }
+        private void OnMessage(string userName, string message) => Message?.Invoke(userName, message);
 
         private void GameServerClient_Leaved(string userName)
         {
@@ -529,19 +541,28 @@ namespace SIGame.ViewModel
                 ServerGames.Add(gameInfo);
         }
 
-        public async Task Init()
+        public async Task InitAsync()
         {
             try
             {
                 IsProgress = true;
+
                 _gamesHostInfo = await _gameServerClient.GetGamesHostInfoAsync(_cancellationTokenSource.Token);
-                await ReloadGamesAsync();
-                await ReloadUsersAsync();
-                _avatar = (await UploadAvatar(Human, CancellationToken.None))?.Item1;
+
+                OnPropertyChanged(nameof(ServerName));
+
+                await ReloadGamesAsync(_cancellationTokenSource.Token);
+                await ReloadUsersAsync(_cancellationTokenSource.Token);
+
+                _avatar = (await UploadAvatarAsync(Human, CancellationToken.None)).AvatarUrl;
+            }
+            catch (TaskCanceledException)
+            {
+
             }
             catch (Exception exc)
             {
-                PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Warning, true);
+                PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Warning, true);                
                 Cancel.Execute(null);
             }
         }
@@ -550,7 +571,7 @@ namespace SIGame.ViewModel
         {
             try
             {
-                var news = await _gameServerClient.GetNews();
+                var news = await _gameServerClient.GetNewsAsync();
 
                 if (!string.IsNullOrEmpty(news))
                 {
@@ -564,11 +585,11 @@ namespace SIGame.ViewModel
             }
         }
 
-        private async Task ReloadUsersAsync()
+        private async Task ReloadUsersAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var users = await _gameServerClient.GetUsers();
+                var users = await _gameServerClient.GetUsersAsync(cancellationToken);
                 Array.Sort(users);
                 lock (_usersLock)
                 {
@@ -586,11 +607,14 @@ namespace SIGame.ViewModel
             }
         }
 
-        protected override async Task ClearConnection()
+        protected override async Task ClearConnectionAsync()
         {
-            await _gameServerClient.DisposeAsync();
+            if (ReleaseConnection)
+            {
+                await _gameServerClient.DisposeAsync();
+            }
 
-            await base.ClearConnection();
+            await base.ClearConnectionAsync();
         }
 
         private async Task ReloadGamesAsync(CancellationToken cancellationToken = default)
@@ -673,24 +697,30 @@ namespace SIGame.ViewModel
             base.Prepare(gameSettings);
 
             gameSettings.NetworkGameType = NetworkGameType.GameServer;
-            gameSettings.CreateGame += CreateGame;
+            gameSettings.CreateGame += CreateGameAsync;
         }
 
-        private async Task<Tuple<SlaveServer, IViewerClient>> CreateGame(GameSettings settings, PackageSources.PackageSource packageSource)
+        private async Task<Tuple<SlaveServer, IViewerClient>> CreateGameAsync(
+            GameSettings settings,
+            PackageSources.PackageSource packageSource)
         {
-            var gameSettingsViewModel = gameSettings;
-            gameSettingsViewModel.Message = Resources.PackageCheck;
+            GameSettings.Message = Resources.PackageCheck;
 
-            var cancellationTokenSource = gameSettingsViewModel.CancellationTokenSource = new CancellationTokenSource();
+            var cancellationTokenSource = GameSettings.CancellationTokenSource = new CancellationTokenSource();
 
-            var hash = await packageSource.GetPackageHashAsync();
-            var packageKey = new PackageKey { Name = packageSource.GetPackageName(), Hash = hash, ID = packageSource.GetPackageId() };
+            var hash = await packageSource.GetPackageHashAsync(cancellationTokenSource.Token);
+            var packageKey = new PackageKey
+            {
+                Name = packageSource.GetPackageName(),
+                Hash = hash,
+                ID = packageSource.GetPackageId()
+            };
 
-            var hasPackage = await _gameServerClient.HasPackage(packageKey);
+            var hasPackage = await _gameServerClient.HasPackageAsync(packageKey, cancellationTokenSource.Token);
 
             if (!hasPackage)
             {
-                var data = await packageSource.GetPackageDataAsync();
+                var data = await packageSource.GetPackageDataAsync(cancellationTokenSource.Token);
                 if (data == null)
                 {
                     throw new Exception(Resources.BadPackage);
@@ -699,13 +729,15 @@ namespace SIGame.ViewModel
                 using (data)
                 {
                     if (cancellationTokenSource.IsCancellationRequested)
+                    {
                         return null;
+                    }
 
-                    gameSettingsViewModel.Message = Resources.SendingPackageToServer;
+                    GameSettings.Message = Resources.SendingPackageToServer;
                     ShowProgress = true;
                     try
                     {
-                        await _gameServerClient.UploadPackage(packageKey, data, cancellationTokenSource.Token);
+                        await _gameServerClient.UploadPackageAsync(packageKey, data, cancellationTokenSource.Token);
                     }
                     finally
                     {
@@ -714,22 +746,48 @@ namespace SIGame.ViewModel
                 }
             }
 
-            gameSettingsViewModel.Message = Resources.Preparing;
+            GameSettings.Message = Resources.Preparing;
 
             var computerAccounts = await ProcessCustomPersonsAsync(settings, cancellationTokenSource.Token);
 
-            gameSettingsViewModel.Message = Resources.Creating;
+            GameSettings.Message = Resources.Creating;
 
-            var gameCreatingResult = await _gameServerClient.CreateGame((GameSettingsCore<AppSettingsCore>)settings, packageKey, computerAccounts.ToArray(), null);
+            if (UseSignalRConnection)
+            {
+                var gameCreatingResult2 = await _gameServerClient.CreateAndJoinGameAsync(
+                    (GameSettingsCore<AppSettingsCore>)settings,
+                    packageKey,
+                    computerAccounts.ToArray(),
+                    Human.IsMale,
+                    cancellationTokenSource.Token);
+
+                if (gameCreatingResult2.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
+                {
+                    throw new Exception(GetMessage(gameCreatingResult2.Code));
+                }
+
+                await InitServerAndClientNewAsync();
+                await JoinGameCompletedAsync(settings.Role, true);
+
+                if (_host == null)
+                {
+                    return null;
+                }
+
+                return Tuple.Create(_server, _host);
+            }
+
+            var gameCreatingResult = await _gameServerClient.CreateGameAsync((GameSettingsCore<AppSettingsCore>)settings, packageKey, computerAccounts.ToArray(), null);
 
             if (gameCreatingResult.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
             {
                 throw new Exception(GetMessage(gameCreatingResult.Code));
             }
 
-            gameSettingsViewModel.Message = Resources.GameEntering;
+            GameSettings.Message = Resources.GameEntering;
 
             await ConnectToServerAsHostAsync(gameCreatingResult.GameId, settings);
+
             if (_host == null)
             {
                 return null;
@@ -738,66 +796,53 @@ namespace SIGame.ViewModel
             return Tuple.Create(_server, _host);
         }
 
-        private static string GetMessage(SI.GameServer.Contract.GameCreationResultCode gameCreationResultCode)
+        private async Task InitServerAndClientNewAsync()
         {
-            switch (gameCreationResultCode)
-            {
-                case SI.GameServer.Contract.GameCreationResultCode.NoPackage:
-                    return Resources.GameCreationError_NoPackage;
+            _server = new GameServerSlave(
+                ServerConfiguration.Default,
+                new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
-                case SI.GameServer.Contract.GameCreationResultCode.TooMuchGames:
-                    return Resources.GameCreationError_TooManyGames;
+            await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient));
 
-                case SI.GameServer.Contract.GameCreationResultCode.ServerUnderMaintainance:
-                    return Resources.GameCreationError_ServerMaintainance;
-
-                case SI.GameServer.Contract.GameCreationResultCode.BadPackage:
-                    return Resources.GameCreationError_BadPackage;
-
-                case SI.GameServer.Contract.GameCreationResultCode.GameNameCollision:
-                    return Resources.GameCreationError_DuplicateName;
-
-                case SI.GameServer.Contract.GameCreationResultCode.InternalServerError:
-                    return Resources.GameCreationError_ServerError;
-
-                case SI.GameServer.Contract.GameCreationResultCode.ServerNotReady:
-                    return Resources.GameCreationError_ServerNotReady;
-
-                case SI.GameServer.Contract.GameCreationResultCode.YourClientIsObsolete:
-                    return Resources.GameCreationError_ObsoleteVersion;
-
-                case SI.GameServer.Contract.GameCreationResultCode.UnknownError:
-                    return Resources.GameCreationError_UnknownReason;
-
-                case SI.GameServer.Contract.GameCreationResultCode.JoinError:
-                    return Resources.GameCreationError_JoinError;
-
-                case SI.GameServer.Contract.GameCreationResultCode.WrongGameSettings:
-                    return Resources.GameCreationError_WrongSettings;
-
-                default:
-                    return Resources.GameCreationError_UnknownReason;
-            }
+            _client = new Client(Human.Name);
+            _client.ConnectTo(_server);
         }
+
+        private static string GetMessage(SI.GameServer.Contract.GameCreationResultCode gameCreationResultCode) =>
+            gameCreationResultCode switch
+            {
+                SI.GameServer.Contract.GameCreationResultCode.NoPackage => Resources.GameCreationError_NoPackage,
+                SI.GameServer.Contract.GameCreationResultCode.TooMuchGames => Resources.GameCreationError_TooManyGames,
+                SI.GameServer.Contract.GameCreationResultCode.ServerUnderMaintainance => Resources.GameCreationError_ServerMaintainance,
+                SI.GameServer.Contract.GameCreationResultCode.BadPackage => Resources.GameCreationError_BadPackage,
+                SI.GameServer.Contract.GameCreationResultCode.GameNameCollision => Resources.GameCreationError_DuplicateName,
+                SI.GameServer.Contract.GameCreationResultCode.InternalServerError => Resources.GameCreationError_ServerError,
+                SI.GameServer.Contract.GameCreationResultCode.ServerNotReady => Resources.GameCreationError_ServerNotReady,
+                SI.GameServer.Contract.GameCreationResultCode.YourClientIsObsolete => Resources.GameCreationError_ObsoleteVersion,
+                SI.GameServer.Contract.GameCreationResultCode.UnknownError => Resources.GameCreationError_UnknownReason,
+                SI.GameServer.Contract.GameCreationResultCode.JoinError => Resources.GameCreationError_JoinError,
+                SI.GameServer.Contract.GameCreationResultCode.WrongGameSettings => Resources.GameCreationError_WrongSettings,
+                _ => Resources.GameCreationError_UnknownReason,
+            };
 
         private async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(GameSettings settings, CancellationToken cancellationToken)
         {
             var computerAccounts = new List<ComputerAccountInfo>();
             foreach (var player in settings.Players)
             {
-                await ProcessPerson(computerAccounts, player, cancellationToken);
+                await ProcessCustomPersonAsync(computerAccounts, player, cancellationToken);
             }
 
-            await ProcessPerson(computerAccounts, settings.Showman, cancellationToken);
+            await ProcessCustomPersonAsync(computerAccounts, settings.Showman, cancellationToken);
 
             return computerAccounts;
         }
 
-        private async Task ProcessPerson(List<ComputerAccountInfo> computerAccounts, Account account, CancellationToken cancellationToken)
+        private async Task ProcessCustomPersonAsync(List<ComputerAccountInfo> computerAccounts, Account account, CancellationToken cancellationToken)
         {
             if (!account.IsHuman && account.CanBeDeleted) // Нестандартный игрок, нужно передать его параметры на сервер
             {
-                var avatar = (await UploadAvatar(account, cancellationToken))?.Item1;
+                var avatar = (await UploadAvatarAsync(account, cancellationToken)).AvatarUrl;
 
                 var computerAccount = new ComputerAccount((ComputerAccount)account) { Picture = avatar };
 
@@ -805,55 +850,54 @@ namespace SIGame.ViewModel
             }
         }
 
-        private async Task<Tuple<string, FileKey>> UploadAvatar(Account account, CancellationToken cancellationToken)
+        private async Task<(string AvatarUrl, FileKey FileKey)> UploadAvatarAsync(
+            Account account,
+            CancellationToken cancellationToken = default)
         {
-            var picture = account.Picture;
-            if (!Uri.TryCreate(picture, UriKind.Absolute, out Uri pictureUri))
+            var avatarUri = account.Picture;
+            if (!Uri.TryCreate(avatarUri, UriKind.Absolute, out Uri pictureUri))
             {
-                return null;
+                return (null, null);
             }
 
-            if (pictureUri.Scheme != "file" || !File.Exists(picture)) // Это локальный файл, и его нужно отправить на сервер
+            if (pictureUri.Scheme != "file" || !File.Exists(avatarUri)) // Это локальный файл, и его нужно отправить на сервер
             {
-                return null;
+                return (null, null);
             }
 
             byte[] fileHash = null;
-            using (var stream = File.OpenRead(picture))
+            using (var stream = File.OpenRead(avatarUri))
             {
-                using (var sha1 = new System.Security.Cryptography.SHA1Managed())
-                {
-                    fileHash = sha1.ComputeHash(stream);
-                }
+                using var sha1 = new System.Security.Cryptography.SHA1Managed();
+                fileHash = sha1.ComputeHash(stream);
             }
 
-            var fileKey = new FileKey { Name = Path.GetFileName(picture), Hash = fileHash };
+            var avatarKey = new FileKey { Name = Path.GetFileName(avatarUri), Hash = fileHash };
 
             // Если файла на сервере нет, загрузим его
-            var picturePath = await _gameServerClient.HasPicture(fileKey);
-            if (picturePath == null)
+            var avatarPath = await _gameServerClient.HasImageAsync(avatarKey, cancellationToken);
+            if (avatarPath == null)
             {
-                using (var stream = File.OpenRead(picture))
-                {
-                    picturePath = await _gameServerClient.UploadPicture(fileKey, stream, cancellationToken);
-                }
+                using var stream = File.OpenRead(avatarUri);
+                avatarPath = await _gameServerClient.UploadImageAsync(avatarKey, stream, cancellationToken);
             }
 
-            if (!Uri.IsWellFormedUriString(picturePath, UriKind.Absolute))
+            if (!Uri.IsWellFormedUriString(avatarPath, UriKind.Absolute))
             {
-                var rootAddress = _gamesHostInfo.ContentPublicBaseUrls.FirstOrDefault() ?? _gameServerClient.ServerAddress;
-                picturePath = rootAddress + picturePath;
+                // Prepend avatarPath with service content root uri
+                var rootAddress = _gamesHostInfo.ContentPublicBaseUrls.FirstOrDefault() ?? _gameServerClient.ServiceUri;
+                avatarPath = rootAddress + avatarPath;
             }
 
-            return Tuple.Create(picturePath, fileKey);
+            return (avatarPath, avatarKey);
         }
 
         protected override string GetExtraCredentials() =>
             !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
 
-        public override async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
+        public override async Task JoinGameCoreAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
         {
-            gameInfo = gameInfo ?? _currentGame;
+            gameInfo ??= _currentGame;
 
             if (!isHost)
             {
@@ -870,17 +914,32 @@ namespace SIGame.ViewModel
 
             try
             {
-                InitServerAndClient(_gamesHostInfo.Host ?? new Uri(ServerAddress).Host, _gamesHostInfo.Port);
-                await ConnectCore(true);
-                var result = await _connector.SetGameID(gameInfo.GameID);
-                if (!result)
+                if (UseSignalRConnection)
                 {
-                    Error = Resources.CreatedGameNotFound;
-                    return;
-                }
+                    var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password);
+                    if (result.ErrorMessage != null)
+                    {
+                        Error = result.ErrorMessage;
+                        return;
+                    }
 
-                await base.JoinGameAsync(gameInfo, role, isHost);
-                _host.Connector.SetGameID(gameInfo.GameID);
+                    await InitServerAndClientNewAsync();
+                    await JoinGameCompletedAsync(role, isHost);
+                }
+                else
+                {
+                    await InitServerAndClientAsync(_gamesHostInfo.Host ?? new Uri(ServerAddress).Host, _gamesHostInfo.Port);
+                    await ConnectCoreAsync(true);
+                    var result = await _connector.SetGameIdAsync(gameInfo.GameID);
+                    if (!result)
+                    {
+                        Error = Resources.CreatedGameNotFound;
+                        return;
+                    }
+
+                    await base.JoinGameCoreAsync(gameInfo, role, isHost);
+                    _host.Connector.SetGameID(gameInfo.GameID);
+                }
             }
             catch (TaskCanceledException exc)
             {
@@ -901,22 +960,22 @@ namespace SIGame.ViewModel
             _password = gameSettings.NetworkGamePassword;
             var game = new GameInfo { GameID = gameID, Owner = name };
 
-            await JoinGame(game, gameSettings.Role, true);
+            await JoinGameAsync(game, gameSettings.Role, true);
         }
 
         public void Say(string message, bool system = false)
         {
             if (!system)
             {
-                _gameServerClient.Say(message);
+                _gameServerClient.SayAsync(message);
             }
         }
 
         protected override void CloseContent_Executed(object arg)
         {
-            if (gameSettings != null)
+            if (GameSettings != null)
             {
-                gameSettings.CancellationTokenSource?.Cancel();
+                GameSettings.CancellationTokenSource?.Cancel();
             }
 
             base.CloseContent_Executed(arg);
@@ -924,9 +983,9 @@ namespace SIGame.ViewModel
 
         public override ValueTask DisposeAsync()
         {
-            if (gameSettings != null)
+            if (GameSettings != null)
             {
-                gameSettings.CancellationTokenSource?.Cancel();
+                GameSettings.CancellationTokenSource?.Cancel();
             }
 
             _cancellationTokenSource.Cancel();

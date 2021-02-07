@@ -379,7 +379,7 @@
     <value>Multimedia port</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Messages</value>
+    <value>MESSAGES</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Move...</value>
@@ -439,7 +439,7 @@
     <value>Pause</value>
   </data>
   <data name="Persons" xml:space="preserve">
-    <value>Participants</value>
+    <value>PERSONS</value>
   </data>
   <data name="Players" xml:space="preserve">
     <value>Players</value>
@@ -679,7 +679,7 @@
     <value>User packs</value>
   </data>
   <data name="Validate_IsTrue" xml:space="preserve">
-    <value>Is the answer of the player correct?</value>
+    <value>Is the answer of the player correct</value>
   </data>
   <data name="Viewers" xml:space="preserve">
     <value>Viewers</value>
@@ -986,5 +986,32 @@
   </data>
   <data name="ReportDelayed" xml:space="preserve">
     <value>Cannot connect to server while sending error report. The report will be sent later</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="MainMenuSound" xml:space="preserve">
+    <value>Main menu sound</value>
+  </data>
+  <data name="PressTheButton" xml:space="preserve">
+    <value>Press the button</value>
+  </data>
+  <data name="DoNotSendReport" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="SendReport" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="HideChat" xml:space="preserve">
+    <value>Hide chat</value>
+  </data>
+  <data name="ShowChat" xml:space="preserve">
+    <value>Show chat</value>
+  </data>
+  <data name="ServerName" xml:space="preserve">
+    <value>Server name</value>
   </data>
 </root>

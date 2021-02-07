@@ -10,7 +10,8 @@
              xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
              xmlns:lp="clr-namespace:SIGame.Properties"
              mc:Ignorable="d"
-             FontSize="16" d:DesignWidth="931.998" d:DesignHeight="426.907">
+             FontSize="16" d:DesignWidth="931.998" d:DesignHeight="426.907"
+             FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <UserControl.Resources>
         <localc:PersonsConverter x:Key="PersonsConverter" />
 
@@ -32,10 +33,10 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <DockPanel Grid.ColumnSpan="2">
-                <Button DockPanel.Dock="Left" Margin="48,0,0,0" Command="{Binding Cancel}" ToolTip="Назад" Style="{StaticResource SIButtonSimple}" Width="48" Height="48" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <Button DockPanel.Dock="Left" Margin="78,15,0,0" Command="{Binding Cancel}" ToolTip="{x:Static lp:Resources.Back}" Style="{StaticResource SIButtonSimple}" Width="48" Height="48" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                     <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
                 </Button>
-                <TextBlock Text="{x:Static lvmp:Resources.MainMenu_NetworkGame}" FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontSize="40" FontWeight="Bold" Margin="7,2" />
+                <TextBlock Text="{x:Static lvmp:Resources.MainMenu_NetworkGame}" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontSize="40" FontWeight="Bold" Margin="15,15,7,2" />
             </DockPanel>
             <DockPanel Margin="7,5,5,0" Grid.Row="1" Grid.ColumnSpan="2">
                 <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" Text="{x:Static lp:Resources.Server}" FontSize="28" Margin="0,0,10,0" Style="{StaticResource CommonText}" />
@@ -87,7 +88,7 @@
                             </Style.Triggers>
                         </Style>
                     </ContentControl.Style>
-                    <Grid DataContext="{Binding GameData}" Margin="7,5,10,5" TextBlock.FontSize="14">
+                    <Grid DataContext="{Binding GameData}" Margin="7,5,10,5" TextBlock.FontSize="20">
                         <Grid.Resources>
                             <Style x:Key="ValueBox" TargetType="TextBlock">
                                 <Setter Property="Grid.Column" Value="1" />
@@ -106,21 +107,21 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.ColumnSpan="2" Text="{Binding GameName}" FontWeight="Bold" FontSize="26" />
-                        <TextBlock Grid.Row="2" Text="Организатор" Margin="0,10,0,0" FontWeight="Bold" />
+                        <TextBlock Grid.ColumnSpan="2" Text="{Binding GameName}" FontWeight="Bold" FontSize="30" />
+                        <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.Host}" Margin="0,10,0,0" FontWeight="Bold" />
                         <TextBlock Grid.Row="2" Style="{StaticResource ValueBox}" Text="{Binding Host}" />
-                        <TextBlock Grid.Row="3" Text="Ведущий" Margin="0,10,0,0" FontWeight="Bold" />
+                        <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.Showman}" Margin="0,10,0,0" FontWeight="Bold" />
                         <TextBlock Grid.Row="3" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Showman}}" />
-                        <TextBlock Grid.Row="4" Text="Игроки" Margin="0,10,0,0" FontWeight="Bold" />
+                        <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Players}" Margin="0,10,0,0" FontWeight="Bold" />
                         <TextBlock Grid.Row="4" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Player}}" />
-                        <TextBlock Grid.Row="5" Text="Зрители" Margin="0,10,0,0" FontWeight="Bold" />
+                        <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Viewers}" Margin="0,10,0,0" FontWeight="Bold" />
                         <TextBlock Grid.Row="5" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Viewer}}" />
                     </Grid>
                 </ContentControl>
             </StackPanel>            
         </Grid>
         <ContentControl DataContext="{Binding Content}" Content="{Binding Content.Data}" Style="{StaticResource navigatorStyle}" Tag="{Binding Content.Title}"
-                        Width="900" Height="700" Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter1}}">
+                        Width="1000" Height="700" Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter1}}">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type lvm:GameSettingsViewModel}">
                     <local:NewGameView FontSize="16" />

@@ -2150,6 +2150,11 @@ namespace SICore
                 newAccount = isPlayer
                     ? ReplaceComputerPlayer(index, account.Name, replacer)
                     : ReplaceComputerShowman(account.Name, replacer);
+
+                if (newAccount == null)
+                {
+                    return;
+                }
             }
             else
             {

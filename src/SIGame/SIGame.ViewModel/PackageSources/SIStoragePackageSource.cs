@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
@@ -17,7 +18,14 @@ namespace SIGame.ViewModel.PackageSources
         private readonly string _packageID;
 
         public override PackageSourceKey Key =>
-            new PackageSourceKey { Type = PackageSourceTypes.SIStorage, Data = _packageUri.AbsoluteUri, ID = _id, Name = _name, PackageID = _packageID };
+            new PackageSourceKey
+            {
+                Type = PackageSourceTypes.SIStorage,
+                Data = _packageUri.AbsoluteUri,
+                ID = _id,
+                Name = _name,
+                PackageID = _packageID
+            };
 
         public SIStoragePackageSource(Uri packageUri, int id, string name, string packageID)
         {
@@ -29,8 +37,9 @@ namespace SIGame.ViewModel.PackageSources
 
         public override string Source => $"*{_name}";
 
-        public override async Task<(string, bool)> GetPackageFileAsync()
+        public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
         {
+            // TODO: rewrite to HttpClient
             var request = (HttpWebRequest)WebRequest.Create(_packageUri);
             request.UserAgent = $"{CommonSettings.AppName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";
 
@@ -40,7 +49,7 @@ namespace SIGame.ViewModel.PackageSources
             using (var fs = File.OpenWrite(fileName))
             using (var stream = response.GetResponseStream())
             {
-                await stream.CopyToAsync(fs); 
+                await stream.CopyToAsync(fs, 81920 /* default */, cancellationToken); 
             }
 
             return (fileName, true);
@@ -48,7 +57,8 @@ namespace SIGame.ViewModel.PackageSources
 
         public override string GetPackageName() => null;
 
-        public override Task<byte[]> GetPackageHashAsync() => Task.FromResult(Array.Empty<byte>());
+        public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(Array.Empty<byte>());
 
         public override string GetPackageId() => _packageID;
     }

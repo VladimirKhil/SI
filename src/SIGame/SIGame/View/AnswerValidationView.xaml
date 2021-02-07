@@ -9,7 +9,6 @@
              mc:Ignorable="d" Width="544">
     <UserControl.Resources>
         <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
-            <Setter Property="Margin" Value="4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="GroupBox">
@@ -18,7 +17,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <TextBlock Text="{TemplateBinding Header}" Margin="5,5,0,0" FontSize="18" />
+                            <ContentPresenter Content="{TemplateBinding Header}" />
                             <ContentPresenter Grid.Row="1" Margin="5" />
                         </Grid>
                     </ControlTemplate>
@@ -40,10 +39,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.ColumnSpan="2" Header="{x:Static lp:Resources.Validate_IsTrue}" Margin="0,5,0,5">
+        <GroupBox Grid.ColumnSpan="2">
+            <GroupBox.Header>
+                <TextBlock Margin="5,5,0,0" FontSize="18">
+                    <Run Text="{x:Static lp:Resources.Validate_IsTrue}" /><Run Text=" " /><Run FontWeight="Bold" Text="{Binding ValidatorName}" /><Run Text="?" />
+                </TextBlock>
+            </GroupBox.Header>
             <TextBlock Text="{Binding Answer, Converter={StaticResource trim}}" FontSize="15" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
         </GroupBox>
-        <Grid Margin="0,0,0,5" Background="#FFA1C2DE" Grid.Row="1" Grid.ColumnSpan="2" Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
+        <Grid Background="#FFA1C2DE" Grid.Row="1" Grid.ColumnSpan="2" Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />

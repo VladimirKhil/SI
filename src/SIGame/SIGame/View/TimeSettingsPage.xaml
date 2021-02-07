@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:SIGame"
       xmlns:lp="clr-namespace:SIGame.Properties"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="300" d:DesignWidth="300" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
       Title="{x:Static lp:Resources.TimeSettings}">
 
     <Page.Resources>
@@ -34,7 +34,7 @@
                         <TextBlock Style="{StaticResource Header}" Text="{Binding Name}" />
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Right" Style="{StaticResource CommonText}" Foreground="White" Text="с" VerticalAlignment="Center" FontSize="20" Margin="5,0,0,0" />
-                            <local:NumericTextBox DockPanel.Dock="Right" Style="{StaticResource {x:Type TextBox}}" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding Maximum,Mode=OneWay}" Minimum="1" Width="50" Margin="3,2,3,0" FontSize="16" VerticalAlignment="Center" />
+                            <local:NumericTextBox DockPanel.Dock="Right" Style="{StaticResource {x:Type TextBox}}" Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Maximum="{Binding Maximum,Mode=OneWay}" Minimum="1" Width="50" Margin="3,2,3,0" FontSize="16" FontWeight="Light" VerticalAlignment="Center" />
                             <Slider Value="{Binding Value}" Margin="0,4" Maximum="{Binding Maximum,Mode=OneWay}" Minimum="1" VerticalAlignment="Center" IsMoveToPointEnabled="True" />
                         </DockPanel>
                     </StackPanel>

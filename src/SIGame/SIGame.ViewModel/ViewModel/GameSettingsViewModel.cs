@@ -35,19 +35,7 @@ namespace SIGame.ViewModel
         /// <summary>
         /// Номер за столом в роли игрока
         /// </summary>
-        public int PlayerNumber
-        {
-            get { return _model.PlayerNumber; }
-            set
-            {
-                if (value > -1 && value < Players.Count)
-                {
-                    _model.PlayerNumber = value;
-                    OnPropertyChanged();
-                    UpdateRoleTrigger();
-                }
-            }
-        }
+        public int PlayerNumber => 0;
 
         /// <summary>
         /// Роль организатора в игре
@@ -134,7 +122,6 @@ namespace SIGame.ViewModel
                 {
                     _model.PlayersCount = value;
                     OnPropertyChanged();
-
                     if (oldValue < value)
                     {
                         do
@@ -145,9 +132,6 @@ namespace SIGame.ViewModel
                     }
                     else
                     {
-                        if (PlayerNumber >= value)
-                            PlayerNumber = value - 1;
-
                         do
                         {
                             Players.RemoveAt(oldValue - 1);
@@ -663,6 +647,7 @@ namespace SIGame.ViewModel
 
             _model.NetworkGamePassword = "";
             _model.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
+            _model.HumanPlayerName = Human.Name;
 
             var (host, _) = new GameRunner(
                 server,
@@ -671,7 +656,7 @@ namespace SIGame.ViewModel
                 BackLink.Default,
                 new WebManager(_model.AppSettings.MultimediaPort),
                 _computerPlayers.ToArray(),
-                null)
+                _computerShowmans.ToArray())
                 .Run();
 
             if (!NetworkGame)
@@ -1041,12 +1026,6 @@ namespace SIGame.ViewModel
             Players.Clear();
 
             var playersCount = PlayersCount;
-
-            if (Role == GameRole.Player)
-            {
-                if (PlayerNumber < 0 || PlayerNumber > playersCount)
-                    PlayerNumber = 0;
-            }
 
             var anyAccount = new HumanAccount { Name = Constants.FreePlace, CanBeDeleted = false };
 

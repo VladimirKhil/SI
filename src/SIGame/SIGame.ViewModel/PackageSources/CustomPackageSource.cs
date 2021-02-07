@@ -2,6 +2,7 @@
 using System.IO;
 using SIPackages;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace SIGame.ViewModel.PackageSources
 {
@@ -21,28 +22,33 @@ namespace SIGame.ViewModel.PackageSources
             _file = file ?? throw new ArgumentNullException(nameof(file));
         }
 
-        public override Task<(string, bool)> GetPackageFileAsync() => Task.FromResult((_file, false));
+        public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult((_file, false));
 
-        public override Task<Stream> GetPackageDataAsync() => Task.FromResult((Stream)File.OpenRead(_file));
+        public override Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult((Stream)File.OpenRead(_file));
 
         public override string GetPackageName() => Source;
 
-        public override async Task<byte[]> GetPackageHashAsync()
+        public override async Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default)
         {
             var buffer = new byte[1024 * 1024];
             int count;
-            using (var sha1 = new System.Security.Cryptography.SHA1Managed())
+
+            using var sha1 = new System.Security.Cryptography.SHA1Managed();
+            using (var stream = File.OpenRead(_file))
             {
-                using (var stream = File.OpenRead(_file))
+                while ((count = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
-                    while ((count = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        sha1.TransformBlock(buffer, 0, count, buffer, 0);                    
+                    sha1.TransformBlock(buffer, 0, count, buffer, 0);
+
+                    cancellationToken.ThrowIfCancellationRequested();
                 }
-
-                sha1.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-
-                return sha1.Hash;
             }
+
+            sha1.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+
+            return sha1.Hash;
         }
 
         public override string GetPackageId()

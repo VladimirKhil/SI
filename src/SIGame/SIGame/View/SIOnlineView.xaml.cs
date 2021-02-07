@@ -1,11 +1,10 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using SIGame.ViewModel;
-using SICore;
+﻿using SIGame.ViewModel;
 using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Threading.Tasks;
 
 namespace SIGame
 {
@@ -24,13 +23,15 @@ namespace SIGame
         private void SIOnlineView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var viewModel = (SIOnlineViewModel)DataContext;
-            if (viewModel != null)
+            if (viewModel == null)
             {
-                viewModel.Message += AddMessage;
-                AddMessage(CommonSettings.AppName, SIGame.Properties.Resources.WelcomeToSIOnline);
-
-                viewModel.Load();
+                return;
             }
+
+            viewModel.Message += AddMessage;
+            AddMessage(CommonSettings.AppName, Properties.Resources.WelcomeToSIOnline);
+
+            viewModel.Load();
         }
 
         private void AddMessage(string userName, string message)

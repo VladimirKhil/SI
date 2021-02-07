@@ -471,4 +471,16 @@
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Licenses folder opening error</value>
   </data>
+  <data name="GameRule_IgnoreWrong" xml:space="preserve">
+    <value>ignore wrong</value>
+  </data>
+  <data name="GameRule_NoFalseStart" xml:space="preserve">
+    <value>no falstarts</value>
+  </data>
+  <data name="GameRule_Oral" xml:space="preserve">
+    <value>oral</value>
+  </data>
+  <data name="GameRule_Sport" xml:space="preserve">
+    <value>simplified</value>
+  </data>
 </root>

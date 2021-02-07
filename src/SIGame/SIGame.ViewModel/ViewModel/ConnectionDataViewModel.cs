@@ -42,7 +42,7 @@ namespace SIGame.ViewModel
         protected abstract bool IsOnline { get; }
 
         protected SlaveServer _server;
-        private Client _client;
+        protected Client _client;
         protected IViewerClient _host;
         protected Connector _connector;
 
@@ -74,11 +74,13 @@ namespace SIGame.ViewModel
 
         private bool _releaseServer = true;
 
+        protected bool ReleaseConnection => _releaseServer;
+
         private bool _isProgress = false;
 
         public bool IsProgress
         {
-            get { return _isProgress; }
+            get => _isProgress;
             set { _isProgress = value; OnPropertyChanged(); }
         }
 
@@ -86,7 +88,7 @@ namespace SIGame.ViewModel
 
         public string Error
         {
-            get { return _error; }
+            get => _error;
             set
             {
                 if (_error != value)
@@ -95,11 +97,13 @@ namespace SIGame.ViewModel
                     OnPropertyChanged();
 
                     if (string.IsNullOrEmpty(_error))
+                    {
                         FullError = null;
+                    }
                 }
             }
         }
-        
+
         public string ServerAddress { get; protected set; }
 
         #endregion
@@ -107,7 +111,9 @@ namespace SIGame.ViewModel
         #region Init
 
         private readonly CommonSettings _commonSettings;
-        protected UserSettings _userSettings;
+        protected readonly UserSettings _userSettings;
+
+        protected GameSettingsViewModel GameSettings { get; private set; }
 
         protected ConnectionDataViewModel(CommonSettings commonSettings, UserSettings userSettings)
         {
@@ -130,19 +136,19 @@ namespace SIGame.ViewModel
             NewGame = new CustomCommand(NewGame_Executed);
         }
 
-        protected GameSettingsViewModel gameSettings;
-
         private void NewGame_Executed(object arg)
         {
-            gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, true) { Human = Human, ChangeSettings = ChangeSettings };
-            gameSettings.StartGame += OnStartGame;
-            gameSettings.PrepareForGame();
+            _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
-            Prepare(gameSettings);
+            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, true) { Human = Human, ChangeSettings = ChangeSettings };
+            GameSettings.StartGame += OnStartGame;
+            GameSettings.PrepareForGame();
+
+            Prepare(GameSettings);
 
             var contextBox = new ContentBox
             {
-                Data = gameSettings,
+                Data = GameSettings,
                 Title = Resources.NewGame
             };
 
@@ -165,25 +171,33 @@ namespace SIGame.ViewModel
 
         #region Начальное подключение к серверу
 
-        protected void InitServerAndClient(string address, int port)
+        protected async Task InitServerAndClientAsync(string address, int port)
         {
             if (_server != null)
             {
-                _server.Dispose();
+                await _server.DisposeAsync();
                 _server = null;
             }
 
-            _server = new TcpSlaveServer(port, address, ServerConfiguration.Default, new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
-            _client = new Client("");
+            _server = new TcpSlaveServer(
+                port,
+                address,
+                ServerConfiguration.Default,
+                new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
+
+            _client = new Client(Human.Name);
+
             _client.ConnectTo(_server);
         }
 
-        protected async Task ConnectCore(bool upgrade)
+        protected async Task ConnectCoreAsync(bool upgrade)
         {
-            await _server.Connect(upgrade);
+            await _server.ConnectAsync(upgrade);
 
             if (_connector != null)
+            {
                 _connector.Dispose();
+            }
 
             _connector = new Connector(_server, _client);
         }
@@ -192,18 +206,15 @@ namespace SIGame.ViewModel
 
         #region Вход в игру
 
-        private async void Join_Executed(object arg)
-        {
-            await JoinGame(null, (GameRole)arg);
-        }
+        private async void Join_Executed(object arg) => await JoinGameAsync(null, (GameRole)arg);
 
-        protected virtual async Task JoinGame(GameInfo gameInfo, GameRole role, bool host = false)
+        protected virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool host = false)
         {
             IsProgress = true;
 
             try
             {
-                await JoinGameAsync(gameInfo, role, host);
+                await JoinGameCoreAsync(gameInfo, role, host);
             }
             catch (Exception exc)
             {
@@ -212,7 +223,9 @@ namespace SIGame.ViewModel
                     Error = exc.Message;
                     FullError = exc.ToString();
                     if (_host != null)
-                        _host.Dispose();
+                    {
+                        await _host.DisposeAsync();
+                    }
                 }
                 catch { }
             }
@@ -222,24 +235,24 @@ namespace SIGame.ViewModel
             }
         }
 
-        public virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
+        public virtual async Task JoinGameCoreAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
         {
             var name = Human.Name;
 
             var sex = Human.IsMale ? 'm' : 'f';
             var command = $"{Messages.Connect}\n{role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{-1}{GetExtraCredentials()}";
 
-            _ = await _connector.JoinGame(command);
-            JoinGameCompleted(role, isHost);
+            _ = await _connector.JoinGameAsync(command);
+            await JoinGameCompletedAsync(role, isHost);
         }
 
         protected virtual string GetExtraCredentials() => "";
 
         protected string _avatar;
 
-        private void JoinGameCompleted(GameRole role, bool isHost)
+        protected async Task JoinGameCompletedAsync(GameRole role, bool isHost)
         {
-            lock (_server.ConnectionsSync)
+            await _server.ConnectionsLock.WithLockAsync(async () =>
             {
                 var externalServer = _server.HostServer;
                 if (externalServer != null)
@@ -254,12 +267,12 @@ namespace SIGame.ViewModel
                     Error = Resources.RejoinError;
                     if (_host != null)
                     {
-                        _host.Dispose();
+                        await _host.DisposeAsync();
                     }
 
                     return;
                 }
-            }
+            });
 
             var humanPlayer = Human;
             var name = humanPlayer.Name;
@@ -274,29 +287,18 @@ namespace SIGame.ViewModel
 
             var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);
 
-            switch (role)
+            _host = role switch
             {
-                case GameRole.Showman:
-                    _host = new Showman(_client, humanPlayer, isHost, localizer, data);
-                    break;
-
-                case GameRole.Player:
-                    _host = new Player(_client, humanPlayer, isHost, localizer, data);
-                    break;
-
-                default:
-                    _host = new SimpleViewer(_client, humanPlayer, isHost, localizer, data);
-                    break;
-            }
+                GameRole.Showman => new Showman(_client, humanPlayer, isHost, localizer, data),
+                GameRole.Player => new Player(_client, humanPlayer, isHost, localizer, data),
+                _ => new SimpleViewer(_client, humanPlayer, isHost, localizer, data),
+            };
 
             _host.Avatar = _avatar;
-
-            _host.Connector = new ReconnectManager(_server, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline) { ServerAddress = ServerAddress };
-
-            if (_host.Client.Name != name)
+            _host.Connector = new ReconnectManager(_server, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline)
             {
-                _host.Rename(name);
-            }
+                ServerAddress = ServerAddress
+            };
 
             _host.Client.ConnectTo(_server);
 
@@ -312,7 +314,7 @@ namespace SIGame.ViewModel
                 _connector = null;
             }
 
-            ClearConnection();
+            await ClearConnectionAsync();
 
             _host.GetInfo();
 
@@ -326,7 +328,7 @@ namespace SIGame.ViewModel
             PlatformManager.Instance.ShowMessage($"{Resources.GameEngineError}: {exc.Message} {exc.InnerException}", isWarning ? MessageType.Warning : MessageType.Error, true);
         }
 
-        protected virtual Task ClearConnection() => Task.CompletedTask;
+        protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 
         public event Action<Server, IViewerClient, bool> Ready;
 
@@ -334,7 +336,7 @@ namespace SIGame.ViewModel
 
         public virtual async ValueTask DisposeAsync()
         {
-            await ClearConnection();
+            await ClearConnectionAsync();
 
             if (_connector != null)
             {
@@ -344,7 +346,7 @@ namespace SIGame.ViewModel
 
             if (_releaseServer && _server != null)
             {
-                _server.Dispose();
+                await _server.DisposeAsync();
                 _server = null;
             }
         }

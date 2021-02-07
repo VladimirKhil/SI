@@ -7,7 +7,7 @@
       xmlns:lp="clr-namespace:SIGame.Properties" FontSize="16"
              mc:Ignorable="d" Loaded="UserControl_Loaded" d:DesignHeight="50" d:DesignWidth="240">
     <StackPanel Orientation="Horizontal" Margin="5" Width="Auto">
-        <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.PlayerSum}" />
+        <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.PlayerSum}" Foreground="{StaticResource MainColor}" />
         <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}"
                               Text="{Binding SelectedPlayer.Second, UpdateSourceTrigger=PropertyChanged}"
                               Maximum="100000" Margin="10,0" Width="100" VerticalAlignment="Center"

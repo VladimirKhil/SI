@@ -1,14 +1,16 @@
 ﻿<Application x:Class="SIGame.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException"
-             ShutdownMode="OnMainWindowClose"
-             
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
              xmlns:l="clr-namespace:SIGame"
              xmlns:lp="clr-namespace:SIGame.Properties"
              xmlns:local="clr-namespace:SIGame;assembly=SIGame.ViewModel"
              xmlns:localc="clr-namespace:SIGame.Converters"
-             xmlns:lb="clr-namespace:SIGame.Behaviors">
+             xmlns:lb="clr-namespace:SIGame.Behaviors"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
+             
+             DispatcherUnhandledException="Application_DispatcherUnhandledException"
+             ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
         <SolidColorBrush x:Key="MenuItem.Highlight.Background" Color="#3D26A0DA"/>
@@ -16,7 +18,8 @@
 
         <SolidColorBrush x:Key="TransparentSIButtonBackground" Color="Transparent" />
 
-        <SolidColorBrush x:Key="MainColor" Color="#FFFFE682" />
+        <SolidColorBrush x:Key="MainColor" Color="White" />
+        <SolidColorBrush x:Key="HoverColor" Color="#FF89B2FF" />
 
         <SolidColorBrush x:Key="ErrorColor" Color="#FFFDB7BE" />
 
@@ -39,7 +42,7 @@
         </Style>
 
         <Style TargetType="{x:Type TextBlock}" x:Key="CommonText" BasedOn="{StaticResource ShadowedText}">
-            <Setter Property="FontFamily" Value="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" />
+            <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
         </Style>
 
@@ -48,6 +51,22 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
+
+        <Style x:Key="CheckBoxBase" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource HoverColor}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SliderBase" TargetType="Slider">
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style TargetType="Slider" BasedOn="{StaticResource SliderBase}" />
 
         <Style x:Key="SIButtonBase" TargetType="{x:Type ButtonBase}">
             <Setter Property="Template">
@@ -60,9 +79,11 @@
                 </Setter.Value>
             </Setter>
             <Setter Property="Padding" Value="0" />
-            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             <Setter Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
         </Style>
 
         <Style x:Key="SIButtonSimple" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonBase}">
@@ -89,7 +110,6 @@
         </Style>
 
         <Style x:Key="SIButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
-            <Setter Property="FontFamily" Value="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" />
             <Setter Property="TextBlock.LineHeight" Value="{Binding FontSize,RelativeSource={RelativeSource Self}}" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
             <Setter Property="Template">
@@ -143,7 +163,8 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter1" />
         <localc:BooleanToCollapsedConverter x:Key="BooleanToCollapsedConverter" />
 
-        <SolidColorBrush x:Key="WindowBackground" Color="#FF5A95E2" />
+        <SolidColorBrush x:Key="WindowBorderColor" Color="White" />
+        <SolidColorBrush x:Key="WindowBackground" Color="#FF00053C" />
 
         <LinearGradientBrush x:Key="Gradient" StartPoint="0,0" EndPoint="0.5,0" SpreadMethod="Reflect">
             <GradientStop Offset="0" Color="#00000000" />
@@ -173,6 +194,10 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="CloseButton" TargetType="Button" BasedOn="{StaticResource SIButtonSimple}">
+            <Setter Property="Margin" Value="0,15,15,0" />
+        </Style>
+
         <Style x:Key="windowStyle" TargetType="{x:Type ContentControl}">
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -183,8 +208,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="#FF111111" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
+                                BorderThickness="3.75" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -194,13 +220,12 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Rectangle Grid.ColumnSpan="2" Fill="#FF183CF3" />
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="Blue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
-                                <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource SIButtonSimple}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="20,24,10,4" VerticalAlignment="Center" />
+                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                                         BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
-                                    <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
+                                    <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="2" />
                                 </Button>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Grid>
@@ -245,8 +270,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="#FF111111" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
+                                BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -262,7 +288,7 @@
                                              Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"/>
                                 <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Fill="#FF183CF3" />
                                 <TextBlock Grid.Row="1" Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
-                                <Button Grid.Row="1" Grid.Column="1" x:Name="bClose" Style="{StaticResource SIButtonSimple}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                <Button Grid.Row="1" Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
                                 <ContentPresenter Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -312,8 +338,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="#FF111111" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
+                                BorderThickness="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -323,15 +350,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Rectangle Grid.ColumnSpan="2" Fill="#FF183CF3" />
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="Blue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
                                 <StackPanel Orientation="Horizontal">
                                     <Button Command="{Binding Back}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter1}}" ToolTip="Назад" Style="{StaticResource SIButtonSimple}" Width="44" Height="44" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                                         <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
                                     </Button>
                                     <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
                                 </StackPanel>
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource SIButtonSimple}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding CancelBase}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding CancelBase}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
@@ -361,8 +387,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="#FF111111" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
+                                BorderThickness="3.75" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -372,10 +399,9 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Rectangle Grid.ColumnSpan="2" Fill="#FF183CF3" />
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="Blue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
                                 <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource SIButtonSimple}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -400,8 +426,9 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="#FF111111" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1">
+                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
+                                BorderThickness="3.75"
+                                TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -411,11 +438,10 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Rectangle Grid.ColumnSpan="2" Fill="#FF183CF3" />
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="Blue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
                                 <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
-                                    <Button x:Name="bClose" Style="{StaticResource SIButtonSimple}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                    <Button x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
                                         <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                     </Button>
                                 </StackPanel>
@@ -461,7 +487,7 @@
             <Setter Property="Content" Value="{Binding Source={x:Static local:UserSettings.Default}, Path=GameSettings.GameButtonKey, Converter={StaticResource ToStringConverter}}" />
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Content" Value="Нажмите клавишу" />
+                    <Setter Property="Content" Value="{x:Static lp:Resources.PressTheButton}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -524,6 +550,7 @@
             <Setter Property="IsTabStop" Value="false"/>
             <Setter Property="Focusable" Value="false"/>
             <Setter Property="ClickMode" Value="Press"/>
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
@@ -609,7 +636,7 @@
                         </ScrollViewer>
                     </Border>
                 </Popup>
-                <ToggleButton x:Name="toggleButton" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"/>
+                <ToggleButton x:Name="toggleButton" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}" />
                 <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}" x:Name="contentPresenter" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Content="{TemplateBinding SelectionBoxItem}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
             </Grid>
             <ControlTemplate.Triggers>
@@ -648,7 +675,7 @@
             <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItemStyle}" />
         </Style>
         <Style x:Key="ComboBoxMainStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-            <Setter Property="FontFamily" Value="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" />
+            <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
         </Style>
 
@@ -675,6 +702,7 @@
             <Setter Property="Padding" Value="6,2,6,4"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
@@ -687,14 +715,14 @@
                                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="false"/>
                                     <Condition Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="Top"/>
                                 </MultiDataTrigger.Conditions>
-                                <Setter Property="Foreground" Value="#FF897831"/>
+                                <Setter Property="Foreground" Value="#66FFFFFF"/>
                             </MultiDataTrigger>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, ElementName=templateRoot}" Value="true"/>
                                     <Condition Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="Top"/>
                                 </MultiDataTrigger.Conditions>
-                                <Setter Property="TextBlock.Foreground" TargetName="contentPresenter" Value="#FFFFF2BD"/>
+                                <Setter Property="TextBlock.Foreground" TargetName="contentPresenter" Value="#99FFFFFF"/>
                             </MultiDataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -703,13 +731,303 @@
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" >
-                            <TextBlock Text="{Binding}" FontWeight="Bold" FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" Effect="{StaticResource Effect}" FontSize="26" />
+                        <Border Margin="7,0,0,0" BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" >
+                            <TextBlock Text="{Binding}" FontWeight="Bold" Effect="{StaticResource Effect}" />
                         </Border>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="StudiaTab" TargetType="TabItem" BasedOn="{StaticResource TabItemStyle1}">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Border Margin="7,0,0,0" BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" Height="35">
+                            <TextBlock Text="{Binding}" FontWeight="Bold" Effect="{StaticResource Effect}" VerticalAlignment="Bottom" />
+                        </Border>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <LinearGradientBrush x:Key="PersonGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#232323" Offset="0" />
+            <GradientStop Color="#010312" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="GradientRev" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#232323" Offset="1" />
+            <GradientStop Color="#010312" Offset="0" />
+        </LinearGradientBrush>
+
+        <Style x:Key="PersonTextStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="3,1" />
+            <Setter Property="uib:FillManager.Fill" Value="True" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Resources/#ITC Conduit Cyrillic" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsConnected}" Value="False">
+                    <Setter Property="Foreground" Value="Gray" />
+                </DataTrigger>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource Equals}">
+                            <Binding Path="Name" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=l:Studia}" Path="DataContext.Data.Name" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="sumTB" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource PersonTextStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Sum}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="nonShowman" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PersonGradient}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Sum}" Value="{x:Null}">
+                    <Setter Property="Background" Value="{x:Null}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="nonShowmanRev" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource GradientRev}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsShowman}" Value="True">
+                    <Setter Property="Height" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="stakeBorder" TargetType="Border" BasedOn="{StaticResource nonShowman}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Stake}" Value="0">
+                    <Setter Property="Visibility" Value="Hidden" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Stake}" Value="-2">
+                    <Setter Property="Visibility" Value="Hidden" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Stake}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Hidden" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="stakeTB" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource PersonTextStyle}">
+            <Setter Property="Foreground" Value="#ffa000" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SafeStake}" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <localc:SexConverter x:Key="SexConverter" />
+        <localc:IsBeforeGameConverter x:Key="ReadyConverter" />
+        <localc:AuctionStakesConverter x:Key="AuctionStakes" />
+        <localc:RowHeightConverter x:Key="RowHeightConverter" />
+        <localc:GreaterThanConverter x:Key="GreaterThan" />
+        <localc:Multiplier x:Key="Multiplier" />
+        <localc:ChangeTypeConverter x:Key="ChangeTypeConverter" />
+
+        <Style x:Key="ReadyStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PersonGradient}" />
+            <Setter Property="Opacity" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Ready}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ReadyButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
+            <Setter Property="Visibility" Value="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Ready}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding BeReadyCommand}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="UnReadyButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
+            <Setter Property="Visibility" Value="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Ready}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding BeUnReadyCommand}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="area" TargetType="{x:Type Grid}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding InGame}" Value="False">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:2" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="0:0:2" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ReplicText" TargetType="{x:Type TextBlock}">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Text" Value="{Binding Replic}" />
+            <Setter Property="Margin" Value="10" />
+        </Style>
+
+        <Style x:Key="ReplicBorder" TargetType="Border">
+            <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.96}" />
+            <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.5}" />
+            <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.254}" />
+            <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.08}" />
+            <Setter Property="Opacity" Value="0.0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Background" Value="Lavender" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsShowman}" Value="True">
+                    <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.8}" />
+                    <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.45}" />
+                    <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.48}" />
+                    <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.1}" />
+                    <Setter Property="Canvas.Bottom" Value="{x:Static sys:Double.NaN}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1.0" Duration="00:00:00.3" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="00:00:00.3" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <SolidColorBrush x:Key="ToolBarDarkFill" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarDisabledFill" Color="#FFDADADA"/>
+        <SolidColorBrush x:Key="ToolBarDisabledBorder" Color="#FFDADADA"/>
+        <SolidColorBrush x:Key="ToolBarSeparatorFill" Color="#FFB6BDC5"/>
+        <SolidColorBrush x:Key="ToolBarButtonHover" Color="#210080FF"/>
+        <SolidColorBrush x:Key="ToolBarButtonHoverBorder" Color="#80DADADA"/>
+        <SolidColorBrush x:Key="ToolBarButtonChecked" Color="#400080FF"/>
+        <SolidColorBrush x:Key="ToolBarButtonPressed" Color="#400080FF"/>
+        <SolidColorBrush x:Key="ToolBarButtonPressedBorder" Color="#90006CD9"/>
+        <SolidColorBrush x:Key="ToolBarMenuBorder" Color="#FFB6BDC5"/>
+        <SolidColorBrush x:Key="ToolBarSubMenuBackground" Color="#FF00053C"/>
+        <SolidColorBrush x:Key="ToolBarMenuCheckFill" Color="#FF212121"/>
+        <SolidColorBrush x:Key="ToolBarOpenHeaderBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarTrayBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarHorizontalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarVerticalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarGripper" Color="#FF6D6D6D"/>
+        <SolidColorBrush x:Key="ToolBarToggleButtonHorizontalBackground" Color="#FFEEF5FD"/>
+        <SolidColorBrush x:Key="ToolBarToggleButtonVerticalBackground" Color="#FFEEF5FD"/>
+
+        <Geometry x:Key="RightArrow">M 0,0 L 4,3.5 L 0,7 Z</Geometry>
+        <Geometry x:Key="ToolBarCheckmark">M 0,2.5 L 2.5,5 L 7,0.5</Geometry>
+
+        <ControlTemplate x:Key="CustomMenuItem" TargetType="{x:Type MenuItem}">
+            <Grid Background="Transparent" SnapsToDevicePixels="true">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="24" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="MenuItemIGTColumnGroup"/>
+                    <ColumnDefinition Width="14"/>
+                </Grid.ColumnDefinitions>
+                <Border Name="Border" Background="{TemplateBinding Background}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                Grid.ColumnSpan="4"
+                                                Margin="1,0"/>
+                <ContentPresenter x:Name="Icon"  Margin="3" VerticalAlignment="Center" ContentSource="Icon" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                <Border Name="GlyphPanel" Margin="0,1" Width="20" Height="20" Visibility="Hidden" BorderBrush="{StaticResource ToolBarButtonHoverBorder}"
+                        Background="{StaticResource ToolBarMenuCheckFill}" BorderThickness="1">
+                    <Path VerticalAlignment="Center" HorizontalAlignment="Center" FlowDirection="LeftToRight" Stroke="{TemplateBinding Foreground}"
+                          StrokeThickness="1.2" Data="{StaticResource ToolBarCheckmark}"/>
+                </Border>
+                <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" Margin="13,10" RecognizesAccessKey="True"
+                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                <Path Grid.Column="3" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="4,0,6,0" Fill="{TemplateBinding Foreground}" Data="{StaticResource RightArrow}"/>
+                <Popup x:Name="PART_Popup" Placement="Right" IsOpen="{Binding Path=IsSubmenuOpen,RelativeSource={RelativeSource TemplatedParent}}"
+                       Focusable="false" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
+                       AllowsTransparency="true">
+                    <Border Name="SubMenuBorder" Background="{StaticResource ToolBarSubMenuBackground}" BorderBrush="{StaticResource ToolBarMenuBorder}"
+                            BorderThickness="1" Grid.IsSharedSizeScope="true">
+                        <ScrollViewer Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type FrameworkElement}, ResourceId=MenuScrollViewer}}">
+                            <Grid RenderOptions.ClearTypeHint="Enabled">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MinWidth="24" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ItemsPresenter Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                                        Grid.ColumnSpan="2"
+                                                                        KeyboardNavigation.TabNavigation="Cycle"
+                                                                        Margin="0,0,0,1"
+                                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsSuspendingPopupAnimation" Value="true">
+                    <Setter TargetName="PART_Popup" Property="PopupAnimation" Value="None"/>
+                </Trigger>
+                <Trigger Property="Icon" Value="{x:Null}">
+                    <Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="true">
+                    <Setter TargetName="GlyphPanel" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+                <Trigger Property="IsHighlighted" Value="true">
+                    <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource ToolBarButtonHoverBorder}"/>
+                    <Setter TargetName="Border" Property="Background" Value="{StaticResource ToolBarButtonHover}"/>
+                    <Setter TargetName="GlyphPanel" Property="BorderBrush" Value="{StaticResource ToolBarButtonPressedBorder}"/>
+                    <Setter TargetName="GlyphPanel" Property="Background" Value="{StaticResource ToolBarDarkFill}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
 
     </Application.Resources>
     <!--Задачи приложения-->

@@ -133,7 +133,7 @@
     <value>Английский</value>
   </data>
   <data name="Entrance" xml:space="preserve">
-    <value>Вход</value>
+    <value>ВХОД В ИГРУ</value>
   </data>
   <data name="Exit" xml:space="preserve">
     <value>Выход</value>
@@ -151,10 +151,10 @@
     <value>игровым столом</value>
   </data>
   <data name="Host" xml:space="preserve">
-    <value>Организатор</value>
+    <value>Хост</value>
   </data>
   <data name="Logon" xml:space="preserve">
-    <value>Войти</value>
+    <value>ВОЙТИ</value>
   </data>
   <data name="NetworkGameHint" xml:space="preserve">
     <value>Для создания сетевой игры нужно играть по локальной сети, иметь реальный IP или настроить NAT</value>
@@ -325,7 +325,7 @@
     <value>Звук</value>
   </data>
   <data name="Validate_IsTrue" xml:space="preserve">
-    <value>Верен ли ответ игрока?</value>
+    <value>Верен ли ответ игрока</value>
   </data>
   <data name="Woman" xml:space="preserve">
     <value>женщина</value>
@@ -385,10 +385,10 @@
     <value>Вести логи</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>Сообщения</value>
+    <value>СООБЩЕНИЯ</value>
   </data>
   <data name="Persons" xml:space="preserve">
-    <value>Участники</value>
+    <value>УЧАСТНИКИ</value>
   </data>
   <data name="TimeSettings" xml:space="preserve">
     <value>Настройки времени</value>
@@ -751,7 +751,7 @@
     <value>(по умолчанию)</value>
   </data>
   <data name="Login" xml:space="preserve">
-    <value>Логин</value>
+    <value>НИКНЕЙМ</value>
   </data>
   <data name="MainBackground" xml:space="preserve">
     <value>Основной фон</value>
@@ -986,5 +986,32 @@
   </data>
   <data name="ReportDelayed" xml:space="preserve">
     <value>Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="MainMenuSound" xml:space="preserve">
+    <value>Мелодия главного меню</value>
+  </data>
+  <data name="PressTheButton" xml:space="preserve">
+    <value>Нажмите клавишу</value>
+  </data>
+  <data name="DoNotSendReport" xml:space="preserve">
+    <value>Не отправлять</value>
+  </data>
+  <data name="SendReport" xml:space="preserve">
+    <value>Отправить отчёт</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
+  <data name="HideChat" xml:space="preserve">
+    <value>Скрыть чат</value>
+  </data>
+  <data name="ShowChat" xml:space="preserve">
+    <value>Показать чат</value>
+  </data>
+  <data name="ServerName" xml:space="preserve">
+    <value>Имя сервера</value>
   </data>
 </root>

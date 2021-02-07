@@ -23,7 +23,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="{TemplateBinding Tag}" Foreground="Black" VerticalAlignment="Center" Margin="2" TextWrapping="Wrap" />
+                <TextBlock Text="{TemplateBinding Tag}" Foreground="{StaticResource MainColor}" VerticalAlignment="Center" Margin="2" TextWrapping="Wrap" />
                 <local:NumericTextBox Grid.Column="1" Text="{Binding Path=Value, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" VerticalAlignment="Center" />
                 <Slider VerticalAlignment="Center" Grid.Column="2" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" TickFrequency="{TemplateBinding TickFrequency}" IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}" Value="{Binding Path=Value, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" />
             </Grid>
@@ -63,7 +63,7 @@
         </Grid.RowDefinitions>
         <TabControl TabStripPlacement="Left" Background="Transparent" BorderThickness="1,0,0,1">
             <TabItem Header="{x:Static lp:Resources.Common}" Padding="15,10">
-                <Grid Margin="4">
+                <Grid Margin="4" TextBlock.Foreground="{StaticResource MainColor}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -80,8 +80,8 @@
                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Name="tbName" />
                     <TextBlock Text="{x:Static lp:Resources.Sex}" Grid.Row="1" />
                     <StackPanel Margin="0,5,0,5" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                        <RadioButton VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Man}" Name="radioButton1" IsChecked="{Binding Model.IsMale}" GroupName="1" />
-                        <RadioButton VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Woman}" Name="radioButton2" GroupName="1" IsChecked="False" />
+                        <RadioButton Foreground="{StaticResource MainColor}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Man}" Name="radioButton1" IsChecked="{Binding Model.IsMale}" GroupName="1" />
+                        <RadioButton Foreground="{StaticResource MainColor}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Woman}" Name="radioButton2" GroupName="1" IsChecked="False" />
                     </StackPanel>
                     <Button Style="{StaticResource SIButton}" Margin="0,0,5,0" Grid.Row="2" Command="{Binding SelectPicturePath}" Padding="20,6" Content="{x:Static lp:Resources.Avatar}" FontSize="20" />
                     <TextBox Grid.Column="1" Grid.Row="2"  Text="{Binding Model.Picture}" VerticalAlignment="Center" />
@@ -96,7 +96,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="{x:Static lp:Resources.SelectionStyle}" Padding="15,10">
-                <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Vertical" TextBlock.Foreground="{StaticResource MainColor}" Margin="5">
                     <TextBlock Text="{x:Static lp:Resources.Selection_PreferTheme}" Margin="2" />
                     <StackPanel Orientation="Horizontal">
                         <TextBox Text="{Binding Model.V1,Mode=TwoWay}" Width="70" Margin="5,0,0,0" />
@@ -149,7 +149,7 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="{x:Static lp:Resources.Logic}" Padding="15,10" DataContext="{Binding Model}">
-                <UniformGrid Columns="1" VerticalAlignment="Top">
+                <UniformGrid Columns="1" VerticalAlignment="Top" Margin="5">
                     <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Erudition}" Value="{Binding F,Mode=TwoWay}" Maximum="500" />
                     <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Bravery}" Value="{Binding B0,Mode=TwoWay}" Maximum="1000" />
                     <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.ReactionSpeed}" IsSnapToTickEnabled="True" TickFrequency="1" Value="{Binding S,Mode=TwoWay, Converter={StaticResource SpeedConverter}}" Maximum="10" />

@@ -54,7 +54,7 @@ namespace SIGame.ViewModel
             IsReconnecting = true;
             try
             {
-                await _server.Connect(_upgrade);
+                await _server.ConnectAsync(_upgrade);
                 _connector = new Connector(_server, _client);
 
                 return true;
@@ -77,9 +77,9 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void JoinGameCompleted()
+        private async ValueTask JoinGameCompletedAsync()
         {
-            lock (_server.ConnectionsSync)
+            await _server.ConnectionsLock.WithLockAsync(() =>
             {
                 var externalServer = _server.HostServer;
                 if (externalServer != null)
@@ -94,7 +94,7 @@ namespace SIGame.ViewModel
                     Error = Resources.RejoinError;
                     return;
                 }
-            }
+            });
 
             _connector.Dispose();
 
@@ -114,7 +114,7 @@ namespace SIGame.ViewModel
             {
                 if (GameId > -1)
                 {
-                    var result = await _connector.SetGameID(GameId);
+                    var result = await _connector.SetGameIdAsync(GameId);
                     if (!result)
                     {
                         Error = Resources.GameClosedCauseEverybodyLeft;
@@ -127,8 +127,8 @@ namespace SIGame.ViewModel
                 var sex = _human.IsMale ? 'm' : 'f';
                 var command = $"{Messages.Connect}\n{_role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{0}{_credentials}";
 
-                var message = await _connector.JoinGame(command);
-                JoinGameCompleted();
+                var message = await _connector.JoinGameAsync(command);
+                JoinGameCompletedAsync();
                 IsReconnecting = false;
             }
             catch (Exception exc)

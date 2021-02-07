@@ -11,7 +11,7 @@
     <Description>SIGame engine</Description>
     <Company>Khil-soft</Company>
     <Version>2.12.0</Version>
-    <Copyright>Copyright © Khil-soft 2007 - 2020</Copyright>
+    <Copyright>Copyright © Khil-soft 2007 - 2021</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

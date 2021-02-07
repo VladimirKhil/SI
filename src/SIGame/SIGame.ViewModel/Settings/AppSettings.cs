@@ -96,6 +96,20 @@ namespace SIGame
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _isChatShown = true;
+
+        /// <summary>
+        /// Показывать ли игровой чат в лобби
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(true)]
+        public bool IsChatShown
+        {
+            get { return _isChatShown; }
+            set { _isChatShown = value; OnPropertyChanged(); }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _showBorderOnFalseStart = true;
 
         /// <summary>

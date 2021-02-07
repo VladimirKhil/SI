@@ -1,7 +1,7 @@
-﻿using SICore.PlatformSpecific;
+﻿using SI.GameServer.Client;
+using SICore.PlatformSpecific;
 using SIGame.Implementation;
 using SIGame.ViewModel;
-using SIGame.ViewModel.ViewModel.Data;
 using SIUI.ViewModel.Core;
 using System;
 using System.ComponentModel;
@@ -81,8 +81,7 @@ namespace SIGame
                     return;
                 }
 
-                GameServerClientNew.GameServerPredefinedUri = SIGame.Properties.Settings.Default.GameServerUri;
-
+                UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
                 MainWindow = new MainWindow { DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default) };

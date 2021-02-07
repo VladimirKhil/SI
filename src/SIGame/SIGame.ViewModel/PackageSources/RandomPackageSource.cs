@@ -3,6 +3,7 @@ using SIGame.ViewModel.Properties;
 using SIPackages;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
@@ -20,7 +21,7 @@ namespace SIGame.ViewModel.PackageSources
 
         public override bool RandomSpecials { get { return true; } }
 
-        public override async Task<(string, bool)> GetPackageFileAsync()
+        public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
         {
             var fileName = Path.GetTempFileName();
 
@@ -50,11 +51,12 @@ namespace SIGame.ViewModel.PackageSources
 
         public override string GetPackageName() => _packageId.ToString();
 
-        public override Task<byte[]> GetPackageHashAsync() => Task.FromResult(BitConverter.GetBytes(_packageId));
+        public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
+            Task.FromResult(BitConverter.GetBytes(_packageId));
 
         public override string GetPackageId() => _packageId.ToString();
 
-        public override async Task<Stream> GetPackageDataAsync()
+        public override async Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default)
         {
             byte[] data;
 

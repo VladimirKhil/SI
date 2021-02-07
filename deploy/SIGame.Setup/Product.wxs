@@ -89,6 +89,9 @@
       <Component Guid="{500F1B75-BE85-40B2-8B3F-F5F4CB33F6D7}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SI.GameServer.Contract.dll" />
       </Component>
+      <Component Guid="{F3FD3383-ADCA-4F68-BCA5-14028689F515}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SI.GameServer.Client.dll" />
+      </Component>
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIData.dll" />
       </Component>

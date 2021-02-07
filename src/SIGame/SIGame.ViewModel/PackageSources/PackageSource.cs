@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
@@ -20,12 +21,12 @@ namespace SIGame.ViewModel.PackageSources
         /// <summary>
         /// Получить игровой пакет
         /// </summary>
-        public abstract Task<(string, bool)> GetPackageFileAsync();
+        public abstract Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default);
         /// <summary>
         /// Получить пакет в виде набора байт
         /// </summary>
         /// <returns></returns>
-        public virtual Task<Stream> GetPackageDataAsync() => null;
+        public virtual Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default) => null;
         /// <summary>
         /// Получить имя игрового пакета
         /// </summary>
@@ -40,7 +41,7 @@ namespace SIGame.ViewModel.PackageSources
         /// Получить уникальный хэш игрового пакета
         /// </summary>
         /// <returns></returns>
-        public abstract Task<byte[]> GetPackageHashAsync();
+        public abstract Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default);
 
         public virtual bool RandomSpecials => false;
 

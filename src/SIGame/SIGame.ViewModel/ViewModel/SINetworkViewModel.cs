@@ -17,7 +17,7 @@ namespace SIGame.ViewModel
 
         public ConnectionGameData GameData
         {
-            get { return _gameData; }
+            get => _gameData;
             set
             {
                 if (_gameData != value)
@@ -32,7 +32,7 @@ namespace SIGame.ViewModel
 
         public string Address
         {
-            get { return _model.Address; }
+            get => _model.Address;
             set
             {
                 var newValue = value.Trim();
@@ -65,7 +65,7 @@ namespace SIGame.ViewModel
 
         public bool Connected
         {
-            get { return _connected; }
+            get => _connected;
             set { if (_connected != value) { _connected = value; OnPropertyChanged(); } }
         }
 
@@ -105,7 +105,7 @@ namespace SIGame.ViewModel
 
         private async Task ConnectToServerAsync(string address, int port)
         {
-            InitServerAndClient(address, port);
+            await InitServerAndClientAsync(address, port);
 
             IsProgress = true;
             Connect.CanBeExecuted = false;
@@ -114,14 +114,14 @@ namespace SIGame.ViewModel
 
             try
             {
-                await ConnectCore(false);
+                await ConnectCoreAsync(false);
 
                 if (_cancellationTokenSource.IsCancellationRequested)
                 {
                     return;
                 }
 
-                var gameInfo = await _connector.GetGameInfo();
+                var gameInfo = await _connector.GetGameInfoAsync();
 
                 if (_cancellationTokenSource.IsCancellationRequested)
                 {
@@ -137,7 +137,7 @@ namespace SIGame.ViewModel
                 {
                     Error = exc.Message;
                     FullError = exc.ToString();
-                    _server.Dispose();
+                    await _server.DisposeAsync();
 
                     if (_connector != null)
                     {

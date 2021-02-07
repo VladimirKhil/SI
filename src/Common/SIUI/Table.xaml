@@ -199,10 +199,7 @@
                             </Viewport3D.Camera>
                             <ContainerUIElement3D x:Name="World">
                                 <ModelUIElement3D x:Name="AmbientLightContainer">
-                                    <AmbientLight x:Name="AmbientLight" Color="#FF494842" />
-                                </ModelUIElement3D>
-                                <ModelUIElement3D x:Name="DirectionalLightContainer">
-                                    <PointLight x:Name="DirectionalLight" Color="#FFBABAA0" ConstantAttenuation="1" LinearAttenuation="0" Position="434,769,85" QuadraticAttenuation="0" Range="4189" />
+                                    <AmbientLight x:Name="AmbientLight" Color="White" />
                                 </ModelUIElement3D>
                             </ContainerUIElement3D>
                             <Viewport2DVisual3D>
@@ -320,14 +317,14 @@
                                         <ScaleTransform x:Key="Y" ScaleY="{Binding TimeLeft}" />
                                     </Grid.Resources>
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="10" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition Height="58*" />
-                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="10" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="10" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="58*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
                                     </Grid.ColumnDefinitions>
                                     <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.ColumnSpan="3" Stretch="Fill" RenderTransform="{StaticResource X}" RenderTransformOrigin="0.5,0.5" />
                                     <Rectangle Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" Grid.Row="2" Grid.ColumnSpan="3" Stretch="Fill" RenderTransform="{StaticResource X}" RenderTransformOrigin="0.5,0.5" />

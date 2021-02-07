@@ -27,7 +27,7 @@
     <Company>Khil-soft</Company>
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
-    <Copyright>Copyright © Khil-soft 2002-2020</Copyright>
+    <Copyright>Copyright © Khil-soft 2002-2021</Copyright>
     <Version>7.5.0</Version>
     <LangVersion>8</LangVersion>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
@@ -89,6 +89,9 @@
     <PackageReference Include="Owin" Version="1.0" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Fonts\Phenomena-Bold.otf" />
+    <Resource Include="Fonts\Phenomena-Light.otf" />
+    <Resource Include="Fonts\Phenomena-Thin.otf" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -305,5 +308,37 @@
     <Compile Remove="obj\x86\Release\App.g.i.cs" />
     <Compile Remove="obj\x86\Release\MainWindow.g.cs" />
     <Compile Remove="obj\x86\Release\MainWindow.g.i.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Fonts\10261.otf" />
+    <None Remove="Fonts\10262.otf" />
+    <None Remove="Fonts\10265.otf" />
+    <None Remove="Fonts\Phenomena-Bold.otf" />
+    <None Remove="Fonts\Phenomena-Light.otf" />
+    <None Remove="Fonts\Phenomena-Thin.otf" />
+    <None Remove="Resources\game_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="View\ShowmanView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
 </Project>

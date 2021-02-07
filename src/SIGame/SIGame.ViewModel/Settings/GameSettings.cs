@@ -47,9 +47,7 @@ namespace SIGame.ViewModel
         /// <summary>
         /// Номер за столом в роли игрока
         /// </summary>
-        [XmlAttribute]
-        [DefaultValue(1)]
-        public int PlayerNumber { get; set; } = 1;
+        public int PlayerNumber => 0;
 
         /// <summary>
         /// Тип ведущего
@@ -67,9 +65,8 @@ namespace SIGame.ViewModel
         [DefaultValue(3)]
         public int PlayersCount { get; set; } = 3;
 
-        public static explicit operator GameSettingsCore<AppSettingsCore>(GameSettings settings)
-        {
-            return new GameSettingsCore<AppSettingsCore>
+        public static explicit operator GameSettingsCore<AppSettingsCore>(GameSettings settings) =>
+            new GameSettingsCore<AppSettingsCore>
             {
                 AllowViewers = settings.AllowViewers,
                 AppSettings = settings.AppSettings.ToAppSettingsCore(),
@@ -81,23 +78,14 @@ namespace SIGame.ViewModel
                 Showman = Convert(settings.Showman),
                 Viewers = Convert(settings.Viewers)
             };
-        }
 
-        private static Account Convert(Account account)
-        {
-            return new Account { IsHuman = account.IsHuman, Name = account.Name, Picture = account.Picture, IsMale = account.IsMale };
-        }
+        private static Account Convert(Account account) =>
+            new Account { IsHuman = account.IsHuman, Name = account.Name, Picture = account.Picture, IsMale = account.IsMale };
 
-        private static Account[] Convert(Account[] accounts)
-        {
-            return accounts.Select(acc => Convert(acc)).ToArray();
-        }
+        private static Account[] Convert(Account[] accounts) => accounts.Select(acc => Convert(acc)).ToArray();
 
         public event Action Updated;
 
-        public void OnUpdated()
-        {
-            Updated?.Invoke();
-        }
+        public void OnUpdated() => Updated?.Invoke();
     }
 }

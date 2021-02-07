@@ -12,7 +12,7 @@
     <Version>7.5.0</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame app</Description>
-    <Copyright>Copyright © Khil-soft 2005 - 2020</Copyright>
+    <Copyright>Copyright © Khil-soft 2005 - 2021</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.3" />
@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\..\Common\SI.GameServer.Client\SI.GameServer.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SI.GameServer.Contract\SI.GameServer.Contract.csproj" />

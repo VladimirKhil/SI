@@ -10,7 +10,7 @@ namespace SIUI.ViewModel.Core
     public sealed class Settings : INotifyPropertyChanged
     {
         public const string DefaultTableFontFamily = "_Default";
-        public const string DefaultTableColorString = "#FFFFE682";
+        public const string DefaultTableColorString = "White";
         public const string DefaultTableBackColorString = "#FF000451";
         public const string DefaultTableGridColorString = null;
         public const string DefaultAnswererColorString = "#DD1D1F77";

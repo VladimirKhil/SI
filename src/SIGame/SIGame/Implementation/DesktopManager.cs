@@ -282,41 +282,19 @@ namespace SIGame.Implementation
             PlaySoundInternal(source, speed, loop);
         }
 
-        private static string GetSoundUri(ThemeSettings themeSettings, string source)
+        private static string GetSoundUri(ThemeSettings themeSettings, string source) => source switch
         {
-            switch (source)
-            {
-                case MainViewModel.MainMenuSound:
-                    return themeSettings.SoundMainMenuUri;
-
-                case Sounds.RoundBegin:
-                    return themeSettings.SoundBeginRoundUri;
-
-                case Sounds.RoundThemes:
-                    return themeSettings.SoundRoundThemesUri;
-
-                case Sounds.QuestionSecret:
-                    return themeSettings.SoundQuestionGiveUri;
-
-                case Sounds.QuestionStake:
-                    return themeSettings.SoundQuestionStakeUri;
-
-                case Sounds.QuestionNoRisk:
-                    return themeSettings.SoundQuestionNoRiskUri;
-
-                case Sounds.QuestionNoAnswers:
-                    return themeSettings.SoundNoAnswerUri;
-
-                case Sounds.FinalThink:
-                    return themeSettings.SoundFinalThinkUri;
-
-                case Sounds.RoundTimeout:
-                    return themeSettings.SoundTimeoutUri;
-
-                default:
-                    return null;
-            }
-        }
+            MainViewModel.MainMenuSound => themeSettings.SoundMainMenuUri,
+            Sounds.RoundBegin => themeSettings.SoundBeginRoundUri,
+            Sounds.RoundThemes => themeSettings.SoundRoundThemesUri,
+            Sounds.QuestionSecret => themeSettings.SoundQuestionGiveUri,
+            Sounds.QuestionStake => themeSettings.SoundQuestionStakeUri,
+            Sounds.QuestionNoRisk => themeSettings.SoundQuestionNoRiskUri,
+            Sounds.QuestionNoAnswers => themeSettings.SoundNoAnswerUri,
+            Sounds.FinalThink => themeSettings.SoundFinalThinkUri,
+            Sounds.RoundTimeout => themeSettings.SoundTimeoutUri,
+            _ => null,
+        };
 
         internal void PlaySoundInternal(string source = null, double speed = 1.0, bool loop = false)
         {
@@ -423,14 +401,8 @@ namespace SIGame.Implementation
 
         public override string GetKeyName(int key) => ((Key)key).ToString();
 
-        public override Action<T> ExecuteOnUIThread<T>(Action<T> action) =>
-            item => Application.Current?.Dispatcher.Invoke(action, item);
-
-        public override Action<T1, T2> ExecuteOnUIThread<T1, T2>(Action<T1, T2> action) =>
-            (item1, item2) => Application.Current.Dispatcher.Invoke(action, item1, item2);
-
         public override IAnimatableTimer GetAnimatableTimer() => new AnimatableTimer();
 
-        public override Action ExecuteOnUIThread(Action action) => () => Application.Current?.Dispatcher.Invoke(action);
+        public override void ExecuteOnUIThread(Action action) => Application.Current?.Dispatcher.Invoke(action);
     }
 }

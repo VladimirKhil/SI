@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SI.GameServer.Client;
+using System;
 using System.Windows.Input;
 
 namespace SIGame.ViewModel.PlatformSpecific
 {
-    public abstract class PlatformManager
+    public abstract class PlatformManager: IUIThreadExecutor
     {
         public static PlatformManager Instance;
 
@@ -36,9 +37,7 @@ namespace SIGame.ViewModel.PlatformSpecific
 
         public abstract string GetKeyName(int key);
 
-        public abstract Action ExecuteOnUIThread(Action action);
-        public abstract Action<T> ExecuteOnUIThread<T>(Action<T> action);
-        public abstract Action<T1, T2> ExecuteOnUIThread<T1, T2>(Action<T1, T2> action);
+        public abstract void ExecuteOnUIThread(Action action);
 
         public abstract ICommand Close { get; }
 

@@ -295,6 +295,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Назад.
+        /// </summary>
+        public static string Back {
+            get {
+                return ResourceManager.GetString("Back", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Забанить.
         /// </summary>
         public static string Ban {
@@ -520,6 +529,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Не отправлять.
+        /// </summary>
+        public static string DoNotSendReport {
+            get {
+                return ResourceManager.GetString("DoNotSendReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Английский.
         /// </summary>
         public static string English {
@@ -529,7 +547,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вход.
+        ///   Ищет локализованную строку, похожую на ВХОД В ИГРУ.
         /// </summary>
         public static string Entrance {
             get {
@@ -763,6 +781,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Фильтр.
+        /// </summary>
+        public static string Filter {
+            get {
+                return ResourceManager.GetString("Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на (все).
         /// </summary>
         public static string Filter_All {
@@ -970,6 +997,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Скрыть чат.
+        /// </summary>
+        public static string HideChat {
+            get {
+                return ResourceManager.GetString("HideChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Сообщать ведущему правильные ответы заранее.
         /// </summary>
         public static string HintShowman {
@@ -979,7 +1015,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Организатор.
+        ///   Ищет локализованную строку, похожую на Хост.
         /// </summary>
         public static string Host {
             get {
@@ -1141,7 +1177,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Логин.
+        ///   Ищет локализованную строку, похожую на НИКНЕЙМ.
         /// </summary>
         public static string Login {
             get {
@@ -1150,7 +1186,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Войти.
+        ///   Ищет локализованную строку, похожую на ВОЙТИ.
         /// </summary>
         public static string Logon {
             get {
@@ -1173,6 +1209,15 @@ namespace SIGame.Properties {
         public static string MainBackground {
             get {
                 return ResourceManager.GetString("MainBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Мелодия главного меню.
+        /// </summary>
+        public static string MainMenuSound {
+            get {
+                return ResourceManager.GetString("MainMenuSound", resourceCulture);
             }
         }
         
@@ -1249,7 +1294,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сообщения.
+        ///   Ищет локализованную строку, похожую на СООБЩЕНИЯ.
         /// </summary>
         public static string Messages {
             get {
@@ -1501,7 +1546,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Участники.
+        ///   Ищет локализованную строку, похожую на УЧАСТНИКИ.
         /// </summary>
         public static string Persons {
             get {
@@ -1560,6 +1605,15 @@ namespace SIGame.Properties {
         public static string PortNumber {
             get {
                 return ResourceManager.GetString("PortNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нажмите клавишу.
+        /// </summary>
+        public static string PressTheButton {
+            get {
+                return ResourceManager.GetString("PressTheButton", resourceCulture);
             }
         }
         
@@ -2077,11 +2131,29 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Отправить отчёт.
+        /// </summary>
+        public static string SendReport {
+            get {
+                return ResourceManager.GetString("SendReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Сервер.
         /// </summary>
         public static string Server {
             get {
                 return ResourceManager.GetString("Server", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Имя сервера.
+        /// </summary>
+        public static string ServerName {
+            get {
+                return ResourceManager.GetString("ServerName", resourceCulture);
             }
         }
         
@@ -2145,6 +2217,15 @@ namespace SIGame.Properties {
         public static string ShowBorderOnFalseStart {
             get {
                 return ResourceManager.GetString("ShowBorderOnFalseStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Показать чат.
+        /// </summary>
+        public static string ShowChat {
+            get {
+                return ResourceManager.GetString("ShowChat", resourceCulture);
             }
         }
         
@@ -2581,7 +2662,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Верен ли ответ игрока?.
+        ///   Ищет локализованную строку, похожую на Верен ли ответ игрока.
         /// </summary>
         public static string Validate_IsTrue {
             get {

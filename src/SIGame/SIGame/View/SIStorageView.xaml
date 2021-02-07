@@ -115,6 +115,7 @@
                 <Style TargetType="DataGridRow">
                     <Setter Property="Margin" Value="0,3,0,0" />
                     <Setter Property="Background" Value="#FF71A2E2" />
+                    <Setter Property="Cursor" Value="Hand" />
                     <Setter Property="TextBlock.FontWeight" Value="{Binding Converter={StaticResource PlayedPackageConverter}}" />
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

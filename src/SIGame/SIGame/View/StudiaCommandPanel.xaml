@@ -10,10 +10,9 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <SolidColorBrush x:Key="FadeColor" Color="#FFD8D5A0" />
-        <SolidColorBrush x:Key="OverColor" Color="#FFFFFFDB" />
 
         <Style TargetType="{x:Type ButtonBase}">
-            <Setter Property="Foreground" Value="{StaticResource FadeColor}" />
+            <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             <Setter Property="Background" Value="#AA555555" />
             <Setter Property="Margin" Value="-1,-1,0,0" />
             <Setter Property="Padding" Value="3" />
@@ -29,7 +28,7 @@
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" uib:FillManager.Fill="True" FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed" />
+                        <TextBlock Text="{Binding}" TextAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" uib:FillManager.Fill="True" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
@@ -40,6 +39,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ButtonBase}}">
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
@@ -48,9 +48,8 @@
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsMouseOver" Value="True" />
-                        <Condition Property="IsChecked" Value="False" />
                     </MultiTrigger.Conditions>
-                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                    <Setter Property="Background" Value="{StaticResource HoverColor}" />
                 </MultiTrigger>
             </Style.Triggers>
         </Style>
@@ -60,14 +59,14 @@
                     <Setter Property="IsEnabled" Value="False" />
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                    <Setter Property="Background" Value="{StaticResource HoverColor}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
         <Style TargetType="local:DropDownButton" BasedOn="{StaticResource {x:Type ButtonBase}}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="{StaticResource OverColor}" />
+                    <Setter Property="Background" Value="{StaticResource HoverColor}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -81,7 +80,9 @@
         </Style>
 
         <ControlTemplate x:Key="GameButtonTemplate" TargetType="{x:Type Button}">
-            <Border Name="Bd" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="#77000000" CornerRadius="10" BorderThickness="1">
+            <Border Name="Bd" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderBrush="#77000000"
+                    CornerRadius="25" BorderThickness="1"
+                    MaxWidth="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource Multiplier}, ConverterParameter=5}">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Offset="0" Color="#FFFF7F7F" />
@@ -90,7 +91,7 @@
                         <GradientStop Offset="1" Color="#FF690000" />
                     </LinearGradientBrush>
                 </Border.Background>
-                <Border Name="BdI" BorderThickness="0" CornerRadius="10" Opacity="0">
+                <Border Name="BdI" BorderThickness="0" CornerRadius="25" Opacity="0">
                     <Border.Background>
                         <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
                             <GradientStop Offset="0" Color="#EEFFFF00" />
@@ -169,15 +170,15 @@
             <RowDefinition Height="26*" />
             <RowDefinition Height="8*" />
             <RowDefinition Height="0*" />
-            <RowDefinition Height="10*" />
+            <RowDefinition Height="12*" />
             <RowDefinition Height="8*" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="1" Grid.ColumnSpan="2" ToolTip="{x:Static lp:Resources.Forward}" Content="▶" Command="{Binding Move}" CommandParameter="1" MaxWidth="100" />
+        <Button Grid.Row="1" Grid.ColumnSpan="2" Cursor="Hand" ToolTip="{x:Static lp:Resources.Forward}" Content="▶" Command="{Binding Move}" CommandParameter="1" MaxWidth="100" />
 
-        <Button Grid.Row="3" Grid.ColumnSpan="3" Margin="5" x:Name="gameButton" Style="{StaticResource GameButton}" Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}" Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
-        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="10" Opacity="0">
+        <Button Grid.Row="3" Grid.ColumnSpan="3" Cursor="Hand" Margin="5,10" x:Name="gameButton" Style="{StaticResource GameButton}" Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}" Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
+        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
             <Border.Background>
                 <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
                     <GradientStop Offset="0" Color="#EEFFFF00" />
@@ -187,19 +188,20 @@
             </Border.Background>
         </Border>
 
-        <Button Grid.Row="4" ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Right}" CommandParameter="+"/>
-        <Button Grid.Row="4" Grid.Column="1" ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Wrong}" CommandParameter="-" />
+        <Button Grid.Row="4" Cursor="Hand" ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Right}" CommandParameter="+"/>
+        <Button Grid.Row="4" Grid.Column="1" Cursor="Hand" ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}" Command="{Binding Data.PlayerDataExtensions.Apellate}" Content="{x:Static lp:Resources.Apellate_Wrong}" CommandParameter="-" />
 
-        <Button Grid.Row="4" Grid.ColumnSpan="2" Command="{Binding Data.PlayerDataExtensions.Pass}" Content="{x:Static lp:Resources.Pass}" />
+        <Button Grid.Row="4" Grid.ColumnSpan="2" Cursor="Hand" Command="{Binding Data.PlayerDataExtensions.Pass}" Content="{x:Static lp:Resources.Pass}" />
 
-        <local:DropDownButton Grid.Row="4" Content="{x:Static lp:Resources.Manage}" ToolTip="{x:Static lp:Resources.Manage_Hint}" Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
+        <local:DropDownButton Grid.Row="4" Cursor="Hand" Content="{x:Static lp:Resources.Manage}" ToolTip="{x:Static lp:Resources.Manage_Hint}" Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
             <local:DropDownButton.DropDown>
-                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21">
+                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21" TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                     <ContextMenu.Resources>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="BorderThickness" Value="1" />
                             <Setter Property="BorderBrush" Value="#FF999999" />
                             <Setter Property="Padding" Value="40,10" />
+                            <Setter Property="Cursor" Value="Hand" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -208,7 +210,7 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsHighlighted" Value="True">
-                                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
+                                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource HoverColor}"/>
                                                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
@@ -229,13 +231,17 @@
                 </ContextMenu>
             </local:DropDownButton.DropDown>
         </local:DropDownButton>
-        <Button Grid.Row="4" Grid.Column="1" Command="{Binding Data.ShowmanDataExtensions.ChangeSums}" Content="{x:Static lp:Resources.Sums}" ToolTip="{x:Static lp:Resources.Sums_Hint}" />
+        <Button Grid.Row="4" Grid.Column="1" Cursor="Hand" Command="{Binding Data.ShowmanDataExtensions.ChangeSums}" Content="{x:Static lp:Resources.Sums}" ToolTip="{x:Static lp:Resources.Sums_Hint}" />
 
-        <ToggleButton Grid.Row="5" Style="{StaticResource PauseButton}" IsChecked="{Binding IsPaused}" Command="{Binding ChangePauseInGame}" />
-        <local:DropDownButton Grid.Row="5" Grid.Column="1" Content="{x:Static lp:Resources.Exit}">
+        <ToggleButton Grid.Row="5" Cursor="Hand" Style="{StaticResource PauseButton}" IsChecked="{Binding IsPaused}" Command="{Binding ChangePauseInGame}" />
+        <local:DropDownButton Grid.Row="5" Grid.Column="1" Cursor="Hand" Content="{x:Static lp:Resources.Exit}">
             <local:DropDownButton.DropDown>
                 <ContextMenu Placement="Relative" HorizontalOffset="100" VerticalOffset="-128">
-                    <MenuItem Header="{x:Static lp:Resources.Exit_Button}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="40,2" FontSize="21" Command="{Binding EndGame}">
+                    <MenuItem Header="{x:Static lp:Resources.Exit_Button}" BorderThickness="1" BorderBrush="#FF999999"
+                              Cursor="Hand"
+                              TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="40,2" FontSize="21"
+                              Command="{Binding EndGame}"
+                              TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                         <MenuItem.Template>
                             <ControlTemplate TargetType="{x:Type MenuItem}">
                                 <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
@@ -243,7 +249,7 @@
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsHighlighted" Value="True">
-                                        <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
+                                        <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource HoverColor}"/>
                                         <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -252,9 +258,9 @@
                     </MenuItem>
                     <ContextMenu.Template>
                         <ControlTemplate TargetType="ContextMenu">
-                            <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
+                            <Border x:Name="Border" Background="#FFC0CFF4" BorderBrush="Gray" BorderThickness="1">
                                 <StackPanel>
-                                    <TextBlock FontSize="18" Text="{x:Static lp:Resources.ExitPrompt}" Margin="20,20,20,0" HorizontalAlignment="Center" />
+                                    <TextBlock FontSize="18" Text="{x:Static lp:Resources.ExitPrompt}" TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" Margin="20,20,20,0" HorizontalAlignment="Center" />
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Border>

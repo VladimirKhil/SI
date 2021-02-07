@@ -7,7 +7,7 @@
     <Version>7.5.0</Version>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <Copyright>Copyright © Khil-soft 2010 - 2020</Copyright>
+    <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

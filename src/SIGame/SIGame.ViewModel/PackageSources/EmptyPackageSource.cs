@@ -1,6 +1,6 @@
 ﻿using SIGame.ViewModel.Properties;
-using SIPackages;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
@@ -14,10 +14,12 @@ namespace SIGame.ViewModel.PackageSources
 
         public override string Source => $"({Resources.PackageNotSelected})";
 
-        public override Task<(string, bool)> GetPackageFileAsync() => throw new NotImplementedException();
+        public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
 
         public override string GetPackageName() => "";
 
-        public override Task<byte[]> GetPackageHashAsync() => throw new NotImplementedException();
+        public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
+            throw new NotImplementedException();
     }
 }

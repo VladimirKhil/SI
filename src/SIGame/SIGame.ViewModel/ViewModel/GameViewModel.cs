@@ -88,6 +88,10 @@ namespace SIGame.ViewModel
         public GameViewModel(Server server, IViewerClient host, UserSettings userSettings)
         {
             _server = server;
+
+            _server.Reconnecting += Server_Reconnecting;
+            _server.Reconnected += Server_Reconnected;
+
             Host = host ?? throw new ArgumentNullException(nameof(host));
             Host.Switch += Host_Switch;
             Host.StageChanged += UpdateMoveCommand;
@@ -110,6 +114,10 @@ namespace SIGame.ViewModel
 
             Timers[1].TimeChanged += GameViewModel_TimeChanged;
         }
+
+        private void Server_Reconnected() => Host.AddLog(Resources.ReconnectingMessage);
+
+        private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectedMessage);
 
         private void Host_Ad(string text)
         {
@@ -170,7 +178,7 @@ namespace SIGame.ViewModel
 
         private void UpdateMoveCommand()
         {
-            Move.CanBeExecuted = Data.Stage != SIData.GameStage.Before && (Host.IsHost /*&& (!this.Data.ShowMan.IsHuman || !this.Data.ShowMan.Connected)*/ || Host is Showman);
+            Move.CanBeExecuted = Data.Stage != SIData.GameStage.Before && (Host.IsHost || Host is Showman);
             ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
         }
 
@@ -193,6 +201,7 @@ namespace SIGame.ViewModel
             Host.StageChanged += UpdateMoveCommand;
             Host.PersonConnected += UpdateMoveCommand;
             Host.PersonDisconnected += UpdateMoveCommand;
+            Host.OnIsHostChanged += UpdateMoveCommand;
             Host.Timer += Host_Timer;
             Host.Ad += Host_Ad;
 
@@ -227,7 +236,7 @@ namespace SIGame.ViewModel
 
         public void Dispose()
         {
-            _server.Dispose();
+            _server.DisposeAsync();
 
             if (TempDocFolder != null && Directory.Exists(TempDocFolder))
             {

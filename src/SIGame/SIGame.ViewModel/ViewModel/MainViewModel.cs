@@ -76,7 +76,7 @@ namespace SIGame.ViewModel
 
         public ICommand Update
         {
-            get { return _update; }
+            get => _update;
             set
             {
                 _update = value;
@@ -93,7 +93,7 @@ namespace SIGame.ViewModel
 
         public bool IsSlideMenuOpen
         {
-            get { return _isSlideMenuOpen; }
+            get => _isSlideMenuOpen;
             set { if (_isSlideMenuOpen != value) { _isSlideMenuOpen = value; OnPropertyChanged(); } }
         }
 
@@ -103,7 +103,7 @@ namespace SIGame.ViewModel
 
         public string StartMenuPage
         {
-            get { return _startMenuPage; }
+            get => _startMenuPage;
             set { if (_startMenuPage != value) { _startMenuPage = value; OnPropertyChanged(); } }
         }
 
@@ -248,8 +248,7 @@ namespace SIGame.ViewModel
             }
 
             Settings.IsEditable = true;
-
-            PlatformSpecific.PlatformManager.Instance.PlaySound(MainMenuSound, loop: true);
+            PlayMainMenuSound();
         }
 
         private async void New_Executed(object arg)
@@ -276,12 +275,12 @@ namespace SIGame.ViewModel
         {
             await Task.Delay(300);
 
-            var login = new LoginViewModel { Login = Human.HumanPlayer.Name };
-            login.Entered += async (l, client) =>
+            var login = new LoginViewModel(_userSettings) { Login = Human.HumanPlayer.Name };
+            login.Entered += async (login, client) =>
             {
                 var humanAccount = new HumanAccount(Human.HumanPlayer)
                 {
-                    Name = l
+                    Name = login
                 };
 
                 var onlineConnection = new SIOnlineViewModel(_userSettings.ConnectionData, client, _commonSettings, _userSettings)
@@ -295,10 +294,10 @@ namespace SIGame.ViewModel
                 onlineConnection.StartGame += StartGame;
 
                 ActiveView = onlineConnection;
-                await onlineConnection.Init();
+                await onlineConnection.InitAsync();
             };
 
-            ActiveView = new ContentBox { Data = login, Title = Resources.MainMenu_OnlineGame, Cancel = Cancel };
+            ActiveView = new ContentBox { Data = login, Cancel = Cancel };
 
             await login.Enter.ExecuteAsync(null);
         }
@@ -347,6 +346,14 @@ namespace SIGame.ViewModel
             else
             {
                 ActiveView = _startMenu;
+                PlayMainMenuSound();
+            }
+        }
+
+        private void PlayMainMenuSound()
+        {
+            if (_userSettings.MainMenuSound)
+            {
                 PlatformSpecific.PlatformManager.Instance.PlaySound(MainMenuSound, loop: true);
             }
         }

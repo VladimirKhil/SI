@@ -13,7 +13,7 @@ namespace SIGame.ViewModel
         internal event Action HumanPlayerChanged;
 
         private HumanAccount _humanPlayer = null;
-        private CommonSettings _commonSettings;
+        private readonly CommonSettings _commonSettings;
 
         /// <summary>
         /// Живой игрок

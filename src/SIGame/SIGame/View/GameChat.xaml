@@ -6,6 +6,7 @@
              mc:Ignorable="d"
              d:DesignHeight="243" d:DesignWidth="389" Background="#88000000"
              xmlns:lp="clr-namespace:SIGame.Properties"
+             xmlns:lc="clr-namespace:SIGame.Converters"
              DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <SolidColorBrush x:Key="SemiTransparentLightBlueVioletBrushKey">#FFC0CFF4</SolidColorBrush>
@@ -15,9 +16,11 @@
         <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle1}">
 
         </Style>
+
+        <lc:HostNameConverter x:Key="HostNameConverter" />
     </UserControl.Resources>
-    <TabControl Padding="0" BorderThickness="0">
-        <TabItem Header="{x:Static lp:Resources.Messages}">
+    <TabControl Padding="0" BorderThickness="0" FontSize="19">
+        <TabItem Header="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -33,10 +36,10 @@
                         <KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
-                <RichTextBox Grid.ColumnSpan="3" BorderThickness="0" Name="text" Padding="1,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" FontSize="13" />
+                <RichTextBox Grid.ColumnSpan="3" BorderThickness="0" Name="text" Padding="1,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" FontSize="15" />
             </Grid>
         </TabItem>
-        <TabItem Header="{x:Static lp:Resources.Persons}">
+        <TabItem Header="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2">
                     <Button Style="{StaticResource SIButton}" Background="#22000000" Margin="-1,-1,0,-1" Padding="20,4" Command="{Binding Kick}" CommandParameter="{Binding Source={StaticResource Persons},Path=Value}" FontSize="24" TextBlock.LineHeight="24" Content="{x:Static lp:Resources.Kick}" />
@@ -45,7 +48,17 @@
                 <ListBox IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Source={StaticResource Persons}}" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" FontSize="16">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Key}" />
+                            <TextBlock>
+                                <Run Text="{Binding Key, Mode=OneWay}" />
+                                <Run>
+                                    <Run.Text>
+                                        <MultiBinding Converter="{StaticResource HostNameConverter}">
+                                            <Binding Path="Key" Mode="OneWay" />
+                                            <Binding RelativeSource="{RelativeSource AncestorType=TabControl}" Path="DataContext.HostName" Mode="OneWay" />
+                                        </MultiBinding>
+                                    </Run.Text>
+                                </Run>
+                            </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
