@@ -124,6 +124,10 @@ namespace SICore
         {
             _data.AllowAppellation = false;
             _data.Round = round;
+            _data.CanMarkQuestion = false;
+            _data.AnswererIndex = -1;
+            _data.StakerIndex = -1;
+            _data.Type = null;
             ProcessRound(round, 1);
 
             if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
@@ -544,6 +548,8 @@ namespace SICore
 
             _data.CanMarkQuestion = false;
             _data.AnswererIndex = -1;
+            _data.StakerIndex = -1;
+            _data.Type = null;
         }
 
         private void Engine_EndQuestion(int themeIndex, int questionIndex)

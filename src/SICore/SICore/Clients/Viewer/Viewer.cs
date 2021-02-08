@@ -74,6 +74,7 @@ namespace SICore
         public event Action<IViewerClient> Switch;
         public event Action StageChanged;
         public event Action<string> Ad;
+        public event Action<bool> IsPausedChanged;
 
         public ViewerData MyData => ClientData;
 
@@ -423,7 +424,9 @@ namespace SICore
                         {
                             #region Pause
 
-                            _logic.OnPauseChanged(mparams[1] == "+");
+                            var isPaused = mparams[1] == "+";
+                            _logic.OnPauseChanged(isPaused);
+                            IsPausedChanged?.Invoke(isPaused);
 
                             if (mparams.Length > 4)
                             {

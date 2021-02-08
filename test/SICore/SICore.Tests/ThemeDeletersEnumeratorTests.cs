@@ -63,5 +63,29 @@ namespace SICore.Tests
 
             Assert.IsFalse(enumerator.MoveNext());
         }
+
+        [Test]
+        public void RemoveNew()
+        {
+            var variants = new HashSet<int>(new int[] { 4 });
+            var newVariants = new HashSet<int>(new int[] { 3 });
+
+            var enumerator = new ThemeDeletersEnumerator(new []
+            {
+                new ThemeDeletersEnumerator.IndexInfo(1),
+                new ThemeDeletersEnumerator.IndexInfo(0),
+                new ThemeDeletersEnumerator.IndexInfo(2),
+                new ThemeDeletersEnumerator.IndexInfo(variants)
+            });
+
+            enumerator.RemoveAt(3);
+
+            enumerator.Reset(false);
+            enumerator.MoveNext();
+            enumerator.MoveNext();
+            enumerator.MoveNext();
+            enumerator.MoveNext();
+            Assert.AreEqual(newVariants, enumerator.Current.PossibleIndicies);
+        }
     }
 }

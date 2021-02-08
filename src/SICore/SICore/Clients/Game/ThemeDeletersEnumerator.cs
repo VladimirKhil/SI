@@ -141,22 +141,6 @@ namespace SICore.Clients.Game
 
             _removeLog.Add("Before: " + removeLog.ToString());
 
-            if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
-            {
-                for (var i = 0; i < _order.Length; i++)
-                {
-                    var playerIndex = _order[i].PlayerIndex;
-                    if (playerIndex > index)
-                    {
-                        _order[i].PlayerIndex--;
-                        continue;
-                    }
-                }
-
-                _removeLog.Add("After: " + ToString());
-                return;
-            }
-
             var processedPossibleIndicies = new HashSet<HashSet<int>>();
 
             void updatePossibleIndices(IndexInfo indexInfo)
@@ -180,6 +164,27 @@ namespace SICore.Clients.Game
                 }
 
                 processedPossibleIndicies.Add(possibleIndices);
+            }
+
+            if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
+            {
+                for (var i = 0; i < _order.Length; i++)
+                {
+                    var playerIndex = _order[i].PlayerIndex;
+                    if (playerIndex > index)
+                    {
+                        _order[i].PlayerIndex--;
+                        continue;
+                    }
+
+                    if (playerIndex == -1)
+                    {
+                        updatePossibleIndices(_order[i]);
+                    }
+                }
+
+                _removeLog.Add("After: " + ToString());
+                return;
             }
 
             try

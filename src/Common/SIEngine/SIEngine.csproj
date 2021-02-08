@@ -10,7 +10,7 @@
     <Product>SIEngine</Product>
     <Description>SIGame engine</Description>
     <Company>Khil-soft</Company>
-    <Version>2.12.0</Version>
+    <Version>2.12.1</Version>
     <Copyright>Copyright © Khil-soft 2007 - 2021</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>

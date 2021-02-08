@@ -494,7 +494,7 @@
 
         <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding Data.Hint}" FontSize="17" Style="{StaticResource HiddenTextBlock}"
                    Foreground="Black" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,5" TextWrapping="Wrap" Padding="15,0"
-                   Background="White">
+                   Background="White" FontWeight="Bold">
         </TextBlock>
 
         <StackPanel Orientation="Vertical" Grid.RowSpan="2" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,63,0,0">

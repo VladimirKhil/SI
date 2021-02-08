@@ -233,7 +233,7 @@
         </local:DropDownButton>
         <Button Grid.Row="4" Grid.Column="1" Cursor="Hand" Command="{Binding Data.ShowmanDataExtensions.ChangeSums}" Content="{x:Static lp:Resources.Sums}" ToolTip="{x:Static lp:Resources.Sums_Hint}" />
 
-        <ToggleButton Grid.Row="5" Cursor="Hand" Style="{StaticResource PauseButton}" IsChecked="{Binding IsPaused}" Command="{Binding ChangePauseInGame}" />
+        <ToggleButton Grid.Row="5" Cursor="Hand" Style="{StaticResource PauseButton}" IsChecked="{Binding IsPaused, Mode=OneWay}" Command="{Binding ChangePauseInGame}" />
         <local:DropDownButton Grid.Row="5" Grid.Column="1" Cursor="Hand" Content="{x:Static lp:Resources.Exit}">
             <local:DropDownButton.DropDown>
                 <ContextMenu Placement="Relative" HorizontalOffset="100" VerticalOffset="-128">

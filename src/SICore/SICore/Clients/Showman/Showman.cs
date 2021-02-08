@@ -223,7 +223,7 @@ namespace SICore
                         }
                     case Messages.Hint:
                         {
-                            ClientData.Hint = LO[nameof(R.RightAnswer)].ToUpperInvariant() + ": " + mparams[1];
+                            ClientData.Hint = $"{LO[nameof(R.RightAnswer)].ToUpperInvariant()} : {mparams[1]}";
                             break;
                         }
                     case Messages.Stage:

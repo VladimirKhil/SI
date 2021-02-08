@@ -22,9 +22,9 @@ namespace SIGame.ViewModel
 
         public IViewerClient Host { get; private set; }
 
-        public ViewerData Data { get { return Host.MyData; } }
+        public ViewerData Data => Host.MyData;
 
-        public TableInfoViewModel TInfo { get { return Host.MyLogic.TInfo; } }
+        public TableInfoViewModel TInfo => Host.MyLogic.TInfo;
 
         public CustomCommand EndGame { get; }
 
@@ -35,28 +35,28 @@ namespace SIGame.ViewModel
 
         public CustomCommand Move { get; set; }
 
-        private bool networkGame = false;
+        private bool _networkGame = false;
 
         public bool NetworkGame
         {
-            get { return networkGame; }
-            set { networkGame = value; OnPropertyChanged(); }
+            get { return _networkGame; }
+            set { _networkGame = value; OnPropertyChanged(); }
         }
 
-        private int networkGamePort;
+        private int _networkGamePort;
 
         public int NetworkGamePort
         {
-            get { return networkGamePort; }
-            set { networkGamePort = value; OnPropertyChanged(); }
+            get { return _networkGamePort; }
+            set { _networkGamePort = value; OnPropertyChanged(); }
         }
 
-        private bool isPaused;
+        private bool _isPaused;
 
         public bool IsPaused
         {
-            get { return isPaused; }
-            set { isPaused = value; OnPropertyChanged(); }
+            get { return _isPaused; }
+            set { _isPaused = value; OnPropertyChanged(); }
         }
 
         public event Action GameEnded;
@@ -99,6 +99,7 @@ namespace SIGame.ViewModel
             Host.PersonDisconnected += UpdateMoveCommand;
             Host.Timer += Host_Timer;
             Host.Ad += Host_Ad;
+            Host.IsPausedChanged += Host_IsPausedChanged;
 
             UserSettings = userSettings;
 
@@ -113,6 +114,11 @@ namespace SIGame.ViewModel
             }
 
             Timers[1].TimeChanged += GameViewModel_TimeChanged;
+        }
+
+        private void Host_IsPausedChanged(bool isPaused)
+        {
+            IsPaused = isPaused;
         }
 
         private void Server_Reconnected() => Host.AddLog(Resources.ReconnectingMessage);
@@ -196,6 +202,7 @@ namespace SIGame.ViewModel
             Host.PersonDisconnected -= UpdateMoveCommand;
             Host.Timer -= Host_Timer;
             Host.Ad -= Host_Ad;
+            Host.IsPausedChanged -= Host_IsPausedChanged;
             Host = newHost;
             Host.Switch += Host_Switch;
             Host.StageChanged += UpdateMoveCommand;
@@ -204,6 +211,7 @@ namespace SIGame.ViewModel
             Host.OnIsHostChanged += UpdateMoveCommand;
             Host.Timer += Host_Timer;
             Host.Ad += Host_Ad;
+            Host.IsPausedChanged += Host_IsPausedChanged;
 
             UpdateMoveCommand();
 

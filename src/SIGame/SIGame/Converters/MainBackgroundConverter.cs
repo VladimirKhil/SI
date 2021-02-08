@@ -20,7 +20,7 @@ namespace SIGame.Converters
                 if (value is string uriString && Uri.TryCreate(uriString, UriKind.Absolute, out Uri uri))
                     image.UriSource = uri;
                 else
-                    image.StreamSource = Application.GetResourceStream(new Uri("/SIGame;component/Theme/main_background.png", UriKind.Relative)).Stream;
+                    image.StreamSource = Application.GetResourceStream(new Uri("/SIGame;component/Theme/main_background.jpg", UriKind.Relative)).Stream;
 
                 image.EndInit();
 

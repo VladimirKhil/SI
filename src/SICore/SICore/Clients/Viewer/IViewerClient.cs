@@ -32,6 +32,7 @@ namespace SICore
         event Action<IViewerClient> Switch;
         event Action StageChanged;
         event Action<string> Ad;
+        event Action<bool> IsPausedChanged;
 
         event Action OnIsHostChanged;
 
