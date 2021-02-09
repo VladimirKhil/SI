@@ -21,7 +21,7 @@ namespace SIGame.ViewModel
 {
     public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
-        private const bool UseSignalRConnection = true;
+        private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
 
         private SI.GameServer.Contract.HostInfo _gamesHostInfo;
 
@@ -612,6 +612,22 @@ namespace SIGame.ViewModel
             if (ReleaseConnection)
             {
                 await _gameServerClient.DisposeAsync();
+            }
+            else
+            {
+                _gameServerClient.GameCreated -= GameServerClient_GameCreated;
+                _gameServerClient.GameDeleted -= GameServerClient_GameDeleted;
+                _gameServerClient.GameChanged -= GameServerClient_GameChanged;
+
+                _gameServerClient.Joined -= GameServerClient_Joined;
+                _gameServerClient.Leaved -= GameServerClient_Leaved;
+                _gameServerClient.Receieve -= OnMessage;
+
+                _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
+                _gameServerClient.Reconnected -= GameServerClient_Reconnected;
+                _gameServerClient.Closed -= GameServerClient_Closed;
+
+                _gameServerClient.UploadProgress -= GameServerClient_UploadProgress;
             }
 
             await base.ClearConnectionAsync();

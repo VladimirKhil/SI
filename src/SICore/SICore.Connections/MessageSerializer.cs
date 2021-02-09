@@ -23,7 +23,7 @@ namespace SICore.Connections
 
         public static void SerializeMessage(Message message, byte[] buffer)
         {
-            buffer[0] = (byte)((message.IsSystem ? 1 : 0) + (message.IsPrivate ? 2 : 0));
+            buffer[0] = (byte)(1 + (message.IsSystem ? 2 : 0) + (message.IsPrivate ? 4 : 0));
 
             var index = 1;
             index += Encoding.UTF8.GetBytes(message.Sender, 0, message.Sender.Length, buffer, index);
@@ -44,8 +44,8 @@ namespace SICore.Connections
 
             var data = buffer.Slice(0, 1).ToArray();
 
-            var isSystem = (data[0] & 1) > 0;
-            var isPrivate = (data[0] & 2) > 0;
+            var isSystem = (data[0] & 2) > 0;
+            var isPrivate = (data[0] & 4) > 0;
 
             var position = buffer.PositionOf(Separator);
             if (!position.HasValue)

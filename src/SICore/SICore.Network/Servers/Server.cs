@@ -159,7 +159,7 @@ namespace SICore.Network.Servers
                 }
 
                 var messageText = m.Text;
-                if (!m.IsSystem)
+                if (!m.IsSystem && messageText != null)
                 {
                     messageText = messageText.Shorten(_serverConfiguration.MaxChatMessageLength);
                 }
