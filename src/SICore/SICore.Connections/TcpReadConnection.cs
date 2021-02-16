@@ -153,6 +153,11 @@ namespace SICore.Connections
                     // Normal dispose
                     break;
                 }
+                catch (SocketException ex) when (ex.ErrorCode == 104 || ex.ErrorCode == 110 || ex.ErrorCode == 113 || ex.ErrorCode == 125)
+                {
+                    // Normal closing
+                    break;
+                }
                 catch (Exception ex)
                 {
                     OnError(ex, true);

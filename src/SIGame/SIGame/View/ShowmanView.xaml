@@ -76,7 +76,7 @@
                 </Style>
             </Button.Style>
             <lb:DropDownBehavior.DropDown>
-                <ContextMenu FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" FontSize="16">
+                <ContextMenu FontSize="16">
                     <ContextMenu.Template>
                         <ControlTemplate TargetType="ContextMenu">
                             <Border x:Name="Border" Background="{StaticResource WindowBackground}" BorderBrush="Gray" BorderThickness="1">

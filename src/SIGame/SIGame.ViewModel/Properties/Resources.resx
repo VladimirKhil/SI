@@ -480,4 +480,7 @@
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Ошибка при открытии папки лицензий: {0}</value>
   </data>
+  <data name="UpdateVersionMessage" xml:space="preserve">
+    <value>Обнаружено обновление программы до версии {0}</value>
+  </data>
 </root>

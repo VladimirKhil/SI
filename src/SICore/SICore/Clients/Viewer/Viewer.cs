@@ -735,8 +735,8 @@ namespace SICore
 
                             if (mparams[1] == "A")
                             {
-                                _logic.OnTimerChanged(1, "STOP", "", null);
-                                Timer?.Invoke(1, "STOP", "");
+                                _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "", null);
+                                Timer?.Invoke(1, MessageParams.Timer_Stop, "");
                             }
 
                             _logic.EndTry(mparams[1]);
@@ -832,13 +832,13 @@ namespace SICore
 
                             _logic.StopRound();
 
-                            _logic.OnTimerChanged(0, "STOP", "", null);
-                            _logic.OnTimerChanged(1, "STOP", "", null);
-                            _logic.OnTimerChanged(2, "STOP", "", null);
+                            _logic.OnTimerChanged(0, MessageParams.Timer_Stop, "", null);
+                            _logic.OnTimerChanged(1, MessageParams.Timer_Stop, "", null);
+                            _logic.OnTimerChanged(2, MessageParams.Timer_Stop, "", null);
 
-                            Timer?.Invoke(0, "STOP", "");
-                            Timer?.Invoke(1, "STOP", "");
-                            Timer?.Invoke(2, "STOP", "");
+                            Timer?.Invoke(0, MessageParams.Timer_Stop, "");
+                            Timer?.Invoke(1, MessageParams.Timer_Stop, "");
+                            Timer?.Invoke(2, MessageParams.Timer_Stop, "");
 
                             OnAd();
 

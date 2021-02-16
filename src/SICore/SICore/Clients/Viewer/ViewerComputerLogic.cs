@@ -210,7 +210,7 @@ namespace SICore
                     _timersInfo[timerIndex].MaxTime = maxTime;
                     break;
 
-                case "STOP":
+                case MessageParams.Timer_Stop:
                     _timersInfo[timerIndex].IsEnabled = false;
                     _timersInfo[timerIndex].PauseTime = -1;
                     break;

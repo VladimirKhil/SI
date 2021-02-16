@@ -148,12 +148,12 @@ namespace SIGame.ViewModel
 
             switch (timerCommand)
             {
-                case "GO":
+                case MessageParams.Timer_Go:
                     var maxTime = int.Parse(arg);
                     timer.Run(maxTime, false);
                     break;
 
-                case "STOP":
+                case MessageParams.Timer_Stop:
                     timer.Stop();
                     break;
 

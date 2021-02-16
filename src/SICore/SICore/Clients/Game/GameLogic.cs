@@ -507,7 +507,7 @@ namespace SICore
                     && roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
                 {
                     // Завершение раунда по времени
-                    _gameActions.SendMessageWithArgs(Messages.Timer, 0, "STOP");
+                    _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
 
                     Engine.SetTimeout();
                 }
@@ -1020,7 +1020,7 @@ namespace SICore
                     _data.AnnounceAnswer = false;
 
                     _data.IsThinking = false;
-                    _gameActions.SendMessageWithArgs(Messages.Timer, 1, "STOP");
+                    _gameActions.SendMessageWithArgs(Messages.Timer, 1, MessageParams.Timer_Stop);
 
                     if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
                     {
@@ -1259,7 +1259,7 @@ namespace SICore
             _data.IsWaiting = false;
             _data.Decision = DecisionType.None;
 
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
         }
 
         private readonly Queue<string> _tasksHistory = new Queue<string>();
@@ -1729,7 +1729,7 @@ namespace SICore
         private void WaitNext(Tasks task)
         {
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
             var playerIndex = task == Tasks.WaitNext ? _data.Order[_data.OrderIndex] : _data.ThemeDeleters.Current.PlayerIndex;
 
@@ -1772,7 +1772,7 @@ namespace SICore
                 _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
             }
 
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
             _data.StakeType = _data.StakeVariants[0] ? StakeMode.Nominal : StakeMode.Pass;
 
             OnDecision();
@@ -1943,7 +1943,7 @@ namespace SICore
 
         private void WaitFinalStake()
         {
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
@@ -2036,7 +2036,7 @@ namespace SICore
             if (_data.IsOralNow)
                 _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
 
-            _gameActions.SendMessageWithArgs(Messages.Timer, 2, "STOP");
+            _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
             _data.ThemeIndex = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
 

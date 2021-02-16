@@ -818,7 +818,7 @@ namespace SIGame.ViewModel
                 ServerConfiguration.Default,
                 new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
-            await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient));
+            await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient) { IsAuthenticated = true });
 
             _client = new Client(Human.Name);
             _client.ConnectTo(_server);

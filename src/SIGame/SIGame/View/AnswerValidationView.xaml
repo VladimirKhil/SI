@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:lc="clr-namespace:SIGame.Converters"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="544">
+             mc:Ignorable="d" Width="544" TextBlock.FontFamily="Segoe UI">
     <UserControl.Resources>
         <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
             <Setter Property="Template">
@@ -25,7 +25,7 @@
             </Setter>
         </Style>
         <DataTemplate x:Key="ItemTemplate" DataType="{x:Type sys:String}">
-            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" />
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" FontSize="15" />
         </DataTemplate>
         <lc:TrimConverter x:Key="trim" MaxLength="250" />
     </UserControl.Resources>
@@ -45,7 +45,7 @@
                     <Run Text="{x:Static lp:Resources.Validate_IsTrue}" /><Run Text=" " /><Run FontWeight="Bold" Text="{Binding ValidatorName}" /><Run Text="?" />
                 </TextBlock>
             </GroupBox.Header>
-            <TextBlock Text="{Binding Answer, Converter={StaticResource trim}}" FontSize="15" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Answer, Converter={StaticResource trim}}" FontSize="17" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
         </GroupBox>
         <Grid Background="#FFA1C2DE" Grid.Row="1" Grid.ColumnSpan="2" Visibility="{Binding AreAnswersShown, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <Grid.ColumnDefinitions>
@@ -56,11 +56,11 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Text="{x:Static lp:Resources.RightAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="13" />
+            <TextBlock Text="{x:Static lp:Resources.RightAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="15" />
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Right}" VerticalAlignment="Stretch" Height="Auto" Margin="5" ItemTemplate="{StaticResource ItemTemplate}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Left" />
             </ScrollViewer>
-            <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.WrongAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="13" />
+            <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.WrongAnswers}" FontWeight="Bold" HorizontalAlignment="Center" Margin="5" FontSize="15" />
             <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Wrong}" VerticalAlignment="Stretch" Height="Auto" Margin="5" ItemTemplate="{StaticResource ItemTemplate}" />
             </ScrollViewer>

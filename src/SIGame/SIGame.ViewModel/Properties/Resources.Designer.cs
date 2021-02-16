@@ -1123,6 +1123,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Обнаружено обновление программы до версии {0}.
+        /// </summary>
+        public static string UpdateVersionMessage {
+            get {
+                return ResourceManager.GetString("UpdateVersionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла..
         /// </summary>
         public static string UploadPackageTimeout {

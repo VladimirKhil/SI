@@ -6,7 +6,7 @@
     <SignAssembly>true</SignAssembly>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Version>7.5.2</Version>
+    <Version>7.5.4</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame data</Description>
     <Copyright>Copyright © Khil-soft 2012 - 2021</Copyright>

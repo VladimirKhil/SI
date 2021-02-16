@@ -21,7 +21,7 @@
     </UserControl.Resources>
     <TabControl Padding="0" BorderThickness="0" FontSize="19">
         <TabItem Header="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
-            <Grid>
+            <Grid TextBlock.FontFamily="Segoe UI">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="1" />
@@ -40,7 +40,7 @@
             </Grid>
         </TabItem>
         <TabItem Header="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
-            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
+            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2">
                     <Button Style="{StaticResource SIButton}" Background="#22000000" Margin="-1,-1,0,-1" Padding="20,4" Command="{Binding Kick}" CommandParameter="{Binding Source={StaticResource Persons},Path=Value}" FontSize="24" TextBlock.LineHeight="24" Content="{x:Static lp:Resources.Kick}" />
                     <Button Style="{StaticResource SIButton}" Background="#22000000" Margin="-1,-1,-1,-1" Padding="20,4" Command="{Binding Ban}" CommandParameter="{Binding Source={StaticResource Persons},Path=Value}" FontSize="24" TextBlock.LineHeight="24" Content="{x:Static lp:Resources.Ban}" />

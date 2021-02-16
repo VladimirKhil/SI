@@ -28,7 +28,7 @@
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
     <Copyright>Copyright © Khil-soft 2002-2021</Copyright>
-    <Version>7.5.2</Version>
+    <Version>7.5.4</Version>
     <LangVersion>8</LangVersion>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
@@ -42,6 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugType>portable</DebugType>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+	<Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>game.ico</ApplicationIcon>

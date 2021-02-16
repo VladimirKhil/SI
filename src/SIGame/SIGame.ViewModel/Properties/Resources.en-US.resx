@@ -483,4 +483,7 @@
   <data name="GameRule_Sport" xml:space="preserve">
     <value>simplified</value>
   </data>
+  <data name="UpdateVersionMessage" xml:space="preserve">
+    <value>Game update to version {0} found</value>
+  </data>
 </root>

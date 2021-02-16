@@ -195,7 +195,7 @@
 
         <local:DropDownButton Grid.Row="4" Cursor="Hand" Content="{x:Static lp:Resources.Manage}" ToolTip="{x:Static lp:Resources.Manage_Hint}" Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
             <local:DropDownButton.DropDown>
-                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21" TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21">
                     <ContextMenu.Resources>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="BorderThickness" Value="1" />
@@ -240,8 +240,7 @@
                     <MenuItem Header="{x:Static lp:Resources.Exit_Button}" BorderThickness="1" BorderBrush="#FF999999"
                               Cursor="Hand"
                               TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="40,2" FontSize="21"
-                              Command="{Binding EndGame}"
-                              TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                              Command="{Binding EndGame}">
                         <MenuItem.Template>
                             <ControlTemplate TargetType="{x:Type MenuItem}">
                                 <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
@@ -260,7 +259,7 @@
                         <ControlTemplate TargetType="ContextMenu">
                             <Border x:Name="Border" Background="#FFC0CFF4" BorderBrush="Gray" BorderThickness="1">
                                 <StackPanel>
-                                    <TextBlock FontSize="18" Text="{x:Static lp:Resources.ExitPrompt}" TextBlock.FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" Margin="20,20,20,0" HorizontalAlignment="Center" />
+                                    <TextBlock FontSize="18" Text="{x:Static lp:Resources.ExitPrompt}" Margin="20,20,20,0" HorizontalAlignment="Center" />
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Border>

@@ -516,7 +516,7 @@
             </Button>            
         </StackPanel>
         <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Bottom" Orientation="Horizontal" Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
-            <my:DropDownButton Content="{x:Static lp:Resources.Update}" Padding="15,3" FontSize="24" TextBlock.LineHeight="24" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+            <my:DropDownButton Content="{x:Static lp:Resources.Update}" Padding="15,3" FontSize="24" Cursor="Hand" TextBlock.LineHeight="24" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                 <my:DropDownButton.Style>
                     <Style TargetType="{x:Type my:DropDownButton}">
                         <Setter Property="BorderThickness" Value="1" />
@@ -559,7 +559,7 @@
                             <ControlTemplate TargetType="{x:Type ContextMenu}">
                                 <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
                                     <StackPanel>
-                                        <TextBlock FontSize="17" Text="{Binding UpdateVersion, StringFormat=Обнаружено обновление программы до версии \{0\}}" Margin="20,20,20,0" HorizontalAlignment="Center" />
+                                        <TextBlock FontSize="17" Text="{Binding UpdateVersionMessage}" Margin="20,20,20,0" HorizontalAlignment="Center" />
                                         <StackPanel Orientation="Horizontal" IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>

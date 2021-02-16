@@ -368,7 +368,7 @@
 
             <ProgressBar Grid.Column="2" Height="10" Foreground="{StaticResource MainColor}" VerticalAlignment="Top" Style="{StaticResource SIProgressBar}"
                          Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
-                         ToolTip="{x:Static lp:Resources.Time_Decide}"
+                         ToolTip="{x:Static lp:Resources.Time_Decide}" Opacity="1"
                          Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}" />
             
             <ContentControl Grid.Column="2" Margin="0,0,0,0" Visibility="{Binding TInfo.Pause,Converter={StaticResource BooleanToVisibilityConverter1}}">
@@ -494,7 +494,7 @@
 
         <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding Data.Hint}" FontSize="17" Style="{StaticResource HiddenTextBlock}"
                    Foreground="Black" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,5" TextWrapping="Wrap" Padding="15,0"
-                   Background="White" FontWeight="Bold">
+                   Background="White" FontWeight="Bold" FontFamily="Segoe UI">
         </TextBlock>
 
         <StackPanel Orientation="Vertical" Grid.RowSpan="2" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,63,0,0">

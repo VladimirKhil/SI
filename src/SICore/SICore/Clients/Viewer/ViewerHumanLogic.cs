@@ -619,7 +619,7 @@ namespace SICore
 
                     if (isPartial)
                     {
-                        var currentText = TInfo.Text;
+                        var currentText = TInfo.Text ?? "";
                         var newTextLength = text.Length;
 
                         var tailIndex = TInfo.TextLength + newTextLength;
@@ -1120,48 +1120,54 @@ namespace SICore
                 TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
             }
 
-            if (timerIndex == 2)
+            if (timerIndex != 2)
             {
-                switch (timerCommand)
-                {
-                    case MessageParams.Timer_Go:
-                        {
-                            if (person != null && int.TryParse(person, out int personIndex))
-                            {
-                                if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
-                                    || _data.DialogMode == DialogModes.None)
-                                {
-                                    if (personIndex == -1)
-                                    {
-                                        _data.ShowMan.IsDeciding = true;
-                                    }
-                                    else if (personIndex > -1 && personIndex < _data.Players.Count)
-                                    {
-                                        _data.Players[personIndex].IsDeciding = true;
-                                    }
-                                }
+                return;
+            }
 
-                                if (personIndex == -2)
+            switch (timerCommand)
+            {
+                case MessageParams.Timer_Go:
+                    {
+                        if (person != null && int.TryParse(person, out int personIndex))
+                        {
+                            if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
+                                || _data.DialogMode == DialogModes.None)
+                            {
+                                if (personIndex == -1)
                                 {
-                                    _data.ShowMainTimer = true;
+                                    _data.ShowMan.IsDeciding = true;
+                                }
+                                else if (personIndex > -1 && personIndex < _data.Players.Count)
+                                {
+                                    _data.Players[personIndex].IsDeciding = true;
                                 }
                             }
 
-                            break;
+                            if (personIndex == -2)
+                            {
+                                _data.ShowMainTimer = true;
+                            }
                         }
 
-                    case "STOP":
+                        break;
+                    }
+
+                case MessageParams.Timer_Stop:
+                    {
+                        if (_data.ShowMan != null)
                         {
                             _data.ShowMan.IsDeciding = false;
-                            foreach (var player in _data.Players)
-                            {
-                                player.IsDeciding = false;
-                            }
-
-                            _data.ShowMainTimer = false;
-                            break;
                         }
-                }
+
+                        foreach (var player in _data.Players)
+                        {
+                            player.IsDeciding = false;
+                        }
+
+                        _data.ShowMainTimer = false;
+                        break;
+                    }
             }
         }
 

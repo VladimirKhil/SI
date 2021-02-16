@@ -903,6 +903,7 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Text" Value="{Binding Replic}" />
             <Setter Property="Margin" Value="10" />
+            <Setter Property="FontFamily" Value="Segoe UI" />
         </Style>
 
         <Style x:Key="ReplicBorder" TargetType="Border">

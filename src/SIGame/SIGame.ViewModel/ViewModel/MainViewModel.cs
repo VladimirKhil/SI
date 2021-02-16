@@ -337,6 +337,8 @@ namespace SIGame.ViewModel
 
         public Version UpdateVersion { get; set; }
 
+        public string UpdateVersionMessage => string.Format(Resources.UpdateVersionMessage, UpdateVersion);
+
         public void ShowMenu()
         {
             if (Human.NewAccount != null)

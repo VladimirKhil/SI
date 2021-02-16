@@ -64,6 +64,11 @@ namespace SICore
         public const string Timer_Go = "GO";
 
         /// <summary>
+        /// Остановка таймера
+        /// </summary>
+        public const string Timer_Stop = "STOP";
+
+        /// <summary>
         /// Можно жать на кнопку, но вопрос ещё не окончен
         /// </summary>
         public const string Try_NotFinished = "NF";

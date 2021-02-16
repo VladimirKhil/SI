@@ -203,7 +203,7 @@
                     Margin="0,0,0,0" x:Name="gamesGrid" ItemsSource="{Binding ServerGames}"
                     SelectedItem="{Binding CurrentGame}" IsSynchronizedWithCurrentItem="True"
                     Background="#FFC0CFF4" ItemContainerStyle="{DynamicResource ListBoxItemStyle1}"
-                    FontWeight="Light">
+                    FontFamily="Segoe UI">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Name="tb" Margin="4,0,0,0" Text="{Binding GameName}" FontSize="18" TextWrapping="Wrap"
@@ -262,7 +262,7 @@
                     <ToggleButton Name="showPassword" Style="{StaticResource SIButtonSimple}" Foreground="Black" BorderThickness="0" Grid.Column="1"
                           Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,8,0" FontSize="10">👁</ToggleButton>
                 </Grid>
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" TextBlock.FontFamily="Segoe UI">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style x:Key="Header" TargetType="{x:Type TextBlock}">
@@ -307,7 +307,7 @@
             <TextBlock Grid.Row="0" Grid.Column="1" Margin="5,0,5,0" Foreground="#FFC10000" Text="{Binding Error}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <TabControl Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,-5,0,0" Padding="0" BorderThickness="0" FontSize="23">
                 <TabItem Header="{x:Static lp:Resources.Tab_Chat}" Style="{StaticResource TabItemStyle1}">
-                    <DockPanel>
+                    <DockPanel TextBlock.FontFamily="Segoe UI">
                         <DockPanel DockPanel.Dock="Bottom" Height="46" Background="#FF5A95E2">
                             <local:DropDownButton Style="{StaticResource SIButtonSimple}" Content="😃" BorderThickness="0" DockPanel.Dock="Right" VerticalAlignment="Top" Width="30" Height="30">
                                 <local:DropDownButton.DropDown>
@@ -370,7 +370,7 @@
                             </Border>
                         </DataTemplate>
                     </TabItem.HeaderTemplate>
-                    <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18">
+                    <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18" TextBlock.FontFamily="Segoe UI">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" Margin="10,5">
