@@ -140,7 +140,12 @@ namespace SIGame.ViewModel
         {
             _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
-            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, true) { Human = Human, ChangeSettings = ChangeSettings };
+            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, true)
+            {
+                Human = Human,
+                ChangeSettings = ChangeSettings
+            };
+
             GameSettings.StartGame += OnStartGame;
             GameSettings.PrepareForGame();
 

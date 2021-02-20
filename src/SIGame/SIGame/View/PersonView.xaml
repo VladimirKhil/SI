@@ -177,7 +177,7 @@
         </Border>
         
         <Canvas>
-            <Border Style="{StaticResource ReplicBorder}" BorderBrush="Gray" BorderThickness="1" CornerRadius="10" Effect="{StaticResource Effect}">
+            <Border Style="{StaticResource PlayerReplicBorder}" BorderBrush="Gray" BorderThickness="1" CornerRadius="10" Effect="{StaticResource Effect}">
                 <TextBlock uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="26" Style="{StaticResource ReplicText}" />
             </Border>
         </Canvas>

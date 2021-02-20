@@ -907,21 +907,43 @@
         </Style>
 
         <Style x:Key="ReplicBorder" TargetType="Border">
+            <Setter Property="Opacity" Value="0.0" />
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Background" Value="Lavender" />
+        </Style>
+
+        <Style x:Key="PlayerReplicBorder" TargetType="Border" BasedOn="{StaticResource ReplicBorder}">
             <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.96}" />
             <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.5}" />
             <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.254}" />
             <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.08}" />
-            <Setter Property="Opacity" Value="0.0" />
-            <Setter Property="IsHitTestVisible" Value="False" />
-            <Setter Property="Background" Value="Lavender" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsShowman}" Value="True">
-                    <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.8}" />
-                    <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.45}" />
-                    <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.48}" />
-                    <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.1}" />
-                    <Setter Property="Canvas.Bottom" Value="{x:Static sys:Double.NaN}" />
+                <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1.0" Duration="00:00:00.3" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" Duration="00:00:00.3" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.ExitActions>
                 </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ShowmanReplicBorder" TargetType="Border" BasedOn="{StaticResource ReplicBorder}">
+            <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.96}" />
+            <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.75}" />
+            <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.76}" />
+            <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.03}" />
+            <Setter Property="Canvas.Bottom" Value="{x:Static sys:Double.NaN}" />
+            <Style.Triggers>
                 <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
                     <DataTrigger.EnterActions>
                         <BeginStoryboard>

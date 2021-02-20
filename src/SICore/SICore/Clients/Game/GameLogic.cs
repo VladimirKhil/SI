@@ -29,16 +29,24 @@ namespace SICore
 
         private const int MaxAnswerLength = 250;
 
-        private readonly Game _actor;
         private readonly GameActions _gameActions;
         private readonly ILocalizer LO;
 
+        private readonly Action _autoGame;
+
         public SIEngine.EngineBase Engine { get; private set; }
 
-        public GameLogic(Game game, GameData data, GameActions gameActions, ILocalizer localizer)
+        public event Action<GameStages, string> StageChanged;
+        public event Action<string, int, int> AdShown;
+
+        internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(stage, stageName);
+        internal void OnAdShown(int adId) =>
+            AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
+
+        public GameLogic(GameData data, GameActions gameActions, ILocalizer localizer, Action autoGame)
             : base(data)
         {
-            _actor = game;
+            _autoGame = autoGame;
             _gameActions = gameActions;
             LO = localizer;
         }
@@ -1635,7 +1643,7 @@ namespace SICore
                             _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
 
                             _data.Stage = GameStage.After;
-                            _actor.OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
+                            OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
                             _gameActions.InformStage();
 
                             _data.ReportsCount = _data.Players.Count;
@@ -1655,7 +1663,7 @@ namespace SICore
                             break;
 
                         case Tasks.AutoGame:
-                            AutoGame();
+                            _autoGame();
                             break;
                     }
                 }
@@ -2154,7 +2162,7 @@ namespace SICore
 #if !DEBUG
                     ClientData.MoveNextBlocked = true;
 #endif
-                    _actor.OnAdShown(adId);
+                    OnAdShown(adId);
                     adShown = true;
                 }
                 else
@@ -2481,23 +2489,6 @@ namespace SICore
             {
                 ScheduleExecution(Tasks.MoveNext, 1);
             }
-        }
-
-        /// <summary>
-        /// Начать игру даже при отсутствии участников (заполнив пустые слоты ботами)
-        /// </summary>
-        internal void AutoGame()
-        {
-            // Заполняем пустые слоты ботами
-            for (int i = 0; i < _data.Players.Count; i++)
-            {
-                if (!_data.Players[i].IsConnected)
-                {
-                    _actor.ChangePersonType(Constants.Player, i.ToString(), null);
-                }
-            }
-
-            _actor.StartGame();
         }
 
         internal void Announce()
@@ -3839,14 +3830,14 @@ namespace SICore
                 if (round.Type == RoundTypes.Final)
                 {
                     _data.Stage = GameStage.Final;
-                    _actor.OnStageChanged(GameStages.Final, LO[nameof(R.Final)]);
+                    OnStageChanged(GameStages.Final, LO[nameof(R.Final)]);
                     ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
                     return;
                 }
                 else
                 {
                     _data.Stage = GameStage.Round;
-                    _actor.OnStageChanged(GameStages.Round, round.Name);
+                    OnStageChanged(GameStages.Round, round.Name);
                 }
 
                 var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
@@ -3942,7 +3933,7 @@ namespace SICore
 #endif
                         adShown = true;
 
-                        _actor.OnAdShown(adId);
+                        OnAdShown(adId);
                     }
                     else
                     {

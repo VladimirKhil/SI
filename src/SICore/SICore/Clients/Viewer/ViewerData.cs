@@ -188,6 +188,8 @@ namespace SICore
             }
         }
 
+        public bool IsInfoInitialized { get; set; }
+
         public bool IsChatOpened { get; set; } = true;
 
         /// <summary>
@@ -316,7 +318,7 @@ namespace SICore
                 throw new Exception($"OnAllPersonsChanged error: {PersonsUpdateHistory}", exc);
             }
 
-            if (!AllPersons.ContainsKey(Name))
+            if (IsInfoInitialized && !AllPersons.ContainsKey(Name))
             {
                 throw new Exception($"!AllPersons.ContainsKey({Name})! {string.Join(",", AllPersons.Keys)} {PersonsUpdateHistory}");
             }

@@ -1680,12 +1680,12 @@ namespace SICore
 
         private async ValueTask ProcessInfoAsync(string[] mparams)
         {
-            int.TryParse(mparams[1], out int numOfPlayers);
-            int numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
+            int.TryParse(mparams[1], out var numOfPlayers);
+            var numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
 
             var gameStarted = ClientData.Stage != GameStage.Before;
 
-            int mIndex = 2;
+            var mIndex = 2;
             ClientData.BeginUpdatePersons($"ProcessInfo {string.Join(" ", mparams)}");
             try
             {
@@ -1732,6 +1732,7 @@ namespace SICore
                 }
 
                 ClientData.Viewers = newViewers;
+                ClientData.IsInfoInitialized = true;
             }
             finally
             {

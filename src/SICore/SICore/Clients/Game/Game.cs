@@ -26,16 +26,10 @@ namespace SICore
     /// </summary>
     public sealed class Game : Actor<GameData, GameLogic>
     {
-        public event Action<GameStages, string> StageChanged;
         public event Action<bool, bool> PersonsChanged;
         public event Action<string> DisconnectRequested;
-        public event Action<string, int, int> AdShown;
 
         private readonly GameActions _gameActions;
-
-        internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(stage, stageName);
-
-        internal void OnAdShown(int adId) => AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
 
         private IMasterServer MasterServer => (IMasterServer)_client.Server;
 
@@ -61,7 +55,7 @@ namespace SICore
             _defaultShowmans = defaultShowmans ?? throw new ArgumentNullException(nameof(defaultShowmans));
         }
 
-        protected override GameLogic CreateLogic(Account personData) => new GameLogic(this, ClientData, _gameActions, LO);
+        protected override GameLogic CreateLogic(Account personData) => new GameLogic(ClientData, _gameActions, LO, AutoGame);
 
         public override async ValueTask DisposeAsync(bool disposing)
         {
@@ -2477,7 +2471,7 @@ namespace SICore
         {
             ClientData.Stage = GameStage.Begin;
 
-            OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
+            _logic.OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
             _gameActions.InformStage();
 
             ClientData.IsOral = ClientData.Settings.AppSettings.Oral && ClientData.ShowMan.IsHuman;
@@ -2682,6 +2676,23 @@ namespace SICore
             {
                 return file;
             }
+        }
+
+        /// <summary>
+        /// Начать игру даже при отсутствии участников (заполнив пустые слоты ботами)
+        /// </summary>
+        internal void AutoGame()
+        {
+            // Заполняем пустые слоты ботами
+            for (int i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (!ClientData.Players[i].IsConnected)
+                {
+                    ChangePersonType(Constants.Player, i.ToString(), null);
+                }
+            }
+
+            StartGame();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SICore.Connections;
-using SICore.Network;
 using SIData;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -1136,7 +1135,10 @@ namespace SICore
                             {
                                 if (personIndex == -1)
                                 {
-                                    _data.ShowMan.IsDeciding = true;
+                                    if (_data.ShowMan != null)
+                                    {
+                                        _data.ShowMan.IsDeciding = true;
+                                    }
                                 }
                                 else if (personIndex > -1 && personIndex < _data.Players.Count)
                                 {

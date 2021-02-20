@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -326,11 +327,10 @@ namespace SIGame.ViewModel
 
         public ICommand SelectPackage => _selectPackage;
 
-        private ICommand closeNewShowman;
-        private ICommand closeNewPlayer;
+        private ICommand _closeNewShowman;
+        private ICommand _closeNewPlayer;
 
         private readonly CommonSettings _commonSettings;
-        private readonly UserSettings _userSettings;
 
         internal event Func<GameSettings, PackageSource, Task<Tuple<SlaveServer, IViewerClient>>> CreateGame;
         public event Action<ContentBox> Navigate;
@@ -351,12 +351,15 @@ namespace SIGame.ViewModel
             set { _message = value; OnPropertyChanged(); }
         }
 
-        public GameSettingsViewModel(GameSettings gameSettings, CommonSettings commonSettings, UserSettings userSettings, bool isNetworkGame = false)
+        public GameSettingsViewModel(
+            GameSettings gameSettings,
+            CommonSettings commonSettings,
+            UserSettings userSettings,
+            bool isNetworkGame = false)
             : base(gameSettings)
         {
             NetworkGame = isNetworkGame;
             _commonSettings = commonSettings;
-            _userSettings = userSettings;
 
             UpdateComputerPlayers();
             UpdateComputerShowmans();
@@ -420,10 +423,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void GameSettings_Updated()
-        {
-            OnPropertyChanged(nameof(NetworkPort));
-        }
+        private void GameSettings_Updated() => OnPropertyChanged(nameof(NetworkPort));
 
         protected override void Initialize()
         {
@@ -438,8 +438,8 @@ namespace SIGame.ViewModel
             RemoveShowmanAccount = new CustomCommand(RemoveShowmanAccount_Executed);
             EditComputerAccount = new CustomCommand(EditComputerAccount_Executed);
 
-            closeNewShowman = new CustomCommand(CloseNewShowman_Executed);
-            closeNewPlayer = new CustomCommand(CloseNewPlayer_Executed);
+            _closeNewShowman = new CustomCommand(CloseNewShowman_Executed);
+            _closeNewPlayer = new CustomCommand(CloseNewPlayer_Executed);
 
             SetErrorMessage();
         }
@@ -593,6 +593,11 @@ namespace SIGame.ViewModel
                     BeginNewGameCompleted(document, path);
                 }
             }
+            catch (TargetInvocationException exc) when (exc.InnerException != null)
+            {
+                ErrorMessage = exc.InnerException.Message;
+                FullError = exc.ToString();
+            }
             catch (Exception exc)
             {
                 ErrorMessage = exc.Message;
@@ -729,7 +734,7 @@ namespace SIGame.ViewModel
                     var account = new ComputerAccount { CanBeDeleted = true };
                     var newShowmanAccount = new ShowmanViewModel(account);
                     newShowmanAccount.Add += NewShowmanAccount_Add;
-                    var contentBox = new ContentBox { Data = newShowmanAccount, Title = Resources.NewShowman, Cancel = closeNewShowman };
+                    var contentBox = new ContentBox { Data = newShowmanAccount, Title = Resources.NewShowman, Cancel = _closeNewShowman };
                     Navigate?.Invoke(contentBox);
 
                     return;
@@ -786,7 +791,7 @@ namespace SIGame.ViewModel
 
                     var newComputerAccount = new ComputerAccountViewModel(account, null);
                     newComputerAccount.Add += NewComputerAccount_Add;
-                    var contentBox = new ContentBox { Data = newComputerAccount, Title = Resources.NewPlayer, Cancel = closeNewPlayer };
+                    var contentBox = new ContentBox { Data = newComputerAccount, Title = Resources.NewPlayer, Cancel = _closeNewPlayer };
                     Navigate?.Invoke(contentBox);
                 }
 

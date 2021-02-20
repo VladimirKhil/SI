@@ -411,15 +411,15 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="14*" />
-                    <RowDefinition Height="22*" />
+                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="18*" />
                 </Grid.RowDefinitions>
 
                 <ProgressBar Grid.ColumnSpan="3" Style="{StaticResource SIProgressBar}" Value="{Binding Timers[0].Time}"
                              ToolTip="{x:Static lp:Resources.Time_Round}" Margin="68,0,0,0" />
 
                 <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" CornerRadius="10" Effect="{StaticResource Effect}"
-                        Margin="80,10,20,90" Background="Lavender">
+                        Margin="80,10,20,165" Background="Lavender">
                     <TextBlock uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="26" Style="{StaticResource ReplicText}"
                                Text="{Binding Data.QuestionCaption}"/>
                     <Border.Style>
