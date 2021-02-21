@@ -27,7 +27,7 @@ namespace SIGame.ViewModel
 {
     public sealed class GameSettingsViewModel: ViewModelWithNewAccount<GameSettings>, INavigatable
     {
-        private static Random Random = new Random();
+        private static readonly Random Random = new Random();
 
         private string unique = null;
 
@@ -592,6 +592,10 @@ namespace SIGame.ViewModel
                     var (document, path) = await BeginNewGameAsync();
                     BeginNewGameCompleted(document, path);
                 }
+            }
+            catch (PortIsUsedException)
+            {
+                ErrorMessage = string.Format(Resources.PortIsUsedError, _model.AppSettings.MultimediaPort);
             }
             catch (TargetInvocationException exc) when (exc.InnerException != null)
             {

@@ -526,6 +526,7 @@
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
+                                <Setter Property="Background" Value="{StaticResource HoverColor}" />
                             </Trigger>
                             <DataTrigger Binding="{Binding Update}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -535,13 +536,14 @@
                 </my:DropDownButton.Style>
                 <my:DropDownButton.Template>
                     <ControlTemplate TargetType="{x:Type my:DropDownButton}">
-                        <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                        <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
                             <ContentPresenter Margin="{TemplateBinding Padding}" x:Name="text" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                         </Border>
                     </ControlTemplate>
                 </my:DropDownButton.Template>
                 <my:DropDownButton.DropDown>
-                    <ContextMenu Placement="Relative" HorizontalOffset="-20" VerticalOffset="-128">
+                    <ContextMenu Placement="Relative" HorizontalOffset="-20" VerticalOffset="-128" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                         <ContextMenu.Resources>
                             <ControlTemplate x:Key="MenuTemplate" TargetType="{x:Type MenuItem}">
                                 <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
@@ -559,7 +561,7 @@
                             <ControlTemplate TargetType="{x:Type ContextMenu}">
                                 <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
                                     <StackPanel>
-                                        <TextBlock FontSize="17" Text="{Binding UpdateVersionMessage}" Margin="20,20,20,0" HorizontalAlignment="Center" />
+                                        <TextBlock FontSize="24" Text="{Binding UpdateVersionMessage}" Margin="20,20,20,0" HorizontalAlignment="Center" />
                                         <StackPanel Orientation="Horizontal" IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
@@ -570,8 +572,8 @@
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ContextMenu.Template>
-                        <MenuItem Header="{x:Static lp:Resources.RunUpdate}" Template="{StaticResource MenuTemplate}" Command="{Binding Update}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="19" />
-                        <MenuItem Header="{x:Static lp:Resources.Skip}" Margin="5,0,0,0" Template="{StaticResource MenuTemplate}" Command="{Binding CancelUpdate}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="19" />
+                        <MenuItem Header="{x:Static lp:Resources.RunUpdate}" Template="{StaticResource MenuTemplate}" Command="{Binding Update}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
+                        <MenuItem Header="{x:Static lp:Resources.Skip}" Margin="5,0,0,0" Template="{StaticResource MenuTemplate}" Command="{Binding CancelUpdate}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
                     </ContextMenu>
                 </my:DropDownButton.DropDown>
             </my:DropDownButton>

@@ -844,6 +844,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Мультимедиа-порт {0} уже занят (возможно, одна игра уже запущена?). Попробуйте задать другой порт в настройках.
+        /// </summary>
+        public static string PortIsUsedError {
+            get {
+                return ResourceManager.GetString("PortIsUsedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Необходимо задать номер порта.
         /// </summary>
         public static string PortNumberRequired {

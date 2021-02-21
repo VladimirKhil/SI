@@ -24,7 +24,7 @@ namespace SICore
         private bool _disposed = false;
 
         protected readonly ViewerActions _viewerActions;
-        protected readonly ILocalizer LO;
+        protected readonly ILocalizer _localizer;
 
         public TableInfoViewModel TInfo { get; }
 
@@ -34,7 +34,7 @@ namespace SICore
             : base(data)
         {
             _viewerActions = viewerActions;
-            LO = localizer;
+            _localizer = localizer;
 
             TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
 
@@ -49,14 +49,14 @@ namespace SICore
             string error;
             if (exc is NotSupportedException)
             {
-                error = $"{LO[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
+                error = $"{_localizer[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
             }
             else
             {
                 error = exc.ToString();
             }
 
-            _data.OnAddString(null, $"{LO[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
+            _data.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
         }
 
         private void TInfo_Ready(object sender, EventArgs e)
@@ -140,7 +140,7 @@ namespace SICore
             }
             catch (XmlException exc)
             {
-                throw new Exception($"{LO[nameof(R.StringParseError)]} {text}.", exc);
+                throw new Exception($"{_localizer[nameof(R.StringParseError)]} {text}.", exc);
             }
 
             var toFormStr = chatMessageBuilder.ToString();
@@ -289,7 +289,7 @@ namespace SICore
                 }
                 catch (IOException exc)
                 {
-                    _data.OnAddString(null, $"{LO[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                    _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                     try
                     {
                         _data.ProtocolWriter.Dispose();
@@ -304,7 +304,7 @@ namespace SICore
                 }
                 catch (EncoderFallbackException exc)
                 {
-                    _data.OnAddString(null, $"{LO[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
+                    _data.OnAddString(null, $"{_localizer[nameof(R.ErrorWritingLogToDisc)]}: {exc.Message}", LogMode.Log);
                 }
             }
         }
@@ -344,11 +344,11 @@ namespace SICore
                             s = "<span style=\"color: #00FFFF; font-weight:bold\">";
                         else
                         {
-                            _data.SystemLog.AppendLine(LO[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
+                            _data.SystemLog.AppendLine(_localizer[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
                             return;
                         }
 
-                        var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + LO[nameof(R.UnknownPerson)] + ">";
+                        var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
                         chatMessageBuilder.AppendFormat("{0}: ", playerName);
                         logMessageBuilder.AppendFormat("{0}{1}: </span>", s, playerName);
                     }
@@ -400,7 +400,7 @@ namespace SICore
                             var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out string path);
                             _data.ProtocolPath = path;
                             _data.ProtocolWriter = new StreamWriter(stream);
-                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + LO[nameof(R.LogTitle)] + "</title></head><body style=\"font-face: Verdana\">");
+                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title></head><body style=\"font-face: Verdana\">");
                         }
                         catch (IOException)
                         {
@@ -416,7 +416,7 @@ namespace SICore
                         }
                     }
 
-                    OnReplic(ReplicCodes.Special.ToString(), $"{LO[nameof(R.GameStarted)]} {DateTime.Now}");
+                    OnReplic(ReplicCodes.Special.ToString(), $"{_localizer[nameof(R.GameStarted)]} {DateTime.Now}");
                     break;
 
                 case GameStage.Round:
@@ -437,7 +437,7 @@ namespace SICore
                     if (_data.ProtocolWriter != null)
                         _data.ProtocolWriter.Write("</body></html>");
                     else
-                        _data.OnAddString(null, LO[nameof(R.ErrorWritingLogs)], LogMode.Chat);
+                        _data.OnAddString(null, _localizer[nameof(R.ErrorWritingLogs)], LogMode.Chat);
                     break;
 
                 default:
@@ -662,7 +662,7 @@ namespace SICore
                             }
                             else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
                             {
-                                TInfo.Text = string.Format(LO[nameof(R.ExternalLink)], uri);
+                                TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
                                 return;
@@ -677,7 +677,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        var warningMessage = string.Format(LO[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
+                        var warningMessage = string.Format(_localizer[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
 
                         TInfo.QuestionContentType = QuestionContentType.Text;
                         TInfo.Sound = false;
@@ -742,7 +742,7 @@ namespace SICore
                             }
                             else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
                             {
-                                TInfo.Text = string.Format(LO[nameof(R.ExternalLink)], uri);
+                                TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
                             }
@@ -756,7 +756,7 @@ namespace SICore
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                        OnReplic(ReplicCodes.System.ToString(), _localizer[nameof(R.HttpsProtocolIsNotSupported)]);
                         return;
                     }
 
@@ -860,7 +860,7 @@ namespace SICore
         {
             if (_data.QuestionType == QuestionTypes.Auction)
             {
-                TInfo.Text = LO[nameof(R.Label_Auction)];
+                TInfo.Text = _localizer[nameof(R.Label_Auction)];
 
                 lock (TInfo.RoundInfoLock)
                 {
@@ -875,7 +875,7 @@ namespace SICore
             }
             else if (_data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat)
             {
-                TInfo.Text = LO[nameof(R.Label_CatInBag)];
+                TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -889,7 +889,7 @@ namespace SICore
             }
             else if (_data.QuestionType == QuestionTypes.Sponsored)
             {
-                TInfo.Text = LO[nameof(R.Label_Sponsored)];
+                TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -1015,7 +1015,7 @@ namespace SICore
         {
             try
             {
-                OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.TryReconnect)]);
+                OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.TryReconnect)]);
 
                 var result = await connector.ReconnectToServer();
                 if (!result)
@@ -1024,7 +1024,7 @@ namespace SICore
                     return;
                 }
 
-                OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.ReconnectOK)]);
+                OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.ReconnectOK)]);
                 await connector.RejoinGame();
 
                 if (!string.IsNullOrEmpty(connector.Error))
@@ -1035,7 +1035,7 @@ namespace SICore
                         OnReplic(ReplicCodes.Special.ToString(), connector.Error);
                 }
                 else
-                    OnReplic(ReplicCodes.Special.ToString(), LO[nameof(R.ReconnectEntered)]);
+                    OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.ReconnectEntered)]);
             }
             catch (Exception exc)
             {
@@ -1104,7 +1104,7 @@ namespace SICore
         public async void PrintGreeting()
         {
             await Task.Delay(1000);
-            _data.OnAddString(null, LO[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            _data.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
         }
 
         public void OnTimeChanged()
@@ -1198,7 +1198,7 @@ namespace SICore
 
             if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
             {
-                OnReplic(ReplicCodes.System.ToString(), LO[nameof(R.HttpsProtocolIsNotSupported)]);
+                OnReplic(ReplicCodes.System.ToString(), _localizer[nameof(R.HttpsProtocolIsNotSupported)]);
                 return;
             }
 

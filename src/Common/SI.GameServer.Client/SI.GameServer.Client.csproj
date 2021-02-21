@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <Version>7.5.4</Version>
+    <Version>7.5.5</Version>
     <Company>Khil-soft</Company>
     <Copyright>Copyright © Khil-soft 2021</Copyright>
     <LangVersion>8</LangVersion>

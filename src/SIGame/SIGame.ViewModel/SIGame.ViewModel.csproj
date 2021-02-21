@@ -9,7 +9,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Version>7.5.4</Version>
+    <Version>7.5.5</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame app</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2021</Copyright>

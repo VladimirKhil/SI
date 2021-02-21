@@ -483,4 +483,7 @@
   <data name="UpdateVersionMessage" xml:space="preserve">
     <value>Обнаружено обновление программы до версии {0}</value>
   </data>
+  <data name="PortIsUsedError" xml:space="preserve">
+    <value>Мультимедиа-порт {0} уже занят (возможно, одна игра уже запущена?). Попробуйте задать другой порт в настройках</value>
+  </data>
 </root>

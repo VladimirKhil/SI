@@ -5,12 +5,16 @@ using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
+using System.Reflection;
 using System.Web.Http;
 
 namespace SIGame.ViewModel.Web
 {
     public sealed class WebManager : ShareBase
     {
+        private const int AddressIsUsedErrorCode = 10048;
+
         internal static WebManager Current;
 
         private class Startup
@@ -56,7 +60,17 @@ namespace SIGame.ViewModel.Web
                         Port = _multimediaPort
                     };
 
-                    _web = WebApp.Start<Startup>(options);
+                    try
+                    {
+                        _web = WebApp.Start<Startup>(options);
+                    }
+                    catch (TargetInvocationException exc)
+                        when (exc.InnerException is SocketException socketException
+                        && socketException.NativeErrorCode == AddressIsUsedErrorCode)
+                    {
+                        throw new PortIsUsedException();
+                    }
+
                     Current = this;
                 }
             }

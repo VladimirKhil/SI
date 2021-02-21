@@ -486,4 +486,7 @@
   <data name="UpdateVersionMessage" xml:space="preserve">
     <value>Game update to version {0} found</value>
   </data>
+  <data name="PortIsUsedError" xml:space="preserve">
+    <value>Multimedia port {0} is alreay used (another game running?). Try to set another port in settings</value>
+  </data>
 </root>

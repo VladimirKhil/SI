@@ -109,10 +109,8 @@ namespace SIGame
             }
         }
 
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
             Trace.TraceError(e.ExceptionObject.ToString());
-        }
 
         private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

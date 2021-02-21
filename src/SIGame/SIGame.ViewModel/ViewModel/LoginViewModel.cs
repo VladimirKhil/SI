@@ -73,10 +73,8 @@ namespace SIGame.ViewModel
             ShowFullError = new CustomCommand(ShowFullError_Executed);
         }
 
-        private void ShowFullError_Executed(object arg)
-        {
+        private void ShowFullError_Executed(object arg) =>
             PlatformSpecific.PlatformManager.Instance.ShowMessage(FullError, PlatformSpecific.MessageType.Warning, true);
-        }
 
         private async Task Enter_ExecutedAsync(object arg)
         {
@@ -96,17 +94,20 @@ namespace SIGame.ViewModel
 
             IGameServerClient client = null;
 
+            NewServerInfo serverInfo;
             try
             {
-                var uri = await GetGameServerUriAsync();
+                serverInfo = await GetGameServerUriAsync();
+            }
+            catch (Exception exc)
+            {
+                Error = $"{Resources.CannotGetServerAddress} {exc.Message}";
+                return;
+            }
 
-                if (uri == null)
-                {
-                    Error = Resources.CannotGetServerAddress;
-                    return;
-                }
-
-                if (uri.ProtocolVersion > ClientProtocolVersion)
+            try
+            {
+                if (serverInfo.ProtocolVersion > ClientProtocolVersion)
                 {
                     IsProgress = false;
                     Enter.CanBeExecuted = true;
@@ -116,7 +117,7 @@ namespace SIGame.ViewModel
 
                 var gameServerClientOptions = new GameServerClientOptions
                 {
-                    ServiceUri = uri.Uri + (uri.Uri.EndsWith("/") ? "" : "/")
+                    ServiceUri = serverInfo.Uri + (serverInfo.Uri.EndsWith("/") ? "" : "/")
                 };
 
                 client = new GameServerClient(gameServerClientOptions, PlatformSpecific.PlatformManager.Instance);
@@ -176,18 +177,10 @@ namespace SIGame.ViewModel
                 };
             }
 
-            try
-            {
-                var siStorageServiceClient = new SIStorageServiceClient();
-                var uris = await siStorageServiceClient.GetGameServersUrisAsync(_cancellationTokenSource.Token);
-                
-                return uris?.FirstOrDefault();
-            }
-            catch (Exception exc)
-            {
-                Trace.TraceError($"{nameof(GetGameServerUriAsync)}: {exc}");
-                return null;
-            }
+            var siStorageServiceClient = new SIStorageServiceClient();
+            var uris = await siStorageServiceClient.GetGameServersUrisAsync(_cancellationTokenSource.Token);
+
+            return uris?.FirstOrDefault();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

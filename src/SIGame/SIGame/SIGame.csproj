@@ -28,7 +28,7 @@
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
     <Copyright>Copyright © Khil-soft 2002-2021</Copyright>
-    <Version>7.5.4</Version>
+    <Version>7.5.5</Version>
     <LangVersion>8</LangVersion>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
