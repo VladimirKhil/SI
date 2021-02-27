@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("SImulator")]
 [assembly: AssemblyDescription("SIGame emulator")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Svoyak-soft")]
+[assembly: AssemblyCompany("Khil-soft")]
 [assembly: AssemblyProduct("SImulator")]
-[assembly: AssemblyCopyright("Copyright © Svoyak-soft 2010 - 2020")]
+[assembly: AssemblyCopyright("Copyright © Khil-soft 2010 - 2021")]
 [assembly: AssemblyTrademark("Vladimir Khil")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.7.0.0")]
-[assembly: AssemblyFileVersion("2.7.0.0")]
+[assembly: AssemblyVersion("2.8.0.0")]
+[assembly: AssemblyFileVersion("2.8.0.0")]

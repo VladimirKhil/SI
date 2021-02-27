@@ -42,9 +42,9 @@ namespace SIGame.ViewModel
             _upgrade = upgrade;
         }
 
-        public void SetGameID(int gameID)
+        public void SetGameID(int gameId)
         {
-            GameId = gameID;
+            GameId = gameId;
         }
 
         public async Task<bool> ReconnectToServer()
@@ -128,7 +128,7 @@ namespace SIGame.ViewModel
                 var command = $"{Messages.Connect}\n{_role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{0}{_credentials}";
 
                 var message = await _connector.JoinGameAsync(command);
-                JoinGameCompletedAsync();
+                await JoinGameCompletedAsync();
                 IsReconnecting = false;
             }
             catch (Exception exc)

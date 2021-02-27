@@ -1,5 +1,4 @@
-﻿using SI.GameServer.Client;
-using SICore.PlatformSpecific;
+﻿using SICore.PlatformSpecific;
 using SIGame.Implementation;
 using SIGame.ViewModel;
 using SIUI.ViewModel.Core;
@@ -156,7 +155,11 @@ namespace SIGame
 
             if (inner is FileNotFoundException)
             {
-                MessageBox.Show($"{SIGame.Properties.Resources.Error_FilesBroken}: {inner.Message}. {SIGame.Properties.Resources.TryReinstallApp}.", CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"{SIGame.Properties.Resources.Error_FilesBroken}: {inner.Message}. {SIGame.Properties.Resources.TryReinstallApp}.",
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
                 return;
             }
 
@@ -208,7 +211,12 @@ namespace SIGame
         internal static string UserConfigFileName = "user.config";
 
         public const string SettingsFolderName = "Settings";
-        private static readonly string SettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CommonSettings.ManufacturerEn, CommonSettings.AppNameEn, SettingsFolderName);
+
+        private static readonly string SettingsFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            CommonSettings.ManufacturerEn,
+            CommonSettings.AppNameEn,
+            SettingsFolderName);
 
         /// <summary>
         /// Загрузить общие настройки
@@ -223,14 +231,16 @@ namespace SIGame
                 {
                     try
                     {
-                        using (var stream = File.Open(commonSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                            return CommonSettings.Load(stream);
-                        }
+                        using var stream = File.Open(commonSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return CommonSettings.Load(stream);
                     }
                     catch (Exception exc)
                     {
-                        MessageBox.Show($"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}", ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        MessageBox.Show(
+                            $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
+                            ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Exclamation);
                     }
                     finally
                     {
@@ -238,32 +248,32 @@ namespace SIGame
                     }
                 }
 
-                using (var file = IsolatedStorageFile.GetMachineStoreForAssembly())
+                using var file = IsolatedStorageFile.GetMachineStoreForAssembly();
+                if (file.FileExists(CommonConfigFileName) && Monitor.TryEnter(CommonConfigFileName, 2000))
                 {
-                    if (file.FileExists(CommonConfigFileName) && Monitor.TryEnter(CommonConfigFileName, 2000))
+                    try
                     {
-                        try
-                        {
-                            using (var stream = file.OpenFile(CommonConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                return CommonSettings.Load(stream);
-                            }
-                        }
-                        catch (Exception exc)
-                        {
-                            MessageBox.Show(SIGame.Properties.Resources.Error_SettingsLoading + ": " + exc.Message + ". " + SIGame.Properties.Resources.DefaultSettingsWillBeUsed, ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        }
-                        finally
-                        {
-                            Monitor.Exit(CommonConfigFileName);
-                        }
+                        using var stream = file.OpenFile(CommonConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return CommonSettings.Load(stream);
                     }
-                    else
+                    catch (Exception exc)
                     {
-                        var oldSettings = CommonSettings.LoadOld(CommonConfigFileName);
-                        if (oldSettings != null)
-                            return oldSettings;
+                        MessageBox.Show(
+                            $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
+                            ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Exclamation);
                     }
+                    finally
+                    {
+                        Monitor.Exit(CommonConfigFileName);
+                    }
+                }
+                else
+                {
+                    var oldSettings = CommonSettings.LoadOld(CommonConfigFileName);
+                    if (oldSettings != null)
+                        return oldSettings;
                 }
             }
             catch { }
@@ -286,10 +296,8 @@ namespace SIGame
                 {
                     try
                     {
-                        using (var stream = File.Create(commonSettingsFile))
-                        {
-                            settings.Save(stream);
-                        }
+                        using var stream = File.Create(commonSettingsFile);
+                        settings.Save(stream);
                     }
                     finally
                     {
@@ -299,7 +307,11 @@ namespace SIGame
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"{SIGame.Properties.Resources.Error_SettingsSaving}: {exc.Message}", ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(
+                    $"{SIGame.Properties.Resources.Error_SettingsSaving}: {exc.Message}",
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
             }
         }
 
@@ -316,14 +328,16 @@ namespace SIGame
                 {
                     try
                     {
-                        using (var stream = File.Open(userSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                            return UserSettings.Load(stream);
-                        }
+                        using var stream = File.Open(userSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return UserSettings.Load(stream);
                     }
                     catch (Exception exc)
                     {
-                        MessageBox.Show($"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}", ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        MessageBox.Show(
+                            $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
+                            ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Exclamation);
                     }
                     finally
                     {
@@ -331,33 +345,33 @@ namespace SIGame
                     }
                 }
 
-                using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
+                using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                if (file.FileExists(UserConfigFileName) && Monitor.TryEnter(UserConfigFileName, 2000))
                 {
-                    if (file.FileExists(UserConfigFileName) && Monitor.TryEnter(UserConfigFileName, 2000))
+                    try
                     {
-                        try
-                        {
-                            using (var stream = file.OpenFile(UserConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                return UserSettings.Load(stream);
-                            }
-                        }
-                        catch (Exception exc)
-                        {
-                            MessageBox.Show(SIGame.Properties.Resources.Error_SettingsLoading + ": " + exc.Message + ". " + SIGame.Properties.Resources.DefaultSettingsWillBeUsed, ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        using var stream = file.OpenFile(UserConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return UserSettings.Load(stream);
+                    }
+                    catch (Exception exc)
+                    {
+                        MessageBox.Show(
+                            $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
+                            ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Exclamation);
 
-                        }
-                        finally
-                        {
-                            Monitor.Exit(UserConfigFileName);
-                        }
                     }
-                    else
+                    finally
                     {
-                        var oldSettings = UserSettings.LoadOld(UserConfigFileName);
-                        if (oldSettings != null)
-                            return oldSettings;
+                        Monitor.Exit(UserConfigFileName);
                     }
+                }
+                else
+                {
+                    var oldSettings = UserSettings.LoadOld(UserConfigFileName);
+                    if (oldSettings != null)
+                        return oldSettings;
                 }
             }
             catch { }
@@ -380,10 +394,8 @@ namespace SIGame
                 {
                     try
                     {
-                        using (var stream = File.Create(userSettingsFile))
-                        {
-                            settings.Save(stream);
-                        }
+                        using var stream = File.Create(userSettingsFile);
+                        settings.Save(stream);
                     }
                     finally
                     {
@@ -393,7 +405,7 @@ namespace SIGame
             }
             catch (Exception exc)
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_SettingsSaving + ": " + exc.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show($"{SIGame.Properties.Resources.Error_SettingsSaving}: {exc.Message}", ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
     }

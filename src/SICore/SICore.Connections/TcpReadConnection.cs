@@ -153,7 +153,13 @@ namespace SICore.Connections
                     // Normal dispose
                     break;
                 }
-                catch (SocketException ex) when (ex.ErrorCode == 104 || ex.ErrorCode == 110 || ex.ErrorCode == 113 || ex.ErrorCode == 125)
+                catch (IOException ex) when (ex.InnerException is SocketException socketException &&
+                    IsNormalSocketClosing(socketException))
+                {
+                    // Normal closing
+                    break;
+                }
+                catch (SocketException ex) when (IsNormalSocketClosing(ex))
                 {
                     // Normal closing
                     break;
@@ -174,6 +180,9 @@ namespace SICore.Connections
 
             writer.Complete();
         }
+
+        private static bool IsNormalSocketClosing(SocketException ex) =>
+            ex.NativeErrorCode == 104 || ex.NativeErrorCode == 110 || ex.NativeErrorCode == 113 || ex.NativeErrorCode == 125;
 
         private async Task ReadPipeAsync(PipeReader reader, CancellationToken cancellationToken = default)
         {

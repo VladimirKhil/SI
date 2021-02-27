@@ -962,7 +962,7 @@ namespace SICore
             }
             else if (stakersCount == 0)
             {
-                AddHistory("Skipping question");
+                _tasksHistory.AddLogEntry("Skipping question");
                 Engine.SkipQuestion();
                 ScheduleExecution(Tasks.MoveNext, 10);
 
@@ -1270,7 +1270,7 @@ namespace SICore
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
         }
 
-        private readonly Queue<string> _tasksHistory = new Queue<string>();
+        private readonly HistoryLog _tasksHistory = new HistoryLog();
 
         public bool IsRunning { get; set; }
 
@@ -1310,13 +1310,13 @@ namespace SICore
                         var stopReasonDetails = _stopReason == StopReason.Move ? _data.MoveDirection.ToString()
                             : (_stopReason == StopReason.Decision ? ClientData.Decision.ToString() : "");
 
-                        _tasksHistory.Enqueue($"StopReason {_stopReason} {stopReasonDetails}");
+                        _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
 
                         // Прекратить обычное выполнение
                         switch (_stopReason)
                         {
                             case StopReason.Pause:
-                                AddHistory($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
+                                _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
                                 PauseExecution((int)task, arg);
                                 break;
 
@@ -1334,7 +1334,7 @@ namespace SICore
                                     task = Tasks.AskToChoose;
                                 }
 
-                                AddHistory($"Appellation PauseExecution {task} {arg} {PrintOldTasks()}");
+                                _tasksHistory.AddLogEntry($"Appellation PauseExecution {task} {arg} {PrintOldTasks()}");
                                 PauseExecution((int)task, arg);
                                 ScheduleExecution(Tasks.PrintAppellation, 10);
                                 break;
@@ -1425,7 +1425,7 @@ namespace SICore
                         }
                     }
 
-                    AddHistory(task.ToString());
+                    _tasksHistory.AddLogEntry(task.ToString());
 
                     var msg = new StringBuilder();
                     switch (task)
@@ -1669,7 +1669,7 @@ namespace SICore
                 }
                 catch (Exception exc)
                 {
-                    _data.BackLink.SendError(new Exception($"Task: {task}, param: {arg}, history: {string.Join(", ", _tasksHistory)}", exc));
+                    _data.BackLink.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
                     ScheduleExecution(Tasks.NoTask, 10);
                     ClientData.MoveNextBlocked = true;
                     _gameActions.SpecialReplic("Game ERROR");
@@ -2181,16 +2181,6 @@ namespace SICore
                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
                 ScheduleExecution(Tasks.PrintQue, 10);
             }
-        }
-
-        internal void AddHistory(string message)
-        {
-            if (_tasksHistory.Count > 500)
-            {
-                _tasksHistory.Dequeue();
-            }
-
-            _tasksHistory.Enqueue(message);
         }
 
         private void CatInfo()
@@ -3416,7 +3406,7 @@ namespace SICore
         {
             if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
             {
-                AddHistory($"PrintAppellation resumed ({PrintOldTasks()})");
+                _tasksHistory.AddLogEntry($"PrintAppellation resumed ({PrintOldTasks()})");
                 ResumeExecution(40);
                 return;
             }
@@ -3476,7 +3466,7 @@ namespace SICore
         {
             if (_data.AppelaerIndex < 0 || _data.AppelaerIndex >= _data.Players.Count)
             {
-                AddHistory($"CheckAppellation resumed ({PrintOldTasks()})");
+                _tasksHistory.AddLogEntry($"CheckAppellation resumed ({PrintOldTasks()})");
                 ResumeExecution(40);
                 return;
             }
@@ -3584,7 +3574,7 @@ namespace SICore
                 _gameActions.AnnounceSums();
             }
 
-            AddHistory($"CheckAppellation resumed normally ({PrintOldTasks()})");
+            _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({PrintOldTasks()})");
             ResumeExecution(40);
         }
 

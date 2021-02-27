@@ -554,7 +554,7 @@ namespace SIGame.ViewModel
                 await ReloadGamesAsync(_cancellationTokenSource.Token);
                 await ReloadUsersAsync(_cancellationTokenSource.Token);
 
-                _avatar = (await UploadAvatarAsync(Human, CancellationToken.None)).AvatarUrl;
+                _avatar = (await UploadAvatarAsync(Human, _cancellationTokenSource.Token)).AvatarUrl;
             }
             catch (TaskCanceledException)
             {
@@ -790,6 +790,8 @@ namespace SIGame.ViewModel
                     return null;
                 }
 
+                _host.Connector.SetGameID(gameCreatingResult2.GameId);
+
                 return Tuple.Create(_server, _host);
             }
 
@@ -954,8 +956,9 @@ namespace SIGame.ViewModel
                     }
 
                     await base.JoinGameCoreAsync(gameInfo, role, isHost);
-                    _host.Connector.SetGameID(gameInfo.GameID);
                 }
+
+                _host.Connector.SetGameID(gameInfo.GameID);
             }
             catch (TaskCanceledException exc)
             {

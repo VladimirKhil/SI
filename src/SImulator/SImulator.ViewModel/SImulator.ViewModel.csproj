@@ -10,9 +10,9 @@
     <Authors>Vladimir Khil</Authors>
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
-    <Company>Svoyak-soft</Company>
-    <Version>2.7.0</Version>
-    <Copyright>Copyright © Svoyak-soft 2010 - 2020</Copyright>
+    <Company>Khil-soft</Company>
+    <Version>2.8.0</Version>
+    <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

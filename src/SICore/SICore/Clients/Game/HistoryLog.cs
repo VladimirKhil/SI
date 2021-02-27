@@ -1,0 +1,23 @@
+﻿using System.Collections.Generic;
+
+namespace SICore.Clients.Game
+{
+    internal sealed class HistoryLog
+    {
+        internal const int MaxSize = 500;
+
+        private readonly Queue<string> _history = new Queue<string>(MaxSize);
+
+        internal void AddLogEntry(string message)
+        {
+            if (_history.Count > MaxSize)
+            {
+                _history.Dequeue();
+            }
+
+            _history.Enqueue(message);
+        }
+
+        public override string ToString() => string.Join(", ", _history);
+    }
+}

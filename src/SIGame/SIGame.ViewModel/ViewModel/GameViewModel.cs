@@ -121,9 +121,9 @@ namespace SIGame.ViewModel
             IsPaused = isPaused;
         }
 
-        private void Server_Reconnected() => Host.AddLog(Resources.ReconnectingMessage);
+        private void Server_Reconnected() => Host.AddLog(Resources.ReconnectedMessage);
 
-        private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectedMessage);
+        private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectingMessage);
 
         private void Host_Ad(string text)
         {
