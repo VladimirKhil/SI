@@ -9,6 +9,10 @@ namespace SICore
     /// </summary>
     public interface IViewer : ILogic
     {
+        IPlayer PlayerLogic { get; }
+
+        IShowman ShowmanLogic { get; }
+
         TableInfoViewModel TInfo { get; }
 
         bool CanSwitchType { get; }

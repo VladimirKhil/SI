@@ -5,7 +5,10 @@ using SICore.Network.Contracts;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -38,6 +41,8 @@ namespace SICore.Network.Servers
 
         public event Action Reconnecting;
         public event Action Reconnected;
+
+        private bool _wrongUserMessageShown = false;
 
         protected void OnReconnecting() => Reconnecting?.Invoke();
         protected void OnReconnected() => Reconnected?.Invoke();
@@ -141,6 +146,7 @@ namespace SICore.Network.Servers
                 {
                     if (!IsMain)
                     {
+                        Trace.TraceError($"emptySender: {m.Sender}|{m.Receiver}|{m.Text}");
                         OnError(new Exception($"{_localizer[nameof(R.UnknownSenderMessage)]}: {m.Text}"), true);
                         return;
                     }
@@ -153,6 +159,7 @@ namespace SICore.Network.Servers
                     {
                         if (sender != NetworkConstants.GameName && !connection.Clients.Contains(sender))
                         {
+                            Trace.TraceError($"Unknown sender: {m.Sender}|{m.Receiver}|{m.Text}");
                             return; // Защита от подлога
                         }
                     }
@@ -169,6 +176,8 @@ namespace SICore.Network.Servers
                     m = new Message(messageText, sender, receiver, m.IsSystem, m.IsPrivate);
                 }
 
+                Debug.WriteLine($"Incoming message received: {m.IsSystem}|{m.IsPrivate}|{m.Sender}|{m.Receiver}|{m.Text}");
+
                 await ProcessIncomingMessageAsync(m);
             }
             catch (Exception exc)
@@ -181,9 +190,16 @@ namespace SICore.Network.Servers
         {
             foreach (var client in _clients.Values)
             {
+                Debug.WriteLine($"Checking client: {client.Name}; message.Receiver = {message.Receiver}.");
                 if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
                 {
+                    Debug.WriteLine($"Message added to client: {client.Name}");
                     client.AddIncomingMessage(message);
+                }
+                else if (!IsMain && !_wrongUserMessageShown)
+                {
+                    _wrongUserMessageShown = true;
+                    OnError(new Exception(string.Format(_localizer["WrongReceiver"], message.Receiver, client.Name)), true);
                 }
             }
 
@@ -331,6 +347,22 @@ namespace SICore.Network.Servers
             catch (ObjectDisposedException)
             {
 
+            }
+            catch (TimeoutException exc)
+            {
+                OnError(exc, true);
+            }
+            catch (WebSocketException exc)
+            {
+                OnError(exc, true);
+            }
+            catch (IOException exc)
+            {
+                OnError(exc, true);
+            }
+            catch (InvalidOperationException exc)
+            {
+                OnError(exc, true);
             }
         }
 

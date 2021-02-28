@@ -91,7 +91,7 @@ namespace SICore
         {
             return personData.IsHuman ?
                 (IShowman)new ShowmanHumanLogic(ClientData, _viewerActions, LO) :
-                new ShowmanComputerLogic(ClientData, _viewerActions);
+                new ShowmanComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
         }
 
         private void ClientData_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

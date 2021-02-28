@@ -80,6 +80,8 @@ namespace SIGame
                     return;
                 }
 
+                Trace.TraceInformation("Game launched");
+
                 UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
@@ -109,7 +111,7 @@ namespace SIGame
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
-            Trace.TraceError(e.ExceptionObject.ToString());
+            Trace.TraceError($"Common game error: {e.ExceptionObject}");
 
         private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

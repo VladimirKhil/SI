@@ -4,6 +4,7 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,8 +20,8 @@ namespace SIGame.ViewModel
 
         public Connector(SlaveServer server, Client client)
         {
-            _server = server;
-            _client = client;
+            _server = server ?? throw new ArgumentNullException(nameof(server));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
 
             client.MessageReceived += ProcessMessageAsync;
         }
@@ -31,6 +32,12 @@ namespace SIGame.ViewModel
 
             _server.ConnectionsLock.WithLock(async () =>
             {
+                if (_server.HostServer == null)
+                {
+                    Trace.TraceError("GetGameInfoAsync: _server.HostServer == null");
+                    return;
+                }
+
                 await _server.HostServer.SendMessageAsync(new Message(Messages.GameInfo, "", ""));
             });
 
@@ -44,6 +51,12 @@ namespace SIGame.ViewModel
             var m = new Message(command, "", "");
             _server.ConnectionsLock.WithLock(async () =>
             {
+                if (_server.HostServer == null)
+                {
+                    Trace.TraceError("JoinGameAsync: _server.HostServer == null");
+                    return;
+                }
+
                 await _server.HostServer.SendMessageAsync(m);
             });
 
@@ -106,10 +119,13 @@ namespace SIGame.ViewModel
 
             _server.ConnectionsLock.WithLock(async () =>
             {
-                if (_server.HostServer != null)
+                if (_server.HostServer == null)
                 {
-                    await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
+                    Trace.TraceError("SetGameIdAsync: _server.HostServer == null");
+                    return;
                 }
+
+                await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
             });
 
             return _tcs2.Task;

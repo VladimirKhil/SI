@@ -26,7 +26,7 @@ namespace SICore
         /// </summary>
         /// <param name="client">Текущий клиент</param>
         public PlayerComputerLogic(ViewerData data, ComputerAccount account, ViewerActions viewerActions)
-            : base(data, viewerActions)
+            : base(data, viewerActions, account)
         {
             _account = account;
         }

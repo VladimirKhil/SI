@@ -14,6 +14,10 @@ namespace SICore
 
         public bool CanSwitchType => false;
 
+        public IPlayer PlayerLogic { get; }
+
+        public IShowman ShowmanLogic { get; }
+
         protected sealed class TimerInfo
         {
             public bool IsEnabled { get; set; }
@@ -39,10 +43,13 @@ namespace SICore
             return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
         }
 
-        internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions)
+        internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
             : base(data)
         {
             _viewerActions = viewerActions;
+
+            //PlayerLogic = new PlayerComputerLogic(data, computerAccount, viewerActions);
+            //ShowmanLogic = new ShowmanComputerLogic(data, viewerActions, computerAccount);
         }
 
         public void ReceiveText(Message m)

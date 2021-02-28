@@ -1,6 +1,7 @@
 ﻿using SICore.Connections;
 using SICore.Network.Contracts;
 using System;
+using System.Diagnostics;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace SICore.Network.Clients
         /// <summary>
         /// Имя клиента
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Текущий сервер
@@ -39,17 +40,6 @@ namespace SICore.Network.Clients
         public Client(string name)
         {
             Name = name;
-
-            if (_inMessages == null)
-            {
-                throw new InvalidOperationException("_inMessages == null");
-            }
-
-            if (_inMessages.Reader == null)
-            {
-                throw new InvalidOperationException("_inMessages.Reader == null");
-            }
-
             WaitForMessages();
         }
 
@@ -65,23 +55,28 @@ namespace SICore.Network.Clients
         {
             try
             {
+                Trace.TraceInformation($"{Name}: WaitForMessages start");
                 while (await _inMessages.Reader.WaitToReadAsync())
                 {
                     while (_inMessages.Reader.TryRead(out var message))
                     {
                         if (MessageReceived != null)
                         {
+                            Debug.WriteLine($"{Name}: Client MessageReceived: {message.Text}");
                             await MessageReceived.Invoke(message);
                         }
                     }
                 }
+
+                Trace.TraceInformation($"{Name}: WaitForMessages stopped");
             }
             catch (OperationCanceledException)
             {
-
+                Trace.TraceWarning($"{Name}: WaitForMessages cancelled");
             }
             catch (Exception exc)
             {
+                Trace.TraceError($"{Name}: WaitForMessages error: {exc}");
                 Server.OnError(exc, true);
             }
         }

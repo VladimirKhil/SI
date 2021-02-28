@@ -9,7 +9,7 @@
     <Product>SIUI</Product>
     <Description>SIGame table ui</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
-    <Version>7.5.5</Version>
+    <Version>7.5.6</Version>
     <LangVersion>8</LangVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>

@@ -135,4 +135,7 @@
   <data name="Until" xml:space="preserve">
     <value>до</value>
   </data>
+  <data name="WrongReceiver" xml:space="preserve">
+    <value>От сервера получено сообщение для пользователя "{0}", а в игре находится пользователь "{1}". Обратитесь к разработчику игры.</value>
+  </data>
 </root>

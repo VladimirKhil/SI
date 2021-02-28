@@ -207,7 +207,13 @@ namespace SIGame.ViewModel
             };
         }
 
-        private void StartGame(Server server, IViewerClient host, bool isNetworkGame, bool isOnline, string tempDocFolder, int networkGamePort = -1)
+        private void StartGame(
+            Server server,
+            IViewerClient host,
+            bool isNetworkGame,
+            bool isOnline,
+            string tempDocFolder,
+            int networkGamePort = -1)
         {
             if (host == null)
             {
@@ -280,7 +286,7 @@ namespace SIGame.ViewModel
             {
                 var humanAccount = new HumanAccount(Human.HumanPlayer)
                 {
-                    Name = login
+                    Name = login.Trim()
                 };
 
                 var onlineConnection = new SIOnlineViewModel(_userSettings.ConnectionData, client, _commonSettings, _userSettings)

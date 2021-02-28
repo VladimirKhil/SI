@@ -13,7 +13,7 @@ namespace SIUI.ViewModel.Core
             Scheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
 
-        public static void Execute(Action action, Action<Exception> onError)
+        public static void Execute(Action action, Action<Exception> onError, CancellationToken cancellationToken)
         {
             void wrappedAction()
             {
@@ -29,7 +29,7 @@ namespace SIUI.ViewModel.Core
 
             if (TaskScheduler.Current != Scheduler && Scheduler != null)
             {
-                Task.Factory.StartNew(wrappedAction, CancellationToken.None, TaskCreationOptions.None, Scheduler);
+                Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.None, Scheduler);
                 return;
             }
 

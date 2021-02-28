@@ -8,8 +8,8 @@ namespace SICore
     /// </summary>
     internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
     {
-        public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions)
-            : base(data, viewerActions)
+        public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
+            : base(data, viewerActions, computerAccount)
         {
             
         }

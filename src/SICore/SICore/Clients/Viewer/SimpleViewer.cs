@@ -25,7 +25,7 @@ namespace SICore
 
             return personData.IsHuman ?
                 (IViewer)new ViewerHumanLogic(ClientData, _viewerActions, LO) :
-                new ViewerComputerLogic(ClientData, _viewerActions);
+                new ViewerComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
         }
     }
 }

@@ -11,6 +11,7 @@ using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -364,14 +365,19 @@ namespace SIGame.ViewModel
         {
             OnMessage(Resources.App_Name, Resources.ReconnectedMessage);
 
-            UI.Execute(async () =>
-            {
-                await ReloadGamesAsync(_cancellationTokenSource.Token);
-                await ReloadUsersAsync(_cancellationTokenSource.Token);
-            }, exc =>
-            {
-                Error = exc.Message;
-            });
+            var cancellationToken = _cancellationTokenSource.Token;
+
+            UI.Execute(
+                async () =>
+                {
+                    await ReloadGamesAsync(cancellationToken);
+                    await ReloadUsersAsync(cancellationToken);
+                },
+                exc =>
+                {
+                    Error = exc.Message;
+                },
+                cancellationToken);
 
             return Task.CompletedTask;
         }
@@ -932,6 +938,7 @@ namespace SIGame.ViewModel
 
             try
             {
+                Trace.TraceInformation($"Joining game: UseSignalRConnection = {UseSignalRConnection}");
                 if (UseSignalRConnection)
                 {
                     var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password);

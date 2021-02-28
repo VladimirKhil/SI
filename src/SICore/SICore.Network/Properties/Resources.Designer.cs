@@ -113,5 +113,14 @@ namespace SICore.Network.Properties {
                 return ResourceManager.GetString("Until", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на От сервера получено сообщение для пользователя &quot;{0}&quot;, а в игре находится пользователь &quot;{1}&quot;. Обратитесь к разработчику игры..
+        /// </summary>
+        internal static string WrongReceiver {
+            get {
+                return ResourceManager.GetString("WrongReceiver", resourceCulture);
+            }
+        }
     }
 }

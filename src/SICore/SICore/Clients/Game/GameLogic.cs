@@ -1425,7 +1425,7 @@ namespace SICore
                         }
                     }
 
-                    _tasksHistory.AddLogEntry(task.ToString());
+                    _tasksHistory.AddLogEntry($"{task}:{arg}");
 
                     var msg = new StringBuilder();
                     switch (task)
@@ -1676,6 +1676,8 @@ namespace SICore
                 }
             });
         }
+
+        internal void AddHistory(string message) => _tasksHistory.AddLogEntry(message);
 
         private void WaitCatCost()
         {

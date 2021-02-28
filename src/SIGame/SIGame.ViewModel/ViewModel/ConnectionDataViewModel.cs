@@ -11,6 +11,7 @@ using SICore.Network.Clients;
 using SICore.Network.Servers;
 using SICore.Network;
 using SICore.Network.Configuration;
+using System.Diagnostics;
 
 namespace SIGame.ViewModel
 {
@@ -323,15 +324,18 @@ namespace SIGame.ViewModel
 
             _host.GetInfo();
 
+            Trace.TraceInformation("INFO request sent");
+
             Error = null;
 
             _server.Error += Server_Error;
         }
 
-        private void Server_Error(Exception exc, bool isWarning)
-        {
-            PlatformManager.Instance.ShowMessage($"{Resources.GameEngineError}: {exc.Message} {exc.InnerException}", isWarning ? MessageType.Warning : MessageType.Error, true);
-        }
+        private void Server_Error(Exception exc, bool isWarning) =>
+            PlatformManager.Instance.ShowMessage(
+                $"{Resources.GameEngineError}: {exc.Message} {exc.InnerException}",
+                isWarning ? MessageType.Warning : MessageType.Error,
+                true);
 
         protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 

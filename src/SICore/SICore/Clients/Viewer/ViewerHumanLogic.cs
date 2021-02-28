@@ -30,6 +30,10 @@ namespace SICore
 
         public bool CanSwitchType => true;
 
+        public IPlayer PlayerLogic { get; }
+
+        public IShowman ShowmanLogic { get; }
+
         public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
             : base(data)
         {
@@ -42,6 +46,9 @@ namespace SICore
             TInfo.Ready += TInfo_Ready;
 
             TInfo.MediaLoadError += TInfo_MediaLoadError;
+
+            //PlayerLogic = new PlayerHumanLogic(data, viewerActions, localizer);
+            //ShowmanLogic = new ShowmanHumanLogic(data, viewerActions, localizer);
         }
 
         private void TInfo_MediaLoadError(Exception exc)

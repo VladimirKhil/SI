@@ -1,4 +1,5 @@
-﻿using SI.GameServer.Client;
+﻿using Microsoft.AspNetCore.SignalR;
+using SI.GameServer.Client;
 using SICore.Connections;
 using System;
 using System.Threading.Tasks;
@@ -32,7 +33,17 @@ namespace SIGame.ViewModel.Implementation
 
         public override string RemoteAddress => throw new NotImplementedException();
 
-        public override ValueTask SendMessageAsync(Message m) => new ValueTask(_gameServerClient.SendMessageAsync(m));
+        public override async ValueTask SendMessageAsync(Message m)
+        {
+            try
+            {
+                await _gameServerClient.SendMessageAsync(m);
+            }
+            catch (HubException exc)
+            {
+                OnError(exc, true);
+            }
+        }
 
         protected override ValueTask DisposeAsync(bool disposing)
         {

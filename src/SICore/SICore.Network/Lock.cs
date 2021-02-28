@@ -175,7 +175,15 @@ namespace SICore.Network
             bool force = false,
             CancellationToken cancellationToken = default)
         {
-            var lockAquired = await _semaphore.WaitAsync(millisecondsTimeout, cancellationToken);
+            var lockAquired = false;
+            try
+            {
+                lockAquired = await _semaphore.WaitAsync(millisecondsTimeout, cancellationToken);
+            }
+            catch (ObjectDisposedException)
+            {
+
+            }
 
             if (!lockAquired)
             {
