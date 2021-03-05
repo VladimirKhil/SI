@@ -70,7 +70,9 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Speech" />
+    <Reference Include="System.Speech">
+      <Private>true</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />

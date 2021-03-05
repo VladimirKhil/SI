@@ -30,7 +30,7 @@ namespace SI.GameServer.Client
 
         Task OpenAsync(string userName, CancellationToken token);
         Task<Contract.HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
-        Task<string> GetNewsAsync();
+        Task<string> GetNewsAsync(CancellationToken cancellationToken = default);
         Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default);
 
         Task<Contract.Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);
@@ -53,7 +53,7 @@ namespace SI.GameServer.Client
             string password,
             CancellationToken cancellationToken = default);
 
-        Task SendMessageAsync(Message message);
+        Task SendMessageAsync(Message message, CancellationToken cancellationToken = default);
 
         Task<Contract.GameCreationResult> CreateAndJoinGameAsync(
             GameSettingsCore<AppSettingsCore> gameSettings,

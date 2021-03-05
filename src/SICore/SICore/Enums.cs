@@ -96,7 +96,7 @@ namespace SICore
         /// <summary>
         /// Объявление Вопроса с секретом
         /// </summary>
-        PrintCat,
+        PrintSecretQuestion,
         /// <summary>
         /// Выяснение, кому будет отдан Вопрос с секретом
         /// </summary>
@@ -120,7 +120,7 @@ namespace SICore
         /// <summary>
         /// Объявление Вопроса со ставкой
         /// </summary>
-        PrintAuct,
+        PrintStakeQuestion,
         /// <summary>
         /// Ожидание решения ведущего о том, кто будет следующим делать ставку
         /// </summary>
@@ -208,12 +208,21 @@ namespace SICore
     }
 
     /// <summary>
-    /// Режим лога
+    /// Describes logging modes.
     /// </summary>
     public enum LogMode
     {
+        /// <summary>
+        /// System message.
+        /// </summary>
         Protocol,
+        /// <summary>
+        /// Message to log only.
+        /// </summary>
         Log,
+        /// <summary>
+        /// Message to chat only.
+        /// </summary>
         Chat
     }
 
@@ -384,34 +393,58 @@ namespace SICore
         AllIn
     }
 
+    /// <summary>
+    /// Describes reasons to stop normal game engine execution.
+    /// </summary>
     public enum StopReason
     {
+        /// <summary>
+        /// No reason. Normal execution.
+        /// </summary>
         None,
+        /// <summary>
+        /// Execution was paused.
+        /// </summary>
         Pause,
+        /// <summary>
+        /// Some required person decision was made.
+        /// </summary>
         Decision,
+        /// <summary>
+        /// Button was hit.
+        /// </summary>
         Answer,
+        /// <summary>
+        /// Appellation was started.
+        /// </summary>
         Appellation,
+        /// <summary>
+        /// Game was moved or round was changed.
+        /// </summary>
         Move,
+        /// <summary>
+        /// Throttling on button hit was started.
+        /// </summary>
         Wait
     }
 
     /// <summary>
-    /// Роли в игре
+    /// Describes game agent roles.
     /// </summary>
     public enum GameRole
     {
         /// <summary>
-        /// Зритель
+        /// Game viewer.
         /// </summary>
         [Display(Description = "GameRole_Viewer")]
         Viewer,
         /// <summary>
-        /// Игрок
+        /// Game player.
         /// </summary>
         [Display(Description = "GameRole_Player")]
         Player,
         /// <summary>
-        /// Ведущий
+        /// Game showman.
         /// </summary>
         [Display(Description = "GameRole_Showman")]
         Showman

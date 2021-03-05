@@ -9,19 +9,25 @@ using System.Threading.Tasks;
 namespace SICore
 {
     /// <summary>
-    /// Логика клиента
+    /// Represents agent logic.
     /// </summary>
-    /// <typeparam name="D">Тип данных клиента</typeparam>
+    /// <typeparam name="D">Agent data type.</typeparam>
     public abstract class Logic<D> : ILogic
         where D : Data
     {
         /// <summary>
-        /// Данные
+        /// Agent data.
         /// </summary>
-        protected D _data;
+        protected D _data; // TODO: field must be private. Implement a property for protected access.
 
+        /// <summary>
+        /// Typed agent data.
+        /// </summary>
         public D ClientData => _data;
 
+        /// <summary>
+        /// Common-typed agent data.
+        /// </summary>
         public Data Data => _data;
 
         private Timer _taskTimer = null;
@@ -30,13 +36,16 @@ namespace SICore
         
         private readonly Lock _taskTimerLock = new Lock(nameof(_taskTimerLock));
         
+        /// <summary>
+        /// Estimated time for current task to fire.
+        /// </summary>
         private DateTime _finishingTime;
 
         internal int CurrentTask { get; private set; } = -1;
 
         internal int NextTask => _oldTasks.Any() ? _oldTasks.Peek().Item1 : -1;
 
-        internal IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
+        protected IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 
         internal Logic(D data)
         {
@@ -87,6 +96,7 @@ namespace SICore
         protected void PauseExecution(int task, int taskArgument)
         {
             var now = DateTime.UtcNow;
+            // Saving running task, its argument and left time
             _oldTasks.Push(Tuple.Create(task, taskArgument, (int)((_finishingTime - now).TotalMilliseconds / 100)));
             CurrentTask = -1;
         }

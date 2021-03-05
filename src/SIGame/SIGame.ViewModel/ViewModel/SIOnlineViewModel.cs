@@ -577,7 +577,7 @@ namespace SIGame.ViewModel
         {
             try
             {
-                var news = await _gameServerClient.GetNewsAsync();
+                var news = await _gameServerClient.GetNewsAsync(_cancellationTokenSource.Token);
 
                 if (!string.IsNullOrEmpty(news))
                 {

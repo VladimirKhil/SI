@@ -274,6 +274,8 @@ namespace SICore
 
             if (_data.IsPartial)
             {
+                // "и" symbol is used as an arbitrary symbol with medium width
+                // It does not need to be localized
                 _gameActions.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
 
                 _data.Text = text;
@@ -444,8 +446,7 @@ namespace SICore
 
             if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
             {
-                var readingSpeed = Math.Max(1, _data.Settings.AppSettings.ReadingSpeed);
-                return Math.Max(1, 10 * _data.QLength / readingSpeed);
+                return GetReadingDurationForTextLength(_data.QLength);
             }
 
             if (atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio)
@@ -591,18 +592,18 @@ namespace SICore
             }
             else
             {
-                // Раунд был завершён вручную. Нам нужно максимально корректно свернуть текущие задачи
+                // Round was finished manually. We need to cancel current waiting tasks in a safe way
                 ClearOldTasks();
             }
         }
 
-        void Engine_RoundEmpty()
+        private void Engine_RoundEmpty()
         {
             _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
             FinishRound();
         }
 
-        void Engine_RoundTimeout()
+        private void Engine_RoundTimeout()
         {
             _gameActions.SendMessage(Messages.Timeout);
             _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)]));
@@ -1301,7 +1302,9 @@ namespace SICore
                 try
                 {
                     if (Engine == null) // disposed
+                    {
                         return;
+                    }
 
                     if (_stopReason != StopReason.None)
                     {
@@ -1317,7 +1320,7 @@ namespace SICore
                         {
                             case StopReason.Pause:
                                 _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
-                                PauseExecution((int)task, arg);
+                                PauseExecution(taskId, arg);
                                 break;
 
                             case StopReason.Decision:
@@ -1335,7 +1338,7 @@ namespace SICore
                                 }
 
                                 _tasksHistory.AddLogEntry($"Appellation PauseExecution {task} {arg} {PrintOldTasks()}");
-                                PauseExecution((int)task, arg);
+                                PauseExecution(taskId, arg);
                                 ScheduleExecution(Tasks.PrintAppellation, 10);
                                 break;
 
@@ -1427,6 +1430,18 @@ namespace SICore
 
                     _tasksHistory.AddLogEntry($"{task}:{arg}");
 
+                    // Special catch for hanging old taksks
+                    if (task == Tasks.AskToChoose && OldTasks.Any())
+                    {
+                        static string oldTaskPrinter(Tuple<int, int, int> t) => $"{t.Item1}:{t.Item2}";
+
+                        ClientData.BackLink.SendError(
+                            new Exception($"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +
+                            $" Task: {task}, param: {arg}, history: {_tasksHistory}"), true);
+
+                        ClearOldTasks();
+                    }
+
                     var msg = new StringBuilder();
                     switch (task)
                     {
@@ -1470,7 +1485,7 @@ namespace SICore
                             OnQuestionType(arg);
                             break;
 
-                        case Tasks.PrintAuct:
+                        case Tasks.PrintStakeQuestion:
                             PrintStakeQuestion();
                             break;
 
@@ -1491,7 +1506,7 @@ namespace SICore
                             PrintAuctPlayer();
                             break;
 
-                        case Tasks.PrintCat:
+                        case Tasks.PrintSecretQuestion:
                             PrintCat(arg);
                             break;
 
@@ -1586,7 +1601,7 @@ namespace SICore
                             break;
 
                         case Tasks.QuestSourComm:
-                            QuestionSourcesAndComments(task, arg);
+                            QuestionSourcesAndComments(arg);
                             break;
 
                         case Tasks.PrintAppellation:
@@ -2380,11 +2395,11 @@ namespace SICore
                 // Реакция согласно типу вопроса
                 if (_data.Type.Name == QuestionTypes.Auction)
                 {
-                    ScheduleExecution(Tasks.PrintAuct, 8 + ClientData.Rand.Next(10), force: true);
+                    ScheduleExecution(Tasks.PrintStakeQuestion, 8 + ClientData.Rand.Next(10), force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
                 {
-                    ScheduleExecution(Tasks.PrintCat, 8 + ClientData.Rand.Next(10), 1, force: true);
+                    ScheduleExecution(Tasks.PrintSecretQuestion, 8 + ClientData.Rand.Next(10), 1, force: true);
                 }
                 else if (_data.Type.Name == QuestionTypes.Sponsored)
                 {
@@ -2442,16 +2457,17 @@ namespace SICore
             }
         }
 
-        private void QuestionSourcesAndComments(Tasks task, int arg)
+        private void QuestionSourcesAndComments(int arg)
         {
+            var textTime = 20;
             if (arg == 1)
             {
                 var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
                 if (sources.Length > 0)
                 {
-                    var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
-                    _gameActions.ShowmanReplic(res.ToString());
+                    var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
+                    _gameActions.ShowmanReplic(text);
+                    textTime = GetReadingDurationForTextLength(text.Length);
                 }
                 else
                 {
@@ -2463,9 +2479,9 @@ namespace SICore
             {
                 if (_data.Question.Info.Comments.Text.Length > 0)
                 {
-                    var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
-                    _gameActions.ShowmanReplic(res.ToString());
+                    var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
+                    _gameActions.ShowmanReplic(text);
+                    textTime = GetReadingDurationForTextLength(text.Length);
                 }
                 else
                 {
@@ -2475,12 +2491,18 @@ namespace SICore
 
             if (arg < 3)
             {
-                ScheduleExecution(task, 20, arg + 1);
+                ScheduleExecution(Tasks.QuestSourComm, textTime, arg + 1);
             }
             else
             {
                 ScheduleExecution(Tasks.MoveNext, 1);
             }
+        }
+
+        private int GetReadingDurationForTextLength(int textLength)
+        {
+            var readingSpeed = Math.Max(1, _data.Settings.AppSettings.ReadingSpeed);
+            return Math.Max(1, 10 * textLength / readingSpeed);
         }
 
         internal void Announce()
@@ -2750,7 +2772,7 @@ namespace SICore
                     }
                 }
 
-                ScheduleExecution(Tasks.PrintCat, 15 + ClientData.Rand.Next(10), arg);
+                ScheduleExecution(Tasks.PrintSecretQuestion, 15 + ClientData.Rand.Next(10), arg);
             }
             else if (arg == 2)
             {
@@ -2789,7 +2811,7 @@ namespace SICore
             else if (arg == 3)
             {
                 PrintSecretQuestionInfo();
-                ScheduleExecution(Tasks.PrintCat, 20 + ClientData.Rand.Next(10), 2);
+                ScheduleExecution(Tasks.PrintSecretQuestion, 20 + ClientData.Rand.Next(10), 2);
             }
         }
 

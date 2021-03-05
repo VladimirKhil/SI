@@ -409,62 +409,7 @@ namespace SICore
                             break;
 
                         case SystemMessages.Disconnect:
-                            #region Disconnect
-                            {
-                                if (args.Length < 3 || !ClientData.AllPersons.TryGetValue(args[1], out var account))
-                                {
-                                    return;
-                                }
-
-                                var withError = args[2] == "+";
-
-                                res.Append(LO[account.IsMale ? nameof(R.Disconnected_Male) : nameof(R.Disconnected_Female)])
-                                    .Append(' ')
-                                    .Append(account.Name);
-
-                                _gameActions.SpecialReplic(res.ToString());
-
-                                _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
-
-                                account.IsConnected = false;
-
-                                if (ClientData.Viewers.Contains(account))
-                                {
-                                    ClientData.Viewers.Remove(account);
-                                }
-                                else
-                                {
-                                    var isBefore = ClientData.Stage == GameStage.Before;
-                                    if (account is GamePersonAccount person)
-                                    {
-                                        person.Name = Constants.FreePlace;
-                                        person.Picture = "";
-                                        if (isBefore)
-                                        {
-                                            person.Ready = false;
-                                        }
-                                    }
-                                }
-
-                                ClientData.OnAllPersonsChanged();
-
-                                if (args[1] == ClientData.HostName)
-                                {
-                                    // Необходимо назначить нового хоста, если это возможно.
-                                    // Хост назначается случайный образом
-
-                                    SelectNewHost();
-
-                                    if (ClientData.Settings.AppSettings.Managed && !_logic.IsRunning)
-                                    {
-                                        ClientData.MoveDirection = 1; // Дальше
-                                        _logic.Stop(StopReason.Move);
-                                    }
-                                }
-
-                                OnPersonsChanged(false, withError);
-                            }
-                            #endregion
+                            OnDisconnect(args);
                             break;
 
                         case Messages.Info:
@@ -970,6 +915,72 @@ namespace SICore
                 }
             });
 
+        private void OnDisconnect(string[] args)
+        {
+            if (args.Length < 3 || !ClientData.AllPersons.TryGetValue(args[1], out var account))
+            {
+                return;
+            }
+
+            var withError = args[2] == "+";
+
+            var res = new StringBuilder()
+                .Append(LO[account.IsMale ? nameof(R.Disconnected_Male) : nameof(R.Disconnected_Female)])
+                .Append(' ')
+                .Append(account.Name);
+
+            _gameActions.SpecialReplic(res.ToString());
+
+            _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
+
+            account.IsConnected = false;
+
+            if (ClientData.Viewers.Contains(account))
+            {
+                ClientData.Viewers.Remove(account);
+            }
+            else
+            {
+                var isBefore = ClientData.Stage == GameStage.Before;
+                if (account is GamePersonAccount person)
+                {
+                    person.Name = Constants.FreePlace;
+                    person.Picture = "";
+                    if (isBefore)
+                    {
+                        person.Ready = false;
+                    }
+                }
+            }
+
+            ClientData.OnAllPersonsChanged();
+
+            if (args[1] == ClientData.HostName)
+            {
+                // A new host must be assigned if possible.
+                // The host is assigned randomly
+
+                SelectNewHost();
+
+                if (ClientData.Settings.AppSettings.Managed && !_logic.IsRunning)
+                {
+                    if (_logic.StopReason == StopReason.Pause || ClientData.TInfo.Pause)
+                    {
+                        _logic.AddHistory($"Managed game pause autoremoved.");
+                        OnPauseCore(false);
+                        return;
+                    }
+
+                    _logic.AddHistory($"Managed game move autostarted.");
+
+                    ClientData.MoveDirection = 1; // Дальше
+                    _logic.Stop(StopReason.Move);
+                }
+            }
+
+            OnPersonsChanged(false, withError);
+        }
+
         private async ValueTask OnConnectAsync(Message message, string[] args)
         {
             if (args.Length < 4)
@@ -1233,7 +1244,8 @@ namespace SICore
                 return;
             }
 
-            if (ClientData.TInfo.Pause && direction == 1)
+            // Is paused or is pause pending
+            if ((ClientData.TInfo.Pause || _logic.StopReason == StopReason.Pause) && direction == 1)
             {
                 OnPauseCore(false);
                 return;
@@ -1264,6 +1276,7 @@ namespace SICore
                     break;
             }
 
+            _logic.AddHistory($"Move started: {ClientData.MoveDirection}");
             _logic.Stop(StopReason.Move);
         }
 

@@ -235,6 +235,11 @@ namespace SICore
             }
             else
             {
+                if (_data.BackLink.TranslateGameToChat)
+                {
+                    _data.OnAddString(null, text, LogMode.Protocol);
+                }
+
                 // all other types of messages are printed only to logs
                 logString = $"<span style=\"font-style: italic\">{text}</span>";
             }
@@ -246,26 +251,16 @@ namespace SICore
             }
         }
 
-        private static string GetColorByPlayerIndex(int playerIndex)
+        private static string GetColorByPlayerIndex(int playerIndex) => playerIndex switch
         {
-            switch (playerIndex)
-            {
-                case 0:
-                    return "#EF21A9";
-                case 1:
-                    return "#0BE6CF";
-                case 2:
-                    return "#FF0000";
-                case 3:
-                    return "#EF21A9";
-                case 4:
-                    return "#00FF00";
-                case 5:
-                    return "#0000FF";
-                default:
-                    return "#00FFFF";
-            }
-        }
+            0 => "#EF21A9",
+            1 => "#0BE6CF",
+            2 => "#FF0000",
+            3 => "#EF21A9",
+            4 => "#00FF00",
+            5 => "#0000FF",
+            _ => "#00FFFF",
+        };
 
         internal void AddToFileLog(Message message) =>
             AddToFileLog($"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> <span style=\"font-weight: bold\">{message.Text}</span><br />");

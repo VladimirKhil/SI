@@ -33,16 +33,22 @@ namespace SIGame.ViewModel.Implementation
 
         public override string RemoteAddress => throw new NotImplementedException();
 
-        public override async ValueTask SendMessageAsync(Message m)
+        public override ValueTask SendMessageAsync(Message m)
         {
             try
             {
-                await _gameServerClient.SendMessageAsync(m);
+                return new ValueTask(_gameServerClient.SendMessageAsync(m));
+            }
+            catch (TaskCanceledException exc)
+            {
+                OnError(exc, true);
             }
             catch (HubException exc)
             {
                 OnError(exc, true);
             }
+
+            return new ValueTask();
         }
 
         protected override ValueTask DisposeAsync(bool disposing)

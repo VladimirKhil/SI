@@ -178,7 +178,8 @@ namespace SI.GameServer.Client
         public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync<HostInfo>("GetGamesHostInfo", cancellationToken);
 
-        public Task<string> GetNewsAsync() => _connection.InvokeAsync<string>("GetNews");
+        public Task<string> GetNewsAsync(CancellationToken cancellationToken = default) =>
+            _connection.InvokeAsync<string>("GetNews", cancellationToken);
 
         public Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync<string[]>("GetUsers", cancellationToken);
@@ -345,6 +346,7 @@ namespace SI.GameServer.Client
             CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync<GameCreationResult>("JoinGameNew", gameId, (int)role, isMale, password, cancellationToken);
 
-        public Task SendMessageAsync(Message message) => _connection.InvokeAsync("SendMessage", message);
+        public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
+            _connection.InvokeAsync("SendMessage", message, cancellationToken);
     }
 }

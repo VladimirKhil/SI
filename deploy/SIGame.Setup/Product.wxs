@@ -233,6 +233,9 @@
       <Component Guid="{D2A5182E-487B-4CD7-8864-25FCB8C1878B}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Encodings.Web.dll" />
       </Component>
+      <Component Guid="{1ADE9843-197D-4EF5-888A-2830E529F951}">
+        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Speech.dll" />
+      </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
       </Component>
