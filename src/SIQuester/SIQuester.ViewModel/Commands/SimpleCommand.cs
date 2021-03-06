@@ -18,7 +18,7 @@ namespace SIQuester.ViewModel
         /// </summary>
         public bool CanBeExecuted
         {
-            get { return _canBeExecuted; }
+            get => _canBeExecuted;
             set
             {
                 if (_canBeExecuted != value)
@@ -28,10 +28,16 @@ namespace SIQuester.ViewModel
                     {
                         if (SynchronizationContext.Current == null)
                         {
-                            Task.Factory.StartNew(() => CanExecuteChanged(this, EventArgs.Empty), CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                            Task.Factory.StartNew(
+                                () => CanExecuteChanged(this, EventArgs.Empty),
+                                CancellationToken.None,
+                                TaskCreationOptions.None,
+                                UI.Scheduler);
                         }
                         else
+                        {
                             CanExecuteChanged(this, EventArgs.Empty);
+                        }
                     }
                 }
             }

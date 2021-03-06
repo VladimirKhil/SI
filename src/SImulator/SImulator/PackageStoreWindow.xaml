@@ -3,8 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:lc="clr-namespace:SImulator.Converters"
         xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Classic" x:Class="SImulator.PackageStoreWindow"
-        Title="Библиотека вопросов" MinHeight="470" Width="694"
-        SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display" Icon="Images/logo.png" WindowStartupLocation="CenterScreen">
+        Title="Библиотека вопросов"
+        MinHeight="470"
+        Width="694"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        Icon="Images/logo.png"
+        WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <lc:BooleanToNonVisibilityConverter x:Key="BooleanToNonVisibilityConverter" />
         <lc:NameConverter x:Key="NameConverter" />
@@ -87,11 +92,35 @@
         <TextBlock TextWrapping="Wrap"><Run Text="Выберите пакет для игры"/></TextBlock>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5">
             <TextBlock VerticalAlignment="Center" FontSize="14">Исключить пакеты категорий</TextBlock>
-            <ComboBox Width="135" VerticalAlignment="Center" Margin="10,0,0,0" ItemsSource="{Binding Restrictions}" SelectedValue="{Binding CurrentRestriction}" />
+            <ComboBox
+                Width="135"
+                VerticalAlignment="Center"
+                Margin="10,0,0,0"
+                ItemsSource="{Binding Restrictions}"
+                SelectedValue="{Binding CurrentRestriction}"
+                Cursor="Hand" />
         </StackPanel>
-        <ProgressBar Grid.Row="2" IsIndeterminate="True" VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="20" />
-        <Border Grid.Row="2" Margin="0,5,0,0" Background="{StaticResource MainBackground}" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToNonVisibilityConverter}}">
-            <TabControl Background="White" ItemsSource="{Binding Publishers}" SelectedItem="{Binding CurrentPublisher}" TabStripPlacement="Left" Padding="0" Margin="-2,1,0,0" BorderThickness="0,1,1,1" Style="{DynamicResource TabControlStyle1}">
+        <ProgressBar
+            Grid.Row="2"
+            IsIndeterminate="True"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            Width="200"
+            Height="20" />
+        <Border
+            Grid.Row="2"
+            Margin="0,5,0,0"
+            Background="{StaticResource MainBackground}"
+            Visibility="{Binding IsLoading, Converter={StaticResource BooleanToNonVisibilityConverter}}">
+            <TabControl
+                Background="White"
+                ItemsSource="{Binding Publishers}"
+                SelectedItem="{Binding CurrentPublisher}"
+                TabStripPlacement="Left"
+                Padding="0"
+                Margin="-2,1,0,0"
+                BorderThickness="0,1,1,1"
+                Style="{DynamicResource TabControlStyle1}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Converter={StaticResource NameConverter}}" />
@@ -99,17 +128,40 @@
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>
                     <DataTemplate>
-                        <ListBox x:Name="list" ItemsSource="{Binding DataContext.Packages, RelativeSource={RelativeSource AncestorType=TabControl}}" SelectedItem="{Binding DataContext.CurrentPackage, RelativeSource={RelativeSource AncestorType=TabControl}}" BorderThickness="0" MouseDoubleClick="ListBox_MouseDoubleClick">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Description}" Margin="2,3" />
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <Grid>
+                            <ProgressBar
+                                IsIndeterminate="True"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Width="200"
+                                Height="20" />
+                            <ListBox
+                                x:Name="list"
+                                ItemsSource="{Binding DataContext.Packages, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                SelectedItem="{Binding DataContext.CurrentPackage, RelativeSource={RelativeSource AncestorType=TabControl}}"
+                                Visibility="{Binding DataContext.IsLoadingPackages, RelativeSource={RelativeSource AncestorType=TabControl}, Converter={StaticResource BooleanToNonVisibilityConverter}}"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                MouseDoubleClick="ListBox_MouseDoubleClick">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Description}" Margin="2,3" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
             </TabControl>
         </Border>
-        <Button FontSize="14" Grid.Row="3" Margin="0,8,0,0" Padding="20,4" HorizontalAlignment="Right" Click="Button_Click" Content="Выбрать пакет" />
+        <Button
+            FontSize="14"
+            Grid.Row="3"
+            Margin="0,8,0,0"
+            Padding="20,4"
+            HorizontalAlignment="Right"
+            Click="Button_Click"
+            Cursor="Hand"
+            Content="Выбрать пакет" />
     </Grid>
 </Window>

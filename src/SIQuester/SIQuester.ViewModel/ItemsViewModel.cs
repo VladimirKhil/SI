@@ -20,7 +20,7 @@ namespace SIQuester.ViewModel
 
         public int CurrentPosition
         {
-            get { return _currentPosition; }
+            get => _currentPosition;
             set
             {
                 if (_currentPosition != value)
@@ -38,10 +38,10 @@ namespace SIQuester.ViewModel
 
         public T CurrentItem
         {
-            get { return _currentItem; }
+            get => _currentItem;
             set
             {
-                if (!object.Equals(_currentItem, value))
+                if (!Equals(_currentItem, value))
                 {
                     var oldValue = _currentItem;
                     _currentItem = value;
@@ -53,26 +53,17 @@ namespace SIQuester.ViewModel
             }
         }
 
-        protected virtual void OnCurrentItemChanged(T oldValue, T newValue)
-        {
-            UpdateCommands();
-        }
+        protected virtual void OnCurrentItemChanged(T oldValue, T newValue) => UpdateCommands();
 
         public void SetCurrentItem(object item)
         {
             CurrentItem = (T)item;
         }
 
-        protected ItemsViewModel()
-        {
-            Init();
-        }
+        protected ItemsViewModel() => Init();
 
         protected ItemsViewModel(IEnumerable<T> collection)
-            : base(collection)
-        {
-            Init();
-        }
+            : base(collection) => Init();
 
         private void Init()
         {
@@ -95,22 +86,23 @@ namespace SIQuester.ViewModel
 
         protected virtual bool CanRemove() => true;
 
-        private void AddItem_Executed(object arg)
-        {
-            Add((T)(object)"");
-        }
+        private void AddItem_Executed(object arg) => Add((T)(object)"");
 
         private void RemoveItem_Executed(object arg)
         {
             if (_currentPosition > -1 && _currentPosition < Count)
+            {
                 RemoveAt(_currentPosition);
+            }
         }
 
         private void MoveLeft_Executed(object arg)
         {
             var index = _currentPosition;
             if (index < 1 || index >= Count)
+            {
                 return;
+            }
 
             var document = OwnerDocument;
 

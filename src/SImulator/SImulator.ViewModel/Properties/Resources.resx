@@ -117,16 +117,91 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
   <data name="ConnectionError" xml:space="preserve">
-    <value>Ошибка связи</value>
+    <value>Ошибка связи: {0}</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Ошибка</value>
   </data>
+  <data name="GameEndingError" xml:space="preserve">
+    <value>Ошибка завершения игры: {0}</value>
+  </data>
+  <data name="GameEndsBecauseOfConnectionLoss" xml:space="preserve">
+    <value>Соединение с демонстрационным компьютером было разорвано. Игра прекращена.</value>
+  </data>
+  <data name="GamePackageLoadError" xml:space="preserve">
+    <value>Ошибка при загрузке игрового пакета: {0}</value>
+  </data>
+  <data name="GameStartError" xml:space="preserve">
+    <value>Ошибка старта игры: {0}</value>
+  </data>
+  <data name="ListenForConnections" xml:space="preserve">
+    <value>Ожидать подключения</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Дальше</value>
+  </data>
   <data name="NoLicensesFolder" xml:space="preserve">
     <value>Папка лицензий не найдена!</value>
   </data>
+  <data name="NoRiskQuestion" xml:space="preserve">
+    <value>Вопрос без риска</value>
+  </data>
   <data name="OpenLicensesError" xml:space="preserve">
     <value>Ошибка при открытии папки лицензий: {0}</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Приостановить</value>
+  </data>
+  <data name="PressTheButton" xml:space="preserve">
+    <value>Нажмите на кнопку</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
+  <data name="RoundThemes" xml:space="preserve">
+    <value>Темы раунда</value>
+  </data>
+  <data name="RoundTimeout" xml:space="preserve">
+    <value>Время раунда вышло.</value>
+  </data>
+  <data name="Run" xml:space="preserve">
+    <value>Запустить</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="SecretQuestion" xml:space="preserve">
+    <value>Вопрос с секретом</value>
+  </data>
+  <data name="SelectAudioFile" xml:space="preserve">
+    <value>Выберите аудиофайл</value>
+  </data>
+  <data name="SelectBackgroundImage" xml:space="preserve">
+    <value>Выберите изображение-фон</value>
+  </data>
+  <data name="SelectBackgroundVideo" xml:space="preserve">
+    <value>Выберите видеофайл-фон</value>
+  </data>
+  <data name="SelectIntroVideo" xml:space="preserve">
+    <value>Выберите заставочный видеофайл</value>
+  </data>
+  <data name="SelectLogoImage" xml:space="preserve">
+    <value>Выберите изображение-заставку</value>
+  </data>
+  <data name="StakeQuestion" xml:space="preserve">
+    <value>Вопрос со ставкой</value>
+  </data>
+  <data name="StartGame" xml:space="preserve">
+    <value>Начать игру</value>
+  </data>
+  <data name="StopListen" xml:space="preserve">
+    <value>Прекратить ожидание</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
   </data>
 </root>

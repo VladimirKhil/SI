@@ -17,7 +17,9 @@ namespace SIQuester.Model
             this[""] = Resources.OtherTypeQuestion;
         }
 
-        private QuestionTypesNames(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext)
+        private QuestionTypesNames(
+            System.Runtime.Serialization.SerializationInfo serializationInfo,
+            System.Runtime.Serialization.StreamingContext streamingContext)
         {
             
         }

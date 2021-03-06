@@ -15,9 +15,6 @@ namespace QTxtConverter
 
         public int Move { get; set; }
 
-        public ReadErrorEventArgs()
-        {
-            Cancel = Skip = false;
-        }
+        public ReadErrorEventArgs() => Cancel = Skip = false;
     }
 }

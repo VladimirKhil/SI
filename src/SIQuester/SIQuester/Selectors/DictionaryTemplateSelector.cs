@@ -14,15 +14,9 @@ namespace SIQuester.Selectors
             Templates = new Dictionary<Type, DataTemplate>();
         }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
-        {
-            if (item != null)
-            {
-                if (Templates.TryGetValue(item.GetType(), out DataTemplate template))
-                    return template;
-            }
-
-            return base.SelectTemplate(item, container);
-        }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container) =>
+            item != null && Templates.TryGetValue(item.GetType(), out var template)
+                ? template
+                : base.SelectTemplate(item, container);
     }
 }

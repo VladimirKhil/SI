@@ -31,38 +31,27 @@ namespace SIQuester.Model
             }
 
             ItemData = sb.ToString();
-            ItemLevel = item is Package ? Level.Package :
+            ItemLevel =
+                item is Package ? Level.Package :
                 item is Round ? Level.Round :
                 item is Theme ? Level.Theme : Level.Question;
         }
 
         public InfoOwner GetItem()
         {
-            InfoOwner item;
-            switch (ItemLevel)
+            InfoOwner item = ItemLevel switch
             {
-                case Level.Package:
-                    item = new Package();
-                    break;
-                case Level.Round:
-                    item = new Round();
-                    break;
-                case Level.Theme:
-                    item = new Theme();
-                    break;
-                case Level.Question:
-                default:
-                    item = new Question();
-                    break;
-            }
+                Level.Package => new Package(),
+                Level.Round => new Round(),
+                Level.Theme => new Theme(),
+                _ => new Question(),
+            };
 
             using (var sr = new StringReader(ItemData))
             {
-                using (var reader = XmlReader.Create(sr))
-                {
-                    reader.Read();
-                    item.ReadXml(reader);
-                }
+                using var reader = XmlReader.Create(sr);
+                reader.Read();
+                item.ReadXml(reader);
             }
 
             return item;

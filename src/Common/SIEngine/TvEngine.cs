@@ -310,7 +310,9 @@ namespace SIEngine
         public void SelectQuestion(int theme, int question)
         {
             if (!CanSelectQuestion)
+            {
                 return;
+            }
 
             _themeIndex = theme;
             _questionIndex = question;

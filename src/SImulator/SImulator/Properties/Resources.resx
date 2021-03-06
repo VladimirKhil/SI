@@ -117,13 +117,52 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CommonAppError" xml:space="preserve">
+    <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
+  </data>
+  <data name="DiskFullError" xml:space="preserve">
+    <value>Закончилось место на диске!</value>
+  </data>
+  <data name="FileDeletionError" xml:space="preserve">
+    <value>Ошибка удаления файла: {0}</value>
+  </data>
+  <data name="FinishGameQuestion" xml:space="preserve">
+    <value>Завершить игру?</value>
+  </data>
   <data name="GameModes_Sport" xml:space="preserve">
     <value>Упрощённая</value>
   </data>
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Классическая</value>
   </data>
+  <data name="LogsFolderNotFound" xml:space="preserve">
+    <value>Папка для записи логов "{0}" не найдена</value>
+  </data>
+  <data name="NavigateToSiteError" xml:space="preserve">
+    <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
+  </data>
+  <data name="OutOfMemoryError" xml:space="preserve">
+    <value>Недостаточно памяти для выполнения программы!</value>
+  </data>
+  <data name="RuntimeBrokenError" xml:space="preserve">
+    <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
+  </data>
   <data name="SavingSettingsError" xml:space="preserve">
     <value>Ошибка при сохранении настроек программы</value>
+  </data>
+  <data name="SelectLogsFolder" xml:space="preserve">
+    <value>Выберите папку для записи логов</value>
+  </data>
+  <data name="SelectQuestionPackage" xml:space="preserve">
+    <value>Выберите пакет вопросов</value>
+  </data>
+  <data name="SIQuestions" xml:space="preserve">
+    <value>Вопросы СИ</value>
+  </data>
+  <data name="SIStorageError" xml:space="preserve">
+    <value>Ошибка работы с библиотекой вопросов: {0}</value>
+  </data>
+  <data name="TestPackage" xml:space="preserve">
+    <value>Пакет тест</value>
   </data>
 </root>

@@ -25,7 +25,7 @@ namespace SIQuester.ViewModel
 
         public PackageType PackageType
         {
-            get { return _packageType; }
+            get => _packageType;
             set
             {
                 if (_packageType != value)
@@ -38,7 +38,7 @@ namespace SIQuester.ViewModel
 
         public string PackageName
         {
-            get { return _packageName; }
+            get => _packageName;
             set
             {
                 if (_packageName != value)

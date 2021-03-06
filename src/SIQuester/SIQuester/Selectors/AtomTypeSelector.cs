@@ -20,19 +20,13 @@ namespace SIQuester.Selectors
         {
             var mediaItem = (MediaItemViewModel)item;
 
-            switch (mediaItem.Type)
+            return mediaItem.Type switch
             {
-                case SIDocument.ImagesStorageName:
-                    return ImageTemplate;
-
-                case SIDocument.AudioStorageName:
-                    return AudioTemplate;
-
-                case SIDocument.VideoStorageName:
-                    return VideoTemplate;
-            }
-
-            return base.SelectTemplate(item, container);
+                SIDocument.ImagesStorageName => ImageTemplate,
+                SIDocument.AudioStorageName => AudioTemplate,
+                SIDocument.VideoStorageName => VideoTemplate,
+                _ => base.SelectTemplate(item, container),
+            };
         }
     }
 }

@@ -5,18 +5,21 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIEngine
 {
     /// <summary>
-    /// Класс, реализующий правила игры в СИ
+    /// Implements SIGame rules.
     /// </summary>
     public abstract class EngineBase : IDisposable, INotifyPropertyChanged
     {
         private bool _isDisposed = false;
 
         protected IEngineSettingsProvider _settingsProvider;
+
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         protected GameStage _stage = GameStage.Begin;
 
@@ -136,7 +139,9 @@ namespace SIEngine
         public void OnIntroFinished()
         {
             if (_stage == GameStage.GameThemes)
+            {
                 AutoNext(1000);
+            }
         }
 
         /// <summary>
@@ -191,8 +196,8 @@ namespace SIEngine
 
         protected EngineBase(SIDocument document, IEngineSettingsProvider settingsProvider)
         {
-            _document = document;
-            _settingsProvider = settingsProvider;
+            _document = document ?? throw new ArgumentNullException(nameof(document));
+            _settingsProvider = settingsProvider ?? throw new ArgumentNullException(nameof(settingsProvider));
         }
 
         public abstract void MoveNext();
@@ -275,32 +280,50 @@ namespace SIEngine
         /// <param name="milliseconds"></param>
         protected async void AutoNext(int milliseconds)
         {
-            if (_settingsProvider.AutomaticGame)
+            try
             {
-                lock (_autoLock)
+                if (milliseconds < 0)
                 {
-                    if (_inAutoMode)
-                        return;
-
-                    _inAutoMode = true;
+                    throw new ArgumentException(
+                        $"Value of milliseconds ({milliseconds}) must be greater or equal to 0",
+                        nameof(milliseconds));
                 }
 
-                await Task.Delay(milliseconds);
-
-                lock (_autoLock)
+                if (_settingsProvider.AutomaticGame)
                 {
-                    _inAutoMode = false;
+                    lock (_autoLock)
+                    {
+                        if (_inAutoMode)
+                        {
+                            return;
+                        }
 
-                    if (_document == null)
-                        return;
+                        _inAutoMode = true;
+                    }
 
-                    AutoNextCore();
+                    await Task.Delay(milliseconds, _cancellationTokenSource.Token);
 
                     lock (SyncRoot)
                     {
+                        if (_isDisposed)
+                        {
+                            return;
+                        }
+
+                        AutoNextCore();
                         MoveNext();
                     }
+
+                    lock (_autoLock)
+                    {
+                        _inAutoMode = false;
+                    }
                 }
+            }
+            catch (TaskCanceledException) { }
+            catch (Exception exc)
+            {
+                OnError($"Engine error: {exc}");
             }
         }
 
@@ -354,8 +377,9 @@ namespace SIEngine
             var moved = true;
             do
             {
-                if (_roundIndex == 0) // Прокрутились назад, и нормального раунда не нашли. Возвращаемся к первому подходящему раунду
+                if (_roundIndex == 0)
                 {
+                    // Cannot find suitable round while moving back. So returning forward to the first matching round
                     return MoveNextRound();
                 }
 
@@ -424,7 +448,7 @@ namespace SIEngine
             else
             {
                 OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, pressMode);
-                AutoNext(1000 * (_settingsProvider.ThinkingTime + _activeQuestion.Scenario.ToString().Length / 20));
+                AutoNext(1000 * (Math.Min(1, _settingsProvider.ThinkingTime) + _activeQuestion.Scenario.ToString().Length / 20));
             }
         }
 
@@ -690,10 +714,8 @@ namespace SIEngine
                 return;
             }
 
-            lock (_autoLock)
-            {
-                _document.Dispose();
-            }
+            _cancellationTokenSource.Cancel();
+            _document.Dispose();
 
             _isDisposed = true;
         }

@@ -51,7 +51,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                _tours = await LoadNodes("SVOYAK");
+                _tours = await LoadNodesAsync("SVOYAK");
                 OnPropertyChanged(nameof(Tours));
             }
             catch (Exception exc)
@@ -84,7 +84,7 @@ namespace SIQuester.ViewModel
 
         internal async Task<SIDocument> SelectAsync(DBNode item)
         {
-            var doc = await Utils.GetXml(item.Key);
+            var doc = await Utils.GetXmlAsync(item.Key);
             var manager = new XmlNamespaceManager(doc.NameTable);
 
             var siDoc = SIDocument.Create(doc.SelectNodes(@"/tournament/Title", manager)[0].InnerText.GrowFirstLetter().ClearPoints(), Resources.EmptyValue);
@@ -287,7 +287,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                node.Children = await LoadNodes(node.Key);
+                node.Children = await LoadNodesAsync(node.Key);
             }
             catch (Exception exc)
             {
@@ -299,12 +299,14 @@ namespace SIQuester.ViewModel
             }
 
             if (node.Children.Length == 0)
+            {
                 Select(node);
+            }
         }
 
-        internal static async Task<DBNode[]> LoadNodes(string filename)
+        internal static async Task<DBNode[]> LoadNodesAsync(string filename)
         {
-            var xmlDocument = await Utils.GetXml(filename);
+            var xmlDocument = await Utils.GetXmlAsync(filename);
 
             var manager = new XmlNamespaceManager(xmlDocument.NameTable);
             var nodeList = xmlDocument.SelectNodes(@"/tournament/tour", manager);

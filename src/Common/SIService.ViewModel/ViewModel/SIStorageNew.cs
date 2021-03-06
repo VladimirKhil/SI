@@ -14,8 +14,16 @@ namespace Services.SI.ViewModel
 
         public bool IsLoading
         {
-            get { return _isLoading; }
+            get => _isLoading;
             set { _isLoading = value; OnPropertyChanged(); }
+        }
+
+        private bool _isLoadingPackages;
+
+        public bool IsLoadingPackages
+        {
+            get => _isLoadingPackages;
+            set { _isLoadingPackages = value; OnPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -217,9 +225,11 @@ namespace Services.SI.ViewModel
         private async void LoadPackagesAsync()
         {
             if (_siService == null)
+            {
                 return;
+            }
 
-            IsLoading = true;
+            IsLoadingPackages = true;
             try
             {
                 Packages = null;
@@ -243,7 +253,7 @@ namespace Services.SI.ViewModel
             }
             finally
             {
-                IsLoading = false;
+                IsLoadingPackages = false;
             }
         }
 
@@ -308,19 +318,20 @@ namespace Services.SI.ViewModel
             catch (Exception exc)
             {
                 Error?.Invoke(exc);
-                IsLoading = false;
             }
+            
+            IsLoading = false;
         }
 
         private void FilterPackages()
         {
-            FilteredPackages = _filter == null? _packages
-                : _packages?.Where(package => package.Description.ToLower().Contains(_filter.ToLower())).ToArray();
+            FilteredPackages = _filter == null ? _packages
+                : _packages?
+                    .Where(package => package.Description.ToLower()
+                    .Contains(_filter.ToLower()))
+                    .ToArray();
 
-            if (_filteredPackages?.Length > 0)
-                CurrentPackage = _filteredPackages[0];
-            else
-                CurrentPackage = null;
+            CurrentPackage = _filteredPackages?.FirstOrDefault();
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -8,7 +8,7 @@ using System.Windows.Media;
 namespace SIQuester.Behaviors
 {
     /// <summary>
-    /// Компонент, обеспечивающий появление всплывающих подсказок у TextBlock, текст которых выводится на экран не полностью
+    /// Provides tooltip for a TextBlock which text is trimmed.
     /// </summary>
     public static class SmartTipBehavior
     {
@@ -54,7 +54,20 @@ namespace SIQuester.Behaviors
         private static void SetToolTip(object sender, EventArgs e)
         {
             var textBlock = sender as TextBlock;
-            var ft = new FormattedText(textBlock.Text, CultureInfo.CurrentUICulture, textBlock.FlowDirection, new Typeface(textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch), textBlock.FontSize, textBlock.Foreground) { TextAlignment = textBlock.TextAlignment, Trimming = TextTrimming.None, LineHeight = textBlock.LineHeight };
+
+            var ft = new FormattedText(
+                textBlock.Text,
+                CultureInfo.CurrentUICulture,
+                textBlock.FlowDirection,
+                new Typeface(textBlock.FontFamily, textBlock.FontStyle, textBlock.FontWeight, textBlock.FontStretch),
+                textBlock.FontSize,
+                textBlock.Foreground,
+                VisualTreeHelper.GetDpi(textBlock).PixelsPerDip)
+            {
+                TextAlignment = textBlock.TextAlignment,
+                Trimming = TextTrimming.None,
+                LineHeight = textBlock.LineHeight
+            };
             
             var showTooltip = ft.WidthIncludingTrailingWhitespace > (textBlock.ActualWidth - textBlock.Padding.Left - textBlock.Padding.Right);
             textBlock.ToolTip = showTooltip ? textBlock.Text : null;

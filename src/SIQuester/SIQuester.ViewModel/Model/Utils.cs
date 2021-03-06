@@ -1,6 +1,7 @@
 ﻿using SIQuester.Model;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -11,20 +12,24 @@ namespace SIQuester
     /// </summary>
     internal static class Utils
     {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
         /// <summary>
         /// Получить XML из Базы
         /// </summary>
         /// <param name="name">Имя турнира в Базе</param>
         /// <returns>Скачанный XML</returns>
-        internal static async Task<XmlDocument> GetXml(string name)
+        internal static async Task<XmlDocument> GetXmlAsync(string name)
         {
-            var webRequest = (HttpWebRequest)WebRequest.Create(String.Format("http://db.chgk.info/tour/{0}/xml", name));
-            webRequest.UserAgent = AppSettings.UserAgentHeader;
+            var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml");
 
-            var response = await webRequest.GetResponseAsync();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(await response.Content.ReadAsStringAsync());
+            }
 
             var xmlDocument = new XmlDocument();
-            using (var stream = response.GetResponseStream())
+            using (var stream = await response.Content.ReadAsStreamAsync())
             {
                 xmlDocument.Load(stream);
             }
@@ -37,13 +42,15 @@ namespace SIQuester
         /// </summary>
         /// <param name="text">Входной текст</param>
         /// <returns>Совпадает ли число открывающих и закрывающих скобок в тексте</returns>
-        internal static bool GoodBrackets(this string text)
+        internal static bool ValidateTextBrackets(this string text)
         {
             if (text == null)
+            {
                 return true;
+            }
 
-            int total = 0;
-            for (int i = 0; i < text.Length; i++)
+            var total = 0;
+            for (var i = 0; i < text.Length; i++)
             {
                 switch (text[i])
                 {
@@ -53,14 +60,18 @@ namespace SIQuester
 
                     case ')':
                         if (total > 0)
+                        {
                             total--;
+                        }
                         else
+                        {
                             return false;
+                        }
                         break;
                 }
             }
 
-            return true;
+            return total == 0;
         }
     }
 }

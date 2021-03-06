@@ -48,7 +48,7 @@ namespace SIQuester.ViewModel
 
         public AboutViewModel()
         {
-            OpenSite = new SimpleCommand(arg => GoToUrl("http://vladimirkhil.com/si/siquester"));
+            OpenSite = new SimpleCommand(arg => GoToUrl("https://vladimirkhil.com/si/siquester"));
 
             LoadLicenses();
         }

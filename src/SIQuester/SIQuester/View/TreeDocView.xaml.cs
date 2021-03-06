@@ -64,10 +64,9 @@ namespace SIQuester
                     Math.Abs(position.Y - _startPoint.Y) <= SystemParameters.MinimumVerticalDragDistance)
                     return;
 
-                if (AppSettings.Default.View == ViewMode.TreeFull)
-                    host = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
-                else
-                    host = FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
+                host = AppSettings.Default.View == ViewMode.TreeFull
+                    ? FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource)
+                    : (FrameworkElement)FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
 
                 if (host == null || host.DataContext == null || host.DataContext is PackageViewModel || !(host.DataContext is IItemViewModel))
                     return;
@@ -116,8 +115,7 @@ namespace SIQuester
                 PreviewMouseMove -= MainWindow_PreviewMouseMove;
                 PreviewMouseLeftButtonUp -= DocumentView_PreviewMouseLeftButtonUp;
 
-                if (itemData != null)
-                    itemData.Dispose();
+                itemData?.Dispose();
             }
         }
 
@@ -154,12 +152,12 @@ namespace SIQuester
             else
             {
                 var format = FlatDocView.GetDragFormat(e);
-                if ((treeViewItem.DataContext is PackageViewModel || treeViewItem.DataContext is RoundViewModel) && format == "siqround" ||
+                e.Effects =
+                    (treeViewItem.DataContext is PackageViewModel || treeViewItem.DataContext is RoundViewModel) && format == "siqround" ||
                     (treeViewItem.DataContext is RoundViewModel || treeViewItem.DataContext is ThemeViewModel) && format == "siqtheme" ||
-                    (treeViewItem.DataContext is ThemeViewModel || treeViewItem.DataContext is QuestionViewModel) && format == "siqquestion")
-                    e.Effects = DragDropEffects.Move;
-                else
-                    e.Effects = DragDropEffects.None;
+                    (treeViewItem.DataContext is ThemeViewModel || treeViewItem.DataContext is QuestionViewModel) && format == "siqquestion"
+                    ? DragDropEffects.Move
+                    : DragDropEffects.None;
             }
 
             e.Handled = true;
@@ -168,39 +166,42 @@ namespace SIQuester
         private static ScrollViewer ScrollView(DragEventArgs e, DependencyObject source = null)
         {
             var scroller = FlatDocView.FindAncestor<ScrollViewer>(source ?? (DependencyObject)e.OriginalSource);
-            if (scroller != null)
+            if (scroller == null)
             {
-                var pos = e.GetPosition(scroller);
-
-                double scrollOffset = 0.0;
-
-                // See if we need to scroll down 
-                if (scroller.ViewportHeight - pos.Y < 40.0)
-                {
-                    scrollOffset = 6.0;
-                }
-                else if (pos.Y < 40.0)
-                {
-                    scrollOffset = -6.0;
-                }
-
-                // Scroll the tree down or up 
-                if (scrollOffset != 0.0)
-                {
-                    scrollOffset += scroller.VerticalOffset;
-
-                    if (scrollOffset < 0.0)
-                    {
-                        scrollOffset = 0.0;
-                    }
-                    else if (scrollOffset > scroller.ScrollableHeight)
-                    {
-                        scrollOffset = scroller.ScrollableHeight;
-                    }
-
-                    scroller.ScrollToVerticalOffset(scrollOffset);
-                }
+                return null;
             }
+
+            var pos = e.GetPosition(scroller);
+
+            double scrollOffset = 0.0;
+
+            // See if we need to scroll down 
+            if (scroller.ViewportHeight - pos.Y < 40.0)
+            {
+                scrollOffset = 6.0;
+            }
+            else if (pos.Y < 40.0)
+            {
+                scrollOffset = -6.0;
+            }
+
+            // Scroll the tree down or up 
+            if (scrollOffset != 0.0)
+            {
+                scrollOffset += scroller.VerticalOffset;
+
+                if (scrollOffset < 0.0)
+                {
+                    scrollOffset = 0.0;
+                }
+                else if (scrollOffset > scroller.ScrollableHeight)
+                {
+                    scrollOffset = scroller.ScrollableHeight;
+                }
+
+                scroller.ScrollToVerticalOffset(scrollOffset);
+            }
+
             return scroller;
         }
 

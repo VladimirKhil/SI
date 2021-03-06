@@ -41,24 +41,12 @@ namespace SIQuester.ViewModel
             return Task.CompletedTask;
         }
 
-        protected internal void OnError(Exception exc)
-        {
-            Error?.Invoke(exc);
-        }
+        protected internal void OnError(Exception exc) => Error?.Invoke(exc);
 
-        protected void OnClosed()
-        {
-            Closed?.Invoke(this);
-        }
+        protected void OnClosed() => Closed?.Invoke(this);
 
-        protected void OnNewItem(WorkspaceViewModel viewModel)
-        {
-            NewItem?.Invoke(viewModel);
-        }
+        protected void OnNewItem(WorkspaceViewModel viewModel) => NewItem?.Invoke(viewModel);
 
-        protected internal virtual Task SaveIfNeeded(bool temp)
-        {
-            return Task.CompletedTask;
-        }
+        protected internal virtual Task SaveIfNeeded(bool temp) => Task.CompletedTask;
     }
 }

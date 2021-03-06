@@ -15,6 +15,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:lb="clr-namespace:SImulator.Behaviors"
         xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
+        xmlns:swm="System.Windows.Media;assembly=PresentationCore"
         SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
         Icon="Images/logo.png"
         Closing="Window_Closing" Height="600" Width="755" MinHeight="600" MinWidth="755"
@@ -22,7 +23,7 @@
         Background="{StaticResource MainBackground}">
     <Window.Resources>
         <ResourceDictionary>
-            
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Windows8Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -173,15 +174,7 @@
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
-                            <Image Stretch="Uniform">
-                                <Image.Source>
-                                    <DrawingImage>
-                                        <DrawingImage.Drawing>
-                                            <GeometryDrawing Geometry="M0,0L11.6,6.7L0,13.4z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                        </DrawingImage.Drawing>
-                                    </DrawingImage>
-                                </Image.Source>
-                            </Image>
+                            <Path Data="M0,0L11.6,6.7L0,13.4z" Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -780,7 +773,7 @@
                         <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
-                                    <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.TableGridColorString}" />
+                                    <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.TableGridColorString, TargetNullValue={x:Static Colors.Transparent}}" />
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -934,7 +927,9 @@
                     </Button>
                 </StackPanel>
                 <TextBlock Style="{StaticResource Header}">Игровые кнопки</TextBlock>
-                <ComboBox ItemsSource="{Binding Source={StaticResource TempPlayerButtonTypes}}" SelectedItem="{Binding Settings.UsePlayersKeys}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
+                <ComboBox ItemsSource="{Binding Source={StaticResource TempPlayerButtonTypes}}"
+                          SelectedItem="{Binding Settings.UsePlayersKeys}"
+                          IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="vmc:PlayerKeysModes">
                             <TextBlock Text="{Binding Converter={StaticResource PlayerButtonTypesConverter}}" />

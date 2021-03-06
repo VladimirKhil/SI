@@ -61,6 +61,42 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику..
+        /// </summary>
+        internal static string CommonAppError {
+            get {
+                return ResourceManager.GetString("CommonAppError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Закончилось место на диске!.
+        /// </summary>
+        internal static string DiskFullError {
+            get {
+                return ResourceManager.GetString("DiskFullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка удаления файла: {0}.
+        /// </summary>
+        internal static string FileDeletionError {
+            get {
+                return ResourceManager.GetString("FileDeletionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Завершить игру?.
+        /// </summary>
+        internal static string FinishGameQuestion {
+            get {
+                return ResourceManager.GetString("FinishGameQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Упрощённая.
         /// </summary>
         internal static string GameModes_Sport {
@@ -79,11 +115,92 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Папка для записи логов &quot;{0}&quot; не найдена.
+        /// </summary>
+        internal static string LogsFolderNotFound {
+            get {
+                return ResourceManager.GetString("LogsFolderNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
+        /// </summary>
+        internal static string NavigateToSiteError {
+            get {
+                return ResourceManager.GetString("NavigateToSiteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
+        /// </summary>
+        internal static string OutOfMemoryError {
+            get {
+                return ResourceManager.GetString("OutOfMemoryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
+        /// </summary>
+        internal static string RuntimeBrokenError {
+            get {
+                return ResourceManager.GetString("RuntimeBrokenError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка при сохранении настроек программы.
         /// </summary>
         internal static string SavingSettingsError {
             get {
                 return ResourceManager.GetString("SavingSettingsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выберите папку для записи логов.
+        /// </summary>
+        internal static string SelectLogsFolder {
+            get {
+                return ResourceManager.GetString("SelectLogsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выберите пакет вопросов.
+        /// </summary>
+        internal static string SelectQuestionPackage {
+            get {
+                return ResourceManager.GetString("SelectQuestionPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопросы СИ.
+        /// </summary>
+        internal static string SIQuestions {
+            get {
+                return ResourceManager.GetString("SIQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка работы с библиотекой вопросов: {0}.
+        /// </summary>
+        internal static string SIStorageError {
+            get {
+                return ResourceManager.GetString("SIStorageError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет тест.
+        /// </summary>
+        internal static string TestPackage {
+            get {
+                return ResourceManager.GetString("TestPackage", resourceCulture);
             }
         }
     }

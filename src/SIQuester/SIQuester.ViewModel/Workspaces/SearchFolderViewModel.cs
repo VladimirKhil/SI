@@ -17,7 +17,7 @@ namespace SIQuester.ViewModel
 
         public string FolderPath
         {
-            get { return AppSettings.Default.SearchPath; }
+            get => AppSettings.Default.SearchPath;
             set
             {
                 if (AppSettings.Default.SearchPath != value)
@@ -39,6 +39,7 @@ namespace SIQuester.ViewModel
                 if (_searchLink != null)
                 {
                     _searchLink.Cancel();
+                    _searchLink = null;
                 }
             }
 
@@ -46,18 +47,21 @@ namespace SIQuester.ViewModel
             SearchProgress = 0;
 
             if (FolderPath.Length == 0 || !Directory.Exists(FolderPath) || _searchText.Length == 0)
+            {
                 return;
+            }
 
             _searchLink = new CancellationTokenSource();
-            var task = Task.Run(new Action(() =>
-            {
-                var directoryInfo = new DirectoryInfo(FolderPath);
-                SearchInDirectory(directoryInfo, _searchText, _subfoldersSearch, _searchLink.Token);
-            }), _searchLink.Token);
 
             try
             {
-                await task;
+                await Task.Run(
+                    new Action(() =>
+                    {
+                        var directoryInfo = new DirectoryInfo(FolderPath);
+                        SearchInDirectory(directoryInfo, _searchText, _subfoldersSearch, _searchLink.Token);
+                    }),
+                    _searchLink.Token);
             }
             catch (Exception exc)
             {
@@ -73,7 +77,7 @@ namespace SIQuester.ViewModel
 
         public string SearchText
         {
-            get { return _searchText; }
+            get => _searchText;
             set
             {
                 if (_searchText != value)
@@ -89,7 +93,7 @@ namespace SIQuester.ViewModel
 
         public bool SubfoldersSearch
         {
-            get { return _subfoldersSearch; }
+            get => _subfoldersSearch;
             set
             {
                 if (_subfoldersSearch != value)
@@ -104,8 +108,8 @@ namespace SIQuester.ViewModel
 
         public int SearchProgress
         {
-            get { return _searchProgress; }
-            set 
+            get => _searchProgress;
+            set
             {
                 if (_searchProgress != value)
                 {
@@ -114,7 +118,7 @@ namespace SIQuester.ViewModel
                 }
             }
         }
-        
+
         public SimpleCommand SelectFolderPath { get; private set; }
         public ICommand Open { get; private set; }
 
@@ -133,20 +137,30 @@ namespace SIQuester.ViewModel
         private void Open_Executed(object arg)
         {
             var result = (SearchResult)arg;
-            _main.OpenFile(result.FileName, _searchText, onSuccess: () =>
-            {
-                PlatformSpecific.PlatformManager.Instance.AddToRecentCategory(result.FileName);
-            });
+            _main.OpenFile(
+                result.FileName,
+                _searchText,
+                onSuccess: () =>
+                {
+                    PlatformSpecific.PlatformManager.Instance.AddToRecentCategory(result.FileName);
+                });
         }
 
         private void SelectFolderPath_Executed(object arg)
         {
             var path = PlatformSpecific.PlatformManager.Instance.SelectSearchFolder();
             if (path != null)
+            {
                 FolderPath = path;
+            }
         }
 
-        private void SearchInDirectory(DirectoryInfo directoryInfo, string searchText, bool subfoldersSearch, CancellationToken token, int level = 0)
+        private void SearchInDirectory(
+            DirectoryInfo directoryInfo,
+            string searchText,
+            bool subfoldersSearch,
+            CancellationToken token,
+            int level = 0)
         {
             var files = directoryInfo.GetFiles("*.siq");
             var folders = directoryInfo.GetDirectories();
@@ -167,37 +181,42 @@ namespace SIQuester.ViewModel
                 {
                     using (var stream = File.OpenRead(file.FullName))
                     {
-                        using (var doc = SIDocument.Load(stream))
+                        using var doc = SIDocument.Load(stream);
+                        var package = doc.Package;
+                        if ((found = package.SearchFragment(searchText)) == null)
                         {
-                            var package = doc.Package;
-                            if ((found = package.SearchFragment(searchText)) == null)
+                            foreach (var round in package.Rounds)
                             {
-                                foreach (var round in package.Rounds)
+                                if ((found = round.SearchFragment(searchText)) != null)
                                 {
-                                    if ((found = round.SearchFragment(searchText)) != null)
-                                        break;
+                                    break;
+                                }
 
-                                    foreach (var theme in round.Themes)
+                                foreach (var theme in round.Themes)
+                                {
+                                    if ((found = theme.SearchFragment(searchText)) != null)
                                     {
-                                        if ((found = theme.SearchFragment(searchText)) != null)
-                                            break;
+                                        break;
+                                    }
 
-                                        foreach (var quest in theme.Questions)
+                                    foreach (var quest in theme.Questions)
+                                    {
+                                        if ((found = quest.SearchFragment(searchText)) != null)
                                         {
-                                            if ((found = quest.SearchFragment(searchText)) != null)
-                                                break;
-                                        }
-
-                                        if (found != null)
                                             break;
+                                        }
                                     }
 
                                     if (found != null)
+                                    {
                                         break;
+                                    }
                                 }
-                            }
-                            else
-                            {
+
+                                if (found != null)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -206,20 +225,24 @@ namespace SIQuester.ViewModel
                     {
                         var fileNameLocal = file.FullName;
                         var foundLocal = found;
-                        Task.Factory.StartNew(() =>
-                        {
-                            lock (_searchSync)
+                        Task.Factory.StartNew(
+                            () =>
                             {
-                                if (token.IsCancellationRequested)
-                                    return;
-
-                                SearchResults.Add(new SearchResult
+                                lock (_searchSync)
                                 {
-                                    FileName = fileNameLocal,
-                                    Fragment = foundLocal
-                                });
-                            }
-                        }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                                    if (token.IsCancellationRequested)
+                                        return;
+
+                                    SearchResults.Add(new SearchResult
+                                    {
+                                        FileName = fileNameLocal,
+                                        Fragment = foundLocal
+                                    });
+                                }
+                            },
+                            CancellationToken.None,
+                            TaskCreationOptions.None,
+                            UI.Scheduler);
                     }
                 }
                 catch
@@ -233,7 +256,9 @@ namespace SIQuester.ViewModel
                         lock (_searchSync)
                         {
                             if (!token.IsCancellationRequested)
+                            {
                                 SearchProgress = 100 * done / total;
+                            }
                         }
                     }
                 }
@@ -258,6 +283,17 @@ namespace SIQuester.ViewModel
                     }
                 }
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (_searchLink != null)
+            {
+                _searchLink.Cancel();
+                _searchLink = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

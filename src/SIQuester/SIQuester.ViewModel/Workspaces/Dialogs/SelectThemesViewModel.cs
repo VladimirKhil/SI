@@ -23,7 +23,7 @@ namespace SIQuester.ViewModel
 
         public int From
         {
-            get { return _from; }
+            get => _from;
             set
             {
                 if (_from != value)
@@ -38,7 +38,7 @@ namespace SIQuester.ViewModel
 
         public int To
         {
-            get { return _to; }
+            get => _to;
             set
             {
                 if (_to != value)

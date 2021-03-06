@@ -32,7 +32,7 @@ namespace SIQuester.ViewModel
 
         public string Text
         {
-            get { return _text; }
+            get => _text;
             set { _text = value; OnPropertyChanged(); }
         }
 
@@ -97,7 +97,7 @@ namespace SIQuester.ViewModel
 
         public bool StandartLogic
         {
-            get { return _standartLogic; }
+            get => _standartLogic;
             set
             {
                 if (_standartLogic != value)
@@ -119,15 +119,15 @@ namespace SIQuester.ViewModel
                 }
             }
         }
-        
+
         private string _goText;
 
         public string GoText
         {
-            get { return _goText; }
+            get => _goText;
             set { _goText = value; OnPropertyChanged(); }
         }
-        
+
         private bool _isEditorOpened;
 
         public bool IsEditorOpened
@@ -337,10 +337,7 @@ namespace SIQuester.ViewModel
             _skip = new SimpleCommand(Skip_Executed);
         }
 
-        private void Sns_Executed(object arg)
-        {
-            SetTemplate(QConverter.GetSnsTemplates(_parts, _standartLogic));
-        }
+        private void Sns_Executed(object arg) => SetTemplate(QConverter.GetSnsTemplates(_parts, _standartLogic));
 
         private async void Auto_Executed(object arg)
         {
@@ -516,7 +513,9 @@ namespace SIQuester.ViewModel
         {
             var text = template.Transform;
             if (!template.Enabled || template.Variants.Contains(text))
+            {
                 return;
+            }
 
             template.Variants.Add(text);
         }
@@ -702,13 +701,13 @@ namespace SIQuester.ViewModel
                 }
                 else if (source != null)
                 {
-                    using (var reader = new StreamReader(source, Encoding.GetEncoding(1251)))
-                    {
-                        Text = reader.ReadToEnd();
-                    }
+                    using var reader = new StreamReader(source, Encoding.GetEncoding(1251));
+                    Text = reader.ReadToEnd();
                 }
                 else
+                {
                     Text = string.Empty;
+                }
             }
             catch (Exception exc)
             {
@@ -748,13 +747,13 @@ namespace SIQuester.ViewModel
                     Progress = progress * 100 / _text.Length;
             }
             else
+            {
                 Progress = progress;
+            }
         }
 
-        private void OnSelectText(int start, int length, Color? color, bool scroll)
-        {
+        private void OnSelectText(int start, int length, Color? color, bool scroll) =>
             SelectText?.Invoke(start, length, color, scroll);
-        }
 
         private void PrepareUI()
         {
@@ -776,7 +775,9 @@ namespace SIQuester.ViewModel
         private string GetNormalView(Expression expression)
         {
             if (expression is StringValue stringValue)
+            {
                 return stringValue.Value;
+            }
 
             if (expression is Set set)
             {
@@ -791,7 +792,9 @@ namespace SIQuester.ViewModel
                 var text = "(";
 
                 if (opt.Operand != null)
+                {
                     text += GetNormalView(opt.Operand);
+                }
 
                 text += ")?";
                 return text;
@@ -928,6 +931,7 @@ namespace SIQuester.ViewModel
                     Problem = string.Format(Resources.ObjectNotFound, setName)
                         + Environment.NewLine + problem + Environment.NewLine + Resources.SourceFail;
                 }
+
                 return;
             }
 

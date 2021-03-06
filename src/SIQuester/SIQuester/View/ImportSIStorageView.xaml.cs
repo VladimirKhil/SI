@@ -15,19 +15,10 @@ namespace SIQuester
             InitializeComponent();
         }
 
-        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            Import();
-        }
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e) => Import();
 
-        private void Import()
-        {
-            ((ImportSIStorageViewModel)DataContext).Select();
-        }
+        private void Import() => ((ImportSIStorageViewModel)DataContext).Select();
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Import();
-        }
+        private void Button_Click(object sender, RoutedEventArgs e) => Import();
     }
 }

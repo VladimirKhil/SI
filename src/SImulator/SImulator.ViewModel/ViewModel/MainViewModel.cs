@@ -148,7 +148,7 @@ namespace SImulator.ViewModel
 
         public GameEngine Game
         {
-            get { return _game; }
+            get => _game;
             private set
             {
                 if (_game != value)
@@ -243,7 +243,7 @@ namespace SImulator.ViewModel
             Settings = settings;
             SettingsViewModel = new AppSettingsViewModel(Settings);
 
-            _start = new SimpleUICommand(Start_Executed) { Name = "Начать игру" };
+            _start = new SimpleUICommand(Start_Executed) { Name = Resources.StartGame };
 
             _selectPackage = new SimpleCommand(SelectPackage_Executed);
             SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
@@ -255,11 +255,11 @@ namespace SImulator.ViewModel
 
             _refresh = new SimpleCommand(Refresh_Executed);
 
-            _listen = new SimpleUICommand(Listen_Executed) { Name = "Ожидать подключения" };
-            _stopListen = new SimpleUICommand(StopListen_Executed) { Name = "Прекратить ожидание" };
+            _listen = new SimpleUICommand(Listen_Executed) { Name = Resources.ListenForConnections };
+            _stopListen = new SimpleUICommand(StopListen_Executed) { Name = Resources.StopListen };
 
-            _addPlayerButton = new SimpleUICommand(AddPlayerButton_Executed) { Name = "Добавить" };
-            _setPlayerButton = new SimpleUICommand(SetPlayerButton_Executed) { Name = "Нажмите на кнопку" };
+            _addPlayerButton = new SimpleUICommand(AddPlayerButton_Executed) { Name = Resources.Add };
+            _setPlayerButton = new SimpleUICommand(SetPlayerButton_Executed) { Name = Resources.PressTheButton };
             _removePlayerButton = new SimpleCommand(RemovePlayerButton_Executed);
 
             NavigateToSite = new SimpleCommand(NavigateToSite_Executed);
@@ -289,7 +289,7 @@ namespace SImulator.ViewModel
             Settings.PropertyChanged += MyDefault_PropertyChanged;
 
 #if DEBUG
-            Settings.ScreenNumber = Math.Max(0, this.Screens.Length - 2);
+            Settings.ScreenNumber = Math.Max(0, Screens.Length - 2);
 #endif
 
             SetIsRemoteControlling();
@@ -304,19 +304,21 @@ namespace SImulator.ViewModel
         private void RemovePlayer_Executed(object arg)
         {
             if (!(arg is SimplePlayerInfo player))
+            {
                 return;
+            }
 
             Players.Remove(player);
         }
 
         private void AddRight_Executed(object arg)
         {
-            _game.AddRight.Execute(null);
+            _game?.AddRight.Execute(null);
         }
 
         private void AddWrong_Executed(object arg)
         {
-            _game.AddWrong.Execute(null);
+            _game?.AddWrong.Execute(null);
         }
 
         private void OpenLicensesFolder_Executed(object arg)
@@ -338,17 +340,7 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void NavigateToSite_Executed(object arg)
-        {
-            try
-            {
-                PlatformManager.Instance.NavigateToSite();
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Возникла ошибка при переходе на сайт программы (http://vladimirkhil.com). Убедитесь, что у вас настроен браузер по умолчанию.\r\n{0}", exc.Message));
-            }
-        }
+        private void NavigateToSite_Executed(object arg) => PlatformManager.Instance.NavigateToSite();
 
         private void SelectColor_Executed(object arg)
         {
@@ -359,7 +351,9 @@ namespace SImulator.ViewModel
 
             var color = PlatformManager.Instance.AskSelectColor();
             if (color == null)
+            {
                 return;
+            }
 
             var settings = Settings.SIUISettings;
             switch (colorMode)
@@ -385,7 +379,9 @@ namespace SImulator.ViewModel
             {
                 case nameof(AppSettings.IsRemoteControlAllowed):
                     if (_computers == null)
+                    {
                         GetComputers();
+                    }
 
                     UpdateStartCommand();
                     break;
@@ -434,7 +430,7 @@ namespace SImulator.ViewModel
                 }
                 catch (Exception exc)
                 {
-                    throw new Exception(string.Format("Ошибка при загрузке игрового пакета: {0}", exc.Message));
+                    throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
                 }
 
                 var gameHost = PlatformManager.Instance.CreateGameHost(engine);
@@ -443,17 +439,25 @@ namespace SImulator.ViewModel
                 if (_isRemoteControlling)
                 {
                     if (!Connect(gameHost, out ui))
+                    {
                         return;
+                    }
                 }
                 else
                 {
-                    var remoteGameUI = new RemoteGameUI { GameHost = gameHost, ScreenIndex = SettingsViewModel.Model.ScreenNumber };
+                    var remoteGameUI = new RemoteGameUI
+                    {
+                        GameHost = gameHost,
+                        ScreenIndex = SettingsViewModel.Model.ScreenNumber
+                    };
+
                     ui = remoteGameUI;
                     ui.UpdateSettings(SettingsViewModel.SIUISettings.Model);
                     remoteGameUI.OnError += ShowError;
                 }
 
                 var game = new GameEngine(SettingsViewModel, engine, gameHost, ui, Players, _isRemoteControlling);
+                Game = game;
 
                 game.Start();
 
@@ -465,15 +469,24 @@ namespace SImulator.ViewModel
                 {
                     recent.Insert(0, _packageSource.Token);
                     if (recent.Count > 10)
+                    {
                         recent.RemoveAt(10);
+                    }
                 }
 
                 Mode = GameMode.Moderator;
-                Game = game;
             }
             catch (Exception exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка старта игры: {0}", exc.ToString()), false);
+                var reason = exc.InnerException ?? exc;
+
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, reason.Message), false);
+                if (_game != null)
+                {
+                    _game.CloseMainView();
+                }
+
+                EndGame();
                 return;
             }
         }
@@ -510,15 +523,16 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void GameEngine_Closed(object sender, EventArgs e)
-        {
-            Task.Factory.StartNew(() =>
-            {
-                EndGame();
-
-                PlatformManager.Instance.ShowMessage("Соединение с демонстрационным компьютером было разорвано. Игра прекращена.", false);
-            }, System.Threading.CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
-        }
+        private void GameEngine_Closed(object sender, EventArgs e) =>
+            Task.Factory.StartNew(
+                () =>
+                {
+                    EndGame();
+                    PlatformManager.Instance.ShowMessage(Resources.GameEndsBecauseOfConnectionLoss, false);
+                },
+                System.Threading.CancellationToken.None,
+                TaskCreationOptions.None,
+                UI.Scheduler);
 
         private void Disconnect()
         {
@@ -532,36 +546,44 @@ namespace SImulator.ViewModel
                 {
                     factory.Abort();
                 }
+                catch (CommunicationObjectFaultedException)
+                {
+                    factory.Abort();
+                }
             }
 
             factory = null;
         }
 
-        async void Game_RequestStop()
-        {
-            await RaiseStop();
-        }
+        private async void Game_RequestStop() => await RaiseStop();
 
         public async Task<bool> RaiseStop()
         {
             if (_game == null)
+            {
                 return true;
+            }
 
-            var result = await PlatformManager.Instance.AskStopGame();
+            var result = await PlatformManager.Instance.AskStopGameAsync();
 
             if (!result)
+            {
                 return false;
+            }
 
             if (_game != null)
+            {
                 _game.CloseMainView();
+            }
 
             Disconnect();
             EndGame();
+
             return true;
         }
 
         /// <summary>
-        /// Завершить игру
+        /// Ends the game.
         /// </summary>
         private void EndGame()
         {
@@ -579,19 +601,23 @@ namespace SImulator.ViewModel
             Transition = ModeTransition.ModeratorToStart;
 
             if (Settings.UsePlayersKeys == PlayerKeysModes.Web)
+            {
                 ActivePlayerButtonCommand = _addPlayerButton;
+            }
         }
 
         private async void SelectPackage_Executed(object arg)
         {
-            var packageSource = await PlatformManager.Instance.AskSelectPackage(arg);
+            var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(arg);
             if (packageSource != null)
+            {
                 PackageSource = packageSource;
+            }
         }
 
         private async void SelectLogoFile_Executed(object arg)
         {
-            var logoUri = await PlatformManager.Instance.AskSelectFile("Выберите изображение-заставку");
+            var logoUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectLogoImage);
             if (logoUri != null)
             {
                 Settings.SIUISettings.LogoUri = logoUri;
@@ -600,7 +626,7 @@ namespace SImulator.ViewModel
 
         private async void SelectVideo_Executed(object arg)
         {
-            var videoUrl = await PlatformManager.Instance.AskSelectFile("Выберите заставочный видеофайл");
+            var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectIntroVideo);
             if (videoUrl != null)
             {
                 Settings.VideoUrl = videoUrl;
@@ -609,7 +635,7 @@ namespace SImulator.ViewModel
 
         private async void SelectBackgroundImageFile_Executed(object arg)
         {
-            var imageUrl = await PlatformManager.Instance.AskSelectFile("Выберите изображение-фон");
+            var imageUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundImage);
             if (imageUrl != null)
             {
                 Settings.SIUISettings.BackgroundImageUri = imageUrl;
@@ -618,7 +644,7 @@ namespace SImulator.ViewModel
 
         private async void SelectBackgroundVideoFile_Executed(object arg)
         {
-            var videoUrl = await PlatformManager.Instance.AskSelectFile("Выберите видеофайл-фон");
+            var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundVideo);
             if (videoUrl != null)
             {
                 Settings.SIUISettings.BackgroundVideoUri = videoUrl;
@@ -629,7 +655,9 @@ namespace SImulator.ViewModel
         {
             var folder = PlatformManager.Instance.AskSelectLogsFolder();
             if (folder != null)
+            {
                 Settings.LogsFolder = folder;
+            }
         }
 
         private async void SelectAudioFile_Executed(object arg)
@@ -639,7 +667,7 @@ namespace SImulator.ViewModel
                 return;
             }
 
-            var fileUri = await PlatformManager.Instance.AskSelectFile("Выберите аудиофайл");
+            var fileUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectAudioFile);
             if (fileUri == null)
             {
                 return;
@@ -711,7 +739,7 @@ namespace SImulator.ViewModel
 
         private void Refresh_Executed(object arg)
         {
-            _computers = new string[0];
+            _computers = Array.Empty<string>();
             OnPropertyChanged(nameof(Computers));
 
             GetComputers();
@@ -851,7 +879,7 @@ namespace SImulator.ViewModel
 
         private void SetPlayerButton_Executed(object arg)
         {
-            // Ничего не делаем; команда активируется нажатием клавиши
+            // Do nothing; the command is activated by key press
         }
 
         private async void GetComputers()
@@ -863,7 +891,7 @@ namespace SImulator.ViewModel
 
             try
             {
-                _computers = await Task.Factory.StartNew(PlatformManager.Instance.GetLocalComputers);
+                _computers = await Task.Run(PlatformManager.Instance.GetLocalComputers);
                 OnPropertyChanged(nameof(Computers));
             }
             catch (Exception exc)

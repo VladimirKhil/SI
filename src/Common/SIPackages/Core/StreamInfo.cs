@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace SIPackages.Core
 {
     /// <summary>
-    /// Информация о потоках, не поддерживающих свойство Length
+    /// Wraps the stream adding <see cref="Length" /> property to it.
     /// </summary>
     public sealed class StreamInfo
     {
+        /// <summary>
+        /// Wrapped stream.
+        /// </summary>
         public Stream Stream { get; set; }
+
+        /// <summary>
+        /// Stream length.
+        /// </summary>
         public long Length { get; set; }
     }
 }

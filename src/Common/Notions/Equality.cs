@@ -21,6 +21,7 @@ namespace Notions
                 {
                     new Point(i, j)
                 };
+
                 _equalsMy.Add(list.ToArray());
             }
 
@@ -30,6 +31,7 @@ namespace Notions
                 {
                     new Point(i, j)
                 };
+
                 _equalsMy.Add(list.ToArray());
             }
 
@@ -39,6 +41,7 @@ namespace Notions
                 {
                     new Point(i, j)
                 };
+
                 _equalsMy.Add(list.ToArray());
             }
 

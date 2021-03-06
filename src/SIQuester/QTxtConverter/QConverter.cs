@@ -1,17 +1,16 @@
-﻿using System;
+﻿using Lingware.Spard;
+using Lingware.Spard.Common;
+using Lingware.Spard.Expressions;
+using Notions;
+using QTxtConverter.Properties;
+using SIPackages;
+using SIPackages.Core;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
-using Notions;
-using QTxtConverter.Properties;
-using System.Collections;
 using System.Linq;
-using SIPackages;
-using SIPackages.Core;
-using Lingware.Spard;
-using Lingware.Spard.Common;
-using Lingware.Spard.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace QTxtConverter

@@ -17,7 +17,7 @@ namespace SIQuester.ViewModel
 
         public bool Enabled
         {
-            get { return _enabled; }
+            get => _enabled;
             set
             {
                 if (_enabled != value)
@@ -32,7 +32,7 @@ namespace SIQuester.ViewModel
 
         public string Transform
         {
-            get { return _transform; }
+            get => _transform;
             set { if (_transform != value) { _transform = value; OnPropertyChanged(); } }
         }
 
@@ -68,7 +68,8 @@ namespace SIQuester.ViewModel
         {
             Aliases = new Dictionary<string, EditAlias>();
 
-            Cut = new SimpleCommand(arg =>
+            Cut = new SimpleCommand(
+                arg =>
                 {
                     if (_transform != null)
                     {
@@ -77,28 +78,33 @@ namespace SIQuester.ViewModel
                     }
                 });
 
-            Copy = new SimpleCommand(arg =>
-            {
-                if (_transform != null)
-                    Clipboard.SetData(DataFormats.UnicodeText, _transform);
-            });
+            Copy = new SimpleCommand(
+                arg =>
+                {
+                    if (_transform != null)
+                        Clipboard.SetData(DataFormats.UnicodeText, _transform);
+                });
 
-            Paste = new SimpleCommand(arg =>
-            {
-                Transform = (string)Clipboard.GetData(DataFormats.UnicodeText);
-            });
+            Paste = new SimpleCommand(
+                arg =>
+                {
+                    Transform = (string)Clipboard.GetData(DataFormats.UnicodeText);
+                });
 
-            InsertAlias = new SimpleCommand(arg =>
+            InsertAlias = new SimpleCommand(
+                arg =>
                 {
                     AliasInserted?.Invoke(arg.ToString());
                 });
 
-            InsertOptional = new SimpleCommand(arg =>
+            InsertOptional = new SimpleCommand(
+                arg =>
                 {
                     OptionalInserted?.Invoke();
                 });
 
-            ChangeTemplate = new SimpleCommand(template =>
+            ChangeTemplate = new SimpleCommand(
+                template =>
                 {
                     Transform = template.ToString();
                 });

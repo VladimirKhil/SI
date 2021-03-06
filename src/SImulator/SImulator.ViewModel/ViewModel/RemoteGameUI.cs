@@ -88,6 +88,8 @@ namespace SImulator.ViewModel
 
         public event Action<Exception> OnError;
 
+        private MemoryStream _buffer = null;
+
         public RemoteGameUI()
         {
             TInfo = new TableInfoViewModel { Enabled = true };
@@ -144,7 +146,7 @@ namespace SImulator.ViewModel
                 ((IChannel)GameHost).Faulted += RemoteGameUI_Closed;
             }
 
-            await PlatformManager.Instance.CreateMainView(this, ScreenIndex);
+            await PlatformManager.Instance.CreateMainViewAsync(this, ScreenIndex);
             TInfo.TStage = TableStage.Sign;
         }
 
@@ -155,7 +157,7 @@ namespace SImulator.ViewModel
 
         public async void StopGame()
         {
-            await PlatformManager.Instance.CloseMainView();
+            await PlatformManager.Instance.CloseMainViewAsync();
 
             lock (TInfo.TStageLock)
             {
@@ -166,12 +168,12 @@ namespace SImulator.ViewModel
             GameHost = null;
         }
 
-        private MemoryStream _buffer = null;
-
         public void ClearBuffer()
         {
             if (_buffer != null)
+            {
                 _buffer.Dispose();
+            }
 
             _buffer = new MemoryStream();
         }
@@ -184,25 +186,28 @@ namespace SImulator.ViewModel
         public async void SetMediaFromBuffer(string uri, bool background)
         {
             _buffer.Position = 0;
+
             var media = new Media(() => new StreamInfo { Stream = _buffer, Length = _buffer.Length }, uri);
-            var mediaPrepared = await PlatformManager.Instance.PrepareMedia(media);
+            var mediaPrepared = await PlatformManager.Instance.PrepareMediaAsync(media);
             if (mediaPrepared == null)
+            {
                 return;
+            }
 
             var source = new MediaSource(mediaPrepared.GetStream().Stream, mediaPrepared.Uri);
-
-            if (background)
-                TInfo.SoundSource = source;
-            else
-                TInfo.MediaSource = source;
+            SetMedia(source, background);
         }
 
         public void SetMedia(MediaSource media, bool background)
         {
             if (background)
+            {
                 TInfo.SoundSource = media;
+            }
             else
+            {
                 TInfo.MediaSource = media;
+            }
         }
 
         public void SetGameThemes(string[] themes)
@@ -263,7 +268,9 @@ namespace SImulator.ViewModel
         {
             var player = TInfo.Players.FirstOrDefault(info => info.Name == playerName);
             if (player != null)
+            {
                 TInfo.Players.Remove(player);
+            }
         }
 
         public void ClearPlayers()
@@ -340,15 +347,9 @@ namespace SImulator.ViewModel
 
         public void PlayComplexSelection(int theme, int quest, bool setActive) => TInfo.PlayComplexSelectionAsync(theme, quest, setActive);
 
-        public void PlaySelection(int theme)
-        {
-            TInfo.PlaySelection(theme);
-        }
-        
-        public void UpdateSettings(Settings settings)
-        {
-            TInfo.Settings.Initialize(settings);
-        }
+        public void PlaySelection(int theme) => TInfo.PlaySelection(theme);
+
+        public void UpdateSettings(Settings settings) => TInfo.Settings.Initialize(settings);
 
         public bool OnKeyPressed(GameKey key)
         {
@@ -437,20 +438,11 @@ namespace SImulator.ViewModel
             }
         }
 
-        public void SeekMedia(int position)
-        {
-            TInfo.OnMediaSeek(position);
-        }
+        public void SeekMedia(int position) => TInfo.OnMediaSeek(position);
 
-        public void RunMedia()
-        {
-            TInfo.OnMediaResume();
-        }
+        public void RunMedia() => TInfo.OnMediaResume();
 
-        public void StopMedia()
-        {
-            TInfo.OnMediaPause();
-        }
+        public void StopMedia() => TInfo.OnMediaPause();
 
         public void RestoreQuestion(int themeIndex, int questionIndex, int price)
         {

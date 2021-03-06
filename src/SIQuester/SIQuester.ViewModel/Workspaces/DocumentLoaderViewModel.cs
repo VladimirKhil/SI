@@ -14,10 +14,10 @@ namespace SIQuester.ViewModel
 
         public string ErrorMessage
         {
-            get { return _errorMessage; }
+            get => _errorMessage;
             set { _errorMessage = value; OnPropertyChanged(); }
         }
-        
+
         public DocumentLoaderViewModel(string title, Func<Task<QDocument>> loader, Action onSuccess = null)
         {
             Title = title;

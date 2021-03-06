@@ -20,6 +20,8 @@ namespace SIQuester
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private static TimeSpan AutoSaveInterval = TimeSpan.FromSeconds(20);
+
         private bool _closingFromThumbnail = false;
         private DispatcherTimer _autoSaveTimer;
 
@@ -28,15 +30,12 @@ namespace SIQuester
             InitializeComponent();
 
             if (AppSettings.Default.AutoSave)
-                _autoSaveTimer = new DispatcherTimer(TimeSpan.FromSeconds(20), DispatcherPriority.Background, AutoSave, Dispatcher);
+            {
+                _autoSaveTimer = new DispatcherTimer(AutoSaveInterval, DispatcherPriority.Background, AutoSave, Dispatcher);
+            }
         }
 
-        private void AutoSave(object sender, EventArgs args)
-        {
-            var main = (MainViewModel)DataContext;
-            if (main != null)
-                main.AutoSave();
-        }
+        private void AutoSave(object sender, EventArgs args) => ((MainViewModel)DataContext)?.AutoSave();
 
         /// <summary>
         /// Поскольку TabControl при привязке к коллекции элементов ведёт себя достаточно странно, обеспечим создание и уничтожение вкладок самостоятельно
@@ -62,9 +61,9 @@ namespace SIQuester
                     tabItem.DragOver += TabItem_DragOver;
                     tabItem.Loaded += new RoutedEventHandler(TabItem_Loaded);
                     tabContent.Loaded += (sender2, e2) =>
-                        {
-                            UpdateCurrentPreview();
-                        };
+                    {
+                        UpdateCurrentPreview();
+                    };
 
                     tabControl1.Items.Add(tabItem);
                     break;
@@ -208,7 +207,9 @@ namespace SIQuester
         private bool UpdateCurrentPreview(TabbedThumbnail thumbnail = null)
         {
             if (!TaskbarManager.IsPlatformSupported)
+            {
                 return false;
+            }
 
             if (tabControl1.SelectedItem is TabItem tabItem)
             {
@@ -217,7 +218,9 @@ namespace SIQuester
                 if (preview != null && (preview == thumbnail || thumbnail == null))
                 {
                     if (!(tabItem.Content is FrameworkElement element) || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
+                    {
                         return false;
+                    }
 
                     var image = new RenderTargetBitmap((int)element.ActualWidth, (int)element.ActualHeight, 96, 96, PixelFormats.Default);
 
@@ -277,7 +280,9 @@ namespace SIQuester
         private void Main_Closed(object sender, EventArgs e)
         {
             if (DataContext is IDisposable disposable)
+            {
                 disposable.Dispose();
+            }
 
             if (_autoSaveTimer != null)
             {
@@ -303,19 +308,16 @@ namespace SIQuester
 
         private void Main_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (DataContext is MainViewModel mainViewModel)
+            if (DataContext is MainViewModel mainViewModel && e.Key == Key.Insert)
             {
-                if (e.Key == Key.Insert)
-                {
-                    var cmd = (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) > 0 ?
-                        mainViewModel.ActiveDocument?.ActiveNode?.Owner?.Add
-                        : mainViewModel.ActiveDocument?.ActiveNode?.Add;
+                var cmd = (e.KeyboardDevice.Modifiers & ModifierKeys.Shift) > 0 ?
+                    mainViewModel.ActiveDocument?.ActiveNode?.Owner?.Add
+                    : mainViewModel.ActiveDocument?.ActiveNode?.Add;
 
-                    if (cmd != null)
-                    {
-                        cmd.Execute(null);
-                        e.Handled = true;
-                    }
+                if (cmd != null)
+                {
+                    cmd.Execute(null);
+                    e.Handled = true;
                 }
             }
         }

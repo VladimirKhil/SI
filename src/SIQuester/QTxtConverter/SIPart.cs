@@ -14,6 +14,6 @@
         /// </summary>
         public string Value { get; set; }
 
-        public override string ToString() => this.Value;
+        public override string ToString() => Value;
     }
 }

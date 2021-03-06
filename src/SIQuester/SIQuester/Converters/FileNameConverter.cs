@@ -7,12 +7,15 @@ namespace SIQuester.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (value == null)
+            {
+                return null;
+            }
+
             return System.IO.Path.GetFileName(value.ToString());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+            => throw new NotImplementedException();
     }
 }

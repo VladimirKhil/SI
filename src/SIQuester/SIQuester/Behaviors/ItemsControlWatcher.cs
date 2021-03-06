@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace SIQuester.ViewModel
 {
@@ -37,31 +36,19 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private static TextBox FindTextBox(DependencyObject parent)
-        {
-            if (parent is TextBox textBox)
-                return textBox;
-
-            var childrenCount = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < childrenCount; i++)
-            {
-                textBox = FindTextBox(VisualTreeHelper.GetChild(parent, i));
-                if (textBox != null)
-                    return textBox;
-            }
-
-            return null;
-        }
-
-        static void Element_GotFocus(object sender, RoutedEventArgs e)
+        private static void Element_GotFocus(object sender, RoutedEventArgs e)
         {
             if (!(sender is FrameworkElement parent) || !(e.OriginalSource is FrameworkElement child))
+            {
                 return;
+            }
 
             var childItem = child.DataContext;
 
             if (!(parent.DataContext is IItemsViewModel parentList) || childItem == null)
+            {
                 return;
+            }
 
             if (parentList.Contains(childItem))
             {

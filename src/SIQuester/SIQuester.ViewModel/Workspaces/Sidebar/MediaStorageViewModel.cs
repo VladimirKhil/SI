@@ -37,7 +37,7 @@ namespace SIQuester.ViewModel
 
         public bool HasPendingChanges
         {
-            get { return _hasPendingChanges; }
+            get => _hasPendingChanges;
             set
             {
                 if (_hasPendingChanges != value)
@@ -55,10 +55,7 @@ namespace SIQuester.ViewModel
 
         internal event Action<IChange> Changed;
 
-        internal void OnChanged(IChange change)
-        {
-            Changed?.Invoke(change);
-        }
+        internal void OnChanged(IChange change) => Changed?.Invoke(change);
 
         /// <summary>
         /// Существующие в коллекции файлы
@@ -106,7 +103,9 @@ namespace SIQuester.ViewModel
         private void Named_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (_blockFlag)
+            {
                 return;
+            }
 
             var ext = (ExtendedPropertyChangedEventArgs<string>)e;
             var item = (Named)sender;
@@ -181,10 +180,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private bool IsChanged()
-        {
-            return _added.Count > 0 || _removed.Count > 0 || _renamed.Count > 0;
-        }
+        private bool IsChanged() => _added.Count > 0 || _removed.Count > 0 || _renamed.Count > 0;
 
         private void Delete_Executed(object arg)
         {
@@ -224,13 +220,15 @@ namespace SIQuester.ViewModel
                 _streams.Remove(name);
             }
             else
+            {
                 _removed.Add(name);
+            }
 
             Files.Remove(name);
             OnPropertyChanged(nameof(Files));
         }
 
-        public async Task Commit(DataCollection collection)
+        public async Task CommitAsync(DataCollection collection)
         {
             foreach (var item in _removed.ToArray())
             {
@@ -243,10 +241,8 @@ namespace SIQuester.ViewModel
             {
                 try
                 {
-                    using (var fs = _streams[item].Item2)
-                    {
-                        await collection.AddFile(item.Model.Name, fs);
-                    }
+                    using var fs = _streams[item].Item2;
+                    await collection.AddFile(item.Model.Name, fs);
                 }
                 catch (Exception exc)
                 {
@@ -266,7 +262,7 @@ namespace SIQuester.ViewModel
             HasPendingChanges = false;
         }
 
-        public async Task ApplyTo(DataCollection collection, bool final = false)
+        public async Task ApplyToAsync(DataCollection collection, bool final = false)
         {
             foreach (var item in _removed.ToArray())
             {
@@ -307,7 +303,9 @@ namespace SIQuester.ViewModel
         {
             var files = PlatformSpecific.PlatformManager.Instance.ShowMediaOpenUI();
             if (files == null)
+            {
                 return;
+            }
 
             foreach (var file in files)
             {
@@ -379,7 +377,9 @@ namespace SIQuester.ViewModel
         {
             var p = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
             if (p.Key != null)
+            {
                 return new Media(p.Value.Item1);
+            }
 
             lock (_document.Sync)
             {

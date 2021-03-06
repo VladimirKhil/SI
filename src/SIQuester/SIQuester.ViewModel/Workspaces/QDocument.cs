@@ -557,13 +557,13 @@ namespace SIQuester.ViewModel
                             using (var tempDoc = Document.SaveAs(stream, !temp))
                             {
                                 if (Images.HasPendingChanges)
-                                    await Images.ApplyTo(tempDoc.Images);
+                                    await Images.ApplyToAsync(tempDoc.Images);
 
                                 if (Audio.HasPendingChanges)
-                                    await Audio.ApplyTo(tempDoc.Audio);
+                                    await Audio.ApplyToAsync(tempDoc.Audio);
 
                                 if (Video.HasPendingChanges)
-                                    await Video.ApplyTo(tempDoc.Video);
+                                    await Video.ApplyToAsync(tempDoc.Video);
 
                                 tempDoc.FinalizeSave();
                             }
@@ -1773,13 +1773,13 @@ namespace SIQuester.ViewModel
                 Document.SaveAs(tempStream, true);
 
                 if (Images.HasPendingChanges)
-                    await Images.Commit(Document.Images);
+                    await Images.CommitAsync(Document.Images);
 
                 if (Audio.HasPendingChanges)
-                    await Audio.Commit(Document.Audio);
+                    await Audio.CommitAsync(Document.Audio);
 
                 if (Video.HasPendingChanges)
-                    await Video.Commit(Document.Video);
+                    await Video.CommitAsync(Document.Video);
 
                 Document.Dispose();
                 // Проверим качество сохранения
@@ -1815,13 +1815,13 @@ namespace SIQuester.ViewModel
                 Document.SaveAs(stream, true);
 
                 if (Images.HasPendingChanges)
-                    await Images.Commit(Document.Images);
+                    await Images.CommitAsync(Document.Images);
 
                 if (Audio.HasPendingChanges)
-                    await Audio.Commit(Document.Audio);
+                    await Audio.CommitAsync(Document.Audio);
 
                 if (Video.HasPendingChanges)
-                    await Video.Commit(Document.Video);
+                    await Video.CommitAsync(Document.Video);
 
                 Document.Dispose();
                 ClearTempFile(this._path);
@@ -2521,7 +2521,9 @@ namespace SIQuester.ViewModel
 
         private void SelectThemes_Executed(object arg)
         {
-            Dialog = new SelectThemesViewModel(this);
+            var selectThemesViewModel = new SelectThemesViewModel(this);
+            selectThemesViewModel.NewItem += OnNewItem;
+            Dialog = selectThemesViewModel;
         }
 
         private void ExpandAll_Executed(object arg)

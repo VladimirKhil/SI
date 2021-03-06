@@ -1433,7 +1433,7 @@ namespace SICore
                     // Special catch for hanging old taksks
                     if (task == Tasks.AskToChoose && OldTasks.Any())
                     {
-                        static string oldTaskPrinter(Tuple<int, int, int> t) => $"{t.Item1}:{t.Item2}";
+                        static string oldTaskPrinter(Tuple<int, int, int> t) => $"{(Tasks)t.Item1}:{t.Item2}";
 
                         ClientData.BackLink.SendError(
                             new Exception($"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +

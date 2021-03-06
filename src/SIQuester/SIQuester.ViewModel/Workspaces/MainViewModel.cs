@@ -209,7 +209,9 @@ namespace SIQuester.ViewModel
             {
                 await doc.Close.ExecuteAsync(null);
                 if (DocList.Contains(doc)) // Закрытие отменено
+                {
                     return false;
+                }
             }
 
             return true;

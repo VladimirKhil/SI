@@ -48,6 +48,7 @@ namespace SIQuester.ViewModel
                         Model.Themes.Insert(i, Themes[i].Model);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (ThemeViewModel theme in e.OldItems)
                     {
@@ -57,6 +58,7 @@ namespace SIQuester.ViewModel
                         OwnerPackage.Document.ClearLinks(theme);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     Model.Themes.Clear();
                     foreach (ThemeViewModel question in Themes)

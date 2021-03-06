@@ -4,9 +4,7 @@ using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIUI.ViewModel.Core;
 using System;
-using System.Collections.Generic;
 using System.ServiceModel;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -45,7 +43,7 @@ namespace SImulator.ViewModel
             }
             catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
             {
-                PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
@@ -57,11 +55,11 @@ namespace SImulator.ViewModel
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
@@ -125,11 +123,11 @@ namespace SImulator.ViewModel
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
@@ -142,25 +140,18 @@ namespace SImulator.ViewModel
         public void OnMediaEnd()
         {
             if (_engine.IsIntro())
+            {
                 return;
+            }
 
             IsMediaEnded = true;
             MediaEnd?.Invoke();
         }
 
-        public void OnMediaProgress(double progress)
-        {
-            MediaProgress?.Invoke(progress);
-        }
+        public void OnMediaProgress(double progress) => MediaProgress?.Invoke(progress);
 
-        public void OnIntroFinished()
-        {
-            _engine.OnIntroFinished();
-        }
+        public void OnIntroFinished() => _engine.OnIntroFinished();
 
-        public void OnRoundThemesFinished()
-        {
-            RoundThemesFinished?.Invoke();
-        }
+        public void OnRoundThemesFinished() => RoundThemesFinished?.Invoke();
     }
 }

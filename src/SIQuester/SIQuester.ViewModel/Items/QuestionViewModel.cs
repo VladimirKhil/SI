@@ -19,10 +19,7 @@ namespace SIQuester.ViewModel
 
         public override ICommand Add
         {
-            get
-            {
-                return null;
-            }
+            get => null;
             protected set { }
         }
 
@@ -68,18 +65,14 @@ namespace SIQuester.ViewModel
         {
             if (OwnerTheme != null)
             {
-                var quest = Model.Clone() as Question;
+                var quest = Model.Clone();
                 var newQuestionViewModel = new QuestionViewModel(quest);
                 OwnerTheme.Questions.Add(newQuestionViewModel);
                 OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
             }
         }
 
-        private void RemoveQuestion_Executed(object arg)
-        {
-            if (OwnerTheme != null)
-                OwnerTheme.Questions.Remove(this);
-        }
+        private void RemoveQuestion_Executed(object arg) => OwnerTheme?.Questions.Remove(this);
 
         private void SetQuestionType_Executed(object arg)
         {

@@ -2,9 +2,10 @@
 using Services.SI.ViewModel;
 using SIEngine;
 using SImulator.Implementation.ButtonManagers;
-using SImulator.ViewModel.Model;
+using SImulator.Properties;
 using SImulator.ViewModel;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
 using System;
@@ -16,21 +17,24 @@ using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.ServiceModel;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using Screen = System.Windows.Forms.Screen;
-using SIUI.ViewModel.Core;
 
 namespace SImulator.Implementation
 {
     /// <summary>
-    /// Реализация функций СИмулятора для десктопа
+    /// Provides desktop implementation of SImulator API.
     /// </summary>
     internal sealed class DesktopManager: PlatformManager
     {
+        private const int StreamCopyBufferSize = 81920;
+        private const string GameSiteUri = "https://vladimirkhil.com";
+
         private Window _window = null;
         private PlayersWindow _playersWindow = null;
         private readonly ButtonManagerFactoryDesktop _buttonManager = new ButtonManagerFactoryDesktop();
@@ -66,7 +70,7 @@ namespace SImulator.Implementation
             }
         }
 
-        public override Task CreateMainView(object dataContext, int screenNumber)
+        public override Task CreateMainViewAsync(object dataContext, int screenNumber)
         {
             var fullScreen = screenNumber < Screen.AllScreens.Length;
 
@@ -88,12 +92,14 @@ namespace SImulator.Implementation
             _window.Show();
 
             if (fullScreen)
+            {
                 _window.WindowState = WindowState.Maximized;
+            }
 
             return Task.CompletedTask;
         }
 
-        public override Task CloseMainView()
+        public override Task CloseMainViewAsync()
         {
             if (_window != null)
             {
@@ -112,10 +118,10 @@ namespace SImulator.Implementation
             return Task.CompletedTask;
         }
 
-        public override IScreen[] GetScreens()
-        {
-            return Screen.AllScreens.Select(screen => new ScreenInfo(screen)).Concat(new ScreenInfo[] { new ScreenInfo(null), new ScreenInfo(null) { IsRemote = true} }).ToArray();
-        }
+        public override IScreen[] GetScreens() =>
+            Screen.AllScreens.Select(screen => new ScreenInfo(screen))
+                .Concat(new ScreenInfo[] { new ScreenInfo(null), new ScreenInfo(null) { IsRemote = true } })
+                .ToArray();
 
         public override string[] GetLocalComputers()
         {
@@ -145,33 +151,37 @@ namespace SImulator.Implementation
             return list.ToArray();
         }
 
-        public override string[] GetComPorts()
-        {
-            return SerialPort.GetPortNames();
-        }
+        public override string[] GetComPorts() => SerialPort.GetPortNames();
 
-        public override bool IsEscapeKey(ViewModel.Core.GameKey key)
-        {
-            return (Key)key == Key.Escape;
-        }
+        public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
 
-        public override int GetKeyNumber(ViewModel.Core.GameKey key)
+        public override int GetKeyNumber(GameKey key)
         {
             var key2 = (Key)key;
             int code = -1;
             if (key2 >= Key.D1 && key2 <= Key.D9)
+            {
                 code = key2 - Key.D1;
+            }
             else if (key2 >= Key.NumPad1 && key2 <= Key.NumPad9)
+            {
                 code = key2 - Key.NumPad1;
+            }
 
             return code;
         }
 
-        public override async Task<IPackageSource> AskSelectPackage(object arg)
+        public override async Task<IPackageSource> AskSelectPackageAsync(object arg)
         {
             if (arg.ToString() == "0")
             {
-                var dialog = new OpenFileDialog { Title = "Выберите пакет вопросов", DefaultExt = ".siq", Filter = "Вопросы СИ|*.siq" };
+                var dialog = new OpenFileDialog
+                {
+                    Title = Resources.SelectQuestionPackage,
+                    DefaultExt = ".siq",
+                    Filter = $"{Resources.SIQuestions}|*.siq"
+                };
+
                 if (dialog.ShowDialog().Value)
                 {
                     return new FilePackageSource(dialog.FileName);
@@ -192,7 +202,7 @@ namespace SImulator.Implementation
 
                 storage.Error += exc =>
                 {
-                    ShowMessage(string.Format("Ошибка работы с библиотекой вопросов: {0}", exc.ToString()), false);
+                    ShowMessage(string.Format(Resources.SIStorageError, exc.ToString()), false);
                 };
 
                 try
@@ -210,7 +220,7 @@ namespace SImulator.Implementation
                 }
                 catch (Exception exc)
                 {
-                    ShowMessage(string.Format("Ошибка работы с библиотекой вопросов: {0}", exc.ToString()), false);
+                    ShowMessage(string.Format(Resources.SIStorageError, exc.ToString()), false);
                     return null;
                 }
             }
@@ -235,7 +245,7 @@ namespace SImulator.Implementation
             return null;
         }
 
-        public override Task<string> AskSelectFile(string header)
+        public override Task<string> AskSelectFileAsync(string header)
         {
             var dialog = new OpenFileDialog { Title = header };
             if (dialog.ShowDialog().Value)
@@ -248,7 +258,7 @@ namespace SImulator.Implementation
 
         public override string AskSelectLogsFolder()
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = "Выберите папку для записи логов" })
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = Resources.SelectLogsFolder })
             {
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
@@ -259,19 +269,26 @@ namespace SImulator.Implementation
             return null;
         }
 
-        public override Task<bool> AskStopGame()
-        {
-            return Task.FromResult(MessageBox.Show("Завершить игру?", MainViewModel.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
-        }
+        public override Task<bool> AskStopGameAsync() =>
+            Task.FromResult(MessageBox.Show(
+                Resources.FinishGameQuestion,
+                MainViewModel.ProductName,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) == MessageBoxResult.Yes);
 
-        public override void ShowMessage(string text, bool error = true)
-        {
+        public override void ShowMessage(string text, bool error = true) =>
             MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
-        }
 
         public override void NavigateToSite()
         {
-            Process.Start("http://vladimirkhil.com");
+            try
+            {
+                Process.Start(GameSiteUri);
+            }
+            catch (Exception exc)
+            {
+                ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message));
+            }
         }
 
         public override void PlaySound(string name, Action onFinish)
@@ -316,55 +333,78 @@ namespace SImulator.Implementation
         private void StopSound()
         {
             if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
+            {
                 _mediaClock.Controller.Stop();
+            }
         }
 
         public override ILogger CreateLogger(string folder)
         {
             if (folder == null)
+            {
                 return Logger.Create(null);
+            }
 
             if (!Directory.Exists(folder))
-                throw new Exception(string.Format("Папка для записи логов \"{0}\" не найдена", folder));
+            {
+                throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
+            }
 
             return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
         }
 
         public override void CreateServer(Type contract, int port, int screenIndex)
         {
-            _host = new ServiceHost(new RemoteGameUIServer { ScreenIndex = screenIndex }, new Uri(string.Format("net.tcp://localhost:{0}", port)));
+            _host = new ServiceHost(
+                new RemoteGameUIServer { ScreenIndex = screenIndex },
+                new Uri(string.Format("net.tcp://localhost:{0}", port)));
+
             _host.AddServiceEndpoint(contract, MainViewModel.GetBinding(), "simulator");
 
             _host.Open();
         }
 
-        public override void CloseServer()
-        {
-            _host.Close();
-        }
+        public override void CloseServer() => _host.Close();
 
-        public override async Task<IMedia> PrepareMedia(IMedia media)
+        public override async Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
         {
-            if (media.GetStream == null) // Это ссылка на внешний файл
+            if (media.GetStream == null) // It is a link to the external file
+            {
                 return media;
+            }
 
-            // Это сам файл
+            // It is a file itself
             var fileName = Path.Combine(Path.GetTempPath(), new Random().Next() + media.Uri);
-            var streamInfo = media.GetStream();
-            if (streamInfo == null)
-                return null;
 
             try
             {
+                var streamInfo = media.GetStream();
+                if (streamInfo == null)
+                {
+                    return null;
+                }
+
+                // WPF can show media only from local file, not from memory
+                // So we need to copy this file to disk
                 using (streamInfo.Stream)
                 {
                     using (var fs = File.Create(fileName))
                     {
-                        await streamInfo.Stream.CopyToAsync(fs);
+                        await streamInfo.Stream.CopyToAsync(fs, StreamCopyBufferSize, cancellationToken);
                     }
                 }
             }
             catch (IOException exc)
+            {
+                ShowMessage(exc.Message);
+                return null;
+            }
+            catch (InvalidDataException exc)
+            {
+                ShowMessage(exc.Message);
+                return null;
+            }
+            catch (IndexOutOfRangeException exc)
             {
                 ShowMessage(exc.Message);
                 return null;
@@ -382,18 +422,22 @@ namespace SImulator.Implementation
                 try
                 {
                     if (File.Exists(file))
+                    {
                         File.Delete(file);
+                    }
                 }
                 catch (Exception exc)
                 {
-                    ShowMessage(string.Format("Ошибка удаления файла: {0}", exc.Message));
+                    ShowMessage(string.Format(Resources.FileDeletionError, exc.Message));
                 }
             }
 
             if (_mediaClock != null)
             {
                 if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
+                {
                     _mediaClock.Controller.Stop();
+                }
 
                 _mediaTimeline = null;
                 _mediaClock = null;
@@ -401,19 +445,13 @@ namespace SImulator.Implementation
             }
         }
 
-        public override T GetCallback<T>()
-        {
-            return OperationContext.Current.GetCallbackChannel<T>();
-        }
+        public override T GetCallback<T>() => OperationContext.Current.GetCallbackChannel<T>();
 
         public override void InitSettings(AppSettings defaultSettings)
         {
             
         }
 
-        public override IExtendedGameHost CreateGameHost(EngineBase engine)
-        {
-            return new GameHostClient(engine);
-        }
+        public override IExtendedGameHost CreateGameHost(EngineBase engine) => new GameHostClient(engine);
     }
 }

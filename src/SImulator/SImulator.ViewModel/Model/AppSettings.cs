@@ -381,7 +381,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(PlayerKeysModes.None)]
         public PlayerKeysModes UsePlayersKeys
         {
-            get { return _usePlayersKeys; }
+            get => _usePlayersKeys;
             set
             {
                 if (_usePlayersKeys != value)

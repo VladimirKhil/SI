@@ -18,7 +18,9 @@ namespace SIQuester
         {
             var item = ((ListBox)sender).SelectedItem;
             if (item != null)
+            {
                 ((SearchFolderViewModel)DataContext).Open.Execute(item);
+            }
         }
     }
 }

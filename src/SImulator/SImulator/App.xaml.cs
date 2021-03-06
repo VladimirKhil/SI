@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Windows;
-using System.Deployment.Application;
 using Settings = SImulator.ViewModel.Model.AppSettings;
-using System.Reflection;
 using SImulator.ViewModel;
 using SImulator.Implementation;
 using System.Threading;
 using System.IO.IsolatedStorage;
 using System.IO;
 using SIUI.ViewModel.Core;
+#if !DEBUG
+using System.Deployment.Application;
+using System.Reflection;
+#endif
 
 namespace SImulator
 {
@@ -17,7 +19,9 @@ namespace SImulator
     /// </summary>
     public partial class App : Application
     {
+#pragma warning disable IDE0052
         private readonly DesktopManager _manager = new DesktopManager();
+#pragma warning restore IDE0052
 
         /// <summary>
         /// Имя конфигурационного файла пользовательских настроек
@@ -44,17 +48,24 @@ namespace SImulator
             var main = new MainViewModel(Settings);
 
             if (e.Args.Length > 0)
+            {
                 main.PackageSource = new FilePackageSource(e.Args[0]);
+            }
 
 #if DEBUG
-            main.PackageSource = new SIStoragePackageSource(new Services.SI.PackageInfo { Description = "Пакет тест" }, new Uri("http://vladimirkhil.com/sistorage/Основные/1.siq"));
+            main.PackageSource = new SIStoragePackageSource(
+                new Services.SI.PackageInfo
+                {
+                    Description = SImulator.Properties.Resources.TestPackage
+                },
+                new Uri("https://vladimirkhil.com/sistorage/Основные/1.siq"));
 #endif
 
             MainWindow = new CommandWindow { DataContext = main };
             MainWindow.Show();
         }
 
- #if !DEBUG
+#if !DEBUG
         private static bool CheckUpdate()
         {
             try
@@ -155,9 +166,8 @@ namespace SImulator
         }
 
         /// <summary>
-        /// Загрузить пользовательские настройки
+        /// Loads user settings.
         /// </summary>
-        /// <returns></returns>
         public static Settings LoadSettings()
         {
             try
@@ -206,24 +216,55 @@ namespace SImulator
         {
             var msg = e.Exception.ToString();
 
-            if (msg.Contains("WmClose")) // При закрытии
+            if (msg.Contains("WmClose")) // Normal closing, it's ok
+            {
                 return;
+            }
 
             if (e.Exception is OutOfMemoryException)
             {
-                MessageBox.Show("Недостаточно памяти для выполнения программы!", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SImulator.Properties.Resources.OutOfMemoryError,
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
-            else if (e.Exception is System.Windows.Markup.XamlParseException)
+            else if (e.Exception is IOException ioException && IsDiskFullError(ioException))
             {
-                MessageBox.Show("Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SImulator.Properties.Resources.DiskFullError,
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else if (e.Exception is System.Windows.Markup.XamlParseException || e.Exception is NotImplementedException)
+            {
+                MessageBox.Show(
+                    string.Format(SImulator.Properties.Resources.RuntimeBrokenError, e.Exception),
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             else
             {
-                MessageBox.Show(string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.", e.Exception.Message), MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format(SImulator.Properties.Resources.CommonAppError, e.Exception.Message),
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
 
             e.Handled = true;
             Shutdown();
+        }
+
+        private static bool IsDiskFullError(Exception ex)
+        {
+            const int HR_ERROR_HANDLE_DISK_FULL = unchecked((int)0x80070027);
+            const int HR_ERROR_DISK_FULL = unchecked((int)0x80070070);
+
+            return ex.HResult == HR_ERROR_HANDLE_DISK_FULL
+                || ex.HResult == HR_ERROR_DISK_FULL;
         }
     }
 }

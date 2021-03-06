@@ -42,7 +42,9 @@ namespace SIQuester.ViewModel
                 if (_logo == null)
                 {
                     if (Model.Logo != null && Model.Logo.Length > 0)
+                    {
                         _logo = Document.Images.Wrap(Model.Logo.Substring(1));
+                    }
                 }
 
                 return _logo;
@@ -100,7 +102,9 @@ namespace SIQuester.ViewModel
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Package.Restriction))
+            {
                 AddRestrictions.CanBeExecuted = Model.Restriction.Length == 0;
+            }
         }
 
         private void Rounds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -112,12 +116,15 @@ namespace SIQuester.ViewModel
                     for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                     {
                         if (Rounds[i].OwnerPackage != null)
+                        {
                             throw new Exception("Попытка вставить привязанный раунд!");
+                        }
 
                         Rounds[i].OwnerPackage = this;
                         Model.Rounds.Insert(i, Rounds[i].Model);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (RoundViewModel round in e.OldItems)
                     {
@@ -127,6 +134,7 @@ namespace SIQuester.ViewModel
                         Document.ClearLinks(round);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     Model.Rounds.Clear();
                     foreach (RoundViewModel round in Rounds)
@@ -140,7 +148,12 @@ namespace SIQuester.ViewModel
         
         private void AddRound_Executed(object arg)
         {
-            var round = new Round { Name = (Rounds.Count + 1).ToString() + Resources.EndingRound, Type = RoundTypes.Standart };
+            var round = new Round
+            { 
+                Name = (Rounds.Count + 1).ToString() + Resources.EndingRound,
+                Type = RoundTypes.Standart
+            };
+
             var roundViewModel = new RoundViewModel(round);
             Rounds.Add(roundViewModel);
             QDocument.ActivatedObject = roundViewModel;
@@ -171,10 +184,14 @@ namespace SIQuester.ViewModel
                 images.AddItem.Execute(null);
 
                 if (!images.HasPendingChanges)
+                {
                     return;
+                }
 
                 if (was == images.Files.Count)
+                {
                     return;
+                }
 
                 model = images.Files.LastOrDefault();
             }

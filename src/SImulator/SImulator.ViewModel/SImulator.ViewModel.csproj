@@ -13,6 +13,7 @@
     <Company>Khil-soft</Company>
     <Version>2.8.0</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

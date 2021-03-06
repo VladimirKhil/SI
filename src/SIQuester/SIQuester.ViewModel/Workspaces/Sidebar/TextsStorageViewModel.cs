@@ -58,7 +58,7 @@ namespace SIQuester.ViewModel
             Collection = new ObservableCollection<T>(_sourceList);
             Collection.CollectionChanged += Collection_CollectionChanged;
 
-            BindHelper.Bind<T>(Collection, _sourceList);
+            BindHelper.Bind(Collection, _sourceList);
 
             foreach (var item in Collection)
             {
@@ -73,10 +73,8 @@ namespace SIQuester.ViewModel
             CheckCommands();
         }
 
-        void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
+        private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) =>
             OnChanged(new CollectionChange { Collection = (IList)sender, Args = e });
-        }
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

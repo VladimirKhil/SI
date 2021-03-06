@@ -276,7 +276,7 @@ namespace SImulator.ViewModel
 
             #region Command creation
 
-            _gameHost.Next = _next = new SimpleUICommand(Next_Executed) { Name = "Дальше" };
+            _gameHost.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
             _gameHost.Back = _back = new SimpleCommand(Back_Executed) { CanBeExecuted = false };
             _gameHost.Stop = _stop = new SimpleCommand(Stop_Executed);
 
@@ -286,14 +286,14 @@ namespace SImulator.ViewModel
             _addRight = new SimpleCommand(AddRight_Executed) { CanBeExecuted = false };
             _addWrong = new SimpleCommand(AddWrong_Executed) { CanBeExecuted = false };
 
-            RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = "Запустить" };
-            StopRoundTimer = new SimpleUICommand(StopRoundTimer_Executed) { Name = "Приостановить" };
+            RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
+            StopRoundTimer = new SimpleUICommand(StopRoundTimer_Executed) { Name = Resources.Pause };
 
-            RunQuestionTimer = new SimpleUICommand(RunQuestionTimer_Executed) { Name = "Запустить" };
-            StopQuestionTimer = new SimpleUICommand(StopQuestionTimer_Executed) { Name = "Приостановить" };
+            RunQuestionTimer = new SimpleUICommand(RunQuestionTimer_Executed) { Name = Resources.Run };
+            StopQuestionTimer = new SimpleUICommand(StopQuestionTimer_Executed) { Name = Resources.Pause };
 
-            RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = "Запустить" };
-            StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = "Приостановить" };
+            RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
+            StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
 
             _gameHost.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
             _gameHost.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
@@ -341,7 +341,7 @@ namespace SImulator.ViewModel
             _engine.Error += OnError;
             _engine.EndGame += Engine_EndGame;
 
-            _engine.PropertyChanged += engine_PropertyChanged;
+            _engine.PropertyChanged += Engine_PropertyChanged;
 
             _gameHost.MediaStart += GameHost_MediaStart;
             _gameHost.MediaProgress += GameHost_MediaProgress;
@@ -406,15 +406,15 @@ namespace SImulator.ViewModel
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (ObjectDisposedException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
@@ -458,8 +458,7 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void ThinkingTimer_Elapsed(object state)
-        {
+        private void ThinkingTimer_Elapsed(object state) =>
             Task.Factory.StartNew(() =>
                 {
                     try
@@ -472,23 +471,27 @@ namespace SImulator.ViewModel
                             ActiveQuestionCommand = null;
 
                             if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
+                            {
                                 _buttonManager.Stop();
+                            }
                         }
                     }
                     catch (TimeoutException exc)
                     {
-                        PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
+                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
                     }
                     catch (CommunicationException exc)
                     {
-                        PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
+                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
                     }
                     catch (Exception exc)
                     {
                         PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
-        }
+                },
+                CancellationToken.None,
+                TaskCreationOptions.None,
+                UI.Scheduler);
 
         private void RoundTimer_Elapsed(object state)
         {
@@ -607,7 +610,9 @@ namespace SImulator.ViewModel
         private void RunQuestionTimer_Executed(object arg)
         {
             if (arg != null)
+            {
                 QuestionTime = 0;
+            }
 
             _thinkingTimer.Change(1000, 1000);
 
@@ -617,7 +622,9 @@ namespace SImulator.ViewModel
         private void StopQuestionTimer_Executed(object arg)
         {
             if (arg != null)
+            {
                 QuestionTime = 0;
+            }
 
             _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
 
@@ -668,15 +675,17 @@ namespace SImulator.ViewModel
             try
             {
                 if (UserInterface != null)
+                {
                     UserInterface.AddPlayer();
+                }
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
@@ -860,26 +869,20 @@ namespace SImulator.ViewModel
 
         private void Engine_Theme(Theme theme)
         {
-            UserInterface.SetText("Тема: " + theme.Name);
+            UserInterface.SetText($"{Resources.Theme}: {theme.Name}");
             UserInterface.SetStage(TableStage.Theme);
 
-            LocalInfo.Text = "Тема: " + theme.Name;
+            LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
             LocalInfo.TStage = TableStage.Theme;
 
             ActiveTheme = theme;
         }
 
-        private void Engine_EndGame()
-        {
-            UserInterface.SetStage(TableStage.Sign);
-        }
+        private void Engine_EndGame() => UserInterface.SetStage(TableStage.Sign);
 
-        private void Stop_Executed(object arg = null)
-        {
-            RequestStop?.Invoke();
-        }
+        private void Stop_Executed(object arg = null) => RequestStop?.Invoke();
 
-        void engine_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Engine_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
@@ -906,9 +909,8 @@ namespace SImulator.ViewModel
         }
 
         /// <summary>
-        /// Следующий шаг игры
+        /// Moves the game to the next stage.
         /// </summary>
-        /// <param name="arg"></param>
         private void Next_Executed(object arg = null)
         {
             try
@@ -924,27 +926,29 @@ namespace SImulator.ViewModel
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (Exception exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
             }
         }
 
         private async void Engine_Package(Package package)
         {
             if (UserInterface == null)
+            {
                 return;
+            }
 
             var videoUrl = Settings.Model.VideoUrl;
             if (!string.IsNullOrWhiteSpace(videoUrl))
             {
-                await SetMedia(new Media(videoUrl));
+                await SetMediaAsync(new Media(videoUrl));
                 UserInterface.SetStage(TableStage.Question);
                 UserInterface.SetQuestionContentType(QuestionContentType.Video);
             }
@@ -969,14 +973,16 @@ namespace SImulator.ViewModel
             _activeRound = round ?? throw new ArgumentNullException(nameof(round));
 
             if (UserInterface == null)
+            {
                 return;
+            }
 
             UserInterface.SetText(round.Name);
             UserInterface.SetStage(TableStage.Round);
             UserInterface.SetSound(Settings.Model.Sounds.RoundBegin);
             LocalInfo.TStage = TableStage.Round;
 
-            _logger.Write("\r\nРаунд {0}", round.Name);
+            _logger.Write("\r\n{0} {1}", Resources.Round, round.Name);
 
             if (round.Type == RoundTypes.Standart)
             {
@@ -991,19 +997,19 @@ namespace SImulator.ViewModel
         {
             LocalInfo.RoundInfo.Clear();
 
-            _logger.Write("Темы раунда:");
+            _logger.Write($"{Resources.RoundThemes}:");
 
             int maxQuestion = roundThemes.Max(theme => theme.Questions.Count);
             foreach (var theme in roundThemes)
             {
-                var themeInfo = new ThemeInfoViewModel() { Name = theme.Name };
+                var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
                 LocalInfo.RoundInfo.Add(themeInfo);
 
                 _logger.Write(theme.Name);
 
                 for (int i = 0; i < maxQuestion; i++)
                 {
-                    var questionInfo = new QuestionInfoViewModel() { Price = i < theme.Questions.Count ? theme.Questions[i].Price : -1 };
+                    var questionInfo = new QuestionInfoViewModel { Price = i < theme.Questions.Count ? theme.Questions[i].Price : -1 };
                     themeInfo.Questions.Add(questionInfo);
                 }
             }
@@ -1017,7 +1023,9 @@ namespace SImulator.ViewModel
         private void Engine_QuestionProcessed(Question question, bool finished, bool pressMode)
         {
             if (question.Type.Name == QuestionTypes.Simple && _buttonManager != null)
-                _buttonManager.Run(); // Кнопки активируются заранее, чтобы работали фальстарты
+            {
+                _buttonManager.Run(); // Buttons are activated in advance for false starts to work
+            }
 
             if (finished)
             {
@@ -1053,7 +1061,7 @@ namespace SImulator.ViewModel
 
             if (Settings.Model.ThinkingTime > 0)
             {
-                // Запуск таймера при игре с фальстартами
+                // Runs timer in game with false starts
                 QuestionTimeMax = Settings.Model.ThinkingTime;
                 RunQuestionTimer_Executed(0);
             }
@@ -1064,16 +1072,15 @@ namespace SImulator.ViewModel
             StopQuestionTimer.Execute(0);
 
             if (_buttonManager != null)
+            {
                 _buttonManager.Stop();
+            }
 
             UserInterface.SetQuestionStyle(QuestionStyle.Normal);
             UserInterface.SetSound("");
         }
 
-        private void Engine_RoundEmpty()
-        {
-            StopRoundTimer_Executed(0);
-        }
+        private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);
 
         private void Engine_NextQuestion()
         {
@@ -1083,13 +1090,15 @@ namespace SImulator.ViewModel
                 LocalInfo.TStage = TableStage.RoundTable;
             }
             else
+            {
                 Next_Executed();
+            }
         }
 
         private void Engine_RoundTimeout()
         {
             UserInterface.SetSound(Settings.Model.Sounds.RoundTimeout);
-            _logger.Write("Время раунда вышло.");
+            _logger.Write(Resources.RoundTimeout);
         }
 
         private void Engine_EndQuestion(int themeIndex, int questionIndex)
@@ -1097,7 +1106,9 @@ namespace SImulator.ViewModel
             StopQuestionTimer_Executed(0);
 
             if (_buttonManager != null)
+            {
                 _buttonManager.Stop();
+            }
 
             UnselectPlayer();
             _selectedPlayers.Clear();
@@ -1114,7 +1125,9 @@ namespace SImulator.ViewModel
             {
                 var themeInfo = LocalInfo.RoundInfo[themeIndex];
                 if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
+                {
                     themeInfo.Questions[questionIndex].Price = -1;
+                }
             }
         }
 
@@ -1125,9 +1138,11 @@ namespace SImulator.ViewModel
             foreach (var theme in finalThemes)
             {
                 if (theme.Questions.Count == 0)
+                {
                     continue;
+                }
 
-                var themeInfo = new ThemeInfoViewModel() { Name = theme.Name };
+                var themeInfo = new ThemeInfoViewModel { Name = theme.Name };
                 LocalInfo.RoundInfo.Add(themeInfo);
             }
 
@@ -1144,7 +1159,7 @@ namespace SImulator.ViewModel
         }
 
         /// <summary>
-        /// "Шагнуть" назад
+        /// Moves back.
         /// </summary>
         private void Back_Executed(object arg = null)
         {
@@ -1167,7 +1182,9 @@ namespace SImulator.ViewModel
             StopQuestionTimer_Executed(0);
 
             if (_buttonManager != null)
+            {
                 _buttonManager.Stop();
+            }
 
             UnselectPlayer();
             _selectedPlayers.Clear();
@@ -1188,7 +1205,9 @@ namespace SImulator.ViewModel
                 {
                     var item = _answeringHistory.Pop();
                     if (item == null)
+                    {
                         break;
+                    }
 
                     if (item.Item3)
                     {
@@ -1253,16 +1272,16 @@ namespace SImulator.ViewModel
             }
             catch (TimeoutException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
             catch (CommunicationException exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
         }
 
         /// <summary>
-        /// Завершить игру
+        /// Ends the game.
         /// </summary>
         public void Dispose()
         {
@@ -1270,7 +1289,7 @@ namespace SImulator.ViewModel
             {
                 lock (_engine.SyncRoot)
                 {
-                    _engine.PropertyChanged -= engine_PropertyChanged;
+                    _engine.PropertyChanged -= Engine_PropertyChanged;
                     _engine.Dispose();
 
                     if (_buttonManager != null)
@@ -1305,7 +1324,7 @@ namespace SImulator.ViewModel
             }
             catch (Exception exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка завершения игры: {0}", exc.Message));
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.GameEndingError, exc.Message));
             }
         }
 
@@ -1324,12 +1343,14 @@ namespace SImulator.ViewModel
         {
             if (Settings.Model.SaveLogs && LocalInfo.Players.Count > 0)
             {
-                var sb = new StringBuilder("\r\nСчёт: ");
+                var sb = new StringBuilder("\r\n").Append(Resources.Score).Append(": ");
                 var first = true;
                 foreach (var player in LocalInfo.Players)
                 {
                     if (!first)
+                    {
                         sb.Append(", ");
+                    }
 
                     first = false;
                     sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
@@ -1345,7 +1366,9 @@ namespace SImulator.ViewModel
             UserInterface.SetSound("");
 
             if (showSign)
+            {
                 UserInterface.SetStage(TableStage.Sign);
+            }
         }
 
         private void Engine_QuestionOther(Atom atom)
@@ -1365,7 +1388,7 @@ namespace SImulator.ViewModel
 
         private async void Engine_QuestionSound(IMedia sound)
         {
-            await SetMedia(sound, true);
+            await SetMediaAsync(sound, true);
 
             UserInterface.SetQuestionSound(true);
             UserInterface.SetQuestionContentType(QuestionContentType.None);
@@ -1373,7 +1396,7 @@ namespace SImulator.ViewModel
             InitMedia();
         }
 
-        private async Task SetMedia(IMedia media, bool background = false)
+        private async Task SetMediaAsync(IMedia media, bool background = false)
         {
             if (_isRemoteControlling)
             {
@@ -1381,16 +1404,15 @@ namespace SImulator.ViewModel
                 {
                     if (media.GetStream != null)
                     {
-                        UserInterface.ClearBuffer();
-
-                        var buffer = new byte[32768];
-                        int i = 0;
-                        while ((i = media.GetStream().Stream.Read(buffer, 0, buffer.Length)) > 0)
+                        var streamInfo = media.GetStream();
+                        try
                         {
-                            if (i < buffer.Length)
-                                Array.Resize(ref buffer, i);
-
-                            UserInterface.AppendToBuffer(buffer);
+                            SendStreamToUI(streamInfo);
+                        }
+                        catch (Exception exc)
+                        {
+                            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+                            return;
                         }
 
                         UserInterface.SetMediaFromBuffer(media.Uri, background);
@@ -1399,15 +1421,41 @@ namespace SImulator.ViewModel
             }
             else
             {
-                var mediaPrepared = await PlatformManager.Instance.PrepareMedia(media);
+                var mediaPrepared = await PlatformManager.Instance.PrepareMediaAsync(media);
                 if (UserInterface != null && mediaPrepared != null)
-                    UserInterface.SetMedia(new MediaSource(mediaPrepared.GetStream?.Invoke().Stream, mediaPrepared.Uri), background);
+                {
+                    try
+                    {
+                        UserInterface.SetMedia(new MediaSource(mediaPrepared.GetStream?.Invoke().Stream, mediaPrepared.Uri), background);
+                    }
+                    catch (Exception exc)
+                    {
+                        PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
+                    }
+                }
+            }
+        }
+
+        private void SendStreamToUI(StreamInfo streamInfo)
+        {
+            UserInterface.ClearBuffer();
+
+            var buffer = new byte[32768];
+            int i;
+            while ((i = streamInfo.Stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                if (i < buffer.Length)
+                {
+                    Array.Resize(ref buffer, i);
+                }
+
+                UserInterface.AppendToBuffer(buffer);
             }
         }
 
         private async void Engine_QuestionVideo(IMedia video)
         {
-            await SetMedia(video);
+            await SetMediaAsync(video);
 
             UserInterface.SetQuestionSound(false);
             UserInterface.SetQuestionContentType(QuestionContentType.Video);
@@ -1417,24 +1465,32 @@ namespace SImulator.ViewModel
 
         private async void Engine_QuestionImage(IMedia image, IMedia sound)
         {
-            await SetMedia(image);
+            await SetMediaAsync(image);
             UserInterface.SetQuestionContentType(QuestionContentType.Image);
 
             UserInterface.SetQuestionSound(sound != null);
 
             if (sound != null)
-                await SetMedia(sound, true);
+            {
+                await SetMediaAsync(sound, true);
+            }
 
             if (sound != null)
+            {
                 InitMedia();
+            }
             else
+            {
                 ActiveMediaCommand = null;
+            }
         }
 
         private async void Engine_QuestionText(string text, IMedia sound)
         {
             // Если без фальстартов, то выведем тему и стоимость
-            var displayedText = Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart || _activeRound?.Type == RoundTypes.Final ? text
+            var displayedText = 
+                Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart || _activeRound?.Type == RoundTypes.Final
+                ? text
                 : $"{ActiveTheme?.Name}\n{ActiveQuestion?.Price}";
 
             UserInterface.SetText(displayedText);
@@ -1442,14 +1498,20 @@ namespace SImulator.ViewModel
             UserInterface.SetQuestionContentType(QuestionContentType.Text);
 
             if (sound != null)
-                await SetMedia(sound, true);
+            {
+                await SetMediaAsync(sound, true);
+            }
 
             UserInterface.SetQuestionSound(sound != null);
 
             if (sound != null)
+            {
                 InitMedia();
+            }
             else
+            {
                 ActiveMediaCommand = null;
+            }
         }
 
         private void Engine_QuestionOral(string oralText)
@@ -1468,6 +1530,11 @@ namespace SImulator.ViewModel
 
         private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
         {
+            if (UserInterface == null)
+            {
+                return;
+            }
+
             _answeringHistory.Push(null);
 
             ActiveTheme = theme;
@@ -1489,18 +1556,18 @@ namespace SImulator.ViewModel
                     case QuestionTypes.Cat:
                     case QuestionTypes.BagCat:
                         UserInterface.SetSound(Settings.Model.Sounds.SecretQuestion);
-                        PrintQuestionType("ВОПРОС С СЕКРЕТОМ", Settings.Model.SpecialsAliases.SecretQuestionAlias);
+                        PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                         setActive = false;
                         break;
 
                     case QuestionTypes.Auction:
                         UserInterface.SetSound(Settings.Model.Sounds.StakeQuestion);
-                        PrintQuestionType("ВОПРОС СО СТАВКОЙ", Settings.Model.SpecialsAliases.StakeQuestionAlias);
+                        PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
                         break;
 
                     case QuestionTypes.Sponsored:
                         UserInterface.SetSound(Settings.Model.Sounds.NoRiskQuestion);
-                        PrintQuestionType("ВОПРОС БЕЗ РИСКА", Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
+                        PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                         setActive = false;
                         break;
 
@@ -1532,26 +1599,30 @@ namespace SImulator.ViewModel
 
         internal PlayerInfo OnGetPlayerByGuid(Guid guid, bool strict)
         {
-            if (Settings.Model.UsePlayersKeys == PlayerKeysModes.Web)
+            if (Settings.Model.UsePlayersKeys != PlayerKeysModes.Web)
             {
-                lock (_playersTable)
+                return null;
+            }
+
+            lock (_playersTable)
+            {
+                if (_playersTable.TryGetValue(guid, out PlayerInfo player))
                 {
-                    if (_playersTable.TryGetValue(guid, out PlayerInfo player))
-                        return player;
+                    return player;
+                }
 
-                    if (!strict)
+                if (!strict)
+                {
+                    foreach (PlayerInfo item in LocalInfo.Players)
                     {
-                        foreach (PlayerInfo item in LocalInfo.Players)
+                        if (item.WaitForRegistration)
                         {
-                            if (item.WaitForRegistration)
-                            {
-                                item.WaitForRegistration = false;
-                                item.IsRegistered = true;
+                            item.WaitForRegistration = false;
+                            item.IsRegistered = true;
 
-                                _playersTable[guid] = item;
+                            _playersTable[guid] = item;
 
-                                return item;
-                            }
+                            return item;
                         }
                     }
                 }
@@ -1564,7 +1635,9 @@ namespace SImulator.ViewModel
         {
             var index = Settings.Model.PlayerKeys2.IndexOf(key);
             if (index == -1 || index >= LocalInfo.Players.Count)
+            {
                 return false;
+            }
 
             var player = (PlayerInfo)LocalInfo.Players[index];
 
@@ -1576,7 +1649,9 @@ namespace SImulator.ViewModel
             // Нет такого игрока
             var index = LocalInfo.Players.IndexOf(player);
             if (index == -1)
+            {
                 return false;
+            }
 
             return ProcessPlayerPress(index, player);
         }
@@ -1624,7 +1699,7 @@ namespace SImulator.ViewModel
             }
             catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
             {
-                PlatformManager.Instance.ShowMessage($"{Resources.ConnectionError}: {exc.Message}");
+                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
 
             _timerStopped = ActiveQuestionCommand == StopQuestionTimer;

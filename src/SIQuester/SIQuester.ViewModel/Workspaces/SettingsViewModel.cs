@@ -20,9 +20,6 @@ namespace SIQuester.ViewModel
             Reset = new SimpleCommand(Reset_Executed);
         }
 
-        private void Reset_Executed(object arg)
-        {
-            AppSettings.Default.Reset();
-        }
+        private void Reset_Executed(object arg) => AppSettings.Default.Reset();
     }
 }

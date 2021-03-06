@@ -3,14 +3,15 @@ using Microsoft.Owin.Hosting;
 using Owin;
 using SImulator.ViewModel.ButtonManagers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace SImulator.Implementation.ButtonManagers.Web
 {
+    // TODO: rewrite to Kestrel and standart web Host when moving to .NET 5
+
+    /// <summary>
+    /// Provides SignalR-based web buttons.
+    /// </summary>
     public sealed class WebManager2 : ButtonManagerBase
     {
         public static WebManager2 Current;
@@ -68,21 +69,24 @@ namespace SImulator.Implementation.ButtonManagers.Web
             context.Clients.All.StateChanged(0);
         }
 
-        public override void Dispose()
-        {
-            _web.Dispose();
-        }
+        public override void Dispose() => _web.Dispose();
 
         internal string Press(string connectionId)
         {
             var player = OnGetPlayerByGuid(Guid.Parse(connectionId), true);
             if (player != null)
+            {
                 OnPlayerPressed(player);
+            }
             else
+            {
                 player = OnGetPlayerByGuid(Guid.Parse(connectionId), false);
+            }
 
             if (player == null)
+            {
                 return "";
+            }
 
             return player.Name;
         }

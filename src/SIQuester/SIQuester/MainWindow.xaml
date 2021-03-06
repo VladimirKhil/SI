@@ -106,7 +106,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="TabControl">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <Grid DataContext="{Binding Settings.History.Files}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid x:Name="grid" DataContext="{Binding Settings.History.Files}" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
@@ -127,17 +127,13 @@
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Count}" Value="0">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Grid.Style>
                                     </Grid>
                                 </ScrollViewer>
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.History.Files.Count}" Value="0">
+                                        <Setter TargetName="grid" Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>

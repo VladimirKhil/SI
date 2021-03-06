@@ -66,7 +66,9 @@ namespace SIQuester
                 AppSettings.Default = LoadSettings();
 
                 if (!IsWindows8_1OrLater)
+                {
                     AppSettings.Default.SpellChecking = false;
+                }
 
                 if (e.Args.Length > 0)
                 {
@@ -93,6 +95,10 @@ namespace SIQuester
             }
         }
 
+        /// <summary>
+        /// Backups SIStorage to folder. This method is called from the console.
+        /// </summary>
+        /// <param name="folder">Folder to backup.</param>
         private async void Backup(string folder)
         {
             int code = 0;
@@ -106,20 +112,16 @@ namespace SIQuester
 
                 var service = new Services.SI.SIStorageServiceClient();
                 var packages = await service.GetPackagesAsync();
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                foreach (var package in packages)
                 {
-                    foreach (var package in packages)
-                    {
-                        var uri = await service.GetPackageByIDAsync(package.ID);
-                        var fileName = Path.GetFileName(Uri.UnescapeDataString(uri.ToString()));
+                    var uri = await service.GetPackageByIDAsync(package.ID);
+                    var fileName = Path.GetFileName(Uri.UnescapeDataString(uri.ToString()));
 
-                        var targetFile = Path.Combine(folder, fileName);
-                        using (var stream = await client.GetStreamAsync(uri))
-                        using (var fileStream = File.Create(targetFile))
-                        {
-                            await stream.CopyToAsync(fileStream);
-                        }
-                    }
+                    var targetFile = Path.Combine(folder, fileName);
+                    using var stream = await client.GetStreamAsync(uri);
+                    using var fileStream = File.Create(targetFile);
+                    await stream.CopyToAsync(fileStream);
                 }
             }
             catch (Exception exc)
@@ -136,34 +138,61 @@ namespace SIQuester
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             if (_hasError)
+            {
                 return;
+            }
 
             _hasError = true;
 
             if (e.Exception is OutOfMemoryException)
             {
-                MessageBox.Show("Недостаточно памяти для выполнения программы!", ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    "Недостаточно памяти для выполнения программы!",
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             else if (e.Exception is Win32Exception || e.Exception is NotImplementedException || e.Exception.ToString().Contains("VerifyNotClosing"))
             {
                 if (e.Exception.Message != "Параметр задан неверно")
+                {
                     MessageBox.Show(string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else if (e.Exception is InvalidOperationException && e.Exception.Message.Contains("Идет завершение работы объекта Application"))
+            else if (e.Exception is InvalidOperationException
+                && e.Exception.Message.Contains("Идет завершение работы объекта Application"))
             {
                 // Это нормально, ничего не сделаешь
             }
-            else if (e.Exception is BadImageFormatException)
+            else if (e.Exception is BadImageFormatException
+                || e.Exception is ArgumentException && e.Exception.Message.Contains("Rect..ctor")
+                || e.Exception is NullReferenceException && e.Exception.Message.Contains("UpdateTaskbarThumbButtons"))
             {
-                MessageBox.Show(string.Format("Ошибка запуска программы: {0}!", e.Exception.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format("Ошибка запуска программы: {0}!", e.Exception.Message),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             else if (e.Exception.ToString().Contains("MediaPlayerState.OpenMedia"))
             {
-                MessageBox.Show(string.Format("Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой: {0}!", e.Exception.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format(
+                        "Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой: {0}!",
+                        e.Exception.Message),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
-            else if (e.Exception is COMException || e.Exception.ToString().Contains("UpdateTaskbarProgressState") || e.Exception.ToString().Contains("FindNameInTemplateContent"))
+            else if (e.Exception is COMException
+                || e.Exception.ToString().Contains("UpdateTaskbarProgressState")
+                || e.Exception.ToString().Contains("FindNameInTemplateContent"))
             {
-                MessageBox.Show(string.Format("Ошибка выполнения программы: {0}!", e.ToString()), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format("Ошибка выполнения программы: {0}!", e.ToString()),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
             else if (e.Exception.ToString().Contains("MahApps.Metro"))
             {
@@ -214,7 +243,11 @@ namespace SIQuester
             else
 #endif
                 {
-                    MessageBox.Show($"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}", ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show(
+                        $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
+                        ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
                 }
             }
 
@@ -230,11 +263,16 @@ namespace SIQuester
                 {
                     SaveSettings(AppSettings.Default);
                 }
+
                 _manager.Dispose();
             }
             catch (Exception exc)
             {
-                MessageBox.Show(string.Format("Ошибка сохранения настроек при выходе: {0}.", exc), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    string.Format("Ошибка сохранения настроек при выходе: {0}.", exc),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
 
             base.OnExit(e);
@@ -248,13 +286,9 @@ namespace SIQuester
                 {
                     try
                     {
-                        using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
-                        {
-                            using (var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file))
-                            {
-                                settings.Save(stream);
-                            }
-                        }
+                        using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                        using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
+                        settings.Save(stream);
                     }
                     finally
                     {
@@ -264,7 +298,7 @@ namespace SIQuester
             }
             catch (Exception exc)
             {
-                MessageBox.Show("Ошибка при сохранении настроек программы: " + exc.Message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show($"Ошибка при сохранении настроек программы: {exc.Message}", AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 
@@ -276,22 +310,18 @@ namespace SIQuester
         {
             try
             {
-                using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
+                using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
                 {
-                    if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
+                    try
                     {
-                        try
-                        {
-                            using (var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                return AppSettings.Load(stream);
-                            }
-                        }
-                        catch { }
-                        finally
-                        {
-                            Monitor.Exit(ConfigFileName);
-                        }
+                        using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return AppSettings.Load(stream);
+                    }
+                    catch { }
+                    finally
+                    {
+                        Monitor.Exit(ConfigFileName);
                     }
                 }
             }

@@ -43,49 +43,43 @@ namespace SIQuester.ViewModel.Workspaces.Dialogs
         {
             try
             {
-                using (var stream = new MemoryStream())
+                using var stream = new MemoryStream();
+                using (var tempDoc = _document.Document.SaveAs(stream, false))
                 {
-                    using (var tempDoc = _document.Document.SaveAs(stream, false))
-                    {
-                        tempDoc.FinalizeSave();
-                    }
+                    tempDoc.FinalizeSave();
+                }
 
-                    var data = stream.ToArray();
+                var data = stream.ToArray();
 
-                    if (data.Length > 100 * 1024 * 1024)
-                    {
-                        ErrorMessage = "Размер файла превышает 100 Мб!";
-                        return;
-                    }
+                if (data.Length > 100 * 1024 * 1024)
+                {
+                    ErrorMessage = "Размер файла превышает 100 Мб!";
+                    return;
+                }
 
-                    using (var ms = new MemoryStream(data))
-                    {
-                        var url = "http://vladimirkhil.com/api/si/AddFile";
-                        var bytesContent = new StreamContent(ms, 262144);
-                        bytesContent.Headers.Add("message", Convert.ToBase64String(Encoding.UTF8.GetBytes(Comment)));
+                using var ms = new MemoryStream(data);
+                var url = "https://vladimirkhil.com/api/si/AddFile";
+                var bytesContent = new StreamContent(ms, 262144);
+                bytesContent.Headers.Add("message", Convert.ToBase64String(Encoding.UTF8.GetBytes(Comment)));
 
-                        using (var handler = new HttpClientHandler())
-                        using (var client = new HttpClient(handler))
-                        using (var formData = new MultipartFormDataContent())
-                        {
-                            formData.Add(bytesContent, "file", Path.GetFileName(_document.Path));
+                using var handler = new HttpClientHandler();
+                using var client = new HttpClient(handler);
+                using var formData = new MultipartFormDataContent
+                {
+                    { bytesContent, "file", Path.GetFileName(_document.Path) }
+                };
 
-                            using (var response = await client.PostAsync(url, formData))
-                            {
-                                if (response.IsSuccessStatusCode)
-                                {
-                                    PlatformManager.Instance.Inform("Пакет успешно отправлен!");
-                                }
-                                else
-                                {
-                                    ErrorMessage = "Не удалось отправить пакет: " +
-                                        (response.StatusCode == HttpStatusCode.Gone ?
-                                        "в настоящий момент на сервере нет места для принятия новых пакетов" :
-                                        await response.Content.ReadAsStringAsync());
-                                }
-                            }
-                        }
-                    }
+                using var response = await client.PostAsync(url, formData);
+                if (response.IsSuccessStatusCode)
+                {
+                    PlatformManager.Instance.Inform("Пакет успешно отправлен!");
+                }
+                else
+                {
+                    ErrorMessage = "Не удалось отправить пакет: " +
+                        (response.StatusCode == HttpStatusCode.Gone ?
+                        "в настоящий момент на сервере нет места для принятия новых пакетов" :
+                        await response.Content.ReadAsStringAsync());
                 }
             }
             catch (Exception exc)

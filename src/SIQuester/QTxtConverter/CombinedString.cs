@@ -23,8 +23,10 @@ namespace QTxtConverter
         public CombinedString(string s, params int[] num)
         {
             _content = s;
-            foreach (int n in num)
+            foreach (var n in num)
+            {
                 Sources.Add(n);
+            }
         }
 
         /// <summary>
@@ -33,41 +35,50 @@ namespace QTxtConverter
         /// <param name="s">Список строк-источников</param>
         public CombinedString(params CombinedString[] s)
         {
-            int r = 0;
+            var index = 0;
             foreach (CombinedString str in s)
             {
-                if (r == 0)
+                if (index == 0)
                 {
                     _content = str.ToString();
                     foreach (int n in str.Sources)
+                    {
                         Sources.Add(n);
+                    }
                 }
                 else
+                {
                     CombineWith(str);
-                r++;
+                }
+
+                index++;
             }
         }
 
         private void CombineWith(CombinedString str)
         {
             int len = _content.Length;
-            if (len > 0)
-                _content = StringManager.BestCommonSubString(this._content, str._content, new StringManager.StringNorm(StringManager.TemplateSearchingNorm), true);
-            else
-                _content = "";
+            _content = len > 0
+                ? StringManager.BestCommonSubString(
+                    _content,
+                    str._content,
+                    new StringManager.StringNorm(StringManager.TemplateSearchingNorm),
+                    true)
+                : "";
 
             foreach (int n in str.Sources)
+            {
                 if (!Sources.Contains(n))
+                {
                     Sources.Add(n);
+                }
+            }
         }
 
         /// <summary>
         /// Содержание строки
         /// </summary>
         /// <returns>Содержание строки</returns>
-        override public string ToString()
-        {
-            return _content;
-        }
+        override public string ToString() => _content;
     }
 }

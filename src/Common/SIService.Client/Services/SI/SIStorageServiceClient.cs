@@ -66,9 +66,15 @@ namespace Services.SI
         public Task<NamedObject[]> GetTagsAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NamedObject[]>("Tags", cancellationToken);
 
-        public Task<PackageInfo[]> GetPackagesAsync(int? tagId = null, int difficultyRelation = 0, int difficulty = 1,
-            int? publisherId = null, int? authorId = null,
-            string restriction = null, PackageSortMode sortMode = PackageSortMode.Name, bool sortAscending = true)
+        public Task<PackageInfo[]> GetPackagesAsync(
+            int? tagId = null,
+            int difficultyRelation = 0,
+            int difficulty = 1,
+            int? publisherId = null,
+            int? authorId = null,
+            string restriction = null,
+            PackageSortMode sortMode = PackageSortMode.Name,
+            bool sortAscending = true)
         {
             var queryString = new StringBuilder();
 

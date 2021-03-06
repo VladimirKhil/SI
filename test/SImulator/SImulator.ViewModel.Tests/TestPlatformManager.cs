@@ -21,7 +21,7 @@ namespace SImulator.ViewModel.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<string> AskSelectFile(string header)
+        public override Task<string> AskSelectFileAsync(string header)
         {
             throw new NotImplementedException();
         }
@@ -31,12 +31,12 @@ namespace SImulator.ViewModel.Tests
             throw new NotImplementedException();
         }
 
-        public override Task<IPackageSource> AskSelectPackage(object arg)
+        public override Task<IPackageSource> AskSelectPackageAsync(object arg)
         {
             throw new NotImplementedException();
         }
 
-        public override Task<bool> AskStopGame()
+        public override Task<bool> AskStopGameAsync()
         {
             throw new NotImplementedException();
         }
@@ -46,7 +46,7 @@ namespace SImulator.ViewModel.Tests
             throw new NotImplementedException();
         }
 
-        public override Task CloseMainView()
+        public override Task CloseMainViewAsync()
         {
             throw new NotImplementedException();
         }
@@ -68,7 +68,7 @@ namespace SImulator.ViewModel.Tests
 
         public override ILogger CreateLogger(string folder) => new TestLogger();
 
-        public override Task CreateMainView(object dataContext, int screenNumber) => Task.CompletedTask;
+        public override Task CreateMainViewAsync(object dataContext, int screenNumber) => Task.CompletedTask;
 
         public override void CreatePlayersView(object dataContext)
         {
@@ -122,7 +122,7 @@ namespace SImulator.ViewModel.Tests
             
         }
 
-        public override Task<IMedia> PrepareMedia(IMedia media)
+        public override Task<IMedia> PrepareMediaAsync(IMedia media)
         {
             throw new NotImplementedException();
         }

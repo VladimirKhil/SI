@@ -15,7 +15,7 @@ namespace SIQuester.ViewModel
 
         public bool CheckEmptyAuthors
         {
-            get { return _checkEmptyAuthors; }
+            get => _checkEmptyAuthors;
             set
             {
                 if (_checkEmptyAuthors != value)
@@ -29,11 +29,11 @@ namespace SIQuester.ViewModel
 
         public bool CheckEmptySources
         {
-            get { return _checkEmptySources; }
+            get => _checkEmptySources;
             set
             {
                 if (_checkEmptySources != value)
-                { 
+                {
                     _checkEmptySources = value; OnPropertyChanged(); Create_Executed();
                 }
             }
@@ -95,13 +95,14 @@ namespace SIQuester.ViewModel
             {
                 stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Name));
                 stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, round.Themes.Count));
+
                 foreach (var theme in round.Themes)
                 {
                     var themeData = new StringBuilder();
                     bool here = false;
                     bool tb1 = theme.Info.Comments.Text.Contains(Resources.Undefined);
                     bool tb2 = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
-                    bool tb3 = !Utils.GoodBrackets(theme.Name) || !Utils.GoodBrackets(theme.Info.Comments.Text);
+                    bool tb3 = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
                     bool tb4 = round.Type == RoundTypes.Standart && theme.Questions.Count < 5;
                     if (tb1 || tb2 || tb3 || tb4)
                     {
@@ -112,13 +113,19 @@ namespace SIQuester.ViewModel
                         }
 
                         if (tb1)
+                        {
                             themeData.AppendLine(Resources.Unrecognized);
+                        }
 
                         if (tb2)
+                        {
                             themeData.AppendLine(Resources.NoAuthors);
+                        }
 
                         if (tb4)
+                        {
                             themeData.AppendLine(Resources.FewQuestions);
+                        }
                     }
 
                     foreach (var quest in theme.Questions)
@@ -163,7 +170,7 @@ namespace SIQuester.ViewModel
                                         break;
                                 }
 
-                                if (!Utils.GoodBrackets(text))
+                                if (!Utils.ValidateTextBrackets(text))
                                 {
                                     bracketsData.Append(quest.Price.ToString());
                                     bracketsData.Append(": ");
@@ -185,20 +192,34 @@ namespace SIQuester.ViewModel
                                 stats.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Name));
                             }
                         }
+
                         if (b1)
+                        {
                             themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoQuestion));
+                        }
+
                         if (b2)
+                        {
                             themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoAnswer));
+                        }
+
                         if (b3)
+                        {
                             themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoSource));
+                        }
+
                         if (b4)
+                        {
                             themeData.Append(bracketsData);
+                        }
                     }
+
                     if (themeData.Length > 0)
                     {
                         stats.AppendLine(themeData.ToString());
                     }
                 }
+
                 stats.AppendLine();
             }
 

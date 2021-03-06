@@ -13,7 +13,7 @@ namespace SIUI.ViewModel.Core
             Scheduler = TaskScheduler.FromCurrentSynchronizationContext();
         }
 
-        public static void Execute(Action action, Action<Exception> onError, CancellationToken cancellationToken)
+        public static void Execute(Action action, Action<Exception> onError, CancellationToken cancellationToken = default)
         {
             void wrappedAction()
             {

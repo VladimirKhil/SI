@@ -11,16 +11,17 @@ namespace SIQuester.Model
     public sealed class AppSettings: INotifyPropertyChanged
     {
         public const string ProductName = "SIQuester";
+
         /// <summary>
         /// Необходимый заголовок для WebRequest'ов и WebClient'ов
         /// </summary>
-        public static string UserAgentHeader
-        {
-            get
-            {
-                return string.Format("{0} {1} ({2})", ProductName, Assembly.GetExecutingAssembly().GetName().Version.ToString(), Environment.OSVersion.VersionString);
-            }
-        }
+        public static string UserAgentHeader =>
+            string.Format(
+                "{0} {1} ({2})",
+                ProductName,
+                Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                Environment.OSVersion.VersionString);
+
         /// <summary>
         /// Используется ли версия Windows от Vista и выше
         /// </summary>

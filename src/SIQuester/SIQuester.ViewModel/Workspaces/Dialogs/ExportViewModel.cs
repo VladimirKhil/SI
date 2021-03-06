@@ -26,7 +26,7 @@ namespace SIQuester.ViewModel
 
         public object Document
         {
-            get { return _document; }
+            get => _document;
             set
             {
                 if (_document != value)
@@ -41,7 +41,7 @@ namespace SIQuester.ViewModel
 
         public ExportFormats Format
         {
-            get { return _format; }
+            get => _format;
             set
             {
                 if (_format != value)
@@ -93,10 +93,11 @@ namespace SIQuester.ViewModel
                 };
 
                 int index = 0;
+
                 if (PlatformManager.Instance.ShowExportUI("Экспорт", filter, ref filename, ref index, out Encoding encoding, out bool start))
                 {
                     OnClosed();
-                    await Export(filename, index, encoding);
+                    await ExportAsync(filename, index, encoding);
                     if (start)
                     {
                         try
@@ -116,7 +117,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        internal async Task Export(string filename, int index, Encoding encoding)
+        internal async Task ExportAsync(string filename, int index, Encoding encoding)
         {
             switch (index)
             {
@@ -141,14 +142,14 @@ namespace SIQuester.ViewModel
                     break;
             }
 
-            await ExportMedia(filename);
+            await ExportMediaAsync(filename);
         }
 
         /// <summary>
         /// Выгрузить медиа в подпапку
         /// </summary>
         /// <param name="filename">Имя основного файла для экспорта</param>
-        private async Task ExportMedia(string filename)
+        private async Task ExportMediaAsync(string filename)
         {
             var extMedia = new List<IMedia>();
 
@@ -167,7 +168,9 @@ namespace SIQuester.ViewModel
                                 if (media.GetStream != null)
                                 {
                                     if (media.Uri != null)
+                                    {
                                         extMedia.Add(media);
+                                    }
                                 }
                             }
                         }
@@ -183,36 +186,33 @@ namespace SIQuester.ViewModel
 
                 foreach (var media in extMedia)
                 {
-                    using (var stream = media.GetStream().Stream)
-                    {
-                        var file = Path.Combine(folder, media.Uri);
-                        using (var fs = File.Open(file, FileMode.Create, FileAccess.Write))
-                        {
-                            await stream.CopyToAsync(fs);
-                        }
-                    }
+                    using var stream = media.GetStream().Stream;
+                    var file = Path.Combine(folder, media.Uri);
+                    using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
+                    await stream.CopyToAsync(fs);
                 }
             }
         }
 
-        private void ExportTxt(string filename, Encoding encoding)
-        {
-            _documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));            
-        }
+        private void ExportTxt(string filename, Encoding encoding) =>
+            _documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));
 
-        private void ExportHtml(string filename)
-        {
-            _documentWrapper.WalkAndSave(filename, Encoding.UTF8, sr => sr.Write("<br>"),
+        private void ExportHtml(string filename) =>
+            _documentWrapper.WalkAndSave(
+                filename,
+                Encoding.UTF8,
+                sr => sr.Write("<br>"),
                 (sr, text) => sr.Write(text),
-                sr => sr.Write(string.Format("<!DOCTYPE html><html><head><title>{0}</title></head><body>", 
+                sr => sr.Write(
+                    string.Format("<!DOCTYPE html><html><head><title>{0}</title></head><body>",
                     _source.Document.Package.Name)),
-                    sr => sr.Write("</body></html>"));
-        }
+                sr => sr.Write("</body></html>"));
 
-        private void ExportRtf(string filename)
-        {
-            // RTF не пооддерживает Unicode!
-            _documentWrapper.WalkAndSave(filename, Encoding.GetEncoding(1251),
+        private void ExportRtf(string filename) =>
+            // RTF does not support Unicode!
+            _documentWrapper.WalkAndSave(
+                filename,
+                Encoding.GetEncoding(1251),
                 sr => sr.Write(@"\par "),
                 (sr, text) => sr.Write(text.Replace(@"\", @"\\")),
                 sr =>
@@ -222,12 +222,13 @@ namespace SIQuester.ViewModel
                     sr.Write("\r\n\\viewkind4\\uc1\\pard\\f0\\fs24 ");
                 },
                 sr => sr.Write("\r\n}\r\n"));
-        }
 
         private void Print_Executed(object arg)
         {
             if (_documentWrapper.Print())
+            {
                 OnClosed();
+            }
         }
     }
 }

@@ -4,7 +4,8 @@
              xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
              xmlns:lb="clr-namespace:SImulator.Behaviors"
              xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException" ShutdownMode="OnMainWindowClose">
+             DispatcherUnhandledException="Application_DispatcherUnhandledException"
+             ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
         <SolidColorBrush x:Key="ImageBrush" Color="#FF232323" />
@@ -17,6 +18,7 @@
             <Setter Property="BorderBrush" Value="Gray" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource ImageBrush}" />
+            <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ButtonBase}">
@@ -94,15 +96,7 @@
                 </DockPanel.Resources>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Button Style="{StaticResource ToolButton}" Height="23" Width="23" Padding="3" Margin="1" Command="{Binding AddPlayer}" ToolTip="Добавить игрока">
-                        <Image>
-                            <Image.Source>
-                                <DrawingImage>
-                                    <DrawingImage.Drawing>
-                                        <GeometryDrawing Geometry="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                    </DrawingImage.Drawing>
-                                </DrawingImage>
-                            </Image.Source>
-                        </Image>
+                        <Path Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z" Stretch="Fill" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                     </Button>
                     <Button Style="{StaticResource ToolButton}" Height="23" Width="23" Padding="3" Margin="1" Command="{Binding ClearPlayers}" ToolTip="Очистить список">
                         <Path Data="M0,0L1,1M0,1L1,0" Stretch="Fill" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" StrokeThickness="4" />
@@ -118,7 +112,7 @@
                                 <Style TargetType="ColumnDefinition">
                                     <Setter Property="Width" Value="0" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
+                                        <DataTrigger Binding="{Binding Settings.Model.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
                                             <Setter Property="Width" Value="29" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -172,26 +166,10 @@
                                     </Grid.Style>
                                     <DockPanel>
                                         <Button Style="{StaticResource ToolButton}" DockPanel.Dock="Left" Padding="3" Margin="1" ToolTip="Добавить сумму" VerticalContentAlignment="Center" Height="23" Width="23" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.AddRight}" CommandParameter="{Binding}">
-                                            <Image>
-                                                <Image.Source>
-                                                    <DrawingImage>
-                                                        <DrawingImage.Drawing>
-                                                            <GeometryDrawing Geometry="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                        </DrawingImage.Drawing>
-                                                    </DrawingImage>
-                                                </Image.Source>
-                                            </Image>
+                                            <Path Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z" Stretch="Fill" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
                                         <Button Style="{StaticResource ToolButton}" DockPanel.Dock="Right" Padding="3" Margin="1" ToolTip="Вычесть сумму" VerticalContentAlignment="Center" Height="23" Width="23" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.AddWrong}" CommandParameter="{Binding}">
-                                            <Image>
-                                                <Image.Source>
-                                                    <DrawingImage>
-                                                        <DrawingImage.Drawing>
-                                                            <GeometryDrawing Geometry="M0,0L30,0L30,10L0,10z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                        </DrawingImage.Drawing>
-                                                    </DrawingImage>
-                                                </Image.Source>
-                                            </Image>
+                                            <Path Data="M0,0L30,0L30,10L0,10z" Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
                                         <TextBox FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Margin="1" Width="Auto" HorizontalAlignment="Stretch" Height="23" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                     </DockPanel>
@@ -243,6 +221,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="Cursor" Value="Hand" />
         </Style>
 
         <LinearGradientBrush x:Key="MainBackground" EndPoint="0.5,0.5" StartPoint="0.5,0" SpreadMethod="Reflect">

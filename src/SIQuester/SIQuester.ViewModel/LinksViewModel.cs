@@ -15,7 +15,9 @@ namespace SIQuester.ViewModel
             {
                 var owner = Owner?.Owner;
                 while (owner?.Owner != null)
+                {
                     owner = owner.Owner;
+                }
 
                 return (owner as PackageViewModel)?.Document;
             }

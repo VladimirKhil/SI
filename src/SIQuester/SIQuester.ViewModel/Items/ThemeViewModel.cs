@@ -47,17 +47,21 @@ namespace SIQuester.ViewModel
                     for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                     {
                         if (Questions[i].OwnerTheme != null)
+                        {
                             throw new Exception(Resources.ErrorInsertingBindedQuestion);
+                        }
 
                         Questions[i].OwnerTheme = this;
                         Model.Questions.Insert(i, Questions[i].Model);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
                     var temp = Model.Questions[e.OldStartingIndex];
                     Model.Questions.Insert(e.NewStartingIndex, temp);
                     Model.Questions.RemoveAt(e.OldStartingIndex + (e.NewStartingIndex < e.OldStartingIndex ? 1 : 0));
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (QuestionViewModel question in e.OldItems)
                     {
@@ -67,6 +71,7 @@ namespace SIQuester.ViewModel
                         OwnerRound?.OwnerPackage?.Document?.ClearLinks(question);
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     Model.Questions.Clear();
                     foreach (QuestionViewModel question in Questions)
@@ -112,11 +117,17 @@ namespace SIQuester.ViewModel
                         price = Math.Max(0, Questions[n - 1].Model.Price + add);
                     }
                     else if (n > 0)
+                    {
                         price = Questions[0].Model.Price * 2;
+                    }
                     else if (OwnerRound.Model.Type == RoundTypes.Final)
+                    {
                         price = 0;
+                    }
                     else
+                    {
                         price = 100;
+                    }
                 }
 
                 var question = QDocument.CreateQuestion(price);

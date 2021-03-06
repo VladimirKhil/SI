@@ -17,19 +17,14 @@ namespace SIQuester.Selectors
         {
             var param = ((QuestionTypeParamViewModel)item).Model;
 
-            if (param.Name == QuestionTypeParams.Cat_Theme)
-                return CatThemeTemplate;
-
-            if (param.Name == QuestionTypeParams.Cat_Cost)
-                return CatCostTemplate;
-
-            if (param.Name == QuestionTypeParams.BagCat_Self)
-                return BagCatSelfTemplate;
-
-            if (param.Name == QuestionTypeParams.BagCat_Knows)
-                return BagCatKnowsTemplate;
-
-            return BaseTemplate;
+            return param.Name switch
+            {
+                QuestionTypeParams.Cat_Theme => CatThemeTemplate,
+                QuestionTypeParams.Cat_Cost => CatCostTemplate,
+                QuestionTypeParams.BagCat_Self => BagCatSelfTemplate,
+                QuestionTypeParams.BagCat_Knows => BagCatKnowsTemplate,
+                _ => BaseTemplate
+            };
         }
     }
 }
