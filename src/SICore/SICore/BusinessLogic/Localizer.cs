@@ -1,5 +1,4 @@
-﻿using SICore.Network.Contracts;
-using SICore.Properties;
+﻿using SICore.Properties;
 using System.Globalization;
 using System.Resources;
 
@@ -24,7 +23,9 @@ namespace SICore.BusinessLogic
         {
             if (_packagesResourceManager == null)
             {
-                _packagesResourceManager = new ResourceManager("SIPackages.Properties.Resources", typeof(SIPackages.Properties.Resources).Assembly);
+                _packagesResourceManager = new ResourceManager(
+                    "SIPackages.Properties.Resources",
+                    typeof(SIPackages.Properties.Resources).Assembly);
             }
 
             return _packagesResourceManager.GetString(key, Culture);

@@ -47,8 +47,8 @@ namespace SICore
 
             TInfo.MediaLoadError += TInfo_MediaLoadError;
 
-            //PlayerLogic = new PlayerHumanLogic(data, viewerActions, localizer);
-            //ShowmanLogic = new ShowmanHumanLogic(data, viewerActions, localizer);
+            //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
+            //ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
         }
 
         private void TInfo_MediaLoadError(Exception exc)
@@ -675,7 +675,9 @@ namespace SICore
 
                     Uri mediaUri;
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
+                    {
                         return;
+                    }
 
                     if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
@@ -837,7 +839,9 @@ namespace SICore
         public void OnPersonFinalStake(int playerIndex)
         {
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            {
                 return;
+            }
 
             _data.Players[playerIndex].Stake = -4;
         }
@@ -845,7 +849,9 @@ namespace SICore
         public void OnPersonFinalAnswer(int playerIndex)
         {
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            {
                 return;
+            }
 
             _data.Players[playerIndex].State = PlayerState.HasAnswered;
         }
@@ -853,13 +859,18 @@ namespace SICore
         public void OnPersonApellated(int playerIndex)
         {
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            {
                 return;
+            }
 
             _data.Players[playerIndex].State = PlayerState.HasAnswered;
         }
 
         public void QType()
         {
+            TInfo.QuestionContentType = QuestionContentType.Text;
+            TInfo.Sound = false;
+
             if (_data.QuestionType == QuestionTypes.Auction)
             {
                 TInfo.Text = _localizer[nameof(R.Label_Auction)];

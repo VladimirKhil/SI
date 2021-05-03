@@ -1,8 +1,9 @@
 ﻿using SICore;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +13,8 @@ namespace SIGame.Behaviors
 {
     public static class ImageLoader
     {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
         public static PersonAccount GetImageSource(DependencyObject obj)
         {
             return (PersonAccount)obj.GetValue(ImageSourceProperty);
@@ -129,7 +132,7 @@ namespace SIGame.Behaviors
 
             try
             {
-                var stream = await Task.Run(() => LoadImage(uri));
+                var stream = await LoadImageAsync(uri);
 
                 var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.Default); // Лучше эти два параметра не трогать, так как в противном случае в некоторых ситуациях изображения могут перестать отображаться
                 if (decoder.Frames.Count == 0)
@@ -140,9 +143,9 @@ namespace SIGame.Behaviors
                 var frame = decoder.Frames[0];
                 image.Source = frame.CanFreeze ? (BitmapSource)frame.GetAsFrozen() : frame;
             }
-            catch
+            catch (Exception exc)
             {
-
+                Trace.TraceError($"Image {uri} load error: {exc}");
             }
         }
 
@@ -151,12 +154,16 @@ namespace SIGame.Behaviors
         /// </summary>
         /// <param name="uri"></param>
         /// <returns></returns>
-        private static async Task<Stream> LoadImage(Uri uri)
+        private static async Task<Stream> LoadImageAsync(Uri uri)
         {
-            var request = WebRequest.CreateHttp(uri);
-            var response = await request.GetResponseAsync();
+            using var response = await HttpClient.GetAsync(uri);
 
-            return response.GetResponseStream();
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(await response.Content.ReadAsStringAsync());
+            }
+
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }

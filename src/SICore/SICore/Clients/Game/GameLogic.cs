@@ -76,6 +76,7 @@ namespace SICore
 
             Engine.SimpleAnswer += Engine_SimpleAnswer;
             Engine.RightAnswer += Engine_RightAnswer;
+            Engine.QuestionPostInfo += Engine_QuestionPostInfo;
             Engine.EndQuestion += Engine_EndQuestion;
             Engine.NextQuestion += Engine_NextQuestion;
             Engine.RoundEmpty += Engine_RoundEmpty;
@@ -101,6 +102,8 @@ namespace SICore
                 _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
             }
         }
+
+        private void Engine_QuestionPostInfo() => QuestionSourcesAndComments(1);
 
         private void Engine_Package(Package package)
         {
@@ -488,7 +491,9 @@ namespace SICore
         private void Engine_SimpleAnswer(string answer)
         {
             if (answer == null)
+            {
                 answer = LO[nameof(R.AnswerNotSet)];
+            }
 
             answer = answer.LeaveFirst(MaxAnswerLength);
 
@@ -1332,13 +1337,10 @@ namespace SICore
                                 break;
 
                             case StopReason.Appellation:
-                                if (task == Tasks.WaitChoose)
-                                {
-                                    task = Tasks.AskToChoose;
-                                }
+                                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : task;
 
-                                _tasksHistory.AddLogEntry($"Appellation PauseExecution {task} {arg} {PrintOldTasks()}");
-                                PauseExecution(taskId, arg);
+                                _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({PrintOldTasks()})");
+                                PauseExecution((int)savedTask, arg);
                                 ScheduleExecution(Tasks.PrintAppellation, 10);
                                 break;
 
@@ -1911,7 +1913,9 @@ namespace SICore
         {
             _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
             if (_data.IsOralNow)
+            {
                 _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            }
 
             _data.AnswererIndex = SelectRandomOnIndex(_data.Players, index => index != _data.ChooserIndex);
 

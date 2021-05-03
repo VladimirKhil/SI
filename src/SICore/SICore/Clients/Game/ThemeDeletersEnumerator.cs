@@ -24,7 +24,7 @@ namespace SICore.Clients.Game
             {
                 if (index < 0)
                 {
-                    throw new ArgumentException("Недопустимый индекс", nameof(index));
+                    throw new ArgumentException($"Недопустимый индекс {index}", nameof(index));
                 }
 
                 PlayerIndex = index;
@@ -33,7 +33,7 @@ namespace SICore.Clients.Game
             public IndexInfo(HashSet<int> indicies)
             {
                 PlayerIndex = -1;
-                PossibleIndicies = indicies; // Разделяют общий набор
+                PossibleIndicies = indicies; // IndexInfo instances share common PossibleIndicies
             }
 
             public void SetIndex(int index)
@@ -131,7 +131,7 @@ namespace SICore.Clients.Game
             _order = order;
         }
 
-        private readonly List<string> _removeLog = new List<string>(); // Temp for catch errors
+        private readonly List<string> _removeLog = new List<string>(); // Temporary object to catch errors
 
         public string GetRemoveLog() => string.Join(Environment.NewLine, _removeLog);
 

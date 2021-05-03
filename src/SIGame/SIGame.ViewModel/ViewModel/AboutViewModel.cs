@@ -11,6 +11,7 @@ namespace SIGame.ViewModel
 {
     public sealed class AboutViewModel: ViewModel<object>
     {
+        public bool IsProgress => false;
 
         /// <summary>
         /// Версия приложения

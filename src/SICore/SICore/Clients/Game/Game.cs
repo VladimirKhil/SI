@@ -307,8 +307,14 @@ namespace SICore
                 {
                     var accounts = accountsToSearch.ToArray();
 
-                    var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index,
-                        accounts[index], connectionAuthenticator);
+                    var result = CheckAccountNew(
+                        role.ToString().ToLower(),
+                        name,
+                        isMale ? "m" : "f",
+                        ref found,
+                        index,
+                        accounts[index],
+                        connectionAuthenticator);
 
                     if (result.HasValue)
                     {
@@ -327,7 +333,13 @@ namespace SICore
                     foreach (var item in accountsToSearch)
                     {
                         index++;
-                        var result = CheckAccountNew(role.ToString().ToLower(), name, isMale ? "m" : "f", ref found, index, item,
+                        var result = CheckAccountNew(
+                            role.ToString().ToLower(),
+                            name,
+                            isMale ? "m" : "f",
+                            ref found,
+                            index,
+                            item,
                             connectionAuthenticator);
 
                         if (result.HasValue)

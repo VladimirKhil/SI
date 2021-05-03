@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace SIPackages.Providers
 {
     public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
         private readonly Services.SI.ISIStorageServiceClient _siStorageServiceClient;
         private readonly HashSet<string> _downloadedFiles = new HashSet<string>();
         private readonly string _storageOriginsPath;
@@ -48,29 +50,24 @@ namespace SIPackages.Providers
             {
                 var fileName = Path.GetTempFileName();
 
-                try
+                var packageNameParts = name.Split('\\');
+                var escapedName = string.Join("/", packageNameParts.Select(pnp => Uri.EscapeDataString(pnp)));
+
+                var uri = $"{_storageUrl}/{escapedName}";
+                using (var response = await HttpClient.GetAsync(uri))
                 {
-                    var request = WebRequest.Create($"{_storageUrl}/{Uri.EscapeDataString(name)}"); // TODO: -> HttpClient
-                    using (var response = await request.GetResponseAsync())
-                    using (var stream = response.GetResponseStream())
+                    if (!response.IsSuccessStatusCode)
                     {
-                        using (var fs = File.Create(fileName))
-                        {
-                            await stream.CopyToAsync(fs);
-                        }
+                        throw new Exception($"Error while accessing \"{uri}\": {await response.Content.ReadAsStringAsync()}!");
                     }
 
-                    _downloadedFiles.Add(fileName);
+                    using var fs = File.Create(fileName);
+                    await response.Content.CopyToAsync(fs);
+                }
 
-                    using (var fs = File.OpenRead(fileName))
-                    {
-                        return SIDocument.Load(fs);
-                    }
-                }
-                finally
-                {
-                    File.Delete(fileName);
-                }
+                _downloadedFiles.Add(fileName);
+
+                return SIDocument.Load(File.OpenRead(fileName));
             }
             else
             {

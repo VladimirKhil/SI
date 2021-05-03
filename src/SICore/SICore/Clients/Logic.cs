@@ -1,5 +1,6 @@
 ﻿using SICore.Network;
 using SICore.Network.Contracts;
+using SICore.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -193,42 +194,12 @@ namespace SICore
                 }
             });
 
-        protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition)
-        {
-            var goodItems = list
-                .Select((item, index) => new { Item = item, Index = index })
-                .Where(item => condition(item.Item)).ToArray();
+        protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>
+            list.SelectRandom(condition, _data.Rand);
 
-            if (goodItems.Length == 0)
-            {
-                throw new Exception("goodItems.Length == 0");
-            }
+        protected int SelectRandomOnIndex<T>(IEnumerable<T> list, Predicate<int> condition) =>
+            list.SelectRandomOnIndex(condition, _data.Rand);
 
-            var ind = Data.Rand.Next(goodItems.Length);
-            return goodItems[ind].Index;
-        }
-
-        protected int SelectRandomOnIndex<T>(IEnumerable<T> list, Predicate<int> condition)
-        {
-            var goodItems = list
-                .Select((item, index) => new { Item = item, Index = index })
-                .Where(item => condition(item.Index)).ToArray();
-
-            var ind = Data.Rand.Next(goodItems.Length);
-            return goodItems[ind].Index;
-        }
-
-        /// <summary>
-        /// Получить случайную строку ресурса
-        /// </summary>
-        /// <param name="resource">Строки ресурса, разделённые точкой с запятой</param>
-        /// <returns>Одна из строк ресурса (случайная)</returns>
-        public string GetRandomString(string resource)
-        {
-            var resources = resource.Split(';');
-            var index = Data.Rand.Next(resources.Length);
-
-            return resources[index];
-        }
+        public string GetRandomString(string resource) => _data.Rand.GetRandomString(resource);
     }
 }

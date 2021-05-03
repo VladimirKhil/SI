@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json;
-using Notions;
-using SICore.BusinessLogic;
+﻿using Notions;
 using SICore.PlatformSpecific;
 using SIData;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
@@ -108,10 +105,7 @@ namespace SICore
         // Иначе - случайная тема
         [XmlIgnore]
         [IgnoreDataMember]
-        public int Rest1
-        {
-            get { return 100 - V2 - V3; }
-        }
+        public int Rest1 => 100 - V2 - V3;
 
         // Если согласно номеру вопроса
         private int _v4 = 0;
@@ -123,7 +117,7 @@ namespace SICore
         [DataMember]
         public int V4
         {
-            get { return _v4; }
+            get => _v4;
             set
             {
                 _v4 = value;
@@ -137,10 +131,7 @@ namespace SICore
 
         [XmlIgnore]
         [IgnoreDataMember]
-        public int V4Max
-        {
-            get { return 100 - V5 - V6 - V7; }
-        }
+        public int V4Max => 100 - V5 - V6 - V7;
 
         private int _v5 = 0;
         /// <summary>
@@ -150,7 +141,7 @@ namespace SICore
         [DataMember]
         public int V5
         {
-            get { return _v5; }
+            get => _v5;
             set
             {
                 _v5 = value;
@@ -164,10 +155,7 @@ namespace SICore
 
         [XmlIgnore]
         [IgnoreDataMember]
-        public int V5Max
-        {
-            get { return 100 - V4 - V6 - V7; }
-        }
+        public int V5Max => 100 - V4 - V6 - V7;
 
         private int _v6 = 0;
         /// <summary>
@@ -177,7 +165,7 @@ namespace SICore
         [DataMember]
         public int V6
         {
-            get { return _v6; }
+            get => _v6;
             set
             {
                 _v6 = value;
@@ -191,10 +179,7 @@ namespace SICore
 
         [XmlIgnore]
         [IgnoreDataMember]
-        public int V6Max
-        {
-            get { return 100 - V5 - V4 - V7; }
-        }
+        public int V6Max => 100 - V5 - V4 - V7;
 
         private int _v7 = 0;
         /// <summary>
@@ -204,7 +189,7 @@ namespace SICore
         [DataMember]
         public int V7
         {
-            get { return _v7; }
+            get => _v7;
             set
             {
                 _v7 = value;
@@ -218,10 +203,7 @@ namespace SICore
 
         [XmlIgnore]
         [IgnoreDataMember]
-        public int V7Max
-        {
-            get { return 100 - V5 - V6 - V4; }
-        }
+        public int V7Max => 100 - V5 - V6 - V4;
 
         private char[] _p2 = null;
 
@@ -231,17 +213,14 @@ namespace SICore
         [DataMember]
         public char[] P2
         {
-            get { return _p2; }
+            get => _p2;
             set { _p2 = value; OnPropertyChanged(); }
         }
 
         // Иначе - случайный вопрос
         [XmlIgnore]
         [IgnoreDataMember]
-        public int Rest2
-        {
-            get { return 100 - V4 - V5 - V6 - V7; }
-        }
+        public int Rest2 => 100 - V4 - V5 - V6 - V7;
 
         // Основные игровые характеристики
 
@@ -330,7 +309,7 @@ namespace SICore
         /// Создание инфы
         /// </summary>
         /// <param name="name">Имя</param>
-        /// <param name="sex">Пол</param>
+        /// <param name="isMale">Пол</param>
         /// <param name="style">Стиль игры</param>
         /// <param name="v1">Вероятность того, что игрок будет выбирать согласно номеру темы, а не вопроса</param>
         /// <param name="v2">Тема та же, что и была</param>
@@ -351,8 +330,30 @@ namespace SICore
         /// <param name="b5">Вероятность сказать "Ва-банк" на вопросе пятой категории</param>
         /// <param name="nq">Максимальное число вопросов до конца третьего раунда, при котором ситуация может стать критической</param>
         /// <param name="part">Минимальная доля собственной суммы по отношению к сумме лидера, при которой ситуация может стать критической</param>
-        public ComputerAccount(string name, bool sex, PlayerStyle style, int v1, int v2, int v3, string p1, int v4, int v5, int v6, int v7, string p2, int f, int b0, int s, int v, int n1, int n5, int b1, int b5, int nq, int part)
-            : base(name, sex)
+        public ComputerAccount(
+            string name,
+            bool isMale,
+            PlayerStyle style,
+            int v1,
+            int v2,
+            int v3,
+            string p1,
+            int v4,
+            int v5,
+            int v6,
+            int v7,
+            string p2,
+            int f,
+            int b0,
+            int s,
+            int v,
+            int n1,
+            int n5,
+            int b1,
+            int b5,
+            int nq,
+            int part)
+            : base(name, isMale)
         {
             IsHuman = false;
 
@@ -382,9 +383,9 @@ namespace SICore
         /// Создание игрока со случайными характеристиками
         /// </summary>
         /// <param name="name">Имя игрока</param>
-        /// <param name="sex">Пол</param>
-        public ComputerAccount(string name, bool sex)
-            : base(name, sex)
+        /// <param name="isMale">Пол</param>
+        public ComputerAccount(string name, bool isMale)
+            : base(name, isMale)
         {
             IsHuman = false;
         }
@@ -513,60 +514,6 @@ namespace SICore
             V5 = item.V5;
             V6 = item.V6;
             V7 = item.V7;
-        }
-
-        /// <summary>
-        /// Коллекция компьютерных участников по умолчанию
-        /// </summary>
-        private static StoredPersons _storedPersons = null;
-
-        internal static StoredPersons StoredPersons
-        {
-            get
-            {
-                if (_storedPersons == null)
-                {
-                    var serializer = new JsonSerializer();
-
-                    using var personsJsonStream = System.Reflection.Assembly.GetExecutingAssembly()
-                        .GetManifestResourceStream("SICore.persons.json");
-                    using var streamReader = new StreamReader(personsJsonStream);
-                    using var reader = new JsonTextReader(streamReader);
-
-                    _storedPersons = serializer.Deserialize<StoredPersons>(reader);
-                }
-
-                return _storedPersons;
-            }
-        }
-
-        public static ComputerAccount[] GetDefaultPlayers(ILocalizer localizer, string photoPath)
-        {
-            var culture = localizer.Culture.TwoLetterISOLanguageName;
-
-            return StoredPersons.Players
-                .Select(player => new ComputerAccount(player)
-                {
-                    Name = player.Names.ContainsKey(culture) ? player.Names[culture] : "-",
-                    IsMale = player.IsMale,
-                    Picture = Path.Combine(photoPath, player.Picture)
-                })
-                .OrderBy(player => player.Name)
-                .ToArray();
-        }
-
-        public static ComputerAccount[] GetDefaultShowmans(ILocalizer localizer, string photoPath)
-        {
-            var culture = localizer.Culture.TwoLetterISOLanguageName;
-
-            return StoredPersons.Showmans.Select(showman => new ComputerAccount(showman)
-                {
-                    Name = showman.Names.ContainsKey(culture) ? showman.Names[culture] : "-",
-                    IsMale = showman.IsMale,
-                    Picture = Path.Combine(photoPath, showman.Picture)
-                })
-                .OrderBy(showman => showman.Name)
-                .ToArray();
         }
 
         public ComputerAccount Clone() => new ComputerAccount

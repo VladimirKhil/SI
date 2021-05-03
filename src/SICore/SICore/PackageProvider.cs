@@ -22,9 +22,7 @@ namespace SICore.PlatformSpecific
             return Task.FromResult(dir.EnumerateFiles("*.siq").Select(file => file.Name));
         }
 
-        public Task<SIDocument> GetPackageAsync(string name)
-        {
-            return Task.FromResult(SIDocument.Load(File.OpenRead(Path.Combine(_folder, name))));
-        }
+        public Task<SIDocument> GetPackageAsync(string name) =>
+            Task.FromResult(SIDocument.Load(File.OpenRead(Path.Combine(_folder, name))));
     }
 }

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   
-  <!-- При обновлении нужно повысить ProductVersion и задать новый GUID для ProductCode -->
-  
-  <?define Manufacturer="Хиль-софт" ?>
+  <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIGame" ?>
   <?define ProductNameR="SIGame" ?>
   <?define ManufacturerEn="Khil-soft" ?>

@@ -1132,6 +1132,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы создали слишком много игр!.
+        /// </summary>
+        public static string TooManyGames {
+            get {
+                return ResourceManager.GetString("TooManyGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Обнаружено обновление программы до версии {0}.
         /// </summary>
         public static string UpdateVersionMessage {

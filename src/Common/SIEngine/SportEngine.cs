@@ -98,12 +98,20 @@ namespace SIEngine
                     {
                         var mode = PlayQuestionAtom();
                         if (mode != QuestionPlayMode.InProcess)
+                        {
                             Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+                        }
 
                         AutoNext(4000);
                         break;
                     }
                     #endregion
+
+                case GameStage.QuestionPostInfo:
+                    OnQuestionPostInfo();
+                    Stage = GameStage.EndQuestion;
+                    AutoNext(3000);
+                    break;
 
                 case GameStage.EndQuestion:
                     #region EndQuestion

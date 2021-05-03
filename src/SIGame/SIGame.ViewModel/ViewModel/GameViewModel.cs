@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class GameViewModel: IDisposable, INotifyPropertyChanged
+    public sealed class GameViewModel: IAsyncDisposable, INotifyPropertyChanged
     {
         private readonly Server _server;
 
@@ -242,9 +242,9 @@ namespace SIGame.ViewModel
             GameEnded?.Invoke();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _server.DisposeAsync();
+            await _server.DisposeAsync();
 
             if (TempDocFolder != null && Directory.Exists(TempDocFolder))
             {

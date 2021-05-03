@@ -8,10 +8,14 @@ namespace SICore
     /// </summary>
     internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
     {
+        //private readonly ViewerActions _viewerActions;
+        //private readonly ViewerData _data;
+
         public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
             : base(data, viewerActions, computerAccount)
         {
-            
+            //_viewerActions = viewerActions;
+            //_data = data;
         }
 
         internal void ScheduleExecution(ShowmanTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
@@ -45,7 +49,7 @@ namespace SICore
         private void SelectPlayer(string message)
         {
             int num = _data.Players.Count(p => p.CanBeSelected);
-            int i = Data.Rand.Next(num);
+            int i = _data.Rand.Next(num);
             while (i < _data.Players.Count && !_data.Players[i].CanBeSelected)
             {
                 i++;
@@ -78,13 +82,13 @@ namespace SICore
 
         #region ShowmanInterface Members
 
-        public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Data.Rand.Next(10));
+        public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + _data.Rand.Next(10));
 
-        public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Data.Rand.Next(10));
+        public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + _data.Rand.Next(10));
 
-        public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Data.Rand.Next(10));
+        public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + _data.Rand.Next(10));
 
-        public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Data.Rand.Next(10));
+        public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + _data.Rand.Next(10));
 
         public void ChangeSum()
         {

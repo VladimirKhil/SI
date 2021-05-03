@@ -28,3 +28,15 @@ using System.Windows;
     //(used if a resource is not found in the page, 
     // app, or any theme specific resource dictionaries)
 )]
+
+#if LEGACY
+[assembly: AssemblyTitle("SImulator")]
+[assembly: AssemblyDescription("SIGame emulator")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("Khil-soft")]
+[assembly: AssemblyProduct("SImulator")]
+[assembly: AssemblyCopyright("Copyright © Khil-soft 2010 - 2021")]
+[assembly: AssemblyCulture("")]
+[assembly: AssemblyVersion("2.8.0.0")]
+[assembly: AssemblyFileVersion("2.8.0.0")]
+#endif

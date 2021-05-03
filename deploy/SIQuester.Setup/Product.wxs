@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <!-- При обновлении нужно повысить ProductVersion и задать новый GUID для ProductCode -->
-
-  <?define Manufacturer="Свояк-софт" ?>
+  <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIQuester" ?>
-  <?define ProductDescription="Редактор вопросов для SIGame" ?>
-  <?define ManufacturerEn="Svoyak-soft" ?>
+  <?define ProductDescription="SIGame packages editor" ?>
+  <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIQuester" ?>
   <?define ProductVersion="!(bind.FileVersion.$(var.SIQuester.TargetFileName))" ?>
   <?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
-  <?define ProductNameR="SIQuester'а" ?>
+  <?define ProductNameR="SIQuester" ?>
 
   <Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
 
-		<MajorUpgrade DowngradeErrorMessage="Уже установлена более поздняя версия $(var.ProductNameR). Установка будет прекращена." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
+		<MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
 		<MediaTemplate EmbedCab="yes" />
 
     <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
@@ -100,6 +98,12 @@
       </Component>
       <Component Guid="{8719608C-AC17-4252-94A7-A00C1B9DE46C}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)MahApps.Metro.dll" />
+      </Component>
+      <Component Guid="{749C358D-77D0-4950-B746-33E119F307AB}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)ControlzEx.dll" />
+      </Component>
+      <Component Guid="{13D8F317-BF61-47D8-B6F0-1F91E42C85C1}">
+        <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Microsoft.Xaml.Behaviors.dll" />
       </Component>
       <Component Guid="{0497682E-D9CD-4CB0-8D0B-5B1247A98C08}">
         <File KeyPath="yes" Source="$(var.SIQuester.TargetDir)Newtonsoft.Json.dll" />

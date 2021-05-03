@@ -486,4 +486,7 @@
   <data name="PortIsUsedError" xml:space="preserve">
     <value>Мультимедиа-порт {0} уже занят (возможно, одна игра уже запущена?). Попробуйте задать другой порт в настройках</value>
   </data>
+  <data name="TooManyGames" xml:space="preserve">
+    <value>Вы создали слишком много игр!</value>
+  </data>
 </root>

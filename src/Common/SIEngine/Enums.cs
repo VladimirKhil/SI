@@ -16,6 +16,7 @@ namespace SIEngine
         Question,
         RightAnswer,
         RightAnswerProceed,
+        QuestionPostInfo,
         EndQuestion,
         FinalThemes,
         WaitDelete,

@@ -17,7 +17,7 @@ namespace SIGame.ViewModel
 
         public ContentBox Content
         {
-            get { return _content; }
+            get => _content;
             set
             {
                 if (_content != value)
@@ -69,6 +69,9 @@ namespace SIGame.ViewModel
         public ICommand Cancel { get; set; }
         public ICommand CancelBase { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event Action Closed;
+
         public NavigatorViewModel()
         {
             Back = new CustomCommand(Back_Executed) { CanBeExecuted = false };
@@ -118,8 +121,5 @@ namespace SIGame.ViewModel
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event Action Closed;
     }
 }

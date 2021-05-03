@@ -211,7 +211,7 @@
         public const string NextDelete = "NEXTDELETE";
 
         /// <summary>
-        /// Игра не сущетствует
+        /// Игра не существует
         /// </summary>
         public const string NoGame = "NOGAME";
 

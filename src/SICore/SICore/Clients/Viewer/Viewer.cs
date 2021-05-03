@@ -4,6 +4,7 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
 using SICore.PlatformSpecific;
+using SICore.Special;
 using SIData;
 using SIPackages.Core;
 using SIUI.Model;
@@ -1849,7 +1850,7 @@ namespace SICore
                 MyData.AllPersons.Values.Where(p => p.IsHuman)
                     .Except(new ViewerAccount[] { player })
                     .ToArray()
-                : (Account[])ComputerAccount.GetDefaultPlayers(LO, MyData.BackLink.PhotoUri)
+                : (Account[])StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.BackLink.PhotoUri)
                     .Where(a => !MyData.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
                     .ToArray();
         }

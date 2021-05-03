@@ -38,7 +38,7 @@ namespace SIQuester.ViewModel
 
                 var ms = new MemoryStream();
 
-                var response = await HttpClient.GetAsync(packageUri);
+                using var response = await HttpClient.GetAsync(packageUri);
 
                 if (!response.IsSuccessStatusCode)
                 {

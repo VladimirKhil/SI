@@ -188,7 +188,7 @@
         <Style x:Key="MainProgress" TargetType="ProgressBar">
             <Setter Property="Visibility" Value="Hidden" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Data.IsProgress}" Value="True">
+                <DataTrigger Binding="{Binding IsProgress}" Value="True">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
             </Style.Triggers>
@@ -208,9 +208,14 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
-                                BorderThickness="3.75" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                TextBlock.Foreground="{StaticResource MainColor}">
+                        <Border
+                            Name="Bd"
+                            BorderBrush="{StaticResource WindowBorderColor}"
+                            Background="{StaticResource WindowBackground}"
+                            BorderThickness="3.75"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -220,14 +225,47 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
-                                <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="20,24,10,4" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                                        BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}"
-                                        ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
-                                    <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="2" />
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    Foreground="DarkBlue"
+                                    IsIndeterminate="True"
+                                    Height="4"
+                                    VerticalAlignment="Top"
+                                    DataContext="{Binding Data}"
+                                    Style="{StaticResource MainProgress}" />
+                                <TextBlock
+                                    Text="{TemplateBinding Tag}"
+                                    Style="{StaticResource CommonText}"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Margin="20,24,10,4"
+                                    VerticalAlignment="Center" />
+                                <Button
+                                    Grid.Column="1"
+                                    x:Name="bClose"
+                                    Style="{StaticResource CloseButton}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    BorderThickness="0"
+                                    Width="30"
+                                    Height="30"
+                                    Padding="0,1,1,0"
+                                    Command="{Binding Cancel}"
+                                    IsEnabled="{TemplateBinding IsEnabled}"
+                                    ToolTip="{x:Static lp:Resources.Close}"
+                                    IsCancel="True">
+                                    <Path
+                                        Data="M0,0L1,1M1,0L0,1"
+                                        Stroke="{StaticResource MainColor}"
+                                        StrokeThickness="2"
+                                        Stretch="Uniform"
+                                        Margin="2" />
                                 </Button>
-                                <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <ContentPresenter
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center" />
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -338,9 +376,14 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                                TextBlock.Foreground="{StaticResource MainColor}">
+                        <Border
+                            Name="Bd"
+                            BorderBrush="{StaticResource WindowBorderColor}"
+                            Background="{StaticResource WindowBackground}"
+                            BorderThickness="1"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                            TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -350,7 +393,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    Foreground="DarkBlue"
+                                    IsIndeterminate="True"
+                                    Height="4"
+                                    VerticalAlignment="Top"
+                                    DataContext="{Binding Content.Data}"
+                                    Style="{StaticResource MainProgress}" />
                                 <StackPanel Orientation="Horizontal">
                                     <Button Command="{Binding Back}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter1}}" ToolTip="Назад" Style="{StaticResource SIButtonSimple}" Width="44" Height="44" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                                         <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
@@ -399,7 +449,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    Foreground="DarkBlue"
+                                    IsIndeterminate="True"
+                                    Height="4"
+                                    VerticalAlignment="Top"                                    
+                                    DataContext="{Binding Data}"
+                                    Style="{StaticResource MainProgress}" />
                                 <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
                                 <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
@@ -438,7 +495,14 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" IsIndeterminate="True" Height="4" VerticalAlignment="Top" Style="{StaticResource MainProgress}" />
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    Foreground="DarkBlue"
+                                    IsIndeterminate="True"
+                                    Height="4"
+                                    VerticalAlignment="Top"
+                                    DataContext="{Binding Data}"
+                                    Style="{StaticResource MainProgress}" />
                                 <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
                                     <Button x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">

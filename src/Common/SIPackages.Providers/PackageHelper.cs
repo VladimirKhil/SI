@@ -20,19 +20,44 @@ namespace SIPackages.Providers
         /// </summary>
         public const string RandomIndicator = "{random}";
 
-        public static async Task<SIDocument> GenerateRandomPackageAsync(IPackagesProvider provider, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100, Stream stream = null)
+        public static Task<SIDocument> GenerateRandomPackageAsync(
+            IPackagesProvider provider,
+            string name,
+            string author,
+            string roundNameFormat,
+            string finalName,
+            int roundsCount = 3,
+            int themesCount = 6,
+            int baseCost = 100,
+            Stream stream = null)
         {
             var doc = SIDocument.Create(name, author, stream);
-            return await GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
+            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName);
         }
 
-        public static async Task<SIDocument> GenerateRandomPackageAsync(IPackagesProvider provider, string folder, string name, string author, string roundNameFormat, int roundsCount = 3, int themesCount = 6, int baseCost = 100)
+        public static Task<SIDocument> GenerateRandomPackageAsync(
+            IPackagesProvider provider,
+            string folder,
+            string name,
+            string author,
+            string roundNameFormat,
+            string finalName,
+            int roundsCount = 3,
+            int themesCount = 6,
+            int baseCost = 100)
         {
             var doc = SIDocument.Create(name, author, folder);
-            return await GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat);
+            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName);
         }
 
-        private static async Task<SIDocument> GenerateCoreAsync(IPackagesProvider provider, int roundsCount, int themesCount, int baseCost, SIDocument doc, string roundNameFormat)
+        private static async Task<SIDocument> GenerateCoreAsync(
+            IPackagesProvider provider,
+            int roundsCount,
+            int themesCount,
+            int baseCost,
+            SIDocument doc,
+            string roundNameFormat,
+            string finalName)
         {
             var files = (await provider.GetPackagesAsync()).ToList();
 
@@ -44,9 +69,18 @@ namespace SIPackages.Providers
                 for (int j = 0; j < themesCount; j++)
                 {
                     if (files.Count == 0)
+                    {
                         break;
+                    }
 
-                    if (!await ExtractTheme(provider, doc, files, i, round => round.Type == RoundTypes.Standart && round.Themes.Count > 0/*, usedThemes*/, packageComments, baseCost))
+                    if (!await ExtractThemeAsync(
+                        provider,
+                        doc,
+                        files,
+                        i,
+                        round => round.Type == RoundTypes.Standart && round.Themes.Count > 0,
+                        packageComments,
+                        baseCost))
                     {
                         j--;
                         continue;
@@ -54,16 +88,27 @@ namespace SIPackages.Providers
                 }
 
                 if (files.Count == 0)
+                {
                     break;
+                }
             }
 
-            doc.Package.Rounds.Add(new Round { Type = RoundTypes.Final, Name = "ФИНАЛ" });
+            doc.Package.Rounds.Add(new Round { Type = RoundTypes.Final, Name = finalName });
             for (var j = 0; j < 7; j++)
             {
                 if (files.Count == 0)
+                {
                     break;
+                }
 
-                if (!await ExtractTheme(provider, doc, files, roundsCount, round => round.Type == RoundTypes.Final && round.Themes.Count > 0/*, usedThemes*/, packageComments, 0))
+                if (!await ExtractThemeAsync(
+                    provider,
+                    doc,
+                    files,
+                    roundsCount,
+                    round => round.Type == RoundTypes.Final && round.Themes.Count > 0,
+                    packageComments,
+                    0))
                 {
                     j--;
                     continue;
@@ -76,7 +121,14 @@ namespace SIPackages.Providers
             return doc;
         }
 
-        private static async Task<bool> ExtractTheme(IPackagesProvider provider, SIDocument doc, List<string> files, int roundIndex, Func<Round, bool> predicate/*, List<int> usedThemes*/, StringBuilder packageComments, int baseCost)
+        private static async Task<bool> ExtractThemeAsync(
+            IPackagesProvider provider,
+            SIDocument doc,
+            List<string> files,
+            int roundIndex,
+            Func<Round, bool> predicate,
+            StringBuilder packageComments,
+            int baseCost)
         {
             var fIndex = Rand.Next(files.Count);
             var doc2 = await provider.GetPackageAsync(files[fIndex]);
@@ -103,7 +155,9 @@ namespace SIPackages.Providers
 
                 // Исключим повторения имён тем
                 if (doc.Package.Rounds.Any(round => round.Themes.Any(th => th.Name == theme.Name)))
+                {
                     return false;
+                }
 
                 // Нужно перенести в пакет необходимых авторов, источники, медиаконтент
                 InheritAuthors(doc2, r, theme);
@@ -115,7 +169,7 @@ namespace SIPackages.Providers
 
                     InheritAuthors(doc2, theme.Questions[i]);
                     InheritSources(doc2, theme.Questions[i]);
-                    await InheritContent(doc, doc2, theme.Questions[i]);
+                    await InheritContentAsync(doc, doc2, theme.Questions[i]);
                 }
 
                 doc.Package.Rounds[roundIndex].Themes.Add(theme);
@@ -133,7 +187,9 @@ namespace SIPackages.Providers
                 {
                     var link = doc2.GetLink(question.Info.Authors, i, out string tail);
                     if (link != null)
+                    {
                         question.Info.Authors[i] = link + tail;
+                    }
                 }
             }
         }
@@ -147,17 +203,21 @@ namespace SIPackages.Providers
                 {
                     var link = doc2.GetLink(question.Info.Sources, i, out string tail);
                     if (link != null)
+                    {
                         question.Info.Sources[i] = link + tail;
+                    }
                 }
             }
         }
 
-        private static async Task InheritContent(SIDocument doc, SIDocument doc2, Question question)
+        private static async Task InheritContentAsync(SIDocument doc, SIDocument doc2, Question question)
         {
             foreach (var atom in question.Scenario)
             {
                 if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
+                {
                     continue;
+                }
 
                 var link = doc2.GetLink(atom);
                 if (link.GetStream != null)
@@ -180,10 +240,8 @@ namespace SIPackages.Providers
 
                     if (collection != null)
                     {
-                        using (var stream = link.GetStream().Stream)
-                        {
-                            await collection.AddFile(link.Uri, stream);
-                        }
+                        using var stream = link.GetStream().Stream;
+                        await collection.AddFile(link.Uri, stream);
                     }
                 }
             }
@@ -196,7 +254,9 @@ namespace SIPackages.Providers
             {
                 authors = round.Info.Authors;
                 if (authors.Count == 0)
+                {
                     authors = doc2.Package.Info.Authors;
+                }
 
                 if (authors.Count > 0)
                 {
@@ -229,7 +289,9 @@ namespace SIPackages.Providers
             {
                 sources = round.Info.Sources;
                 if (sources.Count == 0)
+                {
                     sources = doc2.Package.Info.Sources;
+                }
 
                 if (sources.Count > 0)
                 {

@@ -1,16 +1,19 @@
-﻿<Page x:Class="SIGame.View.ThemeSettingsPage"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             xmlns:lp="clr-namespace:SIGame.Properties"
-             xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:localc="clr-namespace:SIGame.Converters"
-             Title="{x:Static lp:Resources.AppTheme}"
-      FontSize="20">
+﻿<Page
+    x:Class="SIGame.View.ThemeSettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d" 
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:localc="clr-namespace:SIGame.Converters"
+    Title="{x:Static lp:Resources.AppTheme}"
+    FontSize="20"
+    IsEnabled="{Binding Settings.IsEditable}">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
             <Setter Property="Margin" Value="0,30,0,0" />
@@ -29,14 +32,15 @@
             <Setter Property="Content" Value="{Binding Model.GameButtonKey2, Converter={StaticResource ToStringConverter}}" />
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Content" Value="Нажмите клавишу" />
+                    <Setter Property="Content" Value="{x:Static lp:Resources.PressTheButton}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <localc:FontFamilyConverter x:Key="FontFamilyConverter1" />
     </Page.Resources>
-    <StackPanel DataContext="{Binding Settings.ThemeSettings}" Margin="10,5" IsEnabled="{Binding Settings.IsEditable}">
+    <StackPanel DataContext="{Binding Settings.ThemeSettings}" Margin="10,5">
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}" VerticalAlignment="Center" FontSize="20" Margin="5,10" TextWrapping="Wrap" />
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableFont}" />
         <ComboBox Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SIUISettings.TableFontFamily}" Style="{StaticResource ComboBoxStyle}">
             <ComboBox.ItemTemplate>

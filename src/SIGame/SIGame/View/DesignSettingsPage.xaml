@@ -8,7 +8,8 @@
       Title="{x:Static lp:Resources.Other}"
       xmlns:lp="clr-namespace:SIGame.Properties"
       xmlns:local="clr-namespace:SIGame"
-      FontSize="20" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+      FontSize="20"
+      FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
 
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
@@ -55,7 +56,7 @@
         <CheckBox IsChecked="{Binding Model.TranslateGameToChat}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.TranslateToChat}" />
         </CheckBox>
-        <CheckBox IsChecked="{Binding Model.UISettings.Animate3D}" Style="{StaticResource HeaderBox}">
+        <CheckBox IsChecked="{Binding ThemeSettings.Model.UISettings.Animate3D}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ShowAnimations}" />
         </CheckBox>
         <CheckBox IsChecked="{Binding Model.ShowBorderOnFalseStart}" Style="{StaticResource HeaderBox}">

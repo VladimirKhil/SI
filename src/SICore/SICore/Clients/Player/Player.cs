@@ -33,7 +33,7 @@ namespace SICore
             {
                 _viewerActions.SendMessage(Messages.I);
                 DisableGameButton(false);
-                ReleaseGameButtonAsync();
+                ReleaseGameButton();
             }) { CanBeExecuted = true };
 
             ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
@@ -97,12 +97,10 @@ namespace SICore
             ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
         }
 
-        protected override IPlayer CreateLogic(Account personData)
-        {
-            return personData.IsHuman ?
-                (IPlayer)new PlayerHumanLogic(ClientData, _viewerActions, LO) :
+        protected override IPlayer CreateLogic(Account personData) =>
+            personData.IsHuman ?
+                (IPlayer)new PlayerHumanLogic(ClientData, null, _viewerActions, LO) :
                 new PlayerComputerLogic(ClientData, (ComputerAccount)personData, _viewerActions);
-        }
 
         public override ValueTask DisposeAsync(bool disposing)
         {
@@ -128,7 +126,7 @@ namespace SICore
             }
         }
 
-        private async void ReleaseGameButtonAsync()
+        private async void ReleaseGameButton()
         {
             try
             {
@@ -249,6 +247,8 @@ namespace SICore
                         break;
 
                     case Messages.Atom:
+                        _logic.OnAtom(mparams);
+
                         if (ClientData.QuestionType == QuestionTypes.Simple)
                         {
                             _buttonDisabledByGame = false;

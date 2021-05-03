@@ -83,7 +83,7 @@ namespace SIGame.Tests
 
 		public override void ExecuteOnUIThread(Action action)
 		{
-			throw new NotImplementedException();
+			action();
 		}
 	}
 }

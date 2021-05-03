@@ -149,19 +149,15 @@ namespace Services.SI
         {
             try
             {
-                using (var responseMessage = await Client.GetAsync($"{_serverUri}/{request}", cancellationToken))
+                using var responseMessage = await Client.GetAsync($"{_serverUri}/{request}", cancellationToken);
+                if (!responseMessage.IsSuccessStatusCode)
                 {
-                    if (!responseMessage.IsSuccessStatusCode)
-                    {
-                        throw new Exception($"GetAsync error: {await responseMessage.Content.ReadAsStringAsync()}");
-                    }
-
-                    using (var responseStream = await responseMessage.Content.ReadAsStreamAsync())
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        return (T)Serializer.Deserialize(reader, typeof(T));
-                    }
+                    throw new Exception($"GetAsync error: {await responseMessage.Content.ReadAsStringAsync()}");
                 }
+                
+                using var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+                using var reader = new StreamReader(responseStream);
+                return (T)Serializer.Deserialize(reader, typeof(T));
             }
             catch (SocketException exc)
             {

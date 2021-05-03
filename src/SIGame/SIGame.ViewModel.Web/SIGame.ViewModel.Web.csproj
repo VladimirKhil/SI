@@ -8,7 +8,7 @@
   <PropertyGroup>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Version>7.5.6</Version>
+    <Version>7.5.7</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame web connector</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2021</Copyright>

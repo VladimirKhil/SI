@@ -90,7 +90,7 @@ namespace SICore
         protected override IShowman CreateLogic(Account personData)
         {
             return personData.IsHuman ?
-                (IShowman)new ShowmanHumanLogic(ClientData, _viewerActions, LO) :
+                (IShowman)new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
                 new ShowmanComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
         }
 

@@ -31,7 +31,7 @@ namespace SICore
 
         public CustomCommand Apellate
         {
-            get { return _apellate; }
+            get => _apellate;
             set
             {
                 if (_apellate != value)

@@ -466,8 +466,12 @@
                         </ContentControl>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type lvm:NavigatorViewModel}">
-                        <ContentControl Content="{Binding Content.Data}" Tag="{Binding Content.Title}" Style="{StaticResource navigatorStyle}"
-                                        Width="1050" Height="650">
+                        <ContentControl
+                            Content="{Binding Content.Data}"
+                            Tag="{Binding Content.Title}"
+                            Style="{StaticResource navigatorStyle}"
+                            Width="1050"
+                            Height="650">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type lvm:GameSettingsViewModel}">
                                     <my:NewGameView FontSize="16" />

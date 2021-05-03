@@ -489,4 +489,7 @@
   <data name="PortIsUsedError" xml:space="preserve">
     <value>Multimedia port {0} is alreay used (another game running?). Try to set another port in settings</value>
   </data>
+  <data name="TooManyGames" xml:space="preserve">
+    <value>You have created too many games!</value>
+  </data>
 </root>

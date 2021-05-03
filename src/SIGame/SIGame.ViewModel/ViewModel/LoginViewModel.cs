@@ -61,7 +61,7 @@ namespace SIGame.ViewModel
 
         public IAsyncCommand Enter { get; set; }
 
-        internal event Action<string, IGameServerClient> Entered;
+        internal event Func<string, IGameServerClient, Task> Entered;
 
         private readonly UserSettings _userSettings;
 
@@ -124,7 +124,7 @@ namespace SIGame.ViewModel
 
                 await client.OpenAsync(_login, _cancellationTokenSource.Token);
 
-                Entered?.Invoke(_login, client);
+                await Entered?.Invoke(_login, client);
             }
             catch (HttpRequestException exc)
             {

@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using SI.GameServer.Client;
 using SICore;
 using SICore.PlatformSpecific;
 using SIGame.ViewModel;
@@ -11,17 +10,24 @@ using System.Threading.Tasks;
 
 namespace SIGame.Tests
 {
+    [Parallelizable(ParallelScope.All)]
     [TestFixture]
     public class MainTest
     {
         private static readonly HttpClient HttpClient = new HttpClient();
 
-        [TestCase(PackageSourceTypes.RandomServer)]
-        [TestCase(PackageSourceTypes.SIStorage)]
-        [TestCase(PackageSourceTypes.Local)]
-        public async Task RunGame(PackageSourceTypes packageSourceType)
+        [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, true)]
+        [TestCase(PackageSourceTypes.SIStorage, GameRole.Player, true)]
+        [TestCase(PackageSourceTypes.Local, GameRole.Player, true)]
+        [TestCase(PackageSourceTypes.RandomServer, GameRole.Viewer, true)]
+        [TestCase(PackageSourceTypes.RandomServer, GameRole.Showman, true)]
+        [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, false)]
+        public async Task GameCreateAndRun_Ok_Async(
+            PackageSourceTypes packageSourceType,
+            GameRole gameRole,
+            bool useSignalRConnection)
         {
-            UserSettings.Default.GameServerUri = "http://vladimirkhil.com:2301";// "http://127.0.0.1:8088";
+            const string GameServerUri = "https://sionline.ru/siserver/0";
 
             var coreManager = new DesktopCoreManager();
             var manager = new TestManager();
@@ -29,12 +35,22 @@ namespace SIGame.Tests
             var commonSettings = new CommonSettings();
             commonSettings.Humans2.Add(new HumanAccount { Name = "test_" + new Random().Next(10000), BirthDate = DateTime.Now });
 
-            var userSettings = new UserSettings();
+            var userSettings = new UserSettings
+            {
+                GameServerUri = GameServerUri,
+                UseSignalRConnection = useSignalRConnection
+            };
 
             var mainViewModel = new MainViewModel(commonSettings, userSettings);
 
             await mainViewModel.Open.ExecuteAsync(null);
+
+            var contentBox = mainViewModel.ActiveView as ContentBox;
+            Assert.IsNull(contentBox, ((LoginViewModel)contentBox?.Data)?.Error);
+
             var siOnline = (SIOnlineViewModel)mainViewModel.ActiveView;
+
+            Assert.IsNotNull(siOnline);
 
             await siOnline.InitAsync();
 
@@ -43,6 +59,8 @@ namespace SIGame.Tests
             var gameSettings = (GameSettingsViewModel)siOnline.Content.Content.Data;
             gameSettings.NetworkGameName = "testGame" + new Random().Next(10000);
             gameSettings.NetworkGamePassword = "testpass";
+
+            gameSettings.Role = gameRole;
 
             gameSettings.SelectPackage.Execute(packageSourceType);
 
@@ -54,10 +72,17 @@ namespace SIGame.Tests
                     Guid = "d4e98453-fd31-4b62-b120-96a18d6684b3",
                     Description = "3rd Anime"
                 };
+
                 await gameSettings.StorageInfo.LoadStorePackage.ExecuteAsync(null);
             }
 
             await gameSettings.BeginGame.ExecuteAsync(null);
+
+            Assert.IsFalse(gameSettings.IsProgress);
+            Assert.IsNull(gameSettings.ErrorMessage);
+
+            var siOnlineError = mainViewModel.ActiveView as SIOnlineViewModel;
+            Assert.IsNull(siOnlineError, siOnlineError?.Error);
 
             var game = (GameViewModel)mainViewModel.ActiveView;
 
@@ -65,7 +90,22 @@ namespace SIGame.Tests
             tInfo.PropertyChanged += TInfo_PropertyChanged;
 
             await Task.Delay(5000);
-            ((PersonAccount)game.Data.Me).BeReadyCommand.Execute(null);
+            if (gameRole != GameRole.Viewer)
+            {
+                ((PersonAccount)game.Data.Me).BeReadyCommand.Execute(null);
+            }
+
+            // TODO: check game process
+
+            game.EndGame.Execute(null);
+
+            await Task.Delay(5000);
+
+            var contentBox2 = mainViewModel.ActiveView as ContentBox;
+            Assert.IsNull(contentBox2, ((LoginViewModel)contentBox2?.Data)?.Error);
+
+            var siOnline2 = (SIOnlineViewModel)mainViewModel.ActiveView;
+            siOnline2.Cancel.Execute(null);
         }
 
         private static void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

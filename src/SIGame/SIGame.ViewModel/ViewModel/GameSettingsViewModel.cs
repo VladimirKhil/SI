@@ -3,6 +3,7 @@ using SICore.BusinessLogic;
 using SICore.Network;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
+using SICore.Special;
 using SIData;
 using SIGame.ViewModel.Data;
 using SIGame.ViewModel.PackageSources;
@@ -187,8 +188,13 @@ namespace SIGame.ViewModel
             }
         }
 
-        private readonly ComputerAccount[] _defaultComputerPlayers = ComputerAccount.GetDefaultPlayers(new Localizer(Thread.CurrentThread.CurrentUICulture.Name), Global.PhotoUri);
-        private readonly ComputerAccount[] _defaultComputerShowmans = ComputerAccount.GetDefaultShowmans(new Localizer(Thread.CurrentThread.CurrentUICulture.Name), Global.PhotoUri);
+        private readonly ComputerAccount[] _defaultComputerPlayers = StoredPersonsRegistry.GetDefaultPlayers(
+            new Localizer(Thread.CurrentThread.CurrentUICulture.Name),
+            Global.PhotoUri);
+
+        private readonly ComputerAccount[] _defaultComputerShowmans = StoredPersonsRegistry.GetDefaultShowmans(
+            new Localizer(Thread.CurrentThread.CurrentUICulture.Name),
+            Global.PhotoUri);
 
         private readonly ComputerAccount _newPlayerAccount = new ComputerAccount(Resources.New + "…", true);
         private readonly ComputerAccount _newShowmanAccount = new ComputerAccount(Resources.New + "…", true);

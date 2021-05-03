@@ -1,6 +1,6 @@
 ﻿using SICore.BusinessLogic;
-using SICore.Properties;
 using SIData;
+using SIPackages.Core;
 using SIUI.ViewModel;
 using System;
 using System.Threading.Tasks;
@@ -13,9 +13,24 @@ namespace SICore
     /// </summary>
     internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayer
     {
-        public PlayerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
+        //private readonly ViewerActions _viewerActions;
+        //private readonly ViewerData _data;
+        //private readonly ILocalizer _localizer;
+
+        //public TableInfoViewModel TInfo { get; }
+
+        public PlayerHumanLogic(
+            ViewerData data,
+            TableInfoViewModel tableInfoViewModel,
+            ViewerActions viewerActions,
+            ILocalizer localizer)
             : base(data, viewerActions, localizer)
         {
+            //_viewerActions = viewerActions;
+            //_data = data;
+            //_localizer = localizer;
+            //TInfo = tableInfoViewModel;
+
             TInfo.QuestionSelected += PlayerClient_QuestionSelected;
             TInfo.ThemeSelected += PlayerClient_ThemeSelected;
 
@@ -39,38 +54,31 @@ namespace SICore
 
         public void PersonAnswered(int playerIndex, bool isRight)
         {
-            if (_data.Stage == GameStage.Final && _data.Players[playerIndex].Name == _viewerActions.Client.Name || isRight)
+            if ((_data.Stage == GameStage.Final || _data.QuestionType != QuestionTypes.Simple)
+                && _data.Players[playerIndex].Name == _viewerActions.Client.Name
+                || isRight)
             {
                 _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.NumApps > 0;
                 _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
             }
         }
 
-        public void EndThink()
-        {
-            _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
-        }
+        public void EndThink() => _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
 
-        public void Answer()
-        {
-            _data.BackLink.OnFlash();
-        }
+        public void Answer() => _data.BackLink.OnFlash();
 
         void SendAnswer(object sender, EventArgs e)
         {
 
         }
 
-        public void Cat()
-        {
-            _data.BackLink.OnFlash();
-        }
+        public void Cat() => _data.BackLink.OnFlash();
 
         public void Stake()
         {
             _data.DialogMode = DialogModes.Stake;
             _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
-            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+            ((PlayerAccount)_data.Me).IsDeciding = false;
             _data.BackLink.OnFlash();
         }
 
@@ -93,7 +101,7 @@ namespace SICore
         {
             _data.Hint = _viewerActions.LO[nameof(R.HintChooseCatPrice)];
             _data.DialogMode = DialogModes.CatCost;
-            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+            ((PlayerAccount)_data.Me).IsDeciding = false;
 
             _data.BackLink.OnFlash();
         }
@@ -120,6 +128,11 @@ namespace SICore
                 if (cmd != null && cmd.CanExecute(null))
                     cmd.Execute(null);
             }
+        }
+
+        private void AddLog(string s)
+        {
+            _data.OnAddString(null, s, LogMode.Log);
         }
 
         private async void Greet()
@@ -206,6 +219,11 @@ namespace SICore
         }
 
         public void StartThink()
+        {
+            
+        }
+
+        public void OnAtom(string[] mparams)
         {
             
         }

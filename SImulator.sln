@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29201.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SImulator", "src\SImulator\SImulator\SImulator.csproj", "{E7037610-B1C0-4D3B-8FF7-A2BC7E8B1BFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator", "src\SImulator\SImulator\SImulator.csproj", "{E7037610-B1C0-4D3B-8FF7-A2BC7E8B1BFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{069B16F1-8F70-4CFC-8651-E4763D225B60}"
 EndProject
@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.Model", "src\Common\SI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.ViewModel", "src\Common\SIUI.ViewModel\SIUI.ViewModel.csproj", "{6A834083-BE81-4BEA-996B-1287154747A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIUI", "src\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI", "src\Common\SIUI\SIUI.csproj", "{78C96549-6EA8-4236-B026-6ECA55D9EC3A}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "src\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F7CE4B38-4286-47BA-B5BA-0E4FA77E594E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator.ViewModel.Tests", "test\SImulator\SImulator.ViewModel.Tests\SImulator.ViewModel.Tests.csproj", "{CB2B8CE7-876C-4D16-BFA4-E1F67F949280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SImulator_legacy", "src\SImulator\SImulator\SImulator_legacy.csproj", "{7BF7F1CE-2187-4372-9A31-CC0048031E09}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

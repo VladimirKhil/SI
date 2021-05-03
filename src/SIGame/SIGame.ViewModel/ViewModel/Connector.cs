@@ -67,7 +67,9 @@ namespace SIGame.ViewModel
         {
             var text = m.Text?.Split(Message.ArgsSeparatorChar);
             if (text?.Length == 0)
+            {
                 return default;
+            }
 
             if (_tcs2 != null)
             {

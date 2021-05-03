@@ -20,20 +20,17 @@ namespace SIGame
     /// </summary>
     public partial class App : Application
     {
-#pragma warning disable IDE0052 // Удалить непрочитанные закрытые члены
+#pragma warning disable IDE0052
         private readonly DesktopCoreManager _coreManager = new DesktopCoreManager();
-#pragma warning restore IDE0052 // Удалить непрочитанные закрытые члены
+#pragma warning restore IDE0052
         private readonly DesktopManager _manager = new DesktopManager();
+
+        private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
 
         /// <summary>
         /// Имя приложения
         /// </summary>
         public static string ProductName => "SIGame";
-
-        /// <summary>
-        /// Необходимый заголовок для WebRequest'ов и WebClient'ов
-        /// </summary>
-        public static string UserAgentHeader = $"{ProductName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -83,9 +80,13 @@ namespace SIGame
                 Trace.TraceInformation("Game launched");
 
                 UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
+                UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
-                MainWindow = new MainWindow { DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default) };
+                MainWindow = new MainWindow
+                {
+                    DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default)
+                };
                 
                 MainWindow.Show();
                 if (UserSettings.Default.FullScreen)
@@ -95,12 +96,22 @@ namespace SIGame
             }
             catch (OutOfMemoryException)
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_IncifficientResources, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_IncifficientResources,
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 Shutdown();
             }
             catch (System.Windows.Markup.XamlParseException)
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_NetBroken, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_NetBroken,
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 Shutdown();
             }
             catch (Exception exc)
@@ -127,10 +138,14 @@ namespace SIGame
         protected override void OnExit(ExitEventArgs e)
         {
             if (CommonSettings.Default != null)
+            {
                 SaveCommonSettings(CommonSettings.Default);
+            }
 
             if (UserSettings.Default != null)
+            {
                 SaveUserSettings(UserSettings.Default);
+            }
 
             base.OnExit(e);
         }        
@@ -145,13 +160,26 @@ namespace SIGame
 
             if (inner is OutOfMemoryException)
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_IncifficientResourcesForExecution, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_IncifficientResourcesForExecution,
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                
                 return;
             }
 
-            if (inner is System.Windows.Markup.XamlParseException || inner is NotImplementedException || inner is TypeInitializationException || inner is FileFormatException)
+            if (inner is System.Windows.Markup.XamlParseException
+                || inner is NotImplementedException
+                || inner is TypeInitializationException
+                || inner is FileFormatException)
             {
-                MessageBox.Show($"{SIGame.Properties.Resources.Error_RuntimeBroken}: {inner.Message}", CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"{SIGame.Properties.Resources.Error_RuntimeBroken}: {inner.Message}",
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                
                 return;
             }
 
@@ -162,12 +190,18 @@ namespace SIGame
                     CommonSettings.AppName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+
                 return;
             }
 
             if (inner is COMException)
             {
-                MessageBox.Show($"{SIGame.Properties.Resources.Error_DirectXBroken}: {inner.Message}.", CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    $"{SIGame.Properties.Resources.Error_DirectXBroken}: {inner.Message}.",
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 return;
             }
 
@@ -179,22 +213,43 @@ namespace SIGame
 
             var message = e.Exception.ToString();
 
-            if (message.Contains("System.Windows.Automation") || message.Contains("UIAutomationCore.dll") || message.Contains("UIAutomationTypes"))
+            if (message.Contains("System.Windows.Automation")
+                || message.Contains("UIAutomationCore.dll")
+                || message.Contains("UIAutomationTypes"))
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_WindowsAutomationBroken, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_WindowsAutomationBroken,
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 return;
             }
 
-            if (message.Contains("ApplyTaskbarItemInfo") || message.Contains("GetValueFromTemplatedParent") || message.Contains("IsBadSplitPosition")
-                || message.Contains("IKeyboardInputProvider.AcquireFocus") || message.Contains("ReleaseOnChannel") || message.Contains("ManifestSignedXml2.GetIdElement"))
+            if (message.Contains("ApplyTaskbarItemInfo")
+                || message.Contains("GetValueFromTemplatedParent")
+                || message.Contains("IsBadSplitPosition")
+                || message.Contains("IKeyboardInputProvider.AcquireFocus")
+                || message.Contains("ReleaseOnChannel")
+                || message.Contains("ManifestSignedXml2.GetIdElement"))
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_OSBroken, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_OSBroken,
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 return;
             }
 
             if (message.Contains("ComputeTypographyAvailabilities") || message.Contains("FontList.get_Item"))
             {
-                MessageBox.Show(SIGame.Properties.Resources.Error_Typography, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(
+                    SIGame.Properties.Resources.Error_Typography,
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 return;
             }
 
@@ -275,7 +330,9 @@ namespace SIGame
                 {
                     var oldSettings = CommonSettings.LoadOld(CommonConfigFileName);
                     if (oldSettings != null)
+                    {
                         return oldSettings;
+                    }
                 }
             }
             catch { }
@@ -373,7 +430,9 @@ namespace SIGame
                 {
                     var oldSettings = UserSettings.LoadOld(UserConfigFileName);
                     if (oldSettings != null)
+                    {
                         return oldSettings;
+                    }
                 }
             }
             catch { }

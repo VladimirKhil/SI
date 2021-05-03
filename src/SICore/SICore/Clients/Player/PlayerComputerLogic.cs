@@ -1,7 +1,5 @@
 ﻿using SICore.Clients.Player;
 using SICore.Connections;
-using SICore.Network.Contracts;
-using SICore.Special;
 using SICore.Utils;
 using SIData;
 using SIPackages.Core;
@@ -9,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -20,6 +17,8 @@ namespace SICore
     internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     {
         private ComputerAccount _account;
+        //private readonly ViewerActions _viewerActions;
+        //private readonly ViewerData _data;
 
         /// <summary>
         /// Создание логики
@@ -29,6 +28,8 @@ namespace SICore
             : base(data, viewerActions, account)
         {
             _account = account;
+            //_viewerActions = viewerActions;
+            //_data = data;
         }
 
         internal void ScheduleExecution(PlayerTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
@@ -101,9 +102,14 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Final stake calculation error: {0}\r\nParameter values:\r\n" +
+                _data.SystemLog.AppendFormat(
+                    "Final stake calculation error: {0}\r\nParameter values:\r\n" +
                     "sums = {1}. myIndex = {2}. Style = {3}",
-                    exc, string.Join(", ", sums), myIndex2, _account.Style).AppendLine();
+                    exc,
+                    string.Join(", ", sums),
+                    myIndex2,
+                    _account.Style)
+                    .AppendLine();
             }
         }
 
@@ -113,7 +119,7 @@ namespace SICore
             {
                 lock (_data.TInfoLock)
                 {
-                    var choice = SelectRandom(_data.TInfo.RoundInfo, theme => theme.Name != null);
+                    var choice = _data.TInfo.RoundInfo.SelectRandom(theme => theme.Name != null, _data.Rand);
                     _viewerActions.SendMessageWithArgs(Messages.Delete, choice);
                 }
             }
@@ -144,14 +150,28 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при расчёте ставки компьютерного игрока. Описание ошибки: {0}\r\nЗначения параметров.\r\n" +
+                _data.SystemLog.AppendFormat(
+                    "Ошибка при расчёте ставки компьютерного игрока. Описание ошибки: {0}\r\nЗначения параметров.\r\n" +
                     "this.data.choiceQuest = {1}. Sums = {2}. " +
                     "MyIndex = {3}.lastStakerNum = {4}. Style = {5} Vars = {6}:{7}:{8}:{9}. " +
                     "N1 = {10}, N5 = {11}, B1 = {12}, B5 = {13}, Critical = {14}. MinCost = {15}",
                     exc,
-                    _data.QuestionIndex, string.Join(", ", _data.Players.Select(p => p.Sum)),
-                    myIndex, _data.LastStakerIndex, _account.Style, _data.PersonDataExtensions.Var[0], _data.PersonDataExtensions.Var[1], _data.PersonDataExtensions.Var[2], _data.PersonDataExtensions.Var[3],
-                    _account.N1, _account.N5, _account.B1, _account.B5, isCritical, _data.PersonDataExtensions.StakeInfo.Minimum).AppendLine();
+                    _data.QuestionIndex,
+                    string.Join(", ", _data.Players.Select(p => p.Sum)),
+                    myIndex,
+                    _data.LastStakerIndex,
+                    _account.Style,
+                    _data.PersonDataExtensions.Var[0],
+                    _data.PersonDataExtensions.Var[1],
+                    _data.PersonDataExtensions.Var[2],
+                    _data.PersonDataExtensions.Var[3],
+                    _account.N1,
+                    _account.N5,
+                    _account.B1,
+                    _account.B5,
+                    isCritical,
+                    _data.PersonDataExtensions.StakeInfo.Minimum)
+                    .AppendLine();
             }
         }
 
@@ -168,7 +188,7 @@ namespace SICore
                         break;
 
                     case PlayerStyle.Normal:
-                        var = Data.Rand.Next(maxVars);
+                        var = _data.Rand.Next(maxVars);
                         break;
 
                     case PlayerStyle.Agressive:
@@ -181,7 +201,8 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при выборе стоимости Вопроса с секретом. Описание ошибки: {0}", exc).AppendLine();
+                _data.SystemLog.AppendFormat("Ошибка при выборе стоимости Вопроса с секретом. Описание ошибки: {0}", exc)
+                    .AppendLine();
             }
         }
 
@@ -192,7 +213,7 @@ namespace SICore
                 var choice = -1;
                 var isCritical = IsCritical();
 
-                if (isCritical || Data.Rand.Next(100) >= _account.V)
+                if (isCritical || _data.Rand.Next(100) >= _account.V)
                 {
                     if (isCritical)
                     {
@@ -211,7 +232,7 @@ namespace SICore
                     {
                         for (var i = 0; i < _data.Players.Count; i++)
                         {
-                            if (_data.Players[i].Sum == ClientData.BigSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
+                            if (_data.Players[i].Sum == _data.BigSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
                             {
                                 choice = i;
                                 break;
@@ -223,7 +244,7 @@ namespace SICore
                 {
                     for (var i = 0; i < _data.Players.Count; i++)
                     {
-                        if (_data.Players[i].Sum == ClientData.SmallSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
+                        if (_data.Players[i].Sum == _data.SmallSum(_viewerActions.Client) && _data.Players[i].CanBeSelected)
                         {
                             choice = i;
                             break;
@@ -252,11 +273,14 @@ namespace SICore
                 {
                     if (_data.PlayerDataExtensions.IsSure)
                     {
-                        ans.Append(string.Format(GetRandomString(_viewerActions.LO[nameof(R.Sure)]), _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
+                        ans.Append(
+                            string.Format(
+                                _data.Rand.GetRandomString(_viewerActions.LO[nameof(R.Sure)]),
+                                _data.Me.IsMale ? "" : _viewerActions.LO[nameof(R.SureFemaleEnding)]));
                     }
                     else
                     {
-                        ans.Append(GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
+                        ans.Append(_data.Rand.GetRandomString(_viewerActions.LO[nameof(R.NotSure)]));
                     }
                 }
                 else
@@ -285,12 +309,12 @@ namespace SICore
             int nv1 = myInfo.V1, nv4 = myInfo.V4, nv5 = myInfo.V5, nv6 = myInfo.V6, nv7 = myInfo.V7;
             var np2 = myInfo.P2;
 
-            if (myInfo.Style == PlayerStyle.Agressive && ClientData.MySum() < 2 * ClientData.BigSum(_viewerActions.Client))
+            if (myInfo.Style == PlayerStyle.Agressive && _data.MySum() < 2 * _data.BigSum(_viewerActions.Client))
             {
                 nv1 = nv4 = nv5 = nv6 = 0;
                 nv7 = 100;
             }
-            else if (myInfo.Style == PlayerStyle.Normal && ClientData.MySum() < ClientData.BigSum(_viewerActions.Client))
+            else if (myInfo.Style == PlayerStyle.Normal && _data.MySum() < _data.BigSum(_viewerActions.Client))
             {
                 nv1 = nv4 = nv5 = nv6 = 0;
                 nv7 = 80;
@@ -303,7 +327,7 @@ namespace SICore
                 np2 = "54321".ToCharArray();
             }
 
-            var r = Data.Rand.Next(101);
+            var r = _data.Rand.Next(101);
             var selectByThemeIndex = r < nv1; // Выбор по номеру темы
 
             var table = _data.TInfo.RoundInfo;
@@ -371,9 +395,9 @@ namespace SICore
                                 previousTheme = true;
 
                             if (previousTheme)
-                                r = Data.Rand.Next(100);
+                                r = _data.Rand.Next(100);
                             else
-                                r = myInfo.V2 + Data.Rand.Next(100 - myInfo.V2);
+                                r = myInfo.V2 + _data.Rand.Next(100 - myInfo.V2);
 
                             if (r < myInfo.V2)
                                 theme = _data.ThemeIndex;
@@ -392,14 +416,14 @@ namespace SICore
 
                                 if (theme == -1)
                                 {
-                                    var k = Data.Rand.Next(numOfThemes);
+                                    var k = _data.Rand.Next(numOfThemes);
                                     theme = -1;
                                     do { theme++; if (theme < canSelectTheme.Length && canSelectTheme[theme]) k--; } while (k >= 0);
                                 }
                             }
                             else
                             {
-                                var k = Data.Rand.Next(numOfThemes);
+                                var k = _data.Rand.Next(numOfThemes);
                                 theme = -1;
                                 do { theme++; if (theme < canSelectTheme.Length && canSelectTheme[theme]) k--; } while (k >= 0);
                             }
@@ -434,20 +458,20 @@ namespace SICore
                         if (!b4) maxr -= nv4;
                         if (!b5) maxr -= nv5;
                         if (!b6) maxr -= nv6;
-                        r = Data.Rand.Next(maxr);
+                        r = _data.Rand.Next(maxr);
                         if (!b4) r += nv4;
                         if (!b5 && r >= nv4) r += nv5;
                         if (!b6 && r >= nv4 + nv5) r += nv6;
 
                         if (r < nv4)
                         {
-                            var k = Data.Rand.Next(n4);
+                            var k = _data.Rand.Next(n4);
                             quest = _data.QuestionIndex;
                             do if (canSelectQuestion[--quest]) k--; while (k >= 0);
                         }
                         else if (r < nv4 + nv5)
                         {
-                            var k = Data.Rand.Next(n5);
+                            var k = _data.Rand.Next(n5);
                             quest = _data.QuestionIndex;
                             do if (canSelectQuestion[++quest]) k--; while (k >= 0);
                         }
@@ -470,14 +494,14 @@ namespace SICore
 
                             if (quest == -1)
                             {
-                                var k = Data.Rand.Next(numOfQuestions);
+                                var k = _data.Rand.Next(numOfQuestions);
                                 quest = -1;
                                 do if (canSelectQuestion[++quest]) k--; while (k >= 0);
                             }
                         }
                         else
                         {
-                            var k = Data.Rand.Next(numOfQuestions);
+                            var k = _data.Rand.Next(numOfQuestions);
                             quest = -1;
                             do if (canSelectQuestion[++quest]) k--; while (k >= 0);
                         }
@@ -503,7 +527,9 @@ namespace SICore
                     otherSums = otherSums.Where((sum, index) => index != bestIndex).ToArray();
                     var secondSum = otherSums.Max();
                     if (secondSum > 0)
+                    {
                         ops.Add(secondSum);
+                    }
                 }
 
                 // Определяем множество паретооптимальных ставок
@@ -517,16 +543,13 @@ namespace SICore
             foreach (var inter in res)
                 numVars += inter.Length;
 
-            if (style != PlayerStyle.Normal && Data.Rand.Next(100) >= 20)
+            if (style != PlayerStyle.Normal && _data.Rand.Next(100) >= 20)
             {
-                if (style == PlayerStyle.Agressive)
-                    stake = res[res.Count - 1].Max;
-                else
-                    stake = res[0].Min;
+                stake = style == PlayerStyle.Agressive ? res[res.Count - 1].Max : res[0].Min;
             }
             else
             {
-                int variant = Data.Rand.Next(numVars);
+                int variant = _data.Rand.Next(numVars);
                 stake = Interval.Locale(ref res, variant);
             }
 
@@ -541,7 +564,20 @@ namespace SICore
         /// <param name="myIndex">Номер участника</param>
         /// <param name="lastStakerIndex">Индекс последнего ставящего</param>
         /// <param name="style">Стиль участника</param>
-        internal StakeMode MakeStake(int questNum, int[] sums, int myIndex, int lastStakerIndex, PlayerStyle style, bool[] vars, int N1, int N5, int B1, int B5, bool isCritical, int minCost, out int stakeSum)
+        internal StakeMode MakeStake(
+            int questNum,
+            int[] sums,
+            int myIndex,
+            int lastStakerIndex,
+            PlayerStyle style,
+            bool[] vars,
+            int N1,
+            int N5,
+            int B1,
+            int B5,
+            bool isCritical,
+            int minCost,
+            out int stakeSum)
         {
             int i = 0;
             int ran = 0, stake = 0;
@@ -572,13 +608,16 @@ namespace SICore
             StakeDecisions(style, mySum, bestSum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, vars[2], vars[2] ? sums[lastStakerIndex] : 0, ref result);
 
             int maxL = result[0].Probabilities.Count;
-            int li = 0;
+            int li;
             for (int ind = 0; ind < maxL; ind++)
             {
-                if (style == PlayerStyle.Agressive)
-                    li = maxL - ind - 1;
-                else if (style == PlayerStyle.Careful)
-                    li = ind;
+                li = style switch
+                {
+                    PlayerStyle.Agressive => maxL - ind - 1,
+                    PlayerStyle.Careful => ind,
+                    _ => 0,
+                };
+
                 i = 0;
                 while (i < result.Count)
                 {
@@ -608,12 +647,19 @@ namespace SICore
                         }
                         k++;
                     }
+
                     if (worse)
+                    {
                         result.RemoveAt(i--);
+                    }
+
                     i++;
                 }
+
                 if (style == PlayerStyle.Normal)
+                {
                     break;
+                }
             }
 
             if (result.Count == 1 && result[0].Probabilities[0] == 0)
@@ -663,28 +709,40 @@ namespace SICore
             {
                 totalL = 0;
                 foreach (IntervalProbability interval in result)
+                {
                     totalL += interval.Length;
+                }
 
                 int newVal = -pMin * totalL / (-pMin + pMax);
                 newVal = IntervalProbability.Locale(ref result, newVal);
                 i = 0;
+
                 while (i < result.Count)
                 {
                     if (result[i].Max < newVal)
+                    {
                         result.RemoveAt(i--);
+                    }
                     else if (result[i].Min < newVal)
+                    {
                         result[i].Min = newVal;
+                    }
                     i++;
                 }
+
                 pMin = 0;
                 if (pMax <= 0)
+                {
                     pMax = 50;
+                }
             }
             else if (pMax < 0)
             {
                 totalL = 0;
                 foreach (IntervalProbability interval in result)
+                {
                     totalL += interval.Length;
+                }
 
                 int newVal = -pMax * totalL / (pMin + -pMax);
                 newVal = IntervalProbability.Locale(ref result, newVal);
@@ -692,15 +750,22 @@ namespace SICore
                 while (i < result.Count)
                 {
                     if (result[i].Min > newVal)
+                    {
                         result.RemoveAt(i--);
+                    }
                     else if (result[i].Max > newVal)
+                    {
                         result[i].Max = newVal;
+                    }
+
                     i++;
                 }
 
                 pMax = 0;
                 if (pMin <= 0)
+                {
                     pMin = 50;
+                }
             }
 
             totalL = 0;
@@ -710,13 +775,15 @@ namespace SICore
             }
 
             int square = (pMin + pMax) * totalL / 2;
-            ran = Data.Rand.Next(square);
+            ran = _data.Rand.Next(square);
             int c = Math.Min(pMin, pMax);
             int d = Math.Abs(pMin - pMax);
             long bb = (long)((pMin + c) / 2.0 * totalL);
             int x = pMin != 0 ? (ran / pMin) : totalL / 2;
             if (d > 0)
+            {
                 x = (int)((Math.Sqrt(bb * bb + 2.0 * ran * totalL * d) - bb) / d);
+            }
 
             stake = IntervalProbability.Locale(ref result, x);
 
@@ -724,10 +791,11 @@ namespace SICore
             i = 0;
             while (stake % 100 != 0 && i < 2)
             {
-                if (style == PlayerStyle.Careful && i == 1 || style == PlayerStyle.Agressive && i == 0 || style == PlayerStyle.Normal && (i == 0 && stake % 100 >= 50 || i == 1 && stake % 100 < 50))
-                    round = (int)Math.Ceiling(stake / 100.0) * 100;
-                else
-                    round = (int)Math.Floor(stake / 100.0) * 100;
+                round = style == PlayerStyle.Careful && i == 1
+                    || style == PlayerStyle.Agressive && i == 0
+                    || style == PlayerStyle.Normal && (i == 0 && stake % 100 >= 50 || i == 1 && stake % 100 < 50)
+                    ? (int)Math.Ceiling(stake / 100.0) * 100
+                    : (int)Math.Floor(stake / 100.0) * 100;
 
                 foreach (Interval interval in result)
                 {
@@ -768,7 +836,8 @@ namespace SICore
                 numQu = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
             }
 
-            return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3) && ClientData.MySum() < _account.Part * ClientData.BigSum(_viewerActions.Client) / 100;
+            return (numQu <= _account.Nq || GetTimePercentage(0) > 100 - 10 * _account.Nq / 3)
+                && _data.MySum() < _account.Part * _data.BigSum(_viewerActions.Client) / 100;
         }
 
         /// <summary>
@@ -776,19 +845,19 @@ namespace SICore
         /// </summary>
         public void PersonAnswered(int playerIndex, bool isRight)
         {
-            if (ClientData.Me == null)
+            if (_data.Me == null)
             {
                 return;
             }
 
             var playerData = _data.PlayerDataExtensions;
 
-            if (ClientData.MySum() < -2000) // Отрицательная сумма -> смелость падает
+            if (_data.MySum() < -2000) // Отрицательная сумма -> смелость падает
                 if (playerData.RealBrave >= _account.F + 80)
                     playerData.RealBrave -= 80;
                 else
                     playerData.RealBrave = _account.F;
-            else if (ClientData.MySum() < 0)
+            else if (_data.MySum() < 0)
                 if (playerData.RealBrave >= _account.F + 10)
                     playerData.RealBrave -= 10;
                 else
@@ -1086,7 +1155,19 @@ namespace SICore
         /// <param name="canPass">Возможен ли пас в качестве варианта ставок</param>
         /// <param name="stakerSum">Сумма на счёте ставящего при возможности паса (иначе 0)</param>
         /// <param name="result">Паретооптимальное множество ставок</param>
-        internal void StakeDecisions(PlayerStyle style, int mySum, int bestSum, int minStake, int maxStake, double p, ref List<Interval> pass, ref List<Interval> plus100, ref List<Interval> max, bool canPass, int stakerSum, ref List<IntervalProbability> result)
+        internal void StakeDecisions(
+            PlayerStyle style,
+            int mySum,
+            int bestSum,
+            int minStake,
+            int maxStake,
+            double p,
+            ref List<Interval> pass,
+            ref List<Interval> plus100,
+            ref List<Interval> max,
+            bool canPass,
+            int stakerSum,
+            ref List<IntervalProbability> result)
         {
             // Для всех возможных ставок определим наиболее вероятные ответы соперника
 
@@ -1181,7 +1262,9 @@ namespace SICore
             }
 
             if ((smart ? mySum : bestSum) == maxStake && maxStake % 100 != 0)
+            {
                 intervals.Add(new Interval(maxStake, maxStake));
+            }
 
             if (smart)
             {
@@ -1369,7 +1452,7 @@ namespace SICore
                                 break;
 
                             default:
-                                var index = Data.Rand.Next(candidates.Count);
+                                var index = _data.Rand.Next(candidates.Count);
                                 j = candidates[index];
 
                                 decision = j;
@@ -1426,15 +1509,13 @@ namespace SICore
         /// <summary>
         /// Выбор вопроса
         /// </summary>
-        public void ChooseQuest() => ScheduleExecution(PlayerTasks.Choose, 20 + Data.Rand.Next(10));
+        public void ChooseQuest() => ScheduleExecution(PlayerTasks.Choose, 20 + _data.Rand.Next(10));
 
         /// <summary>
         /// Получение части вопроса
         /// </summary>
-        override public void SetAtom(string[] mparams)
+        public void OnAtom(string[] mparams)
         {
-            base.SetAtom(mparams);
-
             var playerData = _data.PlayerDataExtensions;
 
             if (playerData.IsQuestionInProgress)
@@ -1455,7 +1536,7 @@ namespace SICore
 
             if (shortThink)
             {
-                playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
+                playerData.IsSure = _data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.75; // 37,5% for F = 200 and difficulty = 3
 
                 var riskRateLimit = playerData.RealBrave > 0
                     ? (int)(100 * Math.Max(0, Math.Min(1, playerStrength / playerData.RealBrave)))
@@ -1463,12 +1544,12 @@ namespace SICore
 
                 try
                 {
-                    var riskRate = riskRateLimit < 100 ? 1 - Data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
+                    var riskRate = riskRateLimit < 100 ? 1 - _data.Rand.Next(100 - riskRateLimit) * 0.01 : 1; // Minimizes time to press and guess chances too
 
-                    playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength * riskRate / (difficulty + 1);
-                    playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)Data.Rand.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
+                    playerData.KnowsAnswer = playerData.IsSure || _data.Rand.Next(100) < playerStrength * riskRate / (difficulty + 1);
+                    playerData.RealSpeed = Math.Max(1, (int)((playerLag + (int)_data.Rand.NextGaussian(25 - playerStrength / 20 + difficulty * 3, 15)) * riskRate));
 
-                    playerData.ReadyToPress = playerData.IsSure || Data.Rand.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
+                    playerData.ReadyToPress = playerData.IsSure || _data.Rand.Next(100) > 100 - (100 - riskRateLimit) / difficulty;
                 }
                 catch (ArgumentOutOfRangeException exc)
                 {
@@ -1477,10 +1558,10 @@ namespace SICore
             }
             else
             {
-                playerData.IsSure = Data.Rand.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
-                playerData.KnowsAnswer = playerData.IsSure || Data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.5;
+                playerData.IsSure = _data.Rand.Next(100) < playerStrength / (difficulty + 1); // 50% for F = 200 and difficulty = 3
+                playerData.KnowsAnswer = playerData.IsSure || _data.Rand.Next(100) < playerStrength / (difficulty + 1) * 0.5;
 
-                playerData.RealSpeed = Math.Max(1, playerLag + (int)Data.Rand.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
+                playerData.RealSpeed = Math.Max(1, playerLag + (int)_data.Rand.NextGaussian(50 - playerStrength / 20, 15)); // 5s average, 4s for strong player
             }
         }
 
@@ -1510,34 +1591,34 @@ namespace SICore
         /// Необходимо отвечать
         /// </summary>
         public void Answer() => ScheduleExecution(PlayerTasks.Answer,
-            _data.QuestionType == QuestionTypes.Simple ? 10 + Data.Rand.Next(10) : _data.PlayerDataExtensions.RealSpeed);
+            _data.QuestionType == QuestionTypes.Simple ? 10 + _data.Rand.Next(10) : _data.PlayerDataExtensions.RealSpeed);
 
         /// <summary>
         /// Необходимо отдать Вопрос с секретом
         /// </summary>
-        public void Cat() => ScheduleExecution(PlayerTasks.Cat, 10 + Data.Rand.Next(10));
+        public void Cat() => ScheduleExecution(PlayerTasks.Cat, 10 + _data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо сделать ставку
         /// </summary>
-        public void Stake() => ScheduleExecution(PlayerTasks.Stake, 10 + Data.Rand.Next(10));
+        public void Stake() => ScheduleExecution(PlayerTasks.Stake, 10 + _data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо выбрать финальную тему
         /// </summary>
-        public void ChooseFinalTheme() => ScheduleExecution(PlayerTasks.ChooseFinal, 10 + Data.Rand.Next(10));
+        public void ChooseFinalTheme() => ScheduleExecution(PlayerTasks.ChooseFinal, 10 + _data.Rand.Next(10));
 
         /// <summary>
         /// Необходимо сделать финальную ставку
         /// </summary>
-        public void FinalStake() => ScheduleExecution(PlayerTasks.FinalStake, 10 + Data.Rand.Next(20));
+        public void FinalStake() => ScheduleExecution(PlayerTasks.FinalStake, 10 + _data.Rand.Next(20));
 
         /// <summary>
         /// Необходимо выбрать стоимость Вопроса с секретом
         /// </summary>
         public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
-        public void IsRight(bool voteForRight) => ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + Data.Rand.Next(10));
+        public void IsRight(bool voteForRight) => ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + _data.Rand.Next(10));
 
         public void Connected(string name)
         {
@@ -1550,7 +1631,9 @@ namespace SICore
         {
             var cmd = _data.SystemLog.Length > 0 ? _data.PlayerDataExtensions.Report.SendReport : _data.PlayerDataExtensions.Report.SendNoReport;
             if (cmd != null && cmd.CanExecute(null))
+            {
                 cmd.Execute(null);
+            }
         }
 
         public void OnInitialized()

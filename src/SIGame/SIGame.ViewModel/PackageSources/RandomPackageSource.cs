@@ -43,6 +43,7 @@ namespace SIGame.ViewModel.PackageSources
                 Resources.RandomThemes,
                 Resources.Mixed,
                 Resources.RoundTrailing,
+                Resources.GameStage_Final,
                 settings.RandomRoundsCount,
                 settings.RandomThemesCount,
                 settings.RandomQuestionsBasePrice,

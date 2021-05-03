@@ -21,7 +21,7 @@ namespace SIQuester
         /// <returns>Скачанный XML</returns>
         internal static async Task<XmlDocument> GetXmlAsync(string name)
         {
-            var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml");
+            using var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml");
 
             if (!response.IsSuccessStatusCode)
             {

@@ -2,5 +2,6 @@
 {
     public sealed class BestPlayersViewModel: ViewModel<object>
     {
+        public bool IsProgress => false;
     }
 }

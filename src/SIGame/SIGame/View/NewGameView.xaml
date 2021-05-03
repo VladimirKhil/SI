@@ -375,30 +375,67 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            <Button Style="{StaticResource SIButton}" Padding="30,6" FontSize="19" FontWeight="Medium" Grid.Row="3" Grid.Column="3" Background="{StaticResource WindowBackground}"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Top" Command="{Binding BeginGame}" Content="{x:Static lp:Resources.StartGame}" />
-            <Button Grid.Row="6" Grid.Column="3" FontWeight="Medium" Style="{StaticResource SIButton}" Background="{StaticResource WindowBackground}"
-                    Command="{Binding DataContext.ShowSlideMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
-                    CommandParameter="RulesSettingsPage" Padding="30,6" FontSize="19" Margin="0"
-                    ToolTip="{x:Static lp:Resources.RulesHint}" VerticalAlignment="Bottom">
+            <Button
+                Style="{StaticResource SIButton}"
+                Padding="30,6"
+                FontSize="19"
+                FontWeight="Medium"
+                Grid.Row="3"
+                Grid.Column="3"
+                Background="{StaticResource WindowBackground}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                Command="{Binding BeginGame}"
+                Content="{x:Static lp:Resources.StartGame}" />
+            <Button
+                Grid.Row="6"
+                Grid.Column="3"
+                FontWeight="Medium"
+                Style="{StaticResource SIButton}"
+                Background="{StaticResource WindowBackground}"
+                Command="{Binding DataContext.ShowSlideMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                CommandParameter="RulesSettingsPage"
+                Padding="30,6"
+                FontSize="19"
+                Margin="0"
+                ToolTip="{x:Static lp:Resources.RulesHint}"
+                VerticalAlignment="Bottom">
                 <Button.ContentTemplate>
                     <DataTemplate>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SIText}" LineStackingStrategy="BlockLineHeight">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SIText}"
+                            LineStackingStrategy="BlockLineHeight">
                             <Run Text="{x:Static lp:Resources.Rules}" /><Run Text="…" />
                         </TextBlock>
                     </DataTemplate>
                 </Button.ContentTemplate>
             </Button>
             <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2">
-                <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                            Visibility="{Binding IsProgress, Converter={StaticResource BooleanToVisibilityConverter1}}">
-                    <TextBlock Text="{Binding Message}" Foreground="Black" HorizontalAlignment="Right" TextAlignment="Right"
-                               TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                <ContentControl
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding IsProgress, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                    <TextBlock
+                        Text="{Binding Message}"
+                        Foreground="Black"
+                        HorizontalAlignment="Right"
+                        TextAlignment="Right"
+                        TextWrapping="Wrap"
+                        TextTrimming="CharacterEllipsis" />
                 </ContentControl>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                    <TextBlock Width="450" Name="tbError" Text="{Binding ErrorMessage}"
-                               HorizontalAlignment="Right" TextAlignment="Right"
-                               VerticalAlignment="Center" Foreground="#FFC10000" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        Width="450"
+                        Name="tbError"
+                        Text="{Binding ErrorMessage}"
+                        HorizontalAlignment="Right"
+                        TextAlignment="Right"
+                        VerticalAlignment="Center"
+                        Foreground="#FFC10000"
+                        TextWrapping="Wrap"
+                        TextTrimming="CharacterEllipsis" />
                 </StackPanel>
             </Grid>
         </Grid>

@@ -22,8 +22,6 @@ namespace SIGame.ViewModel
 {
     public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
-        private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
-
         private SI.GameServer.Contract.HostInfo _gamesHostInfo;
 
         public string ServerName => _gamesHostInfo?.Name ?? "SIGame";
@@ -42,7 +40,9 @@ namespace SIGame.ViewModel
                     _currentGame = value;
                     OnPropertyChanged();
                     if (value != null)
+                    {
                         UpdateJoinCommand(value.Persons);
+                    }
 
                     CheckJoin();
                 }
@@ -774,7 +774,7 @@ namespace SIGame.ViewModel
 
             GameSettings.Message = Resources.Creating;
 
-            if (UseSignalRConnection)
+            if (_userSettings.UseSignalRConnection)
             {
                 var gameCreatingResult2 = await _gameServerClient.CreateAndJoinGameAsync(
                     (GameSettingsCore<AppSettingsCore>)settings,
@@ -846,6 +846,7 @@ namespace SIGame.ViewModel
                 SI.GameServer.Contract.GameCreationResultCode.UnknownError => Resources.GameCreationError_UnknownReason,
                 SI.GameServer.Contract.GameCreationResultCode.JoinError => Resources.GameCreationError_JoinError,
                 SI.GameServer.Contract.GameCreationResultCode.WrongGameSettings => Resources.GameCreationError_WrongSettings,
+                SI.GameServer.Contract.GameCreationResultCode.TooManyGamesByAddress => Resources.TooManyGames,
                 _ => Resources.GameCreationError_UnknownReason,
             };
 
@@ -938,8 +939,8 @@ namespace SIGame.ViewModel
 
             try
             {
-                Trace.TraceInformation($"Joining game: UseSignalRConnection = {UseSignalRConnection}");
-                if (UseSignalRConnection)
+                Trace.TraceInformation($"Joining game: UseSignalRConnection = {_userSettings.UseSignalRConnection}");
+                if (_userSettings.UseSignalRConnection)
                 {
                     var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password);
                     if (result.ErrorMessage != null)

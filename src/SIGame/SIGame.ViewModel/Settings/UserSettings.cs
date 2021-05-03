@@ -264,6 +264,9 @@ namespace SIGame
         [XmlIgnore]
         public string GameServerUri { get; set; }
 
+        [XmlIgnore]
+        public bool UseSignalRConnection { get; set; }
+
         #endregion
 
         public void Save(Stream stream, XmlSerializer serializer = null)

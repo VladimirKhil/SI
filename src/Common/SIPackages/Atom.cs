@@ -41,26 +41,13 @@ namespace SIPackages
         /// <summary>
         /// Строковое представление некоторых типов
         /// </summary>
-        public string TypeString
+        public string TypeString => _type switch
         {
-            get
-            {
-                switch (_type)
-                {
-                    case AtomTypes.Image:
-                        return Resources.Image;
-
-                    case AtomTypes.Video:
-                        return Resources.Video;
-
-                    case AtomTypes.Audio:
-                        return Resources.Audio;
-
-                    default:
-                        return _type;
-                }
-            }
-        }
+            AtomTypes.Image => Resources.Image,
+            AtomTypes.Video => Resources.Video,
+            AtomTypes.Audio => Resources.Audio,
+            _ => _type,
+        };
 
         /// <summary>
         /// Время действия атома

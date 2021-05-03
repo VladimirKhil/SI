@@ -8,6 +8,7 @@ using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SImulator.ViewModel.Tests
@@ -122,7 +123,7 @@ namespace SImulator.ViewModel.Tests
             
         }
 
-        public override Task<IMedia> PrepareMediaAsync(IMedia media)
+        public override Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
