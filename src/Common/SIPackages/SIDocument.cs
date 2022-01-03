@@ -179,7 +179,7 @@ namespace SIPackages
             return document;
         }
 
-        public static async Task<SIDocument> LoadXml(Stream stream)
+        public static SIDocument LoadXml(Stream stream)
         {
             var document = new SIDocument();
 
@@ -225,16 +225,14 @@ namespace SIPackages
             {
                 using (streamInfo.Stream)
                 {
-                    using (var reader = XmlReader.Create(streamInfo.Stream))
+                    using var reader = XmlReader.Create(streamInfo.Stream);
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                         {
-                            if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
-                            {
-                                _package = new Package();
-                                _package.ReadXml(reader);
-                                break;
-                            }
+                            _package = new Package();
+                            _package.ReadXml(reader);
+                            break;
                         }
                     }
                 }
@@ -245,11 +243,9 @@ namespace SIPackages
             {
                 using (streamInfo.Stream)
                 {
-                    using (var reader = XmlReader.Create(streamInfo.Stream))
-                    {
-                        _authors = new AuthorInfoList();
-                        _authors.ReadXml(reader);
-                    }
+                    using var reader = XmlReader.Create(streamInfo.Stream);
+                    _authors = new AuthorInfoList();
+                    _authors.ReadXml(reader);
                 }
             }
 
@@ -258,11 +254,9 @@ namespace SIPackages
             {
                 using (streamInfo.Stream)
                 {
-                    using (var reader = XmlReader.Create(streamInfo.Stream))
-                    {
-                        _sources = new SourceInfoList();
-                        _sources.ReadXml(reader);
-                    }
+                    using var reader = XmlReader.Create(streamInfo.Stream);
+                    _sources = new SourceInfoList();
+                    _sources.ReadXml(reader);
                 }
             }
         }
@@ -283,26 +277,20 @@ namespace SIPackages
         {
             using (var stream = package.GetStream(ContentFileName, false).Stream)
             {
-                using (var writer = XmlWriter.Create(stream))
-                {
-                    _package.WriteXml(writer);
-                }
+                using var writer = XmlWriter.Create(stream);
+                _package.WriteXml(writer);
             }
 
             using (var stream = package.GetStream(TextsStorageName, AuthorsFileName, false).Stream)
             {
-                using (var writer = XmlWriter.Create(stream))
-                {
-                    _authors.WriteXml(writer);
-                }
+                using var writer = XmlWriter.Create(stream);
+                _authors.WriteXml(writer);
             }
 
             using (var stream = package.GetStream(TextsStorageName, SourcesFileName, false).Stream)
             {
-                using (var writer = XmlWriter.Create(stream))
-                {
-                    _sources.WriteXml(writer);
-                }
+                using var writer = XmlWriter.Create(stream);
+                _sources.WriteXml(writer);
             }
 
             package.Flush();
@@ -362,10 +350,8 @@ namespace SIPackages
                 }
             }
 
-            using (var writer = XmlWriter.Create(stream))
-            {
-                package.WriteXml(writer);
-            }
+            using var writer = XmlWriter.Create(stream);
+            package.WriteXml(writer);
         }
 
         /// <summary>
@@ -555,7 +541,7 @@ namespace SIPackages
         /// </summary>
         /// <param name="atom">Единица сценария</param>
         /// <param name="entryName">Название объекта в хранилище</param>
-        public void SetLink(Atom atom, string entryName)
+        public static void SetLink(Atom atom, string entryName)
         {
             atom.Text = "@" + entryName;
         }

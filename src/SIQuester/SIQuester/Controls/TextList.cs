@@ -49,14 +49,14 @@ namespace SIQuester
         private bool _blockChanges = false;
         private int _blockSelection = 0;
         private bool _blockNotificationsFlag = false;
-        private readonly List<ItemInfo> _infos = new List<ItemInfo>();
+        private readonly List<ItemInfo> _infos = new();
         private int _oldSelectionStart = -1, _oldSelectionLength = -1, _oldOffsetStart = -1;
 
         /// <summary>
         /// Разделитель, вставляемый между элементами
         /// </summary>
         [DefaultValue(", ")]
-        public string ItemsSeparator { get; set; }
+        public string ItemsSeparator { get; set; } = ", ";
 
         /// <summary>
         /// Набор элементов редактора
@@ -90,6 +90,7 @@ namespace SIQuester
             {
                 control.Items = CollectionViewSource.GetDefaultView(control.ItemsSource);
                 control.CurrentItem = control.ItemsSource.Cast<object>().FirstOrDefault();
+                control.CurrentPosition = control.CurrentItem != null ? 0 : -1;
                 if (control.IsSynchronizedWithCurrentItem == true)
                 {
                     control.Items.MoveCurrentToPosition(0);
@@ -104,17 +105,23 @@ namespace SIQuester
             SetText();
 
             if (oldValue is INotifyCollectionChanged notifier)
+            {
                 notifier.CollectionChanged -= Notifier_CollectionChanged;
+            }
 
             notifier = newValue as INotifyCollectionChanged;
             if (notifier != null)
+            {
                 notifier.CollectionChanged += Notifier_CollectionChanged;
+            }
         }
 
         private void Notifier_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_blockNotificationsFlag)
+            {
                 return;
+            }
 
             switch (e.Action)
             {
@@ -147,19 +154,36 @@ namespace SIQuester
 
         public object CurrentItem
         {
-            get { return (object)GetValue(CurrentItemProperty); }
+            get { return GetValue(CurrentItemProperty); }
             set { SetValue(CurrentItemProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for CurrentItem.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CurrentItemProperty =
             DependencyProperty.Register("CurrentItem", typeof(object), typeof(TextList), new PropertyMetadata(null));
-        
+
+        public int CurrentPosition
+        {
+            get { return (int)GetValue(CurrentPositionProperty); }
+            set { SetValue(CurrentPositionProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CurrentPosition.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CurrentPositionProperty =
+            DependencyProperty.Register("CurrentPosition", typeof(int), typeof(TextList), new PropertyMetadata(-1));
+
         private void OnItemsReplaced(NotifyCollectionChangedEventArgs e)
         {
             _blockSelection++;
-            OnItemsRemoved(e);
-            _blockSelection--;
+            try
+            {
+                OnItemsRemoved(e);
+            }
+            finally
+            {
+                _blockSelection--;
+            }
+
             OnItemsAdded(e);
         }
 
@@ -174,7 +198,10 @@ namespace SIQuester
                     var start = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex);
                     var end = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex + e.OldItems.Count);
                     if (e.OldStartingIndex == 0)
+                    {
                         end += ItemsSeparator.Length;
+                    }
+
                     Select(start, end - start);
                     _infos.RemoveRange(e.OldStartingIndex, e.OldItems.Count);
                 }
@@ -230,7 +257,9 @@ namespace SIQuester
                 foreach (var item in e.NewItems)
                 {
                     if (index > 0)
+                    {
                         text.Append(ItemsSeparator);
+                    }
 
                     var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeSpecified, out string tail);
                     text.Append(toAdd);
@@ -238,7 +267,9 @@ namespace SIQuester
                 }
 
                 if (e.NewStartingIndex == 0 && index < _infos.Count)
+                {
                     text.Append(ItemsSeparator);
+                }
 
                 SelectedText = text.ToString();
             }
@@ -310,13 +341,12 @@ namespace SIQuester
         
         public TextList()
         {
-            ItemsSeparator = ", ";
             DataObject.AddCopyingHandler(this, OnCopy);
             DataObject.AddPastingHandler(this, OnPaste);
             IsUndoEnabled = false;
         }
 
-        void OnPaste(object sender, DataObjectPastingEventArgs e)
+        private void OnPaste(object sender, DataObjectPastingEventArgs e)
         {
             var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
             if (ItemsSource.Count == 0
@@ -328,7 +358,7 @@ namespace SIQuester
             }
         }
 
-        void OnCopy(object sender, DataObjectCopyingEventArgs e)
+        private void OnCopy(object sender, DataObjectCopyingEventArgs e)
         {
             var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
             if (ItemsSource.Count == 0
@@ -364,7 +394,9 @@ namespace SIQuester
             base.OnTextChanged(e);
 
             if (_blockChanges)
+            {
                 return;
+            }
 
             int index = 0;
             foreach (var change in e.Changes)
@@ -432,15 +464,29 @@ namespace SIQuester
         /// <returns>Смещение в активном элементе</returns>
         private int ConvertGlobalOffsetToLocalOffset(int offset, out int index)
         {
+            if (ItemsSeparator == null)
+            {
+                throw new InvalidOperationException("ItemsSeparator == null");
+            }
+
+            if (ItemsSource == null)
+            {
+                throw new InvalidOperationException("ItemsSource == null");
+            }
+
             index = 0;
             var length = 0;
             while (index < _infos.Count)
             {
                 var add = _infos[index]._length + ItemsSeparator.Length;
                 if (length + add <= offset)
+                {
                     length += add;
+                }
                 else
+                {
                     break;
+                }
 
                 index++;
             }
@@ -470,12 +516,15 @@ namespace SIQuester
         private int ConvertLocalOffsetToGlobalOffset(int index)
         {
             var result = 0;
-            for (int i = 0; i < index; i++)
+            for (var i = 0; i < index; i++)
             {
                 result += _infos[i]._length;
                 if (i + 1 < index)
+                {
                     result += ItemsSeparator.Length;
+                }
             }
+
             return result;
         }
 
@@ -483,14 +532,18 @@ namespace SIQuester
         {
             base.OnSelectionChanged(e);
             // В данной версии просто запретим выделять более 1 элемента
-            if (_blockSelection > 0)
+            if (_blockSelection > 0 || ItemsSource == null || _infos.Count == 0)
+            {
                 return;
+            }
 
             var offsetStart = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int indexStart);
             var offsetEnd = ConvertGlobalOffsetToLocalOffset(SelectionStart + SelectionLength, out int indexEnd);
 
             if (indexStart >= _infos.Count)
+            {
                 return;
+            }
 
             if (indexStart != indexEnd || ItemsSource != null && ItemsSource.Count > 0 && offsetEnd > _infos[indexStart]._length)
             {
@@ -502,10 +555,14 @@ namespace SIQuester
                         if (SelectionStart + 1 == _oldSelectionStart)
                         {
                             if (SelectionStart > 0)
+                            {
                                 SelectionStart--;
+                            }
                         }
                         else
+                        {
                             SelectionStart++;
+                        }
 
                         _oldSelectionStart = SelectionStart;
                         _oldSelectionLength = SelectionLength;
@@ -552,6 +609,7 @@ namespace SIQuester
             if (ItemsSource != null && indexStart < ItemsSource.Count)
             {
                 CurrentItem = ItemsSource[indexStart];
+                CurrentPosition = indexStart;
             }
 
             if (IsSynchronizedWithCurrentItem == true && Items != null)
@@ -581,7 +639,9 @@ namespace SIQuester
                 foreach (var item in Items.Cast<string>())
                 {
                     if (!isFirst)
+                    {
                         text.Append(ItemsSeparator);
+                    }
 
                     var toAdd = CheckIsLink(index, item, out bool isLink, out bool canBeExtended, out string tail);
                     text.Append(toAdd);

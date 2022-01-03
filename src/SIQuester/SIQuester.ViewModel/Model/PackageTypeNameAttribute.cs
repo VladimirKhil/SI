@@ -2,7 +2,8 @@
 
 namespace SIQuester.Model
 {
-    public sealed class PackageTypeNameAttribute: Attribute
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class PackageTypeNameAttribute : Attribute
     {
         public string Name { get; set; }
 

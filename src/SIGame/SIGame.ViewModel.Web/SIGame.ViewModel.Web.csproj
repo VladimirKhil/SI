@@ -11,7 +11,7 @@
     <Version>7.5.7</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame web connector</Description>
-    <Copyright>Copyright © Khil-soft 2005 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ using SIQuester.ViewModel;
 using SIQuester.ViewModel.PlatformSpecific;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,36 +30,25 @@ namespace SIQuester.Implementation
         internal const string STR_Definition = "{0}: {1}";
         internal const string STR_ExtendedDefinition = "{0}: {1} ({2})";
 
-        private readonly Dictionary<string, string> _mediaFiles = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _mediaFiles = new();
 
         private const int MAX_PATH = 260;
 
-        public override Tuple<int, int, int> GetCurrentItemSelectionArea()
-        {
-            if (ActionMenuViewModel.Instance.PlacementTarget is TextList box)
-                return box.GetSelectionInfo();
-
-            return null;
-        }
+        public override Tuple<int, int, int> GetCurrentItemSelectionArea() =>
+            ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
 
         public override string[] ShowOpenUI()
         {
             var openDialog = new OpenFileDialog { Title = "Открыть пакет", FileName = "", DefaultExt = "siq", Filter = "Вопросы СИ|*.siq", Multiselect = true };
 
             bool result = openDialog.ShowDialog().Value;
-            if (result)
-                return openDialog.FileNames;
-
-            return null;
+            return result ? openDialog.FileNames : null;
         }
 
         public override string[] ShowMediaOpenUI()
         {
             var dialog = new OpenFileDialog { Multiselect = true };
-            if (dialog.ShowDialog().Value)
-                return dialog.FileNames;
-
-            return null;
+            return dialog.ShowDialog().Value ? dialog.FileNames : null;
         }
 
         /// <summary>
@@ -85,7 +75,9 @@ namespace SIQuester.Implementation
             {
                 comboBox.Items.Add(new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogComboBoxItem(enc.DisplayName));
                 if (enc.Name == "utf-8")
+                {
                     comboBox.SelectedIndex = comboBox.Items.Count - 1;
+                }
             }
 
             void handler(int ind)
@@ -99,12 +91,16 @@ namespace SIQuester.Implementation
             if (result)
             {
                 if (comboBox.SelectedIndex > -1 && comboBox.SelectedIndex < comboBox.Items.Count)
+                {
                     encoding = Encoding.GetEncoding(encodings[comboBox.SelectedIndex].Name);
+                }
 
                 start = checkBox.IsChecked;
             }
             else
+            {
                 start = false;
+            }
 
             return result;
         }
@@ -123,7 +119,9 @@ namespace SIQuester.Implementation
                 };
 
                 if (fileTypeChanged != null)
+                {
                     dialog.FileTypeChanged += (sender, e) => fileTypeChanged(dialog.SelectedFileTypeIndex);
+                }
 
                 foreach (var item in filter)
                 {
@@ -136,7 +134,9 @@ namespace SIQuester.Implementation
                 }
 
                 if (title != null)
+                {
                     dialog.Title = title;
+                }
 
                 bool result = dialog.ShowDialog() == CommonFileDialogResult.Ok;
                 filterIndex = dialog.SelectedFileTypeIndex;
@@ -180,11 +180,15 @@ namespace SIQuester.Implementation
                 };
 
                 if (title != null)
+                {
                     saveDialog.Title = title;
+                }
 
                 bool result = saveDialog.ShowDialog().Value;
                 if (result)
+                {
                     filename = saveDialog.FileName;
+                }
 
                 filterIndex = saveDialog.FilterIndex;
                 return result;
@@ -194,39 +198,36 @@ namespace SIQuester.Implementation
         public override string ShowImportUI()
         {
             var openDlg = new OpenFileDialog { DefaultExt = "txt", Filter = "Файлы вопросов (*.txt) | *.txt" };
-            if (openDlg.ShowDialog() == true)
-                return openDlg.FileName;
-
-            return null;
+            return openDlg.ShowDialog() == true ? openDlg.FileName : null;
         }
 
         public override string ShowImportXmlUI()
         {
             var openDlg = new OpenFileDialog { DefaultExt = "xml", Filter = "Файлы вопросов (*.xml) | *.xml" };
-            if (openDlg.ShowDialog() == true)
-                return openDlg.FileName;
-
-            return null;
+            return openDlg.ShowDialog() == true ? openDlg.FileName : null;
         }
 
         public override string SelectSearchFolder()
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = "Выберите папку для поиска" })
+            using var dialog = new System.Windows.Forms.FolderBrowserDialog 
             {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    return dialog.SelectedPath;
-            }
+                Description = "Выберите папку для поиска"
+            };
 
-            return null;
+            return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? dialog.SelectedPath : null;
         }
 
         public override IMedia PrepareMedia(IMedia media, string type)
         {
             if (media.GetStream == null) // Это ссылка на внешний файл
+            {
                 return media;
+            }
 
             if (_mediaFiles.TryGetValue(media.Uri, out string fileName))
+            {
                 return new Media(fileName);
+            }
 
             // Это сам файл
             fileName = Path.Combine(Path.GetTempPath(), new Random().Next() + media.Uri);
@@ -263,9 +264,9 @@ namespace SIQuester.Implementation
                     {
                         File.Delete(path);
                     }
-                    catch (Exception)
+                    catch (Exception exc)
                     {
-                        
+                        Trace.TraceError(exc.ToString());
                     }
 
                     _mediaFiles.Remove(item);
@@ -277,10 +278,7 @@ namespace SIQuester.Implementation
         {
             var viewModel = new LinkViewModel { Title = title, IsMultiline = multiline };
             var view = new InputLinkView { DataContext = viewModel, Owner = Application.Current.MainWindow };
-            if (view.ShowDialog() == true)
-                return viewModel.Uri;
-
-            return null;
+            return view.ShowDialog() == true ? viewModel.Uri : null;
         }
 
         /// <summary>
@@ -443,7 +441,9 @@ namespace SIQuester.Implementation
                             text.AppendLine(string.Format("{0}:", Resources.Tour));
                             text.Append(round.Name.GrowFirstLetter().Trim());
                             if (round.Type == RoundTypes.Final)
+                            {
                                 text.Append(string.Format(" ({0})", Resources.Final));
+                            }
 
                             text.AppendLine();
                             text.AppendLine();
@@ -488,9 +488,14 @@ namespace SIQuester.Implementation
                                 {
                                     text.Append("   ");
                                     if (j < 5)
-                                        text.Append((j + 1).ToString());
+                                    {
+                                        text.Append(j + 1);
+                                    }
                                     else
+                                    {
                                         text.Append("Резерв");
+                                    }
+
                                     text.AppendLine(string.Format(". {0}", theme.Questions[j].Scenario.ToString().EndWithPoint().GrowFirstLetter().Trim()));
                                 }
 
@@ -501,9 +506,13 @@ namespace SIQuester.Implementation
                                 {
                                     var qLine = new StringBuilder("   ");
                                     if (j < 5)
-                                        qLine.Append((j + 1).ToString());
+                                    {
+                                        qLine.Append(j + 1);
+                                    }
                                     else
+                                    {
                                         qLine.Append("Резерв");
+                                    }
 
                                     qLine.Append(string.Format(". {0}", theme.Questions[j].Right[0].ClearPoints().GrowFirstLetter().Trim()));
                                     int A = theme.Questions[j].Right.Count;

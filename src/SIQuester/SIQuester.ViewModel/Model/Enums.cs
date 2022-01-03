@@ -7,7 +7,7 @@ namespace SIQuester.Model
     /// </summary>
     public enum PackageType
     {
-        [PackageTypeName(@"Стандартный пакет для SIGame")]
+        [PackageTypeName("Стандартный пакет для SIGame")]
         [Description("Такой же пакет, как и в Телевизионном аналоге SIGame")]
         [Category("SIGame")]
         Classic,

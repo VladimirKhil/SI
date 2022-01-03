@@ -35,7 +35,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Khil-soft")]
 [assembly: AssemblyProduct("SImulator")]
-[assembly: AssemblyCopyright("Copyright © Khil-soft 2010 - 2021")]
+[assembly: AssemblyCopyright("Copyright © Khil-soft 2010 - 2022")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("2.8.0.0")]
 [assembly: AssemblyFileVersion("2.8.0.0")]

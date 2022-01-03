@@ -401,21 +401,14 @@ namespace SIQuester.ViewModel
                 }
             }
         }
-        
-        internal DataCollection GetCollection(string name)
-        {
-            switch (name)
+
+        internal DataCollection GetCollection(string name) =>
+            name switch
             {
-                case SIDocument.ImagesStorageName:
-                    return Document.Images;
-
-                case SIDocument.AudioStorageName:
-                    return Document.Audio;
-
-                default:
-                    return Document.Video;
-            }
-        }
+                SIDocument.ImagesStorageName => Document.Images,
+                SIDocument.AudioStorageName => Document.Audio,
+                _ => Document.Video,
+            };
 
         /// <summary>
         /// Создать цепочку от корня к текщему элементу
@@ -433,7 +426,7 @@ namespace SIQuester.ViewModel
 
         public IItemViewModel[] ActiveChain
         {
-            get { return _activeChain; }
+            get => _activeChain;
             private set
             {
                 _activeChain = value;
@@ -533,7 +526,7 @@ namespace SIQuester.ViewModel
         {
             if (temp)
             {
-                if (_changed && _lastChangedTime > _lastSavedTime && this._path.Length > 0)
+                if (_changed && _lastChangedTime > _lastSavedTime && _path.Length > 0)
                 {
                     lock (Sync)
                     {
@@ -549,7 +542,7 @@ namespace SIQuester.ViewModel
                         var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester");
                         Directory.CreateDirectory(path);
 
-                        var tempName = System.IO.Path.Combine(path, EncodePath(this._path));
+                        var tempName = System.IO.Path.Combine(path, EncodePath(_path));
                         using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
                         {
 
@@ -773,10 +766,10 @@ namespace SIQuester.ViewModel
 
                         CommitChange();
                     }
-                    catch (Exception exc)
+                    catch
                     {
                         RollbackChange();
-                        throw exc;
+                        throw;
                     }
                 }
                 else
@@ -1824,24 +1817,24 @@ namespace SIQuester.ViewModel
                     await Video.CommitAsync(Document.Video);
 
                 Document.Dispose();
-                ClearTempFile(this._path);
+                ClearTempFile(_path);
 
                 Path = path;
                 Changed = false;
 
-                FileName = System.IO.Path.GetFileNameWithoutExtension(this._path);
+                FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
 
-                stream = File.Open(this._path, FileMode.Open, FileAccess.ReadWrite);
+                stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
                 Document.ResetTo(stream);
             }
-            catch (Exception exc)
+            catch
             {
                 if (stream != null)
                 {
                     stream.Dispose();
                 }
 
-                throw exc;
+                throw;
             }
             finally
             {

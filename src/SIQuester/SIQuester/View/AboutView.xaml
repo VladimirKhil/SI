@@ -20,11 +20,11 @@
                 </Grid.RowDefinitions>
                 <Image Source="/SIQuester;component/Resources/logo.png" Width="64" Margin="5,5,0,5" Grid.RowSpan="3" />
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" FontWeight="Bold">SIQuester</TextBlock>
-                <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">2005 - 2020 гг.</TextBlock>
+                <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">2005 - 2021 гг.</TextBlock>
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="2" Text="{Binding Version, StringFormat=Версия \{0\}}" />
             </Grid>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap"><Bold>Автор:</Bold> Владимир Хиль</TextBlock>
-            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Официальный сайт: <Hyperlink Command="{Binding OpenSite}">http://vladimirkhil.com/si/siquester</Hyperlink></TextBlock>
+            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Официальный сайт: <Hyperlink Command="{Binding OpenSite}">https://vladimirkhil.com/si/siquester</Hyperlink></TextBlock>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">Для добавления пакетов в основной набор для игры SIGame используйте пункт меню "Отправить в компьютерную игру".</TextBlock>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap"><Bold>Лицензии:</Bold></TextBlock>
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap" Text="{Binding Licenses}" />

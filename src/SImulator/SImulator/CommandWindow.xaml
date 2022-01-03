@@ -15,7 +15,6 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:lb="clr-namespace:SImulator.Behaviors"
         xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
-        xmlns:swm="System.Windows.Media;assembly=PresentationCore"
         SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
         Icon="Images/logo.png"
         Closing="Window_Closing" Height="600" Width="755" MinHeight="600" MinWidth="755"

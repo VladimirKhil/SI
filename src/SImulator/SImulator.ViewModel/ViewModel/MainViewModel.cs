@@ -1,23 +1,22 @@
 ﻿using SIEngine;
-using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
-using SImulator.ViewModel.ViewModel;
 using SIPackages;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.IO;
-using System.Diagnostics;
 
 namespace SImulator.ViewModel
 {
@@ -750,6 +749,7 @@ namespace SImulator.ViewModel
         /// </summary>
         private void Listen_Executed(object arg)
         {
+#if LEGACY
             try
             {
                 PlatformManager.Instance.CreateServer(typeof(IRemoteGameUI), Settings.HttpPort, Settings.DemoScreenIndex);
@@ -764,14 +764,17 @@ namespace SImulator.ViewModel
                 Mode = GameMode.Start;
                 ActiveListenCommand = _listen;
             }
+#endif
         }
 
         private void StopListen_Executed(object arg)
         {
+#if LEGACY
             PlatformManager.Instance.CloseServer();
 
             Mode = GameMode.Start;
             ActiveListenCommand = _listen;
+#endif
         }
 
         private void AddPlayerButton_Executed(object arg)

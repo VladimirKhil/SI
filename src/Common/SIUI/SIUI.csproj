@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProductVersion>8.0.30703</ProductVersion>
     <ProjectGuid>{78C96549-6EA8-4236-B026-6ECA55D9EC3A}</ProjectGuid>
@@ -8,7 +8,7 @@
     <Company>Khil-soft</Company>
     <Product>SIUI</Product>
     <Description>SIGame table ui</Description>
-    <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
     <Version>7.5.7</Version>
     <LangVersion>8</LangVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>

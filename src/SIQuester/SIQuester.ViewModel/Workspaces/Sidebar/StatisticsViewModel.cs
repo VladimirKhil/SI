@@ -134,7 +134,7 @@ namespace SIQuester.ViewModel
                         bool b2 = quest.Right.Count == 1 && quest.Right[0] == Resources.RightAnswer;
                         bool b3 = quest.Info.Sources.Count == 0 && _checkEmptySources;
 
-                        StringBuilder bracketsData = new StringBuilder();
+                        var bracketsData = new StringBuilder();
                         if (_checkBrackets)
                         {
                             for (int i = 0; i < 4; i++)
@@ -172,7 +172,7 @@ namespace SIQuester.ViewModel
 
                                 if (!Utils.ValidateTextBrackets(text))
                                 {
-                                    bracketsData.Append(quest.Price.ToString());
+                                    bracketsData.Append(quest.Price);
                                     bracketsData.Append(": ");
                                     bracketsData.Append(Resources.WrongBrackets);
                                     bracketsData.AppendFormat(" ({0})", comment);

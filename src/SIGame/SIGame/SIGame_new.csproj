@@ -1,0 +1,308 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <AssemblyTitle>SIGame</AssemblyTitle>
+    <Company>Khil-soft</Company>
+    <Product>SIGame</Product>
+    <Description>Quizz game</Description>
+    <Copyright>Copyright © Khil-soft 2002-2021</Copyright>
+    <Version>7.5.7</Version>
+    <LangVersion>8</LangVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <DebugType>portable</DebugType>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>game.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SIGame.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Speech">
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.Portable.Compatibility" Version="1.0.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.222702">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\Phenomena-Bold.otf" />
+    <Resource Include="Fonts\Phenomena-Light.otf" />
+    <Resource Include="Fonts\Phenomena-Thin.otf" />
+    <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
+    <None Include="licenses\Newtonsoft.Json.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\Nowin.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.en-US.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="app.manifest" />
+    <None Include="Data\1.siq" />
+    <None Include="Data\2.1.siq" />
+    <None Include="Data\2.2.siq" />
+    <None Include="Data\2.3.siq" />
+    <None Include="Data\pack1-07.siq" />
+    <None Include="Data\pack2-07.siq" />
+    <None Include="Data\pack3-07.siq" />
+    <None Include="Data\Pack3_0.siq" />
+    <None Include="Data\Pack3_1.siq" />
+    <None Include="Data\Pack3_2.siq" />
+    <None Include="Data\pack4-07.siq" />
+    <None Include="Data\pack5-07.siq" />
+    <None Include="Data\pack6-07.siq" />
+    <None Include="Data\pack7-07.siq" />
+    <None Include="Data\pack8-07.siq" />
+    <None Include="Data\Package4_1.siq" />
+    <None Include="Data\Package4_2.siq" />
+    <None Include="Data\Package4_3.siq" />
+    <None Include="Data\Package4_4.siq" />
+    <None Include="Data\Package5_1.siq" />
+    <None Include="Data\Package5_10.siq" />
+    <None Include="Data\Package5_11.siq" />
+    <None Include="Data\Package5_12.siq" />
+    <None Include="Data\Package5_2.siq" />
+    <None Include="Data\Package5_3.siq" />
+    <None Include="Data\Package5_4.siq" />
+    <None Include="Data\Package5_5.siq" />
+    <None Include="Data\Package5_6.siq" />
+    <None Include="Data\Package5_7.siq" />
+    <None Include="Data\Package5_8.siq" />
+    <None Include="Data\Package5_9.siq" />
+    <None Include="Data\Package_2010_1.siq" />
+    <None Include="Data\Package_2010_10.siq" />
+    <None Include="Data\Package_2010_11.siq" />
+    <None Include="Data\Package_2010_12.siq" />
+    <None Include="Data\Package_2010_13.siq" />
+    <None Include="Data\Package_2010_14.siq" />
+    <None Include="Data\Package_2010_15.siq" />
+    <None Include="Data\Package_2010_16.siq" />
+    <None Include="Data\Package_2010_17.siq" />
+    <None Include="Data\Package_2010_18.siq" />
+    <None Include="Data\Package_2010_19.siq" />
+    <None Include="Data\Package_2010_2.siq" />
+    <None Include="Data\Package_2010_20.siq" />
+    <None Include="Data\Package_2010_21.siq" />
+    <None Include="Data\Package_2010_22.siq" />
+    <None Include="Data\Package_2010_23.siq" />
+    <None Include="Data\Package_2010_3.siq" />
+    <None Include="Data\Package_2010_4.siq" />
+    <None Include="Data\Package_2010_5.siq" />
+    <None Include="Data\Package_2010_6.siq" />
+    <None Include="Data\Package_2010_7.siq" />
+    <None Include="Data\Package_2010_8.siq" />
+    <None Include="Data\Package_2010_9.siq" />
+    <None Include="Data\packf-07.siq" />
+    <None Include="Data\pack_kot.siq" />
+    <None Include="Data\Petrov_questions.siq" />
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
+    <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj" />
+    <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
+    <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
+    <ProjectReference Include="..\..\SICore\SICore.Connections\SICore.Connections.csproj" />
+    <ProjectReference Include="..\..\SICore\SICore.Network\SICore.Network.csproj" />
+    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
+    <ProjectReference Include="..\..\SICore\SIData\SIData.csproj" />
+    <ProjectReference Include="..\SIGame.ViewModel\SIGame.ViewModel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\vk_logo.png" />
+    <Resource Include="Resources\qlogo.png" />
+    <Resource Include="Resources\avatar-f.png" />
+    <Resource Include="Resources\avatar-m.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sigame_logo.png" />
+    <None Include="Resources\sigame_logo_no_background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\main_background.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\game.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="game.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\game.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameData\Photo\Ada_Lovelace.jpg" />
+    <None Include="GameData\Photo\Agatha_Christie.jpg" />
+    <None Include="GameData\Photo\Albert_Einstein.jpg" />
+    <None Include="GameData\Photo\Aristotle.jpg" />
+    <None Include="GameData\Photo\Carl_Gustav_Jung.jpg" />
+    <None Include="GameData\Photo\Dmitriy_Mendeleev.jpg" />
+    <None Include="GameData\Photo\Fedor_Dostoevskiy.jpg" />
+    <None Include="GameData\Photo\Francis_Bacon.jpg" />
+    <None Include="GameData\Photo\Franz_Kafka.jpg" />
+    <None Include="GameData\Photo\Galileo.jpg" />
+    <None Include="GameData\Photo\Giordano_Bruno.jpg" />
+    <None Include="GameData\Photo\Goethe.jpg" />
+    <None Include="GameData\Photo\Heisenberg.jpg" />
+    <None Include="GameData\Photo\Heraclite.JPG" />
+    <None Include="GameData\Photo\Hypatia_Alexandria.jpg" />
+    <None Include="GameData\Photo\IsaacNewton.jpg" />
+    <None Include="GameData\Photo\Johannes_Kepler.jpg" />
+    <None Include="GameData\Photo\Kant.jpg" />
+    <None Include="GameData\Photo\Konfuzius.jpg" />
+    <None Include="GameData\Photo\Lao_Tzu.jpg" />
+    <None Include="GameData\Photo\Leonardo.jpg" />
+    <None Include="GameData\Photo\Leo_Tolstoy.jpg" />
+    <None Include="GameData\Photo\Lise_Meitner.jpg" />
+    <None Include="GameData\Photo\Marie_Curie.jpg" />
+    <None Include="GameData\Photo\Mikhail_Lomonosov.jpg" />
+    <None Include="GameData\Photo\Nicholas_of_Cusa.jpg" />
+    <None Include="GameData\Photo\Niels_Bohr.jpg" />
+    <None Include="GameData\Photo\Nietzsche.jpg" />
+    <None Include="GameData\Photo\Nikolaus_Kopernikus.jpg" />
+    <None Include="GameData\Photo\Paracelsus.jpg" />
+    <None Include="GameData\Photo\Pierre_de_Fermat.jpg" />
+    <None Include="GameData\Photo\Platon.jpg" />
+    <None Include="GameData\Photo\Pythagoras.jpg" />
+    <None Include="GameData\Photo\Rene_Descartes.jpg" />
+    <None Include="GameData\Photo\Sofja_Kovalevskaja.jpg" />
+    <None Include="GameData\Photo\Stephen_Hawking.jpg" />
+    <None Include="GameData\Photo\Tesla.jpg" />
+    <None Include="GameData\Photo\Thomas-Aquinas.jpg" />
+    <None Include="GameData\Photo\Thomas_Edison.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Theme\studia.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\fb_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="licenses\Owin.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sounds\answer_wrong.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_big.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_final.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\applause_small.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\final_delete.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\final_think.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_noanswers.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_norisk.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_secret.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\question_stake.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_begin.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_themes.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sounds\round_timeout.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="obj\x86\Debug\App.g.cs" />
+    <Compile Remove="obj\x86\Debug\App.g.i.cs" />
+    <Compile Remove="obj\x86\Debug\MainWindow.g.cs" />
+    <Compile Remove="obj\x86\Debug\MainWindow.g.i.cs" />
+    <Compile Remove="obj\x86\Release\App.g.cs" />
+    <Compile Remove="obj\x86\Release\App.g.i.cs" />
+    <Compile Remove="obj\x86\Release\MainWindow.g.cs" />
+    <Compile Remove="obj\x86\Release\MainWindow.g.i.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Fonts\10261.otf" />
+    <None Remove="Fonts\10262.otf" />
+    <None Remove="Fonts\10265.otf" />
+    <None Remove="Fonts\Phenomena-Bold.otf" />
+    <None Remove="Fonts\Phenomena-Light.otf" />
+    <None Remove="Fonts\Phenomena-Thin.otf" />
+    <None Remove="Resources\game_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="View\ShowmanView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+  </ItemGroup>
+</Project>

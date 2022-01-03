@@ -27,14 +27,13 @@ namespace SIQuester.Implementation
 
         public void ExportXps(string filename)
         {
-            using (var package = System.IO.Packaging.Package.Open(filename, FileMode.Create))
-            using (var xpsDocument = new XpsDocument(package))
-            using (var manager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false))
-            {
-                var paginator = ((IDocumentPaginatorSource)_document).DocumentPaginator;
-                manager.SaveAsXaml(paginator);
-                manager.Commit();
-            }
+            using var package = System.IO.Packaging.Package.Open(filename, FileMode.Create);
+            using var xpsDocument = new XpsDocument(package);
+            using var manager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false);
+            
+            var paginator = ((IDocumentPaginatorSource)_document).DocumentPaginator;
+            manager.SaveAsXaml(paginator);
+            manager.Commit();
         }
 
         public void ExportDocx(string filename)
@@ -47,53 +46,56 @@ namespace SIQuester.Implementation
             using (var docStream = new StreamWriter(docPart.GetStream(FileMode.Create, FileAccess.Write)))
             {
                 var wNamespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-                using (var writer = XmlWriter.Create(docStream))
+                using var writer = XmlWriter.Create(docStream);
+                
+                writer.WriteStartDocument();
+                writer.WriteStartElement("document", wNamespace);
+                writer.WriteStartElement("body", wNamespace);
+
+                writer.WriteStartElement("p", wNamespace);
+                writer.WriteStartElement("r", wNamespace);
+
+                writer.WriteStartElement("rPr", wNamespace);
+
+                writer.WriteStartElement("rFonts", wNamespace);
+                writer.WriteAttributeString("ascii", wNamespace, "Times New Roman");
+                writer.WriteAttributeString("hAnsi", wNamespace, "Times New Roman");
+                writer.WriteEndElement();
+
+                writer.WriteStartElement("sz", wNamespace);
+                writer.WriteAttributeString("val", wNamespace, "24");
+                writer.WriteEndElement();
+
+                foreach (var paragraph in _document.Blocks.OfType<Paragraph>())
                 {
-                    writer.WriteStartDocument();
-                    writer.WriteStartElement("document", wNamespace);
-                    writer.WriteStartElement("body", wNamespace);
-
-                    writer.WriteStartElement("p", wNamespace);
-                    writer.WriteStartElement("r", wNamespace);
-
-                    writer.WriteStartElement("rPr", wNamespace);
-
-                    writer.WriteStartElement("rFonts", wNamespace);
-                    writer.WriteAttributeString("ascii", wNamespace, "Times New Roman");
-                    writer.WriteAttributeString("hAnsi", wNamespace, "Times New Roman");
-                    writer.WriteEndElement();
-
-                    writer.WriteStartElement("sz", wNamespace);
-                    writer.WriteAttributeString("val", wNamespace, "24");
-                    writer.WriteEndElement();
-
-                    foreach (var paragraph in _document.Blocks.OfType<Paragraph>())
+                    foreach (var inline in paragraph.Inlines)
                     {
-                        foreach (var inline in paragraph.Inlines)
+                        if (inline is LineBreak)
                         {
-                            if (inline is LineBreak)
-                                writer.WriteElementString("br", wNamespace, string.Empty);
-                            else
+                            writer.WriteElementString("br", wNamespace, string.Empty);
+                        }
+                        else
+                        {
+                            var text = ((Run)inline).Text;
+
+                            writer.WriteStartElement("t", wNamespace);
+                            if (text.Length > 0 && (char.IsWhiteSpace(text[0]) || char.IsWhiteSpace(text[text.Length - 1])))
                             {
-                                var text = ((Run)inline).Text;
-
-                                writer.WriteStartElement("t", wNamespace);
-                                if (text.Length > 0 && (Char.IsWhiteSpace(text[0]) || Char.IsWhiteSpace(text[text.Length - 1])))
-                                    writer.WriteAttributeString("xml", "space", null, "preserve");
-
-                                writer.WriteValue(text);
-                                writer.WriteEndElement();
+                                writer.WriteAttributeString("xml", "space", null, "preserve");
                             }
+
+                            writer.WriteValue(text);
+                            writer.WriteEndElement();
                         }
                     }
-
-                    writer.WriteEndElement();
-                    writer.WriteEndElement();
-
-                    writer.WriteEndElement();
-                    writer.WriteEndElement();
-                    writer.WriteEndDocument();
                 }
+
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
             }
 
             docxPackage.Flush();
@@ -105,22 +107,21 @@ namespace SIQuester.Implementation
 
         public void WalkAndSave(string filename, Encoding encoding, Action<StreamWriter> onLineBreak, Action<StreamWriter, string> onText, Action<StreamWriter> onHeader = null, Action<StreamWriter> onFooter = null)
         {
-            using (var sr = new StreamWriter(filename, false, encoding))
+            using var sr = new StreamWriter(filename, false, encoding);
+            
+            onHeader?.Invoke(sr);
+            foreach (var paragraph in _document.Blocks.OfType<Paragraph>())
             {
-                onHeader?.Invoke(sr);
-                foreach (var paragraph in _document.Blocks.OfType<Paragraph>())
+                foreach (var inline in paragraph.Inlines)
                 {
-                    foreach (var inline in paragraph.Inlines)
-                    {
-                        if (inline is LineBreak)
-                            onLineBreak(sr);
-                        else
-                            onText(sr, (inline as Run).Text);
-                    }
+                    if (inline is LineBreak)
+                        onLineBreak(sr);
+                    else
+                        onText(sr, (inline as Run).Text);
                 }
-
-                onFooter?.Invoke(sr);
             }
+
+            onFooter?.Invoke(sr);
         }
 
         public bool Print()

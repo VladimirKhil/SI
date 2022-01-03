@@ -2,7 +2,7 @@
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.Core;
 
-namespace SImulator.ViewModel.ViewModel
+namespace SImulator.ViewModel
 {
     /// <summary>
     /// Настройки для движка СИ

@@ -1064,9 +1064,12 @@
             <DataTemplate x:Key="Tags">
                 <DockPanel>
                     <TextBlock Text="Тематика" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                    <siq:TextList Style="{StaticResource LightTextBox}" DataContext="{Binding Tags}" ItemsSource="{Binding}"
-                                  CurrentItem="{Binding CurrentItem, Mode=TwoWay}"
-                                  siq:SmartMenuManager.SecondMenu="True" IsSynchronizedWithCurrentItem="True"
+                    <siq:TextList Style="{StaticResource LightTextBox}"
+                                  DataContext="{Binding Tags}"
+                                  ItemsSource="{Binding}"
+                                  CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                                  siq:SmartMenuManager.SecondMenu="True"
+                                  IsSynchronizedWithCurrentItem="True"
                                   siq:ActivateManager.IsWatching="True" />
                 </DockPanel>
             </DataTemplate>
@@ -1152,9 +1155,11 @@
                 </Style.Triggers>
             </Style>
 
+            <siqcv:ImageConverter x:Key="ImageConverter" />
+
             <DataTemplate x:Key="Logo">
                 <Border Style="{StaticResource mediaBorder}" ToolTip="Логотип пакета" Width="Auto" Margin="0,5,10,5" Padding="3" siq:SmartMenuManager.SecondMenu="True">
-                    <Image MaxHeight="100" Source="{Binding Logo.Uri}" HorizontalAlignment="Center" />
+                    <Image MaxHeight="100" Source="{Binding Logo.Uri, Converter={StaticResource ImageConverter}}" HorizontalAlignment="Center" />
                 </Border>
             </DataTemplate>
 
@@ -1368,7 +1373,13 @@
             </Style>
 
             <DataTemplate x:Key="WrongAnswersTemplateKey">
-                <siq:TextList Style="{StaticResource LightTextBox}" CurrentItem="{Binding CurrentItem, Mode=TwoWay}" ItemsSource="{Binding}" Background="#FFFFE1E6" siq:SmartMenuManager.SecondMenu="True" siq:ActivateManager.IsWatching="True" />
+                <siq:TextList
+                    Style="{StaticResource LightTextBox}"
+                    CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                    ItemsSource="{Binding}"
+                    Background="#FFFFE1E6"
+                    siq:SmartMenuManager.SecondMenu="True"
+                    siq:ActivateManager.IsWatching="True" />
             </DataTemplate>
 
             <Style x:Key="WrongAnswersStyle" TargetType="{x:Type ContentControl}">
@@ -1399,8 +1410,6 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
-            <siqcv:ImageConverter x:Key="ImageConverter" />
             
             <Style x:Key="ImageControlStyle" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding}" />
@@ -1591,7 +1600,15 @@
                     <ContentControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
                     <TextBlock Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" Text="(" Style="{StaticResource BlockStyleKey}"/>
                     <StackPanel MaxWidth="400" Grid.Row="1" Grid.Column="4" Orientation="Vertical" VerticalAlignment="Center" TextBlock.FontStyle="Italic">
-                        <siq:TextList siq:SmartMenuManager.SecondMenu="True" CurrentItem="{Binding CurrentItem, Mode=TwoWay}" Style="{StaticResource LightTextBox}" DataContext="{Binding Right}" ItemsSource="{Binding}" x:Name="right" MinWidth="50" TabIndex="3" />
+                        <siq:TextList
+                            Style="{StaticResource LightTextBox}"
+                            siq:SmartMenuManager.SecondMenu="True"
+                            CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                            DataContext="{Binding Right}"
+                            ItemsSource="{Binding}"
+                            x:Name="right"
+                            MinWidth="50"
+                            TabIndex="3" />
                         <ContentControl Style="{StaticResource WrongAnswersStyle}" Content="{Binding Wrong}" KeyboardNavigation.IsTabStop="False" />
                     </StackPanel>
                     <TextBlock Grid.Row="1" Grid.Column="5" VerticalAlignment="Center" Text=")" Style="{StaticResource BlockStyleKey}"/>
@@ -1609,14 +1626,26 @@
             <DataTemplate x:Key="Authors">
                 <DockPanel>
                     <TextBlock Text="Авторы:" Style="{StaticResource BlockStyleKey}" />
-                    <siq:TextList Style="{StaticResource LightTextBox}" ItemsSource="{Binding}" LinkManager="{StaticResource LinkManager}" siq:SmartMenuManager.SecondMenu="True" CurrentItem="{Binding CurrentItem, Mode=TwoWay}" siq:ActivateManager.IsWatching="True" />
+                    <siq:TextList
+                        Style="{StaticResource LightTextBox}"
+                        ItemsSource="{Binding}"
+                        LinkManager="{StaticResource LinkManager}"
+                        siq:SmartMenuManager.SecondMenu="True"
+                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                        siq:ActivateManager.IsWatching="True" />
                 </DockPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="Sources">
                 <DockPanel>
                     <TextBlock Text="Источники:" Style="{StaticResource BlockStyleKey}" />
-                    <siq:TextList Style="{StaticResource LightTextBox}" ItemsSource="{Binding}" LinkManager="{StaticResource LinkManager}" siq:SmartMenuManager.SecondMenu="True" CurrentItem="{Binding CurrentItem, Mode=TwoWay}" siq:ActivateManager.IsWatching="True" />
+                    <siq:TextList
+                        Style="{StaticResource LightTextBox}"
+                        ItemsSource="{Binding}"
+                        LinkManager="{StaticResource LinkManager}"
+                        siq:SmartMenuManager.SecondMenu="True"
+                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                        siq:ActivateManager.IsWatching="True" />
                 </DockPanel>
             </DataTemplate>
 

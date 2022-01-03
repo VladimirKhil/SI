@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
@@ -27,7 +27,7 @@
     <Company>Khil-soft</Company>
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
-    <Copyright>Copyright © Khil-soft 2002-2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2002-2022</Copyright>
     <Version>7.5.7</Version>
     <LangVersion>8</LangVersion>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>

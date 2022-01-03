@@ -348,6 +348,10 @@ namespace SICore.Network.Servers
             {
 
             }
+            catch (TaskCanceledException exc)
+            {
+                OnError(exc, true);
+            }
             catch (TimeoutException exc)
             {
                 OnError(exc, true);

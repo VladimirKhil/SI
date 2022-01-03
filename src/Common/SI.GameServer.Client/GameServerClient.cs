@@ -143,7 +143,9 @@ namespace SI.GameServer.Client
             if (gameInfo.Mode == SIEngine.GameModes.Sport)
             {
                 if (sb.Length > 0)
+                {
                     sb.Append(", ");
+                }
 
                 sb.Append(Resources.GameRule_Sport);
             }
@@ -151,7 +153,9 @@ namespace SI.GameServer.Client
             if ((rules & GameRules.FalseStart) == 0)
             {
                 if (sb.Length > 0)
+                {
                     sb.Append(", ");
+                }
 
                 sb.Append(Resources.GameRule_NoFalseStart);
             }
@@ -159,7 +163,9 @@ namespace SI.GameServer.Client
             if ((rules & GameRules.Oral) > 0)
             {
                 if (sb.Length > 0)
+                {
                     sb.Append(", ");
+                }
 
                 sb.Append(Resources.GameRule_Oral);
             }
@@ -167,7 +173,9 @@ namespace SI.GameServer.Client
             if ((rules & GameRules.IgnoreWrong) > 0)
             {
                 if (sb.Length > 0)
+                {
                     sb.Append(", ");
+                }
 
                 sb.Append(Resources.GameRule_IgnoreWrong);
             }

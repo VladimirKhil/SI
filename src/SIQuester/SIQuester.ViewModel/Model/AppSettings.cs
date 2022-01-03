@@ -25,7 +25,7 @@ namespace SIQuester.Model
         /// <summary>
         /// Используется ли версия Windows от Vista и выше
         /// </summary>
-        public static bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
+        public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
 
         public static AppSettings Default { get; set; }
 

@@ -69,7 +69,9 @@ namespace SICore.Network.Servers
                 lock (_listenerSync)
                 {
                     if (_cancellation.IsCancellationRequested)
+                    {
                         break;
+                    }
                 }
 
                 try

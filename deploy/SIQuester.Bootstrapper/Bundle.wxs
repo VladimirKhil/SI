@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 
-	<Bundle AboutUrl="http://vladimirkhil.com/si/siquester" Name="SIQuester"
+	<Bundle AboutUrl="https://vladimirkhil.com/si/siquester" Name="SIQuester"
           Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
           Version="!(bind.packageVersion.SIQuester.Setup)" Manufacturer="Свояк-софт"
           UpgradeCode="31CC22C7-17EC-4D88-88F5-2E3EB1A1FA7C"

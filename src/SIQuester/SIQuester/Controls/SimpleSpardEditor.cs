@@ -14,13 +14,13 @@ namespace SIQuester
     public sealed class SimpleSpardEditor: RichTextBox
     {
         private Sequence _rootExpression = null;
-        private readonly Dictionary<Inline, Expression> _indexTable = new Dictionary<Inline, Expression>();
+        private readonly Dictionary<Inline, Expression> _indexTable = new();
         private bool _updateFlag = false;
 
         private SpardTemplateViewModel _spardViewModel = null;
         private readonly Paragraph _paragraph = null;
 
-        private readonly object _sync = new object();
+        private readonly object _sync = new();
 
         private bool _selFlag = false;
 
@@ -214,7 +214,7 @@ namespace SIQuester
 
         private void InsertExpression(TextPointer pointer, Expression expression)
         {
-            if (!(expression is Optional))
+            if (expression is not Optional)
             {
                 RemoveSelection();
                 Selection.Text = "";
@@ -414,9 +414,11 @@ namespace SIQuester
             }
 
             var previous = leftIndex > 0 || Selection.IsEmpty || pointer == Selection.End ? current : GetExpression(inline.PreviousInline);
-            
+
             if (previous is Optional && GetRunInContainer((InlineUIContainer)prevInline).Text == "(" && leftIndex == 1)
+            {
                 InsertExpressionAtTheBeginning(expression, (Sequence)previous.Operands().First());
+            }
             else
             {
                 var chain = GetExpressionChain(previous);
@@ -430,7 +432,10 @@ namespace SIQuester
                         {
                             sequence = seq;
                             if (i > 0)
+                            {
                                 previous = chain[i - 1];
+                            }
+
                             break;
                         }
                     }
@@ -468,7 +473,7 @@ namespace SIQuester
         /// <returns></returns>
         private Inline GetSelectedInline(TextPointer pointer, out int leftIndex)
         {
-            if (!(pointer.Parent is Run active))
+            if (pointer.Parent is not Run active)
             {
                 leftIndex = 1;
                 System.Windows.DependencyObject element;
@@ -607,7 +612,7 @@ namespace SIQuester
         {
             InsertPureExpressionAtTheBeginning(expr, root);
 
-            InsertExpressionAtPoint(expr, out Inline toInsert);
+            InsertExpressionAtPoint(expr, out Inline _);
         }
 
         private bool InsertExpressionAtPoint(Expression child, out Inline toInsert)
@@ -788,7 +793,10 @@ namespace SIQuester
                     {
                         sequence = seq;
                         if (i > 0)
+                        {
                             expr = chain[i - 1];
+                        }
+
                         break;
                     }
                 }
@@ -868,7 +876,7 @@ namespace SIQuester
         {
             if (expression is StringValue stringValue)
             {
-                if (!(parent is Instruction)) // Мало ли
+                if (parent is not Instruction) // Мало ли
                 {
                     var instruct = new Instruction(new StringValue("ignoresp"), stringValue);
 

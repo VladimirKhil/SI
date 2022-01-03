@@ -225,10 +225,10 @@ namespace SIQuester
                     else
                         active.RollbackChange();
                 }
-                catch (Exception exc)
+                catch
                 {
                     active.RollbackChange();
-                    throw exc;
+                    throw;
                 }
             }
             else
@@ -237,12 +237,13 @@ namespace SIQuester
                 {
                     roundViewModel = themeViewModel.OwnerRound;
                     if (roundViewModel == null)
+                    {
                         throw new ArgumentException(nameof(roundViewModel));
+                    }
 
                     int index = roundViewModel.Themes.IndexOf(themeViewModel);
 
                     active.BeginChange();
-
                     try
                     {
                         var sb = new StringBuilder();
@@ -265,10 +266,10 @@ namespace SIQuester
 
                         active.CommitChange();
                     }
-                    catch (Exception exc)
+                    catch
                     {
                         active.RollbackChange();
-                        throw exc;
+                        throw;
                     }
                 }
                 else
@@ -323,10 +324,10 @@ namespace SIQuester
 
                         active.CommitChange();
                     }
-                    catch (Exception exc)
+                    catch
                     {
                         active.RollbackChange();
-                        throw exc;
+                        throw;
                     }
                 }
             }
@@ -485,7 +486,9 @@ namespace SIQuester
                         ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
                     }
                     else
+                    {
                         ApplicationCommands.Open.Execute(longPathString, this);
+                    }
                 }
 
                 e.Effects = e.AllowedEffects;

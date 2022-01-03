@@ -111,13 +111,17 @@ namespace SIQuester.ViewModel
         private void CurrentAtom_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(AtomViewModel.IsExpanded))
+            {
                 UpdateAtomCommands();
+            }
         }
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Atom.AtomTime))
+            {
                 UpdateAtomCommands();
+            }
         }
 
         private void UpdateAtomCommands()
@@ -358,7 +362,9 @@ namespace SIQuester.ViewModel
         {
             var index = CurrentPosition;
             if (index == -1)
+            {
                 index = Count - 1;
+            }
 
             OwnerDocument.BeginChange();
 
@@ -373,12 +379,14 @@ namespace SIQuester.ViewModel
                     }
                 }
                 else if (string.IsNullOrWhiteSpace(this[index].Model.Text))
+                {
                     RemoveAt(index--);
+                }
 
                 var atom = new AtomViewModel(new Atom { Type = mediaType, Text = "" });
                 Insert(index + 1, atom);
 
-                OwnerDocument.Document.SetLink(atom.Model, file.Model.Name);
+                SIDocument.SetLink(atom.Model, file.Model.Name);
                 OwnerDocument.ActiveItem = null;
             }
             catch (Exception exc)
@@ -454,7 +462,9 @@ namespace SIQuester.ViewModel
 
                 var last = collection.Files.LastOrDefault();
                 if (last != null)
-                    document.Document.SetLink(atom.Model, last.Model.Name);
+                {
+                    SIDocument.SetLink(atom.Model, last.Model.Name);
+                }
 
                 document.ActiveItem = null;
             }

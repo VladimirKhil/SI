@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{8B3640F3-9547-4B76-874D-7FA2E75AD679}</ProjectGuid>
     <TargetFramework>net48</TargetFramework>
@@ -6,10 +6,10 @@
     <Company>Svoyak-soft</Company>
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
-    <Copyright>Copyright © Khil-soft 2014 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
     <Version>5.6.2</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>portable</DebugType>

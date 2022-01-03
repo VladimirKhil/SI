@@ -205,7 +205,8 @@ namespace SIGame
                 return;
             }
 
-            if (inner is FileLoadException)
+            if (inner is FileLoadException || inner is IOException
+                || inner is ArgumentOutOfRangeException && inner.Message.Contains("capacity"))
             {
                 MessageBox.Show(inner.Message, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
                 return;

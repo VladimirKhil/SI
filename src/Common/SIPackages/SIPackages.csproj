@@ -11,7 +11,7 @@
     <Company>Khil-soft</Company>
     <Version>7.5.7</Version>
     <Authors>Vladimir Khil</Authors>
-    <Copyright>Copyright © Khil-soft 2007 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
     <LangVersion>8</LangVersion>
     <PackageProjectUrl>https://github.com/VladimirKhil/SI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/SI</RepositoryUrl>
@@ -23,6 +23,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>2</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />

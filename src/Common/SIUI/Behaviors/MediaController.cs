@@ -69,7 +69,7 @@ namespace SIUI.Behaviors
             mediaElement.MediaFailed += (sender, e2) =>
                 {
                     tableInfo.OnMediaLoadError(e2.ErrorException);
-                    Trace.TraceError(e2.ErrorException.ToString());
+                    Trace.TraceError("MediaFailed error: " + e2.ErrorException);
                 };
 
             System.Timers.Timer timer = null;
@@ -81,7 +81,9 @@ namespace SIUI.Behaviors
                     mediaElement.Dispatcher.BeginInvoke((Action)(() =>
                     {
                         if (mediaElement.NaturalDuration.HasTimeSpan)
+                        {
                             tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
+                        }
                     }));
                 };
             }
@@ -92,13 +94,17 @@ namespace SIUI.Behaviors
                 tableInfo.OnMediaStart();
 
                 if (mediaElement.NaturalDuration.HasTimeSpan && timer != null)
+                {
                     timer.Start();
+                }
             };
 
             void seekHandler(int pos)
             {
                 if (mediaElement.NaturalDuration.HasTimeSpan)
+                {
                     mediaElement.Position = TimeSpan.FromSeconds(mediaElement.NaturalDuration.TimeSpan.TotalSeconds * pos / 100);
+                }
             }
 
             void pauseHandler()

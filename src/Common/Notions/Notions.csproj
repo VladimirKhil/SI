@@ -11,7 +11,7 @@
     <Description>String processing functions</Description>
     <Company>Khil-soft</Company>
     <Version>2.9.7</Version>
-    <Copyright>Copyright © Khil-soft 2007 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

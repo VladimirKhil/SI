@@ -1,17 +1,17 @@
-﻿using System;
-using System.Linq;
-using System.ServiceModel;
-using System.IO;
-using System.Windows.Input;
-using System.ServiceModel.Channels;
-using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
-using System.Threading.Tasks;
-using System.Threading;
-using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
-using SImulator.ViewModel.Model;
+using SIUI.ViewModel;
+using SIUI.ViewModel.Core;
+using System;
+using System.IO;
+using System.Linq;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SImulator.ViewModel
 {
@@ -117,7 +117,9 @@ namespace SImulator.ViewModel
                     SetSound();
 
                     if (GameHost != null && !_stageCallbackBlock)
+                    {
                         GameHost.OnRoundThemesFinished();
+                    }
                 }
             }
         }
@@ -125,7 +127,9 @@ namespace SImulator.ViewModel
         private void TInfo_Ready(object sender, EventArgs e)
         {
             if (GameHost != null)
+            {
                 GameHost.OnReady();
+            }
         }
 
         public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound, SoundFinished), OnError);
@@ -133,7 +137,9 @@ namespace SImulator.ViewModel
         private void SoundFinished()
         {
             if (TInfo.TStage == TableStage.Sign)
+            {
                 _gameHost.OnIntroFinished();
+            }
         }
 
         public async void Start()
@@ -141,19 +147,19 @@ namespace SImulator.ViewModel
             if (_gameHost == null)
             {
                 // Удалённое воспроизведение
+#if LEGACY
                 GameHost = PlatformManager.Instance.GetCallback<IGameHost>();
                 ((IChannel)GameHost).Closed += RemoteGameUI_Closed;
                 ((IChannel)GameHost).Faulted += RemoteGameUI_Closed;
+#endif
             }
 
             await PlatformManager.Instance.CreateMainViewAsync(this, ScreenIndex);
             TInfo.TStage = TableStage.Sign;
         }
 
-        void RemoteGameUI_Closed(object sender, EventArgs e)
-        {
+        private void RemoteGameUI_Closed(object sender, EventArgs e) =>
             Task.Factory.StartNew(StopGame, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
-        }
 
         public async void StopGame()
         {
@@ -185,6 +191,11 @@ namespace SImulator.ViewModel
 
         public async void SetMediaFromBuffer(string uri, bool background)
         {
+            if (_buffer == null)
+            {
+                throw new InvalidOperationException("_buffer == null");
+            }
+
             _buffer.Position = 0;
 
             var media = new Media(() => new StreamInfo { Stream = _buffer, Length = _buffer.Length }, uri);
@@ -194,7 +205,9 @@ namespace SImulator.ViewModel
                 return;
             }
 
-            var source = new MediaSource(mediaPrepared.GetStream().Stream, mediaPrepared.Uri);
+            var streamInfo = mediaPrepared.GetStream();
+
+            var source = new MediaSource(streamInfo?.Stream, mediaPrepared.Uri);
             SetMedia(source, background);
         }
 
@@ -224,7 +237,9 @@ namespace SImulator.ViewModel
         public void SetStage(TableStage stage)
         {
             if (stage == TableStage.RoundTable)
+            {
                 _stageCallbackBlock = true;
+            }
 
             lock (TInfo.TStageLock)
             {
@@ -319,7 +334,9 @@ namespace SImulator.ViewModel
             lock (TInfo.TStageLock)
             {
                 if (TInfo.TStage != TableStage.RoundTable)
+                {
                     return;
+                }
             }
 
             int questionIndex = -1;
@@ -337,7 +354,9 @@ namespace SImulator.ViewModel
                 }
 
                 if (found)
+                {
                     break;
+                }
             }
 
             GameHost.OnQuestionSelected(themeIndex, questionIndex);
@@ -399,7 +418,9 @@ namespace SImulator.ViewModel
                         {
                             var code = PlatformManager.Instance.GetKeyNumber(key);
                             if (code == -1)
+                            {
                                 return false;
+                            }
 
                             if (code < TInfo.RoundInfo.Count && TInfo.RoundInfo[code].Name != null)
                             {

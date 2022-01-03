@@ -12,9 +12,15 @@
     <Description>SImulator view model</Description>
     <Company>Khil-soft</Company>
     <Version>2.8.0</Version>
-    <Copyright>Copyright © Khil-soft 2010 - 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;LEGACY</DefineConstants>
+  </PropertyGroup>
+<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<DefineConstants>LEGACY</DefineConstants>
+</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />

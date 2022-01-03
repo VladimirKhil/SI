@@ -20,8 +20,10 @@ namespace SImulator.Implementation.ButtonManagers
                 case PlayerKeysModes.Com:
                     return new ComButtonManager(settings.ComPort);
 
+#if LEGACY
                 case PlayerKeysModes.Web:
                     return new WebManager2(settings.WebPort);
+#endif
             }
 
             return base.Create(settings);

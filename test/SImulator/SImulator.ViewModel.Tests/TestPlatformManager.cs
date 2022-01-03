@@ -57,11 +57,6 @@ namespace SImulator.ViewModel.Tests
             
         }
 
-        public override void CloseServer()
-        {
-            throw new NotImplementedException();
-        }
-
         public override IExtendedGameHost CreateGameHost(EngineBase engine)
         {
             return new TestGameHost(engine);
@@ -76,7 +71,13 @@ namespace SImulator.ViewModel.Tests
             throw new NotImplementedException();
         }
 
+#if LEGACY
         public override void CreateServer(Type contract, int port, int screenIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void CloseServer()
         {
             throw new NotImplementedException();
         }
@@ -85,6 +86,7 @@ namespace SImulator.ViewModel.Tests
         {
             throw new NotImplementedException();
         }
+#endif
 
         public override string[] GetComPorts()
         {

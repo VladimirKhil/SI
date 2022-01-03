@@ -199,11 +199,13 @@ namespace SIQuester.ViewModel
 
         private async void Close_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (await DisposeRequest())
+            if (await DisposeRequestAsync())
+            {
                 PlatformManager.Instance.Exit();
+            }
         }
 
-        public async Task<bool> DisposeRequest()
+        public async Task<bool> DisposeRequestAsync()
         {
             foreach (var doc in DocList.ToArray())
             {
@@ -277,12 +279,6 @@ namespace SIQuester.ViewModel
                         item.Closed -= Item_Closed;
                     }
                     CheckSaveAllCanBeExecuted(this, EventArgs.Empty);
-                    break;
-
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    break;
-
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     break;
 
                 default:
@@ -398,7 +394,7 @@ namespace SIQuester.ViewModel
                         throw new Exception(Resources.FileIsReadOnly, exc);
                     }
 
-                    throw exc;
+                    throw;
                 }
             }).ContinueWith(task =>
             {
@@ -441,24 +437,24 @@ namespace SIQuester.ViewModel
             model.Start();
         }
 
-        private async void ImportXml_Executed(object arg)
+        private void ImportXml_Executed(object arg)
         {
             var file = PlatformManager.Instance.ShowImportXmlUI();
             if (file == null)
+            {
                 return;
+            }
 
             try
             {
-                using (var stream = File.OpenRead(file))
-                {
-                    var doc = await SIDocument.LoadXml(stream);
+                using var stream = File.OpenRead(file);
+                var doc = SIDocument.LoadXml(stream);
 
-                    var docViewModel = new QDocument(doc, _storageContextViewModel) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
+                var docViewModel = new QDocument(doc, _storageContextViewModel) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
 
-                    LoadMediaFromFolder(docViewModel, Path.GetDirectoryName(file));
+                LoadMediaFromFolder(docViewModel, Path.GetDirectoryName(file));
 
-                    DocList.Add(docViewModel);
-                }
+                DocList.Add(docViewModel);
             }
             catch (Exception exc)
             {
@@ -466,7 +462,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void LoadMediaFromFolder(QDocument document, string folder)
+        private static void LoadMediaFromFolder(QDocument document, string folder)
         {
             // Загрузим файлы контента при наличии ссылок на них
             foreach (var round in document.Package.Rounds)

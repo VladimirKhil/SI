@@ -1,5 +1,6 @@
 ﻿using SIPackages.Core;
 using System;
+using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -12,28 +13,16 @@ namespace SIQuester.Converters
         public Brush CatBrush { get; set; }
         public Brush SponsoredBrush { get; set; }
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            switch ((string)value)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+            (string)value switch
             {
-                case QuestionTypes.Auction:
-                    return AuctionBrush;
+                QuestionTypes.Auction => AuctionBrush,
+                QuestionTypes.BagCat or QuestionTypes.Cat => CatBrush,
+                QuestionTypes.Sponsored => SponsoredBrush,
+                _ => CommonBrush
+            };
 
-                case QuestionTypes.BagCat:
-                case QuestionTypes.Cat:
-                    return CatBrush;
-
-                case QuestionTypes.Sponsored:
-                    return SponsoredBrush;
-
-                default:
-                    return CommonBrush;
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();
-        }
     }
 }

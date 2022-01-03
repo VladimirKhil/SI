@@ -6,7 +6,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Version>7.5.7</Version>
     <Company>Khil-soft</Company>
-    <Copyright>Copyright © Khil-soft 2021</Copyright>
+    <Copyright>Copyright © Khil-soft 2021-2022</Copyright>
     <LangVersion>8</LangVersion>
   </PropertyGroup>
 

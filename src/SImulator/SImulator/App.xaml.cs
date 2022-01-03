@@ -7,7 +7,7 @@ using System.Threading;
 using System.IO.IsolatedStorage;
 using System.IO;
 using SIUI.ViewModel.Core;
-#if !DEBUG
+#if !DEBUG && LEGACY
 using System.Deployment.Application;
 using System.Reflection;
 #endif
@@ -34,7 +34,7 @@ namespace SImulator
         {
             base.OnStartup(e);
 
-#if !DEBUG
+#if !DEBUG && LEGACY
             ProcessAsync();
 
             if (ApplicationDeployment.IsNetworkDeployed)
@@ -65,7 +65,7 @@ namespace SImulator
             MainWindow.Show();
         }
 
-#if !DEBUG
+#if !DEBUG && LEGACY
         private static bool CheckUpdate()
         {
             try
@@ -196,7 +196,7 @@ namespace SImulator
             return Settings.Create();
         }
 
-#if !DEBUG
+#if !DEBUG && LEGACY
         private void ProcessAsync()
         {
             var isFirstAppRun = Settings.IsFirstRun;

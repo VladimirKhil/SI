@@ -116,21 +116,29 @@ namespace SIQuester.ViewModel
                 while (i < text.Length && !(text[i].Length > 3 && text[i].Substring(0, 3) == "   "))
                 {
                     if (themeName.Length > 0)
+                    {
                         themeName.Append(' ');
+                    }
+
                     themeName.Append(text[i++]);
                 }
 
                 var theme = round.CreateTheme(themeName.ToString().GrowFirstLetter().ClearPoints());
                 var authorsText = node2["Authors"].InnerText;
                 if (!string.IsNullOrWhiteSpace(authorsText))
+                {
                     theme.Info.Authors.Add(authorsText);
+                }
 
                 var themeComments = new StringBuilder(node2["Comments"].InnerText);
 
                 while (i < text.Length && text[i].Length > 4 && text[i].Substring(0, 3) == "   " && !char.IsDigit(text[i][3]))
                 {
                     if (themeComments.Length > 0)
+                    {
                         themeComments.Append(' ');
+                    }
+
                     themeComments.Append(text[i++]);
                 }
 
@@ -236,7 +244,6 @@ namespace SIQuester.ViewModel
 
                 i = -1;
                 qText = new StringBuilder();
-                number = 0;
                 number2 = 0;
 
                 while (++i < sour.Length)
@@ -245,34 +252,52 @@ namespace SIQuester.ViewModel
                     number = 0;
                     int k = 0;
                     while (char.IsDigit(sour[i][k]))
+                    {
                         number = number * 10 + int.Parse(sour[i][k++].ToString());
+                    }
+
                     number--;
                     if (!((sour[i].Length > k + 2 && sour[i].Substring(k, 2) == ". " || sour[i].Length > 3 + k && sour[i].Substring(k, 3) == "0. ")))
+                    {
                         number = -1;
+                    }
+
                     if (number >= 0)
                     {
                         if (qText.Length > 0 && theme.Questions.Count > number2)
+                        {
                             theme.Questions[number2].Info.Sources.Add(qText.ToString().GrowFirstLetter().ClearPoints());
+                        }
 
                         number2 = number;
                         int add = 3;
                         if (sour[i].Substring(k, 2) == ". ")
+                        {
                             add = 2;
+                        }
+
                         qText = new StringBuilder(sour[i].Substring(k + add));
                     }
                     else
                     {
                         if (qText.Length > 0)
+                        {
                             qText.Append(' ');
+                        }
+
                         qText.Append(sour[i]);
                     }
                 }
 
                 if (theme.Questions.Count > number2 && qText.Length > 0)
+                {
                     theme.Questions[number2].Info.Sources.Add(qText.ToString().GrowFirstLetter().ClearPoints());
+                }
 
                 if (number2 == -1)
+                {
                     theme.Info.Sources.Add(node2["Sources"].InnerText);
+                }
 
                 #endregion
             }

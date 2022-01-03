@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <AssemblyTitle>SIQuester.ViewModel</AssemblyTitle>
+    <Company>Khil-soft</Company>
+    <Product>SIQuester.ViewModel</Product>
+    <Description>SIQuester business logic</Description>
+    <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
+    <Version>5.7.0</Version>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <Import Project="..\..\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
+  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
+  <ItemGroup>
+    <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
+      <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\DataSources\System.Uri.datasource" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

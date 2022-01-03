@@ -9,10 +9,9 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
-    <Company>Svoyak-soft</Company>
-    <Version>5.6.2</Version>
-    <Copyright>Copyright © Khil-soft 2009 - 2021</Copyright>
-    <LangVersion>8</LangVersion>
+    <Company>Khil-soft</Company>
+    <Version>5.7.0</Version>
+    <Copyright>Copyright © Khil-soft 2009 - 2022</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />
@@ -21,6 +20,10 @@
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include="dlls\Lingware.Spard.dll" />
   </ItemGroup>

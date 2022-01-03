@@ -1,0 +1,187 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <ApplicationIcon>Resources\logo.ico</ApplicationIcon>
+    <StartupObject>SIQuester.App</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>SIQuester</AssemblyTitle>
+    <Company>Khil-soft</Company>
+    <Product>SIQuester</Product>
+    <Description>Questions editor for SIGame</Description>
+    <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
+    <Version>5.7.0</Version>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
+      <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="licenses\MahApps.Metro.LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\MahApps.Metro.LICENSE+">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="licenses\Newtonsoft.Json.LICENSE.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\DataSources\System.Uri.datasource" />
+    <Resource Include="Resources\Entypo.ttf" />
+    <None Include="site.url" />
+    <Content Include="Help.xps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cog.png" />
+    <None Include="Resources\bullet_error.png" />
+    <None Include="Resources\script_go.png" />
+    <Resource Include="Resources\cut.png" />
+    <Resource Include="Resources\page_copy.png" />
+    <Resource Include="Resources\paste_plain.png" />
+    <None Include="Resources\marker.png" />
+    <None Include="app.manifest" />
+    <None Include="Resources\AppIcon.ico" />
+    <None Include="Resources\bullet_wrench.png" />
+    <Resource Include="Resources\page_edit.png" />
+    <None Include="Resources\pencil.png" />
+    <None Include="Resources\logo.ico" />
+    <Resource Include="Resources\logo.png" />
+    <None Include="Resources\map_add.png" />
+    <None Include="Resources\map_delete.png" />
+    <None Include="Resources\map_go.png" />
+    <None Include="Resources\WindowsIcons-license.txt" />
+    <None Include="Resources\Entypo-license.txt" />
+    <None Include="licenses\Modern UI Icons.license.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow_in.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrow_out.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Clone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\favicon-wiki.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Import.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Minus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\mircIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SaveAs.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SI.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Statistics.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\txt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\xml.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\New.png" />
+    <None Include="Resources\Open.png" />
+    <None Include="Resources\Save.png" />
+    <None Include="Resources\save24.png" />
+    <None Include="Resources\SaveAll24.png" />
+    <None Include="Resources\Export24.png" />
+    <None Include="Resources\SiquesterIcon.png" />
+    <None Include="Resources\SiquesterIcon2.png" />
+    <None Include="Resources\StatIcon.png" />
+    <None Include="Resources\chart.png" />
+    <None Include="Resources\clock.png" />
+    <None Include="Resources\film.png" />
+    <None Include="Resources\find.png" />
+    <None Include="Resources\image.png" />
+    <None Include="Resources\music.png" />
+    <None Include="Resources\sound.png" />
+    <None Include="Resources\book_open.png" />
+    <None Include="Resources\user_gray.png" />
+    <None Include="Resources\Import24.png" />
+    <None Include="Resources\arrow_redo.png" />
+    <None Include="Resources\arrow_undo.png" />
+    <None Include="Resources\Left.png" />
+    <None Include="Resources\Right.png" />
+    <None Include="Resources\cancel.png" />
+    <None Include="Resources\color_wheel.png" />
+    <None Include="Resources\arrow_down.png" />
+    <Content Include="ygpackagekey3.0.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ygpackagesimple3.0.xslt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
+    <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj" />
+    <ProjectReference Include="..\SIQuester.ViewModel\SIQuester.ViewModel_legacy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Converters\InfoOwnerToContextualCommandConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="ygpackage3.1.xsd">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

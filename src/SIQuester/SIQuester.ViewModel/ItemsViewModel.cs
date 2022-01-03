@@ -27,7 +27,10 @@ namespace SIQuester.ViewModel
                 {
                     _currentPosition = value;
                     if (_currentPosition > -1 && _currentPosition < Count)
+                    {
                         CurrentItem = this[_currentPosition];
+                        UpdateCommands();
+                    }
 
                     OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentPosition)));
                 }
@@ -53,7 +56,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        protected virtual void OnCurrentItemChanged(T oldValue, T newValue) => UpdateCommands();
+        protected virtual void OnCurrentItemChanged(T oldValue, T newValue) { }
 
         public void SetCurrentItem(object item)
         {
@@ -94,6 +97,8 @@ namespace SIQuester.ViewModel
             {
                 RemoveAt(_currentPosition);
             }
+
+            UpdateCommands();
         }
 
         private void MoveLeft_Executed(object arg)

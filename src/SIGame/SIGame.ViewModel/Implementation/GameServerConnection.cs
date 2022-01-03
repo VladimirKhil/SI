@@ -2,6 +2,7 @@
 using SI.GameServer.Client;
 using SICore.Connections;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.Implementation
@@ -9,6 +10,7 @@ namespace SIGame.ViewModel.Implementation
     internal sealed class GameServerConnection : ConnectionBase
     {
         private readonly IGameServerClient _gameServerClient;
+        private bool _isDisposed;
 
         public GameServerConnection(
             IGameServerClient gameServerClient)
@@ -35,11 +37,21 @@ namespace SIGame.ViewModel.Implementation
 
         public override ValueTask SendMessageAsync(Message m)
         {
+            if (_isDisposed)
+            {
+                OnError(new InvalidOperationException("Connection was closed"), true);
+                return new ValueTask();
+            }
+
             try
             {
                 return new ValueTask(_gameServerClient.SendMessageAsync(m));
             }
             catch (TaskCanceledException exc)
+            {
+                OnError(exc, true);
+            }
+            catch (InvalidDataException exc)
             {
                 OnError(exc, true);
             }
@@ -56,6 +68,8 @@ namespace SIGame.ViewModel.Implementation
             _gameServerClient.IncomingMessage -= OnMessageReceived;
             _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
             _gameServerClient.Reconnected -= GameServerClient_Reconnected;
+
+            _isDisposed = true;
 
             return _gameServerClient.DisposeAsync();
         }

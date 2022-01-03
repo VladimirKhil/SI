@@ -181,14 +181,14 @@ namespace SIQuester.ViewModel
 
         #endregion
 
-        private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _tokenSource = new();
         private readonly TaskScheduler _scheduler = null;
 
         private readonly StorageContextViewModel _storageContextViewModel;
 
         private string _badTextCopy = "";
 
-        private readonly QConverter _converter = new QConverter();
+        private readonly QConverter _converter = new();
 
         private SIDocument _existing = null;
         private string _path = string.Empty;
@@ -197,7 +197,7 @@ namespace SIQuester.ViewModel
         private SIPart[][] _parts = null;
         private SITemplate _template = null;
 
-        private readonly object _sync = new object();
+        private readonly object _sync = new();
 
         private static Color BadSourceBackColor = Colors.Wheat;
 
@@ -598,21 +598,24 @@ namespace SIQuester.ViewModel
                 if (!string.IsNullOrEmpty(_path))
                 {
                     string filename = Path.GetFileNameWithoutExtension(_path);
-                    Task.Factory.StartNew(new Action(() =>
-                    {
-                        var themesNum = _existing.Package.Rounds.Sum(r => r.Themes.Count);
-                        var message = $"{Resources.TotalImport} {themesNum}. {Resources.LostFile}{filename}_LostPart.txt?";
+                    Task.Factory.StartNew(
+                        new Action(() =>
+                        {
+                            var themesNum = _existing.Package.Rounds.Sum(r => r.Themes.Count);
+                            var message = $"{Resources.TotalImport} {themesNum}. {Resources.LostFile}{filename}_LostPart.txt?";
 
-                        var save = PlatformManager.Instance.ConfirmExclWithWindow(message);
+                            var save = PlatformManager.Instance.ConfirmExclWithWindow(message);
 
-                        if (save)
-                        {                            
-                            using (var writer = new StreamWriter(Path.Combine(Path.GetDirectoryName(_path), string.Format("{0}_LostPart.txt", filename))))
+                            if (save)
                             {
+                                using var writer = new StreamWriter(Path.Combine(Path.GetDirectoryName(_path), string.Format("{0}_LostPart.txt", filename)));
+                            
                                 if (themesNum < _parts.Length)
                                 {
                                     if (_parts[themesNum].Length > 0)
+                                    {
                                         writer.Write(_parts[themesNum][_parts[themesNum].Length - 1].Value);
+                                    }
 
                                     for (int i = themesNum + 1; i < _parts.Length; i++)
                                     {
@@ -623,8 +626,10 @@ namespace SIQuester.ViewModel
                                     }
                                 }
                             }
-                        }
-                    }), CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                        }),
+                        CancellationToken.None,
+                        TaskCreationOptions.None,
+                        UI.Scheduler);
 
                     OnNewItem(new QDocument(_existing, _storageContextViewModel) { FileName = _existing.Package.Name });
                 }
@@ -634,19 +639,15 @@ namespace SIQuester.ViewModel
             {
                 if (PlatformManager.Instance.Confirm(Resources.SaveFile))
                 {
-                    using (var writer = new StreamWriter(_path, false, System.Text.Encoding.GetEncoding(1251)))
-                    {
-                        writer.Write(_text);
-                        writer.Close();
-                    }
+                    using var writer = new StreamWriter(_path, false);
+                    writer.Write(_text);
+                    writer.Close();
                 }
             }
         }
 
-        private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
+        private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
             OnReadyChanged();
-        }
 
         internal void Start()
         {
@@ -697,11 +698,11 @@ namespace SIQuester.ViewModel
             {
                 if (!string.IsNullOrEmpty(_path))
                 {
-                    Text = File.ReadAllText(_path, Encoding.GetEncoding(1251));
+                    Text = File.ReadAllText(_path);
                 }
                 else if (source != null)
                 {
-                    using var reader = new StreamReader(source, Encoding.GetEncoding(1251));
+                    using var reader = new StreamReader(source);
                     Text = reader.ReadToEnd();
                 }
                 else

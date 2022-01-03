@@ -49,14 +49,17 @@ namespace SImulator.ViewModel.PlatformSpecific
 
         public abstract IExtendedGameHost CreateGameHost(EngineBase engine);
 
+#if LEGACY
         public abstract void CreateServer(Type contract, int port, int screenIndex);
         public abstract void CloseServer();
+#endif
 
         public abstract Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default);
         public abstract void ClearMedia();
 
+#if LEGACY
         public abstract T GetCallback<T>();
-
+#endif
         public abstract void InitSettings(AppSettings defaultSettings);
     }
 }

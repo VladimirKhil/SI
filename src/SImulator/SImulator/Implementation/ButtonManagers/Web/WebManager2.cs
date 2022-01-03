@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿#if LEGACY
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Hosting;
 using Owin;
 using SImulator.ViewModel.ButtonManagers;
@@ -92,3 +93,4 @@ namespace SImulator.Implementation.ButtonManagers.Web
         }
     }
 }
+#endif

@@ -54,20 +54,17 @@ namespace SIQuester.ViewModel
 
         public void UpdateAnswersCommands()
         {
-            var text = CurrentItem as string;
+            var text = CurrentItem;
             AnswerSpecial1.CanBeExecuted = !string.IsNullOrEmpty(text) && text.Contains(" ");
             AnswerSpecial2.CanBeExecuted = text != null && text.Contains("(") && text.Contains(")");
             AnswerSpecial3.CanBeExecuted = text != null && text.Contains(" и ");
         }
 
-        public override string ToString()
-        {
-            return string.Join(", ", this);
-        }
+        public override string ToString() => string.Join(", ", this);
 
         private void AnswerSpecial1_Executed(object arg)
         {
-            var text = CurrentItem as string;
+            var text = CurrentItem;
             var words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             var s = words[words.Length - 1];
             Add(s.GrowFirstLetter());
@@ -87,7 +84,9 @@ namespace SIQuester.ViewModel
                 {
                     var comments = Owner.Info.Comments;
                     if (comments.Text.Length > 0)
+                    {
                         comments.Text += Environment.NewLine;
+                    }
 
                     comments.Text += s[1].GrowFirstLetter();
                     var str = new StringBuilder(s[0].Trim());
@@ -112,10 +111,12 @@ namespace SIQuester.ViewModel
 
         private void AnswerSpecial3_Executed(object arg)
         {
-            var text = CurrentItem as string;
+            var text = CurrentItem;
             int i = text.IndexOf(" и ");
             if (i > -1)
-                Add(String.Format("{0} и {1}", text.Substring(i + 3).GrowFirstLetter(), text.Substring(0, i)));
+            {
+                Add(string.Format("{0} и {1}", text.Substring(i + 3).GrowFirstLetter(), text.Substring(0, i)));
+            }
         }
 
         private string ProcessSelection()
@@ -159,7 +160,9 @@ namespace SIQuester.ViewModel
         {
             var text = ProcessSelection();
             if (text == null)
+            {
                 return;
+            }
 
             Add(text);
         }
@@ -170,7 +173,9 @@ namespace SIQuester.ViewModel
             {
                 var text = ProcessSelection();
                 if (text == null)
+                {
                     return;
+                }
 
                 var sources = Owner.Info.Sources;
                 sources.Add(text);
@@ -185,19 +190,20 @@ namespace SIQuester.ViewModel
         {
             var text = ProcessSelection();
             if (text == null)
+            {
                 return;
+            }
 
             var comments = Owner.Info.Comments;
             if (comments.Text.Length > 0)
+            {
                 comments.Text += Environment.NewLine;
+            }
 
             comments.Text += text;
         }
 
-        protected override bool CanRemove()
-        {
-            return Count > 1 || Owner == null || Owner.Wrong == this;
-        }
+        protected override bool CanRemove() => Count > 1 || Owner == null || Owner.Wrong == this;
 
         private void SelectAtomObject_Executed(object arg)
         {

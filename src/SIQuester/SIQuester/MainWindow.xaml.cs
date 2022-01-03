@@ -20,7 +20,7 @@ namespace SIQuester
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private static TimeSpan AutoSaveInterval = TimeSpan.FromSeconds(20);
+        private static readonly TimeSpan AutoSaveInterval = TimeSpan.FromSeconds(20);
 
         private bool _closingFromThumbnail = false;
         private DispatcherTimer _autoSaveTimer;
@@ -47,7 +47,12 @@ namespace SIQuester
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    var tabContent = new ContentControl { Content = e.NewItems[0], ContentTemplateSelector = (DataTemplateSelector)Application.Current.Resources["ContentSelector"] };
+                    var tabContent = new ContentControl
+                    {
+                        Content = e.NewItems[0],
+                        ContentTemplateSelector = (DataTemplateSelector)Application.Current.Resources["ContentSelector"]
+                    };
+
                     var tabItem = new TabItem()
                     {
                         Header = new ContentControl { Content = e.NewItems[0], ContentTemplate = (DataTemplate)Resources["TabItemHeaderTemplate"] },
@@ -76,7 +81,8 @@ namespace SIQuester
                         if (contentControl.Content == e.OldItems[0])
                         {
                             tabControl1.Items.RemoveAt(i--);
-                            if (TaskbarManager.IsPlatformSupported && !_closingFromThumbnail)
+                            if (TaskbarManager.IsPlatformSupported && !_closingFromThumbnail
+                                && TaskbarManager.Instance.TabbedThumbnail.IsThumbnailPreviewAdded(tabItem2))
                             {
                                 try
                                 {
@@ -165,10 +171,14 @@ namespace SIQuester
         private void Preview_TabbedThumbnailActivated(object sender, TabbedThumbnailEventArgs e)
         {
             if (e.WindowsControl is TabItem tabItem)
+            {
                 tabControl1.SelectedItem = tabItem;
+            }
 
             if (WindowState == WindowState.Minimized)
+            {
                 WindowState = WindowState.Normal;
+            }
 
             Activate();
         }
@@ -196,10 +206,7 @@ namespace SIQuester
             }
         }
 
-        private void Main_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateCurrentPreview();
-        }
+        private void Main_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateCurrentPreview();
 
         /// <summary>
         /// Обновить можно только текущий открытый thumbnail
@@ -217,7 +224,7 @@ namespace SIQuester
 
                 if (preview != null && (preview == thumbnail || thumbnail == null))
                 {
-                    if (!(tabItem.Content is FrameworkElement element) || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
+                    if (tabItem.Content is not FrameworkElement element || element.ActualWidth < 1.0 || element.ActualHeight < 1.0)
                     {
                         return false;
                     }
@@ -298,7 +305,7 @@ namespace SIQuester
             {
                 e.Cancel = true;
 
-                var result = await mainViewModel.DisposeRequest();
+                var result = await mainViewModel.DisposeRequestAsync();
                 if (result)
                 {
                     await Dispatcher.BeginInvoke((Action)Close);

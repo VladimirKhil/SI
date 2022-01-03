@@ -43,7 +43,9 @@ namespace SImulator.Implementation
         private MediaClock _mediaClock = null;
         private MediaPlayer _player = null;
 
+#if LEGACY
         private ServiceHost _host = null;
+#endif
 
         private readonly List<string> _mediaFiles = new List<string>();
 
@@ -353,6 +355,7 @@ namespace SImulator.Implementation
             return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
         }
 
+#if LEGACY
         public override void CreateServer(Type contract, int port, int screenIndex)
         {
             _host = new ServiceHost(
@@ -365,6 +368,7 @@ namespace SImulator.Implementation
         }
 
         public override void CloseServer() => _host.Close();
+#endif
 
         public override async Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
         {
@@ -445,7 +449,9 @@ namespace SImulator.Implementation
             }
         }
 
+#if LEGACY
         public override T GetCallback<T>() => OperationContext.Current.GetCallbackChannel<T>();
+#endif
 
         public override void InitSettings(AppSettings defaultSettings)
         {
