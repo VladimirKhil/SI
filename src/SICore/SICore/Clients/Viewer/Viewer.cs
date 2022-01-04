@@ -8,6 +8,7 @@ using SICore.Special;
 using SIData;
 using SIPackages.Core;
 using SIUI.Model;
+using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -378,6 +379,12 @@ namespace SICore
                         }
                         break;
 
+                    case Messages.ComputerAccounts:
+                        {
+                            ClientData.DefaultComputerPlayers = mparams.Skip(1).Select(name => new Account { Name = name }).ToArray();
+                            break;
+                        }
+
                     case Messages.PackageId:
                         {
                             if (mparams.Length > 1)
@@ -588,6 +595,7 @@ namespace SICore
                     case Messages.Theme:
                         if (mparams.Length > 1)
                         {
+                            _logic.SetText(mparams[1], TableStage.Theme);
                             OnThemeOrQuestion(mparams);
                             ClientData.ThemeName = mparams[1];
                         }
@@ -596,6 +604,7 @@ namespace SICore
                     case Messages.Question:
                         if (mparams.Length > 1)
                         {
+                            _logic.SetText(mparams[1], TableStage.QuestionPrice);
                             OnThemeOrQuestion(mparams);
                             ClientData.QuestionCaption = $"{ClientData.ThemeName}, {mparams[1]}";
                         }
@@ -1048,8 +1057,6 @@ namespace SICore
 
         private void OnThemeOrQuestion(string[] mparams)
         {
-            _logic.SetText(mparams[1]);
-
             foreach (var item in ClientData.Players)
             {
                 item.State = PlayerState.None;
@@ -1849,13 +1856,16 @@ namespace SICore
             player.Replace.CanBeExecuted = player.Others.Any();
         }
 
+        private Account[] GetDefaultComputerPlayers() => MyData.DefaultComputerPlayers
+            ?? StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.BackLink.PhotoUri);
+
         private void UpdateOthers(PlayerAccount player)
         {
             player.Others = player.IsHuman ?
                 MyData.AllPersons.Values.Where(p => p.IsHuman)
                     .Except(new ViewerAccount[] { player })
                     .ToArray()
-                : (Account[])StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.BackLink.PhotoUri)
+                : GetDefaultComputerPlayers()
                     .Where(a => !MyData.AllPersons.Values.Any(p => !p.IsHuman && p.Name == a.Name))
                     .ToArray();
         }

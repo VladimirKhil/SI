@@ -76,6 +76,11 @@
         public const string Choose = "CHOOSE";
 
         /// <summary>
+        /// Default computer players.
+        /// </summary>
+        public const string ComputerAccounts = "COMPUTERACCOUNTS";
+
+        /// <summary>
         /// Изменение конфигурации игры
         /// </summary>
         public const string Config = "CONFIG";

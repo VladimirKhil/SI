@@ -126,7 +126,7 @@ namespace SICore
 
         void OnTextSpeed(double speed);
 
-        void SetText(string text);
+        void SetText(string text, TableStage stage = TableStage.Round);
 
         void OnPauseChanged(bool isPaused);
 

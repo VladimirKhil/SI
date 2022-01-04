@@ -28,6 +28,9 @@ namespace SICore
 
         public void SendMessageWithArgs(params object[] args) => SendMessage(string.Join(Message.ArgsSeparator, args));
 
+        public void SendMessageToWithArgs(string receiver, params object[] args) =>
+            SendMessage(string.Join(Message.ArgsSeparator, args), receiver);
+
         /// <summary>
         /// Вывод в протокол
         /// </summary>
