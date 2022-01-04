@@ -706,6 +706,10 @@ namespace SICore
             {
                 ClientData.IsWaiting = false; // Чтобы не обрабатывать повторные сообщения
             }
+            else if ((reason == StopReason.Appellation || reason == StopReason.Pause) && ClientData.IsWaiting)
+            {
+                StopWaiting();
+            }
 
             _stopReason = reason;
             ExecuteImmediate();
@@ -1432,7 +1436,7 @@ namespace SICore
 
                     _tasksHistory.AddLogEntry($"{task}:{arg}");
 
-                    // Special catch for hanging old taksks
+                    // Special catch for hanging old tasks
                     if (task == Tasks.AskToChoose && OldTasks.Any())
                     {
                         static string oldTaskPrinter(Tuple<int, int, int> t) => $"{(Tasks)t.Item1}:{t.Item2}";

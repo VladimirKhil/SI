@@ -38,8 +38,17 @@ namespace Services.SI
         public Task<Uri> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
             GetAsync<Uri>($"Package?packageID={packageID}", cancellationToken);
 
+        public Task<PackageLink> GetPackage2ByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+            GetAsync<PackageLink>($"Package2?packageID={packageID}", cancellationToken);
+
         public Task<Uri> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
             GetAsync<Uri>($"PackageByGuid?packageGuid={packageGuid}", cancellationToken);
+
+        public Task<PackageLink> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default) =>
+            GetAsync<PackageLink>($"PackageByGuid2?packageGuid={packageGuid}", cancellationToken);
+
+        public Task<string> GetPackageNameByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+            GetAsync<string>($"packages/{packageGuid}/name", cancellationToken);
 
         public Task<string[]> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
         {

@@ -135,7 +135,12 @@ namespace SICore
                 index = "";
             }
 
-            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_Set, player != null ? Constants.Player : Constants.Showman, index, account.Name);
+            _viewerActions.SendMessage(
+                Messages.Config,
+                MessageParams.Config_Set,
+                player != null ? Constants.Player : Constants.Showman,
+                index,
+                account.Name);
         }
 
         private void Free_Executed(object arg)

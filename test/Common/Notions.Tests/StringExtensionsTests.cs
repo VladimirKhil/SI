@@ -2,7 +2,7 @@
 
 namespace Notions.Tests
 {
-    public sealed class Tests
+    public sealed class StringExtensionTests
     {
         [Test]
         [TestCase("test", "Test")]

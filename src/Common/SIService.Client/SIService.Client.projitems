@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\Package.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageCategory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\SI\PackageLink.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\SI\SIStorageServiceClient.cs" />
   </ItemGroup>
 </Project>
