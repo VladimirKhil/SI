@@ -260,6 +260,7 @@ namespace SIUI.ViewModel
         }
 
         private bool _enabled = false;
+
         /// <summary>
         /// Можно ли выбирать что-то на табло
         /// </summary>
@@ -304,9 +305,11 @@ namespace SIUI.ViewModel
 
         private SettingsViewModel _settings;
 
-        public SettingsViewModel Settings { get { return _settings; } set { _settings = value; OnPropertyChanged(); } }
+        public SettingsViewModel Settings { get => _settings; set { _settings = value; OnPropertyChanged(); } }
 
-        public bool PartialText { get; set; }
+        private bool _partialText = false;
+
+        public bool PartialText { get => _partialText; set { _partialText = value; OnPropertyChanged(); } }
 
         public TableInfoViewModel()
         {

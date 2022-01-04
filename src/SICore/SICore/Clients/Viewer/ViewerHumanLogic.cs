@@ -577,6 +577,7 @@ namespace SICore
             TInfo.TextLength = 0;
             TInfo.PartialText = true;
             TInfo.Text = text.ToString();
+            TInfo.TStage = TableStage.Question;
         }
 
         virtual public void SetAtom(string[] mparams)
@@ -1074,10 +1075,10 @@ namespace SICore
             TInfo.TextSpeed = speed;
         }
 
-        public void SetText(string text)
+        public void SetText(string text, TableStage stage = TableStage.Round)
         {
             TInfo.Text = text;
-            TInfo.TStage = TableStage.Round;
+            TInfo.TStage = stage;
         }
 
         public void OnPauseChanged(bool isPaused) => TInfo.Pause = isPaused;

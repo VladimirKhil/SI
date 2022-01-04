@@ -7,15 +7,14 @@ namespace SIUI.Selectors
     public sealed class QuestionTemplateSelector: DataTemplateSelector
     {
         public DataTemplate Simple { get; set; }
+
         public DataTemplate Animated { get; set; }
+
         public DataTemplate Partial { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, System.Windows.DependencyObject container)
-        {
-            if (item is TableInfoViewModel info)
-                return info.PartialText ? Partial : info.AnimateText ? Animated : Simple;
-
-            return base.SelectTemplate(item, container);
-        }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container) =>
+            item is TableInfoViewModel info
+                ? info.PartialText ? Partial : info.AnimateText ? Animated : Simple
+                : base.SelectTemplate(item, container);
     }
 }

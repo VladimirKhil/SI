@@ -1,4 +1,5 @@
 ﻿using SICore.Connections;
+using SIData;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -389,6 +390,11 @@ namespace SICore
                 OnPropertyChanged();
             }
         }
+
+        /// <summary>
+        /// Default computer players known by server.
+        /// </summary>
+        public Account[] DefaultComputerPlayers { get; set; }
 
         private bool _isUpdating = false;
 

@@ -16,7 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
   </ItemGroup>
 

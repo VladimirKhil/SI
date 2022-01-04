@@ -94,7 +94,7 @@ namespace SICore
             try
             {
                 var fullText = ClientData.Text ?? "";
-                var errorMessage = new StringBuilder("SerializaionError: ")
+                var errorMessage = new StringBuilder("SerializationError: ")
                     .Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(fullText)))
                     .Append('\n')
                     .Append(ClientData.TextLength)
@@ -124,6 +124,11 @@ namespace SICore
         /// <param name="person">Тот, кого надо проинформировать</param>
         private void Inform(string person = NetworkConstants.Everybody)
         {
+            _gameActions.SendMessageToWithArgs(
+                person,
+                Messages.ComputerAccounts,
+                string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
+
             var info = new StringBuilder(Messages.Info2)
                 .Append(Message.ArgsSeparatorChar)
                 .Append(ClientData.Players.Count)
@@ -172,14 +177,14 @@ namespace SICore
                 }
             }
 
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed), person);
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-"), person);
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton), person);
+            _gameActions.SendMessageToWithArgs(person, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed);
+            _gameActions.SendMessageToWithArgs(person, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-");
+            _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton);
 
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
-            _gameActions.SendMessageWithArgs(Messages.Timer, 1, "MAXTIME", maxPressingTime);
+            _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
 
-            _gameActions.SendMessageWithArgs(Messages.Hostname, ClientData.HostName ?? "");
+            _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
         }
 
         private void AppendAccountExt(ViewerAccount account, StringBuilder info)

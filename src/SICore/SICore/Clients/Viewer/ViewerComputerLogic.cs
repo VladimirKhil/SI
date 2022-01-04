@@ -2,6 +2,7 @@
 using SICore.Connections;
 using SICore.Utils;
 using SIData;
+using SIUI.ViewModel;
 
 namespace SICore
 {
@@ -174,7 +175,7 @@ namespace SICore
 
         }
 
-        public void SetText(string text)
+        public void SetText(string text, TableStage tableStage)
         {
 
         }
@@ -300,6 +301,6 @@ namespace SICore
             
         }
 
-        public SIUI.ViewModel.TableInfoViewModel TInfo => null;
+        public TableInfoViewModel TInfo => null;
     }
 }
