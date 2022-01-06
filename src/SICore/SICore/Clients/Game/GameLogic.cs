@@ -417,6 +417,7 @@ namespace SICore
                     _gameActions.ShowmanReplic(printedAnswer);
                 }
 
+                _data.AllowAppellation = true;
                 _data.IsAnswer = false;
             }
 
