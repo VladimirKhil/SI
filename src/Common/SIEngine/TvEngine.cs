@@ -3,7 +3,6 @@ using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SIEngine
 {
@@ -143,6 +142,7 @@ namespace SIEngine
                         var mode = PlayQuestionAtom();
                         if (mode != QuestionPlayMode.InProcess)
                         {
+                            OnAnswerShown();
                             Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
                         }
 
@@ -151,9 +151,9 @@ namespace SIEngine
                     }
                 #endregion
 
-                case GameStage.QuestionPostInfo:
+                case GameStage.QuestionPostInfo: // why use this stage?
                     OnQuestionPostInfo();
-                    Stage = GameStage.EndQuestion;
+                    Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
                     AutoNext(3000);
                     break;
 
@@ -236,6 +236,7 @@ namespace SIEngine
                         var playMode = PlayQuestionAtom();
                         if (playMode != QuestionPlayMode.InProcess)
                         {
+                            OnQuestionProcessed(_activeQuestion, true, false);
                             Stage = GameStage.FinalThink;
                             AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
                         }
@@ -267,6 +268,10 @@ namespace SIEngine
                             Stage = GameStage.RightAnswerProceed;
                             AutoNext(3000);
                             break;
+                        }
+                        else
+                        {
+                            OnAnswerShown();
                         }
                     }
 

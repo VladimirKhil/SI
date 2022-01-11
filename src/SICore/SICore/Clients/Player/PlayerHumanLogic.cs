@@ -3,6 +3,7 @@ using SIData;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using R = SICore.Properties.Resources;
 
@@ -146,6 +147,10 @@ namespace SICore
             }
             catch (ObjectDisposedException)
             {
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("Greet error: " + exc);
             }
         }
 

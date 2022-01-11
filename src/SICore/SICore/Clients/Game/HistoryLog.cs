@@ -4,7 +4,7 @@ namespace SICore.Clients.Game
 {
     internal sealed class HistoryLog
     {
-        internal const int MaxSize = 500;
+        internal const int MaxSize = 100;
 
         private readonly Queue<string> _history = new Queue<string>(MaxSize);
 

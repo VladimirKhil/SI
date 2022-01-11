@@ -99,7 +99,8 @@ namespace SIEngine
                         var mode = PlayQuestionAtom();
                         if (mode != QuestionPlayMode.InProcess)
                         {
-                            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+                            OnAnswerShown();
+                            Stage = GameStage.EndQuestion;
                         }
 
                         AutoNext(4000);
@@ -154,9 +155,23 @@ namespace SIEngine
             _questionIndex--;
             if (_questionIndex < 0)
             {
-                _themeIndex--;
-                SetActiveTheme();
-                _questionIndex = _activeTheme.Questions.Count - 1;
+                do
+                {
+                    _themeIndex--;
+
+                    if (_themeIndex < 0)
+                    {
+                        throw new InvalidOperationException("_themeIndex < 0");
+                    }
+
+                    SetActiveTheme();
+
+                    if (_activeTheme.Questions.Any())
+                    {
+                        _questionIndex = _activeTheme.Questions.Count - 1;
+                        break;
+                    }
+                } while (_themeIndex >= 0);
             }
 
             CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
@@ -179,7 +194,9 @@ namespace SIEngine
                 SetActiveTheme();
 
                 if (_activeTheme.Questions.Any())
+                {
                     return true;
+                }
             }
 
             return false;

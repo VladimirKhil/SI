@@ -55,7 +55,6 @@ namespace SICore.Network.Clients
         {
             try
             {
-                Trace.TraceInformation($"{Name}: WaitForMessages start");
                 while (await _inMessages.Reader.WaitToReadAsync())
                 {
                     while (_inMessages.Reader.TryRead(out var message))
@@ -67,8 +66,6 @@ namespace SICore.Network.Clients
                         }
                     }
                 }
-
-                Trace.TraceInformation($"{Name}: WaitForMessages stopped");
             }
             catch (OperationCanceledException)
             {

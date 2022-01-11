@@ -6,6 +6,7 @@ using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -1060,11 +1061,18 @@ namespace SICore
 
         private async void AnotherTry(IConnector connector)
         {
-            OnReplic(ReplicCodes.Special.ToString(), connector.Error);
-            if (!_disposed)
+            try
             {
-                await Task.Delay(10000);
-                TryConnect(connector);
+                OnReplic(ReplicCodes.Special.ToString(), connector.Error);
+                if (!_disposed)
+                {
+                    await Task.Delay(10000);
+                    TryConnect(connector);
+                }
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("AnotherTry error: " + exc);
             }
         }
 
@@ -1117,8 +1125,15 @@ namespace SICore
 
         public async void PrintGreeting()
         {
-            await Task.Delay(1000);
-            _data.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            try
+            {
+                await Task.Delay(1000);
+                _data.OnAddString(null, _localizer[nameof(R.Greeting)] + Environment.NewLine, LogMode.Protocol);
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("PrintGreeting error: " + exc);
+            }
         }
 
         public void OnTimeChanged()

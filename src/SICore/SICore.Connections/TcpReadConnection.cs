@@ -118,7 +118,7 @@ namespace SICore.Connections
             {
                 CloseCore(true, true);
             }
-            catch (SocketException exc)
+            catch (SocketException)
             {
                 CloseCore(true, true);
             }

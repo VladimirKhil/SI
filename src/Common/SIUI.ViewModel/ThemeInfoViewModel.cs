@@ -1,7 +1,9 @@
 ﻿using SIUI.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -112,10 +114,17 @@ namespace SIUI.ViewModel
 
         internal async void SilentFlashOut()
         {
-            await Task.Delay(500);
+            try
+            {
+                await Task.Delay(500);
 
-            _state = QuestionInfoStages.None;
-            Name = null;
+                _state = QuestionInfoStages.None;
+                Name = null;
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("SilentFlashOut error: " + exc);
+            }
         }
     }
 }

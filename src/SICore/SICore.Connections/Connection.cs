@@ -20,7 +20,7 @@ namespace SICore.Connections
         /// <summary>
         /// Пинг
         /// </summary>
-        private const string PingMessage = "PING";
+        public const string PingMessage = "PING";
 
         private Timer _timer;
         private DateTime _lastMessageTime = DateTime.UtcNow;
@@ -188,9 +188,16 @@ namespace SICore.Connections
         /// <remarks>Not Async because it is called by the timer.</remarks>
         private async void SendPing(object state)
         {
-            if (DateTime.UtcNow.Subtract(_lastMessageTime).TotalSeconds > 30)
+            try
             {
-                await SendMessageAsync(new Message(PingMessage, UserName));
+                if (DateTime.UtcNow.Subtract(_lastMessageTime).TotalSeconds > 30)
+                {
+                    await SendMessageAsync(new Message(PingMessage, UserName));
+                }
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("SendPing error: " + exc);
             }
         }
 

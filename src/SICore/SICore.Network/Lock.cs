@@ -68,7 +68,8 @@ namespace SICore.Network
             }
         }
 
-        public async void WithLock(Func<Task> asyncAction, CancellationToken cancellationToken = default)
+        [Obsolete]
+        public async Task WithLock(Func<Task> asyncAction, CancellationToken cancellationToken = default)
         {
             _semaphore.Wait(cancellationToken);
             try

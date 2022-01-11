@@ -159,7 +159,11 @@ namespace SICore.Network.Servers
                     {
                         if (sender != NetworkConstants.GameName && !connection.Clients.Contains(sender))
                         {
-                            Trace.TraceError($"Unknown sender: {m.Sender}|{m.Receiver}|{m.Text}");
+                            if (m.Text != Connection.PingMessage)
+                            {
+                                Trace.TraceError($"Unknown sender: {m.Sender}|{m.Receiver}|{m.Text}");
+                            }
+
                             return; // Защита от подлога
                         }
                     }
@@ -367,6 +371,10 @@ namespace SICore.Network.Servers
             catch (InvalidOperationException exc)
             {
                 OnError(exc, true);
+            }
+            catch (Exception exc)
+            {
+                OnError(exc, false);
             }
         }
 

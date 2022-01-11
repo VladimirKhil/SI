@@ -1398,6 +1398,13 @@ namespace SICore
                 return;
             }
 
+            _logic.AddHistory(nameof(OnAtom));
+
+            if (!ClientData.IsQuestionPlaying)
+            {
+                throw new Exception("Incorrect game state: " + _logic.PrintHistory());
+            }
+
             ClientData.HaveViewedAtom--;
             if (ClientData.HaveViewedAtom == 0)
             {

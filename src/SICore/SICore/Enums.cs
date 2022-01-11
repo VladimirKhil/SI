@@ -154,6 +154,10 @@ namespace SICore
         /// </summary>
         WaitNextToDelete,
         /// <summary>
+        /// Объявление темы финального раунда
+        /// </summary>
+        AnnounceFinalTheme,
+        /// <summary>
         /// Выяснение ставки игроков в финале
         /// </summary>
         AskFinalStake,

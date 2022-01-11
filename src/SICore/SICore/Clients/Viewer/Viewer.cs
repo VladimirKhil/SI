@@ -1694,8 +1694,6 @@ namespace SICore
 
         private async ValueTask ProcessInfoAsync(string[] mparams)
         {
-            Trace.TraceInformation($"Game info received: {string.Join(" ", mparams)}");
-
             int.TryParse(mparams[1], out var numOfPlayers);
             var numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
 

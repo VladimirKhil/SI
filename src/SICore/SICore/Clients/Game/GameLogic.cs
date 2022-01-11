@@ -72,10 +72,12 @@ namespace SICore
             Engine.QuestionVideo += Engine_QuestionVideo;
             Engine.QuestionOther += Engine_QuestionOther;
             Engine.QuestionAtom += Engine_QuestionAtom;
+            Engine.QuestionProcessed += Engine_QuestionProcessed;
             Engine.WaitTry += Engine_WaitTry;
 
             Engine.SimpleAnswer += Engine_SimpleAnswer;
             Engine.RightAnswer += Engine_RightAnswer;
+            Engine.AnswerShown += Engine_AnswerShown;
             Engine.QuestionPostInfo += Engine_QuestionPostInfo;
             Engine.EndQuestion += Engine_EndQuestion;
             Engine.NextQuestion += Engine_NextQuestion;
@@ -100,6 +102,16 @@ namespace SICore
                 _data.TimerStartTime[2] = DateTime.UtcNow;
 
                 _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
+            }
+        }
+
+        private void Engine_QuestionProcessed(Question question, bool finished, bool pressMode)
+        {
+            if (finished)
+            {
+                _data.IsQuestionFinished = true;
+                _data.IsPlayingMedia = false;
+                _data.IsPlayingMediaPaused = false;
             }
         }
 
@@ -417,7 +429,6 @@ namespace SICore
                     _gameActions.ShowmanReplic(printedAnswer);
                 }
 
-                _data.AllowAppellation = true;
                 _data.IsAnswer = false;
             }
 
@@ -469,12 +480,12 @@ namespace SICore
 
         private void Engine_WaitTry(Question question, bool final)
         {
+            _data.IsQuestionFinished = true;
+            _data.IsPlayingMedia = false;
+            _data.IsPlayingMediaPaused = false;
+
             if (!final)
             {
-                _data.IsQuestionFinished = true;
-                _data.IsPlayingMedia = false;
-                _data.IsPlayingMediaPaused = false;
-
                 if (!_data.IsQuestionPlaying)
                     ScheduleExecution(Tasks.MoveNext, 1, force: true);
                 else if (_data.Type.Name != QuestionTypes.Simple)
@@ -506,7 +517,10 @@ namespace SICore
 
             _gameActions.SendMessageWithArgs(Messages.RightAnswer, AtomTypes.Text, answer);
 
+            _tasksHistory.AddLogEntry("Engine_SimpleAnswer: Appellation activated");
+
             _data.AllowAppellation = true;
+            _data.IsPlayingMedia = false;
             var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
             ScheduleExecution(Tasks.QuestSourComm, (answerTime == 0 ? 2 : answerTime) * 10, 1);
         }
@@ -527,6 +541,14 @@ namespace SICore
                     Engine.SetTimeout();
                 }
             }
+        }
+
+        private void Engine_AnswerShown()
+        {
+            _tasksHistory.AddLogEntry("Engine_AnswerShown: Appellation activated");
+
+            _data.AllowAppellation = true;
+            _data.IsPlayingMedia = false;
         }
 
         private void Engine_NextQuestion()
@@ -647,15 +669,18 @@ namespace SICore
             _gameActions.PlayerReplic(playerIndex, themeName);
         }
 
-        private async void Engine_PrepareFinalQuestion(Theme theme, Question question)
+        private void Engine_PrepareFinalQuestion(Theme theme, Question question)
         {
-            await Task.Delay(1500);
-
             _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
             _data.Theme = theme;
 
-            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {theme.Name}");
-            _gameActions.SendMessageWithArgs(Messages.QuestionCaption, theme.Name);
+            ScheduleExecution(Tasks.AnnounceFinalTheme, 15);
+        }
+
+        private void AnnounceFinalTheme()
+        {
+            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.PlayTheme)])} {_data.Theme.Name}");
+            _gameActions.SendMessageWithArgs(Messages.QuestionCaption, _data.Theme.Name);
 
             ScheduleExecution(Tasks.Theme, 10, 1);
         }
@@ -707,13 +732,19 @@ namespace SICore
             {
                 ClientData.IsWaiting = false; // Чтобы не обрабатывать повторные сообщения
             }
-            else if ((reason == StopReason.Appellation || reason == StopReason.Pause) && ClientData.IsWaiting)
+            else if (reason == StopReason.Appellation && ClientData.IsWaiting)
             {
                 StopWaiting();
             }
 
             _stopReason = reason;
             ExecuteImmediate();
+        }
+
+        protected internal override void ExecuteImmediate()
+        {
+            _tasksHistory.AddLogEntry(nameof(ExecuteImmediate));
+            base.ExecuteImmediate();
         }
 
         internal void CancelStop() => _stopReason = StopReason.None;
@@ -1283,10 +1314,14 @@ namespace SICore
 
         private readonly HistoryLog _tasksHistory = new HistoryLog();
 
+        internal string PrintHistory() => _tasksHistory.ToString();
+
         public bool IsRunning { get; set; }
 
         internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
+            _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)CurrentTask}): {task} {arg} {taskTime}");
+
             SetTask((int)task, arg);
             if (_data.Settings.AppSettings.Managed && !force && _data.HostName != null && _data.AllPersons.ContainsKey(_data.HostName))
             {
@@ -1443,8 +1478,10 @@ namespace SICore
                         static string oldTaskPrinter(Tuple<int, int, int> t) => $"{(Tasks)t.Item1}:{t.Item2}";
 
                         ClientData.BackLink.SendError(
-                            new Exception($"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +
-                            $" Task: {task}, param: {arg}, history: {_tasksHistory}"), true);
+                            new Exception(
+                                $"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +
+                                $" Task: {task}, param: {arg}, history: {_tasksHistory}"),
+                            true);
 
                         ClearOldTasks();
                     }
@@ -1633,6 +1670,10 @@ namespace SICore
 
                         case Tasks.WaitDelete:
                             WaitDelete();
+                            break;
+
+                        case Tasks.AnnounceFinalTheme:
+                            AnnounceFinalTheme();
                             break;
 
                         case Tasks.AskFinalStake:

@@ -72,7 +72,7 @@ namespace SICore
             }
         }
 
-        protected internal void ExecuteImmediate() =>
+        protected virtual internal void ExecuteImmediate() =>
             _taskTimerLock.WithLock(() =>
             {
                 if (_taskTimer != null)

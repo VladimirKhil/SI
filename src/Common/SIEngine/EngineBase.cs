@@ -172,6 +172,7 @@ namespace SIEngine
         public event Action<Question, bool> WaitTry;
         public event Action<string> SimpleAnswer;
         public event Action RightAnswer;
+        public event Action AnswerShown;
         public event Action QuestionPostInfo;
 
         public event Action ShowScore;
@@ -243,6 +244,8 @@ namespace SIEngine
         protected void OnSimpleAnswer(string answer) => SimpleAnswer?.Invoke(answer);
 
         protected void OnRightAnswer() => RightAnswer?.Invoke();
+
+        protected void OnAnswerShown() => AnswerShown?.Invoke();
 
         protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 
@@ -590,8 +593,9 @@ namespace SIEngine
                     AutoNext(3000);
                     return;
                 }
-                else if (mode == QuestionPlayMode.JustFinished)
+                else if (mode == QuestionPlayMode.JustFinished) // Remove this block?
                 {
+                    OnAnswerShown();
                     Stage = GameStage.QuestionPostInfo;
                     AutoNext(3000);
                     return;
