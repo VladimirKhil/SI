@@ -28,7 +28,8 @@ namespace SICore
         private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
         private const int MaxAnswerLength = 250;
-
+        private const int DefaultAudioVideoTime = 300;
+        private const int DefaultImageTime = 50;
         private readonly GameActions _gameActions;
         private readonly ILocalizer LO;
 
@@ -77,7 +78,6 @@ namespace SICore
 
             Engine.SimpleAnswer += Engine_SimpleAnswer;
             Engine.RightAnswer += Engine_RightAnswer;
-            Engine.AnswerShown += Engine_AnswerShown;
             Engine.QuestionPostInfo += Engine_QuestionPostInfo;
             Engine.EndQuestion += Engine_EndQuestion;
             Engine.NextQuestion += Engine_NextQuestion;
@@ -115,7 +115,18 @@ namespace SICore
             }
         }
 
-        private void Engine_QuestionPostInfo() => QuestionSourcesAndComments(1);
+        private void Engine_QuestionPostInfo()
+        {
+            if (!_data.AllowAppellation) // Simple answer has already activated it
+            {
+                _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
+
+                _data.AllowAppellation = true;
+                _data.IsPlayingMedia = false;
+            }
+
+            ScheduleExecution(Tasks.QuestSourComm, 1, 1);
+        }
 
         private void Engine_Package(Package package)
         {
@@ -305,7 +316,7 @@ namespace SICore
 
             if (sound != null)
             {
-                ShareMedia(sound, AtomTypes.Audio, true);
+                _data.MediaOk = ShareMedia(sound, AtomTypes.Audio, true);
             }
         }
 
@@ -330,12 +341,15 @@ namespace SICore
             _data.QLength = oralText.Length;
         }
 
-        private void ShareMedia(IMedia link, string atomType, bool isBackground = false)
+        private bool ShareMedia(IMedia link, string atomType, bool isBackground = false)
         {
             try
             {
                 var msg = new StringBuilder();
-                msg.Append(isBackground ? Messages.Atom_Second : Messages.Atom).Append(Message.ArgsSeparatorChar).Append(atomType).Append(Message.ArgsSeparatorChar);
+                msg.Append(isBackground ? Messages.Atom_Second : Messages.Atom)
+                    .Append(Message.ArgsSeparatorChar)
+                    .Append(atomType)
+                    .Append(Message.ArgsSeparatorChar);
 
                 if (link.GetStream == null) // Внешняя ссылка
                 {
@@ -343,10 +357,17 @@ namespace SICore
                     {
                         msg.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(link.Uri);
                         _gameActions.SendMessage(msg.ToString());
+
+                        return true;
                     }
                     else
                     {
-                        _gameActions.SendMessageWithArgs(isBackground ? Messages.Atom_Second : Messages.Atom, AtomTypes.Text, string.Format(LO[nameof(R.MediaNotFound)], link.Uri));
+                        _gameActions.SendMessageWithArgs(
+                            isBackground ? Messages.Atom_Second : Messages.Atom,
+                            AtomTypes.Text,
+                            string.Format(LO[nameof(R.MediaNotFound)], link.Uri));
+
+                        return false;
                     }
                 }
                 else
@@ -381,11 +402,14 @@ namespace SICore
 
                         _gameActions.SendMessage(msg2.ToString(), person);
                     }
+
+                    return true;
                 }
             }
             catch (Exception exc)
             {
                 ClientData.BackLink.OnError(exc);
+                return false;
             }
         }
 
@@ -395,20 +419,20 @@ namespace SICore
             ShareMedia(image, AtomTypes.Image);
             if (sound != null)
             {
-                ShareMedia(sound, AtomTypes.Audio, true);
+                _data.MediaOk = ShareMedia(sound, AtomTypes.Audio, true);
             }
         }
 
         private void Engine_QuestionSound(IMedia sound)
         {
             _data.IsPartial = false;
-            ShareMedia(sound, AtomTypes.Audio);
+            _data.MediaOk = ShareMedia(sound, AtomTypes.Audio);
         }
 
         private void Engine_QuestionVideo(IMedia video)
         {
             _data.IsPartial = false;
-            ShareMedia(video, AtomTypes.Video);
+            _data.MediaOk = ShareMedia(video, AtomTypes.Video);
         }
 
         private void Engine_QuestionOther(Atom atom)
@@ -464,18 +488,16 @@ namespace SICore
                 return GetReadingDurationForTextLength(_data.QLength);
             }
 
-            if (atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio)
+            if ((atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio) && _data.MediaOk)
             {
                 _data.HaveViewedAtom = _data.Viewers.Count
                     + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
                     + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
 
-                // TODO: если всё так тормозит, что за 2 минуты аудио/видео ни у кого не прогружается,
-                // что происходит при игре с фальстартами и без?
-                return 1200;
+                return DefaultAudioVideoTime;
             }
             
-            return 50 + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
+            return DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
         }
 
         private void Engine_WaitTry(Question question, bool final)
@@ -487,11 +509,18 @@ namespace SICore
             if (!final)
             {
                 if (!_data.IsQuestionPlaying)
+                {
                     ScheduleExecution(Tasks.MoveNext, 1, force: true);
-                else if (_data.Type.Name != QuestionTypes.Simple)
+                }
+                else if (_data.Type != null && _data.Type.Name != QuestionTypes.Simple)
+                {
                     ScheduleExecution(Tasks.AskAnswer, 1, force: true);
+                }
                 else
-                    ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : ClientData.Rand.Next(10)), force: true); // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
+                {
+                    // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
+                    ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : ClientData.Rand.Next(10)), force: true);
+                }
             }
             else
             {
@@ -521,8 +550,9 @@ namespace SICore
 
             _data.AllowAppellation = true;
             _data.IsPlayingMedia = false;
+
             var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-            ScheduleExecution(Tasks.QuestSourComm, (answerTime == 0 ? 2 : answerTime) * 10, 1);
+            ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
         }
 
         private void Engine_RightAnswer()
@@ -543,14 +573,6 @@ namespace SICore
             }
         }
 
-        private void Engine_AnswerShown()
-        {
-            _tasksHistory.AddLogEntry("Engine_AnswerShown: Appellation activated");
-
-            _data.AllowAppellation = true;
-            _data.IsPlayingMedia = false;
-        }
-
         private void Engine_NextQuestion()
         {
             if (_data.OpenedFiles.Count > 0)
@@ -565,7 +587,7 @@ namespace SICore
 
                 if (activeQuestionsCount == 0)
                 {
-                    throw new Exception($"{nameof(activeQuestionsCount)} == 0! {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
+                    throw new Exception($"{nameof(activeQuestionsCount)} == 0! {Engine.LeftQuestionsCount}");
                 }
 
                 ScheduleExecution(Tasks.AskToChoose, 4, force: true);
@@ -656,7 +678,7 @@ namespace SICore
             {
                 var errorMessage = new StringBuilder(themeIndex.ToString()).Append(' ')
                     .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})"))).Append(' ')
-                    .Append(_data.ThemeIndex).Append(' ')
+                    .Append(_data.ThemeIndexToDelete).Append(' ')
                     .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
 
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
@@ -671,6 +693,8 @@ namespace SICore
 
         private void Engine_PrepareFinalQuestion(Theme theme, Question question)
         {
+            AddHistory("::Engine_PrepareFinalQuestion");
+
             _data.ThemeIndex = _data.Round.Themes.IndexOf(theme);
             _data.Theme = theme;
 
@@ -767,7 +791,7 @@ namespace SICore
                     {
                         _data.AllowAppellation = false;
                         StopWaiting();
-                        ((SIEngine.TvEngine)Engine).SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
+                        Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
                         return true;
                     }
 
@@ -848,7 +872,7 @@ namespace SICore
                     #endregion
 
                 case DecisionType.FinalThemeDeleting:
-                    return OnFinalThemeDeleting();
+                    return OnDecisionFinalThemeDeleting();
 
                 case DecisionType.FinalStakeMaking:
 
@@ -886,21 +910,28 @@ namespace SICore
             return true;
         }
 
-        private bool OnFinalThemeDeleting()
+        private bool OnDecisionFinalThemeDeleting()
         {
-            if (_data.ThemeIndex == -1)
+            if (_data.ThemeIndexToDelete == -1)
             {
                 return false;
             }
 
             StopWaiting();
-            ((SIEngine.TvEngine)Engine).SelectTheme(_data.ThemeIndex);
 
-            var innerThemeIndex = ((SIEngine.TvEngine)Engine).OnReady(out bool more);
+            Engine.SelectTheme(_data.ThemeIndexToDelete);
+
+            var innerThemeIndex = Engine.OnReady(out bool more);
             if (innerThemeIndex > -1)
             {
                 // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
-                _data.TInfo.RoundInfo[_data.ThemeIndex].Name = null;
+                if (_data.ThemeIndexToDelete < 0 || _data.ThemeIndexToDelete >= _data.TInfo.RoundInfo.Count)
+                {
+                    throw new Exception($"OnDecisionFinalThemeDeleting: _data.ThemeIndexToDelete: {_data.ThemeIndexToDelete}, " +
+                        $"_data.TInfo.RoundInfo.Count: {_data.TInfo.RoundInfo.Count}");
+                }
+
+                _data.TInfo.RoundInfo[_data.ThemeIndexToDelete].Name = QuestionHelper.InvalidThemeName;
                 if (more)
                 {
                     ScheduleExecution(Tasks.MoveNext, 10);
@@ -1251,7 +1282,7 @@ namespace SICore
 
             if (activeQuestionsCount == 0)
             {
-                throw new Exception($"{nameof(activeQuestionsCount)} == 0! {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
+                throw new Exception($"{nameof(activeQuestionsCount)} == 0! {Engine.LeftQuestionsCount}");
             }
 
             ScheduleExecution(Tasks.AskToChoose, 20);
@@ -1320,7 +1351,7 @@ namespace SICore
 
         internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
-            _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)CurrentTask}): {task} {arg} {taskTime}");
+            _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)CurrentTask}): {task} {arg} {taskTime / 10}");
 
             SetTask((int)task, arg);
             if (_data.Settings.AppSettings.Managed && !force && _data.HostName != null && _data.AllPersons.ContainsKey(_data.HostName))
@@ -1776,6 +1807,8 @@ namespace SICore
         {
             Engine?.MoveNext();
             ClientData.MoveNextBlocked = false;
+
+            _tasksHistory.AddLogEntry($"Moved -> {Engine?.Stage}");
         }
 
         private void PrintAuctPlayer()
@@ -1792,8 +1825,8 @@ namespace SICore
 
             _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
-            var msg = new StringBuilder()
-                .AppendFormat("{0} {1} {2} {3}", Notion.RandomString(LO[nameof(R.NowPlays)]), _data.Players[_data.StakerIndex].Name, LO[nameof(R.With)], Notion.FormatNumber(_data.Stake));
+            var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[_data.StakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
+
             _gameActions.ShowmanReplic(msg.ToString());
 
             ScheduleExecution(Tasks.PrintQue, 15 + ClientData.Rand.Next(10));
@@ -2108,12 +2141,15 @@ namespace SICore
         private void WaitDelete()
         {
             _gameActions.SendMessage(Messages.Cancel, _data.ActivePlayer.Name);
+
             if (_data.IsOralNow)
+            {
                 _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+            }
 
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
 
-            _data.ThemeIndex = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
+            _data.ThemeIndexToDelete = SelectRandom(_data.TInfo.RoundInfo, item => item.Name != null);
 
             OnDecision();
         }
@@ -2734,7 +2770,7 @@ namespace SICore
 
             if (activeQuestionsCount == 0)
             {
-                throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {((SIEngine.TvEngine)Engine).LeftQuestionsCount}");
+                throw new Exception($"activeQuestionsCount == 0 {Engine.Stage} {Engine.LeftQuestionsCount}");
             }
 
             msg.Append(GetRandomString(LO[activeQuestionsCount > 1 ? nameof(R.ChooseQuest) : nameof(R.LastQuest)]));
@@ -3113,7 +3149,7 @@ namespace SICore
 
             _gameActions.SendMessage(message, _data.ActivePlayer.Name);
 
-            _data.ThemeIndex = -1;
+            _data.ThemeIndexToDelete = -1;
             ScheduleExecution(Tasks.WaitDelete, waitTime);
             WaitFor(DecisionType.FinalThemeDeleting, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
         }

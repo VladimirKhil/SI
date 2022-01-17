@@ -55,7 +55,7 @@ namespace SI.GameServer.Client
 
         private readonly IUIThreadExecutor _uIThreadExecutor;
 
-        public GameServerClient(GameServerClientOptions options, IUIThreadExecutor uIThreadExecutor)
+        public GameServerClient(GameServerClientOptions options, IUIThreadExecutor uIThreadExecutor = null)
         {
             _options = options;
             _uIThreadExecutor = uIThreadExecutor;
@@ -204,11 +204,12 @@ namespace SI.GameServer.Client
             CancellationToken cancellationToken = default)
         {
             var uri = "api/Account/LogOn";
-            using var content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["login"] = user,
-                ["password"] = password
-            });
+            using var content = new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    ["login"] = user,
+                    ["password"] = password
+                });
 
             var response = await _client.PostAsync(uri, content, cancellationToken);
             if (response.IsSuccessStatusCode)
@@ -286,7 +287,16 @@ namespace SI.GameServer.Client
 
         private Task OnConnectionClosedAsync(Exception exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 
-        private void OnUI(Action action) => _uIThreadExecutor.ExecuteOnUIThread(action);
+        private void OnUI(Action action)
+        {
+            if (_uIThreadExecutor != null)
+            {
+                _uIThreadExecutor.ExecuteOnUIThread(action);
+                return;
+            }
+
+            action();
+        }
 
         private void MessageHandler_HttpSendProgress(object sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
 
@@ -343,7 +353,12 @@ namespace SI.GameServer.Client
             formData.Headers.ContentMD5 = imageKey.Hash;
             var response = await _client.PostAsync(uri, formData, cancellationToken);
 
-            return response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : null;
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception(await response.Content.ReadAsStringAsync());
+            }
+
+            return await response.Content.ReadAsStringAsync();
         }
 
         public Task<GameCreationResult> JoinGameAsync(
@@ -356,5 +371,8 @@ namespace SI.GameServer.Client
 
         public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync("SendMessage", message, cancellationToken);
+
+        public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
+            _connection.InvokeAsync("LeaveGame", cancellationToken);
     }
 }

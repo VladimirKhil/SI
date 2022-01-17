@@ -10,6 +10,8 @@ namespace SIEngine
     /// </summary>
     public sealed class SportEngine: EngineBase
     {
+        public override int LeftQuestionsCount => throw new NotImplementedException();
+
         public SportEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
             : base(document, settingsProvider)
         {
@@ -99,8 +101,7 @@ namespace SIEngine
                         var mode = PlayQuestionAtom();
                         if (mode != QuestionPlayMode.InProcess)
                         {
-                            OnAnswerShown();
-                            Stage = GameStage.EndQuestion;
+                            Stage = GameStage.QuestionPostInfo;
                         }
 
                         AutoNext(4000);
@@ -205,5 +206,20 @@ namespace SIEngine
         protected override bool AcceptRound(Round round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
 
         public override bool CanNext() => _stage != GameStage.End;
+
+        public override void SelectQuestion(int theme, int question)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override int OnReady(out bool more)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SelectTheme(int publicThemeIndex)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

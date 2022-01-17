@@ -28,7 +28,7 @@ namespace SI.GameServer.Client
         event Action<int> UploadProgress;
         event Action<Message> IncomingMessage;
 
-        Task OpenAsync(string userName, CancellationToken token);
+        Task OpenAsync(string userName, CancellationToken token = default);
         Task<Contract.HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
         Task<string> GetNewsAsync(CancellationToken cancellationToken = default);
         Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default);
@@ -39,7 +39,11 @@ namespace SI.GameServer.Client
 
         Task UploadPackageAsync(FileKey packageHash, Stream stream, CancellationToken cancellationToken = default);
 
-        Task<Contract.GameCreationResult> CreateGameAsync(GameSettingsCore<AppSettingsCore> gameSettings, PackageKey packageKey, ComputerAccountInfo[] computerAccounts, FileKey background);
+        Task<Contract.GameCreationResult> CreateGameAsync(
+            GameSettingsCore<AppSettingsCore> gameSettings,
+            PackageKey packageKey,
+            ComputerAccountInfo[] computerAccounts,
+            FileKey background);
 
         Task<string> HasImageAsync(FileKey imageKey, CancellationToken cancellationToken = default);
         Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default);
@@ -61,5 +65,7 @@ namespace SI.GameServer.Client
             ComputerAccountInfo[] computerAccounts,
             bool isMale,
             CancellationToken cancellationToken = default);
+
+        Task LeaveGameAsync(CancellationToken cancellationToken = default);
     }
 }

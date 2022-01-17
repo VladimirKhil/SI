@@ -476,9 +476,11 @@ namespace SICore
         /// Выводится ли текст вопроса по частям
         /// </summary>
         public bool IsPartial { get; internal set; }
+        public bool MediaOk { get; internal set; }
         public int TextLength { get; internal set; }
 
         public bool IsThinking { get; internal set; }
+        public bool IsThinkingPaused { get; internal set; }
         public double TimeThinking { get; internal set; }
         [Obsolete]
         public DateTime StartTryTime { get; internal set; }
@@ -489,5 +491,7 @@ namespace SICore
 
         public bool IsPlayingMediaPaused { get; set; }
         public string DocumentPath { get; internal set; }
+
+        public int ThemeIndexToDelete { get; set; } = -1;
     }
 }

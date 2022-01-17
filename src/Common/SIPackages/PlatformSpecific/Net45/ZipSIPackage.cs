@@ -11,45 +11,40 @@ namespace SIPackages.PlatformSpecific.Net45
 {
     internal sealed class ZipSIPackage : ISIPackage
     {
-        private Stream _stream;
-        private ZipArchive _zipArchive;
+        private readonly Stream _stream;
+        private readonly ZipArchive _zipArchive;
 
         private Dictionary<string, string> _contentTypes = new Dictionary<string, string>();
 
-        public static ZipSIPackage Create(Stream stream)
+        private ZipSIPackage(Stream stream, ZipArchive zipArchive)
         {
-            return new ZipSIPackage
-            {
-                _stream = stream,
-                _zipArchive = new ZipArchive(stream, ZipArchiveMode.Update, false)
-            };
+            _stream = stream;
+            _zipArchive = zipArchive;
         }
+
+        public static ZipSIPackage Create(Stream stream, bool leaveOpen = false) =>
+            new ZipSIPackage(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
 
         public static ZipSIPackage Open(Stream stream, bool read = true)
         {
-            var zipPackage = new ZipSIPackage
-            {
-                _stream = stream,
-                _zipArchive = new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false)
-            };
+            var zipPackage = new ZipSIPackage(
+                stream,
+                new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
 
             var entry = zipPackage._zipArchive.GetEntry("[Content_Types].xml");
             if (entry != null)
             {
-                using (var readStream = entry.Open())
-                {
-                    using (var reader = XmlReader.Create(readStream))
-                    {
-                        while (reader.Read())
-                        {
-                            if (reader.NodeType == XmlNodeType.Element && reader.Name == "Default")
-                            {
-                                var ext = reader["Extension"];
-                                var type = reader["ContentType"];
+                using var readStream = entry.Open();
+                using var reader = XmlReader.Create(readStream);
 
-                                zipPackage._contentTypes[ext.ToLower()] = type;
-                            }
-                        }
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "Default")
+                    {
+                        var ext = reader["Extension"];
+                        var type = reader["ContentType"];
+
+                        zipPackage._contentTypes[ext.ToLower()] = type;
                     }
                 }
             }
@@ -152,16 +147,14 @@ namespace SIPackages.PlatformSpecific.Net45
 
             // Переоткрываем
             if (closeCurrent)
-                _stream.Dispose();
+            {
+                _stream.Dispose(); // what about _zipPackage?
+            }
 
             return Open(stream, false);
         }
 
-        public void Dispose()
-        {
-            _zipArchive.Dispose();
-            _stream.Dispose();
-        }
+        public void Dispose() => _zipArchive.Dispose();
 
         public void Flush()
         {
@@ -169,23 +162,24 @@ namespace SIPackages.PlatformSpecific.Net45
             var entry = _zipArchive.GetEntry("[Content_Types].xml");
 
             if (entry != null)
+            {
                 entry.Delete();
+            }
 
             entry = _zipArchive.CreateEntry("[Content_Types].xml", CompressionLevel.Optimal);
 
             using (var writeStream = entry.Open())
             {
                 var ns = "http://schemas.openxmlformats.org/package/2006/content-types";
-                using (var writer = XmlWriter.Create(writeStream))
+                using var writer = XmlWriter.Create(writeStream);
+
+                writer.WriteStartElement("Types", ns);
+                foreach (var item in _contentTypes)
                 {
-                    writer.WriteStartElement("Types", ns);
-                    foreach (var item in _contentTypes)
-                    {
-                        writer.WriteStartElement("Default", ns);
-                        writer.WriteAttributeString("Extension", item.Key);
-                        writer.WriteAttributeString("ContentType", item.Value);
-                        writer.WriteEndElement();
-                    }
+                    writer.WriteStartElement("Default", ns);
+                    writer.WriteAttributeString("Extension", item.Key);
+                    writer.WriteAttributeString("ContentType", item.Value);
+                    writer.WriteEndElement();
                 }
             }
 

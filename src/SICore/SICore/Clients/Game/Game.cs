@@ -381,6 +381,8 @@ namespace SICore
                     return;
                 }
 
+                Logic.AddHistory($"[{message.Text}@{message.Sender}]");
+
                 var args = message.Text.Split(Message.ArgsSeparatorChar);
 
                 try
@@ -495,7 +497,7 @@ namespace SICore
                             break;
 
                         case Messages.Start:
-                            if (message.Sender == ClientData.HostName)
+                            if (message.Sender == ClientData.HostName && ClientData.Stage == GameStage.Before)
                             {
                                 StartGame();
                             }
@@ -784,31 +786,7 @@ namespace SICore
                             break;
 
                         case Messages.Delete:
-                            if (ClientData.IsWaiting && ClientData.Decision == DecisionType.FinalThemeDeleting
-                                && ClientData.ActivePlayer != null
-                                && (message.Sender == ClientData.ActivePlayer.Name ||
-                                ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
-                            {
-                                #region Delete
-
-                                if (int.TryParse(args[1], out int themeIndex) && themeIndex > -1 && themeIndex < ClientData.TInfo.RoundInfo.Count)
-                                {
-                                    if (ClientData.TInfo.RoundInfo[themeIndex].Name != QuestionHelper.InvalidThemeName)
-                                    {
-                                        ClientData.ThemeIndex = themeIndex;
-
-                                        if (ClientData.IsOralNow)
-                                        {
-                                            _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
-                                                ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
-                                        }
-
-                                        _logic.Stop(StopReason.Decision);
-                                    }
-                                }
-
-                                #endregion
-                            }
+                            OnDelete(message, args);
                             break;
 
                         case Messages.FinalStake:
@@ -931,6 +909,40 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             });
+
+        private void OnDelete(Message message, string[] args)
+        {
+            if (!ClientData.IsWaiting
+                || ClientData.Decision != DecisionType.FinalThemeDeleting
+                || ClientData.ActivePlayer == null
+                || message.Sender != ClientData.ActivePlayer.Name && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+            {
+                return;
+            }
+
+            if (!int.TryParse(args[1], out int themeIndex) || themeIndex <= -1 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+            {
+                return;
+            }
+
+            if (ClientData.TInfo.RoundInfo[themeIndex].Name == QuestionHelper.InvalidThemeName)
+            {
+                return;
+            }
+
+            ClientData.ThemeIndexToDelete = themeIndex;
+
+            if (ClientData.IsOralNow)
+            {
+                _gameActions.SendMessage(
+                    Messages.Cancel,
+                    message.Sender == ClientData.ShowMan.Name
+                        ? ClientData.ActivePlayer.Name
+                        : ClientData.ShowMan.Name);
+            }
+
+            _logic.Stop(StopReason.Decision);
+        }
 
         private void OnDisconnect(string[] args)
         {
@@ -1328,7 +1340,9 @@ namespace SICore
                 {
                     var startTime = ClientData.TimerStartTime[1];
 
-                    ClientData.TimeThinking = ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                    ClientData.TimeThinking += ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                    ClientData.IsThinkingPaused = true;
+                    ClientData.IsThinking = false;
                 }
 
                 if (ClientData.IsPlayingMedia)
@@ -1337,7 +1351,7 @@ namespace SICore
                     ClientData.IsPlayingMedia = false;
                 }
 
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < Constants.TimersCount; i++)
                 {
                     times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
@@ -1356,7 +1370,7 @@ namespace SICore
 
                 var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
 
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < Constants.TimersCount; i++)
                 {
                     times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
                     ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
@@ -1366,6 +1380,12 @@ namespace SICore
                 {
                     ClientData.IsPlayingMediaPaused = false;
                     ClientData.IsPlayingMedia = true;
+                }
+
+                if (ClientData.IsThinkingPaused)
+                {
+                    ClientData.IsThinkingPaused = false;
+                    ClientData.IsThinking = true;
                 }
 
                 if (_logic.StopReason == StopReason.Pause)
@@ -1396,13 +1416,6 @@ namespace SICore
             if (!ClientData.IsPlayingMedia)
             {
                 return;
-            }
-
-            _logic.AddHistory(nameof(OnAtom));
-
-            if (!ClientData.IsQuestionPlaying)
-            {
-                throw new Exception("Incorrect game state: " + _logic.PrintHistory());
             }
 
             ClientData.HaveViewedAtom--;
@@ -1567,6 +1580,8 @@ namespace SICore
                 return;
             }
 
+            var canPressChanged = false;
+
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
                 var player = ClientData.Players[i];
@@ -1574,11 +1589,12 @@ namespace SICore
                 {
                     player.CanPress = false;
                     _gameActions.SendMessageWithArgs(Messages.Pass, i);
+                    canPressChanged = true;
                     break;
                 }
             }
 
-            if (ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
+            if (canPressChanged && ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
             {
                 _logic.ScheduleExecution(Tasks.WaitTry, 3, force: true);
             }

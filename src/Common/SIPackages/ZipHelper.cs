@@ -12,15 +12,13 @@ namespace SIPackages
         public static void ExtractToDirectory(string sourceArchiveFileName, string destinationDirectoryName, bool unescape = false)
         {
             Directory.CreateDirectory(destinationDirectoryName);
-            using (var stream = File.OpenRead(sourceArchiveFileName))
+
+            using var stream = File.OpenRead(sourceArchiveFileName);
+            using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
+
+            foreach (var entry in archive.Entries)
             {
-                using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
-                {
-                    foreach (var entry in archive.Entries)
-                    {
-                        ExtractEntryToDirectory(entry, destinationDirectoryName, unescape);
-                    }
-                }
+                ExtractEntryToDirectory(entry, destinationDirectoryName, unescape);
             }
         }
 

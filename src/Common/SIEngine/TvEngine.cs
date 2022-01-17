@@ -30,7 +30,7 @@ namespace SIEngine
 
         public List<int> FinalMap => _finalMap; // for debugging only
 
-        public int LeftQuestionsCount => _questionsTable.Count; // for debugging only
+        public override int LeftQuestionsCount => _questionsTable.Count; // for debugging only
 
         public TvEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
             : base(document, settingsProvider)
@@ -55,10 +55,15 @@ namespace SIEngine
                 case GameStage.GameThemes:
                     #region GameThemes
                     OnSound();
+
                     var themes = new List<string>();
                     foreach (var round in _document.Package.Rounds.Where(round => round.Type != RoundTypes.Final))
-                        foreach (var theme in round.Themes)
+                    {
+                        foreach (var theme in round.Themes.Where(theme => theme.Questions.Any()))
+                        {
                             themes.Add(theme.Name);
+                        }
+                    }
 
                     themes.Sort();
                     OnGameThemes(themes.ToArray());
@@ -142,8 +147,7 @@ namespace SIEngine
                         var mode = PlayQuestionAtom();
                         if (mode != QuestionPlayMode.InProcess)
                         {
-                            OnAnswerShown();
-                            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+                            Stage = GameStage.QuestionPostInfo;
                         }
 
                         AutoNext(4000);
@@ -151,7 +155,7 @@ namespace SIEngine
                     }
                 #endregion
 
-                case GameStage.QuestionPostInfo: // why use this stage?
+                case GameStage.QuestionPostInfo:
                     OnQuestionPostInfo();
                     Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
                     AutoNext(3000);
@@ -247,7 +251,7 @@ namespace SIEngine
 
                 case GameStage.FinalThink:
                     OnSound("finalthink.wav");
-                    Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightFinalAnswer : GameStage.AfterFinalThink;
+                    Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightFinalAnswer : GameStage.QuestionPostInfo;
                     OnWaitTry(_activeQuestion, true);
                     AutoNext(38000);
                     break;
@@ -269,13 +273,9 @@ namespace SIEngine
                             AutoNext(3000);
                             break;
                         }
-                        else
-                        {
-                            OnAnswerShown();
-                        }
                     }
 
-                    Stage = GameStage.AfterFinalThink;
+                    Stage = GameStage.QuestionPostInfo;
                     AutoNext(4000);
                     break;
                     #endregion
@@ -320,7 +320,7 @@ namespace SIEngine
             return Tuple.Create(theme, question, _activeRound.Themes[theme].Questions[question].Price);
         }
 
-        public void SelectQuestion(int theme, int question)
+        public override void SelectQuestion(int theme, int question)
         {
             if (!CanSelectQuestion)
             {
@@ -335,7 +335,7 @@ namespace SIEngine
             OnQuestionSelected();
         }
 
-        public void SelectTheme(int publicThemeIndex)
+        public override void SelectTheme(int publicThemeIndex)
         {
             if (_stage == GameStage.FinalQuestion)
             {
@@ -404,7 +404,7 @@ namespace SIEngine
             UpdateCanNext();
         }
 
-        public int OnReady(out bool more)
+        public override int OnReady(out bool more)
         {
             var result = -1;
             more = false;

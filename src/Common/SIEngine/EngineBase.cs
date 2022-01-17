@@ -10,10 +10,8 @@ using System.Threading.Tasks;
 
 namespace SIEngine
 {
-    /// <summary>
-    /// Implements SIGame rules.
-    /// </summary>
-    public abstract class EngineBase : IDisposable, INotifyPropertyChanged
+    /// <inheritdoc cref="ISIEngine" />
+    public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChanged
     {
         private bool _isDisposed = false;
 
@@ -172,7 +170,6 @@ namespace SIEngine
         public event Action<Question, bool> WaitTry;
         public event Action<string> SimpleAnswer;
         public event Action RightAnswer;
-        public event Action AnswerShown;
         public event Action QuestionPostInfo;
 
         public event Action ShowScore;
@@ -245,8 +242,6 @@ namespace SIEngine
 
         protected void OnRightAnswer() => RightAnswer?.Invoke();
 
-        protected void OnAnswerShown() => AnswerShown?.Invoke();
-
         protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 
         protected void OnShowScore() => ShowScore?.Invoke();
@@ -279,6 +274,8 @@ namespace SIEngine
         #endregion
 
         public object SyncRoot { get; } = new object();
+
+        public abstract int LeftQuestionsCount { get; }
 
         /// <summary>
         /// Автоматический шаг дальше
@@ -413,16 +410,28 @@ namespace SIEngine
 
         public void SkipQuestion() => Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
 
+        /// <summary>
+        /// Skips rest of the question and goes directly to the answer.
+        /// </summary>
         public void MoveToAnswer()
         {
-            if (Stage == GameStage.Question)
+            if (Stage == GameStage.Question && _atomIndex < _activeQuestion.Scenario.Count)
             {
-                // Нужно прокрутиться до ответа
-                QuestionPlayMode playMode;
                 do
                 {
-                    playMode = PlayQuestionAtom();
-                } while (playMode != QuestionPlayMode.AlreadyFinished);
+                    if (ActiveAtom.Type == AtomTypes.Marker)
+                    {
+                        _atomIndex++;
+                        if (_atomIndex < _activeQuestion.Scenario.Count)
+                        {
+                            _useAnswerMarker = true;
+                        }
+
+                        break;
+                    }
+
+                    _atomIndex++;
+                } while (_atomIndex < _activeQuestion.Scenario.Count);
             }
 
             SetAnswerStage();
@@ -430,7 +439,7 @@ namespace SIEngine
 
         private void SetAnswerStage()
         {
-            Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.EndQuestion;
+            Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.QuestionPostInfo;
         }
 
         protected void OnQuestion()
@@ -461,9 +470,11 @@ namespace SIEngine
         /// <summary>
         /// Отобразить вопрос (его часть)
         /// </summary>
-        /// <returns>JustFinished, если вопрос был показан полностью
-        /// InProcess, если вопрос был показан не полностью,
-        /// AlreadyFinished, если вопрос уже был показан ранее</returns>
+        /// <returns>
+        /// <see cref="QuestionPlayMode.JustFinished" />, если вопрос был показан полностью
+        /// <see cref="QuestionPlayMode.InProcess" />, если вопрос был показан не полностью,
+        /// <see cref="QuestionPlayMode.AlreadyFinished" />, если вопрос уже был показан ранее
+        /// </returns>
         protected QuestionPlayMode PlayQuestionAtom()
         {
             if (_atomIndex == _activeQuestion.Scenario.Count)
@@ -593,16 +604,9 @@ namespace SIEngine
                     AutoNext(3000);
                     return;
                 }
-                else if (mode == QuestionPlayMode.JustFinished) // Remove this block?
-                {
-                    OnAnswerShown();
-                    Stage = GameStage.QuestionPostInfo;
-                    AutoNext(3000);
-                    return;
-                }
             }
 
-            Stage = GameStage.EndQuestion;
+            Stage = GameStage.QuestionPostInfo;
             AutoNext(3000);
         }
 
@@ -733,5 +737,11 @@ namespace SIEngine
 
             _isDisposed = true;
         }
+
+        public abstract void SelectQuestion(int theme, int question);
+
+        public abstract int OnReady(out bool more);
+
+        public abstract void SelectTheme(int publicThemeIndex);
     }
 }

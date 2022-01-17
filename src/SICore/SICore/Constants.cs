@@ -45,5 +45,10 @@
         /// Место для подстановки ответа
         /// </summary>
         public const string AnswerPlaceholder = "#";
+
+        /// <summary>
+        /// Number of ingame timers.
+        /// </summary>
+        public const int TimersCount = 3;
     }
 }

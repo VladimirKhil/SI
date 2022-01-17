@@ -99,15 +99,31 @@ namespace SIPackages
 
         private SIDocument()
         {
-
+            
         }
 
-        public static SIDocument Create(string name, string author, Stream stream = null)
+        public static SIDocument Create(string name, string author)
+        {
+            var document = new SIDocument();
+
+            var ms = new MemoryStream();
+            document.CreateInternal(ms, name, author, false);
+
+            Init(document);
+
+            return document;
+        }
+
+        public static SIDocument Create(
+            string name,
+            string author,
+            Stream stream,
+            bool leaveStreamOpen = false)
         {
             var document = new SIDocument();
 
             var ms = stream ?? new MemoryStream();
-            document.CreateInternal(ms, name, author);
+            document.CreateInternal(ms, name, author, leaveStreamOpen);
 
             Init(document);
 
@@ -125,15 +141,26 @@ namespace SIPackages
             return document;
         }
 
+        public static SIDocument Create(string name, string author, ISIPackage source)
+        {
+            var document = new SIDocument();
+
+            document.CreateInternal(source, name, author);
+
+            Init(document);
+
+            return document;
+        }
+
         private static void Init(SIDocument document)
         {
             document._package.ID = Guid.NewGuid().ToString();
             document._package.Date = DateTime.UtcNow.ToString("dd.MM.yyyy");
         }
 
-        private void CreateInternal(Stream stream, string name, string author)
+        private void CreateInternal(Stream stream, string name, string author, bool leaveStreamOpen)
         {
-            _source = SIPackageFactory.Instance.CreatePackage(stream);
+            _source = SIPackageFactory.Instance.CreatePackage(stream, leaveStreamOpen);
 
             CreateCore(name, author);
         }
@@ -141,6 +168,13 @@ namespace SIPackages
         private void CreateInternal(string folder, string name, string author)
         {
             _source = SIPackageFactory.Instance.CreatePackage(folder);
+
+            CreateCore(name, author);
+        }
+
+        private void CreateInternal(ISIPackage source, string name, string author)
+        {
+            _source = source;
 
             CreateCore(name, author);
         }
@@ -184,7 +218,7 @@ namespace SIPackages
             var document = new SIDocument();
 
             var ms = new MemoryStream();
-            document.CreateInternal(ms, "", "");
+            document.CreateInternal(ms, "", "", false);
 
             using (var reader = XmlReader.Create(stream))
             {
@@ -320,7 +354,9 @@ namespace SIPackages
             SaveCore(newSource);
 
             if (switchTo)
+            {
                 return this;
+            }
 
             var doc = new SIDocument { _source = newSource };
             doc.InitializeStorages();
