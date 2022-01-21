@@ -1419,8 +1419,9 @@ namespace SICore
             }
 
             ClientData.HaveViewedAtom--;
-            if (ClientData.HaveViewedAtom == 0)
+            if (ClientData.HaveViewedAtom <= 0)
             {
+                ClientData.IsPlayingMedia = false;
                 _logic.ExecuteImmediate();
             }
             else

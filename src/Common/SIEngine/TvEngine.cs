@@ -145,9 +145,11 @@ namespace SIEngine
                     #region RightAnswerProceed
                     {
                         var mode = PlayQuestionAtom();
-                        if (mode != QuestionPlayMode.InProcess)
+                        if (mode == QuestionPlayMode.AlreadyFinished)
                         {
+                            OnQuestionFinished();
                             Stage = GameStage.QuestionPostInfo;
+                            MoveNext();
                         }
 
                         AutoNext(4000);
@@ -238,10 +240,14 @@ namespace SIEngine
                     #region FinalQuestion
                     {
                         var playMode = PlayQuestionAtom();
-                        if (playMode != QuestionPlayMode.InProcess)
+                        if (playMode == QuestionPlayMode.AlreadyFinished)
                         {
-                            OnQuestionProcessed(_activeQuestion, true, false);
                             Stage = GameStage.FinalThink;
+                            MoveNext();
+                        }
+                        else
+                        {
+                            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, false);                            
                             AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
                         }
 
@@ -266,13 +272,10 @@ namespace SIEngine
                     else
                     {
                         _atomIndex++;
-                        var mode = PlayQuestionAtom();
-                        if (mode == QuestionPlayMode.InProcess)
-                        {
-                            Stage = GameStage.RightAnswerProceed;
-                            AutoNext(3000);
-                            break;
-                        }
+                        PlayQuestionAtom();
+                        Stage = GameStage.RightAnswerProceed;
+                        AutoNext(3000);
+                        break;
                     }
 
                     Stage = GameStage.QuestionPostInfo;

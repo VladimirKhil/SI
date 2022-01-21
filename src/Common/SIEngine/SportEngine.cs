@@ -99,9 +99,11 @@ namespace SIEngine
                     #region RightAnswerProceed
                     {
                         var mode = PlayQuestionAtom();
-                        if (mode != QuestionPlayMode.InProcess)
+                        if (mode == QuestionPlayMode.AlreadyFinished)
                         {
+                            OnQuestionFinished();
                             Stage = GameStage.QuestionPostInfo;
+                            MoveNext();
                         }
 
                         AutoNext(4000);

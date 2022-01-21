@@ -59,10 +59,10 @@ namespace SICore.Network.Clients
                 {
                     while (_inMessages.Reader.TryRead(out var message))
                     {
-                        if (MessageReceived != null)
+                        var task = MessageReceived?.Invoke(message);
+                        if (task.HasValue)
                         {
-                            Debug.WriteLine($"{Name}: Client MessageReceived: {message.Text}");
-                            await MessageReceived.Invoke(message);
+                            await task.Value;
                         }
                     }
                 }

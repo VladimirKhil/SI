@@ -1,11 +1,14 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SICore
 {
     public sealed class StoredComputerAccount: ComputerAccount
     {
-        private const string UnsetName = "<Unset name>";
+        private const string UnsetName = "#";
+        private const string DefaultCulture = "en";
 
         [JsonProperty]
         public new bool IsMale { get; set; }
@@ -20,7 +23,17 @@ namespace SICore
                 return name;
             }
 
-            return UnsetName;
+            if (Names.TryGetValue(DefaultCulture, out name))
+            {
+                return name;
+            }
+
+            if (Names.Any())
+            {
+                return Names.First().Value;
+            }
+
+            return UnsetName + new Random().Next(short.MaxValue);
         }
     }
 }

@@ -167,6 +167,7 @@ namespace SIEngine
         public event Action<IMedia> QuestionVideo;
         public event Action<Atom> QuestionOther;
         public event Action<Question, bool, bool> QuestionProcessed;
+        public event Action QuestionFinished;
         public event Action<Question, bool> WaitTry;
         public event Action<string> SimpleAnswer;
         public event Action RightAnswer;
@@ -235,6 +236,8 @@ namespace SIEngine
         protected void OnQuestionOther(Atom atom) => QuestionOther?.Invoke(atom);
 
         protected void OnQuestionProcessed(Question question, bool finished, bool pressMode) => QuestionProcessed?.Invoke(question, finished, pressMode);
+
+        protected void OnQuestionFinished() => QuestionFinished?.Invoke();
 
         protected void OnWaitTry(Question question, bool final = false) => WaitTry?.Invoke(question, final);
 
@@ -448,6 +451,7 @@ namespace SIEngine
             var pressMode = _settingsProvider.IsPressMode(_isMedia);
             if (playMode == QuestionPlayMode.AlreadyFinished)
             {
+                OnQuestionFinished();
                 SetAnswerStage();
 
                 if (pressMode)
@@ -597,13 +601,10 @@ namespace SIEngine
             }
             else // Ответ находится в тексте вопроса
             {
-                var mode = PlayQuestionAtom();
-                if (mode == QuestionPlayMode.InProcess)
-                {
-                    Stage = GameStage.RightAnswerProceed;
-                    AutoNext(3000);
-                    return;
-                }
+                PlayQuestionAtom();
+                Stage = GameStage.RightAnswerProceed;
+                AutoNext(3000);
+                return;
             }
 
             Stage = GameStage.QuestionPostInfo;

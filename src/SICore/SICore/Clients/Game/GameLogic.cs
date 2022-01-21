@@ -28,7 +28,7 @@ namespace SICore
         private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
         private const int MaxAnswerLength = 250;
-        private const int DefaultAudioVideoTime = 300;
+        private const int DefaultAudioVideoTime = 1200; // maximum audio/video duration (120 s)
         private const int DefaultImageTime = 50;
         private readonly GameActions _gameActions;
         private readonly ILocalizer LO;
@@ -73,7 +73,7 @@ namespace SICore
             Engine.QuestionVideo += Engine_QuestionVideo;
             Engine.QuestionOther += Engine_QuestionOther;
             Engine.QuestionAtom += Engine_QuestionAtom;
-            Engine.QuestionProcessed += Engine_QuestionProcessed;
+            Engine.QuestionFinished += Engine_QuestionFinished;
             Engine.WaitTry += Engine_WaitTry;
 
             Engine.SimpleAnswer += Engine_SimpleAnswer;
@@ -105,14 +105,11 @@ namespace SICore
             }
         }
 
-        private void Engine_QuestionProcessed(Question question, bool finished, bool pressMode)
+        private void Engine_QuestionFinished()
         {
-            if (finished)
-            {
-                _data.IsQuestionFinished = true;
-                _data.IsPlayingMedia = false;
-                _data.IsPlayingMediaPaused = false;
-            }
+            _data.IsQuestionFinished = true;
+            _data.IsPlayingMedia = false;
+            _data.IsPlayingMediaPaused = false;
         }
 
         private void Engine_QuestionPostInfo()
@@ -502,10 +499,6 @@ namespace SICore
 
         private void Engine_WaitTry(Question question, bool final)
         {
-            _data.IsQuestionFinished = true;
-            _data.IsPlayingMedia = false;
-            _data.IsPlayingMediaPaused = false;
-
             if (!final)
             {
                 if (!_data.IsQuestionPlaying)

@@ -39,8 +39,8 @@ namespace SICore.Special
         {
             var cultureCode = CultureHelper.GetCultureCode(localizer.Culture.Name);
 
-            return StoredPersons.Players
-                .Select(player => new ComputerAccount(player)
+            return StoredPersons.Players.Select(
+                player => new ComputerAccount(player)
                 {
                     Name = player.GetLocalizedName(cultureCode),
                     IsMale = player.IsMale,
@@ -54,7 +54,7 @@ namespace SICore.Special
         {
             var cultureCode = CultureHelper.GetCultureCode(localizer.Culture.Name);
 
-            var r = StoredPersons.Showmans.Select(
+            return StoredPersons.Showmans.Select(
                 showman => new ComputerAccount(showman)
                 {
                     Name = showman.GetLocalizedName(cultureCode),
@@ -63,8 +63,6 @@ namespace SICore.Special
                 })
                 .OrderBy(showman => showman.Name)
                 .ToArray();
-
-            return r;
         }
     }
 }

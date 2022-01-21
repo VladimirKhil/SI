@@ -99,7 +99,8 @@ namespace SICore
 
         public StringBuilder EventLog { get; } = new StringBuilder();
 
-        protected static string PrintAccount(ViewerAccount viewerAccount) => $"{viewerAccount?.Name}:{viewerAccount?.IsConnected}";
+        protected static string PrintAccount(ViewerAccount viewerAccount) =>
+            $"{viewerAccount?.Name}@{viewerAccount?.IsHuman}:{viewerAccount?.IsConnected}";
 
         public virtual void OnAddString(string person, string text, LogMode mode)
         {
