@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -75,6 +76,15 @@ namespace SIGame
 
                     Shutdown();
                     return;
+                }
+
+                if (Environment.OSVersion.Version < new Version(10, 0))
+                {
+                    ServicePointManager.Expect100Continue = true;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                        | SecurityProtocolType.Tls11
+                        | SecurityProtocolType.Tls12
+                        | SecurityProtocolType.Ssl3;
                 }
 
                 Trace.TraceInformation("Game launched");

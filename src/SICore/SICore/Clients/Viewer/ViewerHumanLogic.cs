@@ -571,7 +571,7 @@ namespace SICore
 
         virtual public void SetAtom(string[] mparams)
         {
-            if (TInfo.TStage != TableStage.Answer)
+            if (TInfo.TStage != TableStage.Answer && !_data.Speaker.IsShowman)
             {
                 _data.Speaker.Replic = "";
             }

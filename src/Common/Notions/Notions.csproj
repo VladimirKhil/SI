@@ -10,7 +10,7 @@
     <Product>Notions</Product>
     <Description>String processing functions</Description>
     <Company>Khil-soft</Company>
-    <Version>2.9.7</Version>
+    <Version>2.9.8</Version>
     <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
     <LangVersion>9</LangVersion>
 	<Nullable>enable</Nullable>

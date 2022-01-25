@@ -1892,7 +1892,16 @@ namespace SICore
                 switch (role)
                 {
                     case Constants.Showman:
-                        ClientData.ShowMan = new PersonAccount(account) { IsHuman = true, IsConnected = true, Ready = false, GameStarted = ClientData.Stage != GameStage.Before, IsShowman = true, IsExtendedMode = IsHost };
+                        ClientData.ShowMan = new PersonAccount(account)
+                        {
+                            IsHuman = true,
+                            IsConnected = true,
+                            Ready = false,
+                            GameStarted = ClientData.Stage != GameStage.Before,
+                            IsShowman = true,
+                            IsExtendedMode = IsHost
+                        };
+
                         CreateShowmanCommands();
                         break;
 
@@ -1900,7 +1909,16 @@ namespace SICore
                         var playersWereUpdated = false;
                         while (index >= ClientData.Players.Count)
                         {
-                            var p = new PlayerAccount(Constants.FreePlace, true, false, ClientData.Stage != GameStage.Before) { IsHuman = true, Ready = false, IsExtendedMode = IsHost };
+                            var p = new PlayerAccount(
+                                Constants.FreePlace,
+                                true,
+                                false,
+                                ClientData.Stage != GameStage.Before)
+                            {
+                                IsHuman = true,
+                                Ready = false,
+                                IsExtendedMode = IsHost
+                            };
 
                             CreatePlayerCommands(p);
                             ClientData.Players.Add(p);

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Company>Khil-soft</Company>
     <Description>Game table model</Description>
-    <Version>7.5.7</Version>
+    <Version>7.5.8</Version>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
