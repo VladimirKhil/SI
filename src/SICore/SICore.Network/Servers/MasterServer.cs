@@ -3,6 +3,7 @@ using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -32,7 +33,7 @@ namespace SICore.Network.Servers
 
         }
 
-        public override async ValueTask<bool> AddConnectionAsync(IConnection connection)
+        public override async ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default)
         {
             if (_isDisposed)
             {
@@ -53,12 +54,14 @@ namespace SICore.Network.Servers
                 return false;
             }
 
-            await base.AddConnectionAsync(connection);
+            await base.AddConnectionAsync(connection, cancellationToken);
 
-            await ConnectionsLock.WithLockAsync(() =>
-            {
-                _connections.Add(connection);
-            });
+            await ConnectionsLock.WithLockAsync(
+                () =>
+                {
+                    _connections.Add(connection);
+                },
+                cancellationToken);
 
             return true;
         }
@@ -81,17 +84,22 @@ namespace SICore.Network.Servers
             }
         }
 
-        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
+        public override async ValueTask RemoveConnectionAsync(
+            IConnection connection,
+            bool withError,
+            CancellationToken cancellationToken = default)
         {
-            await ConnectionsLock.WithLockAsync(() =>
-            {
-                if (_connections.Contains(connection))
+            await ConnectionsLock.WithLockAsync(
+                () =>
                 {
-                    _connections.Remove(connection);
-                }
-            });
+                    if (_connections.Contains(connection))
+                    {
+                        _connections.Remove(connection);
+                    }
+                },
+                cancellationToken);
 
-            await base.RemoveConnectionAsync(connection, withError);
+            await base.RemoveConnectionAsync(connection, withError, cancellationToken);
         }
 
         public async ValueTask KickAsync(string name, bool ban = false)

@@ -47,7 +47,7 @@ namespace SIPackages
         /// <summary>
         /// Содержит ли категория файл
         /// </summary>
-        /// <param name="entryName">Имя файла</param>
+        /// <param name="fileName">Имя файла</param>
         /// <returns>Содержит ли категория данный файл</returns>
         internal bool Contains(string fileName)
         {

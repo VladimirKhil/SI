@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
@@ -51,7 +52,7 @@ namespace SICore.Network.Servers
 
         public abstract IEnumerable<IConnection> Connections { get; }
 
-        public virtual ValueTask<bool> AddConnectionAsync(IConnection connection)
+        public virtual ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default)
         {
             connection.MessageReceived += Connection_MessageReceived;
             connection.ConnectionClose += Connection_ConnectionClosed;
@@ -61,7 +62,7 @@ namespace SICore.Network.Servers
             return new ValueTask<bool>(true);
         }
 
-        public virtual async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
+        public virtual async ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
         {
             ClearListeners(connection);
             await connection.DisposeAsync();
@@ -180,7 +181,7 @@ namespace SICore.Network.Servers
                     m = new Message(messageText, sender, receiver, m.IsSystem, m.IsPrivate);
                 }
 
-                Debug.WriteLine($"Incoming message received: {m.IsSystem}|{m.IsPrivate}|{m.Sender}|{m.Receiver}|{m.Text}");
+                Debug.WriteLine($"Incoming message received: {m.IsSystem}|{m.IsPrivate}|{m.Sender}|{m.Receiver}|{m.Text.Replace(Message.ArgsSeparatorChar, ' ')}");
 
                 await ProcessIncomingMessageAsync(m);
             }

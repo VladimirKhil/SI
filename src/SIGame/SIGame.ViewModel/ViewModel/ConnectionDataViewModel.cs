@@ -214,13 +214,13 @@ namespace SIGame.ViewModel
 
         private async void Join_Executed(object arg) => await JoinGameAsync(null, (GameRole)arg);
 
-        protected virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool host = false)
+        protected virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
         {
             IsProgress = true;
 
             try
             {
-                await JoinGameCoreAsync(gameInfo, role, host);
+                await JoinGameCoreAsync(gameInfo, role, host, cancellationToken);
             }
             catch (Exception exc)
             {
@@ -241,7 +241,11 @@ namespace SIGame.ViewModel
             }
         }
 
-        public virtual async Task JoinGameCoreAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
+        public virtual async Task JoinGameCoreAsync(
+            GameInfo gameInfo,
+            GameRole role,
+            bool isHost = false,
+            CancellationToken cancellationToken = default)
         {
             var name = Human.Name;
 
@@ -249,36 +253,38 @@ namespace SIGame.ViewModel
             var command = $"{Messages.Connect}\n{role.ToString().ToLowerInvariant()}\n{name}\n{sex}\n{-1}{GetExtraCredentials()}";
 
             _ = await _connector.JoinGameAsync(command);
-            await JoinGameCompletedAsync(role, isHost);
+            await JoinGameCompletedAsync(role, isHost, cancellationToken);
         }
 
         protected virtual string GetExtraCredentials() => "";
 
         protected string _avatar;
 
-        protected async Task JoinGameCompletedAsync(GameRole role, bool isHost)
+        protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
         {
-            await _server.ConnectionsLock.WithLockAsync(async () =>
-            {
-                var externalServer = _server.HostServer;
-                if (externalServer != null)
+            await _server.ConnectionsLock.WithLockAsync(
+                async () =>
                 {
-                    lock (externalServer.ClientsSync)
+                    var externalServer = _server.HostServer;
+                    if (externalServer != null)
                     {
-                        externalServer.Clients.Add(NetworkConstants.GameName);
+                        lock (externalServer.ClientsSync)
+                        {
+                            externalServer.Clients.Add(NetworkConstants.GameName);
+                        }
                     }
-                }
-                else
-                {
-                    Error = Resources.RejoinError;
-                    if (_host != null)
+                    else
                     {
-                        await _host.DisposeAsync();
-                    }
+                        Error = Resources.RejoinError;
+                        if (_host != null)
+                        {
+                            await _host.DisposeAsync();
+                        }
 
-                    return;
-                }
-            });
+                        return;
+                    }
+                },
+                cancellationToken);
 
             var humanPlayer = Human;
             var name = humanPlayer.Name;

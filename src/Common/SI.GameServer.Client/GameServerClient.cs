@@ -61,11 +61,20 @@ namespace SI.GameServer.Client
             _uIThreadExecutor = uIThreadExecutor;
         }
 
-        public Task<GameCreationResult> CreateGameAsync(GameSettingsCore<AppSettingsCore> gameSettings, PackageKey packageKey, ComputerAccountInfo[] computerAccounts, FileKey background)
+        public Task<GameCreationResult> CreateGameAsync(
+            GameSettingsCore<AppSettingsCore> gameSettings,
+            PackageKey packageKey,
+            ComputerAccountInfo[] computerAccounts,
+            CancellationToken cancellationToken = default)
         {
             gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
 
-            return _connection.InvokeAsync<GameCreationResult>("CreateGame", gameSettings, packageKey, computerAccounts.Select(ca => ca.Account).ToArray());
+            return _connection.InvokeAsync<GameCreationResult>(
+                "CreateGame",
+                gameSettings,
+                packageKey,
+                computerAccounts.Select(ca => ca.Account).ToArray(),
+                cancellationToken);
         }
 
         public Task<GameCreationResult> CreateAndJoinGameAsync(
@@ -238,7 +247,7 @@ namespace SI.GameServer.Client
                 BaseAddress = new Uri(ServiceUri),
                 Timeout = TimeSpan.FromMinutes(PackageUploadTimelimitInMinutes)
             };
-
+            
             var token = await AuthenticateUserAsync(userName, "", cancellationToken);
 
             _login = userName;
@@ -319,11 +328,21 @@ namespace SI.GameServer.Client
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    string errorMessage;
+                    var serverError = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge)
+                    if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
+                        response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
                     {
                         errorMessage = Resources.FileTooLarge;
+                    }
+                    else if (response.StatusCode == HttpStatusCode.BadGateway)
+                    {
+                        errorMessage = $"{response.StatusCode}: Bad Gateway";
+                    }
+                    else
+                    {
+                        errorMessage = $"{response.StatusCode}: {serverError}";
                     }
 
                     throw new Exception(errorMessage);

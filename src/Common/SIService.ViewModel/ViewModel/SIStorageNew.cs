@@ -83,12 +83,14 @@ namespace Services.SI.ViewModel
             }
         }
 
-        public async Task<Uri> LoadSelectedPackageUriAsync()
+        public Task<Uri> LoadSelectedPackageUriAsync()
         {
             if (_siService == null || CurrentPackage == null)
-                return null;
+            {
+                return Task.FromResult<Uri>(null);
+            }
 
-            return await _siService.GetPackageByIDAsync(CurrentPackage.ID);
+            return _siService.GetPackageByIDAsync(CurrentPackage.ID);
         }
 
         private NamedObject[] _publishers;

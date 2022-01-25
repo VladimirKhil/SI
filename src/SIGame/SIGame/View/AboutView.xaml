@@ -4,7 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="650" FontSize="22" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+             xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance vm:AboutViewModel}"
+             Width="650"
+             FontSize="22"
+             FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <UserControl.Resources>
         <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -31,7 +36,7 @@
         <Border Margin="20,20,40,0" BorderBrush="#FF111111" BorderThickness="0" VerticalAlignment="Top" Grid.RowSpan="8">
             <Image Stretch="Fill" Source="/SIGame;component/Resources/game.jpg" />
         </Border>
-        <TextBlock Grid.Column="1" Grid.Row="1" Text="2002 — 2021 гг." />
+        <TextBlock Grid.Column="1" Grid.Row="1" Text="2002 — 2022" />
         <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding AppVersion}" />
         <TextBlock Grid.Column="1" Grid.Row="3" Text="{x:Static lp:Resources.About_Author}" />
         <TextBlock Grid.Column="1" Grid.Row="4" Text="{x:Static lp:Resources.About_Design}" />

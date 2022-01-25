@@ -53,13 +53,9 @@ namespace SIGame.ViewModel.PackageSources
 
         public override string GetPackageId()
         {
-            using (var stream = File.OpenRead(_file))
-            {
-                using (var doc = SIDocument.Load(stream))
-                {
-                    return doc.Package.ID;
-                }
-            }
+            using var stream = File.OpenRead(_file);
+            using var doc = SIDocument.Load(stream);
+            return doc.Package.ID;
         }
     }
 }

@@ -12,7 +12,15 @@ namespace SIGame.ViewModel
 
         internal event Action<PackageSource> AddPackage;
 
-        public bool IsProgress => Model.IsLoading;
+        public bool IsProgress => Model.IsLoading || Model.IsLoadingPackages || IsLoading;
+
+        private bool _isLoading;
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsProgress)); } }
+        }
 
         public SIStorageViewModel(UserSettings userSettings)
             : base(new SIStorageNew())
@@ -45,6 +53,10 @@ namespace SIGame.ViewModel
                     case nameof(SIStorageNew.IsLoading):
                         OnPropertyChanged(nameof(IsProgress));
                         break;
+
+                    case nameof(SIStorageNew.IsLoadingPackages):
+                        OnPropertyChanged(nameof(IsProgress));
+                        break;
                 }
             };
 
@@ -60,15 +72,20 @@ namespace SIGame.ViewModel
         {
             try
             {
+                IsLoading = true;
+
                 var packageInfo = Model.CurrentPackage;
                 var uri = await Model.LoadSelectedPackageUriAsync();
 
                 var packageSource = new SIStoragePackageSource(uri, packageInfo.ID, packageInfo.Description, packageInfo.Guid);
 
                 AddPackage?.Invoke(packageSource);
+                
+                IsLoading = false;
             }
             catch (Exception exc)
             {
+                IsLoading = false;
                 PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.SIStorageCallError + ": " + exc.Message, PlatformSpecific.MessageType.Warning);
             }
             finally
@@ -89,7 +106,9 @@ namespace SIGame.ViewModel
         internal void Init()
         {
             if (_isInitialized)
+            {
                 return;
+            }
 
             Model.Open();
             _isInitialized = true;

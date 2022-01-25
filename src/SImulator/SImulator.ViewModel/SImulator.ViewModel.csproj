@@ -13,7 +13,7 @@
     <Company>Khil-soft</Company>
     <Version>2.8.0</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;LEGACY</DefineConstants>

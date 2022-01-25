@@ -532,7 +532,7 @@ namespace SIQuester.Implementation
                                     text.AppendLine(qLine.ToString().EndWithPoint());
                                 }
 
-                                bool qHasSource(Question quest) => quest.Info.Sources.Count > 0 && quest.Info.Sources[0].Length > 3;
+                                static bool qHasSource(Question quest) => quest.Info.Sources.Count > 0 && quest.Info.Sources[0].Length > 3;
                                 if (theme.Questions.Any(qHasSource))
                                 {
                                     text.AppendLine();
@@ -793,19 +793,14 @@ namespace SIQuester.Implementation
                 document.Blocks.Add(table);
             }
 
-            using (var package = System.IO.Packaging.Package.Open(filename, FileMode.Create))
-            {
-                using (var xpsDocument = new XpsDocument(package))
-                {
-                    using (var manager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false))
-                    {
-                        var paginator = ((IDocumentPaginatorSource)document).DocumentPaginator;
-                        paginator.PageSize = new Size(1056.0, 816.0); // A4
-                        manager.SaveAsXaml(paginator);
-                        manager.Commit();
-                    }
-                }
-            }
+            using var package = System.IO.Packaging.Package.Open(filename, FileMode.Create);
+            using var xpsDocument = new XpsDocument(package);
+            using var manager = new XpsSerializationManager(new XpsPackagingPolicy(xpsDocument), false);
+
+            var paginator = ((IDocumentPaginatorSource)document).DocumentPaginator;
+            paginator.PageSize = new Size(1056.0, 816.0); // A4
+            manager.SaveAsXaml(paginator);
+            manager.Commit();
         }
 
         public override IXpsDocumentWrapper GetHelp()

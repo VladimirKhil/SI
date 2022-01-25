@@ -788,8 +788,8 @@ namespace SIGame.ViewModel
                     throw new Exception(GetMessage(gameCreatingResult2.Code));
                 }
 
-                await InitServerAndClientNewAsync();
-                await JoinGameCompletedAsync(settings.Role, true);
+                await InitServerAndClientNewAsync(cancellationTokenSource.Token);
+                await JoinGameCompletedAsync(settings.Role, true, cancellationTokenSource.Token);
 
                 if (_host == null)
                 {
@@ -801,7 +801,11 @@ namespace SIGame.ViewModel
                 return Tuple.Create(_server, _host);
             }
 
-            var gameCreatingResult = await _gameServerClient.CreateGameAsync((GameSettingsCore<AppSettingsCore>)settings, packageKey, computerAccounts.ToArray(), null);
+            var gameCreatingResult = await _gameServerClient.CreateGameAsync(
+                (GameSettingsCore<AppSettingsCore>)settings,
+                packageKey,
+                computerAccounts.ToArray(),
+                cancellationTokenSource.Token);
 
             if (gameCreatingResult.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
             {
@@ -810,7 +814,7 @@ namespace SIGame.ViewModel
 
             GameSettings.Message = Resources.GameEntering;
 
-            await ConnectToServerAsHostAsync(gameCreatingResult.GameId, settings);
+            await ConnectToServerAsHostAsync(gameCreatingResult.GameId, settings, cancellationTokenSource.Token);
 
             if (_host == null)
             {
@@ -820,13 +824,13 @@ namespace SIGame.ViewModel
             return Tuple.Create(_server, _host);
         }
 
-        private async Task InitServerAndClientNewAsync()
+        private async Task InitServerAndClientNewAsync(CancellationToken cancellationToken = default)
         {
             _server = new GameServerSlave(
                 ServerConfiguration.Default,
                 new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
-            await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient) { IsAuthenticated = true });
+            await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient) { IsAuthenticated = true }, cancellationToken);
 
             _client = new Client(Human.Name);
             _client.ConnectTo(_server);
@@ -907,7 +911,7 @@ namespace SIGame.ViewModel
                 avatarPath = await _gameServerClient.UploadImageAsync(avatarKey, stream, cancellationToken);
             }
 
-            if (!Uri.IsWellFormedUriString(avatarPath, UriKind.Absolute))
+            if (avatarPath != null && !Uri.IsWellFormedUriString(avatarPath, UriKind.Absolute))
             {
                 // Prepend avatarPath with service content root uri
                 var rootAddress = _gamesHostInfo.ContentPublicBaseUrls.FirstOrDefault() ?? _gameServerClient.ServiceUri;
@@ -917,10 +921,13 @@ namespace SIGame.ViewModel
             return (avatarPath, avatarKey);
         }
 
-        protected override string GetExtraCredentials() =>
-            !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
+        protected override string GetExtraCredentials() => !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
 
-        public override async Task JoinGameCoreAsync(GameInfo gameInfo, GameRole role, bool isHost = false)
+        public override async Task JoinGameCoreAsync(
+            GameInfo gameInfo,
+            GameRole role,
+            bool isHost = false,
+            CancellationToken cancellationToken = default)
         {
             gameInfo ??= _currentGame;
 
@@ -942,15 +949,15 @@ namespace SIGame.ViewModel
                 Trace.TraceInformation($"Joining game: UseSignalRConnection = {_userSettings.UseSignalRConnection}");
                 if (_userSettings.UseSignalRConnection)
                 {
-                    var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password);
+                    var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password, cancellationToken);
                     if (result.ErrorMessage != null)
                     {
                         Error = result.ErrorMessage;
                         return;
                     }
 
-                    await InitServerAndClientNewAsync();
-                    await JoinGameCompletedAsync(role, isHost);
+                    await InitServerAndClientNewAsync(cancellationToken);
+                    await JoinGameCompletedAsync(role, isHost, cancellationToken);
                 }
                 else
                 {
@@ -963,7 +970,7 @@ namespace SIGame.ViewModel
                         return;
                     }
 
-                    await base.JoinGameCoreAsync(gameInfo, role, isHost);
+                    await base.JoinGameCoreAsync(gameInfo, role, isHost, cancellationToken);
                 }
 
                 _host.Connector.SetGameID(gameInfo.GameID);
@@ -980,14 +987,14 @@ namespace SIGame.ViewModel
             }
         }
 
-        internal async Task ConnectToServerAsHostAsync(int gameID, GameSettings gameSettings)
+        internal async Task ConnectToServerAsHostAsync(int gameID, GameSettings gameSettings, CancellationToken cancellationToken = default)
         {
             var name = Human.Name;
 
             _password = gameSettings.NetworkGamePassword;
             var game = new GameInfo { GameID = gameID, Owner = name };
 
-            await JoinGameAsync(game, gameSettings.Role, true);
+            await JoinGameAsync(game, gameSettings.Role, true, cancellationToken);
         }
 
         public void Say(string message, bool system = false)

@@ -356,7 +356,6 @@ namespace SICore
                         break;
 
                     case Messages.Validation:
-                    case "VALIDATIION": // Obsolete
                         OnValidation(mparams);
                         break;
 

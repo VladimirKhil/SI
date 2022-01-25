@@ -11,8 +11,8 @@ namespace Services.SI
 {
     public sealed class SIStorageServiceClient: ISIStorageServiceClient
     {
-        private static readonly JsonSerializer Serializer = new JsonSerializer();
-        private static readonly HttpClient Client = new HttpClient();
+        private static readonly JsonSerializer Serializer = new();
+        private static readonly HttpClient Client = new();
 
         private readonly string _serverUri;
 
@@ -64,7 +64,7 @@ namespace Services.SI
         }
 
         public Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<NewServerInfo[]>("GetGameServersUrisNew", cancellationToken);
+            GetAsync<NewServerInfo[]>("servers", cancellationToken);
 
         public Task<NamedObject[]> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NamedObject[]>("Authors", cancellationToken);

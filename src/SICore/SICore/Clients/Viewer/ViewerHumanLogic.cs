@@ -188,13 +188,14 @@ namespace SICore
         public void OnReplic(string replicCode, string text)
         {
             string logString = null;
+
             if (replicCode == ReplicCodes.Showman.ToString())
             {
-                
                 if (_data.ShowMan == null)
                 {
                     return;
                 }
+
                 // reset old speaker's replic
                 if (_data.Speaker != null)
                 {
@@ -205,7 +206,7 @@ namespace SICore
                 _data.Speaker = _data.ShowMan;
                 _data.Speaker.Replic = text;
 
-                logString = $"<span style=\"color: #0AEA2A; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>";
+                logString = $"<span class=\"sh\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
                 if (_data.BackLink.TranslateGameToChat)
                     _data.AddToChat(new Message(text, _data.Speaker.Name));
@@ -223,15 +224,17 @@ namespace SICore
                     _data.Speaker = _data.Players[index];
                     _data.Speaker.Replic = text;
 
-                    logString = $"<span style=\"color: {GetColorByPlayerIndex(index)}; font-weight: bold\">{_data.Speaker.Name}: </span><span style=\"font-weight: bold\">{text}</span>";
+                    logString = $"<span class=\"sr n{index}\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
                     if (_data.BackLink.TranslateGameToChat)
+                    {
                         _data.AddToChat(new Message(text, _data.Speaker.Name));
+                    }
                 }
             }
             else if (replicCode == ReplicCodes.Special.ToString())
             {
-                logString = $"<span style=\"font-style: italic; font-weight: bold\">{text}</span>";
+                logString = $"<span class=\"sp\">{text}</span>";
                 _data.OnAddString("* ", text, LogMode.Protocol);
             }
             else
@@ -242,7 +245,7 @@ namespace SICore
                 }
 
                 // all other types of messages are printed only to logs
-                logString = $"<span style=\"font-style: italic\">{text}</span>";
+                logString = $"<span class=\"s\">{text}</span>";
             }
 
             if (logString != null && _data.BackLink.MakeLogs)
@@ -251,17 +254,6 @@ namespace SICore
                 AddToFileLog(logString);
             }
         }
-
-        private static string GetColorByPlayerIndex(int playerIndex) => playerIndex switch
-        {
-            0 => "#EF21A9",
-            1 => "#0BE6CF",
-            2 => "#FF0000",
-            3 => "#EF21A9",
-            4 => "#00FF00",
-            5 => "#0000FF",
-            _ => "#00FFFF",
-        };
 
         internal void AddToFileLog(Message message) =>
             AddToFileLog($"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> <span style=\"font-weight: bold\">{message.Text}</span><br />");
@@ -312,8 +304,12 @@ namespace SICore
             }
         }
 
-        private void ParseMessageToPrint(XmlReader reader, StringBuilder chatMessageBuilder,
-            StringBuilder logMessageBuilder, ref bool isPrintable, ref bool special)
+        private void ParseMessageToPrint(
+            XmlReader reader,
+            StringBuilder chatMessageBuilder,
+            StringBuilder logMessageBuilder,
+            ref bool isPrintable,
+            ref bool special)
         {
             var name = reader.Name;
             var content = reader.ReadElementContentAsString();
@@ -322,61 +318,42 @@ namespace SICore
             {
                 case "this.client":
                     chatMessageBuilder.AppendFormat("{0}: ", content);
-                    logMessageBuilder.AppendFormat("<span style=\"color: #646464; font-weight: bold\">{0}: </span>", content);
+                    logMessageBuilder.AppendFormat("<span class=\"l\">{0}: </span>", content);
                     break;
 
                 case Constants.Player:
                     {
                         isPrintable = true;
 
-                        var n = int.Parse(content);
-                        string s;
-                        if (n == 0)
-                            s = "<span style=\"color: #EF21A9; font-weight:bold\">";
-                        else if (n == 1)
-                            s = "<span style=\"color: #0BE6CF; font-weight:bold\">";
-                        else if (n == 2)
-                            s = "<span style=\"color: #EF9F21; font-weight:bold\">";
-                        else if (n == 3)
-                            s = "<span style=\"color: #FF0000; font-weight:bold\">";
-                        else if (n == 4)
-                            s = "<span style=\"color: #00FF00; font-weight:bold\">";
-                        else if (n == 5)
-                            s = "<span style=\"color: #0000FF; font-weight:bold\">";
-                        else if (n < Constants.MaxPlayers)
-                            s = "<span style=\"color: #00FFFF; font-weight:bold\">";
-                        else
-                        {
-                            _data.SystemLog.AppendLine(_localizer[nameof(R.BadTextInLog)] + ": " + logMessageBuilder);
-                            return;
-                        }
+                        int.TryParse(content, out var playerIndex);
+                        var speaker = $"<span class=\"sr n{playerIndex}\">";
 
-                        var playerName = n < _data.Players.Count ? _data.Players[n].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
+                        var playerName = playerIndex < _data.Players.Count ? _data.Players[playerIndex].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
                         chatMessageBuilder.AppendFormat("{0}: ", playerName);
-                        logMessageBuilder.AppendFormat("{0}{1}: </span>", s, playerName);
+                        logMessageBuilder.AppendFormat("{0}{1}: </span>", speaker, playerName);
                     }
                     break;
 
                 case Constants.Showman:
                     isPrintable = true;
                     chatMessageBuilder.AppendFormat("{0}: ", content);
-                    logMessageBuilder.AppendFormat("<span style=\"color: #0AEA2A; font-weight: bold\">{0}: </span>", content);
+                    logMessageBuilder.AppendFormat("<span class=\"sh\">{0}: </span>", content);
                     break;
 
                 case "replic":
                     chatMessageBuilder.Append(content);
-                    logMessageBuilder.AppendFormat("<span style=\"font-weight: bold\">{0}</span>", content);
+                    logMessageBuilder.AppendFormat("<span class=\"r\">{0}</span>", content);
                     break;
 
                 case "system":
                     chatMessageBuilder.Append(content);
-                    logMessageBuilder.AppendFormat("<span style=\"font-style: italic\">{0}</span>", content);
+                    logMessageBuilder.AppendFormat("<span class=\"s\">{0}</span>", content);
                     break;
 
                 case "special":
                     special = true;
                     chatMessageBuilder.AppendFormat("* {0}", content.ToUpper());
-                    logMessageBuilder.AppendFormat("<span style=\"font-style: italic; font-weight: bold\">{0}</span>", content);
+                    logMessageBuilder.AppendFormat("<span class=\"sl\">{0}</span>", content);
                     break;
 
                 case "line":
@@ -403,7 +380,9 @@ namespace SICore
                             var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out string path);
                             _data.ProtocolPath = path;
                             _data.ProtocolWriter = new StreamWriter(stream);
-                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title></head><body style=\"font-face: Verdana\">");
+                            _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
+                            _data.ProtocolWriter.Write("<style>.sr { font-weight:bold; color: #00FFFF; } .n0 { color: #EF21A9; } .n1 { color: #0BE6CF; } .n2 { color: #EF9F21; } .n3 { color: #FF0000; } .n4 { color: #00FF00; } .n5 { color: #0000FF; } .sp, .sl { font-style: italic; font-weight: bold; } .sh { color: #0AEA2A; font-weight: bold; } .l { color: #646464; font-weight: bold; } .r { font-weight: bold; } .s { font-style: italic; } </style>");
+                            _data.ProtocolWriter.Write("</head><body>");
                         }
                         catch (IOException)
                         {
@@ -420,6 +399,15 @@ namespace SICore
                     }
 
                     OnReplic(ReplicCodes.Special.ToString(), $"{_localizer[nameof(R.GameStarted)]} {DateTime.Now}");
+
+                    var gameMeta = new StringBuilder($"<span data-tag=\"gameInfo\" data-showman=\"{ClientData.ShowMan?.Name}\"");
+
+                    for (var i = 0; i < ClientData.Players.Count; i++)
+                    {
+                        gameMeta.Append($" data-player-{i}=\"{ClientData.Players[i].Name}\"");
+                    }
+
+                    AddToFileLog(gameMeta + "></span>");
                     break;
 
                 case GameStage.Round:
@@ -583,6 +571,11 @@ namespace SICore
 
         virtual public void SetAtom(string[] mparams)
         {
+            if (TInfo.TStage != TableStage.Answer)
+            {
+                _data.Speaker.Replic = "";
+            }
+
             _data.AtomType = mparams[1];
 
             var isPartial = _data.AtomType == Constants.PartialText;
@@ -836,6 +829,8 @@ namespace SICore
                 _data.Players[playerIndex].Pass = true;
                 _data.Players[playerIndex].State = PlayerState.Wrong;
             }
+
+            AddToFileLog($"<span data-tag=\"sumChange\" data-playerIndex=\"{playerIndex}\" data-change=\"{(isRight ? 1 : -1) * ClientData.CurPriceRight}\"></span>");
         }
 
         public void OnPersonFinalStake(int playerIndex)

@@ -441,7 +441,7 @@ namespace SIPackages
         /// <summary>
         /// Выделить настоящие источники
         /// </summary>
-        /// <param name="authors">Список источников</param>
+        /// <param name="sources">Список источников</param>
         /// <returns>Набор источников, где вычислены все ссылки</returns>
         public string[] GetRealSources(Sources sources)
         {
@@ -654,10 +654,8 @@ namespace SIPackages
             {
                 if (collection.Contains(link))
                 {
-                    using (var stream = collection.GetFile(link).Stream)
-                    {
-                        await newCollection.AddFile(link, stream);
-                    }
+                    using var stream = collection.GetFile(link).Stream;
+                    await newCollection.AddFile(link, stream);
                 }
             }
         }

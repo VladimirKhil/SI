@@ -43,7 +43,7 @@ namespace SI.GameServer.Client
             GameSettingsCore<AppSettingsCore> gameSettings,
             PackageKey packageKey,
             ComputerAccountInfo[] computerAccounts,
-            FileKey background);
+            CancellationToken cancellationToken = default);
 
         Task<string> HasImageAsync(FileKey imageKey, CancellationToken cancellationToken = default);
         Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default);

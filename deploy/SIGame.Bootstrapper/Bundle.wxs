@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
-    <Bundle AboutUrl="https://vladimirkhil.com/si/game" Name="SIGame"
-        Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
-        Version="!(bind.packageVersion.SIGame.Setup)" Manufacturer="Khil-soft"
-        UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2"
-        IconSourceFile="Resources\game.ico">
+    <Bundle AboutUrl="https://vladimirkhil.com/si/game"
+            Name="SIGame"
+            Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
+            Version="!(bind.packageVersion.SIGame.Setup)"
+            Manufacturer="Khil-soft"
+            UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2"
+            IconSourceFile="Resources\game.ico">
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
             <bal:WixStandardBootstrapperApplication LicenseUrl=""
                 LocalizationFile="HyperlinkTheme_ru-ru.wxl" 
@@ -14,17 +17,22 @@
                 SuppressOptionsUI="yes" />
         </BootstrapperApplicationRef>
 
-        <util:RegistrySearch Variable="Win8_1Update1" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Value="BuildLabEx" Condition="VersionNT = v6.3" />
+        <util:RegistrySearch Variable="Win8_1Update1"
+                             Root="HKLM"
+                             Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+                             Value="BuildLabEx"
+                             Condition="VersionNT = v6.3" />
 
-        <bal:Condition Message="You need to install Update 1 для Windows 8.1.">
+        <bal:Condition Message="You need to install Update 1 for Windows 8.1.">
             <![CDATA[(VersionNT <> v6.3) OR (Win8_1Update1 << "9600.2") OR (Win8_1Update1 << "9600.19") OR (Win8_1Update1 << "9600.18")
              OR ((Win8_1Update1 << "9600.17") AND NOT (Win8_1Update1 << "9600.1700") AND NOT (Win8_1Update1 << "9600.1701") AND NOT (Win8_1Update1 << "9600.1702") AND NOT (Win8_1Update1 << "9600.17030"))]]>
         </bal:Condition>
 
         <Chain>
             <PackageGroupRef Id="NetFx48Web" />
-                <MsiPackage Id="SIGame.Setup" DisplayName="SIGame"
-                    SourceFile="$(var.SIGame.Setup.TargetPath)" />
+            <MsiPackage Id="SIGame.Setup"
+                        DisplayName="SIGame"
+                        SourceFile="$(var.SIGame.Setup.TargetPath)" />
         </Chain>
     </Bundle>
 </Wix>

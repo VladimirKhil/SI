@@ -1,10 +1,12 @@
 ﻿using NUnit.Framework;
 using SICore;
+using SICore.Connections;
 using SICore.PlatformSpecific;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
 using SIUI.ViewModel;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -14,7 +16,7 @@ namespace SIGame.Tests
     [TestFixture]
     public class MainTest
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new();
 
         [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, true)]
         [TestCase(PackageSourceTypes.SIStorage, GameRole.Player, true)]
@@ -27,7 +29,7 @@ namespace SIGame.Tests
             GameRole gameRole,
             bool useSignalRConnection)
         {
-            const string GameServerUri = "https://sionline.ru/siserver/0";
+            const string GameServerUri = "https://sionline.ru/siserver/1";
 
             var coreManager = new DesktopCoreManager();
             var manager = new TestManager();
@@ -66,12 +68,24 @@ namespace SIGame.Tests
 
             if (packageSourceType == PackageSourceTypes.SIStorage)
             {
-                var storage = gameSettings.StorageInfo.Model.CurrentPackage = new Services.SI.PackageInfo
+                var counter = 10;
+
+                while (gameSettings.StorageInfo.Model.Packages == null && counter > 0)
                 {
-                    ID = 300,
-                    Guid = "d4e98453-fd31-4b62-b120-96a18d6684b3",
-                    Description = "3rd Anime"
-                };
+                    counter--;
+                    await Task.Delay(1000);
+                }
+
+                if (gameSettings.StorageInfo.Model.Packages == null)
+                {
+                    Assert.Fail("Could not load storage packages");
+                }
+
+                var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(p => p.ID == 300);
+
+                Assert.IsNotNull(package);
+
+                var storage = gameSettings.StorageInfo.Model.CurrentPackage = package;
 
                 await gameSettings.StorageInfo.LoadStorePackage.ExecuteAsync(null);
             }
@@ -95,11 +109,18 @@ namespace SIGame.Tests
                 ((PersonAccount)game.Data.Me).BeReadyCommand.Execute(null);
             }
 
-            // TODO: check game process
+            if (packageSourceType == PackageSourceTypes.Local) // One mode check is enough
+            {
+                var host = game.Host;
+
+                await Task.Delay(50000);
+            }
 
             game.EndGame.Execute(null);
 
             await Task.Delay(5000);
+
+            // Sometimes it does not have time to login again
 
             var contentBox2 = mainViewModel.ActiveView as ContentBox;
             Assert.IsNull(contentBox2, ((LoginViewModel)contentBox2?.Data)?.Error);
@@ -108,21 +129,22 @@ namespace SIGame.Tests
             siOnline2.Cancel.Execute(null);
         }
 
-        private static void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private static async void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(TableInfoViewModel.MediaSource))
             {
-                Download(((TableInfoViewModel)sender).MediaSource.Uri);
+                var mediaSource = ((TableInfoViewModel)sender).MediaSource;
+
+                if (mediaSource != null)
+                {
+                    var result = await HttpClient.GetAsync(mediaSource.Uri);
+                    Assert.IsTrue(result.IsSuccessStatusCode);
+                }
             }
             else if (e.PropertyName == nameof(TableInfoViewModel.SoundSource))
             {
-                Download(((TableInfoViewModel)sender).SoundSource.Uri);
+                await HttpClient.GetAsync(((TableInfoViewModel)sender).SoundSource.Uri);
             }
-        }
-
-        private static async void Download(string uri)
-        {
-            _ = await HttpClient.GetAsync(uri);
         }
     }
 }

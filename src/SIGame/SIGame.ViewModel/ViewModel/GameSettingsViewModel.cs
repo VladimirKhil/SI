@@ -729,7 +729,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        void Showman_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Showman_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(GameAccount.AccountType))
             {

@@ -157,7 +157,7 @@ namespace SIQuester.Model
             }
         }
 
-        private StringCollection _delayedErrors = new StringCollection();
+        private StringCollection _delayedErrors = new();
 
         public StringCollection DelayedErrors
         {
@@ -172,7 +172,7 @@ namespace SIQuester.Model
             }
         }
 
-        private FileHistory _history = new FileHistory();
+        private FileHistory _history = new();
 
         public FileHistory History
         {
@@ -203,7 +203,7 @@ namespace SIQuester.Model
             }
         }
 
-        private CostSetterList _costSetters = new CostSetterList();
+        private CostSetterList _costSetters = new();
 
         public CostSetterList CostSetters
         {

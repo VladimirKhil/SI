@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:SIGame"
              xmlns:lctrl="clr-namespace:SIGame.Controls"
              xmlns:lc="clr-namespace:SIGame.Converters"
              xmlns:lp="clr-namespace:SIGame.Properties"
@@ -178,6 +177,18 @@
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.PublishedDate}" />
             <TextBlock Text="{Binding PublishedDate, StringFormat=d}" />
         </StackPanel>
-        <ProgressBar Foreground="Blue" Width="200" Height="10" Style="{StaticResource MainProgress}" Grid.Row="2" Grid.ColumnSpan="3" IsIndeterminate="True" Visibility="{Binding Model.IsLoading, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+        <Grid
+            Background="#77000000"
+            Grid.Row="2"
+            Grid.RowSpan="2"
+            Grid.ColumnSpan="3"
+            Visibility="{Binding IsProgress, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            <ProgressBar
+                Foreground="Blue"
+                Width="200"
+                Height="10"
+                Style="{StaticResource MainProgress}"
+                IsIndeterminate="True" />
+        </Grid>
     </Grid>
 </UserControl>

@@ -14,7 +14,7 @@
     <Version>7.5.7</Version>
     <Authors>Vladimir Khil</Authors>
     <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

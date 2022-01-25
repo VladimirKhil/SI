@@ -11,7 +11,10 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
-    mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}" d:DesignHeight="407" d:DesignWidth="635"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}"
+    d:DesignHeight="407"
+    d:DesignWidth="635"
     FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     MouseRightButtonDown="UserControl_MouseRightButtonDown">
     <UserControl.Resources>
@@ -366,7 +369,7 @@
 
             <ui:Table x:Name="table" Grid.Column="2" Margin="0,0,0,0" MediaElement.MediaEnded="Table_MediaEnded" TextOptions.TextFormattingMode="Display" SnapsToDevicePixels="True" DataContext="{Binding TInfo}" />
 
-            <ProgressBar Grid.Column="2" Height="10" Foreground="{StaticResource MainColor}" VerticalAlignment="Top" Style="{StaticResource SIProgressBar}"
+            <ProgressBar Grid.Column="2" Height="10" Foreground="#ffa000" VerticalAlignment="Top" Style="{StaticResource SIProgressBar}"
                          Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
                          ToolTip="{x:Static lp:Resources.Time_Decide}" Opacity="1"
                          Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}" />

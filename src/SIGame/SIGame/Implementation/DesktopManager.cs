@@ -230,7 +230,8 @@ namespace SIGame.Implementation
             return dialog.FileName;
         }
 
-        public override void Activate() => Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+        public override void Activate() => Application.Current.Dispatcher.BeginInvoke(
+            (Action)(() =>
             {
                 var main = (MainWindow)Application.Current.MainWindow;
                 if (main != null)
@@ -341,7 +342,7 @@ namespace SIGame.Implementation
             };
         }
 
-        void Media_Ended(object sender, EventArgs e)
+        private void Media_Ended(object sender, EventArgs e)
         {
             if (!_loop)
             {

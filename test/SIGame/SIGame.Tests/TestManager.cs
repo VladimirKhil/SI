@@ -9,10 +9,7 @@ namespace SIGame.Tests
 	{
 		public override ICommand Close { get; } = new CustomCommand((arg) => { });
 
-		public override void Activate()
-		{
-			throw new NotImplementedException();
-		}
+		public override void Activate() { }
 
 		public override bool Ask(string text) => throw new NotImplementedException();
 

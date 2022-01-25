@@ -26,7 +26,7 @@ namespace SImulator.ViewModel
 
         internal IGameHost GameHost
         {
-            get { return _gameHost; }
+            get => _gameHost;
             set
             {
                 if (_gameHost != value)
@@ -39,7 +39,7 @@ namespace SImulator.ViewModel
                             {
                                 try
                                 {
-                                    _gameHost.OnMediaStart();
+                                    _gameHost?.OnMediaStart();
                                 }
                                 catch (CommunicationObjectAbortedException)
                                 {
@@ -51,18 +51,19 @@ namespace SImulator.ViewModel
                             {
                                 try
                                 {
-                                    _gameHost.OnMediaEnd();
+                                    _gameHost?.OnMediaEnd();
                                 }
                                 catch (ObjectDisposedException)
                                 {
 
                                 }
                             };
+
                         TInfo.MediaProgress += progress =>
                         {
                             try
                             {
-                                _gameHost.OnMediaProgress(progress);
+                                _gameHost?.OnMediaProgress(progress);
                             }
                             catch (CommunicationObjectAbortedException)
                             {
@@ -73,7 +74,7 @@ namespace SImulator.ViewModel
                 }
             }
         }
-        
+
         public TableInfoViewModel TInfo { get; private set; }
 
         public ICommand Next { get; private set; }

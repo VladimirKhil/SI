@@ -1,5 +1,6 @@
 ﻿using SICore.Connections;
 using System;
+using System.Threading.Tasks;
 
 namespace SICore.Network.Contracts
 {
@@ -22,6 +23,11 @@ namespace SICore.Network.Contracts
         /// Получить входящее сообщение
         /// </summary>
         void AddIncomingMessage(Message message);
+
+        /// <summary>
+        /// Message received event.
+        /// </summary>
+        event Func<Message, ValueTask> MessageReceived;
 
         /// <summary>
         /// Отправить сообщение

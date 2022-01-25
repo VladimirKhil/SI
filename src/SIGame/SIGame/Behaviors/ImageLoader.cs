@@ -132,9 +132,17 @@ namespace SIGame.Behaviors
 
             try
             {
-                var stream = await LoadImageAsync(uri);
+                using var response = await HttpClient.GetAsync(uri);
 
-                var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.Default); // Лучше эти два параметра не трогать, так как в противном случае в некоторых ситуациях изображения могут перестать отображаться
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new Exception(await response.Content.ReadAsStringAsync());
+                }
+
+                using var stream = await response.Content.ReadAsStreamAsync();
+
+                // It's better not to touch these options because their incorrect values could lead to images load errors
+                var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.Default);
                 if (decoder.Frames.Count == 0)
                 {
                     return;
@@ -147,23 +155,6 @@ namespace SIGame.Behaviors
             {
                 Trace.TraceError($"Image {uri} load error: {exc}");
             }
-        }
-
-        /// <summary>
-        /// Очень важно, что этот код находится в отдельном методе - GetResponseAsync работает не совсем асинхронно
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        private static async Task<Stream> LoadImageAsync(Uri uri)
-        {
-            using var response = await HttpClient.GetAsync(uri);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception(await response.Content.ReadAsStringAsync());
-            }
-
-            return await response.Content.ReadAsStreamAsync();
         }
     }
 }

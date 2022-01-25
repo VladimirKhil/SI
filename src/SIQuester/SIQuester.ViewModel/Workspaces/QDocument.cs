@@ -38,8 +38,8 @@ namespace SIQuester.ViewModel
         private const int MaxUndoListCount = 100;
 
         private bool _changed = false;
-        private readonly Stack<IChange> _undoList = new Stack<IChange>();
-        private readonly Stack<IChange> _redoList = new Stack<IChange>();
+        private readonly Stack<IChange> _undoList = new();
+        private readonly Stack<IChange> _redoList = new();
         private bool _isMakingUndo = false; // Блокирует добавление UnDo-операций для самого UnDo
         private ChangeGroup _changeGroup = null;
 
@@ -116,7 +116,7 @@ namespace SIQuester.ViewModel
         }
 
         private CancellationTokenSource _cancellation = null;
-        private readonly object _searchSync = new object();
+        private readonly object _searchSync = new();
 
         private async void MakeSearch()
         {
@@ -545,22 +545,17 @@ namespace SIQuester.ViewModel
                         var tempName = System.IO.Path.Combine(path, EncodePath(_path));
                         using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
                         {
+                            using var tempDoc = Document.SaveAs(stream, !temp);
+                            if (Images.HasPendingChanges)
+                                await Images.ApplyToAsync(tempDoc.Images);
 
+                            if (Audio.HasPendingChanges)
+                                await Audio.ApplyToAsync(tempDoc.Audio);
 
-                            using (var tempDoc = Document.SaveAs(stream, !temp))
-                            {
-                                if (Images.HasPendingChanges)
-                                    await Images.ApplyToAsync(tempDoc.Images);
+                            if (Video.HasPendingChanges)
+                                await Video.ApplyToAsync(tempDoc.Video);
 
-                                if (Audio.HasPendingChanges)
-                                    await Audio.ApplyToAsync(tempDoc.Audio);
-
-                                if (Video.HasPendingChanges)
-                                    await Video.ApplyToAsync(tempDoc.Video);
-
-                                tempDoc.FinalizeSave();
-                            }
-
+                            tempDoc.FinalizeSave();
                         }
 
                         _lastSavedTime = DateTime.Now;
@@ -725,8 +720,10 @@ namespace SIQuester.ViewModel
             }
             else
             {
-                if (!(e is ExtendedPropertyChangedEventArgs<string> ext))
+                if (e is not ExtendedPropertyChangedEventArgs<string> ext)
+                {
                     return;
+                }
 
                 if (sender is QuestionTypeViewModel questionType)
                 {
@@ -1348,63 +1345,59 @@ namespace SIQuester.ViewModel
                 {
                     foreach (var file in files)
                     {
-                        using (var stream = File.OpenRead(file))
+                        using var stream = File.OpenRead(file);
+                        using var doc = SIDocument.Load(stream);
+                        foreach (var round in doc.Package.Rounds)
                         {
-                            using (var doc = SIDocument.Load(stream))
+                            Package.Rounds.Add(new RoundViewModel(round.Clone()));
+                        }
+
+                        CopyAuthorsAndSources(doc, doc.Package);
+
+                        foreach (var round in doc.Package.Rounds)
+                        {
+                            CopyAuthorsAndSources(doc, round);
+                            foreach (var theme in round.Themes)
                             {
-                                foreach (var round in doc.Package.Rounds)
+                                CopyAuthorsAndSources(doc, theme);
+                                foreach (var question in theme.Questions)
                                 {
-                                    Package.Rounds.Add(new RoundViewModel(round.Clone()));
-                                }
-
-                                CopyAuthorsAndSources(doc, doc.Package);
-                                
-                                foreach (var round in doc.Package.Rounds)
-                                {
-                                    CopyAuthorsAndSources(doc, round);
-                                    foreach (var theme in round.Themes)
+                                    CopyAuthorsAndSources(doc, question);
+                                    foreach (var atom in question.Scenario)
                                     {
-                                        CopyAuthorsAndSources(doc, theme);
-                                        foreach (var question in theme.Questions)
+                                        if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.Video)
                                         {
-                                            CopyAuthorsAndSources(doc, question);
-                                            foreach (var atom in question.Scenario)
+                                            continue;
+                                        }
+
+                                        var collection = doc.Images;
+                                        var newCollection = Images;
+                                        switch (atom.Type)
+                                        {
+                                            case AtomTypes.Audio:
+                                                collection = doc.Audio;
+                                                newCollection = Audio;
+                                                break;
+
+                                            case AtomTypes.Video:
+                                                collection = doc.Video;
+                                                newCollection = Video;
+                                                break;
+                                        }
+
+                                        var link = doc.GetLink(atom);
+
+                                        if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
+                                        {
+                                            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
+                                            Directory.CreateDirectory(tempPath);
+                                            var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
+                                            using (var fileStream = File.Create(tempFile))
                                             {
-                                                if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.Video)
-                                                {
-                                                    continue;
-                                                }
-
-                                                var collection = doc.Images;
-                                                var newCollection = Images;
-                                                switch (atom.Type)
-                                                {
-                                                    case AtomTypes.Audio:
-                                                        collection = doc.Audio;
-                                                        newCollection = Audio;
-                                                        break;
-
-                                                    case AtomTypes.Video:
-                                                        collection = doc.Video;
-                                                        newCollection = Video;
-                                                        break;
-                                                }
-
-                                                var link = doc.GetLink(atom);
-
-                                                if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
-                                                {
-                                                    var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
-                                                    Directory.CreateDirectory(tempPath);
-                                                    var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
-                                                    using (var fileStream = File.Create(tempFile))
-                                                    {
-                                                        await link.GetStream().Stream.CopyToAsync(fileStream);
-                                                    }
-
-                                                    newCollection.AddFile(tempFile);
-                                                }
+                                                await link.GetStream().Stream.CopyToAsync(fileStream);
                                             }
+
+                                            newCollection.AddFile(tempFile);
                                         }
                                     }
                                 }
@@ -1500,14 +1493,11 @@ namespace SIQuester.ViewModel
                         Document.SaveXml(ms);
                         ms.Position = 0;
 
-                        using (var xreader = XmlReader.Create(ms))
-                        using (var fs = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.Write))
-                        {
-                            using (var result = XmlWriter.Create(fs, new XmlWriterSettings { OmitXmlDeclaration = true }))
-                            {
-                                transform.Transform(xreader, result);
-                            }
-                        }
+                        using var xreader = XmlReader.Create(ms);
+                        using var fs = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.Write);
+                        using var result = XmlWriter.Create(fs, new XmlWriterSettings { OmitXmlDeclaration = true });
+
+                        transform.Transform(xreader, result);
                     }
 
                     Process.Start(filename);
@@ -1671,10 +1661,8 @@ namespace SIQuester.ViewModel
                         rind++;
                     });
 
-                    using (var writer = new StreamWriter(filename, false, Encoding.GetEncoding(1251)))
-                    {
-                        writer.Write(file);
-                    }
+                    using var writer = new StreamWriter(filename, false, Encoding.GetEncoding(1251));
+                    writer.Write(file);
                 }
             }
             catch (Exception exc)

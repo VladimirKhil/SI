@@ -1081,7 +1081,8 @@ namespace SICore
                         .Append('+')
                         .Append(Message.ArgsSeparatorChar)
                         .Append(_data.AnswererIndex)
-                        .Append(Message.ArgsSeparatorChar).Append(_data.CurPriceRight);
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(_data.CurPriceRight);
 
                     _gameActions.SendMessage(s.ToString());
 
@@ -1447,6 +1448,17 @@ namespace SICore
                                     case 1:
                                         // Просто выполняем текущую задачу, дополнительной обработки делать не надо
                                         stop = false;
+
+                                        if (task == Tasks.PrintPartial) // Skip partial printing
+                                        {
+                                            var subText = _data.Text.Substring(_data.TextLength);
+
+                                            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+                                            _gameActions.SystemReplic(subText);
+
+                                            task = Tasks.MoveNext;
+                                        }
+
                                         break;
 
                                     case 2:

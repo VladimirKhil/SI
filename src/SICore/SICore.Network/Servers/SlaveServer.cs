@@ -2,6 +2,7 @@
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SICore.Network.Servers
@@ -29,12 +30,13 @@ namespace SICore.Network.Servers
 
         }
 
-        public override ValueTask<bool> AddConnectionAsync(IConnection connection) =>
-            ConnectionsLock.WithLockAsync(async () =>
+        public override ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default) =>
+            ConnectionsLock.WithLockAsync(
+                async () =>
                 {
                     if (HostServer != null && HostServer != connection)
                     {
-                        await RemoveConnectionAsync(HostServer, false);
+                        await RemoveConnectionAsync(HostServer, false, cancellationToken);
                     }
 
                     HostServer = connection;
@@ -42,23 +44,26 @@ namespace SICore.Network.Servers
                     connection.Reconnecting += OnReconnecting;
                     connection.Reconnected += OnReconnected;
 
-                    return await base.AddConnectionAsync(connection);
-                });
+                    return await base.AddConnectionAsync(connection, cancellationToken);
+                },
+                cancellationToken);
 
-        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError)
+        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
         {
-            await ConnectionsLock.WithLockAsync(() =>
-            {
-                if (HostServer == connection)
+            await ConnectionsLock.WithLockAsync(
+                () =>
                 {
-                    connection.Reconnecting -= OnReconnecting;
-                    connection.Reconnected -= OnReconnected;
+                    if (HostServer == connection)
+                    {
+                        connection.Reconnecting -= OnReconnecting;
+                        connection.Reconnected -= OnReconnected;
 
-                    HostServer = null;
-                }
-            });
+                        HostServer = null;
+                    }
+                },
+                cancellationToken);
 
-            await base.RemoveConnectionAsync(connection, withError);
+            await base.RemoveConnectionAsync(connection, withError, cancellationToken);
         }
 
         public abstract ValueTask ConnectAsync(bool upgrade);

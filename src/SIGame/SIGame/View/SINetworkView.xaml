@@ -10,7 +10,10 @@
              xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
              xmlns:lp="clr-namespace:SIGame.Properties"
              mc:Ignorable="d"
-             FontSize="16" d:DesignWidth="931.998" d:DesignHeight="426.907"
+             d:DataContext="{d:DesignInstance Type=lvm:SINetworkViewModel}"
+             FontSize="16"
+             d:DesignWidth="931.998"
+             d:DesignHeight="426.907"
              FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <UserControl.Resources>
         <localc:PersonsConverter x:Key="PersonsConverter" />

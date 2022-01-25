@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   
   <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIGame" ?>
@@ -10,53 +11,55 @@
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
     
-	<Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
+    <Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+        <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
 
-		<MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
-		<MediaTemplate EmbedCab="yes" />
+        <MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
+        <MediaTemplate EmbedCab="yes" />
 
-    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
+        <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
     
-    <Icon Id="AppIcon" SourceFile="$(var.SIGame.ProjectDir)Resources\game.ico" />
-    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+        <Icon Id="AppIcon" SourceFile="$(var.SIGame.ProjectDir)Resources\game.ico" />
+        <Property Id="ARPPRODUCTICON" Value="AppIcon" />
     
-    <Property Id="WixShellExecTarget" Value="[#SIGame.exe]" />
-    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+        <Property Id="WixShellExecTarget" Value="[#SIGame.exe]" />
+        <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
       
-    <InstallExecuteSequence>
-      <LaunchConditions After="AppSearch" />
-      <FindRelatedProducts After="LaunchConditions" />
+        <InstallExecuteSequence>
+            <LaunchConditions After="AppSearch" />
+            <FindRelatedProducts After="LaunchConditions" />
 
-      <Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
-    </InstallExecuteSequence>
+            <Custom Action="LaunchApplication" After="InstallFinalize">Not Installed OR WIX_UPGRADE_DETECTED</Custom>
+        </InstallExecuteSequence>
 
-    <InstallUISequence>
-      <LaunchConditions After="AppSearch" />
-      <FindRelatedProducts After="LaunchConditions" />
-    </InstallUISequence>
+        <InstallUISequence>
+            <LaunchConditions After="AppSearch" />
+            <FindRelatedProducts After="LaunchConditions" />
+        </InstallUISequence>
       
-		<Feature Id="ProductFeature" Title="SIGame.Setup" Level="1">
-			<ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="Sounds" />
-      <ComponentGroupRef Id="Data" />
-      <ComponentGroupRef Id="Photo" />
-      <ComponentGroupRef Id="en-US" />
-      <ComponentGroupRef Id="Manufacturer" />
-      <ComponentGroupRef Id="ManufacturerProgramMenu" />
-      <ComponentGroupRef Id="ApplicationProgramMenu" />
-		</Feature>
-	</Product>
+        <Feature Id="ProductFeature" Title="SIGame.Setup" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentGroupRef Id="Sounds" />
+            <ComponentGroupRef Id="Data" />
+            <ComponentGroupRef Id="Photo" />
+            <ComponentGroupRef Id="en-US" />
+            <ComponentGroupRef Id="licenses" />
+            <ComponentGroupRef Id="Manufacturer" />
+            <ComponentGroupRef Id="ManufacturerProgramMenu" />
+            <ComponentGroupRef Id="ApplicationProgramMenu" />
+        </Feature>
+    </Product>
 
-	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="LocalAppDataFolder">
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+        <Directory Id="LocalAppDataFolder">
         <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
           <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
             <Directory Id="DataFolder" Name="Data" />
             <Directory Id="PhotoFolder" Name="Photo" />
             <Directory Id="SoundsFolder" Name="Sounds" />
             <Directory Id="EnUSFolder" Name="en-US" />
+            <Directory Id="LicensesFolder" Name="licenses" />
           </Directory>
         </Directory>
       </Directory>
@@ -65,14 +68,14 @@
           <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
         </Directory>
       </Directory>
-		</Directory>
-	</Fragment>
+        </Directory>
+    </Fragment>
   
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
-			<Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
+            <Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
         <File Id="SIGame.exe" Source="$(var.SIGame.TargetDir)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes">
-          <netfx:NativeImage Id="ngen_SIWindows.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
+            <netfx:NativeImage Id="ngen_SIWindows.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
         </File>
       </Component>
       <Component Guid="{167EE7C2-7628-4983-8E15-C1CFEE780BE7}">
@@ -123,9 +126,6 @@
       <Component Guid="{B3BF9084-2D54-4A54-A86B-FCF54598AE60}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Newtonsoft.Json.dll" />
       </Component>
-      <!--<Component Guid="{A442A50E-F965-4694-9832-2EC2F3AE1C07}" >
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNet.SignalR.Client.dll" />
-      </Component>-->
       <Component Guid="{FEE0F556-6F68-4B46-8045-30D85290FE65}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Owin.dll" />
       </Component>
@@ -244,13 +244,19 @@
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.exe.config" />
       </Component>
       <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
-        <RegistryValue Id="InstallFolder" Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
-                  Name="InstallDir" Action="write" Type="string" Value="[INSTALLLOCATION]" />
+        <RegistryValue
+            Id="InstallFolder"
+            Root="HKMU"
+            Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)"
+            Name="InstallDir"
+            Action="write"
+            Type="string"
+            Value="[INSTALLLOCATION]" />
       
         <RemoveFolder Id="INSTALLLOCATION" On="uninstall" />
       </Component>
-		</ComponentGroup>
-	</Fragment>
+        </ComponentGroup>
+    </Fragment>
 
   <Fragment>
     <ComponentGroup Id="Sounds" Directory="SoundsFolder">
@@ -467,6 +473,27 @@
       </Component>
     </ComponentGroup>
   </Fragment>
+
+<Fragment>
+    <ComponentGroup Id="licenses" Directory="LicensesFolder">
+        <Component Guid="{214E3004-1EFF-4FC5-881A-4832D0FD7980}">
+            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Ben.Demystifier.LICENSE.txt" />
+        </Component>
+        <Component Guid="{417121A7-629F-4FB1-BAD0-EBB15B8535A9}">
+            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Newtonsoft.Json.LICENSE.md" />
+        </Component>
+        <Component Guid="{54CE3171-4382-4E37-827A-C0C5245FA338}">
+            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Nowin.LICENSE.md" />
+        </Component>
+        <Component Guid="{1D473AD1-7BAB-4257-9A62-E561CE233056}">
+            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Owin.LICENSE.txt" />
+        </Component>
+        <Component Id="LicensesReg" Guid="{4C7D3CA0-40F4-437A-8ED2-9C037D2B607C}">
+            <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
+            <RemoveFolder Id="LicensesFolder" On="uninstall" />
+        </Component>
+    </ComponentGroup>
+</Fragment>
 
   <Fragment>
     <ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">
