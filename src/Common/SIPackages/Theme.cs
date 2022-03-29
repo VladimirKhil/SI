@@ -10,6 +10,9 @@ namespace SIPackages
     /// </summary>
     public sealed class Theme : InfoOwner
     {
+        /// <summary>
+        /// Theme questions.
+        /// </summary>
         public List<Question> Questions { get; } = new List<Question>();
 
         /// <summary>
@@ -56,6 +59,10 @@ namespace SIPackages
             return quest;
         }
 
+        /// <summary>
+        /// Reades data from XML reader.
+        /// </summary>
+        /// <param name="reader">XML Reader.</param>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             _name = reader.GetAttribute("name");
@@ -101,6 +108,10 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Writes data to XML writer.
+        /// </summary>
+        /// <param name="writer">XML writer.</param>
         public override void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("theme");
@@ -120,9 +131,12 @@ namespace SIPackages
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
         public Theme Clone()
         {
-            var theme = new Theme()
+            var theme = new Theme
             {
                 _name = _name
             };

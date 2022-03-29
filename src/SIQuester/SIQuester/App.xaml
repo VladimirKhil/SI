@@ -547,7 +547,15 @@
                                 <Border x:Name="mainBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,0,1,0" Background="{TemplateBinding Background}" Margin="0">
                                     
                                 </Border>
-                                <ContentPresenter x:Name="contentPresenter" ContentSource="Header" Focusable="False" HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                                <ContentPresenter
+                                    x:Name="contentPresenter"
+                                    ContentSource="Header"
+                                    Focusable="False"
+                                    HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    Margin="{TemplateBinding Padding}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -720,7 +728,12 @@
                                                     <Button ToolTip="Добавить раунд (Insert)" Content="{StaticResource AddImage}" Command="{Binding AddRound}" Style="{StaticResource MenuButton}" />
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Header="{StaticResource SumImage}" ToolTip="Задать стоимости" ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItem}" />
+                                                        <MenuItem
+                                                            Header="{StaticResource SumImage}"
+                                                            ToolTip="Задать стоимости"
+                                                            ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
                                                     <Button ToolTip="Задать тематику" Command="{Binding AddTags}" Style="{StaticResource MenuButton}">
                                                         <Button.ContentTemplate>
@@ -774,7 +787,12 @@
                                                     <Button ToolTip="Удалить раунд" Content="{StaticResource RemoveImage}" Command="{Binding Remove}" Style="{StaticResource MenuButton}" />
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Header="{StaticResource SumImage}" ToolTip="Задать стоимости" ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItem}" />
+                                                        <MenuItem
+                                                            Header="{StaticResource SumImage}"
+                                                            ToolTip="Задать стоимости"
+                                                            ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
@@ -791,7 +809,12 @@
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Button ToolTip="Отсортировать вопросы по стоимости" Content="{StaticResource SortImage}" Command="{Binding SortQuestions}" Style="{StaticResource MenuButton}" />
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Header="{StaticResource SumImage}" ToolTip="Задать стоимости" ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItem}" />
+                                                        <MenuItem
+                                                            Header="{StaticResource SumImage}"
+                                                            ToolTip="Задать стоимости"
+                                                            ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
@@ -832,18 +855,6 @@
                                                         </PriorityBinding>
                                                     </Setter.Value>
                                                 </Setter>
-                                            </Style>
-
-                                            <Style x:Key="SubMenuItemImages" BasedOn="{StaticResource SubMenuItem}" TargetType="MenuItem">
-                                                <Setter Property="CommandParameter" Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
-                                            </Style>
-
-                                            <Style x:Key="SubMenuItemAudio" BasedOn="{StaticResource SubMenuItem}" TargetType="MenuItem">
-                                                <Setter Property="CommandParameter" Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Audio}}" />
-                                            </Style>
-
-                                            <Style x:Key="SubMenuItemVideo" BasedOn="{StaticResource SubMenuItem}" TargetType="MenuItem">
-                                                <Setter Property="CommandParameter" Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
                                             </Style>
 
                                             <Style x:Key="SubMenuItemLink" TargetType="MenuItem">
@@ -890,33 +901,62 @@
                                                     <Button ToolTip="Добавить текст" Content="{StaticResource AddImage}" Command="{Binding AddText}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить устный текст" Content="{StaticResource AddVoiceImage}" Command="{Binding AddVoice}" Style="{StaticResource MenuButton}" />
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem ToolTip="Добавить изображение" Header="{StaticResource AddImageImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemImages}">
+                                                        <MenuItem
+                                                            ToolTip="Добавить изображение"
+                                                            Header="{StaticResource AddImageImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
                                                                     <Binding Path="OwnerDocument.Images.Files" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem ToolTip="Добавить аудио" Header="{StaticResource AddAudioImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemAudio}">
+                                                        <MenuItem
+                                                            ToolTip="Добавить аудио"
+                                                            Header="{StaticResource AddAudioImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
                                                                     <Binding Path="OwnerDocument.Audio.Files" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Audio}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem ToolTip="Добавить видео" Header="{StaticResource AddVideoImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemVideo}">
+                                                        <MenuItem
+                                                            ToolTip="Добавить видео"
+                                                            Header="{StaticResource AddVideoImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
                                                                     <Binding Path="OwnerDocument.Video.Files" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter Property="CommandParameter"
+                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
                                                     <Button ToolTip="Добавить маркер ответа" Content="{StaticResource AddMarkerImage}" Command="{Binding AddMarker}" Style="{StaticResource MenuButton}" />
@@ -939,34 +979,77 @@
                                                     <Button ToolTip="Переместить левее" Content="{StaticResource LeftImageKey}" Command="{Binding MoveLeft}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить ответ" Content="{StaticResource AddImage}" Command="{Binding AddItem}" Style="{StaticResource MenuButton}" />
                                                     <StackPanel Orientation="Horizontal" Visibility="{Binding Owner.Scenario.IsComplex, Converter={StaticResource FalseToVisiblityConverter}}">
-                                                        <Menu Style="{StaticResource MenuMenu}" Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
-                                                            <MenuItem ToolTip="Добавить изображение" Header="{StaticResource AddImageImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemImages}">
+                                                        <Menu
+                                                            Style="{StaticResource MenuMenu}"
+                                                            Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
+                                                            <MenuItem
+                                                                ToolTip="Добавить изображение"
+                                                                Header="{StaticResource AddImageImage}"
+                                                                Style="{StaticResource MenuMenuHeader}">
                                                                 <MenuItem.ItemsSource>
                                                                     <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                         <Binding Source="{StaticResource Additional}" />
                                                                         <Binding Path="OwnerDocument.Images.Files" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
+                                                                <MenuItem.ItemContainerStyle>
+                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                        <Setter
+                                                                            Property="CommandParameter"
+                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
+                                                                    </Style>
+                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
-                                                        <Menu Style="{StaticResource MenuMenu}" Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
-                                                            <MenuItem ToolTip="Добавить аудио" Header="{StaticResource AddAudioImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemAudio}">
+                                                        <Menu
+                                                            Style="{StaticResource MenuMenu}"
+                                                            Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
+                                                            <MenuItem
+                                                                ToolTip="Добавить аудио"
+                                                                Header="{StaticResource AddAudioImage}"
+                                                                Style="{StaticResource MenuMenuHeader}">
                                                                 <MenuItem.ItemsSource>
                                                                     <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                         <Binding Source="{StaticResource Additional}" />
                                                                         <Binding Path="OwnerDocument.Audio.Files" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
+                                                                <MenuItem.ItemContainerStyle>
+                                                                    <Style TargetType="MenuItem">
+                                                                        <Setter Property="Command" Value="{Binding DataContext.SelectAtomObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
+                                                                        <Setter Property="CommandParameter" Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Audio}}" />
+                                                                        <Setter Property="Header">
+                                                                            <Setter.Value>
+                                                                                <PriorityBinding>
+                                                                                    <Binding Path="Model.Name" />
+                                                                                    <Binding />
+                                                                                </PriorityBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
-                                                        <Menu Style="{StaticResource MenuMenu}" Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
-                                                            <MenuItem ToolTip="Добавить видео" Header="{StaticResource AddVideoImage}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemVideo}">
+                                                        <Menu
+                                                            Style="{StaticResource MenuMenu}"
+                                                            Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
+                                                            <MenuItem
+                                                                ToolTip="Добавить видео"
+                                                                Header="{StaticResource AddVideoImage}"
+                                                                Style="{StaticResource MenuMenuHeader}">
                                                                 <MenuItem.ItemsSource>
                                                                     <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                         <Binding Source="{StaticResource Additional}" />
                                                                         <Binding Path="OwnerDocument.Video.Files" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
+                                                                <MenuItem.ItemContainerStyle>
+                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                        <Setter
+                                                                            Property="CommandParameter"
+                                                                            Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
+                                                                    </Style>
+                                                                </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
                                                     </StackPanel>                                                    

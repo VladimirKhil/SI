@@ -241,7 +241,7 @@ namespace SIPackages.Providers
                     if (collection != null)
                     {
                         using var stream = link.GetStream().Stream;
-                        await collection.AddFile(link.Uri, stream);
+                        await collection.AddFileAsync(link.Uri, stream);
                     }
                 }
             }

@@ -107,9 +107,17 @@ namespace SIPackages
             return result.ToString();
         }
 
-        public AuthorInfo Clone()
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
+        public AuthorInfo Clone() => new()
         {
-            return new AuthorInfo { _city = _city, _country = _country, _name = _name, _secondName = _secondName, _surname = _surname, Id = Id };
-        }
+            _city = _city,
+            _country = _country,
+            _name = _name,
+            _secondName = _secondName,
+            _surname = _surname,
+            Id = Id
+        };
     }
 }

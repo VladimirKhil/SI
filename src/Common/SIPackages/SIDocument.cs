@@ -89,9 +89,20 @@ namespace SIPackages
         /// </summary>
         public List<SourceInfo> Sources { get { return _sources; } }
 
-        public DataCollection Images { get { return _images; } }
-        public DataCollection Audio { get { return _audio; } }
-        public DataCollection Video { get { return _video; } }
+        /// <summary>
+        /// Document images collection.
+        /// </summary>
+        public DataCollection Images => _images;
+
+        /// <summary>
+        /// Document audio collection.
+        /// </summary>
+        public DataCollection Audio => _audio;
+
+        /// <summary>
+        /// Document video collection.
+        /// </summary>
+        public DataCollection Video => _video;
 
         #endregion
 
@@ -102,6 +113,11 @@ namespace SIPackages
             
         }
 
+        /// <summary>
+        /// Creates an empty document.
+        /// </summary>
+        /// <param name="name">Document name.</param>
+        /// <param name="author">Document author.</param>
         public static SIDocument Create(string name, string author)
         {
             var document = new SIDocument();
@@ -114,6 +130,14 @@ namespace SIPackages
             return document;
         }
 
+        /// <summary>
+        /// Creates a document and associates it with the stream.
+        /// </summary>
+        /// <param name="name">Document name.</param>
+        /// <param name="author">Document author.</param>
+        /// <param name="stream">Stream to write data.</param>
+        /// <param name="leaveStreamOpen">Do not close the stream when disposing.</param>
+        /// <returns></returns>
         public static SIDocument Create(
             string name,
             string author,
@@ -130,6 +154,12 @@ namespace SIPackages
             return document;
         }
 
+        /// <summary>
+        /// Creates a document and associates it with the folder.
+        /// </summary>
+        /// <param name="name">Document name.</param>
+        /// <param name="author">Document author.</param>
+        /// <param name="folder">Folder to write data.</param>
         public static SIDocument Create(string name, string author, string folder)
         {
             var document = new SIDocument();
@@ -141,6 +171,12 @@ namespace SIPackages
             return document;
         }
 
+        /// <summary>
+        /// Creates a document and associates it with the specified source.
+        /// </summary>
+        /// <param name="name">Document name.</param>
+        /// <param name="author">Document author.</param>
+        /// <param name="source">Source to write data.</param>
         public static SIDocument Create(string name, string author, ISIPackage source)
         {
             var document = new SIDocument();
@@ -194,6 +230,11 @@ namespace SIPackages
             _sources = new SourceInfoList();
         }
 
+        /// <summary>
+        /// Loads document from stream.
+        /// </summary>
+        /// <param name="stream">Source stream.</param>
+        /// <param name="read">Should the document be read-only.</param>
         public static SIDocument Load(Stream stream, bool read = true)
         {
             var document = new SIDocument();
@@ -213,6 +254,10 @@ namespace SIPackages
             return document;
         }
 
+        /// <summary>
+        /// Loads document from stream as XML.
+        /// </summary>
+        /// <param name="stream">Source stream.</param>
         public static SIDocument LoadXml(Stream stream)
         {
             var document = new SIDocument();
@@ -330,6 +375,12 @@ namespace SIPackages
             package.Flush();
         }
 
+        /// <summary>
+        /// Saves document to stream.
+        /// </summary>
+        /// <param name="stream">Target stream.</param>
+        /// <param name="switchTo">Should the document be retargeted to this stream.</param>
+        /// <returns>Document based on new stream.</returns>
         public SIDocument SaveAs(Stream stream, bool switchTo)
         {
             var newSource = _source.CopyTo(stream, switchTo, out bool isNew);
@@ -364,6 +415,10 @@ namespace SIPackages
             return doc;
         }
 
+        /// <summary>
+        /// Saves document XML to the stream.
+        /// </summary>
+        /// <param name="stream">Target stream.</param>
         public void SaveXml(Stream stream)
         {
             var package = _package.Clone();
@@ -655,7 +710,7 @@ namespace SIPackages
                 if (collection.Contains(link))
                 {
                     using var stream = collection.GetFile(link).Stream;
-                    await newCollection.AddFile(link, stream);
+                    await newCollection.AddFileAsync(link, stream);
                 }
             }
         }

@@ -110,7 +110,7 @@ namespace SIPackages.PlatformSpecific.Net45
             AddContentTypeInfo(name, contentType);
         }
 
-        public async Task CreateStream(string category, string name, string contentType, Stream stream)
+        public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
         {
             var entry = _zipArchive.CreateEntry(category + "/" + Uri.EscapeUriString(name), CompressionLevel.Optimal);
             using (var writeStream = entry.Open())

@@ -37,6 +37,8 @@ namespace SIQuester.ViewModel
 
         private const int MaxUndoListCount = 100;
 
+        private const string ClipboardKey = "siqdata";
+
         private bool _changed = false;
         private readonly Stack<IChange> _undoList = new();
         private readonly Stack<IChange> _redoList = new();
@@ -1008,12 +1010,6 @@ namespace SIQuester.ViewModel
             PreviousSearchResult = new SimpleCommand(PreviousSearchResult_Executed) { CanBeExecuted = false };
             ClearSearchText = new SimpleCommand(ClearSearchText_Executed) { CanBeExecuted = false };
 
-            AddCommandBinding(ApplicationCommands.SaveAs, SaveAs_Executed);
-
-            AddCommandBinding(ApplicationCommands.Cut, Cut_Executed);
-            AddCommandBinding(ApplicationCommands.Copy, Copy_Executed);
-            AddCommandBinding(ApplicationCommands.Paste, Paste_Executed);
-
             FileName = "";
             Path = "";
 
@@ -1211,14 +1207,12 @@ namespace SIQuester.ViewModel
             return errors.Count == 0 ? null : string.Join(Environment.NewLine, errors);
         }
 
-        private void Cut_Executed(object sender, ExecutedRoutedEventArgs e)
+        internal void Cut_Executed()
         {
             // Пока не поддерживается
         }
 
-        private const string ClipboardKey = "siqdata";
-
-        private void Copy_Executed(object sender, ExecutedRoutedEventArgs e)
+        internal void Copy_Executed()
         {
             if (_activeNode == null)
                 return;
@@ -1236,7 +1230,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private async void Paste_Executed(object sender, ExecutedRoutedEventArgs e)
+        internal async void Paste_Executed()
         {
             if (_activeNode == null)
                 return;
@@ -1303,7 +1297,7 @@ namespace SIQuester.ViewModel
                 else
                     return;
 
-                await itemData.ApplyData(Document);
+                await itemData.ApplyDataAsync(Document);
             }
             catch (Exception exc)
             {
@@ -1533,7 +1527,7 @@ namespace SIQuester.ViewModel
         {
             try
             {
-                string filename = String.Format("{0}IRCScriptFile", FileName.Replace(".", "-"));
+                string filename = string.Format("{0}IRCScriptFile", FileName.Replace(".", "-"));
                 var filter = new Dictionary<string, string>
                 {
                     ["Текстовые файлы"] = "txt"
@@ -1552,52 +1546,52 @@ namespace SIQuester.ViewModel
                     file.AppendLine(Resources.ToIRCtext);
                     file.AppendLine();
                     int pind = 1, rind = 1, tind = 1, qind = 1;
-                    file.AppendLine(String.Format("[p{0}name]", pind));
+                    file.AppendLine(string.Format("[p{0}name]", pind));
                     file.AppendLine(Document.Package.Name);
 
-                    file.AppendLine(String.Format("[p{0}auth]", pind));
+                    file.AppendLine(string.Format("[p{0}auth]", pind));
                     file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(Document.Package.Info.Authors)));
 
-                    file.AppendLine(String.Format("[p{0}sour]", pind));
+                    file.AppendLine(string.Format("[p{0}sour]", pind));
                     file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(Document.Package.Info.Sources)));
 
-                    file.AppendLine(String.Format("[p{0}comm]", pind));
+                    file.AppendLine(string.Format("[p{0}comm]", pind));
                     file.AppendLine(Document.Package.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
 
                     Document.Package.Rounds.ForEach(round =>
                     {
-                        file.AppendLine(String.Format("[r{0}name]", rind));
+                        file.AppendLine(string.Format("[r{0}name]", rind));
                         file.AppendLine(round.Name);
-                        file.AppendLine(String.Format("[r{0}type]", rind));
+                        file.AppendLine(string.Format("[r{0}type]", rind));
                         if (round.Type == RoundTypes.Standart)
                             file.AppendLine(Resources.Simple);
                         else
                             file.AppendLine(Resources.Final);
-                        file.AppendLine(String.Format("[r{0}auth]", rind));
+                        file.AppendLine(string.Format("[r{0}auth]", rind));
                         file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(round.Info.Authors)));
-                        file.AppendLine(String.Format("[r{0}sour]", rind));
+                        file.AppendLine(string.Format("[r{0}sour]", rind));
                         file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(round.Info.Sources)));
-                        file.AppendLine(String.Format("[r{0}comm]", rind));
+                        file.AppendLine(string.Format("[r{0}comm]", rind));
                         file.AppendLine(round.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
                         round.Themes.ForEach(theme =>
                         {
-                            file.AppendLine(String.Format("[t{0}name]", tind));
+                            file.AppendLine(string.Format("[t{0}name]", tind));
                             file.AppendLine(theme.Name);
-                            file.AppendLine(String.Format("[t{0}auth]", tind));
+                            file.AppendLine(string.Format("[t{0}auth]", tind));
                             file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(theme.Info.Authors)));
-                            file.AppendLine(String.Format("[t{0}sour]", tind));
+                            file.AppendLine(string.Format("[t{0}sour]", tind));
                             file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(theme.Info.Sources)));
-                            file.AppendLine(String.Format("[t{0}comm]", tind));
+                            file.AppendLine(string.Format("[t{0}comm]", tind));
                             file.AppendLine(theme.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
                             theme.Questions.ForEach(quest =>
                             {
-                                file.AppendLine(String.Format("[q{0}price]", qind));
+                                file.AppendLine(string.Format("[q{0}price]", qind));
                                 file.AppendLine(quest.Price.ToString());
-                                file.AppendLine(String.Format("[q{0}type]", qind));
+                                file.AppendLine(string.Format("[q{0}type]", qind));
                                 file.AppendLine(quest.Type.Name);
                                 foreach (QuestionTypeParam p in quest.Type.Params)
                                 {
-                                    file.AppendLine(String.Format("[q{0}{1}]", qind, p.Name));
+                                    file.AppendLine(string.Format("[q{0}{1}]", qind, p.Name));
                                     file.AppendLine(p.Value.Replace('[', '<').Replace(']', '>'));
                                 }
                                 var qText = new StringBuilder();
@@ -1642,17 +1636,17 @@ namespace SIQuester.ViewModel
                                     showmanComments.Append(comments);
                                 }
 
-                                file.AppendLine(String.Format("[q{0}text]", qind));
+                                file.AppendLine(string.Format("[q{0}text]", qind));
                                 file.AppendLine(qText.ToString());
-                                file.AppendLine(String.Format("[q{0}right]", qind));
+                                file.AppendLine(string.Format("[q{0}right]", qind));
                                 file.AppendLine(string.Join(Environment.NewLine, quest.Right.ToArray()));
-                                file.AppendLine(String.Format("[q{0}wrong]", qind));
+                                file.AppendLine(string.Format("[q{0}wrong]", qind));
                                 file.AppendLine(string.Join(Environment.NewLine, quest.Wrong.ToArray()));
-                                file.AppendLine(String.Format("[q{0}auth]", qind));
+                                file.AppendLine(string.Format("[q{0}auth]", qind));
                                 file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(quest.Info.Authors)));
-                                file.AppendLine(String.Format("[q{0}sour]", qind));
+                                file.AppendLine(string.Format("[q{0}sour]", qind));
                                 file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(quest.Info.Sources)));
-                                file.AppendLine(String.Format("[q{0}comm]", qind));
+                                file.AppendLine(string.Format("[q{0}comm]", qind));
                                 file.AppendLine(showmanComments.ToString());
                                 qind++;
                             });
@@ -1693,6 +1687,7 @@ namespace SIQuester.ViewModel
             {
                 ["Документы (*.xps)"] = "xps"
             };
+
             if (PlatformManager.Instance.ShowSaveUI("Экспорт в формат таблицы", "xps", filter, ref filename))
             {
                 IsProgress = true;
@@ -1846,9 +1841,16 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private async void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
+        internal async void SaveAs_Executed()
         {
-            await SaveAs();
+            try
+            {
+                await SaveAs();
+            }
+            catch (Exception exc)
+            {
+                OnError(exc);
+            }
         }
 
         private async Task SaveAs()
@@ -2455,7 +2457,7 @@ namespace SIQuester.ViewModel
 
                 for (int i = 0; i < gamesCount; i++)
                 {
-                    var themeViewModel = new ThemeViewModel(new Theme { Name = String.Format(Resources.GameNumber, i + 1) });
+                    var themeViewModel = new ThemeViewModel(new Theme { Name = string.Format(Resources.GameNumber, i + 1) });
                     roundViewModel.Themes.Add(themeViewModel);
 
                     for (int j = 0; j < 15; j++)

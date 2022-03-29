@@ -48,7 +48,7 @@ namespace SIQuester.Behaviors
         private static void RemoveHandlers(TextBlock textBlock)
         {
             TextDescriptor.RemoveValueChanged(textBlock, SetToolTip);
-            WidthDescriptor.AddValueChanged(textBlock, SetToolTip);
+            WidthDescriptor.RemoveValueChanged(textBlock, SetToolTip);
         }
 
         private static void SetToolTip(object sender, EventArgs e)

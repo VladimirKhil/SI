@@ -10,6 +10,7 @@ namespace SIPackages
     /// <summary>
     /// Категория в хранилище
     /// </summary>
+    /// <inheritdoc cref="IEnumerable{T}" />
     public sealed class DataCollection : IEnumerable<string>
     {
         private readonly string _mediaType;
@@ -25,16 +26,18 @@ namespace SIPackages
         /// Название коллекции
         /// </summary>
         public string Name { get; }
+
         /// <summary>
         /// Количество элементов в коллекции
         /// </summary>
-        public int Count { get { return _files.Count(); } }
+        public int Count => _files.Count();
 
         /// <summary>
-        /// Создание категории
+        /// Initilizes a new instance of <see cref="DataCollection" /> class.
         /// </summary>
-        /// <param name="package">Документ-владелец</param>
-        /// <param name="name">Имя категории</param>
+        /// <param name="package">Package that owns the collection.</param>
+        /// <param name="name">Collection name.</param>
+        /// <param name="mediaType">Collection media type.</param>
         internal DataCollection(ISIPackage package, string name, string mediaType)
         {
             Name = name;
@@ -49,15 +52,13 @@ namespace SIPackages
         /// </summary>
         /// <param name="fileName">Имя файла</param>
         /// <returns>Содержит ли категория данный файл</returns>
-        internal bool Contains(string fileName)
-        {
-            return _files.Contains(fileName);
-        }
+        internal bool Contains(string fileName) => _files.Contains(fileName);
 
-        public StreamInfo GetFile(string fileName)
-        {
-            return _package.GetStream(Name, fileName);
-        }
+        /// <summary>
+        /// Gets collection file.
+        /// </summary>
+        /// <param name="fileName">File name.</param>
+        public StreamInfo GetFile(string fileName) => _package.GetStream(Name, fileName);
 
         #region IEnumerable<string> Members
 
@@ -77,24 +78,39 @@ namespace SIPackages
 
         #endregion
 
-        public async Task AddFile(string fileName, Stream stream)
+        /// <summary>
+        /// Adss file to the collection.
+        /// </summary>
+        /// <param name="fileName">File name.</param>
+        /// <param name="stream">File stream.</param>
+        public async Task AddFileAsync(string fileName, Stream stream)
         {
-            await _package.CreateStream(Name, fileName, _mediaType, stream);
+            await _package.CreateStreamAsync(Name, fileName, _mediaType, stream);
             _files.Add(fileName);
         }
 
+        /// <summary>
+        /// Removes file from the collection.
+        /// </summary>
+        /// <param name="fileName">File name.</param>
         public void RemoveFile(string fileName)
         {
             _package.DeleteStream(Name, fileName);
             _files.Remove(fileName);
         }
 
-        public async Task RenameFile(string oldName, string newName)
+        /// <summary>
+        /// Renames a file.
+        /// </summary>
+        /// <param name="oldName">Old file name.</param>
+        /// <param name="newName">New file name.</param>
+        /// <returns></returns>
+        public async Task RenameFileAsync(string oldName, string newName)
         {
             var streamInfo = _package.GetStream(Name, oldName);
             using (var stream = streamInfo.Stream)
             {
-                await _package.CreateStream(Name, newName, _mediaType, stream);
+                await _package.CreateStreamAsync(Name, newName, _mediaType, stream);
             }
 
             _files.Add(newName);
@@ -103,9 +119,6 @@ namespace SIPackages
             _files.Remove(oldName);
         }
 
-        internal void UpdateSource(ISIPackage package)
-        {
-            _package = package;
-        }
+        internal void UpdateSource(ISIPackage package) => _package = package;
     }
 }

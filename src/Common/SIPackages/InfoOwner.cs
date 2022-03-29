@@ -31,11 +31,21 @@ namespace SIPackages
             Info.Comments.Text = infoOwner.Info.Comments.Text;
         }
 
-        public override bool Contains(string value)
-        {
-            return base.Contains(value) || Info.Authors.ContainsQuery(value) || Info.Sources.ContainsQuery(value) || Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
-        }
+        /// <summary>
+        /// Does the object contain specified value.
+        /// </summary>
+        /// <param name="value">Text value.</param>
+        public override bool Contains(string value) => 
+            base.Contains(value)
+            || Info.Authors.ContainsQuery(value)
+            || Info.Sources.ContainsQuery(value)
+            || Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
+        /// <summary>
+        /// Searches a value inside object.
+        /// </summary>
+        /// <param name="value">Value to search.</param>
+        /// <returns>Search results.</returns>
         public override IEnumerable<SearchData> Search(string value)
         {
             foreach (var item in base.Search(value))

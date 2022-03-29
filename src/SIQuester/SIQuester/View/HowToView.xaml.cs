@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿using SIQuester.ViewModel.Helpers;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -20,10 +20,14 @@ namespace SIQuester
         {
             try
             {
-                if (e.Uri.Scheme == "http")
-                    Process.Start(e.Uri.ToString());
+                if (e.Uri.Scheme == "http" || e.Uri.Scheme == "https")
+                {
+                    Browser.Open(e.Uri.ToString());
+                }
                 else
+                {
                     viewer.GoToPage(4);
+                }
             }
             catch (Exception exc)
             {

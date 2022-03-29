@@ -10,7 +10,7 @@ namespace SIPackages
     public sealed class QuestionTypeParam : Named
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _value;
+        private string _value = "";
 
         /// <summary>
         /// Значение параметра

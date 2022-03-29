@@ -11,7 +11,7 @@ namespace SIPackages.Core
     {
         // TODO: private
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        protected string _name;
+        protected string _name = "";
 
         /// <summary>
         /// Имя

@@ -1,0 +1,1 @@
+dotnet build src\SIQuester\SIQuester\SIQuester.csproj -c Release

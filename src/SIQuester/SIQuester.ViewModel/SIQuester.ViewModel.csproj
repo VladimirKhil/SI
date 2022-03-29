@@ -1,21 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{8B3640F3-9547-4B76-874D-7FA2E75AD679}</ProjectGuid>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SIQuester.ViewModel</AssemblyTitle>
-    <Company>Svoyak-soft</Company>
+    <Company>Khil-soft</Company>
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
     <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
-    <Version>5.6.3</Version>
+    <Version>5.7.0</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>portable</DebugType>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -30,16 +29,11 @@
       <HintPath>..\QTxtConverter\dlls\Lingware.Spard.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="MahApps.Metro" Version="1.5.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.5" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

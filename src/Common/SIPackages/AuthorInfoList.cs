@@ -7,11 +7,15 @@ namespace SIPackages
     [CollectionDataContract(Name = "Authors", Namespace = "")]
     public sealed class AuthorInfoList: List<AuthorInfo>, IXmlSerializable
     {
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
+        /// <summary>
+        /// Gets XML schema to use.
+        /// </summary>
+        public System.Xml.Schema.XmlSchema GetSchema() => null;
 
+        /// <summary>
+        /// Loads data from XML reader.
+        /// </summary>
+        /// <param name="reader">Reader to use.</param>
         public void ReadXml(System.Xml.XmlReader reader)
         {
             AuthorInfo authorInfo = null;
@@ -65,6 +69,10 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Writes data to XML writer.
+        /// </summary>
+        /// <param name="writer">Writer.</param>
         public void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("Authors");

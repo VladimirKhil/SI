@@ -1,6 +1,7 @@
 ﻿using Services.SI.ViewModel;
 using SIQuester.ViewModel.Properties;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,12 +18,23 @@ namespace SIQuester.ViewModel
 
         private readonly StorageContextViewModel _storageContextViewModel;
 
+        public bool IsProgress => Storage.IsLoading || Storage.IsLoadingPackages;
+
         public ImportSIStorageViewModel(StorageContextViewModel storageContextViewModel)
         {
             _storageContextViewModel = storageContextViewModel;
 
             Storage.Error += OnError;
+            Storage.PropertyChanged += Storage_PropertyChanged;
             Storage.Open();
+        }
+
+        private void Storage_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SIStorageNew.IsLoading) || e.PropertyName == nameof(SIStorageNew.IsLoadingPackages))
+            {
+                OnPropertyChanged(nameof(IsProgress));
+            }
         }
 
         public void Select()

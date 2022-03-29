@@ -1,7 +1,5 @@
 ﻿using SIPackages.Properties;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 
@@ -186,6 +184,10 @@ namespace SIPackages
             return round;
         }
 
+        /// <summary>
+        /// Reads data from XML reader.
+        /// </summary>
+        /// <param name="reader">XML reader.</param>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             _name = reader.GetAttribute("name");
@@ -252,6 +254,10 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Writes data to XML writer.
+        /// </summary>
+        /// <param name="writer">XML writer.</param>
         public override void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("package", "http://vladimirkhil.com/ygpackage3.0.xsd");
@@ -306,6 +312,9 @@ namespace SIPackages
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Creates a copy of this object.
+        /// </summary>
         public Package Clone()
         {
             var package = new Package

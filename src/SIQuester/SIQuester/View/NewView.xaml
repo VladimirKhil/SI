@@ -7,8 +7,9 @@
              xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
              xmlns:lc="clr-namespace:SIQuester.Converters"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" 
-             FontSize="14" FocusManager.FocusedElement="{Binding ElementName=bCreate}">
+             mc:Ignorable="d"
+             FontSize="14"
+             FocusManager.FocusedElement="{Binding ElementName=bCreate}">
     <UserControl.Resources>
         <ObjectDataProvider x:Key="PackageTypes" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
             <ObjectDataProvider.MethodParameters>

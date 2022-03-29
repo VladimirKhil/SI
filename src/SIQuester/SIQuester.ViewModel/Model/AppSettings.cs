@@ -335,10 +335,10 @@ namespace SIQuester.Model
         [DefaultValue("Calibri")]
         public string FontFamily
         {
-            get { return _fontFamily; }
+            get => _fontFamily;
             set
             {
-                if (_fontFamily != value)
+                if (_fontFamily != value && value != null)
                 {
                     _fontFamily = value;
                     OnPropertyChanged();

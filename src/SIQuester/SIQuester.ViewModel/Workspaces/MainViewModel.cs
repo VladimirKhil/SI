@@ -2,12 +2,12 @@
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Core;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +19,8 @@ namespace SIQuester.ViewModel
 {
     public sealed class MainViewModel: ModelViewBase, INotifyPropertyChanged
     {
+        private const string DonateUrl = "https://yoomoney.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
+
         #region Commands
 
         public ICommand Open { get; private set; }
@@ -119,10 +121,18 @@ namespace SIQuester.ViewModel
             AddCommandBinding(ApplicationCommands.Help, Help_Executed);
             AddCommandBinding(ApplicationCommands.Close, Close_Executed);
 
+            AddCommandBinding(ApplicationCommands.SaveAs, (s, e) => ActiveDocument?.SaveAs_Executed(), CanExecuteDocumentCommand);
+
+            AddCommandBinding(ApplicationCommands.Cut, (s, e) => ActiveDocument?.Cut_Executed(), CanExecuteDocumentCommand);
+            AddCommandBinding(ApplicationCommands.Copy, (s, e) => ActiveDocument?.Copy_Executed(), CanExecuteDocumentCommand);
+            AddCommandBinding(ApplicationCommands.Paste, (s, e) => ActiveDocument?.Paste_Executed(), CanExecuteDocumentCommand);
+
             _args = args;
 
             UI.Initialize();
         }
+
+        private void CanExecuteDocumentCommand(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = ActiveDocument != null;
 
         public async void AutoSave()
         {
@@ -219,34 +229,11 @@ namespace SIQuester.ViewModel
             return true;
         }
 
-        private void Feedback_Executed(object arg)
-        {
-            try
-            {
-                Process.Start(Uri.EscapeUriString(Resources.AuthorSiteUrl));
-            }
-            catch (Exception exc)
-            {
-                ShowError(exc);
-            }
-        }
+        private void Feedback_Executed(object arg) => Browser.Open(Uri.EscapeDataString(Resources.AuthorSiteUrl), ShowError);
 
-        private void Donate_Executed(object arg)
-        {
-            try
-            {
-                Process.Start("https://money.yandex.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9");
-            }
-            catch (Exception exc)
-            {
-                ShowError(exc);
-            }
-        }
+        private void Donate_Executed(object arg) => Browser.Open(DonateUrl, ShowError);
 
-        private void About_Executed(object arg)
-        {
-            DocList.Add(new AboutViewModel());
-        }
+        private void About_Executed(object arg) => DocList.Add(new AboutViewModel());
 
         private void MainViewModel_CurrentChanged(object sender, EventArgs e)
         {

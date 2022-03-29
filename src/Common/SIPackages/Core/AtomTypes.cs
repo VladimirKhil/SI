@@ -1,5 +1,8 @@
 ﻿namespace SIPackages.Core
 {
+    /// <summary>
+    /// Defines well-known atom types.
+    /// </summary>
     public static class AtomTypes
     {
         /// <summary>

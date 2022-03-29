@@ -5,24 +5,40 @@ using System.Runtime.InteropServices;
 
 namespace SIPackages
 {
+    /// <summary>
+    /// Provides helper methods for working with zip archives.
+    /// </summary>
     public static class ZipHelper
     {
         internal static int MaxFileNameLength = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // / 2 из-за кириллических символов
 
-        public static void ExtractToDirectory(string sourceArchiveFileName, string destinationDirectoryName, bool unescape = false)
+        /// <summary>
+        /// Etracts zip archive to directory.
+        /// </summary>
+        /// <param name="sourceArchiveFilePath">Arhive file path.</param>
+        /// <param name="destinationDirectoryPath">Target directory path.</param>
+        /// <param name="unescape">Should extracted items be unescaped.</param>
+        public static void ExtractToDirectory(string sourceArchiveFilePath, string destinationDirectoryPath, bool unescape = false)
         {
-            Directory.CreateDirectory(destinationDirectoryName);
+            Directory.CreateDirectory(destinationDirectoryPath);
 
-            using var stream = File.OpenRead(sourceArchiveFileName);
+            using var stream = File.OpenRead(sourceArchiveFilePath);
             using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
             foreach (var entry in archive.Entries)
             {
-                ExtractEntryToDirectory(entry, destinationDirectoryName, unescape);
+                ExtractEntryToDirectory(entry, destinationDirectoryPath, unescape);
             }
         }
 
-        public static string PrepareForExtraction(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape)
+        /// <summary>
+        /// Creates directory for entity extraction and returns target file name.
+        /// </summary>
+        /// <param name="entry">Entry to extract.</param>
+        /// <param name="destinationDirectoryPath">Target directory path.</param>
+        /// <param name="unescape">Should extracted items be unescaped.</param>
+        /// <returns>Target entity file name.</returns>
+        public static string PrepareForExtraction(ZipArchiveEntry entry, string destinationDirectoryPath, bool unescape)
         {
             var name = unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
             if (name.Length > MaxFileNameLength)
@@ -30,15 +46,22 @@ namespace SIPackages
 
             var index = entry.FullName.IndexOf('/');
 
-            var targetDir = index > -1 ? Path.Combine(destinationDirectoryName, entry.FullName.Substring(0, index)) : destinationDirectoryName;
+            var targetDir = index > -1 ? Path.Combine(destinationDirectoryPath, entry.FullName.Substring(0, index)) : destinationDirectoryPath;
             Directory.CreateDirectory(targetDir);
 
             return Path.Combine(targetDir, name);
         }
 
-        public static void ExtractEntryToDirectory(ZipArchiveEntry entry, string destinationDirectoryName, bool unescape = false)
+        /// <summary>
+        /// Extracts entity to directory.
+        /// </summary>
+        /// <param name="entry">Entry to extract.</param>
+        /// <param name="destinationDirectoryPath">Target directory path.</param>
+        /// <param name="unescape">Should extracted items be unescaped.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Target file name if too long.</exception>
+        public static void ExtractEntryToDirectory(ZipArchiveEntry entry, string destinationDirectoryPath, bool unescape = false)
         {
-            var targetFile = PrepareForExtraction(entry, destinationDirectoryName, unescape);
+            var targetFile = PrepareForExtraction(entry, destinationDirectoryPath, unescape);
 
             if (Path.GetFileName(targetFile).Length > MaxFileNameLength)
             {

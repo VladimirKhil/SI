@@ -1,4 +1,5 @@
-﻿using SIQuester.ViewModel.Properties;
+﻿using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.Properties;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -72,16 +73,6 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void GoToUrl(string url)
-        {
-            try
-            {
-                Process.Start(url);
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
-        }
+        private void GoToUrl(string url) => Browser.Open(url, OnError);
     }
 }

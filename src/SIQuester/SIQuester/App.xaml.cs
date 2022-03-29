@@ -46,11 +46,6 @@ namespace SIQuester
         public static string StartupPath => AppDomain.CurrentDomain.BaseDirectory;
 
         /// <summary>
-        /// Путь к исполняемому файлу приложения
-        /// </summary>
-        public static string ExecutablePath => Assembly.GetEntryAssembly().Location;
-
-        /// <summary>
         /// Необходимый заголовок для WebRequest'ов и WebClient'ов
         /// </summary>
         public static string UserAgentHeader => $"{ProductName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";

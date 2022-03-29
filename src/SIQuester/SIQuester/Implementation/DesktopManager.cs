@@ -309,7 +309,7 @@ namespace SIQuester.Implementation
                             {
                                 var theme = round.Themes[i];
                                 paragraph.AppendLine();
-                                paragraph.AppendFormat("Тема {0}. {1}", i + 1, theme.Name?.ToUpper().EndWithPoint());
+                                paragraph.AppendFormat("Тема {0}. {1}", i + 1, (theme.Name ?? "").ToUpper().EndWithPoint());
                                 AppendInfo(doc, paragraph, theme);
                                 paragraph.AppendLine();
                                 paragraph.AppendLine();

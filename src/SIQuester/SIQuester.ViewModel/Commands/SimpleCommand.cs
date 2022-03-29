@@ -29,7 +29,7 @@ namespace SIQuester.ViewModel
                         if (SynchronizationContext.Current == null)
                         {
                             Task.Factory.StartNew(
-                                () => CanExecuteChanged(this, EventArgs.Empty),
+                                () => CanExecuteChanged?.Invoke(this, EventArgs.Empty),
                                 CancellationToken.None,
                                 TaskCreationOptions.None,
                                 UI.Scheduler);

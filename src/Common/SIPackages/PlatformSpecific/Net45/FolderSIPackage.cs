@@ -38,7 +38,7 @@ namespace SIPackages.PlatformSpecific.Net45
             using (File.Create(Path.Combine(_folder, category, name))) { }
         }
 
-        public async Task CreateStream(string category, string name, string contentType, Stream stream)
+        public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
         {
             Directory.CreateDirectory(Path.Combine(_folder, category));
             using (var fs = File.Create(Path.Combine(_folder, category, name)))

@@ -3,6 +3,7 @@ using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -469,101 +470,108 @@ namespace SIQuester
         private async void Main_Drop(object sender, DragEventArgs e)
         {
             e.Handled = true;
-            line.Visibility = Visibility.Hidden;
 
-            if (e.Data.GetDataPresent("FileName"))
-            {
-                var files = e.Data.GetData("FileName") as string[];
-                foreach (var file in files)
-                {
-                    var longPath = new StringBuilder(255);
-                    GetLongPathName(file, longPath, longPath.Capacity);
-
-                    var longPathString = longPath.ToString();
-
-                    if (Path.GetExtension(longPathString) == ".txt")
-                    {
-                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
-                    }
-                    else
-                    {
-                        ApplicationCommands.Open.Execute(longPathString, this);
-                    }
-                }
-
-                e.Effects = e.AllowedEffects;
-                return;
-            }
-
-            if (e.Data.GetDataPresent("FileContents"))
-            {
-                using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
-                {
-                    ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
-                }
-
-                e.Effects = e.AllowedEffects;
-                return;
-            }
-
-            var format = GetDragFormat(e);
-
-            InfoOwnerData dragData = null;
             try
             {
-                dragData = (InfoOwnerData)e.Data.GetData(typeof(InfoOwnerData));
-            }
-            catch (SerializationException)
-            {
-                return;
-            }
+                line.Visibility = Visibility.Hidden;
 
-            e.Effects = DragDropEffects.Move;
-            try
-            {
-                if (format == "siqquestion" && _insertionPosition != null)
+                if (e.Data.GetDataPresent("FileName"))
                 {
-                    Question question = null;
-                    if (dragData != null)
+                    var files = e.Data.GetData("FileName") as string[];
+                    foreach (var file in files)
                     {
-                        question = (Question)dragData.GetItem();
-                    }
-                    else
-                    {
-                        var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                        using (var stringReader = new StringReader(value))
-                        using (var reader = XmlReader.Create(stringReader))
+                        var longPath = new StringBuilder(255);
+                        GetLongPathName(file, longPath, longPath.Capacity);
+
+                        var longPathString = longPath.ToString();
+
+                        if (Path.GetExtension(longPathString) == ".txt")
                         {
-                            question = new Question();
-                            question.ReadXml(reader);
+                            ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
+                        }
+                        else
+                        {
+                            ApplicationCommands.Open.Execute(longPathString, this);
                         }
                     }
 
-                    var themeViewModel = _insertionPosition.Item1;
-                    var index = _insertionPosition.Item2;
-
-                    if (themeViewModel.Questions.Any(questionViewModel => questionViewModel.Model == question))
-                        question = question.Clone();
-
-                    var questionViewModelNew = new QuestionViewModel(question);
-                    themeViewModel.Questions.Insert(index, questionViewModelNew);
-
-                    if (AppSettings.Default.ChangePriceOnMove)
-                        RecountPrices(themeViewModel);
-
-                    var document = (QDocument)DataContext;
-                    await dragData.ApplyData(document.Document);
-                    document.Navigate.Execute(questionViewModelNew);
+                    e.Effects = e.AllowedEffects;
+                    return;
                 }
-                else
-                    e.Effects = DragDropEffects.None;
-            }
-            finally
-            {
-                if (dragData != null)
+
+                if (e.Data.GetDataPresent("FileContents"))
                 {
-                    dragData.Dispose();
+                    using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
+                    {
+                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
+                    }
+
+                    e.Effects = e.AllowedEffects;
+                    return;
                 }
+
+                var format = GetDragFormat(e);
+
+                InfoOwnerData dragData = null;
+                try
+                {
+                    dragData = (InfoOwnerData)e.Data.GetData(typeof(InfoOwnerData));
+                }
+                catch (SerializationException)
+                {
+                    return;
+                }
+
+                e.Effects = DragDropEffects.Move;
+                try
+                {
+                    if (format == "siqquestion" && _insertionPosition != null)
+                    {
+                        Question question = null;
+                        if (dragData != null)
+                        {
+                            question = (Question)dragData.GetItem();
+                        }
+                        else
+                        {
+                            var value = e.Data.GetData(DataFormats.Serializable).ToString();
+                            using var stringReader = new StringReader(value);
+                            using var reader = XmlReader.Create(stringReader);
+
+                            question = new Question();
+                            question.ReadXml(reader);
+                        }
+
+                        var themeViewModel = _insertionPosition.Item1;
+                        var index = _insertionPosition.Item2;
+
+                        if (themeViewModel.Questions.Any(questionViewModel => questionViewModel.Model == question))
+                            question = question.Clone();
+
+                        var questionViewModelNew = new QuestionViewModel(question);
+                        themeViewModel.Questions.Insert(index, questionViewModelNew);
+
+                        if (AppSettings.Default.ChangePriceOnMove)
+                            RecountPrices(themeViewModel);
+
+                        var document = (QDocument)DataContext;
+                        await dragData.ApplyDataAsync(document.Document);
+                        document.Navigate.Execute(questionViewModelNew);
+                    }
+                    else
+                        e.Effects = DragDropEffects.None;
+                }
+                finally
+                {
+                    if (dragData != null)
+                    {
+                        dragData.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"Main_Drop error: {ex}");
             }
         }
 

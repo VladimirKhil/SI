@@ -2,9 +2,12 @@
 
 namespace SIPackages.Core
 {
+    /// <summary>
+    /// Provides helper method for parsing secret question cost.
+    /// </summary>
     public static class BagCatHelper
     {
-        private static readonly Regex CatCostRegex = new Regex(@"\[(?'min'\d+);(?'max'\d+)\](/(?'step'\d+))?", RegexOptions.Compiled);
+        private static readonly Regex CatCostRegex = new(@"\[(?'min'\d+);(?'max'\d+)\](/(?'step'\d+))?", RegexOptions.Compiled);
 
         /// <summary>
         /// Разобрать стоимость Обобщённого вопроса с секретом (см. спецификацию типа)

@@ -151,11 +151,6 @@ namespace SIQuester.Behaviors
                         mediaUri = media.Source;
                     }
 
-                    if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
-                    {
-                        MessageBox.Show("Протокол https не поддерживается!", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                        return;
-                    }
 
                     try
                     {

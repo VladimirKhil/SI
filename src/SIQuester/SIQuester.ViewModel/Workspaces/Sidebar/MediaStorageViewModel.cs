@@ -242,7 +242,7 @@ namespace SIQuester.ViewModel
                 try
                 {
                     using var fs = _streams[item].Item2;
-                    await collection.AddFile(item.Model.Name, fs);
+                    await collection.AddFileAsync(item.Model.Name, fs);
                 }
                 catch (Exception exc)
                 {
@@ -255,7 +255,7 @@ namespace SIQuester.ViewModel
 
             foreach (var item in _renamed.ToArray())
             {
-                await collection.RenameFile(item.Item1, item.Item2);
+                await collection.RenameFileAsync(item.Item1, item.Item2);
                 _renamed.Remove(item);
             }
 
@@ -276,19 +276,19 @@ namespace SIQuester.ViewModel
                 {
                     using (fs)
                     {
-                        await collection.AddFile(item.Model.Name, fs);
+                        await collection.AddFileAsync(item.Model.Name, fs);
                     }
                 }
                 else
                 {
-                    await collection.AddFile(item.Model.Name, fs);
+                    await collection.AddFileAsync(item.Model.Name, fs);
                     fs.Position = 0;
                 }
             }
 
             foreach (var item in _renamed.ToArray())
             {
-                await collection.RenameFile(item.Item1, item.Item2);
+                await collection.RenameFileAsync(item.Item1, item.Item2);
             }
 
             if (final)

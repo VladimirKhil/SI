@@ -2,6 +2,7 @@
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -66,7 +67,7 @@ namespace SIQuester
 
                 host = AppSettings.Default.View == ViewMode.TreeFull
                     ? FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource)
-                    : (FrameworkElement)FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
+                    : FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
 
                 if (host == null || host.DataContext == null || host.DataContext is PackageViewModel || !(host.DataContext is IItemViewModel))
                     return;
@@ -209,188 +210,195 @@ namespace SIQuester
         {
             e.Handled = true;
 
-            if (e.Data.GetDataPresent("FileName"))
-            {
-                var files = e.Data.GetData("FileName") as string[];
-                foreach (var file in files)
-                {
-                    var longPath = new StringBuilder(255);
-                    GetLongPathName(file, longPath, longPath.Capacity);
-
-                    var longPathString = longPath.ToString();
-
-                    if (Path.GetExtension(longPathString) == ".txt")
-                    {
-                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
-                    }
-                    else
-                        ApplicationCommands.Open.Execute(longPathString, this);
-                }
-
-                e.Effects = e.AllowedEffects;
-                return;
-            }
-
-            if (e.Data.GetDataPresent("FileContents"))
-            {
-                using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
-                {
-                    ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
-                }
-
-                e.Effects = e.AllowedEffects;
-                return;
-            }
-
-            var treeViewItem = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
-
-            if (treeViewItem == null)
-            {
-                e.Effects = DragDropEffects.None;
-                return;
-            }
-
-            var format = FlatDocView.GetDragFormat(e);
-
-            InfoOwnerData dragData = null;
             try
             {
-                dragData = (InfoOwnerData)e.Data.GetData(typeof(InfoOwnerData));
-            }
-            catch (SerializationException)
-            {
-                return;
-            }
-
-            var dataContext = ((IItemViewModel)treeViewItem.DataContext).GetModel();
-            if (dataContext == null || dataContext.GetType().ToString() == format && Equals(dataContext, dragData.ItemData))
-            {
-                e.Effects = DragDropEffects.None;
-                return;
-            }
-
-            var document = ((QDocument)DataContext).Document;
-
-            e.Effects = DragDropEffects.Move;
-            try
-            {
-                if (format == "siqround")
+                if (e.Data.GetDataPresent("FileName"))
                 {
-                    Round round = null;
-                    if (dragData != null)
+                    var files = e.Data.GetData("FileName") as string[];
+                    foreach (var file in files)
                     {
-                        round = (Round)dragData.GetItem();
-                    }
-                    else
-                    {
-                        var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                        using (var stringReader = new StringReader(value))
-                        using (var reader = XmlReader.Create(stringReader))
+                        var longPath = new StringBuilder(255);
+                        GetLongPathName(file, longPath, longPath.Capacity);
+
+                        var longPathString = longPath.ToString();
+
+                        if (Path.GetExtension(longPathString) == ".txt")
                         {
-                            round = new Round();
-                            round.ReadXml(reader);
+                            ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
                         }
+                        else
+                            ApplicationCommands.Open.Execute(longPathString, this);
                     }
 
-                    if (treeViewItem.DataContext is PackageViewModel)
-                    {
-                        var package = treeViewItem.DataContext as PackageViewModel;
-                        package.Rounds.Add(new RoundViewModel(round));
-                        await dragData.ApplyData(document);
-                    }
-                    else if (treeViewItem.DataContext is RoundViewModel)
-                    {
-                        var docRound = treeViewItem.DataContext as RoundViewModel;
-                        docRound.OwnerPackage.Rounds.Insert(docRound.OwnerPackage.Rounds.IndexOf(docRound), new RoundViewModel(round));
-                        await dragData.ApplyData(document);
-                    }
+                    e.Effects = e.AllowedEffects;
+                    return;
                 }
-                else if (format == "siqtheme")
+
+                if (e.Data.GetDataPresent("FileContents"))
                 {
-                    Theme theme = null;
-                    if (dragData != null)
+                    using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
                     {
-                        theme = (Theme)dragData.GetItem();
-                    }
-                    else
-                    {
-                        var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                        using (var stringReader = new StringReader(value))
-                        using (var reader = XmlReader.Create(stringReader))
-                        {
-                            theme = new Theme();
-                            theme.ReadXml(reader);
-                        }
+                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
                     }
 
-                    if (treeViewItem.DataContext is RoundViewModel)
-                    {
-                        var docRound = treeViewItem.DataContext as RoundViewModel;
-                        docRound.Themes.Add(new ThemeViewModel(theme));
-                        await dragData.ApplyData(document);
-                    }
-                    else if (treeViewItem.DataContext is ThemeViewModel)
-                    {
-                        var docTheme = treeViewItem.DataContext as ThemeViewModel;
-                        docTheme.OwnerRound.Themes.Insert(docTheme.OwnerRound.Themes.IndexOf(docTheme), new ThemeViewModel(theme));
-                        await dragData.ApplyData(document);
-                    }
+                    e.Effects = e.AllowedEffects;
+                    return;
                 }
-                else if (format == "siqquestion")
+
+                var treeViewItem = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+
+                if (treeViewItem == null)
                 {
-                    Question question = null;
-                    if (dragData != null)
-                    {
-                        question = (Question)dragData.GetItem();
-                    }
-                    else
-                    {
-                        var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                        using (var stringReader = new StringReader(value))
-                        using (var reader = XmlReader.Create(stringReader))
-                        {
-                            question = new Question();
-                            question.ReadXml(reader);
-                        }
-                    }
-
-                    if (treeViewItem.DataContext is ThemeViewModel)
-                    {
-                        var docTheme = treeViewItem.DataContext as ThemeViewModel;
-                        if (docTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
-                            question = question.Clone();
-
-                        docTheme.Questions.Add(new QuestionViewModel(question));
-
-                        if (AppSettings.Default.ChangePriceOnMove)
-                            FlatDocView.RecountPrices(docTheme);
-
-                        await dragData.ApplyData(document);
-                    }
-                    else if (treeViewItem.DataContext is QuestionViewModel)
-                    {
-                        var docQuestion = treeViewItem.DataContext as QuestionViewModel;
-                        if (docQuestion.OwnerTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
-                            question = question.Clone();
-
-                        int pos = docQuestion.OwnerTheme.Questions.IndexOf(docQuestion);
-                        docQuestion.OwnerTheme.Questions.Insert(pos, new QuestionViewModel(question));
-
-                        if (AppSettings.Default.ChangePriceOnMove)
-                            FlatDocView.RecountPrices(docQuestion.OwnerTheme);
-
-                        await dragData.ApplyData(document);
-                    }
-                }
-                else
                     e.Effects = DragDropEffects.None;
-            }
-            finally
-            {
-                if (dragData != null)
-                {
-                    dragData.Dispose();
+                    return;
                 }
+
+                var format = FlatDocView.GetDragFormat(e);
+
+                InfoOwnerData dragData = null;
+                try
+                {
+                    dragData = (InfoOwnerData)e.Data.GetData(typeof(InfoOwnerData));
+                }
+                catch (SerializationException)
+                {
+                    return;
+                }
+
+                var dataContext = ((IItemViewModel)treeViewItem.DataContext).GetModel();
+                if (dataContext == null || dataContext.GetType().ToString() == format && Equals(dataContext, dragData.ItemData))
+                {
+                    e.Effects = DragDropEffects.None;
+                    return;
+                }
+
+                var document = ((QDocument)DataContext).Document;
+
+                e.Effects = DragDropEffects.Move;
+                try
+                {
+                    if (format == "siqround")
+                    {
+                        Round round = null;
+                        if (dragData != null)
+                        {
+                            round = (Round)dragData.GetItem();
+                        }
+                        else
+                        {
+                            var value = e.Data.GetData(DataFormats.Serializable).ToString();
+                            using (var stringReader = new StringReader(value))
+                            using (var reader = XmlReader.Create(stringReader))
+                            {
+                                round = new Round();
+                                round.ReadXml(reader);
+                            }
+                        }
+
+                        if (treeViewItem.DataContext is PackageViewModel)
+                        {
+                            var package = treeViewItem.DataContext as PackageViewModel;
+                            package.Rounds.Add(new RoundViewModel(round));
+                            await dragData.ApplyDataAsync(document);
+                        }
+                        else if (treeViewItem.DataContext is RoundViewModel)
+                        {
+                            var docRound = treeViewItem.DataContext as RoundViewModel;
+                            docRound.OwnerPackage.Rounds.Insert(docRound.OwnerPackage.Rounds.IndexOf(docRound), new RoundViewModel(round));
+                            await dragData.ApplyDataAsync(document);
+                        }
+                    }
+                    else if (format == "siqtheme")
+                    {
+                        Theme theme = null;
+                        if (dragData != null)
+                        {
+                            theme = (Theme)dragData.GetItem();
+                        }
+                        else
+                        {
+                            var value = e.Data.GetData(DataFormats.Serializable).ToString();
+                            using (var stringReader = new StringReader(value))
+                            using (var reader = XmlReader.Create(stringReader))
+                            {
+                                theme = new Theme();
+                                theme.ReadXml(reader);
+                            }
+                        }
+
+                        if (treeViewItem.DataContext is RoundViewModel)
+                        {
+                            var docRound = treeViewItem.DataContext as RoundViewModel;
+                            docRound.Themes.Add(new ThemeViewModel(theme));
+                            await dragData.ApplyDataAsync(document);
+                        }
+                        else if (treeViewItem.DataContext is ThemeViewModel)
+                        {
+                            var docTheme = treeViewItem.DataContext as ThemeViewModel;
+                            docTheme.OwnerRound.Themes.Insert(docTheme.OwnerRound.Themes.IndexOf(docTheme), new ThemeViewModel(theme));
+                            await dragData.ApplyDataAsync(document);
+                        }
+                    }
+                    else if (format == "siqquestion")
+                    {
+                        Question question = null;
+                        if (dragData != null)
+                        {
+                            question = (Question)dragData.GetItem();
+                        }
+                        else
+                        {
+                            var value = e.Data.GetData(DataFormats.Serializable).ToString();
+                            using (var stringReader = new StringReader(value))
+                            using (var reader = XmlReader.Create(stringReader))
+                            {
+                                question = new Question();
+                                question.ReadXml(reader);
+                            }
+                        }
+
+                        if (treeViewItem.DataContext is ThemeViewModel)
+                        {
+                            var docTheme = treeViewItem.DataContext as ThemeViewModel;
+                            if (docTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
+                                question = question.Clone();
+
+                            docTheme.Questions.Add(new QuestionViewModel(question));
+
+                            if (AppSettings.Default.ChangePriceOnMove)
+                                FlatDocView.RecountPrices(docTheme);
+
+                            await dragData.ApplyDataAsync(document);
+                        }
+                        else if (treeViewItem.DataContext is QuestionViewModel)
+                        {
+                            var docQuestion = treeViewItem.DataContext as QuestionViewModel;
+                            if (docQuestion.OwnerTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
+                                question = question.Clone();
+
+                            int pos = docQuestion.OwnerTheme.Questions.IndexOf(docQuestion);
+                            docQuestion.OwnerTheme.Questions.Insert(pos, new QuestionViewModel(question));
+
+                            if (AppSettings.Default.ChangePriceOnMove)
+                                FlatDocView.RecountPrices(docQuestion.OwnerTheme);
+
+                            await dragData.ApplyDataAsync(document);
+                        }
+                    }
+                    else
+                        e.Effects = DragDropEffects.None;
+                }
+                finally
+                {
+                    if (dragData != null)
+                    {
+                        dragData.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"Main_Drop error: {ex}");
             }
         }
     }

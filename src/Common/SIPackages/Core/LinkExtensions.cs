@@ -1,7 +1,7 @@
 ﻿namespace SIPackages.Core
 {
     /// <summary>
-    /// Функции для работы с SIQ-ссылками
+    /// Provides helper methods for working with document links.
     /// </summary>
     internal static class LinkExtensions
     {
@@ -9,6 +9,7 @@
         /// Выделить текст ссылки из строки
         /// </summary>
         /// <param name="s">Строка текста в формате @link#tail</param>
+        /// <param name="useTail">Should link tail (part after #) be used.</param>
         /// <returns>Ссылка link</returns>
         internal static string ExtractLink(this string s, bool useTail = false)
         {

@@ -40,7 +40,7 @@ namespace SIQuester.ViewModel.Commands
 
         public bool CanExecute(object parameter) => _canBeExecuted;
 
-        public async void Execute(object parameter) => await _execute(parameter);
+        public async void Execute(object parameter) => await _execute(parameter); // TODO: throw NotSupported because `async void` is a bad practice
 
         public Task ExecuteAsync(object parameter) => _execute(parameter);
     }

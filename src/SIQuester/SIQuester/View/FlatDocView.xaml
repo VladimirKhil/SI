@@ -195,14 +195,15 @@
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="8">
                         <TextBlock Text="Тип" />
-                        <ComboBox Margin="0,1,0,0" IsSynchronizedWithCurrentItem="False"
+                        <ComboBox Margin="0,1,0,0"
+                                  IsSynchronizedWithCurrentItem="False"
                                   SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}"
                                   ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}" />
                         <ItemsControl ItemsSource="{Binding Type.Params}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Name, Converter={StaticResource QuestionTypeParamConverter}}" Margin="0,5,0,0" />
+                                        <TextBlock Text="{Binding Model.Name, Converter={StaticResource QuestionTypeParamConverter}}" Margin="0,5,0,0" />
                                         <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource TypeParamSelector}" />
                                     </StackPanel>
                                 </DataTemplate>

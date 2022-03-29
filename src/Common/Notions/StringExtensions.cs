@@ -12,9 +12,6 @@ namespace Notions
         /// <returns>Результат</returns>
         public static string Translit(this string str)
         {
-            if (str == null)
-                return null;
-
             var res = new StringBuilder();
             int l = str.Length;
             for (int i = 0; i < l; i++)
@@ -160,9 +157,6 @@ namespace Notions
 
         public static string DigitPart(this string s)
         {
-            if (s == null)
-                return null;
-
             var res = new StringBuilder();
             int length = s.Length;
             for (var i = 0; i < length; i++)
@@ -174,9 +168,6 @@ namespace Notions
 
         public static string NotDigitPart(this string s)
         {
-            if (s == null)
-                return null;
-
             var res = new StringBuilder();
             int length = s.Length;
             for (int i = 0; i < length; i++)
@@ -196,9 +187,6 @@ namespace Notions
         /// В этом случае возвращается исходная строка</returns>
         public static string Simplify(this string s)
         {
-            if (s == null)
-                return null;
-
             var length = s.Length;
             var res = new StringBuilder();
             for (var i = 0; i < length; i++)
@@ -215,9 +203,6 @@ namespace Notions
         /// <returns>Результат</returns>
         public static string ProlongString(this string str)
         {
-            if (str == null)
-                return null;
-
             if (str.Length < 2)
                 return str + Environment.NewLine;
 
@@ -235,9 +220,6 @@ namespace Notions
         /// <returns>Результат</returns>
         public static string EndWithPoint(this string s)
         {
-            if (s == null)
-                return null;
-
             var res = ClearPoints(s);
             if (res.Length == 0)
                 return "";
@@ -259,9 +241,6 @@ namespace Notions
         /// <returns>Результат</returns>
         public static string ClearPoints(this string s)
         {
-            if (s == null)
-                return null;
-
             if (s.Length == 0)
                 return "";
 
@@ -279,9 +258,6 @@ namespace Notions
         /// <returns>Результат</returns>
         public static string GrowFirstLetter(this string s)
         {
-            if (s == null)
-                return null;
-
             if (s.Length == 0)
                 return "";
 
@@ -307,9 +283,6 @@ namespace Notions
 
         public static string FullTrim(this string s)
         {
-            if (s == null)
-                return null;
-
             s = s.Trim();
             if (s.Length == 0)
                 return s;
@@ -351,13 +324,8 @@ namespace Notions
         /// <summary>
         /// Викификация строки (появляются тире и кавычки русского языка)
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static string Wikify(this string s)
         {
-            if (s == null)
-                return null;
-
             var length = s.Length;
             var res = new StringBuilder();
             for (var i = 0; i < length; i++)

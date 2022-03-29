@@ -3,9 +3,12 @@ using Microsoft.WindowsAPICodePack.Taskbar;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -62,9 +65,10 @@ namespace SIQuester
                         BorderThickness = new Thickness(10)
                     };
 
-                    tabItem.DragEnter += new DragEventHandler(TabItem_DragEnter);
+                    tabItem.DragEnter += TabItem_DragEnter;
                     tabItem.DragOver += TabItem_DragOver;
-                    tabItem.Loaded += new RoutedEventHandler(TabItem_Loaded);
+                    tabItem.Loaded += TabItem_Loaded;
+
                     tabContent.Loaded += (sender2, e2) =>
                     {
                         UpdateCurrentPreview();
@@ -78,10 +82,13 @@ namespace SIQuester
                     {
                         var tabItem2 = tabControl1.Items[i] as TabItem;
                         var contentControl = tabItem2.Content as ContentControl;
+
                         if (contentControl.Content == e.OldItems[0])
                         {
                             tabControl1.Items.RemoveAt(i--);
-                            if (TaskbarManager.IsPlatformSupported && !_closingFromThumbnail
+
+                            if (TaskbarManager.IsPlatformSupported
+                                && !_closingFromThumbnail
                                 && TaskbarManager.Instance.TabbedThumbnail.IsThumbnailPreviewAdded(tabItem2))
                             {
                                 try
@@ -92,6 +99,18 @@ namespace SIQuester
                                 {
                                 }
                             }
+
+                            contentControl.Content = null;
+                            contentControl.ContentTemplateSelector = null;
+
+                            var headerControl = tabItem2.Header as ContentControl;
+
+                            headerControl.Content = null;
+                            headerControl.ContentTemplateSelector = null;
+
+                            tabItem2.Header = null;
+                            tabItem2.Content = null;
+                            tabItem2.DataContext = null;
 
                             tabItem2.DragEnter -= TabItem_DragEnter;
                             tabItem2.DragOver -= TabItem_DragOver;
@@ -114,10 +133,11 @@ namespace SIQuester
         private void TabItem_Loaded(object sender, RoutedEventArgs e)
         {
             var tabItem = sender as TabItem;
+            tabItem.Loaded -= TabItem_Loaded;
+
             if (TaskbarManager.IsPlatformSupported)
             {
                 var data = (WorkspaceViewModel)((TabItem)sender).DataContext;
-                tabItem.Loaded -= TabItem_Loaded;
 
                 var point = tabItem.TranslatePoint(new System.Windows.Point(), this);
 
@@ -130,7 +150,7 @@ namespace SIQuester
                 preview.TabbedThumbnailActivated += Preview_TabbedThumbnailActivated;
                 preview.TabbedThumbnailClosed += Preview_TabbedThumbnailClosed;
                 preview.TabbedThumbnailBitmapRequested += Preview_TabbedThumbnailBitmapRequested;
-                
+
                 preview.SetWindowIcon(Properties.Resources.Icon.GetHicon());
 
                 try
@@ -300,16 +320,23 @@ namespace SIQuester
 
         private async void Main_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            FocusManager.SetFocusedElement(this, this);
-            if (DataContext is MainViewModel mainViewModel && mainViewModel.DocList.Any())
+            try
             {
-                e.Cancel = true;
-
-                var result = await mainViewModel.DisposeRequestAsync();
-                if (result)
+                FocusManager.SetFocusedElement(this, this);
+                if (DataContext is MainViewModel mainViewModel && mainViewModel.DocList.Any())
                 {
-                    await Dispatcher.BeginInvoke((Action)Close);
+                    e.Cancel = true;
+
+                    var result = await mainViewModel.DisposeRequestAsync();
+                    if (result)
+                    {
+                        await Dispatcher.BeginInvoke((Action)Close);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"Main_Drop error: {ex}");
             }
         }
 
@@ -327,6 +354,19 @@ namespace SIQuester
                     e.Handled = true;
                 }
             }
+        }
+
+        protected override AutomationPeer OnCreateAutomationPeer() => new CustomWindowAutomationPeer(this);
+
+        private sealed class CustomWindowAutomationPeer : FrameworkElementAutomationPeer
+        {
+            public CustomWindowAutomationPeer(FrameworkElement owner) : base(owner) { }
+
+            protected override string GetNameCore() => nameof(CustomWindowAutomationPeer);
+
+            protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Window;
+
+            protected override List<AutomationPeer> GetChildrenCore() => new List<AutomationPeer>();
         }
     }
 }

@@ -119,7 +119,7 @@ namespace SIQuester.Model
             }
         }
 
-        public async Task ApplyData(SIDocument document)
+        public async Task ApplyDataAsync(SIDocument document)
         {
             if (Authors != null)
             {
@@ -149,7 +149,7 @@ namespace SIQuester.Model
                 {
                     if (!document.Images.Contains(item.Key))
                     {
-                        await document.Images.AddFile(item.Key, item.Value.Stream);
+                        await document.Images.AddFileAsync(item.Key, item.Value.Stream);
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace SIQuester.Model
                 {
                     if (!document.Audio.Contains(item.Key))
                     {
-                        await document.Audio.AddFile(item.Key, item.Value.Stream);
+                        await document.Audio.AddFileAsync(item.Key, item.Value.Stream);
                     }
                 }
             }
@@ -171,7 +171,7 @@ namespace SIQuester.Model
                 {
                     if (!document.Video.Contains(item.Key))
                     {
-                        await document.Video.AddFile(item.Key, item.Value.Stream);
+                        await document.Video.AddFileAsync(item.Key, item.Value.Stream);
                     }
                 }
             }

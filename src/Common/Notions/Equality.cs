@@ -114,7 +114,7 @@ namespace Notions
         {
             var best = BestEquality(string1, string2, norm);
 
-            return best != null ? SubString(string1, best) : null;
+            return SubString(string1, best);
         }
 
         private static string SubString(string str, Point[] equals)

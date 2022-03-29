@@ -19,6 +19,9 @@ namespace SIPackages
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _text = "";
 
+        /// <summary>
+        /// Is this atom a link to a file.
+        /// </summary>
         public bool IsLink => _text.Length > 0 && _text[0] == '@';
 
         /// <summary>
@@ -84,6 +87,10 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Does atom text contain specified value.
+        /// </summary>
+        /// <param name="value">Text value.</param>
         public bool Contains(string value) => _text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
         /// <summary>

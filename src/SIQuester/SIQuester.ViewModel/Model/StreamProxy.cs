@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
 
@@ -30,23 +31,30 @@ namespace SIQuester.Model
 
         public async void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (Stream.Length > 4194304)
+            try
             {
-                var temp = Path.GetTempFileName();
-                using (var fs = File.Create(temp))
+                if (Stream.Length > 4194304)
                 {
-                    await Stream.CopyToAsync(fs);
-                }
+                    var temp = Path.GetTempFileName();
+                    using (var fs = File.Create(temp))
+                    {
+                        await Stream.CopyToAsync(fs);
+                    }
 
-                info.AddValue("path", temp, typeof(string));
-                info.AddValue("type", 0);
+                    info.AddValue("path", temp, typeof(string));
+                    info.AddValue("type", 0);
+                }
+                else
+                {
+                    var ms = new MemoryStream();
+                    await Stream.CopyToAsync(ms);
+                    info.AddValue("stream", ms, typeof(MemoryStream));
+                    info.AddValue("type", 1);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var ms = new MemoryStream();
-                await Stream.CopyToAsync(ms);
-                info.AddValue("stream", ms, typeof(MemoryStream));
-                info.AddValue("type", 1);
+                Trace.TraceError($"GetObjectData error: {ex}");
             }
         }
 
