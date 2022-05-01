@@ -271,7 +271,6 @@ namespace SIEngine
                     }
                     else
                     {
-                        _atomIndex++;
                         PlayQuestionAtom();
                         Stage = GameStage.RightAnswerProceed;
                         AutoNext(3000);
