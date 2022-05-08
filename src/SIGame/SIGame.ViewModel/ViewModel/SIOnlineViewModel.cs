@@ -785,7 +785,8 @@ namespace SIGame.ViewModel
 
                 if (gameCreatingResult2.Code != SI.GameServer.Contract.GameCreationResultCode.Ok)
                 {
-                    throw new Exception(GetMessage(gameCreatingResult2.Code));
+                    var errorDetail = gameCreatingResult2.ErrorMessage != null ? $": {gameCreatingResult2.ErrorMessage}" : null;
+                    throw new Exception(GetMessage(gameCreatingResult2.Code) + errorDetail);
                 }
 
                 await InitServerAndClientNewAsync(cancellationTokenSource.Token);

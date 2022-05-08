@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using Utils;
 
 namespace SIGame.Behaviors
 {
@@ -69,15 +69,7 @@ namespace SIGame.Behaviors
         private static void OnUrlClick(object sender, RoutedEventArgs e)
         {
             var link = (Hyperlink)sender;
-            // Do something with link.NavigateUri like:
-            try
-            {
-                Process.Start(link.NavigateUri.ToString());
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message);
-            }
+            Browser.Open(link.NavigateUri.ToString());
         }
     }
 }

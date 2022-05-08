@@ -16,10 +16,10 @@
     <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;LEGACY</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	<DefineConstants>LEGACY</DefineConstants>
+	<DefineConstants></DefineConstants>
 </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

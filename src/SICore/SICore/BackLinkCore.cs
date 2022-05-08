@@ -85,7 +85,6 @@ namespace SICore.PlatformSpecific
         }
 
         public abstract void OnGameFinished(string packageId);
-        public abstract void OnText(string text);
 
         public abstract void LogWarning(string message);
 

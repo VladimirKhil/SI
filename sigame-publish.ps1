@@ -1,0 +1,2 @@
+dotnet publish src\SIGame\SIGame\SIGame.csproj -c Release -p:PublishSingleFile=true -r win-x64 --self-contained true -p:EnableCompressionInSingleFile=true
+dotnet publish src\SIGame\SIGame\SIGame.csproj -c Release -p:PublishSingleFile=true -r win-x86 --self-contained true -p:EnableCompressionInSingleFile=true

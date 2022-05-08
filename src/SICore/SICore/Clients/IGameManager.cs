@@ -38,9 +38,7 @@ namespace SICore
         /// <summary>
         /// Получить рекламное сообщение
         /// </summary>
-        /// <returns></returns>
         string GetAd(string localization, out int adId);
-        void OnText(string text);
 
         void LogWarning(string message);
     }

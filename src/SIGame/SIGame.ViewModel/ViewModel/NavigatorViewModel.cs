@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace SIGame.ViewModel
 {
-    public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable
+    public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDisposable
     {
         private readonly Stack<ContentBox> _history = new Stack<ContentBox>();
 
@@ -120,6 +120,14 @@ namespace SIGame.ViewModel
         private void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public void Dispose()
+        {
+            if (_content.Data is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }

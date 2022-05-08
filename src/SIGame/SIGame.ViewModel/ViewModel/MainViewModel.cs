@@ -28,7 +28,7 @@ namespace SIGame.ViewModel
 
         public object ActiveView
         {
-            get { return _activeView; }
+            get => _activeView;
             set
             {
                 if (_activeView != value)
@@ -189,23 +189,24 @@ namespace SIGame.ViewModel
 
                     Cancel_Executed(arg);
                 })
-                { CanBeExecuted = _commonSettings.Humans2.Any() }
+                {
+                    CanBeExecuted = _commonSettings.Humans2.Any()
+                }
             };
         }
 
-        private void Human_AccountEditing()
-        {
+        private void Human_AccountEditing() =>
             ActiveView = new ContentBox
             {
                 Data = Human,
                 Title = Resources.ChangeAccount,
-                Cancel = new CustomCommand(arg =>
-                {
-                    Human.NewAccount = null;
-                    Cancel_Executed(arg);
-                })
+                Cancel = new CustomCommand(
+                    arg =>
+                    {
+                        Human.NewAccount = null;
+                        Cancel_Executed(arg);
+                    })
             };
-        }
 
         private void StartGame(
             Server server,

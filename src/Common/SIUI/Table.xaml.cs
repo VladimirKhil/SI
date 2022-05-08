@@ -52,6 +52,7 @@ namespace SIUI
             var widthBinding = new Binding("ActualWidth") { Source = this };
             var heightBinding = new Binding("ActualHeight") { Source = this };
             var zoomBinding = new MultiBinding { Converter = new ZoomConverter { BaseWidth = 400, BaseHeight = 300 } };
+
             zoomBinding.Bindings.Add(widthBinding);
             zoomBinding.Bindings.Add(heightBinding);
             SetBinding(ZoomProperty, zoomBinding);

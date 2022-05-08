@@ -1,17 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <ProjectGuid>{78C96549-6EA8-4236-B026-6ECA55D9EC3A}</ProjectGuid>
-    <TargetFramework>net48</TargetFramework>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SIUI</AssemblyTitle>
     <Company>Khil-soft</Company>
     <Product>SIUI</Product>
     <Description>SIGame table ui</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <Version>7.5.8</Version>
-    <LangVersion>8</LangVersion>
+    <Version>7.6.0</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -26,13 +23,6 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Fonts\FuturaC.ttf" />
     <Resource Include="Fonts\Clefs.ttf" />
     <Resource Include="Fonts\DINCondensedC.ttf" />
@@ -45,22 +35,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="RoundThemesView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Table.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SIUI.Model\SIUI.Model.csproj" />
     <ProjectReference Include="..\SIUI.ViewModel\SIUI.ViewModel.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logo.png" />

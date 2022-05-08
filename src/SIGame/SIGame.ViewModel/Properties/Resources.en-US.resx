@@ -400,13 +400,13 @@
     <value>Random themes set</value>
   </data>
   <data name="FeedbackLink" xml:space="preserve">
-    <value>https://www.facebook.com/groups/1939875346068773/permalink/2107631785959794/</value>
+    <value>https://vk.com/topic-135725718_34967839</value>
   </data>
   <data name="GroupLink" xml:space="preserve">
-    <value>https://www.facebook.com/groups/1939875346068773/</value>
+    <value>https://vk.com/si_game</value>
   </data>
   <data name="ThemesLink" xml:space="preserve">
-    <value>https://www.facebook.com/groups/1939875346068773/permalink/2107636099292696</value>
+    <value>https://vk.com/topic-135725718_34975471</value>
   </data>
   <data name="Error_SendingReport" xml:space="preserve">
     <value>Cannot connect to server while uploading game report. The report will be sent later</value>

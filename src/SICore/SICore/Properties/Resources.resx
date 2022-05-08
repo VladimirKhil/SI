@@ -662,9 +662,6 @@
   <data name="ErrorWritingLogToDisc" xml:space="preserve">
     <value>Ошибка записи лога на дискs</value>
   </data>
-  <data name="HttpsProtocolIsNotSupported" xml:space="preserve">
-    <value>Ошибка загрузки медиа {0}. Протокол https не поддерживается!</value>
-  </data>
   <data name="Label_Auction" xml:space="preserve">
     <value>ВОПРОС СО СТАВКОЙ</value>
   </data>

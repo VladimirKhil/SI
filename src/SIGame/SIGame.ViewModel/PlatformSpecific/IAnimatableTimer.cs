@@ -2,7 +2,7 @@
 
 namespace SIGame.ViewModel.PlatformSpecific
 {
-    public interface IAnimatableTimer
+    public interface IAnimatableTimer : IDisposable
     {
         int MaxTime { get; set; }
         double Time { get; }

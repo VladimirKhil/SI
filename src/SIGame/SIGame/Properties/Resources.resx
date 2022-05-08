@@ -954,9 +954,6 @@
   <data name="Licenses" xml:space="preserve">
     <value>Лицензии</value>
   </data>
-  <data name="ReadQuestions" xml:space="preserve">
-    <value>Озвучивать текст вопросов</value>
-  </data>
   <data name="About_Composer" xml:space="preserve">
     <value>Композитор</value>
   </data>

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Windows;
-using System.IO;
-using System.Windows.Input;
-using SICore;
+﻿using SICore;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
+using System;
+using System.IO;
+using System.Windows.Input;
+using Utils;
 
 namespace SIGame.ViewModel
 {
@@ -47,40 +46,30 @@ namespace SIGame.ViewModel
                 return;
             }
 
-            try
-            {
-                Process.Start(new ProcessStartInfo(logsFolder));
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLogsError, exc.Message), MessageType.Error);
-            }
+            Browser.Open(
+                logsFolder,
+                exc => PlatformManager.Instance.ShowMessage(
+                    string.Format(Resources.OpenLogsError, exc.Message),
+                    MessageType.Error));
         }
 
         private static void Comment_Executed(object arg)
         {
-            try
-            {
-                var commentUri = Uri.EscapeUriString(Resources.FeedbackLink);
-                Process.Start(commentUri);
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.CommentSiteError + "\r\n{0}", exc.Message), MessageType.Error);
-            }
+            var commentUri = Uri.EscapeDataString(Resources.FeedbackLink);
+            Browser.Open(
+                commentUri,
+                exc => PlatformManager.Instance.ShowMessage(
+                    string.Format(Resources.CommentSiteError + "\r\n{0}", exc.Message),
+                    MessageType.Error));
         }
 
         private static void Donate_Executed(object arg)
         {
-            try
-            {
-                var donateUri = "https://money.yandex.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
-                Process.Start(donateUri);
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.LinkError + "\r\n{0}", exc.Message), MessageType.Error);
-            }
+            var donateUri = "https://money.yandex.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
+            Browser.Open(donateUri,
+                exc => PlatformManager.Instance.ShowMessage(
+                    string.Format(Resources.LinkError + "\r\n{0}", exc.Message),
+                    MessageType.Error));
         }
 
         private static void Help_Executed(object arg)

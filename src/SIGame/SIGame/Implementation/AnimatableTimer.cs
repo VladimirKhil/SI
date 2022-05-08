@@ -8,15 +8,10 @@ namespace SIGame.Implementation
 {
     internal sealed class AnimatableTimer : Animatable, IAnimatableTimer
     {
-        public event Action<IAnimatableTimer> TimeChanged;
+        public static readonly DependencyProperty TimeProperty =
+            DependencyProperty.Register(nameof(Time), typeof(double), typeof(AnimatableTimer), new PropertyMetadata(0.0));
 
-        public AnimatableTimer()
-        {
-            TimeDescriptor.AddValueChanged(this, (sender, r) =>
-            {
-                TimeChanged?.Invoke(this);
-            });
-        }
+        public static DependencyPropertyDescriptor TimeDescriptor = DependencyPropertyDescriptor.FromProperty(TimeProperty, typeof(AnimatableTimer));
 
         public double Time
         {
@@ -24,18 +19,18 @@ namespace SIGame.Implementation
             set { SetValue(TimeProperty, value); }
         }
 
+        private bool _isUserPaused;
+        private bool _isSystemPaused;
+
         public int MaxTime { get; set; }
 
         public TimerState State { get; private set; } = TimerState.Stopped;
 
-        private bool _isUserPaused;
-        private bool _isSystemPaused;
+        public event Action<IAnimatableTimer> TimeChanged;
 
-        // Using a DependencyProperty as the backing store for Time.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty TimeProperty =
-            DependencyProperty.Register(nameof(Time), typeof(double), typeof(AnimatableTimer), new PropertyMetadata(0.0));
+        public AnimatableTimer() => TimeDescriptor.AddValueChanged(this, OnTimeChanged);
 
-        public static DependencyPropertyDescriptor TimeDescriptor = DependencyPropertyDescriptor.FromProperty(TimeProperty, typeof(AnimatableTimer));
+        private void OnTimeChanged(object sender, EventArgs e) => TimeChanged?.Invoke(this);
 
         public void Run(int maxTime, bool byUser)
         {
@@ -131,5 +126,7 @@ namespace SIGame.Implementation
                 }
             }
         }
+
+        public void Dispose() => TimeDescriptor.RemoveValueChanged(this, OnTimeChanged);
     }
 }

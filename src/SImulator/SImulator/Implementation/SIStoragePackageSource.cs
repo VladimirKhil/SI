@@ -5,6 +5,7 @@ using SImulator.ViewModel.PlatformSpecific;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -14,6 +15,8 @@ namespace SImulator.Implementation
     {
         private readonly PackageInfo _package;
         private readonly Uri _packageUri;
+
+        private static readonly HttpClient _client = new();
 
         public string Name => _package.Description;
 
@@ -37,12 +40,11 @@ namespace SImulator.Implementation
                     progress.SetLine(1, "Загрузка файла…", false);
                     progress.Start(ProgressDialog.ProgressDialogFlags.MarqueeProgress | ProgressDialog.ProgressDialogFlags.NoCancel | ProgressDialog.ProgressDialogFlags.NoMinimize);
                 }
-
-                var request = WebRequest.Create(_packageUri);
+                
+                using var response = await _client.GetAsync(_packageUri);
 
                 var stream = new MemoryStream();
-                using (var response = await request.GetResponseAsync())
-                using (var s = response.GetResponseStream())
+                using (var s = await response.Content.ReadAsStreamAsync())
                 {
                     await s.CopyToAsync(stream);
                 }

@@ -402,12 +402,49 @@
                                     DataContext="{Binding Content.Data}"
                                     Style="{StaticResource MainProgress}" />
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Command="{Binding Back}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter1}}" ToolTip="Назад" Style="{StaticResource SIButtonSimple}" Width="44" Height="44" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                                        <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
+                                    <Button
+                                        Command="{Binding Back}"
+                                        Visibility="{Binding
+                                            IsEnabled,
+                                            RelativeSource={RelativeSource Self},
+                                            Converter={StaticResource BooleanToVisibilityConverter1}}"
+                                        ToolTip="{x:Static lp:Resources.Back}"
+                                        Style="{StaticResource SIButtonSimple}"
+                                        Width="44"
+                                        Height="44"
+                                        BorderThickness="0"
+                                        VerticalAlignment="Center"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch">
+                                        <Path
+                                            Data="M5,0L0,5L5,10M0.2,5L10,5"
+                                            Stroke="{StaticResource MainColor}"
+                                            StrokeThickness="2"
+                                            Stretch="Uniform"
+                                            Margin="12" />
                                     </Button>
-                                    <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
+                                    <TextBlock
+                                        Text="{TemplateBinding Tag}"
+                                        Style="{StaticResource CommonText}"
+                                        FontSize="30"
+                                        FontWeight="Bold"
+                                        Margin="10,4"
+                                        VerticalAlignment="Center" />
                                 </StackPanel>
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding CancelBase}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                <Button
+                                    x:Name="bClose"
+                                    Grid.Column="1"
+                                    Style="{StaticResource CloseButton}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    BorderThickness="0"
+                                    Width="30"
+                                    Height="30"
+                                    Padding="0,1,1,0"
+                                    Command="{Binding CancelBase}"
+                                    IsEnabled="{TemplateBinding IsEnabled}"
+                                    ToolTip="{x:Static lp:Resources.Close}"
+                                    IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
@@ -437,9 +474,14 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
-                                BorderThickness="3.75" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                TextBlock.Foreground="{StaticResource MainColor}">
+                        <Border
+                            Name="Bd"
+                            BorderBrush="{StaticResource WindowBorderColor}"
+                            Background="{StaticResource WindowBackground}"
+                            BorderThickness="3.75"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -457,8 +499,27 @@
                                     VerticalAlignment="Top"                                    
                                     DataContext="{Binding Data}"
                                     Style="{StaticResource MainProgress}" />
-                                <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
-                                <Button Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                <TextBlock
+                                    Text="{TemplateBinding Tag}"
+                                    Style="{StaticResource CommonText}"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Margin="10,4"
+                                    VerticalAlignment="Center" />
+                                <Button
+                                    x:Name="bClose"
+                                    Grid.Column="1"
+                                    Style="{StaticResource CloseButton}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    BorderThickness="0"
+                                    Width="30"
+                                    Height="30"
+                                    Padding="0,1,1,0"
+                                    Command="{Binding Cancel}"
+                                    IsEnabled="{TemplateBinding IsEnabled}"
+                                    ToolTip="{x:Static lp:Resources.Close}"
+                                    IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -483,9 +544,12 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
-                                BorderThickness="3.75"
-                                TextBlock.Foreground="{StaticResource MainColor}">
+                        <Border
+                            Name="Bd"
+                            BorderBrush="{StaticResource WindowBorderColor}"
+                            Background="{StaticResource WindowBackground}"
+                            BorderThickness="3.75"
+                            TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -503,10 +567,33 @@
                                     VerticalAlignment="Top"
                                     DataContext="{Binding Data}"
                                     Style="{StaticResource MainProgress}" />
-                                <TextBlock Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
+                                <TextBlock
+                                    Text="{TemplateBinding Tag}"
+                                    Style="{StaticResource CommonText}"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Margin="10,4"
+                                    VerticalAlignment="Center" />
                                 <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
-                                    <Button x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
-                                        <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
+                                    <Button
+                                        x:Name="bClose"
+                                        Style="{StaticResource CloseButton}"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        BorderThickness="0"
+                                        Width="30"
+                                        Height="30"
+                                        Padding="0,1,1,0"
+                                        Command="{Binding Cancel}"
+                                        IsEnabled="{TemplateBinding IsEnabled}"
+                                        ToolTip="{x:Static lp:Resources.Close}"
+                                        IsCancel="True">
+                                        <Path
+                                            Data="M0,0L1,1M1,0L0,1"
+                                            Stroke="{StaticResource MainColor}"
+                                            StrokeThickness="2"
+                                            Stretch="Uniform"
+                                            Margin="5" />
                                     </Button>
                                 </StackPanel>
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" />
@@ -536,19 +623,10 @@
 
         <Color x:Key="DisabledForegroundColor">#FF888888</Color>
 
-        <ControlTemplate x:Key="AccountMenu" TargetType="{x:Type ContextMenu}">
-            <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
-                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="HasDropShadow" Value="true">
-                    <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-
         <Style x:Key="GameButtonSetter" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource SIButton}">
-            <Setter Property="Content" Value="{Binding Source={x:Static local:UserSettings.Default}, Path=GameSettings.GameButtonKey, Converter={StaticResource ToStringConverter}}" />
+            <Setter
+                Property="Content"
+                Value="{Binding Source={x:Static local:UserSettings.Default}, Path=GameSettings.GameButtonKey, Converter={StaticResource ToStringConverter}}" />
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
                     <Setter Property="Content" Value="{x:Static lp:Resources.PressTheButton}" />
@@ -560,7 +638,12 @@
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Rectangle StrokeDashArray="1 2" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" Margin="2"/>
+                        <Rectangle
+                            StrokeDashArray="1 2"
+                            StrokeThickness="1"
+                            Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                            SnapsToDevicePixels="true"
+                            Margin="2" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -700,23 +783,41 @@
                         </ScrollViewer>
                     </Border>
                 </Popup>
-                <ToggleButton x:Name="toggleButton" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}" />
-                <ContentPresenter TextBlock.Foreground="{TemplateBinding Foreground}" x:Name="contentPresenter" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Content="{TemplateBinding SelectionBoxItem}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                <ToggleButton
+                    x:Name="toggleButton"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{TemplateBinding Background}"
+                    Grid.ColumnSpan="2"
+                    IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                    Style="{StaticResource ComboBoxToggleButton}" />
+                <ContentPresenter
+                    x:Name="contentPresenter"
+                    TextBlock.Foreground="{TemplateBinding Foreground}"
+                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                    ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                    Content="{TemplateBinding SelectionBoxItem}"
+                    ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                    IsHitTestVisible="false"
+                    Margin="{TemplateBinding Padding}"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
             </Grid>
             <ControlTemplate.Triggers>
                 <Trigger Property="HasItems" Value="false">
-                    <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>
+                    <Setter Property="Height" TargetName="dropDownBorder" Value="95" />
                 </Trigger>
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
-                        <Condition Property="IsGrouping" Value="true"/>
-                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                        <Condition Property="IsGrouping" Value="true" />
+                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false" />
                     </MultiTrigger.Conditions>
-                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                    <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
                 </MultiTrigger>
                 <Trigger Property="ScrollViewer.CanContentScroll" SourceName="DropDownScrollViewer" Value="false">
-                    <Setter Property="Canvas.Top" TargetName="opaqueRect" Value="{Binding VerticalOffset, ElementName=DropDownScrollViewer}"/>
-                    <Setter Property="Canvas.Left" TargetName="opaqueRect" Value="{Binding HorizontalOffset, ElementName=DropDownScrollViewer}"/>
+                    <Setter Property="Canvas.Top" TargetName="opaqueRect" Value="{Binding VerticalOffset, ElementName=DropDownScrollViewer}" />
+                    <Setter Property="Canvas.Left" TargetName="opaqueRect" Value="{Binding HorizontalOffset, ElementName=DropDownScrollViewer}" />
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -724,18 +825,18 @@
             <Setter Property="Foreground" Value="Black" />
         </Style>
         <Style x:Key="ComboBoxStyle" TargetType="{x:Type ComboBox}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="{StaticResource MainColor}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
             <Setter Property="Foreground" Value="Black" />
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
             <Setter Property="Padding" Value="6,3,5,3"/>
             <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
             <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
             <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
-            <Setter Property="Template" Value="{StaticResource ComboBoxTemplate}"/>
+            <Setter Property="Template" Value="{StaticResource ComboBoxTemplate}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItemStyle}" />
         </Style>
         <Style x:Key="ComboBoxMainStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
@@ -771,7 +872,15 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
                         <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
-                            <ContentPresenter x:Name="contentPresenter" ContentSource="Header" Focusable="False" HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                            <ContentPresenter
+                                x:Name="contentPresenter"
+                                ContentSource="Header"
+                                Focusable="False"
+                                Margin="{TemplateBinding Padding}"
+                                RecognizesAccessKey="True"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <MultiDataTrigger>

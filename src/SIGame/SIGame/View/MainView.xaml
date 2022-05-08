@@ -11,10 +11,14 @@
     xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
-    xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" x:Class="SIGame.MainView" 
+    xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+    x:Class="SIGame.MainView" 
     mc:Ignorable="d" 
-    d:DesignHeight="300" d:DesignWidth="300"
-    x:Name="main" FontFamily="Segoe UI, Tahoma">
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    x:Name="main"
+    FontFamily="Segoe UI, Tahoma"
+    d:DataContext="{d:DesignInstance lvm:MainViewModel}">
     <UserControl.Resources>
         <uic:Multiplier x:Key="Mult" />
 
@@ -346,47 +350,46 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Viewbox>
-                            <my:DropDownButton Grid.ColumnSpan="3" Grid.RowSpan="4" Cursor="Hand" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                Margin="0" BorderThickness="0" ToolTip="{x:Static lp:Resources.Profile}"
-                                FontSize="18" FontWeight="Medium">
+                            <my:DropDownButton
+                                Grid.ColumnSpan="3"
+                                Grid.RowSpan="4"
+                                Cursor="Hand"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="0"
+                                BorderThickness="0"
+                                ToolTip="{x:Static lp:Resources.Profile}"
+                                FontSize="18"
+                                FontWeight="Medium">
                                 <my:DropDownButton.Resources>
                                     <lb:BindingProxy x:Key="Proxy" Data="{Binding}" />
 
-                                    <Style x:Key="AccountItem" TargetType="{x:Type MenuItem}">
-                                        <Setter Property="Command" Value="{Binding DataContext.SetProfile, RelativeSource={RelativeSource AncestorType={x:Type my:DropDownButton}}}" />
-                                        <Setter Property="CommandParameter" Value="{Binding}" />
-                                        <Setter Property="Cursor" Value="Hand" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                    <Border x:Name="Border" BorderThickness="1">
-                                                        <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True" />
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="ButtonBase.Command" Value="{x:Null}" />
-                                                        <Trigger Property="IsHighlighted" Value="true">
-                                                            <Setter Property="Background" TargetName="Border" Value="#FF94B7E7" />
-                                                            <Setter Property="BorderBrush" TargetName="Border">
-                                                                <Setter.Value>
-                                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                                        <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0" />
-                                                                        <GradientStop Color="Transparent" Offset="1" />
-                                                                    </LinearGradientBrush>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Trigger>
-                                                        <Trigger Property="IsEnabled" Value="false">
-                                                            <Setter Property="Foreground">
-                                                                <Setter.Value>
-                                                                    <SolidColorBrush Color="{StaticResource DisabledForegroundColor}" />
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
+                                    <ControlTemplate x:Key="AccountItemTemplate" TargetType="{x:Type MenuItem}">
+                                        <Border x:Name="Border" BorderThickness="1">
+                                            <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="ButtonBase.Command" Value="{x:Null}" />
+                                            <Trigger Property="IsHighlighted" Value="true">
+                                                <Setter Property="Background" TargetName="Border" Value="#FF94B7E7" />
+                                                <Setter Property="BorderBrush" TargetName="Border">
+                                                    <Setter.Value>
+                                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                            <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0" />
+                                                            <GradientStop Color="Transparent" Offset="1" />
+                                                        </LinearGradientBrush>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="false">
+                                                <Setter Property="Foreground">
+                                                    <Setter.Value>
+                                                        <SolidColorBrush Color="{StaticResource DisabledForegroundColor}" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
 
                                     <DataTemplate x:Key="HumanAccountTemplate" DataType="{x:Type lvm:HumanAccount}">
                                         <DockPanel Height="60" Width="210" Margin="10,0" Background="Transparent">
@@ -406,9 +409,34 @@
                                     <CollectionViewSource x:Key="HumansMain2" Source="{Binding Human.HumanPlayers}" />
                                 </my:DropDownButton.Resources>
                                 <my:DropDownButton.DropDown>
-                                    <ContextMenu Placement="Bottom" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
-                                        ItemsSource="{Binding Source={StaticResource HumansMain2}}" ItemTemplate="{StaticResource HumanAccountTemplate}"
-                                        ItemContainerStyle="{StaticResource AccountItem}" Template="{StaticResource AccountMenu}"/>
+                                    <ContextMenu
+                                        Placement="Bottom"
+                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
+                                        ItemsSource="{Binding Source={StaticResource HumansMain2}}"
+                                        ItemTemplate="{StaticResource HumanAccountTemplate}">
+                                        <ContextMenu.Template>
+                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
+                                                <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
+                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="HasDropShadow" Value="true">
+                                                        <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </ContextMenu.Template>
+                                        <ContextMenu.ItemContainerStyle>
+                                            <Style TargetType="{x:Type MenuItem}">
+                                                <Setter
+                                                    Property="Command"
+                                                    Value="{Binding DataContext.SetProfile, RelativeSource={RelativeSource AncestorType={x:Type my:DropDownButton}}}" />
+                                                <Setter Property="CommandParameter" Value="{Binding}" />
+                                                <Setter Property="Cursor" Value="Hand" />
+                                                <Setter Property="Template" Value="{StaticResource AccountItemTemplate}" />
+                                            </Style>
+                                        </ContextMenu.ItemContainerStyle>
+                                    </ContextMenu>
                                 </my:DropDownButton.DropDown>
                                 <my:DropDownButton.Style>
                                     <Style TargetType="{x:Type my:DropDownButton}">
@@ -442,17 +470,31 @@
                                             </Style>
                                         </Image.Style>
                                     </Image>
-                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Human.HumanPlayer}" VerticalAlignment="Center" Foreground="{StaticResource MainColor}"
-                                               TextTrimming="CharacterEllipsis" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                                    <TextBlock
+                                        DockPanel.Dock="Right"
+                                        Text="{Binding Human.HumanPlayer}"
+                                        VerticalAlignment="Center"
+                                        Foreground="{StaticResource MainColor}"
+                                        TextTrimming="CharacterEllipsis"
+                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                                         <TextBlock.Effect>
                                             <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
                                         </TextBlock.Effect>
                                     </TextBlock>
                                 </StackPanel>
                             </my:DropDownButton>
-                            <TextBlock Grid.ColumnSpan="3" Grid.RowSpan="4" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,3,3"
-                                       Width="45" Height="45">
-                                <Hyperlink NavigateUri="{Binding Source={x:Static lvmp:Resources.GroupLink}, Converter={StaticResource UriConverter}}" Command="{Binding NavigateToVK}" TextDecorations="{x:Null}">
+                            <TextBlock
+                                Grid.ColumnSpan="3"
+                                Grid.RowSpan="4"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Margin="0,0,3,3"
+                                Width="45"
+                                Height="45">
+                                <Hyperlink
+                                    NavigateUri="{Binding Source={x:Static lvmp:Resources.GroupLink}, Converter={StaticResource UriConverter}}"
+                                    Command="{Binding NavigateToVK}"
+                                    TextDecorations="{x:Null}">
                                     <Image Source="{Binding Source={x:Static lp:Resources.LinkLogo}}" />
                                 </Hyperlink>
                             </TextBlock>

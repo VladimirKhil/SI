@@ -23,14 +23,15 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SIGame.ViewModel
 {
-    public sealed class GameSettingsViewModel: ViewModelWithNewAccount<GameSettings>, INavigatable
+    public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings>, INavigatable, IDisposable
     {
-        private static readonly Random Random = new Random();
+        private readonly Random _random = new Random();
 
-        private string unique = null;
+        private string _duplicatingName = null;
 
         internal CancellationTokenSource CancellationTokenSource { get; set; }
 
@@ -501,14 +502,11 @@ namespace SIGame.ViewModel
                     break;
 
                 case PackageSourceTypes.VK:
-                    try
-                    {
-                        Process.Start(Resources.ThemesLink);
-                    }
-                    catch (Exception exc)
-                    {
-                        PlatformManager.Instance.ShowMessage(string.Format(Resources.VKThemesError + "\r\n{1}", Resources.ThemesLink, exc.Message), MessageType.Error);
-                    }
+                    Browser.Open(
+                        Resources.ThemesLink,
+                        exc => PlatformManager.Instance.ShowMessage(
+                            string.Format(Resources.VKThemesError + "\r\n{1}", Resources.ThemesLink, exc.Message),
+                            MessageType.Error));
                     break;
             }
         }
@@ -848,25 +846,29 @@ namespace SIGame.ViewModel
             accounts.AddRange(Players.Select(acc => acc.SelectedAccount));
             accounts.AddRange(Viewers.Select(acc => acc.SelectedAccount));
             if (Showman != null)
+            {
                 accounts.Add(Showman.SelectedAccount);
+            }
 
             for (int i = 0; i < accounts.Count; i++)
             {
                 if (accounts[i] == null || accounts[i].Name == Constants.FreePlace)
+                {
                     continue;
+                }
 
                 for (int j = i + 1; j < accounts.Count; j++)
                 {
-                    if (accounts[i] == accounts[j])
+                    if (accounts[j] != null && accounts[i].Name == accounts[j].Name)
                     {
-                        unique = accounts[i].Name;
+                        _duplicatingName = accounts[i].Name;
                         SetErrorMessage();
                         return;
                     }
                 }
             }
 
-            unique = null;
+            _duplicatingName = null;
             SetErrorMessage();
         }
 
@@ -880,7 +882,9 @@ namespace SIGame.ViewModel
         private void UpdateRoleTrigger()
         {
             if (Human == null)
+            {
                 return;
+            }
 
             int player = -1;
             if (Role == GameRole.Player)
@@ -974,7 +978,7 @@ namespace SIGame.ViewModel
                     }
                 }
 
-                var index = Random.Next(_computerPlayers.Length - visited.Count - 1);
+                var index = _random.Next(_computerPlayers.Length - visited.Count - 1);
                 while (visited.Contains(index))
                 {
                     index++;
@@ -996,9 +1000,9 @@ namespace SIGame.ViewModel
                 ErrorMessage = " ";
                 BeginGame.CanBeExecuted = false;
             }
-            else if (unique != null)
+            else if (_duplicatingName != null)
             {
-                ErrorMessage = string.Format(Resources.IsDouble, unique);
+                ErrorMessage = string.Format(Resources.IsDouble, _duplicatingName);
                 BeginGame.CanBeExecuted = false;
             }
             else if (NetworkGame && NetworkGameType == NetworkGameType.GameServer && string.IsNullOrEmpty(NetworkGameName))
@@ -1071,6 +1075,11 @@ namespace SIGame.ViewModel
                 else
                     Showman = new GameAccount(this) { AccountType = AccountTypes.Human, SelectedAccount = anyAccount };
             }
+        }
+
+        public void Dispose()
+        {
+            Model.Updated -= GameSettings_Updated;
         }
     }
 }

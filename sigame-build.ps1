@@ -1,0 +1,1 @@
+dotnet build src\SIGame\SIGame\SIGame.csproj -c Release

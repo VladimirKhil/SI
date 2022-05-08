@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Net;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -84,7 +83,7 @@ namespace SIGame
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
                         | SecurityProtocolType.Tls11
                         | SecurityProtocolType.Tls12
-                        | SecurityProtocolType.Ssl3;
+                        | SecurityProtocolType.Ssl3; // Windows 7
                 }
 
                 Trace.TraceInformation("Game launched");
@@ -215,7 +214,8 @@ namespace SIGame
                 return;
             }
 
-            if (inner is FileLoadException || inner is IOException
+            if (inner is FileLoadException
+                || inner is IOException
                 || inner is ArgumentOutOfRangeException && inner.Message.Contains("capacity"))
             {
                 MessageBox.Show(inner.Message, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);

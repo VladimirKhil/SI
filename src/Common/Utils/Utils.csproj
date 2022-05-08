@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net6.0-windows</TargetFramework>
+	  <UseWPF>true</UseWPF>
+	  <Copyright>Copyright © Khil-soft 2022</Copyright>
+	  <Version>7.6.0</Version>
+	  <Company>Khil-soft</Company>
+	  <Product>Utils</Product>
+	  <Description>SIGame utils</Description>
+  </PropertyGroup>
+
+</Project>

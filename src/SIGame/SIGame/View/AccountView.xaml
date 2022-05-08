@@ -4,10 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:lp="clr-namespace:SIGame.Properties"
+             xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
              Name="root"
              mc:Ignorable="d"
              FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
-             FocusManager.FocusedElement="{Binding ElementName=tbName}" Loaded="UserControl_Loaded">
+             FocusManager.FocusedElement="{Binding ElementName=tbName}"
+             Loaded="UserControl_Loaded"
+             d:DataContext="{d:DesignInstance vm:HumanAccountViewModel}">
     <UserControl.Resources>
         <Style x:Key="labelStyle" TargetType="{x:Type TextBlock}">
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -18,8 +21,6 @@
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Padding" Value="0,2" />
         </Style>
-
-        <!--<RoutedCommand x:Key="SelectPathCommand" />-->
     </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding AddNewAccount}" />

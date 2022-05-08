@@ -8,6 +8,9 @@ using SIData;
 
 namespace SI.GameServer.Client
 {
+    /// <summary>
+    /// Provides a client to SIGame server.
+    /// </summary>
     public interface IGameServerClient: IAsyncDisposable
     {
         string ServiceUri { get; }

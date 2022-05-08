@@ -19,7 +19,7 @@ namespace SICore.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -142,7 +142,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апелляция принята.
+        ///   Ищет локализованную строку, похожую на Апелляция была принята.
         /// </summary>
         public static string ApellationAccepted {
             get {
@@ -151,7 +151,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апелляция отклонена.
+        ///   Ищет локализованную строку, похожую на Апелляция была отклонена.
         /// </summary>
         public static string ApellationDenied {
             get {
@@ -758,15 +758,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка загрузки медиа {0}. Протокол https не поддерживается!.
-        /// </summary>
-        public static string HttpsProtocolIsNotSupported {
-            get {
-                return ResourceManager.GetString("HttpsProtocolIsNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Человек.
         /// </summary>
         public static string Human {
@@ -785,7 +776,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игру начнёт;Игру будет начинать.
+        ///   Ищет локализованную строку, похожую на Игру начнёт {0};Игру будет начинать {0}.
         /// </summary>
         public static string InformChooser {
             get {

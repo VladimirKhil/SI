@@ -246,6 +246,13 @@ namespace SIGame.ViewModel
         {
             await _server.DisposeAsync();
 
+            Timers[1].TimeChanged -= GameViewModel_TimeChanged;
+
+            for (int i = 0; i < Timers.Length; i++)
+            {
+                Timers[i].Dispose();
+            }
+
             if (TempDocFolder != null && Directory.Exists(TempDocFolder))
             {
                 try

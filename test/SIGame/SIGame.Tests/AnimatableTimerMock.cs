@@ -17,7 +17,12 @@ namespace SIGame.Tests
 			remove { }
 		}
 
-		public void Pause(int currentTime, bool byUser)
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Pause(int currentTime, bool byUser)
 		{
 			throw new NotImplementedException();
 		}

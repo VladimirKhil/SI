@@ -255,7 +255,13 @@ namespace SImulator.ViewModel
 
         #endregion
         
-        public GameEngine(AppSettingsViewModel settings, EngineBase engine, IExtendedGameHost gameHost, IRemoteGameUI ui, IList<SimplePlayerInfo> players, bool isRemoteControlling)
+        public GameEngine(
+            AppSettingsViewModel settings,
+            EngineBase engine,
+            IExtendedGameHost gameHost,
+            IRemoteGameUI ui,
+            IList<SimplePlayerInfo> players,
+            bool isRemoteControlling)
         {
             Settings = settings;
             _engine = engine;
@@ -1287,6 +1293,9 @@ namespace SImulator.ViewModel
         {
             try
             {
+                Settings.Model.SIUISettings.PropertyChanged -= Default_PropertyChanged;
+                Settings.SIUISettings.PropertyChanged -= Default_PropertyChanged;
+
                 lock (_engine.SyncRoot)
                 {
                     _engine.PropertyChanged -= Engine_PropertyChanged;

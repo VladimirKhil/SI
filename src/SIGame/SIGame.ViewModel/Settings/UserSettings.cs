@@ -89,20 +89,6 @@ namespace SIGame
 
         public event Action<double> VolumeChanged;
 
-        private bool _readQuestions = false;
-
-        [XmlAttribute]
-        [DefaultValue(false)]
-        public bool ReadQuestions
-        {
-            get { return _readQuestions; }
-            set
-            {
-                _readQuestions = value;
-                OnPropertyChanged();
-            }
-        }
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool _fullScreen = 
 #if DEBUG
@@ -332,7 +318,6 @@ namespace SIGame
             Sound = settings.Sound;
             Volume = settings.Volume;
             LoadExternalMedia = settings.LoadExternalMedia;
-            ReadQuestions = settings.ReadQuestions;
 
             GameSettings.AppSettings.Set(settings.GameSettings.AppSettings);
             GameSettings.NetworkPort = settings.GameSettings.NetworkPort;

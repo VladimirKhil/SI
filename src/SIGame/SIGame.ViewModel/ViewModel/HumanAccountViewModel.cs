@@ -8,16 +8,18 @@ namespace SIGame.ViewModel
 {
     public sealed class HumanAccountViewModel: AccountViewModel<HumanAccount>
     {
-        private string haErrorMessage = "";
+        public bool IsProgress => false;
+
+        private string _haErrorMessage = "";
 
         public string HAErrorMessage
         {
-            get { return this.haErrorMessage; }
+            get => _haErrorMessage;
             set
             {
-                if (this.haErrorMessage != value)
+                if (_haErrorMessage != value)
                 {
-                    this.haErrorMessage = value;
+                    _haErrorMessage = value;
                     OnPropertyChanged();
                 }
             }
@@ -27,26 +29,23 @@ namespace SIGame.ViewModel
 
         public bool IsEdit
         {
-            get { return this.isEdit; }
+            get => isEdit;
             set
             {
-                if (this.isEdit != value)
+                if (isEdit != value)
                 {
-                    this.isEdit = value;
+                    isEdit = value;
                     OnPropertyChanged();
                     CheckHumanAccount();
                 }
             }
         }
 
-        public string CommitHeader
-        {
-            get { return IsEdit ? Resources.Save : Resources.Create; }
-        }
+        public string CommitHeader => IsEdit ? Resources.Save : Resources.Create;
 
-        private CustomCommand addNewAccount;
+        private CustomCommand _addNewAccount;
 
-        public ICommand AddNewAccount { get { return this.addNewAccount; } }
+        public ICommand AddNewAccount => _addNewAccount;
 
         public HumanAccount CurrentAccount { get; internal set; }
 
@@ -68,9 +67,9 @@ namespace SIGame.ViewModel
         {
             base.Initialize();
 
-            this.addNewAccount = new CustomCommand(AddNewAccount_Executed);
+            _addNewAccount = new CustomCommand(AddNewAccount_Executed);
 
-            this._model.PropertyChanged += model_PropertyChanged;
+            _model.PropertyChanged += Model_PropertyChanged;
             CheckHumanAccount();
         }
 
@@ -82,7 +81,7 @@ namespace SIGame.ViewModel
                 Add?.Invoke();
         }
 
-        void model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(HumanAccount.Name) || e.PropertyName == nameof(HumanAccount.BirthDate))
             {
@@ -92,16 +91,16 @@ namespace SIGame.ViewModel
 
         private void CheckHumanAccount()
         {
-            if (string.IsNullOrWhiteSpace(this._model.Name))
-                this.HAErrorMessage = Resources.NameRequired;
-            else if (!IsEdit && CommonSettings.Default.Humans2.Any(acc => acc.Name == this._model.Name))
-                this.HAErrorMessage = Resources.AlreadyExists;
-            else if (!this._model.BirthDate.HasValue)
-                this.HAErrorMessage = Resources.BirthDateRequired;
+            if (string.IsNullOrWhiteSpace(_model.Name))
+                HAErrorMessage = Resources.NameRequired;
+            else if (!IsEdit && CommonSettings.Default.Humans2.Any(acc => acc.Name == _model.Name))
+                HAErrorMessage = Resources.AlreadyExists;
+            else if (!_model.BirthDate.HasValue)
+                HAErrorMessage = Resources.BirthDateRequired;
             else
-                this.HAErrorMessage = "";
+                HAErrorMessage = "";
 
-            this.addNewAccount.CanBeExecuted = this.HAErrorMessage.Length == 0;
+            _addNewAccount.CanBeExecuted = HAErrorMessage.Length == 0;
         }
     }
 }

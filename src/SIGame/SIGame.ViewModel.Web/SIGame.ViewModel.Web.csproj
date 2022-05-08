@@ -8,7 +8,7 @@
   <PropertyGroup>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Version>7.5.8</Version>
+    <Version>7.6.0</Version>
     <LangVersion>8</LangVersion>
     <Description>SIGame web connector</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.2.0" />
     <PackageReference Include="Nowin" Version="0.26.0" />
     <PackageReference Include="Owin" Version="1.0.0" />
   </ItemGroup>

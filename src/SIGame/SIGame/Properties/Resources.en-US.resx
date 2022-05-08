@@ -925,7 +925,7 @@
     <value>Not set</value>
   </data>
   <data name="LinkLogo" xml:space="preserve">
-    <value>/SIGame;component/Resources/fb_logo.png</value>
+    <value>/SIGame;component/Resources/vk_logo.png</value>
   </data>
   <data name="Error_Typography" xml:space="preserve">
     <value>System fonts error. Cannot run the game</value>
@@ -953,9 +953,6 @@
   </data>
   <data name="Licenses" xml:space="preserve">
     <value>Licenses</value>
-  </data>
-  <data name="ReadQuestions" xml:space="preserve">
-    <value>Read questions aloud</value>
   </data>
   <data name="About_Composer" xml:space="preserve">
     <value>Composer</value>

@@ -19,14 +19,13 @@ using System.Threading.Tasks;
 namespace SI.GameServer.Client
 {
     /// <summary>
-    /// Клиент для SignalR.Core
+    /// Represents SIGame server client.
     /// </summary>
     public sealed class GameServerClient : IGameServerClient
     {
-        private const double PackageUploadTimelimitInMinutes = 4.0;
-
         private const int _BufferSize = 80 * 1024;
 
+        private bool _isOpened;
         private string _login;
 
         private readonly GameServerClientOptions _options;
@@ -109,6 +108,12 @@ namespace SI.GameServer.Client
             {
                 _client.Dispose();
                 _client = null;
+            }
+
+            if (_httpClientHandler != null)
+            {
+                _httpClientHandler.Dispose();
+                _httpClientHandler = null;
             }
         }
 
@@ -213,6 +218,7 @@ namespace SI.GameServer.Client
             CancellationToken cancellationToken = default)
         {
             var uri = "api/Account/LogOn";
+
             using var content = new FormUrlEncodedContent(
                 new Dictionary<string, string>
                 {
@@ -236,6 +242,11 @@ namespace SI.GameServer.Client
 
         public async Task OpenAsync(string userName, CancellationToken cancellationToken = default)
         {
+            if (_isOpened)
+            {
+                throw new InvalidOperationException("Client has been already opened");
+            }
+
             _cookieContainer = new CookieContainer();
             _httpClientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
 
@@ -245,7 +256,7 @@ namespace SI.GameServer.Client
             _client = new HttpClient(_progressMessageHandler)
             {
                 BaseAddress = new Uri(ServiceUri),
-                Timeout = TimeSpan.FromMinutes(PackageUploadTimelimitInMinutes)
+                Timeout = _options.Timeout
             };
             
             var token = await AuthenticateUserAsync(userName, "", cancellationToken);
@@ -281,7 +292,7 @@ namespace SI.GameServer.Client
 
             _connection.Closed += OnConnectionClosedAsync;
 
-            _connection.HandshakeTimeout = TimeSpan.FromMinutes(1);
+            _connection.HandshakeTimeout = TimeSpan.FromMinutes(2);
             
             _connection.On<string, string>("Say", (user, text) => OnUI(() => Receieve?.Invoke(user, text)));
             _connection.On<Contract.GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(ToSICoreGame(gameInfo))));
@@ -292,6 +303,8 @@ namespace SI.GameServer.Client
             _connection.On<Message>("Receive", (message) => IncomingMessage?.Invoke(message));
 
             await _connection.StartAsync(cancellationToken);
+
+            _isOpened = true;
         }
 
         private Task OnConnectionClosedAsync(Exception exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
@@ -314,7 +327,7 @@ namespace SI.GameServer.Client
         public async Task UploadPackageAsync(FileKey packageKey, Stream stream, CancellationToken cancellationToken = default)
         {
             var url = "api/upload/package";
-            var content = new StreamContent(stream, _BufferSize);
+            using var content = new StreamContent(stream, _BufferSize);
 
             try
             {
@@ -328,23 +341,7 @@ namespace SI.GameServer.Client
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    string errorMessage;
-                    var serverError = await response.Content.ReadAsStringAsync();
-
-                    if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
-                        response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
-                    {
-                        errorMessage = Resources.FileTooLarge;
-                    }
-                    else if (response.StatusCode == HttpStatusCode.BadGateway)
-                    {
-                        errorMessage = $"{response.StatusCode}: Bad Gateway";
-                    }
-                    else
-                    {
-                        errorMessage = $"{response.StatusCode}: {serverError}";
-                    }
-
+                    var errorMessage = await GetErrorMessageAsync(response);
                     throw new Exception(errorMessage);
                 }
             }
@@ -359,9 +356,28 @@ namespace SI.GameServer.Client
             }
         }
 
+        private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
+        {
+            var serverError = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
+                response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
+            {
+                return Resources.FileTooLarge;
+            }
+            
+            if (response.StatusCode == HttpStatusCode.BadGateway)
+            {
+                return $"{response.StatusCode}: Bad Gateway";
+            }
+
+            return $"{response.StatusCode}: {serverError}";
+        }
+
         public async Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default)
         {
             var uri = "api/upload/image";
+
             var bytesContent = new StreamContent(data, _BufferSize);
 
             using var formData = new MultipartFormDataContent
@@ -370,6 +386,7 @@ namespace SI.GameServer.Client
             };
 
             formData.Headers.ContentMD5 = imageKey.Hash;
+
             var response = await _client.PostAsync(uri, formData, cancellationToken);
 
             if (!response.IsSuccessStatusCode)

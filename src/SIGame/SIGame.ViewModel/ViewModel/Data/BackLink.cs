@@ -7,7 +7,6 @@ using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Speech.Synthesis;
 
 namespace SIGame.ViewModel
 {
@@ -17,8 +16,6 @@ namespace SIGame.ViewModel
 
         private readonly AppSettingsViewModel _settings;
         private readonly UserSettings _userSettings;
-
-        private SpeechSynthesizer _speechSynthesizer;
 
         internal BackLink(AppSettingsViewModel settings, UserSettings userSettings)
         {
@@ -102,31 +99,6 @@ namespace SIGame.ViewModel
                     _userSettings.PackageHistory.Add(packageId);
                 }
             });
-        }
-
-        public override void OnText(string text)
-        {
-            if (!_userSettings.ReadQuestions)
-            {
-                return;
-            }
-
-            try
-            {
-                if (_speechSynthesizer == null)
-                {
-                    _speechSynthesizer = new SpeechSynthesizer();
-                    _speechSynthesizer.SetOutputToDefaultAudioDevice();
-                    _speechSynthesizer.Rate = 4;
-                    _speechSynthesizer.SelectVoiceByHints(VoiceGender.Male, VoiceAge.Senior);
-                }
-
-                _speechSynthesizer.SpeakAsync(text);
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
         }
 
         public override bool AreAnswersShown

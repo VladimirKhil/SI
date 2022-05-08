@@ -9,6 +9,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Utils;
 
 namespace SIGame.Implementation
 {
@@ -62,19 +63,17 @@ namespace SIGame.Implementation
                 document.Close();
             };
 
-            docViewer.AddHandler(System.Windows.Documents.Hyperlink.RequestNavigateEvent,
+            docViewer.AddHandler(
+                System.Windows.Documents.Hyperlink.RequestNavigateEvent,
                 new System.Windows.Navigation.RequestNavigateEventHandler((sender, e) =>
                 {
                     if (e.Uri.IsAbsoluteUri && e.Uri.Scheme == "http")
                     {
-                        try
-                        {
-                            Process.Start(e.Uri.ToString());
-                        }
-                        catch (Exception exc)
-                        {
-                            MessageBox.Show(string.Format(Resources.SiteNavigationError + "\r\n{1}", e.Uri, exc.Message), CommonSettings.AppName);
-                        }
+                        Browser.Open(
+                            e.Uri.ToString(),
+                            exc => MessageBox.Show(
+                                string.Format(Resources.SiteNavigationError + "\r\n{1}", e.Uri, exc.Message),
+                                CommonSettings.AppName));
 
                         e.Handled = true;
                     }
@@ -82,9 +81,13 @@ namespace SIGame.Implementation
             ));
 
             if (asDialog)
+            {
                 helpWindow.ShowDialog();
+            }
             else
+            {
                 helpWindow.Show();
+            }
         }
 
         public override string SelectColor()

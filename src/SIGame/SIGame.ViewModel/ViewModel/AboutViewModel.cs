@@ -2,10 +2,10 @@
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Input;
+using Utils;
 
 namespace SIGame.ViewModel
 {
@@ -47,28 +47,19 @@ namespace SIGame.ViewModel
                 return;
             }
 
-            try
-            {
-                Process.Start(new ProcessStartInfo(licensesFolder));
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), MessageType.Error);
-            }
+            Browser.Open(
+                licensesFolder,
+                exc => PlatformManager.Instance.ShowMessage(
+                    string.Format(Resources.OpenLicensesError, exc.Message),
+                    MessageType.Error));
         }
 
         private void OpenPublicDomain_Executed(object arg) => OpenSite("https://en.wikipedia.org/wiki/Wikipedia:Public_domain");
 
-        private void OpenSite(string url)
-        {
-            try
-            {
-                Process.Start(url);
-            }
-            catch (Exception exc)
-            {
-                PlatformManager.Instance.ShowMessage($"{string.Format(Resources.ErrorMovingToSite, url)}{Environment.NewLine}{exc.Message}", MessageType.Error);
-            }
-        }
+        private static void OpenSite(string url) => Browser.Open(
+            url,
+            exc => PlatformManager.Instance.ShowMessage(
+                $"{string.Format(Resources.ErrorMovingToSite, url)}{Environment.NewLine}{exc.Message}",
+                MessageType.Error));
     }
 }

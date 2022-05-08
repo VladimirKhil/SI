@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   
   <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIGame" ?>
   <?define ProductNameR="SIGame" ?>
   <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIGame" ?>
-  <?define ProductVersion="!(bind.FileVersion.$(var.SIGame.TargetFileName))" ?>
+  <?define ProductVersion="7.6.0" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
+
+	<?if $(var.Platform) = x64 ?>
+	    <?define PublishFolder = "$(var.SIGame.ProjectDir)bin\Release\net6.0-windows\win-x64\publish\" ?>
+	<?else ?>
+	    <?define PublishFolder = "$(var.SIGame.ProjectDir)bin\Release\net6.0-windows\win-x86\publish\" ?>
+	<?endif ?>
     
-    <Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+    <Product
+		Id="*"
+		Name="$(var.ProductName)"
+		Language="1049"
+		Version="$(var.ProductVersion)"
+		Manufacturer="$(var.Manufacturer)"
+		UpgradeCode="$(var.UpgradeCode)">
+		
         <Package InstallerVersion="200" Compressed="yes" InstallScope="perUser" />
 
-        <MajorUpgrade DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled." Schedule="afterInstallInitialize" IgnoreRemoveFailure="yes" />
+        <MajorUpgrade
+			DowngradeErrorMessage="Newer version of $(var.ProductNameR) is installed. Installation is cancelled."
+		    Schedule="afterInstallInitialize"
+		    IgnoreRemoveFailure="yes" />
+		
         <MediaTemplate EmbedCab="yes" />
-
-        <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
     
         <Icon Id="AppIcon" SourceFile="$(var.SIGame.ProjectDir)Resources\game.ico" />
         <Property Id="ARPPRODUCTICON" Value="AppIcon" />
@@ -42,7 +56,6 @@
             <ComponentGroupRef Id="Sounds" />
             <ComponentGroupRef Id="Data" />
             <ComponentGroupRef Id="Photo" />
-            <ComponentGroupRef Id="en-US" />
             <ComponentGroupRef Id="licenses" />
             <ComponentGroupRef Id="Manufacturer" />
             <ComponentGroupRef Id="ManufacturerProgramMenu" />
@@ -58,7 +71,6 @@
             <Directory Id="DataFolder" Name="Data" />
             <Directory Id="PhotoFolder" Name="Photo" />
             <Directory Id="SoundsFolder" Name="Sounds" />
-            <Directory Id="EnUSFolder" Name="en-US" />
             <Directory Id="LicensesFolder" Name="licenses" />
           </Directory>
         </Directory>
@@ -74,174 +86,33 @@
     <Fragment>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
             <Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
-        <File Id="SIGame.exe" Source="$(var.SIGame.TargetDir)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes">
-            <netfx:NativeImage Id="ngen_SIWindows.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
-        </File>
+            <File Id="SIGame.exe" Source="$(var.PublishFolder)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes">
+                <netfx:NativeImage Id="ngen_SIGame.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
+            </File>
       </Component>
       <Component Guid="{167EE7C2-7628-4983-8E15-C1CFEE780BE7}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Notions.dll" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
       </Component>
       <Component Guid="{87AED8E4-25E6-4429-8304-D3AB3CAFB32C}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.ViewModel.dll" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)PenImc_cor3.dll" />
       </Component>
       <Component Guid="{C119C5BD-BB1D-4B1D-84F1-FF73F81943BA}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.ViewModel.Web.dll" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)PresentationNative_cor3.dll" />
       </Component>
       <Component Guid="{500F1B75-BE85-40B2-8B3F-F5F4CB33F6D7}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SI.GameServer.Contract.dll" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)vcruntime140_cor3.dll" />
       </Component>
       <Component Guid="{F3FD3383-ADCA-4F68-BCA5-14028689F515}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SI.GameServer.Client.dll" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)wpfgfx_cor3.dll" />
       </Component>
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIData.dll" />
-      </Component>
-      <Component Guid="{1101A59A-404B-46B1-BDA6-8BB31BF4AAAE}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIPackages.dll" />
-      </Component>
-      <Component Guid="{0702D285-1EFC-412A-B540-6FEE5C942AF4}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIPackages.Providers.dll" />
-      </Component>
-      <Component Guid="{1DF6FBDC-4653-4E25-B6D6-1E38CFA7BE5E}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.Connections.dll" />
-      </Component>
-      <Component Guid="{C8947FDD-EF8D-4A1C-BFB5-8A169F649D68}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.Network.dll" />
-      </Component>
-      <Component Guid="{219205CD-7DAC-4d05-A0E6-3D1B9CC4D740}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SICore.dll" />
-      </Component>
-      <Component Guid="{D09DE4D2-6225-4AFE-90DB-DC947C40069E}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.dll" />
-      </Component>
-      <Component Guid="a790beab-c8bc-404c-a5f1-8dec6ccb8797">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.Model.dll" />
-      </Component>
-      <Component Guid="{65C79A94-7A7F-4222-BE21-91EE350CC65F}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIUI.ViewModel.dll" />
-      </Component>
-      <Component Guid="{8EDCB71D-59DE-4E24-92EC-0156A3978AC9}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIEngine.dll" />
-      </Component>
-      <Component Guid="{B3BF9084-2D54-4A54-A86B-FCF54598AE60}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Newtonsoft.Json.dll" />
-      </Component>
-      <Component Guid="{FEE0F556-6F68-4B46-8045-30D85290FE65}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Owin.dll" />
-      </Component>
-      <Component Guid="{8689EEE7-74AC-4DCC-8D12-180CC83C0616}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Owin.dll" />
-      </Component>
-      <Component Guid="{A4D28677-6A9A-44C3-8C54-401A480A80F8}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Owin.Hosting.dll" />
-      </Component>
-      <Component Guid="{AFE71CDE-73F3-4C8A-885E-27C1216060C9}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Nowin.dll" />
-      </Component>
-      <Component Guid="{A068AC71-795F-40BA-BF7A-D9521FDFF6F4}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Web.Http.dll" />
-      </Component>
-      <Component Guid="{12352896-D582-4C26-8F9E-2DC63169A9F7}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Net.Http.Formatting.dll" />
-      </Component>
-      <Component Guid="{AEEB4B3B-4111-4DD2-949B-BB21D1C6CAD3}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Web.Http.Owin.dll" />
-      </Component>
-      <Component Guid="{8025836A-9446-44E2-B53D-3BD058364484}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.ComponentModel.Annotations.dll" />
-      </Component>
-      <Component Guid="{C975A012-4DCF-4C55-B17D-CE24C65203C6}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)MessagePack.dll" />
-      </Component>
-      <Component Guid="{B5849F24-704F-4FEC-B94E-8D8CF470BF2F}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Client.Core.dll" />
-      </Component>
-      <Component Guid="{77704068-7FE8-47FF-A15C-02FE26511498}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Client.dll" />
-      </Component>
-      <Component Guid="{C42BCC89-04F2-4E84-86B2-9C505515B257}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Common.dll" />
-      </Component>
-      <Component Guid="{8C7B0B7B-6E01-4366-8987-9804AD06CEF0}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Protocols.Json.dll" />
-      </Component>
-      <Component Guid="{D9195365-DD44-4E72-A2A2-312412EC1143}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.SignalR.Protocols.MessagePack.dll" />
-      </Component>
-      <Component Guid="{4F610C9A-4881-4E9E-A171-142BE1C975AB}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Connections.Client.dll" />
-      </Component>
-      <Component Guid="{7B1E130D-7821-44D7-BF7D-AEE7AF6142CB}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Connections.Common.dll" />
-      </Component>
-      <Component Guid="{4C3BF8FE-B37C-4BC7-AAA6-83C18ED4298E}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Connections.Abstractions.dll" />
-      </Component>
-      <Component Guid="{566D33D0-64F4-4848-B048-0054B1BDD1C2}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
-      </Component>
-      <Component Guid="{F3A7B8BE-2F28-4240-B5E0-55D13E31D4E5}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.DependencyInjection.dll" />
-      </Component>
-      <Component Guid="{40CEEB87-5A62-4C14-A37A-9AABD471F71D}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Logging.dll" />
-      </Component>
-      <Component Guid="{515F8215-01CB-4390-A79E-5BAFE6B38D71}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Options.dll" />
-      </Component>
-      <Component Guid="{70DB8822-DC91-441F-98AC-2E323E4C1DFD}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" />
-      </Component>
-      <Component Guid="{A23F1518-9028-42D3-B726-AF236E52B1EF}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Extensions.Primitives.dll" />
-      </Component>
-      <Component Guid="{9AA13937-D2CF-4B5C-8CB9-1CC5375134AB}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Memory.dll" />
-      </Component>
-      <Component Guid="{8C835CDA-93F5-40CD-BB0A-D8DE4DF8D1E0}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.IO.Pipelines.dll" />
-      </Component>
-      <Component Guid="{341398A4-696B-47FD-875A-08FE2578B1FA}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.AspNetCore.Http.Features.dll" />
-      </Component>
-      <Component Guid="{1AF6371D-0B3C-454F-925F-02BBDA4CF333}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Buffers.dll" />
-      </Component>
-      <Component Guid="{850B75C6-FC7B-40CA-B352-F67647A5A3B5}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.Tasks.Extensions.dll" />
-      </Component>
-      <Component Guid="{E9B02733-B44D-4B3C-90CD-74754D123671}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
-      </Component>
-      <Component Guid="{EA533CC4-BACB-4077-8EED-F392C6762DBD}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Numerics.Vectors.dll" />
-      </Component>
-      <Component Guid="{534FF525-17C6-4B16-926A-08DAE91A57B9}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.ValueTuple.dll" />
-      </Component>
-      <Component Guid="{1EB0115D-F79C-4FCD-93D6-D8FD34F2D7E4}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Json.dll" />
-      </Component>
-      <Component Guid="{AC9853E0-02DD-4A07-99D4-577F4595F52F}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" />
-      </Component>
-      <Component Guid="{1B3E665C-B81D-40A5-BE05-29B79464322E}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Threading.Channels.dll" />
-      </Component>
-      <Component Guid="{D2A5182E-487B-4CD7-8864-25FCB8C1878B}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Text.Encodings.Web.dll" />
-      </Component>
-      <Component Guid="{1ADE9843-197D-4EF5-888A-2830E529F951}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)System.Speech.dll" />
+        <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
       </Component>
       <Component Guid="{ADDF321D-6B06-412B-8096-3911FF966799}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_en.xps" />
-      </Component>
-      <Component Guid="{6E88EA98-D6AE-48D1-AA49-86B9BA2FDED9}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)SIGame.exe.config" />
       </Component>
       <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
         <RegistryValue
@@ -457,24 +328,6 @@
   </Fragment>
 
   <Fragment>
-    <ComponentGroup Id="en-US" Directory="EnUSFolder">
-      <Component Guid="{AF1C76BA-6755-4595-9111-7CC3A18121B0}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SICore.resources.dll" />
-      </Component>
-      <Component Guid="{8A21D5F5-52F1-4814-84DB-F6F9EE56972D}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SIGame.resources.dll" />
-      </Component>
-      <Component Guid="{311C7F73-5C13-4A2F-90C7-C2C7F55695B1}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)en-US\SIGame.ViewModel.resources.dll" />
-      </Component>
-      <Component Id="EnUSReg" Guid="{6330E7F5-82E8-4231-92A6-80AC07E11954}">
-        <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="enUS" Type="integer" Value="1" KeyPath="yes" />
-        <RemoveFolder Id="EnUSFolder" On="uninstall" />
-      </Component>
-    </ComponentGroup>
-  </Fragment>
-
-<Fragment>
     <ComponentGroup Id="licenses" Directory="LicensesFolder">
         <Component Guid="{214E3004-1EFF-4FC5-881A-4832D0FD7980}">
             <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Ben.Demystifier.LICENSE.txt" />
@@ -488,12 +341,15 @@
         <Component Guid="{1D473AD1-7BAB-4257-9A62-E561CE233056}">
             <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Owin.LICENSE.txt" />
         </Component>
+		<Component Guid="{FCD1B58A-5BA3-4258-8A72-A1423D9A79EF}">
+			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
+		</Component>
         <Component Id="LicensesReg" Guid="{4C7D3CA0-40F4-437A-8ED2-9C037D2B607C}">
             <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
             <RemoveFolder Id="LicensesFolder" On="uninstall" />
         </Component>
     </ComponentGroup>
-</Fragment>
+  </Fragment>
 
   <Fragment>
     <ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">

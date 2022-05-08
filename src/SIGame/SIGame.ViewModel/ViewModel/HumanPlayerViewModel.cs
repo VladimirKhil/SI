@@ -10,9 +10,12 @@ namespace SIGame.ViewModel
 {
     public sealed class HumanPlayerViewModel: ViewModel<GameSettings>
     {
+        public bool IsProgress => false;
+
         internal event Action HumanPlayerChanged;
 
         private HumanAccount _humanPlayer = null;
+
         private readonly CommonSettings _commonSettings;
 
         /// <summary>
@@ -20,13 +23,11 @@ namespace SIGame.ViewModel
         /// </summary>
         public HumanAccount HumanPlayer
         {
-            get
-            {
-                return _humanPlayer;
-            }
+            get => _humanPlayer;
             set
             {
                 _model.HumanPlayerName = value != null ? value.Name : "";
+
                 SetHumanPlayer();
                 OnPropertyChanged();
 
@@ -43,7 +44,7 @@ namespace SIGame.ViewModel
 
         public HumanAccount[] HumanPlayers
         {
-            get { return _humanPlayers; }
+            get => _humanPlayers;
             set
             {
                 _humanPlayers = value;
@@ -59,6 +60,7 @@ namespace SIGame.ViewModel
             {
                 _newHumanAccount
             };
+
             HumanPlayers = result.ToArray();
         }
 
@@ -73,24 +75,25 @@ namespace SIGame.ViewModel
             HumanPlayerChanged?.Invoke();
         }
 
-        private HumanAccountViewModel newAccount = null;
+        private HumanAccountViewModel _newAccount = null;
 
         public HumanAccountViewModel NewAccount
         {
-            get { return newAccount; }
+            get => _newAccount;
             set
             {
-                if (newAccount != null)
+                if (_newAccount != null)
                 {
-                    newAccount.Add -= NewAccount_Add;
-                    newAccount.Edit -= NewAccount_Edit;
+                    _newAccount.Add -= NewAccount_Add;
+                    _newAccount.Edit -= NewAccount_Edit;
                 }
 
-                newAccount = value;
-                if (newAccount != null)
+                _newAccount = value;
+
+                if (_newAccount != null)
                 {
-                    newAccount.Add += NewAccount_Add;
-                    newAccount.Edit += NewAccount_Edit;
+                    _newAccount.Add += NewAccount_Add;
+                    _newAccount.Edit += NewAccount_Edit;
                 }
 
                 OnPropertyChanged();
@@ -98,11 +101,13 @@ namespace SIGame.ViewModel
         }
 
         public ICommand EditAccount { get; private set; }
+
         public ICommand RemoveAccount { get; private set; }
 
         private void NewAccount_Add()
         {
             _commonSettings.Humans2.Add(NewAccount.Model);
+
             UpdateHumanPlayers();
             HumanPlayer = NewAccount.Model;
             NewAccount = null;
@@ -113,7 +118,7 @@ namespace SIGame.ViewModel
         private void NewAccount_Edit()
         {
             var currentAccount = NewAccount.CurrentAccount;
-            var newAccount = this.newAccount.Model;
+            var newAccount = _newAccount.Model;
 
             currentAccount.Name = newAccount.Name;
             currentAccount.IsMale = newAccount.IsMale;
@@ -125,21 +130,19 @@ namespace SIGame.ViewModel
             NewAccountCreated?.Invoke();
         }
 
-        private void SetHumanPlayer()
-        {
+        private void SetHumanPlayer() => 
             _humanPlayer = HumanPlayers.FirstOrDefault(acc => acc.Name == _model.HumanPlayerName);
-        }
 
         public HumanPlayerViewModel(CommonSettings commonSettings)
         {
-            this._commonSettings = commonSettings;
+            _commonSettings = commonSettings;
             InitializeCore();
         }
 
         public HumanPlayerViewModel(GameSettings model, CommonSettings commonSettings)
             : base(model)
         {
-            this._commonSettings = commonSettings;
+            _commonSettings = commonSettings;
             InitializeCore();
         }
 
@@ -164,21 +167,28 @@ namespace SIGame.ViewModel
         private void EditAccount_Executed(object arg)
         {
             var humanAccount = arg as HumanAccount;
+            var humanAccountCopy = new HumanAccount(humanAccount) { CanBeDeleted = true };
 
-            NewAccount = new HumanAccountViewModel(new HumanAccount(humanAccount) { CanBeDeleted = true }) { IsEdit = true, CurrentAccount = humanAccount };
+            NewAccount = new HumanAccountViewModel(humanAccountCopy)
+            {
+                IsEdit = true,
+                CurrentAccount = humanAccount
+            };
+
             AccountEditing?.Invoke();
         }
 
         private void RemoveAccount_Executed(object arg)
         {
-            if (!(arg is HumanAccount humanAccount) || !humanAccount.CanBeDeleted ||
-                !PlatformManager.Instance.Ask(string.Format(Resources.DeleteConfirm, humanAccount.Name)))
-                return;
+            if (arg is HumanAccount humanAccount
+                && humanAccount.CanBeDeleted
+                && PlatformManager.Instance.Ask(string.Format(Resources.DeleteConfirm, humanAccount.Name)))
+            {
+                _commonSettings.Humans2.Remove(humanAccount);
+                UpdateHumanPlayers();
 
-            _commonSettings.Humans2.Remove(humanAccount);
-            UpdateHumanPlayers();
-
-            HumanPlayer = HumanPlayers.First();
+                HumanPlayer = HumanPlayers.First();
+            }
         }
     }
 }

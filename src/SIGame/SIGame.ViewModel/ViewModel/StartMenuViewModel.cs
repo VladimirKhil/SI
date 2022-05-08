@@ -1,12 +1,7 @@
 ﻿using SICore;
 using SIGame.ViewModel.Properties;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SIGame.ViewModel
 {
@@ -27,14 +22,11 @@ namespace SIGame.ViewModel
 
         private void NavigateToVK_Executed(object arg)
         {
-            try
-            {
-                Process.Start(Resources.GroupLink);
-            }
-            catch (Exception exc)
-            {
-                PlatformSpecific.PlatformManager.Instance.ShowMessage(string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message), PlatformSpecific.MessageType.Error);
-            }
+            Browser.Open(
+                Resources.GroupLink,
+                exc => PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                    string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
+                    PlatformSpecific.MessageType.Error));
         }
     }
 }

@@ -1522,7 +1522,6 @@ namespace SICore
                         ClearOldTasks();
                     }
 
-                    var msg = new StringBuilder();
                     switch (task)
                     {
                         case Tasks.MoveNext:
@@ -1647,33 +1646,7 @@ namespace SICore
                             break;
 
                         case Tasks.WaitRight:
-                            #region WaitRight
-
-                            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
-
-                            if (_data.Answerer == null)
-                            {
-                                ScheduleExecution(Tasks.MoveNext, 10);
-                                break;
-                            }
-
-                            var isRight = false;
-
-                            foreach (var s in _data.Question.GetRightAnswers())
-                            {
-                                isRight = AnswerChecker.IsAnswerRight(_data.Answerer.Answer, s);
-                                if (isRight)
-                                {
-                                    break;
-                                }
-                            }
-
-                            _data.Answerer.AnswerIsRight = isRight;
-
-                            _data.ShowmanDecision = true;
-                            OnDecision();
-
-                            #endregion
+                            WaitRight();
                             break;
 
                         case Tasks.ContinueQuestion:
@@ -1737,28 +1710,7 @@ namespace SICore
                             break;
 
                         case Tasks.GoodLuck:
-                            #region GoodLuck
-
-                            _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
-
-                            _data.Stage = GameStage.After;
-                            OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
-                            _gameActions.InformStage();
-
-                            _data.ReportsCount = _data.Players.Count;
-                            ScheduleExecution(Tasks.WaitReport, 10 * 60 * 5); // 5 минут
-                            WaitFor(DecisionType.Reporting, 10 * 60 * 5, -3);
-
-                            _data.AcceptedReports = 0;
-
-                            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, LO);
-
-                            foreach (var item in _data.Players)
-                            {
-                                _gameActions.SendMessage(Messages.Report + Message.ArgsSeparatorChar + reportString, item.Name);
-                            }
-
-                            #endregion
+                            GoodLuck();
                             break;
 
                         case Tasks.AutoGame:
@@ -1774,6 +1726,55 @@ namespace SICore
                     _gameActions.SpecialReplic("Game ERROR");
                 }
             });
+        }
+
+        private void GoodLuck()
+        {
+            _gameActions.ShowmanReplic(LO[nameof(R.GoodLuck)]);
+
+            _data.Stage = GameStage.After;
+            OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
+            _gameActions.InformStage();
+
+            _data.ReportsCount = _data.Players.Count;
+            ScheduleExecution(Tasks.WaitReport, 10 * 60 * 5); // 5 минут
+            WaitFor(DecisionType.Reporting, 10 * 60 * 5, -3);
+
+            _data.AcceptedReports = 0;
+
+            var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, LO);
+
+            foreach (var item in _data.Players)
+            {
+                _gameActions.SendMessage(Messages.Report + Message.ArgsSeparatorChar + reportString, item.Name);
+            }
+        }
+
+        private void WaitRight()
+        {
+            _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
+
+            if (_data.Answerer == null)
+            {
+                ScheduleExecution(Tasks.MoveNext, 10);
+                return;
+            }
+
+            var isRight = false;
+
+            foreach (var s in _data.Question.GetRightAnswers())
+            {
+                isRight = AnswerChecker.IsAnswerRight(_data.Answerer.Answer, s);
+                if (isRight)
+                {
+                    break;
+                }
+            }
+
+            _data.Answerer.AnswerIsRight = isRight;
+
+            _data.ShowmanDecision = true;
+            OnDecision();
         }
 
         internal void AddHistory(string message) => _tasksHistory.AddLogEntry(message);

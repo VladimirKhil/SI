@@ -19,7 +19,7 @@ namespace SIGame.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -1731,15 +1731,6 @@ namespace SIGame.Properties {
         public static string ReadingSpeed {
             get {
                 return ResourceManager.GetString("ReadingSpeed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Озвучивать текст вопросов.
-        /// </summary>
-        public static string ReadQuestions {
-            get {
-                return ResourceManager.GetString("ReadQuestions", resourceCulture);
             }
         }
         

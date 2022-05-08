@@ -657,9 +657,6 @@
   <data name="ErrorWritingLogToDisc" xml:space="preserve">
     <value>Error while writing log to disc</value>
   </data>
-  <data name="HttpsProtocolIsNotSupported" xml:space="preserve">
-    <value>Media {0} load error. Https protocol is not supported!</value>
-  </data>
   <data name="Label_Auction" xml:space="preserve">
     <value>QUESTION WITH A STAKE</value>
   </data>

@@ -633,7 +633,6 @@ namespace SICore
 
                     TInfo.QuestionContentType = QuestionContentType.Text;
                     TInfo.Sound = false;
-                    _data.BackLink.OnText(text.ToString());
                     break;
 
                 case AtomTypes.Video:
@@ -671,17 +670,6 @@ namespace SICore
                     Uri mediaUri;
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
                     {
-                        return;
-                    }
-
-                    if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
-                    {
-                        var warningMessage = string.Format(_localizer[nameof(R.HttpsProtocolIsNotSupported)], mediaUri);
-
-                        TInfo.QuestionContentType = QuestionContentType.Text;
-                        TInfo.Sound = false;
-                        TInfo.Text = warningMessage;
-                        _data.OnAddString(null, warningMessage, LogMode.Protocol);
                         return;
                     }
 
@@ -751,11 +739,7 @@ namespace SICore
 
                     Uri mediaUri;
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
-                        return;
-
-                    if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
                     {
-                        OnReplic(ReplicCodes.System.ToString(), _localizer[nameof(R.HttpsProtocolIsNotSupported)]);
                         return;
                     }
 
@@ -1217,12 +1201,6 @@ namespace SICore
 
             if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out Uri mediaUri))
             {
-                return;
-            }
-
-            if (mediaUri.IsAbsoluteUri && mediaUri.Scheme == "https")
-            {
-                OnReplic(ReplicCodes.System.ToString(), _localizer[nameof(R.HttpsProtocolIsNotSupported)]);
                 return;
             }
 

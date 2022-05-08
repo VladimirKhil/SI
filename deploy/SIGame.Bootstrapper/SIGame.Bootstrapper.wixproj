@@ -22,7 +22,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Bundle.wxs" />
-    <Compile Include="NetFx48.wxs" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixUtilExtension">
@@ -45,16 +44,6 @@
     <Content Include="HyperlinkTheme.xml" />
     <Content Include="Resources\game.ico" />
     <Content Include="Resources\game_small.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SIGame.Setup\SIGame.Setup.wixproj">
-      <Name>SIGame.Setup</Name>
-      <Project>{aa17f85b-338e-40f1-a199-1d471be5535c}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

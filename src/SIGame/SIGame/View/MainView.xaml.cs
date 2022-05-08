@@ -18,7 +18,7 @@ namespace SIGame
             Dispatcher.CurrentDispatcher.ShutdownStarted += CurrentDispatcher_ShutdownStarted;
         }
 
-        void CurrentDispatcher_ShutdownStarted(object sender, EventArgs e)
+        private void CurrentDispatcher_ShutdownStarted(object sender, EventArgs e)
         {
             var main = (MainViewModel)DataContext;
             if (main != null)

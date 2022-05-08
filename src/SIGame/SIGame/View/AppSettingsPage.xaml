@@ -51,7 +51,6 @@
         <CheckBox IsChecked="{Binding Model.LoadExternalMedia}">
             <TextBlock Text="{x:Static lp:Resources.LoadExternalMedia}" TextWrapping="Wrap" />
         </CheckBox>
-        <CheckBox IsChecked="{Binding Model.ReadQuestions}" Content="{x:Static lp:Resources.ReadQuestions}" />
 
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
         <TextBlock Style="{StaticResource CommonText}" Text="{x:Static lp:Resources.RestartRequired}" FontSize="20" />
