@@ -8,7 +8,7 @@ namespace SImulator
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static bool CanClose = false;
+        public static bool CanClose;
 
         public MainWindow(bool fullScreen)
         {
@@ -20,7 +20,9 @@ namespace SImulator
                 WindowStyle = WindowStyle.SingleBorderWindow;
             }
             else if (System.Windows.Forms.Screen.AllScreens.Length == 1)
+            {
                 hint.Visibility = Visibility.Visible;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

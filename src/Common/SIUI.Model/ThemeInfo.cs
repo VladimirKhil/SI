@@ -4,19 +4,19 @@ using System.Runtime.Serialization;
 namespace SIUI.Model
 {
     /// <summary>
-    /// Данные темы
+    /// Defines themes information.
     /// </summary>
     [DataContract]
     public sealed class ThemeInfo
     {
         /// <summary>
-        /// Название темы
+        /// Theme name.
         /// </summary>
         [DataMember]
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// Вопросы темы
+        /// Questions information.
         /// </summary>
         [DataMember]
         public List<QuestionInfo> Questions { get; } = new List<QuestionInfo>();

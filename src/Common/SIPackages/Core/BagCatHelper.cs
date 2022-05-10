@@ -19,7 +19,9 @@ namespace SIPackages.Core
         {
             var m = CatCostRegex.Match(cost);
             if (!m.Success)
+            {
                 return null;
+            }
 
             int.TryParse(m.Groups["min"].ToString(), out var minimum);
             int.TryParse(m.Groups["max"].ToString(), out var maximum);

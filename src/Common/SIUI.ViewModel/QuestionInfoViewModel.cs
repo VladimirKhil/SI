@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 namespace SIUI.ViewModel
 {
     /// <summary>
-    /// Информация о вопросе
+    /// Defines question information view model.
     /// </summary>
     public sealed class QuestionInfoViewModel : ViewModelBase<QuestionInfo>
     {
         private QuestionInfoStages _state = QuestionInfoStages.None;
 
         /// <summary>
-        /// Цена вопроса
+        /// Question price.
         /// </summary>
         public int Price
         {

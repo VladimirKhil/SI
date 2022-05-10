@@ -1,26 +1,23 @@
-﻿#if LEGACY
-using Microsoft.AspNet.SignalR;
-#endif
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace SImulator.Implementation.ButtonManagers.Web
 {
-#if LEGACY
-    public sealed class ButtonHub : Hub
+    /// <summary>
+    /// Provides a SignalR Hub for web clients.
+    /// </summary>
+    public sealed class ButtonHub : Hub<IButtonClient>
     {
-        public string Press()
+        private readonly IButtonProcessor _buttonProcessor;
+
+        public ButtonHub(IButtonProcessor buttonProcessor)
         {
-            return WebManager2.Current.Press(this.Context.ConnectionId);
+            _buttonProcessor = buttonProcessor;
         }
 
-        public string Test()
-        {
-            return "A";
-        }
+        /// <summary>
+        /// Press the button.
+        /// </summary>
+        /// <returns>Pressed player name.</returns>
+        public string Press() => _buttonProcessor.Press(Context.ConnectionId);
     }
-#endif
 }

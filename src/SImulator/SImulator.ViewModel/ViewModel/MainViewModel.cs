@@ -50,14 +50,9 @@ namespace SImulator.ViewModel
         private readonly SimpleCommand _selectLogsFolder;
         private readonly SimpleCommand _selectAudioFile;
 
-        private readonly SimpleUICommand _listen;
-        private readonly SimpleUICommand _stopListen;
-
         private readonly SimpleUICommand _addPlayerButton;
         private readonly SimpleUICommand _setPlayerButton;
         private readonly SimpleCommand _removePlayerButton;
-
-        private readonly SimpleCommand _refresh;
 
         public ICommand Start => _start;
 
@@ -71,22 +66,13 @@ namespace SImulator.ViewModel
 
         public ICommand DeletePlayerKey => _removePlayerButton;
 
-        public ICommand Refresh => _refresh;
-
         public ICommand NavigateToSite { get; private set; }
 
         public ICommand SelectColor { get; private set; }
 
         public ICommand AddPlayer { get; private set; }
+
         public ICommand RemovePlayer { get; private set; }
-
-        private ICommand _activeListenCommand;
-
-        public ICommand ActiveListenCommand
-        {
-            get { return _activeListenCommand; }
-            set { _activeListenCommand = value; OnPropertyChanged(); }
-        }
 
         private ICommand _activePlayerButtonCommand;
 
@@ -162,7 +148,7 @@ namespace SImulator.ViewModel
 
         public GameMode Mode
         {
-            get { return _mode; }
+            get => _mode;
             set
             {
                 if (_mode != value)
@@ -182,55 +168,11 @@ namespace SImulator.ViewModel
             set { _transition = value; OnPropertyChanged(); }
         }
 
-        private bool _isRemoteControlling = false;
-
-        public bool IsRemoteControlling
-        {
-            get { return _isRemoteControlling; }
-            set
-            {
-                if (_isRemoteControlling != value)
-                {
-                    _isRemoteControlling = value;
-                    OnPropertyChanged();
-
-                    if (value && _computers == null)
-                        GetComputers();
-
-                    UpdateStartCommand();
-                }
-            }
-        }
-
-        private string[] _computers = null;
-
-        public string[] Computers
-        {
-            get
-            {
-                if (_computers == null)
-                {
-                    GetComputers();
-                }
-
-                return _computers;
-            }
-        }
-
-        public bool CanSelectScreens
-        {
-            get { return (_mode == GameMode.Start) && Screens.Length > 1; }
-        }
+        public bool CanSelectScreens => (_mode == GameMode.Start) && Screens.Length > 1;
 
         public IScreen[] Screens { get; private set; }
 
-        public string Host
-        {
-            get
-            {
-                return "[Ваш IP-адрес]";
-            }
-        }
+        public string Host => "[Ваш IP-адрес]";
 
         /// <summary>
         /// Список игроков, отображаемых на табло в особом режиме игры
@@ -252,11 +194,6 @@ namespace SImulator.ViewModel
             _selectLogsFolder = new SimpleCommand(SelectLogsFolder_Executed);
             _selectAudioFile = new SimpleCommand(SelectAudioFile_Executed);
 
-            _refresh = new SimpleCommand(Refresh_Executed);
-
-            _listen = new SimpleUICommand(Listen_Executed) { Name = Resources.ListenForConnections };
-            _stopListen = new SimpleUICommand(StopListen_Executed) { Name = Resources.StopListen };
-
             _addPlayerButton = new SimpleUICommand(AddPlayerButton_Executed) { Name = Resources.Add };
             _setPlayerButton = new SimpleUICommand(SetPlayerButton_Executed) { Name = Resources.PressTheButton };
             _removePlayerButton = new SimpleCommand(RemovePlayerButton_Executed);
@@ -272,26 +209,27 @@ namespace SImulator.ViewModel
 
             OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
 
-            ActiveListenCommand = _listen;
             ActivePlayerButtonCommand = _addPlayerButton;
 
             UpdateStartCommand();
             UpdateCanAddPlayerButton();
 
-            Screens = PlatformManager.Instance.GetScreens();
             Players = new ObservableCollection<SimplePlayerInfo>();
 
+            Screens = PlatformManager.Instance.GetScreens();
+            
             var screensLength = Screens.Length;
-            if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
-                Settings.ScreenNumber = screensLength - 1;
-
-            Settings.PropertyChanged += MyDefault_PropertyChanged;
 
 #if DEBUG
-            Settings.ScreenNumber = Math.Max(0, Screens.Length - 2);
+            Settings.ScreenNumber = Math.Max(0, screensLength - 1);
+#else
+            if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
+            {
+                Settings.ScreenNumber = screensLength - 1;
+            }
 #endif
 
-            SetIsRemoteControlling();
+            Settings.PropertyChanged += MyDefault_PropertyChanged;
         }
 
         private void AddPlayer_Executed(object arg)
@@ -302,7 +240,7 @@ namespace SImulator.ViewModel
 
         private void RemovePlayer_Executed(object arg)
         {
-            if (!(arg is SimplePlayerInfo player))
+            if (arg is not SimplePlayerInfo player)
             {
                 return;
             }
@@ -376,23 +314,6 @@ namespace SImulator.ViewModel
         {
             switch (e.PropertyName)
             {
-                case nameof(AppSettings.IsRemoteControlAllowed):
-                    if (_computers == null)
-                    {
-                        GetComputers();
-                    }
-
-                    UpdateStartCommand();
-                    break;
-
-                case nameof(AppSettings.ScreenNumber):
-                    SetIsRemoteControlling();
-                    break;
-
-                case nameof(AppSettings.RemotePCName):
-                    UpdateStartCommand();
-                    break;
-
                 case nameof(AppSettings.UsePlayersKeys):
                     Settings.PlayerKeys2.Clear();
                     UpdateCanAddPlayerButton();
@@ -402,11 +323,6 @@ namespace SImulator.ViewModel
                     UpdatePlayersView();
                     break;
             }
-        }
-
-        private void SetIsRemoteControlling()
-        {
-            IsRemoteControlling = Screens[Settings.ScreenNumber].IsRemote;
         }
 
         /// <summary>
@@ -432,30 +348,18 @@ namespace SImulator.ViewModel
                     throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
                 }
 
-                var gameHost = PlatformManager.Instance.CreateGameHost(engine);
+                var gameHost = new GameHost(engine);
 
-                IRemoteGameUI ui;
-                if (_isRemoteControlling)
+                var remoteGameUI = new RemoteGameUI
                 {
-                    if (!Connect(gameHost, out ui))
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    var remoteGameUI = new RemoteGameUI
-                    {
-                        GameHost = gameHost,
-                        ScreenIndex = SettingsViewModel.Model.ScreenNumber
-                    };
+                    GameHost = gameHost,
+                    ScreenIndex = SettingsViewModel.Model.ScreenNumber
+                };
 
-                    ui = remoteGameUI;
-                    ui.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-                    remoteGameUI.OnError += ShowError;
-                }
+                remoteGameUI.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+                remoteGameUI.OnError += ShowError;
 
-                var game = new GameEngine(SettingsViewModel, engine, gameHost, ui, Players, _isRemoteControlling);
+                var game = new GameEngine(SettingsViewModel, engine, gameHost, remoteGameUI, Players);
                 Game = game;
 
                 game.Start();
@@ -485,7 +389,7 @@ namespace SImulator.ViewModel
                     _game.CloseMainView();
                 }
 
-                EndGame();
+                await EndGameAsync();
                 return;
             }
         }
@@ -497,62 +401,16 @@ namespace SImulator.ViewModel
             return binding;
         }
 
-        private DuplexChannelFactory<IRemoteGameUI> factory = null;
-
-        internal bool Connect(IGameHost gameHost, out IRemoteGameUI ui)
-        {
-            try
-            {
-                factory = new DuplexChannelFactory<IRemoteGameUI>(new InstanceContext(gameHost), GetBinding(), new EndpointAddress(string.Format("net.tcp://{1}:{0}/simulator", SettingsViewModel.Model.HttpPort, SettingsViewModel.Model.RemotePCName)));
-                factory.Open();
-                ui = factory.CreateChannel();
-
-                ui.UpdateSettings(SettingsViewModel.SIUISettings.Model); // Проверим соединение заодно
-
-                ((IChannel)ui).Closed += GameEngine_Closed;
-                ((IChannel)ui).Faulted += GameEngine_Closed;
-
-                return true;
-            }
-            catch (Exception exc)
-            {
-                ui = null;
-                ShowError(exc.Message);
-                return false;
-            }
-        }
-
         private void GameEngine_Closed(object sender, EventArgs e) =>
             Task.Factory.StartNew(
-                () =>
+                async () =>
                 {
-                    EndGame();
+                    await EndGameAsync();
                     PlatformManager.Instance.ShowMessage(Resources.GameEndsBecauseOfConnectionLoss, false);
                 },
                 System.Threading.CancellationToken.None,
                 TaskCreationOptions.None,
                 UI.Scheduler);
-
-        private void Disconnect()
-        {
-            if (factory != null)
-            {
-                try
-                {
-                    factory.Close(TimeSpan.FromSeconds(2.0));
-                }
-                catch (TimeoutException)
-                {
-                    factory.Abort();
-                }
-                catch (CommunicationObjectFaultedException)
-                {
-                    factory.Abort();
-                }
-            }
-
-            factory = null;
-        }
 
         private async void Game_RequestStop() => await RaiseStop();
 
@@ -575,8 +433,7 @@ namespace SImulator.ViewModel
                 _game.CloseMainView();
             }
 
-            Disconnect();
-            EndGame();
+            await EndGameAsync();
 
             return true;
         }
@@ -584,14 +441,14 @@ namespace SImulator.ViewModel
         /// <summary>
         /// Ends the game.
         /// </summary>
-        private void EndGame()
+        private async Task EndGameAsync()
         {
             if (_game != null)
             {
                 _game.Error -= ShowError;
                 _game.RequestStop -= Game_RequestStop;
 
-                _game.Dispose();
+                await _game.DisposeAsync();
 
                 Game = null;
             }
@@ -736,48 +593,7 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void Refresh_Executed(object arg)
-        {
-            _computers = Array.Empty<string>();
-            OnPropertyChanged(nameof(Computers));
-
-            GetComputers();
-        }
-
-        /// <summary>
-        /// Разрешить удалённое управление
-        /// </summary>
-        private void Listen_Executed(object arg)
-        {
-#if LEGACY
-            try
-            {
-                PlatformManager.Instance.CreateServer(typeof(IRemoteGameUI), Settings.HttpPort, Settings.DemoScreenIndex);
-
-                Mode = GameMode.View;
-                ActiveListenCommand = _stopListen;
-            }
-            catch (Exception exc)
-            {
-                ShowError(exc);
-
-                Mode = GameMode.Start;
-                ActiveListenCommand = _listen;
-            }
-#endif
-        }
-
-        private void StopListen_Executed(object arg)
-        {
-#if LEGACY
-            PlatformManager.Instance.CloseServer();
-
-            Mode = GameMode.Start;
-            ActiveListenCommand = _listen;
-#endif
-        }
-
-        private void AddPlayerButton_Executed(object arg)
+        private async void AddPlayerButton_Executed(object arg)
         {
             ActivePlayerButtonCommand = _setPlayerButton;
 
@@ -792,7 +608,7 @@ namespace SImulator.ViewModel
                     if (!_buttonManager.Run())
                     {
                         ActivePlayerButtonCommand = _addPlayerButton;
-                        _buttonManager.Dispose();
+                        await _buttonManager.DisposeAsync();
                         _buttonManager = null;
                     }
                 }
@@ -814,7 +630,7 @@ namespace SImulator.ViewModel
                     ProcessNewPlayerButton(key);
 
                     _buttonManager.Stop();
-                    _buttonManager.Dispose();
+                    _buttonManager.DisposeAsync(); // no await
                     _buttonManager = null;
                 }
             }
@@ -847,7 +663,7 @@ namespace SImulator.ViewModel
             return false;
         }
 
-        public void OnButtonsLeft()
+        public async Task OnButtonsLeftAsync()
         {
             if (!_lockPlayerButtonSync)
             {
@@ -858,7 +674,7 @@ namespace SImulator.ViewModel
                     if (_mode == GameMode.Start && (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com) && _buttonManager != null)
                     {
                         _buttonManager.Stop();
-                        _buttonManager.Dispose();
+                        await _buttonManager.DisposeAsync();
                         _buttonManager = null;
                     }
                 }
@@ -885,28 +701,6 @@ namespace SImulator.ViewModel
             // Do nothing; the command is activated by key press
         }
 
-        private async void GetComputers()
-        {
-            if (!_isRemoteControlling)
-                return;
-
-            _refresh.CanBeExecuted = false;
-
-            try
-            {
-                _computers = await Task.Run(PlatformManager.Instance.GetLocalComputers);
-                OnPropertyChanged(nameof(Computers));
-            }
-            catch (Exception exc)
-            {
-                ShowError(exc);
-            }
-            finally
-            {
-                _refresh.CanBeExecuted = true;
-            }
-        }
-
         private void ShowError(string error)
         {
             PlatformManager.Instance.ShowMessage(error);
@@ -923,8 +717,7 @@ namespace SImulator.ViewModel
 
         private void UpdateStartCommand()
         {
-            _start.CanBeExecuted = (_mode == GameMode.Start) && _packageSource != null &&
-                (!_isRemoteControlling || !string.IsNullOrWhiteSpace(Settings.RemotePCName));
+            _start.CanBeExecuted = _mode == GameMode.Start && _packageSource != null;
         }
 
         private void OnModeChanged()

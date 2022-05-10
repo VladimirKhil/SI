@@ -1,30 +1,26 @@
-﻿using System;
+﻿using SImulator.Implementation;
+using SImulator.ViewModel;
+using SIUI.ViewModel.Core;
+using System;
+using System.IO;
+using System.IO.IsolatedStorage;
+using System.Threading;
 using System.Windows;
 using Settings = SImulator.ViewModel.Model.AppSettings;
-using SImulator.ViewModel;
-using SImulator.Implementation;
-using System.Threading;
-using System.IO.IsolatedStorage;
-using System.IO;
-using SIUI.ViewModel.Core;
-#if !DEBUG && LEGACY
-using System.Deployment.Application;
-using System.Reflection;
-#endif
 
 namespace SImulator
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Provides interaction logic for App.xaml.
     /// </summary>
     public partial class App : Application
     {
 #pragma warning disable IDE0052
-        private readonly DesktopManager _manager = new DesktopManager();
+        private readonly DesktopManager _manager = new();
 #pragma warning restore IDE0052
 
         /// <summary>
-        /// Имя конфигурационного файла пользовательских настроек
+        /// User settings configuration file name.
         /// </summary>
         private const string ConfigFileName = "user.config";
 
@@ -34,15 +30,6 @@ namespace SImulator
         {
             base.OnStartup(e);
 
-#if !DEBUG && LEGACY
-            ProcessAsync();
-
-            if (ApplicationDeployment.IsNetworkDeployed)
-            {
-                if (CheckUpdate())
-                    return;
-            }
-#endif
             UI.Initialize();
 
             var main = new MainViewModel(Settings);
@@ -65,71 +52,6 @@ namespace SImulator
             MainWindow.Show();
         }
 
-#if !DEBUG && LEGACY
-        private static bool CheckUpdate()
-        {
-            try
-            {
-                UpdateCheckInfo info = null;
-                var ad = ApplicationDeployment.CurrentDeployment;
-
-                try
-                {
-                    info = ad.CheckForDetailedUpdate();
-                }
-                catch (DeploymentDownloadException dde)
-                {
-                    MessageBox.Show("Невозможно загрузить новую версию приложения. \n\nОшибка: " + dde.Message);
-                    return false;
-                }
-                catch (InvalidDeploymentException ide)
-                {
-                    MessageBox.Show("Невозможно проверить наличие новой версии приложения. Ошибка: " + ide.Message);
-                    return false;
-                }
-                catch (InvalidOperationException ioe)
-                {
-                    MessageBox.Show("Невозможно обновить это приложение. Ошибка: " + ioe.Message);
-                    return false;
-                }
-
-                if (info.UpdateAvailable)
-                {
-                    bool doUpdate = true;
-
-                    if (!info.IsUpdateRequired)
-                    {
-                        if (MessageBox.Show("Найдено обновление программы. Обновиться сейчас?", "Найдено обновление", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
-                        {
-                            doUpdate = false;
-                        }
-                    }
-
-                    if (doUpdate)
-                    {
-                        try
-                        {
-                            ad.Update();
-                            System.Windows.Forms.Application.Restart();
-                            Application.Current.Shutdown();
-                            return true;
-                        }
-                        catch (DeploymentDownloadException dde)
-                        {
-                            MessageBox.Show("не удалось установить последнюю версию приложения. \n\n Ошибка: " + dde);
-                        }
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show("Ошибка поиска обновления: " + exc.Message);
-            }
-
-            return false;
-        }
-#endif
-
         protected override void OnExit(ExitEventArgs e)
         {            
             SaveSettings(Settings);           
@@ -145,13 +67,9 @@ namespace SImulator
                 {
                     try
                     {
-                        using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
-                        {
-                            using (var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file))
-                            {
-                                settings.Save(stream, DesktopManager.SettingsSerializer);
-                            }
-                        }
+                        using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                        using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
+                        settings.Save(stream, DesktopManager.SettingsSerializer);
                     }
                     finally
                     {
@@ -161,7 +79,11 @@ namespace SImulator
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(
+                    $"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}",
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
             }
         }
 
@@ -172,22 +94,18 @@ namespace SImulator
         {
             try
             {
-                using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
+                using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
                 {
-                    if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
+                    try
                     {
-                        try
-                        {
-                            using (var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                            {
-                                return Settings.Load(stream, DesktopManager.SettingsSerializer);
-                            }
-                        }
-                        catch { }
-                        finally
-                        {
-                            Monitor.Exit(ConfigFileName);
-                        }
+                        using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return Settings.Load(stream, DesktopManager.SettingsSerializer);
+                    }
+                    catch { }
+                    finally
+                    {
+                        Monitor.Exit(ConfigFileName);
                     }
                 }
             }
@@ -195,22 +113,6 @@ namespace SImulator
 
             return Settings.Create();
         }
-
-#if !DEBUG && LEGACY
-        private void ProcessAsync()
-        {
-            var isFirstAppRun = Settings.IsFirstRun;
-            Settings.IsFirstRun = false;
-
-            if (ApplicationDeployment.IsNetworkDeployed) // Это приложение ClickOnce
-            {
-                if (!isFirstAppRun && ApplicationDeployment.CurrentDeployment.IsFirstRun)
-                {
-                    Settings.FalseStart = true;
-                }
-            }
-        }
-#endif
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {

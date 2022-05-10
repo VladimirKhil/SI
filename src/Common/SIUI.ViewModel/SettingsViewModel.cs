@@ -3,42 +3,40 @@ using System.Linq;
 
 namespace SIUI.ViewModel
 {
+    /// <summary>
+    /// Defines a settings view model.
+    /// </summary>
     public sealed class SettingsViewModel : ViewModelBase<Settings>
     {
         public double TableColorR
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableColorString.Substring(3, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableColorString.Substring(3, 2), 16);
             set
             {
                 _model.TableColorString = _model.TableColorString.Substring(0, 3)
-                    + ((byte)value).ToString("x2") + _model.TableColorString.Substring(5);
+                    + ((byte)value).ToString("x2")
+                    + _model.TableColorString.Substring(5);
+
                 OnPropertyChanged(nameof(TableColorString));
             }
         }
 
         public double TableColorG
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableColorString.Substring(5, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableColorString.Substring(5, 2), 16);
             set
             {
                 _model.TableColorString = _model.TableColorString.Substring(0, 5)
-                    + ((byte)value).ToString("x2") + _model.TableColorString.Substring(7);
+                    + ((byte)value).ToString("x2")
+                    + _model.TableColorString.Substring(7);
+
                 OnPropertyChanged(nameof(TableColorString));
             }
         }
 
         public double TableColorB
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableColorString.Substring(7, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableColorString.Substring(7, 2), 16);
             set
             {
                 _model.TableColorString = _model.TableColorString.Substring(0, 7) + ((byte)value).ToString("x2");
@@ -50,38 +48,33 @@ namespace SIUI.ViewModel
 
         public double TableBackColorR
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableBackColorString.Substring(3, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableBackColorString.Substring(3, 2), 16);
             set
             {
                 _model.TableBackColorString = _model.TableBackColorString.Substring(0, 3)
-                    + ((byte)value).ToString("x2") + _model.TableBackColorString.Substring(5);
+                    + ((byte)value).ToString("x2")
+                    + _model.TableBackColorString.Substring(5);
+
                 OnPropertyChanged(nameof(TableBackColorString));
             }
         }
 
         public double TableBackColorG
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableBackColorString.Substring(5, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableBackColorString.Substring(5, 2), 16);
             set
             {
                 _model.TableBackColorString = _model.TableBackColorString.Substring(0, 5)
-                    + ((byte)value).ToString("x2") + _model.TableBackColorString.Substring(7);
+                    + ((byte)value).ToString("x2")
+                    + _model.TableBackColorString.Substring(7);
+
                 OnPropertyChanged(nameof(TableBackColorString));
             }
         }
 
         public double TableBackColorB
         {
-            get
-            {
-                return System.Convert.ToByte(_model.TableBackColorString.Substring(7, 2), 16);
-            }
+            get => System.Convert.ToByte(_model.TableBackColorString.Substring(7, 2), 16);
             set
             {
                 _model.TableBackColorString = _model.TableBackColorString.Substring(0, 7) + ((byte)value).ToString("x2");
@@ -97,17 +90,20 @@ namespace SIUI.ViewModel
 
         public string TableFontFamily
         {
-            get { return _model.TableFontFamily; }
+            get => _model.TableFontFamily;
             set { if (_model.TableFontFamily != value) { _model.TableFontFamily = value; OnPropertyChanged(); } }
         }
 
         public double QuestionLineSpacing
         {
-            get { return _model.QuestionLineSpacing; }
+            get => _model.QuestionLineSpacing;
             set { if (_model.QuestionLineSpacing != value) { _model.QuestionLineSpacing = value; OnPropertyChanged(); } }
         }
 
-        public string[] FontFamilies { get; } = new string[] { Settings.DefaultTableFontFamily }.Concat(new string[] { "Arial", "Segoe UI" }).ToArray();
+        public string[] FontFamilies { get; } = new string[] { Settings.DefaultTableFontFamily }
+            .Concat(new string[] { "Arial", "Segoe UI" })
+            .ToArray();
+
         public double[] LineSpaces { get; } = new double[] { 1.0, Settings.DefaultQuestionLineSpacing };
 
         public SettingsViewModel()

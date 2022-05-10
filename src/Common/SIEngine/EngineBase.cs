@@ -118,19 +118,27 @@ namespace SIEngine
             }
         }
 
-        public bool CanChangeSum() => _stage == GameStage.Question || _stage == GameStage.RoundTable || _stage == GameStage.AfterFinalThink
-            || _stage == GameStage.EndQuestion || _stage == GameStage.RightAnswer;
+        public bool CanChangeSum() =>
+            _stage == GameStage.Question
+            || _stage == GameStage.RoundTable
+            || _stage == GameStage.AfterFinalThink
+            || _stage == GameStage.QuestionPostInfo
+            || _stage == GameStage.RightAnswer;
 
         public bool CanReturnToQuestion() => _activeRound != null
-                && _activeRound.Type != RoundTypes.Final
-                && _activeQuestion != null && _activeQuestion.Type.Name == QuestionTypes.Simple;
+            && _activeRound.Type != RoundTypes.Final
+            && _activeQuestion != null && _activeQuestion.Type.Name == QuestionTypes.Simple;
 
-        public bool CanPress() => _activeQuestion.Type.Name == QuestionTypes.Simple
-            && (_stage == GameStage.RightAnswer || _stage == GameStage.EndQuestion);
+        public bool CanPress() =>
+            _activeQuestion.Type.Name == QuestionTypes.Simple
+            && (_stage == GameStage.RightAnswer || _stage == GameStage.QuestionPostInfo);
 
         public bool IsQuestion() => _stage == GameStage.Question;
 
-        public bool IsWaitingForPress() => _stage == GameStage.Question || _stage == GameStage.RightAnswer || _stage == GameStage.EndQuestion;
+        public bool IsWaitingForPress() =>
+            _stage == GameStage.Question
+            || _stage == GameStage.RightAnswer
+            || _stage == GameStage.QuestionPostInfo;
 
         public bool IsQuestionFinished() => _activeQuestion != null && _atomIndex == _activeQuestion.Scenario.Count;
 
@@ -143,9 +151,8 @@ namespace SIEngine
         }
 
         /// <summary>
-        /// Игровая заставка
+        /// Is engine in intro mode.
         /// </summary>
-        /// <returns></returns>
         public bool IsIntro() => _roundIndex == -1;
 
         #region Events

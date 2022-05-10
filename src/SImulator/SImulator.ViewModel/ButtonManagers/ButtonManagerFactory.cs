@@ -4,20 +4,20 @@ using SImulator.ViewModel.Core;
 namespace SImulator.ViewModel.ButtonManagers
 {
     /// <summary>
-    /// Фабрика кнопочных менеджеров
+    /// Defines a factory for creating button managers.
     /// </summary>
     public class ButtonManagerFactory
     {
-        public virtual IButtonManager Create(AppSettings settings)
-        {
-            switch (settings.UsePlayersKeys)
+        /// <summary>
+        /// Creates an instance of <see cref="IButtonManager" />.
+        /// </summary>
+        /// <param name="settings">Button manager settings.</param>
+        /// <returns>Created button manager.</returns>
+        public virtual IButtonManager Create(AppSettings settings) =>
+            settings.UsePlayersKeys switch
             {
-                case PlayerKeysModes.External:
-                    return new EmptyButtonManager();
-
-                default:
-                    return null;
-            }
-        }
+                PlayerKeysModes.External => new EmptyButtonManager(),
+                _ => null,
+            };
     }
 }

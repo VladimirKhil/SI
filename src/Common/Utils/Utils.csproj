@@ -8,6 +8,8 @@
 	  <Company>Khil-soft</Company>
 	  <Product>Utils</Product>
 	  <Description>SIGame utils</Description>
+	  <SignAssembly>True</SignAssembly>
+	  <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>

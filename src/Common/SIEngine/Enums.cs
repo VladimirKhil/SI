@@ -23,7 +23,7 @@ namespace SIEngine
         AfterDelete,
         FinalQuestion,
         /// <summary>
-        /// Размышление в финале
+        /// Thinking in final round.
         /// </summary>
         FinalThink,
         RightFinalAnswer,
@@ -39,17 +39,17 @@ namespace SIEngine
     }
 
     /// <summary>
-    /// Тип игры
+    /// Defines game modes.
     /// </summary>
     public enum GameModes
     {
         /// <summary>
-        /// Классическая
+        /// Classic mode (with final round and special questions support).
         /// </summary>
         [Display(Description = "GameModes_Tv")]
         Tv,
         /// <summary>
-        /// Упрощённая
+        /// Simplified mode (without final round and special questions).
         /// </summary>
         [Display(Description = "GameModes_Sport")]
         Sport

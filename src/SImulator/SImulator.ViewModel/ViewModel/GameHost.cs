@@ -11,7 +11,7 @@ using System.Windows.Input;
 
 namespace SImulator.ViewModel
 {
-    public class GameHost: IExtendedGameHost
+    public sealed class GameHost : IExtendedGameHost
     {
         private readonly EngineBase _engine;
 

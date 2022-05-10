@@ -16,7 +16,10 @@ namespace SImulator.ViewModel
             _appSettings = appSettings;
         }
 
-        public bool IsPressMode(bool isMultimediaQuestion) => _appSettings.FalseStart && (!isMultimediaQuestion || _appSettings.FalseStartMultimedia) && _appSettings.UsePlayersKeys != PlayerKeysModes.None;
+        public bool IsPressMode(bool isMultimediaQuestion) =>
+            _appSettings.FalseStart
+            && (!isMultimediaQuestion || _appSettings.FalseStartMultimedia)
+            && _appSettings.UsePlayersKeys != PlayerKeysModes.None;
 
         public bool ShowRight => _appSettings.ShowRight;
 

@@ -228,25 +228,6 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private bool _isRemoteControlAllowed = false;
-
-        /// <summary>
-        /// Допускается ли удалённое управление игрой
-        /// </summary>
-        [DefaultValue(false)]
-        public bool IsRemoteControlAllowed
-        {
-            get { return _isRemoteControlAllowed; }
-            set
-            {
-                if (_isRemoteControlAllowed != value)
-                {
-                    _isRemoteControlAllowed = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private string _restriction = "12+";
 
         /// <summary>
@@ -266,45 +247,7 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private string _remotePCName = "";
-
-        /// <summary>
-        /// Имя удалённого компьютера, на котором проводится игра
-        /// </summary>
-        [DefaultValue("")]
-        public string RemotePCName
-        {
-            get { return _remotePCName; }
-            set
-            {
-                if (_remotePCName != value)
-                {
-                    _remotePCName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private int _httpPort = 7777;
-
-        /// <summary>
-        /// Порт удалённого компьютера, на котором проводится игра
-        /// </summary>
-        [DefaultValue(7777)]
-        public int HttpPort
-        {
-            get { return _httpPort; }
-            set
-            {
-                if (_httpPort != value)
-                {
-                    _httpPort = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private ObservableCollection<string> _recent = new ObservableCollection<string>();
+        private ObservableCollection<string> _recent = new();
 
         public ObservableCollection<string> Recent
         {

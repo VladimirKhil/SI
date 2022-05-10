@@ -3,13 +3,13 @@
 namespace SIUI.Model
 {
     /// <summary>
-    /// Данные вопроса
+    /// Defines question information.
     /// </summary>
     [DataContract]
     public sealed class QuestionInfo
     {
         /// <summary>
-        /// Цена вопроса
+        /// Question price.
         /// </summary>
         [DataMember]
         public int Price { get; set; } = -1;

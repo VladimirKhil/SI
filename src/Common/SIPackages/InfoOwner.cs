@@ -9,7 +9,7 @@ namespace SIPackages
     /// <summary>
     /// Владелец информации
     /// </summary>
-    public abstract class InfoOwner: Named, IXmlSerializable
+    public abstract class InfoOwner : Named, IXmlSerializable
     {
         /// <summary>
         /// Информация об объекте

@@ -23,7 +23,7 @@ namespace SIPackages.PlatformSpecific.Net45
         }
 
         public static ZipSIPackage Create(Stream stream, bool leaveOpen = false) =>
-            new ZipSIPackage(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
+            new(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
 
         public static ZipSIPackage Open(Stream stream, bool read = true)
         {
@@ -101,7 +101,9 @@ namespace SIPackages.PlatformSpecific.Net45
 
             var ext = extension.ToLower();
             if (!_contentTypes.ContainsKey(ext))
+            {
                 _contentTypes[ext] = contentType;
+            }
         }
 
         public void CreateStream(string category, string name, string contentType)

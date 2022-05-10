@@ -1,25 +1,35 @@
-﻿<Window x:Name="root" x:Class="SImulator.CommandWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="СИмулятор" mc:Ignorable="d" 
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
-        xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
-        xmlns:local="clr-namespace:SImulator"
-        xmlns:se="clr-namespace:SIEngine;assembly=SIEngine"
-        xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
-        xmlns:my="clr-namespace:SImulator.Converters"
-        xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
-        xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:lb="clr-namespace:SImulator.Behaviors"
-        xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
-        SnapsToDevicePixels="True" TextOptions.TextFormattingMode="Display"
-        Icon="Images/logo.png"
-        Closing="Window_Closing" Height="600" Width="755" MinHeight="600" MinWidth="755"
-        lb:CommandWindowBehavior.IsAttached="True"
-        Background="{StaticResource MainBackground}">
+﻿<Window
+    x:Name="root"
+    x:Class="SImulator.CommandWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="СИмулятор"
+    mc:Ignorable="d" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
+    xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
+    xmlns:local="clr-namespace:SImulator"
+    xmlns:se="clr-namespace:SIEngine;assembly=SIEngine"
+    xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
+    xmlns:vm="clr-namespace:SImulator.ViewModel;assembly=SImulator.ViewModel"
+    xmlns:my="clr-namespace:SImulator.Converters"
+    xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
+    xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:uim="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
+    SnapsToDevicePixels="True"
+    TextOptions.TextFormattingMode="Display"
+    Icon="Images/logo.png"
+    Closing="Window_Closing"
+    Height="600"
+    Width="755"
+    MinHeight="600"
+    MinWidth="755"
+    lb:CommandWindowBehavior.IsAttached="True"
+    Background="{StaticResource MainBackground}"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Window.Resources>
         <ResourceDictionary>
 
@@ -359,7 +369,7 @@
                 </uic:TemplateConverter.Templates>
             </uic:TemplateConverter>
 
-            <CollectionViewSource x:Key="DemonstrationScreens" Source="{Binding Screens}" Filter="DemonstrationScreens_Filter" />
+            <CollectionViewSource x:Key="DemonstrationScreens" Source="{Binding Screens}" />
         </ResourceDictionary>        
     </Window.Resources>
     <Window.TaskbarItemInfo>
@@ -475,25 +485,6 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
-                    <!--<StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <CheckBox IsChecked="{Binding Settings.IsRemoteControlling}">Вести игру на удалённом компьютере</CheckBox>
-                    </StackPanel>-->
-                    <StackPanel Visibility="{Binding IsRemoteControlling, Converter={StaticResource BVConverter}}" Margin="0,4,0,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Style="{StaticResource Header}">Имя (адрес) компьютера</TextBlock>
-                            <Button Style="{StaticResource HelpButton}" Visibility="{Binding IsRemoteControlling, Converter={StaticResource BVConverter}}">
-                                <lb:TipBehavior.Tip>
-                                    <TextBlock Text="Демонстрационный компьютер должен находиться в локальной сети или не быть спрятан за NAT" />
-                                </lb:TipBehavior.Tip>
-                            </Button>
-                        </StackPanel>
-                        <TextBox Margin="0,2,0,0" Text="{Binding Settings.RemotePCName, UpdateSourceTrigger=PropertyChanged}" />
-                        <TextBlock Style="{StaticResource Header}">Номер порта</TextBlock>
-                        <TextBox Margin="0,2,0,0" Text="{Binding Settings.HttpPort}" />
-                        <TextBlock Style="{StaticResource Header}">Список компьютеров в локальной сети</TextBlock>
-                        <ListBox ItemsSource="{Binding Computers}" SelectedItem="{Binding Settings.RemotePCName}" Margin="0,2,5,5" Height="100" ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                        <Button Content="Обновить" Height="25" Width="100" Command="{Binding Refresh}" HorizontalAlignment="Left" />
-                    </StackPanel>
                 </StackPanel>
                 <DockPanel Grid.Row="2" Margin="0,10,0,0">
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -692,56 +683,6 @@
                     </ContentControl>
                 </Border>
             </DockPanel>
-        </TabItem>
-        <TabItem Header="Демонстрация" Visibility="{Binding Mode, Converter={StaticResource DisplayView}}">
-            <Grid>
-                <StackPanel Margin="2,2,0,0">
-                    <TextBlock Style="{StaticResource Title}">Демонстрация</TextBlock>
-                    <TextBlock Margin="0,2,0,0">Демонстрировать на этом компьютере игру, управляемую с другого компьютера</TextBlock>
-                    <TextBlock Style="{StaticResource Header}">Номер порта для прослушивания</TextBlock>
-                    <TextBox lb:NumericBehavior.IsAttached="True" Margin="0,5,0,0" Text="{Binding Settings.HttpPort}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
-                    <!--<Button Margin="0,5,0,0" Height="25" Width="170" HorizontalAlignment="Left" Command="{Binding ActiveListenCommand}" Content="{Binding ActiveListenCommand.Name}" />-->
-                    <TextBlock Margin="0,5,0,0" Text="Ожидаем подключения…" Visibility="{Binding Mode, Converter={StaticResource ViewView}, Mode=OneWay}" />
-                </StackPanel>
-                <Grid VerticalAlignment="Bottom" Margin="2,0,4,5">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                        <TextBlock Text="Экран" VerticalAlignment="Center" />
-                        <ComboBox Margin="10,0,0,0" Width="150" IsEnabled="{Binding CanSelectScreens}" ItemsSource="{Binding Source={StaticResource DemonstrationScreens}}" SelectedIndex="{Binding Settings.DemoScreenIndex}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-                    <Button ToolTip="{Binding ActiveListenCommand.Name}" Command="{Binding ActiveListenCommand}" BorderThickness="0" Width="40" Height="40" HorizontalAlignment="Right">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="ContentTemplate">
-                                    <Setter.Value>
-                                        <DataTemplate>
-                                            <Path Data="M0,0L5,5L0,10M-5,5L5,5" Stretch="Uniform" Stroke="#FF003200" StrokeThickness="3" />
-                                        </DataTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Padding" Value="10" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ActiveListenCommand.Name}" Value="Прекратить ожидание">
-                                        <Setter Property="ContentTemplate">
-                                            <Setter.Value>
-                                                <DataTemplate>
-                                                    <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
-                                                </DataTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Setter Property="Padding" Value="12" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </Grid>
-            </Grid>
         </TabItem>
         <TabItem Header="Внешний вид" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
             <StackPanel Margin="2,2,0,0">

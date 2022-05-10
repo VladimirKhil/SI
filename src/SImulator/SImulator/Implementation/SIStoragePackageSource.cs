@@ -4,7 +4,6 @@ using SImulator.ViewModel;
 using SImulator.ViewModel.PlatformSpecific;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
@@ -35,7 +34,7 @@ namespace SImulator.Implementation
             {
                 if (Environment.OSVersion.Version.Major >= 6)
                 {
-                    progress = new ProgressDialog() { Title = MainViewModel.ProductName };
+                    progress = new ProgressDialog { Title = MainViewModel.ProductName };
 
                     progress.SetLine(1, "Загрузка файла…", false);
                     progress.Start(ProgressDialog.ProgressDialogFlags.MarqueeProgress | ProgressDialog.ProgressDialogFlags.NoCancel | ProgressDialog.ProgressDialogFlags.NoMinimize);

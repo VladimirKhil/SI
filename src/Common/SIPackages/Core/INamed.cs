@@ -3,12 +3,12 @@
 namespace SIPackages.Core
 {
     /// <summary>
-    /// Именованный объект
+    /// Defines an object with name.
     /// </summary>
     public interface INamed : INotifyPropertyChanged
     {
         /// <summary>
-        /// Имя объекта
+        /// Object name.
         /// </summary>
         string Name { get; set; }
     }

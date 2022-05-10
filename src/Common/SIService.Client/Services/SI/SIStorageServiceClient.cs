@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Services.SI
 {
-    public sealed class SIStorageServiceClient: ISIStorageServiceClient
+    public sealed class SIStorageServiceClient : ISIStorageServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
         private static readonly HttpClient Client = new();

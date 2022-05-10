@@ -7,7 +7,7 @@ namespace SIPackages
     /// <summary>
     /// Авторы объекта в пакете
     /// </summary>
-    public sealed class Authors: List<string>
+    public sealed class Authors : List<string>
     {
         /// <summary>
         /// Создание списка авторов

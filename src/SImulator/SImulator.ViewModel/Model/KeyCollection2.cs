@@ -4,7 +4,7 @@ using SImulator.ViewModel.Core;
 
 namespace SImulator.ViewModel.Model
 {
-    public sealed class KeyCollection2: ObservableCollection<GameKey>
+    public sealed class KeyCollection2 : ObservableCollection<GameKey>
     {
         public KeyCollection2()
         {

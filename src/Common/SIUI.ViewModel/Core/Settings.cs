@@ -6,6 +6,9 @@ using System.Xml.Serialization;
 
 namespace SIUI.ViewModel.Core
 {
+    /// <summary>
+    /// Defines a UI settings.
+    /// </summary>
     [DataContract]
     public sealed class Settings : INotifyPropertyChanged
     {
@@ -25,7 +28,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string TableFontFamily
         {
-            get { return _tableFontFamily; }
+            get => _tableFontFamily;
             set { if (_tableFontFamily != value) { _tableFontFamily = value; OnPropertyChanged(); } }
         }
 
@@ -36,7 +39,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string TableColorString
         {
-            get { return _tableColorString; }
+            get => _tableColorString;
             set { if (_tableColorString != value) { _tableColorString = value; OnPropertyChanged(); } }
         }
 
@@ -47,7 +50,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string TableBackColorString
         {
-            get { return _tableBackColorString; }
+            get => _tableBackColorString;
             set { if (_tableBackColorString != value) { _tableBackColorString = value; OnPropertyChanged(); } }
         }
 
@@ -58,7 +61,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string TableGridColorString
         {
-            get { return _tableGridColorString; }
+            get => _tableGridColorString;
             set { if (_tableGridColorString != value) { _tableGridColorString = value; OnPropertyChanged(); } }
         }
 
@@ -69,7 +72,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string AnswererColorString
         {
-            get { return _answererColorString; }
+            get => _answererColorString;
             set { if (_answererColorString != value) { _answererColorString = value; OnPropertyChanged(); } }
         }
 
@@ -80,7 +83,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public double QuestionLineSpacing
         {
-            get { return _questionLineSpacing; }
+            get => _questionLineSpacing;
             set { if (Math.Abs(_questionLineSpacing - value) < double.Epsilon) { _questionLineSpacing = value; OnPropertyChanged(); } }
         }
 
@@ -91,7 +94,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public bool ShowScore
         {
-            get { return _showScore; }
+            get => _showScore;
             set { if (_showScore != value) { _showScore = value; OnPropertyChanged(); } }
         }
 
@@ -102,7 +105,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public bool Animate3D
         {
-            get { return _animate3D; }
+            get => _animate3D;
             set { if (_animate3D != value) { _animate3D = value; OnPropertyChanged(); } }
         }
 
@@ -113,7 +116,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public bool KeyboardControl
         {
-            get { return _keyboardControl; }
+            get => _keyboardControl;
             set { if (_keyboardControl != value) { _keyboardControl = value; OnPropertyChanged(); } }
         }
 
@@ -127,7 +130,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string LogoUri
         {
-            get { return _logoUri; }
+            get => _logoUri;
             set
             {
                 if (_logoUri != value)
@@ -148,7 +151,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string BackgroundImageUri
         {
-            get { return _backgroundImageUri; }
+            get => _backgroundImageUri;
             set
             {
                 if (_backgroundImageUri != value)
@@ -169,7 +172,7 @@ namespace SIUI.ViewModel.Core
         [DataMember]
         public string BackgroundVideoUri
         {
-            get { return _backgroundVideoUri; }
+            get => _backgroundVideoUri;
             set
             {
                 if (_backgroundVideoUri != value)

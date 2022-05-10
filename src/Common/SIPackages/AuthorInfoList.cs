@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 namespace SIPackages
 {
     [CollectionDataContract(Name = "Authors", Namespace = "")]
-    public sealed class AuthorInfoList: List<AuthorInfo>, IXmlSerializable
+    public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
     {
         /// <summary>
         /// Gets XML schema to use.

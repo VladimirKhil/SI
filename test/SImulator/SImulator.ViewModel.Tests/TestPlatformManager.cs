@@ -57,11 +57,6 @@ namespace SImulator.ViewModel.Tests
             
         }
 
-        public override IExtendedGameHost CreateGameHost(EngineBase engine)
-        {
-            return new TestGameHost(engine);
-        }
-
         public override ILogger CreateLogger(string folder) => new TestLogger();
 
         public override Task CreateMainViewAsync(object dataContext, int screenNumber) => Task.CompletedTask;
@@ -70,23 +65,6 @@ namespace SImulator.ViewModel.Tests
         {
             throw new NotImplementedException();
         }
-
-#if LEGACY
-        public override void CreateServer(Type contract, int port, int screenIndex)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void CloseServer()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override T GetCallback<T>()
-        {
-            throw new NotImplementedException();
-        }
-#endif
 
         public override string[] GetComPorts()
         {

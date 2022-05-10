@@ -1,5 +1,8 @@
 ﻿namespace SIPackages.Core
 {
+    /// <summary>
+    /// Provides well-known question type parameters.
+    /// </summary>
     public static class QuestionTypeParams
     {
         /// <summary>

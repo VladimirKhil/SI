@@ -2,10 +2,8 @@
 
 namespace SIPackages.Core
 {
-    /// <summary>
-    /// Represents a common media source (Uri or direct stream).
-    /// </summary>
-    public sealed class Media: IMedia
+    /// <inheritdoc cref="IMedia" />
+    public sealed class Media : IMedia
     {
         /// <summary>
         /// Gets media as a stream factory.

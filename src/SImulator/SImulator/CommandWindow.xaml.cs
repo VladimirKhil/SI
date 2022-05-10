@@ -1,34 +1,25 @@
-﻿using System.Windows;
+﻿using SImulator.ViewModel;
+using System.ComponentModel;
+using System.Reflection;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using SImulator.ViewModel;
-using System.Reflection;
-using SImulator.ViewModel.PlatformSpecific;
 
 namespace SImulator
 {
     /// <summary>
-    /// Interaction logic for CommandWindow.xaml
+    /// Provides interaction logic for CommandWindow.xaml.
     /// </summary>
     public partial class CommandWindow : Window
     {
         /// <summary>
-        /// Версия программы
+        /// Application version.
         /// </summary>
-        public string Version
-        {
-            get
-            {
-                return Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-            }
-        }
+        public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
-        public CommandWindow()
-        {
-            InitializeComponent();
-        }
+        public CommandWindow() => InitializeComponent();
 
-        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object sender, CancelEventArgs e)
         {
             if (DataContext != null)
             {
@@ -37,20 +28,17 @@ namespace SImulator
             }
         }
 
-        private void Button_LostKeyboardFocus_1(object sender, KeyboardFocusChangedEventArgs e)
+        private async void Button_LostKeyboardFocus_1(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (DataContext is MainViewModel gameEngine)
-                gameEngine.OnButtonsLeft();
-        }
-
-        private void DemonstrationScreens_Filter(object sender, FilterEventArgs e)
-        {
-            e.Accepted = !((IScreen)e.Item).IsRemote;
+            if (DataContext is MainViewModel mainViewModel)
+            {
+                await mainViewModel.OnButtonsLeftAsync();
+            }
         }
 
         private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
         {
-            e.Accepted = (SImulator.ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;
+            e.Accepted = (ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;
         }
     }
 }
