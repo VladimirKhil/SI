@@ -29,5 +29,10 @@
         /// No-risk question.
         /// </summary>
         public const string Sponsored = "sponsored";
+
+        /// <summary>
+        /// Multiple choice question.
+        /// </summary>
+        public const string Choice = "choice";
     }
 }

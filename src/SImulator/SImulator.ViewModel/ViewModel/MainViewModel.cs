@@ -336,12 +336,12 @@ namespace SImulator.ViewModel
                 var packageStream = await _packageSource.GetPackageAsync();
 
                 var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
-                EngineBase engine;
+                ISIEngine engine;
 
                 try
                 {
                     var document = SIDocument.Load(packageStream);
-                    engine = SettingsViewModel.Model.GameMode == GameModes.Tv ? (EngineBase)new TvEngine(document, engineSettingsProvider) : new SportEngine(document, engineSettingsProvider);
+                    engine = EngineFactory.CreateEngine(SettingsViewModel.Model.GameMode == GameModes.Tv, document, engineSettingsProvider);
                 }
                 catch (Exception exc)
                 {

@@ -30,7 +30,7 @@ namespace SImulator.Implementation.ButtonManagers.Web
 
             _webApplication.UseEndpoints(endpoints => endpoints.MapHub<ButtonHub>("/buttonHost"));
 
-            _webApplication.RunAsync($"http://localhost:{port}");
+            _webApplication.RunAsync($"http://+:{port}");
         }
 
         public override bool Run()

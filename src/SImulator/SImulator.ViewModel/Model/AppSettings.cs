@@ -12,32 +12,24 @@ using System.Xml.Serialization;
 
 namespace SImulator.ViewModel.Model
 {
+    /// <summary>
+    /// Defines application settings.
+    /// </summary>
     public sealed class AppSettings : INotifyPropertyChanged
     {
         #region Settings
 
-        private bool _isFirstRun = true;
+        private const int RoundTimeDefaultValue = 600;
 
-        [DefaultValue(true)]
-        public bool IsFirstRun
-        {
-            get { return _isFirstRun; }
-            set
-            {
-                if (_isFirstRun != value)
-                {
-                    _isFirstRun = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        private int _roundTime = RoundTimeDefaultValue;
 
-        private int _roundTime = 600;
-
-        [DefaultValue(600)]
+        /// <summary>
+        /// Maximum round time.
+        /// </summary>
+        [DefaultValue(RoundTimeDefaultValue)]
         public int RoundTime
         {
-            get { return _roundTime; }
+            get => _roundTime;
             set
             {
                 if (_roundTime != value && value > 0)
@@ -48,15 +40,17 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private int _thinkingTime = 5;
+        private const int ThinkingTimeDefaultValue = 5;
+
+        private int _thinkingTime = ThinkingTimeDefaultValue;
 
         /// <summary>
-        /// Время на размышление над вопросом
+        /// Time for thinking on question.
         /// </summary>
-        [DefaultValue(5)]
+        [DefaultValue(ThinkingTimeDefaultValue)]
         public int ThinkingTime
         {
-            get { return _thinkingTime; }
+            get => _thinkingTime;
             set
             {
                 if (_thinkingTime != value && value > 0)
@@ -72,7 +66,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(0)]
         public int ScreenNumber
         {
-            get { return _screenNumber; }
+            get => _screenNumber;
             set
             {
                 if (_screenNumber != value)
@@ -83,27 +77,11 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private int _demoScreenIndex = 0;
-
-        [DefaultValue(0)]
-        public int DemoScreenIndex
-        {
-            get { return _demoScreenIndex; }
-            set
-            {
-                if (_demoScreenIndex != value)
-                {
-                    _demoScreenIndex = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
         private Settings _siUISettings = new Settings();
 
         public Settings SIUISettings
         {
-            get { return _siUISettings; }
+            get => _siUISettings;
             set
             {
                 if (_siUISettings != value && value != null)
@@ -122,7 +100,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(true)]
         public bool DropStatsOnBack
         {
-            get { return _dropStatsOnBack; }
+            get => _dropStatsOnBack;
             set
             {
                 if (_dropStatsOnBack != value)
@@ -136,12 +114,12 @@ namespace SImulator.ViewModel.Model
         private bool _showRight = false;
 
         /// <summary>
-        /// Показывать правильные ответы
+        /// Show right answers on the screen.
         /// </summary>
         [DefaultValue(false)]
         public bool ShowRight
         {
-            get { return _showRight; }
+            get => _showRight;
             set
             {
                 if (_showRight != value)
@@ -155,12 +133,12 @@ namespace SImulator.ViewModel.Model
         private bool _substractOnWrong = true;
 
         /// <summary>
-        /// Снимать очки за неверный ответ
+        /// Subtract points for wrong answer.
         /// </summary>
         [DefaultValue(true)]
         public bool SubstractOnWrong
         {
-            get { return _substractOnWrong; }
+            get => _substractOnWrong;
             set
             {
                 if (_substractOnWrong != value)
@@ -174,12 +152,12 @@ namespace SImulator.ViewModel.Model
         private bool _playSpecials = true;
 
         /// <summary>
-        /// Играть спецвопросы
+        /// Play special questions in classic game mode.
         /// </summary>
         [DefaultValue(true)]
         public bool PlaySpecials
         {
-            get { return _playSpecials; }
+            get => _playSpecials;
             set
             {
                 if (_playSpecials != value)
@@ -193,12 +171,12 @@ namespace SImulator.ViewModel.Model
         private GameModes _gameMode = GameModes.Tv;
 
         /// <summary>
-        /// Тип игры
+        /// Default game mode.
         /// </summary>
         [DefaultValue(GameModes.Tv)]
         public GameModes GameMode
         {
-            get { return _gameMode; }
+            get => _gameMode;
             set
             {
                 if (_gameMode != value)
@@ -231,12 +209,12 @@ namespace SImulator.ViewModel.Model
         private string _restriction = "12+";
 
         /// <summary>
-        /// Ограничение на использование пакетов
+        /// Default package age restriction.
         /// </summary>
         [DefaultValue("12+")]
         public string Restriction
         {
-            get { return _restriction; }
+            get => _restriction;
             set
             {
                 if (_restriction != value)
@@ -249,9 +227,12 @@ namespace SImulator.ViewModel.Model
 
         private ObservableCollection<string> _recent = new();
 
+        /// <summary>
+        /// Played package files history.
+        /// </summary>
         public ObservableCollection<string> Recent
         {
-            get { return _recent; }
+            get => _recent;
             set
             {
                 if (_recent != value)
@@ -270,7 +251,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(true)]
         public bool FalseStart
         {
-            get { return _falseStart; }
+            get => _falseStart;
             set
             {
                 if (_falseStart != value)
@@ -289,7 +270,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(true)]
         public bool FalseStartMultimedia
         {
-            get { return _falseStartMultimedia; }
+            get => _falseStartMultimedia;
             set
             {
                 if (_falseStartMultimedia != value)
@@ -308,7 +289,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(false)]
         public bool ShowTextNoFalstart
         {
-            get { return _showTextNoFalstart; }
+            get => _showTextNoFalstart;
             set
             {
                 if (_showTextNoFalstart != value)
@@ -340,7 +321,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(false)]
         public bool SignalsAfterTimer
         {
-            get { return _signalsAfterTimer; }
+            get => _signalsAfterTimer;
             set
             {
                 if (_signalsAfterTimer != value)
@@ -357,7 +338,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue(3.0)]
         public double BlockingTime
         {
-            get { return _blockingTime; }
+            get => _blockingTime;
             set
             {
                 if (_blockingTime != value)
@@ -376,7 +357,7 @@ namespace SImulator.ViewModel.Model
         [DefaultValue("")]
         public string ComPort
         {
-            get { return _comPort; }
+            get => _comPort;
             set
             {
                 if (_comPort != value)
@@ -387,11 +368,11 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private ErrorInfoList _delayedErrors = new ErrorInfoList();
+        private ErrorInfoList _delayedErrors = new();
 
         public ErrorInfoList DelayedErrors
         {
-            get { return _delayedErrors; }
+            get => _delayedErrors;
             set
             {
                 if (_delayedErrors != value)
@@ -402,12 +383,12 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private KeyCollection2 _playerKeys2 = new KeyCollection2();
+        private KeyCollection2 _playerKeys2 = new();
 
         [XmlIgnore]
         public KeyCollection2 PlayerKeys2
         {
-            get { return _playerKeys2; }
+            get => _playerKeys2;
             set
             {
                 if (_playerKeys2 != value)
@@ -418,11 +399,11 @@ namespace SImulator.ViewModel.Model
             }
         }
 
-        private List<int> _playerKeysPublic = new List<int>();
+        private List<int> _playerKeysPublic = new();
         
         public List<int> PlayerKeysPublic
         {
-            get { return _playerKeysPublic; }
+            get => _playerKeysPublic;
             set { _playerKeysPublic = value; OnPropertyChanged(); }
         }
 
@@ -561,8 +542,6 @@ namespace SImulator.ViewModel.Model
         /// <summary>
         /// Загрузить пользовательские настройки
         /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
         public static AppSettings Load(Stream stream, XmlSerializer serializer = null)
         {
             if (serializer == null)

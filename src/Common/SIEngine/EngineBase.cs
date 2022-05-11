@@ -151,7 +151,7 @@ namespace SIEngine
         }
 
         /// <summary>
-        /// Is engine in intro mode.
+        /// Is engine currently staying in the intro stage.
         /// </summary>
         public bool IsIntro() => _roundIndex == -1;
 
@@ -285,12 +285,15 @@ namespace SIEngine
 
         public object SyncRoot { get; } = new object();
 
+        /// <summary>
+        /// Number of unanswered questions in the round.
+        /// </summary>
         public abstract int LeftQuestionsCount { get; }
 
         /// <summary>
-        /// Автоматический шаг дальше
+        /// Move game futher automatically after specified amount of time.
         /// </summary>
-        /// <param name="milliseconds"></param>
+        /// <param name="milliseconds">Amount of time in milliseconds to delay before moving futher.</param>
         protected async void AutoNext(int milliseconds)
         {
             try

@@ -31,7 +31,7 @@ namespace SImulator.ViewModel
         internal event Action<string> Error;
         internal event Action RequestStop;
 
-        private readonly Stack<Tuple<PlayerInfo, int, bool>> _answeringHistory = new Stack<Tuple<PlayerInfo, int, bool>>();
+        private readonly Stack<Tuple<PlayerInfo, int, bool>> _answeringHistory = new();
 
         private readonly EngineBase _engine;
 
@@ -165,14 +165,20 @@ namespace SImulator.ViewModel
 
         private int _questionTime = 0;
 
+        /// <summary>
+        /// Current thinking time value.
+        /// </summary>
         public int QuestionTime
         {
-            get { return _questionTime; }
+            get => _questionTime;
             set { _questionTime = value; OnPropertyChanged(); }
         }
 
         private int _questionTimeMax = int.MaxValue;
 
+        /// <summary>
+        /// Maximum thinking time value.
+        /// </summary>
         public int QuestionTimeMax
         {
             get { return _questionTimeMax; }
@@ -256,13 +262,13 @@ namespace SImulator.ViewModel
         
         public GameEngine(
             AppSettingsViewModel settings,
-            EngineBase engine,
+            ISIEngine engine,
             IExtendedGameHost gameHost,
             IRemoteGameUI ui,
             IList<SimplePlayerInfo> players)
         {
             Settings = settings;
-            _engine = engine;
+            _engine = (EngineBase)engine;
             _gameHost = gameHost;
             UserInterface = ui;
 
@@ -408,7 +414,9 @@ namespace SImulator.ViewModel
             try
             {
                 if (UserInterface != null)
+                {
                     UserInterface.UpdateSettings(Settings.SIUISettings.Model);
+                }
             }
             catch (TimeoutException exc)
             {
@@ -427,7 +435,9 @@ namespace SImulator.ViewModel
         private void Info_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PlayerInfo.IsSelected) || e.PropertyName == nameof(PlayerInfo.IsRegistered))
+            {
                 return;
+            }
 
             var player = (PlayerInfo)sender;
 
@@ -438,7 +448,9 @@ namespace SImulator.ViewModel
                     foreach (PlayerInfo item in LocalInfo.Players)
                     {
                         if (item != sender)
+                        {
                             item.WaitForRegistration = false;
+                        }
                     }
                 }
 
@@ -448,7 +460,9 @@ namespace SImulator.ViewModel
             try
             {
                 if (UserInterface != null)
+                {
                     UserInterface.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
+                }
             }
             catch (TimeoutException exc)
             {
@@ -464,53 +478,37 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void ThinkingTimer_Elapsed(object state) =>
-            Task.Factory.StartNew(() =>
+        private void ThinkingTimer_Elapsed(object state) => UI.Execute(
+            () =>
+            {
+                QuestionTime++;
+                if (QuestionTime < QuestionTimeMax)
                 {
-                    try
-                    {
-                        QuestionTime++;
-                        if (QuestionTime >= QuestionTimeMax)
-                        {
-                            UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
-                            StopQuestionTimer_Executed(null);
-                            ActiveQuestionCommand = null;
+                    return;
+                }
 
-                            if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
-                            {
-                                _buttonManager.Stop();
-                            }
-                        }
-                    }
-                    catch (TimeoutException exc)
-                    {
-                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-                    }
-                    catch (CommunicationException exc)
-                    {
-                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-                    }
-                    catch (Exception exc)
-                    {
-                        PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
-                    }
-                },
-                CancellationToken.None,
-                TaskCreationOptions.None,
-                UI.Scheduler);
+                UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
+                StopQuestionTimer_Executed(null);
+                ActiveQuestionCommand = null;
 
-        private void RoundTimer_Elapsed(object state)
-        {
-            UI.Execute(() =>
+                if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
                 {
-                    RoundTime++;
-                    if (RoundTime >= Settings.Model.RoundTime)
-                    {
-                        _engine.SetTimeout();
-                        StopRoundTimer_Executed(null);
-                    }
-                }, exc => OnError(exc.ToString()));
-        }
+                    _buttonManager.Stop();
+                }
+            },
+            exc => OnError(exc.ToString()));
+
+        private void RoundTimer_Elapsed(object state) => UI.Execute(
+            () =>
+            {
+                RoundTime++;
+                if (RoundTime >= Settings.Model.RoundTime)
+                {
+                    _engine.SetTimeout();
+                    StopRoundTimer_Executed(null);
+                }
+            },
+            exc => OnError(exc.ToString()));
 
         private void ThemeInfo_Selected(ThemeInfoViewModel theme)
         {
@@ -1539,6 +1537,9 @@ namespace SImulator.ViewModel
                         UserInterface.SetSound(Settings.Model.Sounds.NoRiskQuestion);
                         PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                         setActive = false;
+                        break;
+
+                    case QuestionTypes.Choice:
                         break;
 
                     default:

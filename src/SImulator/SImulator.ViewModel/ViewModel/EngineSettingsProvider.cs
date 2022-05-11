@@ -4,9 +4,7 @@ using SImulator.ViewModel.Core;
 
 namespace SImulator.ViewModel
 {
-    /// <summary>
-    /// Настройки для движка СИ
-    /// </summary>
+    /// <inheritdoc cref="IEngineSettingsProvider" />
     internal sealed class EngineSettingsProvider : IEngineSettingsProvider
     {
         private readonly AppSettings _appSettings;

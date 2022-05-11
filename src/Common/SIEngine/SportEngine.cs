@@ -6,9 +6,9 @@ using System.Linq;
 namespace SIEngine
 {
     /// <summary>
-    /// Упрощённая (спортивная) SIGame
+    /// Defines a simplified SIGame engine. Simplified game omits special questions and final round.
     /// </summary>
-    public sealed class SportEngine: EngineBase
+    public sealed class SportEngine : EngineBase
     {
         public override int LeftQuestionsCount => throw new NotImplementedException();
 

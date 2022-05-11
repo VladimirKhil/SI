@@ -1,7 +1,7 @@
 ﻿namespace SIEngine
 {
     /// <summary>
-    /// Provides <see cref="EngineBase" /> settings allowing them to be changed during the play.
+    /// Provides <see cref="ISIEngine" /> settings allowing them to be changed during the play.
     /// </summary>
     public interface IEngineSettingsProvider
     {
