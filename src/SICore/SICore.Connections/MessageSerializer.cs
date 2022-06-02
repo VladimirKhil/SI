@@ -17,7 +17,8 @@ namespace SICore.Connections
         private const byte Separator = (byte)'\n';
 
         public static int GetBufferSizeForMessage(Message message) =>
-            4 + Encoding.UTF8.GetByteCount(message.Sender)
+            4 // initial flag + 2 separators + zero byte
+            + Encoding.UTF8.GetByteCount(message.Sender)
             + Encoding.UTF8.GetByteCount(message.Receiver ?? "")
             + Encoding.UTF8.GetByteCount(message.Text);
 

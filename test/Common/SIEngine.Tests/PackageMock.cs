@@ -12,13 +12,9 @@ namespace SIEngine.Tests
     {
         private readonly Dictionary<string, HashSet<string>> _streams = new();
 
-        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew)
-        {
-            throw new NotImplementedException();
-        }
+        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-        public void CreateStream(string name, string contentType) =>
-            CreateStream("", name, contentType);
+        public void CreateStream(string name, string contentType) => CreateStream("", name, contentType);
 
         public void CreateStream(string category, string name, string contentType)
         {
@@ -30,25 +26,14 @@ namespace SIEngine.Tests
             categoryStreams.Add(name);
         }
 
-        public Task CreateStream(string category, string name, string contentType, Stream stream)
-        {
+        public Task CreateStreamAsync(string category, string name, string contentType, Stream stream) =>
             throw new NotImplementedException();
-        }
 
-        public void DeleteStream(string category, string name)
-        {
-            throw new NotImplementedException();
-        }
+        public void DeleteStream(string category, string name) => throw new NotImplementedException();
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose() => throw new NotImplementedException();
 
-        public void Flush()
-        {
-            throw new NotImplementedException();
-        }
+        public void Flush() => throw new NotImplementedException();
 
         public string[] GetEntries(string category)
         {
@@ -60,14 +45,8 @@ namespace SIEngine.Tests
             return categoryStreams.ToArray();
         }
 
-        public StreamInfo GetStream(string name, bool read = true)
-        {
-            throw new NotImplementedException();
-        }
+        public StreamInfo GetStream(string name, bool read = true) => throw new NotImplementedException();
 
-        public StreamInfo GetStream(string category, string name, bool read = true)
-        {
-            throw new NotImplementedException();
-        }
+        public StreamInfo GetStream(string category, string name, bool read = true) => throw new NotImplementedException();
     }
 }

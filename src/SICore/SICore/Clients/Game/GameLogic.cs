@@ -135,6 +135,7 @@ namespace SICore
             }
 
             _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
+            _gameActions.InformRoundsNames();
 
             ProcessPackage(package, 1);
         }

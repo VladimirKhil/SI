@@ -2,6 +2,7 @@
 {
     internal enum ShowmanTasks
     {
+        Ready,
         AnswerFirst,
         AnswerNextStake,
         AnswerRight,

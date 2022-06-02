@@ -196,10 +196,11 @@ namespace SICore
 
                             #endregion
                         }
+
                     case Messages.Validation:
-                    case "VALIDATIION": // Obsolete
                         OnValidation(mparams);
                         break;
+
                     case Messages.FirstDelete:
                         {
                             #region FirstDelete
@@ -231,7 +232,8 @@ namespace SICore
                             ClientData.Hint = "";
                             break;
                         }
-                    // Команды для устной игры (ведущий делает выбор, озвучиваемый игроками)
+
+                    // Oral game commands (the showman performs actions announced by players)
                     case Messages.Choose:
                         #region Choose
 

@@ -16,7 +16,7 @@ namespace SIPackages
 
         public IEnumerable<SearchData> Search(string value)
         {
-            for (var i = 0; i < this.Count; i++)
+            for (var i = 0; i < Count; i++)
             {
                 foreach (var item in this[i].Search(value))
                 {

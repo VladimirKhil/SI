@@ -25,6 +25,11 @@ namespace SICore
             var task = (ShowmanTasks)taskId;
             switch (task)
             {
+
+                case ShowmanTasks.Ready:
+                    Ready();
+                    break;
+
                 case ShowmanTasks.AnswerFirst:
                     AnswerFirst();
                     break;
@@ -45,6 +50,8 @@ namespace SICore
                     break;
             }
         }
+
+        private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
 
         private void SelectPlayer(string message)
         {
@@ -97,10 +104,7 @@ namespace SICore
 
         #endregion
 
-        public void OnInitialized()
-        {
-            ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
-        }
+        public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 
         public void ClearSelections(bool full = false)
         {

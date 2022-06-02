@@ -135,6 +135,28 @@ namespace SICore
         }
 
         /// <summary>
+        /// Sends all rounds names to person. Only rounds with at least one question are taken into account.
+        /// </summary>
+        /// <param name="person">Person name.</param>
+        public void InformRoundsNames(string person = NetworkConstants.Everybody)
+        {
+            if (_gameData.Package == null)
+            {
+                return;
+            }
+
+            var activeRounds = _gameData.Package.Rounds.Where(round => round.Themes.Any(theme => theme.Questions.Any())).ToArray();
+
+            var message = new StringBuilder(Messages.RoundsNames);
+            for (var i = 0; i < activeRounds.Length; i++)
+            {
+                message.Append(Message.ArgsSeparatorChar).Append(activeRounds[i].Name);
+            }
+
+            SendMessage(message.ToString(), person);
+        }
+
+        /// <summary>
         /// Объявить суммы
         /// </summary>
         public void AnnounceSums()

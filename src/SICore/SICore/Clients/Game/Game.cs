@@ -432,45 +432,7 @@ namespace SICore
                             break;
 
                         case Messages.Info:
-                            #region Info
-
-                            Inform(message.Sender);
-                            foreach (var item in ClientData.MainPersons)
-                            {
-                                if (item.Ready)
-                                {
-                                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
-                                }
-                            }
-
-                            _gameActions.InformStage(message.Sender);
-                            _gameActions.InformSums(message.Sender);
-
-                            if (ClientData.Stage == GameStage.Round)
-                            {
-                                lock (ClientData.TabloInformStageLock)
-                                {
-                                    if (ClientData.TabloInformStage > 0)
-                                    {
-                                        _gameActions.InformRoundThemes(message.Sender, false);
-                                        if (ClientData.TabloInformStage > 1)
-                                        {
-                                            _gameActions.InformTablo(message.Sender);
-                                        }
-                                    }
-                                }
-                            }
-                            else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
-                            {
-                                var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
-
-                                if (leftTimeBeforeStart > 0)
-                                {
-                                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), message.Sender);
-                                }
-                            }
-
-                            #endregion
+                            OnInfo(message);
                             break;
 
                         case Messages.Config:
@@ -504,45 +466,7 @@ namespace SICore
                             break;
 
                         case Messages.Ready:
-                            if (ClientData.Stage == GameStage.Before)
-                            {
-                                #region Ready
-                                // Игрок или ведущий готов приступить к игре
-                                res.Append(Messages.Ready).Append(Message.ArgsSeparatorChar);
-                                var readyAll = true;
-                                var found = false;
-                                var toReady = args.Length == 1 || args[1] == "+";
-                                foreach (var item in ClientData.MainPersons)
-                                {
-                                    if (message.Sender == item.Name && (toReady && !item.Ready || !toReady && item.Ready))
-                                    {
-                                        item.Ready = toReady;
-                                        res.Append(message.Sender).Append(Message.ArgsSeparatorChar).Append(toReady ? "+" : "-");
-                                        found = true;
-                                    }
-
-                                    readyAll = readyAll && item.Ready;
-                                }
-
-                                if (found)
-                                {
-                                    _gameActions.SendMessage(res.ToString());
-                                }
-
-                                if (readyAll)
-                                {
-                                    StartGame();
-                                }
-                                else if (ClientData.Settings.IsAutomatic)
-                                {
-                                    if (ClientData.Players.All(player => player.IsConnected))
-                                    {
-                                        StartGame();
-                                    }
-                                }
-
-                                #endregion
-                            }
+                            OnReady(message, args);
                             break;
 
                         case Messages.Picture:
@@ -909,6 +833,51 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             });
+
+        private void OnInfo(Message message)
+        {
+            Inform(message.Sender);
+
+            foreach (var item in ClientData.MainPersons)
+            {
+                if (item.Ready)
+                {
+                    _gameActions.SendMessage($"{Messages.Ready}\n{item.Name}", message.Sender);
+                }
+            }
+
+            _gameActions.InformStage(message.Sender);
+            _gameActions.InformSums(message.Sender);
+
+            if (ClientData.Stage != GameStage.Before)
+            {
+                _gameActions.InformRoundsNames(message.Sender);
+            }
+
+            if (ClientData.Stage == GameStage.Round)
+            {
+                lock (ClientData.TabloInformStageLock)
+                {
+                    if (ClientData.TabloInformStage > 0)
+                    {
+                        _gameActions.InformRoundThemes(message.Sender, false);
+                        if (ClientData.TabloInformStage > 1)
+                        {
+                            _gameActions.InformTablo(message.Sender);
+                        }
+                    }
+                }
+            }
+            else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
+            {
+                var leftTimeBeforeStart = Constants.AutomaticGameStartDuration - (int)(DateTime.UtcNow - ClientData.TimerStartTime[2]).TotalSeconds * 10;
+
+                if (leftTimeBeforeStart > 0)
+                {
+                    _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Timer, 2, MessageParams.Timer_Go, leftTimeBeforeStart, -2), message.Sender);
+                }
+            }
+        }
 
         private void OnDelete(Message message, string[] args)
         {
@@ -1307,6 +1276,51 @@ namespace SICore
 
             _logic.AddHistory($"Move started: {ClientData.MoveDirection}");
             _logic.Stop(StopReason.Move);
+        }
+
+        private void OnReady(Message message, string[] args)
+        {
+            if (ClientData.Stage != GameStage.Before)
+            {
+                return;
+            }
+
+            var res = new StringBuilder();
+
+            // Player or showman is ready to start the game
+            res.Append(Messages.Ready).Append(Message.ArgsSeparatorChar);
+            var readyAll = true;
+            var found = false;
+            var toReady = args.Length == 1 || args[1] == "+";
+
+            foreach (var item in ClientData.MainPersons)
+            {
+                if (message.Sender == item.Name && (toReady && !item.Ready || !toReady && item.Ready))
+                {
+                    item.Ready = toReady;
+                    res.Append(message.Sender).Append(Message.ArgsSeparatorChar).Append(toReady ? "+" : "-");
+                    found = true;
+                }
+
+                readyAll = readyAll && item.Ready;
+            }
+
+            if (found)
+            {
+                _gameActions.SendMessage(res.ToString());
+            }
+
+            if (readyAll)
+            {
+                StartGame();
+            }
+            else if (ClientData.Settings.IsAutomatic)
+            {
+                if (ClientData.Players.All(player => player.IsConnected))
+                {
+                    StartGame();
+                }
+            }
         }
 
         private void OnPause(Message message, string[] args)
@@ -2195,9 +2209,18 @@ namespace SICore
                     return;
                 }
 
-                newAccount = isPlayer
-                    ? ReplaceComputerPlayer(index, account.Name, replacer)
-                    : ReplaceComputerShowman(account.Name, replacer);
+                ClientData.BeginUpdatePersons($"SetComputerPerson {account.Name} {account.IsConnected} {replacer} {index}");
+
+                try
+                {
+                    newAccount = isPlayer
+                        ? ReplaceComputerPlayer(index, account.Name, replacer)
+                        : ReplaceComputerShowman(account.Name, replacer);
+                }
+                finally
+                {
+                    ClientData.EndUpdatePersons();
+                }
 
                 if (newAccount == null)
                 {

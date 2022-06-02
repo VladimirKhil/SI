@@ -39,6 +39,10 @@ namespace SICore
             var task = (PlayerTasks)taskId;
             switch (task)
             {
+                case PlayerTasks.Ready:
+                    Ready();
+                    break;
+
                 case PlayerTasks.Answer:
                     AnswerTask();
                     break;
@@ -1652,9 +1656,11 @@ namespace SICore
             {
                 _data.PlayerDataExtensions.RealBrave = _account.B0;
             }
-
-            ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
+            
+            ScheduleExecution(PlayerTasks.Ready, 10);
         }
+
+        private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
 
         public void ApellateChanged()
         {

@@ -326,6 +326,11 @@
         public const string Replic = "REPLIC";
 
         /// <summary>
+        /// Package rounds names. Only rounds with at least one question are taken into account.
+        /// </summary>
+        public const string RoundsNames = "ROUNDSNAMES";
+
+        /// <summary>
         /// Темы раунда
         /// </summary>
         public const string RoundThemes = "ROUNDTHEMES";

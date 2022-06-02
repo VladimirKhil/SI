@@ -14,5 +14,7 @@ namespace SI.GameServer.Contract
         public string PackagesPublicBaseUrl { get; set; }
 
         public string[] ContentPublicBaseUrls { get; set; }
+
+        public string License { get; set; }
     }
 }
