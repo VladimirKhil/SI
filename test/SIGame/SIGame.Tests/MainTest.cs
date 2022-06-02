@@ -29,7 +29,7 @@ namespace SIGame.Tests
             GameRole gameRole,
             bool useSignalRConnection)
         {
-            const string GameServerUri = "https://sionline.ru/siserver/1";
+            const string GameServerUri = "https://sionline.ru/siserver/0";
 
             var coreManager = new DesktopCoreManager();
             var manager = new TestManager();

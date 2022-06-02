@@ -5,6 +5,7 @@ namespace SIPackages.Core
     /// <summary>
     /// Wraps the stream adding <see cref="Length" /> property to it.
     /// </summary>
+    /// <remarks>Not all stream types support Length property by default.</remarks>
     public sealed class StreamInfo
     {
         /// <summary>

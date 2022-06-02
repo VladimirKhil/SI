@@ -12,20 +12,11 @@ namespace SIPackages.PlatformSpecific.Net45
     {
         private string _folder;
 
-        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew)
-        {
-            throw new NotImplementedException();
-        }
+        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-        internal static ISIPackage Create(string folder)
-        {
-            return new FolderSIPackage { _folder = folder };
-        }
+        internal static ISIPackage Create(string folder) => new FolderSIPackage { _folder = folder };
 
-        internal static ISIPackage Open(string folder)
-        {
-            return new FolderSIPackage { _folder = folder };
-        }
+        internal static ISIPackage Open(string folder) => new FolderSIPackage { _folder = folder };
 
         public void CreateStream(string name, string contentType)
         {
@@ -41,32 +32,24 @@ namespace SIPackages.PlatformSpecific.Net45
         public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
         {
             Directory.CreateDirectory(Path.Combine(_folder, category));
-            using (var fs = File.Create(Path.Combine(_folder, category, name)))
-            {
-                await stream.CopyToAsync(fs);
-            }
-        }
-
-        public void DeleteStream(string category, string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
             
+            using var fs = File.Create(Path.Combine(_folder, category, name));
+            await stream.CopyToAsync(fs);
         }
 
-        public void Flush()
-        {
-            
-        }
+        public void DeleteStream(string category, string name) => throw new NotImplementedException();
+
+        public void Dispose() { }
+
+        public void Flush() { }
 
         public string[] GetEntries(string category)
         {
             var directoryInfo = new DirectoryInfo(Path.Combine(_folder, category));
             if (!directoryInfo.Exists)
+            {
                 return Array.Empty<string>();
+            }
 
             return directoryInfo.GetFiles().Select(file => file.Name).ToArray();
         }
@@ -75,7 +58,9 @@ namespace SIPackages.PlatformSpecific.Net45
         {
             var file = new FileInfo(Path.Combine(_folder, name));
             if (!file.Exists)
+            {
                 return null;
+            }
 
             return new StreamInfo { Length = file.Length, Stream = read ? file.OpenRead() : file.Open(FileMode.Open) };
         }
@@ -83,7 +68,9 @@ namespace SIPackages.PlatformSpecific.Net45
         public StreamInfo GetStream(string category, string name, bool read = true)
         {
             if (name.Length > ZipHelper.MaxFileNameLength)
+            {
                 name = ZipHelper.CalculateHash(name);
+            }
 
             return GetStream(Path.Combine(category, name), read);
         }

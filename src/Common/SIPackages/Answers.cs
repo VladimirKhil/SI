@@ -3,7 +3,7 @@
 namespace SIPackages
 {
     /// <summary>
-    /// Ответы
+    /// Describes a question answers collection.
     /// </summary>
     public sealed class Answers : List<string>
     {

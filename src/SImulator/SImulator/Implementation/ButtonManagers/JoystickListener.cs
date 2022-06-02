@@ -1,18 +1,18 @@
-﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Windows.Input;
-using System.Threading;
+﻿using SImulator.ViewModel;
 using SImulator.ViewModel.ButtonManagers;
-using SImulator.ViewModel;
 using SImulator.ViewModel.Core;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SImulator.Implementation.ButtonManagers
 {
     /// <summary>
-    /// Прослушиватель джойстика
+    /// Provides joystick-based player buttons.
     /// </summary>
-    internal sealed class JoystickListener: ButtonManagerBase
+    internal sealed class JoystickListener : ButtonManagerBase
     {
         private const int Period = 100;
 
@@ -26,7 +26,7 @@ namespace SImulator.Implementation.ButtonManagers
 
         private bool _acquired = false;
 
-        private readonly object _sync = new object();
+        private readonly object _sync = new();
 
         public JoystickListener()
         {
@@ -37,25 +37,35 @@ namespace SImulator.Implementation.ButtonManagers
         private void Timer_Elapsed(object state)
         {
             if (!Monitor.TryEnter(_sync))
+            {
                 return;
+            }
 
             try
             {
                 _joystick.Poll();
 
                 var data = _joystick.GetBufferedData();
-                if (data.Length > 0)
+                if (data.Length == 0)
                 {
-                    var buttonData = data.Where(upd => upd.Offset >= SharpDX.DirectInput.JoystickOffset.Buttons0 && upd.Offset <= SharpDX.DirectInput.JoystickOffset.Buttons127 && upd.Value == 128);
-                    if (buttonData.Any())
-                    {
-                        var buttonDataFirstTimestamp = buttonData.First().Timestamp;
-                        var states = buttonData.Where(upd => upd.Timestamp == buttonDataFirstTimestamp).ToArray();
-
-                        var index = new Random().Next(states.Length);
-                        Pressed(states[index].Offset - SharpDX.DirectInput.JoystickOffset.Buttons0);
-                    }
+                    return;
                 }
+
+                var buttonData = data.Where(upd =>
+                    upd.Offset >= SharpDX.DirectInput.JoystickOffset.Buttons0
+                    && upd.Offset <= SharpDX.DirectInput.JoystickOffset.Buttons127
+                    && upd.Value == 128);
+
+                if (!buttonData.Any())
+                {
+                    return;
+                }
+
+                var buttonDataFirstTimestamp = buttonData.First().Timestamp;
+                var states = buttonData.Where(upd => upd.Timestamp == buttonDataFirstTimestamp).ToArray();
+
+                var index = new Random().Next(states.Length);
+                Pressed(states[index].Offset - SharpDX.DirectInput.JoystickOffset.Buttons0);
             }
             finally
             {
@@ -63,13 +73,7 @@ namespace SImulator.Implementation.ButtonManagers
             }
         }
 
-        void Pressed(int button)
-        {
-            _dispatcher.BeginInvoke((Action)(() =>
-                {
-                    OnKeyPressed((GameKey)(Key.D1 + button));
-                }));
-        }
+        private void Pressed(int button) => _dispatcher.BeginInvoke(() => OnKeyPressed((GameKey)(Key.D1 + button)));
 
         public override bool Run()
         {
@@ -112,10 +116,11 @@ namespace SImulator.Implementation.ButtonManagers
             }
         }
 
-        private void ShowError(string error)
-        {
-            System.Windows.MessageBox.Show(error, MainViewModel.ProductName, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-        }
+        private static void ShowError(string error) => System.Windows.MessageBox.Show(
+            error,
+            MainViewModel.ProductName,
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Error);
 
         public override void Stop()
         {
@@ -131,7 +136,7 @@ namespace SImulator.Implementation.ButtonManagers
             }
         }
 
-        public override void Dispose()
+        public override ValueTask DisposeAsync()
         {
             lock (_sync)
             {
@@ -150,6 +155,8 @@ namespace SImulator.Implementation.ButtonManagers
 
             _form.Dispose();
             _timer.Dispose();
+
+            return new ValueTask();
         }
     }
 }

@@ -138,6 +138,9 @@
   <data name="LogsFolderNotFound" xml:space="preserve">
     <value>Папка для записи логов "{0}" не найдена</value>
   </data>
+  <data name="MainScreen" xml:space="preserve">
+    <value>Основной</value>
+  </data>
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
   </data>
@@ -149,6 +152,9 @@
   </data>
   <data name="SavingSettingsError" xml:space="preserve">
     <value>Ошибка при сохранении настроек программы</value>
+  </data>
+  <data name="SecondaryScreen" xml:space="preserve">
+    <value>Дополнительный</value>
   </data>
   <data name="SelectLogsFolder" xml:space="preserve">
     <value>Выберите папку для записи логов</value>
@@ -164,5 +170,8 @@
   </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>Окно</value>
   </data>
 </root>

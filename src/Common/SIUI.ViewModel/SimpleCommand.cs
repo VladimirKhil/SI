@@ -20,7 +20,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public bool CanBeExecuted
         {
-            get { return _canBeExecuted; }
+            get => _canBeExecuted;
             set
             {
                 if (_canBeExecuted != value)
@@ -30,19 +30,22 @@ namespace SIUI.ViewModel
                     {
                         if (SynchronizationContext.Current == null)
                         {
-                            Task.Factory.StartNew(() => CanExecuteChanged(this, EventArgs.Empty), CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                            Task.Factory.StartNew(
+                                () => CanExecuteChanged(this, EventArgs.Empty),
+                                CancellationToken.None,
+                                TaskCreationOptions.None,
+                                UI.Scheduler);
                         }
                         else
+                        {
                             CanExecuteChanged(this, EventArgs.Empty);
+                        }
                     }
                 }
             }
         }
-        
-        public bool CanExecute(object parameter)
-        {
-            return _canBeExecuted;
-        }
+
+        public bool CanExecute(object parameter) => _canBeExecuted;
 
         /// <summary>
         /// Возможность выполнения команды изменилась

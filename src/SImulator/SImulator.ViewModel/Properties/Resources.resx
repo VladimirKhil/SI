@@ -138,9 +138,6 @@
   <data name="GameStartError" xml:space="preserve">
     <value>Ошибка старта игры: {0}</value>
   </data>
-  <data name="ListenForConnections" xml:space="preserve">
-    <value>Ожидать подключения</value>
-  </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>
@@ -197,9 +194,6 @@
   </data>
   <data name="StartGame" xml:space="preserve">
     <value>Начать игру</value>
-  </data>
-  <data name="StopListen" xml:space="preserve">
-    <value>Прекратить ожидание</value>
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>

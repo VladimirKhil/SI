@@ -6,14 +6,13 @@ using System.Text;
 namespace SIPackages.Core
 {
     /// <summary>
-    /// Функции для работы со строковыми списками
+    /// Provides extension methods for string lists.
     /// </summary>
     public static class ListExtensions
     {
         /// <summary>
-        /// Строковое представление списка
+        /// Converts list to normalized string.
         /// </summary>
-        /// <returns></returns>
         public static string ToCommonString(this List<string> list)
         {
             var text = new StringBuilder();
@@ -21,7 +20,9 @@ namespace SIPackages.Core
             for (int i = 0; i < list.Count; i++)
             {
                 if (i > 0)
+                {
                     text.Append(", ");
+                }
 
                 text.Append(list[i]);
             }
@@ -30,18 +31,24 @@ namespace SIPackages.Core
             return text.ToString();
         }
 
-        public static bool ContainsQuery(this List<string> list, string pattern)
-        {
-            return list.Any(item => item.IndexOf(pattern, StringComparison.CurrentCultureIgnoreCase) > -1);
-        }
+        public static bool ContainsQuery(this List<string> list, string pattern) =>
+            list.Any(item => item.IndexOf(pattern, StringComparison.CurrentCultureIgnoreCase) > -1);
 
+        /// <summary>
+        /// Searches pattern in list values.
+        /// </summary>
+        /// <param name="list">List to search.</param>
+        /// <param name="pattern">Searched pattern.</param>
+        /// <returns>Search result.</returns>
         public static IEnumerable<SearchData> Search(this List<string> list, string pattern)
         {
             for (int i = 0; i < list.Count; i++)
             {
                 var index = list[i].IndexOf(pattern, StringComparison.CurrentCultureIgnoreCase);
                 if (index > -1)
+                {
                     yield return new SearchData(list[i], index, i);
+                }
             }
         }
     }

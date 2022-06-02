@@ -19,7 +19,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public string Name
         {
-            get { return _model.Name; }
+            get => _model.Name;
             set { _model.Name = value; OnPropertyChanged(); }
         }
 
@@ -30,7 +30,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public QuestionInfoStages State
         {
-            get { return _state; }
+            get => _state;
             set { _state = value; OnPropertyChanged(); }
         }
 
@@ -43,7 +43,7 @@ namespace SIUI.ViewModel
 
         public bool Empty
         {
-            get { return _empty; }
+            get => _empty;
             set { _empty = value; OnPropertyChanged(); }
         }
 
@@ -51,7 +51,7 @@ namespace SIUI.ViewModel
 
         public bool Active
         {
-            get { return _active; }
+            get => _active;
             set { _active = value; OnPropertyChanged(); }
         }
 
@@ -67,7 +67,7 @@ namespace SIUI.ViewModel
 
         private void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-             switch (e.Action)
+            switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (QuestionInfoViewModel item in e.NewItems)
@@ -76,6 +76,7 @@ namespace SIUI.ViewModel
                     }
                     InvalidateIsEmpty();
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
                     foreach (QuestionInfoViewModel item in e.OldItems)
                     {
@@ -83,6 +84,7 @@ namespace SIUI.ViewModel
                     }
                     InvalidateIsEmpty();
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
                     foreach (QuestionInfoViewModel item in e.OldItems)
                     {
@@ -93,6 +95,7 @@ namespace SIUI.ViewModel
                         item.PropertyChanged += Item_PropertyChanged;
                     }
                     break;
+
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     InvalidateIsEmpty();
                     break;
@@ -102,7 +105,9 @@ namespace SIUI.ViewModel
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(QuestionInfoViewModel.Price))
+            {
                 InvalidateIsEmpty();
+            }
         }
 
         private void InvalidateIsEmpty()

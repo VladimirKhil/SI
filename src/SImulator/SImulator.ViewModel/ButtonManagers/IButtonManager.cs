@@ -5,21 +5,22 @@ using System;
 namespace SImulator.ViewModel.ButtonManagers
 {
     /// <summary>
-    /// Объект, способный обрабатывать нажатия кнопок игроками
+    /// Supports players buttons.
     /// </summary>
-    public interface IButtonManager: IDisposable
+    public interface IButtonManager : IAsyncDisposable
     {
         /// <summary>
-        /// Активировать кнопки
+        /// Enables players buttons.
         /// </summary>
         bool Run();
+
         /// <summary>
-        /// Деактивировать кнопки
+        /// Disables players buttons.
         /// </summary>
         void Stop();
 
         event Func<GameKey, bool> KeyPressed;
         event Func<PlayerInfo, bool> PlayerPressed;
-        event Func<Guid, bool, PlayerInfo> GetPlayerByGuid;
+        event Func<string, bool, PlayerInfo> GetPlayerById;
     }
 }

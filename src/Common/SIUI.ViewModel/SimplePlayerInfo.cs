@@ -18,7 +18,7 @@ namespace SIUI.ViewModel
         [DataMember]
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set { if (_name != value) { _name = value; OnPropertyChanged(); } }
         }
 
@@ -30,14 +30,11 @@ namespace SIUI.ViewModel
         [DataMember]
         public int Sum
         {
-            get { return _sum; }
+            get => _sum;
             set { if (_sum != value) { _sum = value; OnPropertyChanged(); } }
         }
 
-        public override string ToString()
-        {
-            return $"{_name}: {_sum}";
-        }
+        public override string ToString() => $"{_name}: {_sum}";
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

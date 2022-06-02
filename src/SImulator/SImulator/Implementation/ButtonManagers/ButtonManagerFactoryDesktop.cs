@@ -5,28 +5,17 @@ using SImulator.ViewModel.Core;
 
 namespace SImulator.Implementation.ButtonManagers
 {
+    /// <inheritdoc cref="ButtonManagerFactory" />
     internal sealed class ButtonManagerFactoryDesktop : ButtonManagerFactory
     {
-        public override IButtonManager Create(AppSettings settings)
-        {
-            switch (settings.UsePlayersKeys)
+        public override IButtonManager Create(AppSettings settings) =>
+            settings.UsePlayersKeys switch
             {
-                case PlayerKeysModes.Keyboard:
-                    return new KeyboardHook();
-
-                case PlayerKeysModes.Joystick:
-                    return new JoystickListener();
-
-                case PlayerKeysModes.Com:
-                    return new ComButtonManager(settings.ComPort);
-
-#if LEGACY
-                case PlayerKeysModes.Web:
-                    return new WebManager2(settings.WebPort);
-#endif
-            }
-
-            return base.Create(settings);
-        }
+                PlayerKeysModes.Keyboard => new KeyboardHook(),
+                PlayerKeysModes.Joystick => new JoystickListener(),
+                PlayerKeysModes.Com => new ComButtonManager(settings.ComPort),
+                PlayerKeysModes.Web => new WebManager(settings.WebPort),
+                _ => base.Create(settings),
+            };
     }
 }

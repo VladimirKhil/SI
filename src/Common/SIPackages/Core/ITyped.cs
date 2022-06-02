@@ -3,12 +3,12 @@
 namespace SIPackages.Core
 {
     /// <summary>
-    /// Типизированный объект
+    /// Defines an object with type.
     /// </summary>
     public interface ITyped : INotifyPropertyChanged
     {
         /// <summary>
-        /// Тип объекта
+        /// Object type.
         /// </summary>
         string Type { get; set; }
     }

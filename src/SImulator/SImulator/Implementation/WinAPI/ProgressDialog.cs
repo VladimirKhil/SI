@@ -14,7 +14,7 @@ namespace SImulator.Implementation.WinAPI
         /// <summary>
         /// Объект progress dialog box
         /// </summary>
-        private Guid CLSID_ProgressDialog = new Guid("F8383852-FCD3-11d1-A6B9-006097DF5BD4");
+        private readonly Guid CLSID_ProgressDialog = new("F8383852-FCD3-11d1-A6B9-006097DF5BD4");
 
         /// <summary>
         /// Флаги используемого диалога

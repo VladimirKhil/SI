@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace SIPackages.Core
 {
     /// <summary>
-    /// Владелец идентификатора
+    /// Defines an object having an id.
     /// </summary>
     [DataContract]
     public abstract class IdOwner : PropertyChangedNotifier
@@ -12,12 +12,12 @@ namespace SIPackages.Core
         private string _id = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// Идентификатор
+        /// Object id.
         /// </summary>
         [DataMember]
         public string Id
         {
-            get { return _id; }
+            get => _id;
             set
             {
                 var oldValue = _id;

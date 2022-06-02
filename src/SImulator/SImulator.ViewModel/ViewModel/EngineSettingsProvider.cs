@@ -4,9 +4,7 @@ using SImulator.ViewModel.Core;
 
 namespace SImulator.ViewModel
 {
-    /// <summary>
-    /// Настройки для движка СИ
-    /// </summary>
+    /// <inheritdoc cref="IEngineSettingsProvider" />
     internal sealed class EngineSettingsProvider : IEngineSettingsProvider
     {
         private readonly AppSettings _appSettings;
@@ -16,7 +14,10 @@ namespace SImulator.ViewModel
             _appSettings = appSettings;
         }
 
-        public bool IsPressMode(bool isMultimediaQuestion) => _appSettings.FalseStart && (!isMultimediaQuestion || _appSettings.FalseStartMultimedia) && _appSettings.UsePlayersKeys != PlayerKeysModes.None;
+        public bool IsPressMode(bool isMultimediaQuestion) =>
+            _appSettings.FalseStart
+            && (!isMultimediaQuestion || _appSettings.FalseStartMultimedia)
+            && _appSettings.UsePlayersKeys != PlayerKeysModes.None;
 
         public bool ShowRight => _appSettings.ShowRight;
 

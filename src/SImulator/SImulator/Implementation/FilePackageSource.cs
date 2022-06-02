@@ -1,11 +1,10 @@
 ﻿using SImulator.ViewModel.PlatformSpecific;
-using System;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace SImulator.Implementation
 {
-    internal sealed class FilePackageSource: IPackageSource
+    internal sealed class FilePackageSource : IPackageSource
     {
         public string Name { get; }
 

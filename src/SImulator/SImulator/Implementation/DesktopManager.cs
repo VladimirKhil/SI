@@ -30,26 +30,22 @@ namespace SImulator.Implementation
     /// <summary>
     /// Provides desktop implementation of SImulator API.
     /// </summary>
-    internal sealed class DesktopManager: PlatformManager
+    internal sealed class DesktopManager : PlatformManager
     {
         private const int StreamCopyBufferSize = 81920;
         private const string GameSiteUri = "https://vladimirkhil.com";
 
         private Window _window = null;
         private PlayersWindow _playersWindow = null;
-        private readonly ButtonManagerFactoryDesktop _buttonManager = new ButtonManagerFactoryDesktop();
+        private readonly ButtonManagerFactoryDesktop _buttonManager = new();
 
         private MediaTimeline _mediaTimeline = null;
         private MediaClock _mediaClock = null;
         private MediaPlayer _player = null;
 
-#if LEGACY
-        private ServiceHost _host = null;
-#endif
+        private readonly List<string> _mediaFiles = new();
 
-        private readonly List<string> _mediaFiles = new List<string>();
-
-        internal static XmlSerializer SettingsSerializer = new XmlSerializer(typeof(AppSettings));
+        internal static XmlSerializer SettingsSerializer = new(typeof(AppSettings));
 
         public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
 
@@ -122,7 +118,7 @@ namespace SImulator.Implementation
 
         public override IScreen[] GetScreens() =>
             Screen.AllScreens.Select(screen => new ScreenInfo(screen))
-                .Concat(new ScreenInfo[] { new ScreenInfo(null), new ScreenInfo(null) { IsRemote = true } })
+                .Concat(new ScreenInfo[] { new ScreenInfo(null) })
                 .ToArray();
 
         public override string[] GetLocalComputers()
@@ -199,7 +195,9 @@ namespace SImulator.Implementation
                 storage.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == nameof(SIStorageNew.CurrentRestriction))
+                    {
                         ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction;
+                    }
                 };
 
                 storage.Error += exc =>
@@ -355,21 +353,6 @@ namespace SImulator.Implementation
             return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
         }
 
-#if LEGACY
-        public override void CreateServer(Type contract, int port, int screenIndex)
-        {
-            _host = new ServiceHost(
-                new RemoteGameUIServer { ScreenIndex = screenIndex },
-                new Uri(string.Format("net.tcp://localhost:{0}", port)));
-
-            _host.AddServiceEndpoint(contract, MainViewModel.GetBinding(), "simulator");
-
-            _host.Open();
-        }
-
-        public override void CloseServer() => _host.Close();
-#endif
-
         public override async Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
         {
             if (media.GetStream == null) // It is a link to the external file
@@ -449,15 +432,9 @@ namespace SImulator.Implementation
             }
         }
 
-#if LEGACY
-        public override T GetCallback<T>() => OperationContext.Current.GetCallbackChannel<T>();
-#endif
-
         public override void InitSettings(AppSettings defaultSettings)
         {
             
         }
-
-        public override IExtendedGameHost CreateGameHost(EngineBase engine) => new GameHostClient(engine);
     }
 }

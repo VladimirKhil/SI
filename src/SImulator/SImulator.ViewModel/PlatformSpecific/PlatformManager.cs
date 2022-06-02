@@ -1,5 +1,4 @@
-﻿using SIEngine;
-using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SIPackages.Core;
 using System;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 namespace SImulator.ViewModel.PlatformSpecific
 {
     /// <summary>
-    /// Логика, различающаяся на разных платформах
+    /// Implements platform-specific logic.
     /// </summary>
     public abstract class PlatformManager
     {
@@ -47,19 +46,10 @@ namespace SImulator.ViewModel.PlatformSpecific
         public abstract void PlaySound(string name, Action onFinish);
         public abstract ILogger CreateLogger(string folder);
 
-        public abstract IExtendedGameHost CreateGameHost(EngineBase engine);
-
-#if LEGACY
-        public abstract void CreateServer(Type contract, int port, int screenIndex);
-        public abstract void CloseServer();
-#endif
-
         public abstract Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default);
+
         public abstract void ClearMedia();
 
-#if LEGACY
-        public abstract T GetCallback<T>();
-#endif
         public abstract void InitSettings(AppSettings defaultSettings);
     }
 }

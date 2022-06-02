@@ -3,7 +3,7 @@ using System.IO;
 
 namespace SImulator.Implementation
 {
-    internal sealed class Logger: ILogger
+    internal sealed class Logger : ILogger
     {
         private StreamWriter _writer;
 
@@ -26,7 +26,9 @@ namespace SImulator.Implementation
         public void Write(string message, params object[] args)
         {
             if (_writer == null)
+            {
                 return;
+            }
 
             _writer.WriteLine(message, args);
         }
@@ -34,7 +36,9 @@ namespace SImulator.Implementation
         public void Dispose()
         {
             if (_writer != null)
+            {
                 _writer.Dispose();
+            }
         }
     }
 }

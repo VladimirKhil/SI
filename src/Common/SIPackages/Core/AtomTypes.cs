@@ -6,32 +6,32 @@
     public static class AtomTypes
     {
         /// <summary>
-        /// Просто текст
+        /// Plain text.
         /// </summary>
         public const string Text = "text";
 
         /// <summary>
-        /// Устный текст
+        /// Oral text.
         /// </summary>
         public const string Oral = "say";
 
         /// <summary>
-        /// Изображение
+        /// Image atom type.
         /// </summary>
         public const string Image = "image";
 
         /// <summary>
-        /// Звук
+        /// Audio atom type.
         /// </summary>
         public const string Audio = "voice";
 
         /// <summary>
-        /// Видео
+        /// Video atom type.
         /// </summary>
         public const string Video = "video";
 
         /// <summary>
-        /// Разделитель вопроса и ответа
+        /// Question and answer separator.
         /// </summary>
         public const string Marker = "marker";
     }

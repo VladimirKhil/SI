@@ -1,44 +1,29 @@
 ﻿using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using System;
+using System.Threading.Tasks;
 
 namespace SImulator.ViewModel.ButtonManagers
 {
-    public abstract class ButtonManagerBase: IButtonManager
+    /// <inheritdoc cref="IButtonManager" />
+    public abstract class ButtonManagerBase : IButtonManager
     {
         public abstract bool Run();
+
         public abstract void Stop();
 
         public event Func<GameKey, bool> KeyPressed;
 
-        public event Func<Guid, bool, PlayerInfo> GetPlayerByGuid;
+        public event Func<string, bool, PlayerInfo> GetPlayerById;
 
         public event Func<PlayerInfo, bool> PlayerPressed;
 
-        public abstract void Dispose();
+        public virtual ValueTask DisposeAsync() => new();
 
-        protected bool OnKeyPressed(GameKey key)
-        {
-            if (KeyPressed != null)
-                return KeyPressed(key);
+        protected bool OnKeyPressed(GameKey key) => KeyPressed != null && KeyPressed(key);
 
-            return false;
-        }
+        protected PlayerInfo OnGetPlayerById(string playerId, bool strict) => GetPlayerById != null ? GetPlayerById(playerId, strict) : null;
 
-        protected PlayerInfo OnGetPlayerByGuid(Guid guid, bool strict)
-        {
-            if (GetPlayerByGuid != null)
-                return GetPlayerByGuid(guid, strict);
-
-            return null;
-        }
-
-        protected bool OnPlayerPressed(PlayerInfo player)
-        {
-            if (PlayerPressed != null)
-                return PlayerPressed(player);
-
-            return false;
-        }
+        protected bool OnPlayerPressed(PlayerInfo player) => PlayerPressed != null && PlayerPressed(player);
     }
 }

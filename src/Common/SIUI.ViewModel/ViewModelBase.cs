@@ -3,11 +3,18 @@ using System.Runtime.CompilerServices;
 
 namespace SIUI.ViewModel
 {
+    /// <summary>
+    /// Defines a base class for View Models.
+    /// </summary>
+    /// <typeparam name="T">Model type.</typeparam>
     public abstract class ViewModelBase<T> : INotifyPropertyChanged
         where T : new()
     {
         protected T _model;
 
+        /// <summary>
+        /// Model object.
+        /// </summary>
         public T Model => _model;
 
         protected ViewModelBase()

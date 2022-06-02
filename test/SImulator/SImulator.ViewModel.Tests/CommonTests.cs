@@ -1,8 +1,5 @@
 using NUnit.Framework;
 using SImulator.ViewModel.Model;
-using SIUI.Model;
-using SIUI.ViewModel;
-using System;
 
 namespace SImulator.ViewModel.Tests
 {

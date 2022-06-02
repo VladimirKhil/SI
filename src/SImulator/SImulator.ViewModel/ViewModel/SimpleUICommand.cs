@@ -5,16 +5,19 @@ using SIUI.ViewModel;
 
 namespace SImulator.ViewModel
 {
-    public sealed class SimpleUICommand: SimpleCommand, INotifyPropertyChanged
+    /// <summary>
+    /// Provides a named command.
+    /// </summary>
+    public sealed class SimpleUICommand : SimpleCommand, INotifyPropertyChanged
     {
         private string _name = "";
 
         /// <summary>
-        /// Имя команды
+        /// Command name.
         /// </summary>
         public string Name
         {
-            get { return _name; }
+            get => _name;
             set { _name = value; OnPropertyChanged(); }
         }
 

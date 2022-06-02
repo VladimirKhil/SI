@@ -19,7 +19,7 @@ namespace SImulator.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -124,6 +124,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Основной.
+        /// </summary>
+        internal static string MainScreen {
+            get {
+                return ResourceManager.GetString("MainScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
         /// </summary>
         internal static string NavigateToSiteError {
@@ -156,6 +165,15 @@ namespace SImulator.Properties {
         internal static string SavingSettingsError {
             get {
                 return ResourceManager.GetString("SavingSettingsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Дополнительный.
+        /// </summary>
+        internal static string SecondaryScreen {
+            get {
+                return ResourceManager.GetString("SecondaryScreen", resourceCulture);
             }
         }
         
@@ -201,6 +219,15 @@ namespace SImulator.Properties {
         internal static string TestPackage {
             get {
                 return ResourceManager.GetString("TestPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Окно.
+        /// </summary>
+        internal static string Window {
+            get {
+                return ResourceManager.GetString("Window", resourceCulture);
             }
         }
     }

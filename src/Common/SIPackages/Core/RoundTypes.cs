@@ -1,14 +1,17 @@
 ﻿namespace SIPackages.Core
 {
+    /// <summary>
+    /// Provides well-known round types.
+    /// </summary>
     public static class RoundTypes
     {
         /// <summary>
-        /// Обычный раунд
+        /// Simple round type.
         /// </summary>
         public const string Standart = "standart";
 
         /// <summary>
-        /// Финальный раунд
+        /// Final round type.
         /// </summary>
         public const string Final = "final";
     }

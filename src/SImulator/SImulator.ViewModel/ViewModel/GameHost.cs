@@ -11,9 +11,9 @@ using System.Windows.Input;
 
 namespace SImulator.ViewModel
 {
-    public class GameHost: IExtendedGameHost
+    public sealed class GameHost : IExtendedGameHost
     {
-        private readonly EngineBase _engine;
+        private readonly ISIEngine _engine;
 
         public bool IsMediaEnded { get; set; }
 
@@ -30,7 +30,7 @@ namespace SImulator.ViewModel
         public event Action<double> MediaProgress;
         public event Action RoundThemesFinished;
 
-        public GameHost(EngineBase engine)
+        public GameHost(ISIEngine engine)
         {
             _engine = engine;
         }
@@ -63,7 +63,7 @@ namespace SImulator.ViewModel
             }
         }
 
-        private readonly object _moveLock = new object();
+        private readonly object _moveLock = new();
 
         public void AskNext()
         {
@@ -79,7 +79,9 @@ namespace SImulator.ViewModel
             lock (_moveLock)
             {
                 if (_engine.CanMoveBack)
+                {
                     Back?.Execute(null);
+                }
             }
         }
 

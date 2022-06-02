@@ -80,10 +80,17 @@ namespace SIGame
                 if (Environment.OSVersion.Version < new Version(10, 0))
                 {
                     ServicePointManager.Expect100Continue = true;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-                        | SecurityProtocolType.Tls11
-                        | SecurityProtocolType.Tls12
-                        | SecurityProtocolType.Ssl3; // Windows 7
+                    try
+                    {
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                            | SecurityProtocolType.Tls11
+                            | SecurityProtocolType.Tls12
+                            | SecurityProtocolType.Ssl3; // Windows 7
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
 
                 Trace.TraceInformation("Game launched");

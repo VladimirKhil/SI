@@ -3,18 +3,16 @@ using System.Runtime.InteropServices;
 
 namespace SImulator.Implementation.WinAPI
 {
+    /// <summary>
+    /// Provides helper WinAPI methods.
+    /// </summary>
     internal static class Win32
     {
         internal delegate IntPtr LowLevelKeyboardProcDelegate(int nCode, IntPtr wParam, ref KBDLLHOOKSTRUCT lParam);
 
-        /// <summary>
-        /// Важно знать, что при подключённом Debugger'е хук не работает
-        /// </summary>
-        /// <param name="idHook"></param>
-        /// <param name="lpfn"></param>
-        /// <param name="hMod"></param>
-        /// <param name="dwThreadId"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// When Debugger is attached the hook does not work.
+        /// </remarks>
         [DllImport("user32", EntryPoint = "SetWindowsHookExA", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         internal static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProcDelegate lpfn, IntPtr hMod, int dwThreadId);
         

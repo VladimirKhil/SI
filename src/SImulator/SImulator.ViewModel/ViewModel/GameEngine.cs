@@ -22,17 +22,16 @@ using System.Windows.Input;
 namespace SImulator.ViewModel
 {
     /// <summary>
-    /// Класс, хранящий общую игровую информацию и отвечающий за проведение игры
+    /// Controls a single game run.
     /// </summary>
-    public sealed class GameEngine: INotifyPropertyChanged, IDisposable
+    public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     {
         #region Fields
-        private readonly bool _isRemoteControlling;
 
         internal event Action<string> Error;
         internal event Action RequestStop;
 
-        private readonly Stack<Tuple<PlayerInfo, int, bool>> _answeringHistory = new Stack<Tuple<PlayerInfo, int, bool>>();
+        private readonly Stack<Tuple<PlayerInfo, int, bool>> _answeringHistory = new();
 
         private readonly EngineBase _engine;
 
@@ -54,8 +53,8 @@ namespace SImulator.ViewModel
 
         private PlayerInfo _selectedPlayer = null;
 
-        private readonly List<PlayerInfo> _selectedPlayers = new List<PlayerInfo>();
-        private readonly Dictionary<Guid, PlayerInfo> _playersTable = new Dictionary<Guid, PlayerInfo>();
+        private readonly List<PlayerInfo> _selectedPlayers = new();
+        private readonly Dictionary<string, PlayerInfo> _playersTable = new();
 
         #endregion
 
@@ -166,14 +165,20 @@ namespace SImulator.ViewModel
 
         private int _questionTime = 0;
 
+        /// <summary>
+        /// Current thinking time value.
+        /// </summary>
         public int QuestionTime
         {
-            get { return _questionTime; }
+            get => _questionTime;
             set { _questionTime = value; OnPropertyChanged(); }
         }
 
         private int _questionTimeMax = int.MaxValue;
 
+        /// <summary>
+        /// Maximum thinking time value.
+        /// </summary>
         public int QuestionTimeMax
         {
             get { return _questionTimeMax; }
@@ -257,17 +262,15 @@ namespace SImulator.ViewModel
         
         public GameEngine(
             AppSettingsViewModel settings,
-            EngineBase engine,
+            ISIEngine engine,
             IExtendedGameHost gameHost,
             IRemoteGameUI ui,
-            IList<SimplePlayerInfo> players,
-            bool isRemoteControlling)
+            IList<SimplePlayerInfo> players)
         {
             Settings = settings;
-            _engine = engine;
+            _engine = (EngineBase)engine;
             _gameHost = gameHost;
             UserInterface = ui;
-            _isRemoteControlling = isRemoteControlling;
 
             LocalInfo = new TableInfoViewModel(players);
 
@@ -337,6 +340,7 @@ namespace SImulator.ViewModel
             _engine.RightAnswer += Engine_RightAnswer;
             _engine.ShowScore += Engine_ShowScore;
             _engine.LogScore += LogScore;
+            _engine.QuestionPostInfo += Engine_QuestionPostInfo;
             _engine.EndQuestion += Engine_EndQuestion;
             _engine.RoundTimeout += Engine_RoundTimeout;
             _engine.NextQuestion += Engine_NextQuestion;
@@ -355,6 +359,8 @@ namespace SImulator.ViewModel
             _gameHost.RoundThemesFinished += GameHost_RoundThemesFinished;
             _gameHost.ThemeDeleted += GameHost_ThemeDeleted;
         }
+
+        private void Engine_QuestionPostInfo() => Task.Run(_engine.MoveNext);
 
         private void GameHost_ThemeDeleted(int themeIndex)
         {
@@ -408,7 +414,9 @@ namespace SImulator.ViewModel
             try
             {
                 if (UserInterface != null)
+                {
                     UserInterface.UpdateSettings(Settings.SIUISettings.Model);
+                }
             }
             catch (TimeoutException exc)
             {
@@ -427,7 +435,9 @@ namespace SImulator.ViewModel
         private void Info_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PlayerInfo.IsSelected) || e.PropertyName == nameof(PlayerInfo.IsRegistered))
+            {
                 return;
+            }
 
             var player = (PlayerInfo)sender;
 
@@ -438,7 +448,9 @@ namespace SImulator.ViewModel
                     foreach (PlayerInfo item in LocalInfo.Players)
                     {
                         if (item != sender)
+                        {
                             item.WaitForRegistration = false;
+                        }
                     }
                 }
 
@@ -448,7 +460,9 @@ namespace SImulator.ViewModel
             try
             {
                 if (UserInterface != null)
+                {
                     UserInterface.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
+                }
             }
             catch (TimeoutException exc)
             {
@@ -464,53 +478,37 @@ namespace SImulator.ViewModel
             }
         }
 
-        private void ThinkingTimer_Elapsed(object state) =>
-            Task.Factory.StartNew(() =>
+        private void ThinkingTimer_Elapsed(object state) => UI.Execute(
+            () =>
+            {
+                QuestionTime++;
+                if (QuestionTime < QuestionTimeMax)
                 {
-                    try
-                    {
-                        QuestionTime++;
-                        if (QuestionTime >= QuestionTimeMax)
-                        {
-                            UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
-                            StopQuestionTimer_Executed(null);
-                            ActiveQuestionCommand = null;
+                    return;
+                }
 
-                            if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
-                            {
-                                _buttonManager.Stop();
-                            }
-                        }
-                    }
-                    catch (TimeoutException exc)
-                    {
-                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-                    }
-                    catch (CommunicationException exc)
-                    {
-                        PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-                    }
-                    catch (Exception exc)
-                    {
-                        PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
-                    }
-                },
-                CancellationToken.None,
-                TaskCreationOptions.None,
-                UI.Scheduler);
+                UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
+                StopQuestionTimer_Executed(null);
+                ActiveQuestionCommand = null;
 
-        private void RoundTimer_Elapsed(object state)
-        {
-            UI.Execute(() =>
+                if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
                 {
-                    RoundTime++;
-                    if (RoundTime >= Settings.Model.RoundTime)
-                    {
-                        _engine.SetTimeout();
-                        StopRoundTimer_Executed(null);
-                    }
-                }, exc => OnError(exc.ToString()));
-        }
+                    _buttonManager.Stop();
+                }
+            },
+            exc => OnError(exc.ToString()));
+
+        private void RoundTimer_Elapsed(object state) => UI.Execute(
+            () =>
+            {
+                RoundTime++;
+                if (RoundTime >= Settings.Model.RoundTime)
+                {
+                    _engine.SetTimeout();
+                    StopRoundTimer_Executed(null);
+                }
+            },
+            exc => OnError(exc.ToString()));
 
         private void ThemeInfo_Selected(ThemeInfoViewModel theme)
         {
@@ -737,7 +735,7 @@ namespace SImulator.ViewModel
 
         private void AddRight_Executed(object arg)
         {
-            if (!(arg is PlayerInfo player))
+            if (arg is not PlayerInfo player)
             {
                 if (_selectedPlayer == null)
                 {
@@ -824,7 +822,7 @@ namespace SImulator.ViewModel
             {
                 _buttonManager.KeyPressed += OnPlayerKeyPressed;
                 _buttonManager.PlayerPressed += OnPlayerPressed;
-                _buttonManager.GetPlayerByGuid += OnGetPlayerByGuid;
+                _buttonManager.GetPlayerById += OnGetPlayerById;
             }
 
             if (Settings.Model.SaveLogs)
@@ -860,7 +858,9 @@ namespace SImulator.ViewModel
             UserInterface.ClearLostButtonPlayers();
 
             if (Settings.Model.AutomaticGame)
+            {
                 Next_Executed();
+            }
         }
 
         private void Engine_Question(Question question)
@@ -1289,24 +1289,24 @@ namespace SImulator.ViewModel
         /// <summary>
         /// Ends the game.
         /// </summary>
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             try
             {
                 Settings.Model.SIUISettings.PropertyChanged -= Default_PropertyChanged;
                 Settings.SIUISettings.PropertyChanged -= Default_PropertyChanged;
 
+                if (_buttonManager != null)
+                {
+                    _buttonManager.Stop();
+                    await _buttonManager.DisposeAsync();
+                    _buttonManager = null;
+                }
+
                 lock (_engine.SyncRoot)
                 {
                     _engine.PropertyChanged -= Engine_PropertyChanged;
                     _engine.Dispose();
-
-                    if (_buttonManager != null)
-                    {
-                        _buttonManager.Stop();
-                        _buttonManager.Dispose();
-                        _buttonManager = null;
-                    }
 
                     if (_logger != null)
                     {
@@ -1407,58 +1407,17 @@ namespace SImulator.ViewModel
 
         private async Task SetMediaAsync(IMedia media, bool background = false)
         {
-            if (_isRemoteControlling)
+            var mediaPrepared = await PlatformManager.Instance.PrepareMediaAsync(media);
+            if (UserInterface != null && mediaPrepared != null)
             {
-                if (UserInterface != null)
+                try
                 {
-                    if (media.GetStream != null)
-                    {
-                        var streamInfo = media.GetStream();
-                        try
-                        {
-                            SendStreamToUI(streamInfo);
-                        }
-                        catch (Exception exc)
-                        {
-                            PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
-                            return;
-                        }
-
-                        UserInterface.SetMediaFromBuffer(media.Uri, background);
-                    }
+                    UserInterface.SetMedia(new MediaSource(mediaPrepared.GetStream?.Invoke().Stream, mediaPrepared.Uri), background);
                 }
-            }
-            else
-            {
-                var mediaPrepared = await PlatformManager.Instance.PrepareMediaAsync(media);
-                if (UserInterface != null && mediaPrepared != null)
+                catch (Exception exc)
                 {
-                    try
-                    {
-                        UserInterface.SetMedia(new MediaSource(mediaPrepared.GetStream?.Invoke().Stream, mediaPrepared.Uri), background);
-                    }
-                    catch (Exception exc)
-                    {
-                        PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
-                    }
+                    PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
                 }
-            }
-        }
-
-        private void SendStreamToUI(StreamInfo streamInfo)
-        {
-            UserInterface.ClearBuffer();
-
-            var buffer = new byte[32768];
-            int i;
-            while ((i = streamInfo.Stream.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                if (i < buffer.Length)
-                {
-                    Array.Resize(ref buffer, i);
-                }
-
-                UserInterface.AppendToBuffer(buffer);
             }
         }
 
@@ -1580,6 +1539,9 @@ namespace SImulator.ViewModel
                         setActive = false;
                         break;
 
+                    case QuestionTypes.Choice:
+                        break;
+
                     default:
                         UserInterface.SetText(question.Type.Name);
                         break;
@@ -1606,7 +1568,7 @@ namespace SImulator.ViewModel
             Error?.Invoke(error);
         }
 
-        internal PlayerInfo OnGetPlayerByGuid(Guid guid, bool strict)
+        internal PlayerInfo OnGetPlayerById(string playerId, bool strict)
         {
             if (Settings.Model.UsePlayersKeys != PlayerKeysModes.Web)
             {
@@ -1615,7 +1577,7 @@ namespace SImulator.ViewModel
 
             lock (_playersTable)
             {
-                if (_playersTable.TryGetValue(guid, out PlayerInfo player))
+                if (_playersTable.TryGetValue(playerId, out PlayerInfo player))
                 {
                     return player;
                 }
@@ -1629,7 +1591,7 @@ namespace SImulator.ViewModel
                             item.WaitForRegistration = false;
                             item.IsRegistered = true;
 
-                            _playersTable[guid] = item;
+                            _playersTable[playerId] = item;
 
                             return item;
                         }
@@ -1668,7 +1630,9 @@ namespace SImulator.ViewModel
         private bool ProcessPlayerPress(int index, PlayerInfo player)
         {
             if (!_engine.IsWaitingForPress())
+            {
                 return false;
+            }
 
             // Уже кто-то отвечает
             if (_selectedPlayer != null)

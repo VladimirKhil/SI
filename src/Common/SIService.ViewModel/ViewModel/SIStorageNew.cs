@@ -150,10 +150,7 @@ namespace Services.SI.ViewModel
 
         public NamedObject[] Tags
         {
-            get
-            {
-                return _tags;
-            }
+            get => _tags;
             set
             {
                 _tags = value;
@@ -165,7 +162,7 @@ namespace Services.SI.ViewModel
 
         public string Filter
         {
-            get { return _filter; }
+            get => _filter;
             set
             {
                 if (_filter != value)
@@ -197,7 +194,7 @@ namespace Services.SI.ViewModel
 
         public bool CurrentSortDirection
         {
-            get { return _currentSortDirection; }
+            get => _currentSortDirection;
             set
             {
                 if (_currentSortDirection != value)
@@ -210,6 +207,7 @@ namespace Services.SI.ViewModel
         }
 
         public string DefaultPublisher { get; internal set; }
+
         public string DefaultTag { get; internal set; }
 
         public SIStorageNew()

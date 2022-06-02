@@ -15,7 +15,7 @@ namespace SImulator.ViewModel.Model
         [DataMember]
         public int Right
         {
-            get { return _right; }
+            get => _right;
             set { _right = value; OnPropertyChanged(); }
         }
 
@@ -24,7 +24,7 @@ namespace SImulator.ViewModel.Model
         [DataMember]
         public int Wrong
         {
-            get { return _wrong; }
+            get => _wrong;
             set { _wrong = value; OnPropertyChanged(); }
         }
 
@@ -32,7 +32,7 @@ namespace SImulator.ViewModel.Model
 
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
         }
 
@@ -48,7 +48,7 @@ namespace SImulator.ViewModel.Model
         /// </summary>
         public bool IsRegistered
         {
-            get { return _isRegistered; }
+            get => _isRegistered;
             set { if (_isRegistered != value) { _isRegistered = value; OnPropertyChanged(); } }
         }
 
@@ -56,7 +56,7 @@ namespace SImulator.ViewModel.Model
 
         public bool WaitForRegistration
         {
-            get { return _waitForRegistration; }
+            get => _waitForRegistration;
             set { if (_waitForRegistration != value) { _waitForRegistration = value; OnPropertyChanged(); } }
         }
     }

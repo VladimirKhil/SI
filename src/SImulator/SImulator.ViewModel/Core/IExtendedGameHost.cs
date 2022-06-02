@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel.Core
 {
-    public interface IExtendedGameHost: IGameHost
+    public interface IExtendedGameHost : IGameHost
     {
         bool IsMediaEnded { get; set; }
 

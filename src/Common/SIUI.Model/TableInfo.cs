@@ -3,22 +3,22 @@
 namespace SIUI.Model
 {
     /// <summary>
-    /// Данные табло
+    /// Defines table information.
     /// </summary>
     public sealed class TableInfo
     {
         /// <summary>
-        /// Темы игры
+        /// Game themes.
         /// </summary>
         public List<string> GameThemes { get; } = new List<string>();
 
         /// <summary>
-        /// Стоимости вопросов в раунде
+        /// Themes information.
         /// </summary>
         public List<ThemeInfo> RoundInfo { get; } = new List<ThemeInfo>();
 
         /// <summary>
-        /// Флаг паузы в игре
+        /// Is table paused.
         /// </summary>
         public bool Pause { get; set; }
     }

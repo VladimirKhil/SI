@@ -62,8 +62,6 @@ namespace SImulator.ViewModel
                 Model.BlockingTime = defaultSettings.BlockingTime;
                 Model.DropStatsOnBack = defaultSettings.DropStatsOnBack;
                 Model.FalseStart = defaultSettings.FalseStart;
-                Model.HttpPort = defaultSettings.HttpPort;
-                Model.IsRemoteControlAllowed = defaultSettings.IsRemoteControlAllowed;
                 Model.EndQuestionOnRightAnswer = defaultSettings.EndQuestionOnRightAnswer;
                 Model.RoundTime = defaultSettings.RoundTime;
                 Model.SignalsAfterTimer = defaultSettings.SignalsAfterTimer;

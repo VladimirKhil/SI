@@ -1,30 +1,38 @@
 ﻿namespace SIPackages.Core
 {
+    /// <summary>
+    /// Provides well-known question types.
+    /// </summary>
     public static class QuestionTypes
     {
         /// <summary>
-        /// Простой вопрос
+        /// Simple question type.
         /// </summary>
         public const string Simple = "simple";
 
         /// <summary>
-        /// Вопрос со ставкой
+        /// Stake question type.
         /// </summary>
         public const string Auction = "auction";
 
         /// <summary>
-        /// Вопрос с секретом
+        /// Secret question type.
         /// </summary>
         public const string Cat = "cat";
 
         /// <summary>
-        /// Обобщённый Вопрос с секретом
+        /// Extended secret question type.
         /// </summary>
         public const string BagCat = "bagcat";
 
         /// <summary>
-        /// Вопрос без риска
+        /// No-risk question.
         /// </summary>
         public const string Sponsored = "sponsored";
+
+        /// <summary>
+        /// Multiple choice question.
+        /// </summary>
+        public const string Choice = "choice";
     }
 }

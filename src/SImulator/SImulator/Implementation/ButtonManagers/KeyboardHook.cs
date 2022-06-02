@@ -9,7 +9,10 @@ using SImulator.ViewModel;
 
 namespace SImulator.Implementation.ButtonManagers
 {
-    internal sealed class KeyboardHook: ButtonManagerBase
+    /// <summary>
+    /// Provides keyboard-based player buttons.
+    /// </summary>
+    internal sealed class KeyboardHook : ButtonManagerBase
     {
         private IntPtr _hookPtr = IntPtr.Zero;
         private readonly Win32.LowLevelKeyboardProcDelegate _callbackPtr;
@@ -44,14 +47,11 @@ namespace SImulator.Implementation.ButtonManagers
         {
             var key = KeyInterop.KeyFromVirtualKey(lParam.vkCode);
             if (OnKeyPressed((GameKey)key))
+            {
                 return new IntPtr(1);
+            }
 
             return Win32.CallNextHookEx(_hookPtr, nCode, wParam, ref lParam);
-        }
-
-        public override void Dispose()
-        {
-            
         }
     }
 }

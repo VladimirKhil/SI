@@ -6,7 +6,7 @@ namespace SIPackages
     /// <summary>
     /// Комментарии к объекту пакета
     /// </summary>
-    public sealed class Comments: PropertyChangedNotifier
+    public sealed class Comments : PropertyChangedNotifier
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _text = "";

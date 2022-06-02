@@ -145,16 +145,6 @@ namespace SImulator.ViewModel
 
         public async void Start()
         {
-            if (_gameHost == null)
-            {
-                // Удалённое воспроизведение
-#if LEGACY
-                GameHost = PlatformManager.Instance.GetCallback<IGameHost>();
-                ((IChannel)GameHost).Closed += RemoteGameUI_Closed;
-                ((IChannel)GameHost).Faulted += RemoteGameUI_Closed;
-#endif
-            }
-
             await PlatformManager.Instance.CreateMainViewAsync(this, ScreenIndex);
             TInfo.TStage = TableStage.Sign;
         }

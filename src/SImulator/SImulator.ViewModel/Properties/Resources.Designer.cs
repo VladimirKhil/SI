@@ -19,7 +19,7 @@ namespace SImulator.ViewModel.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -120,15 +120,6 @@ namespace SImulator.ViewModel.Properties {
         internal static string GameStartError {
             get {
                 return ResourceManager.GetString("GameStartError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Ожидать подключения.
-        /// </summary>
-        internal static string ListenForConnections {
-            get {
-                return ResourceManager.GetString("ListenForConnections", resourceCulture);
             }
         }
         
@@ -300,15 +291,6 @@ namespace SImulator.ViewModel.Properties {
         internal static string StartGame {
             get {
                 return ResourceManager.GetString("StartGame", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Прекратить ожидание.
-        /// </summary>
-        internal static string StopListen {
-            get {
-                return ResourceManager.GetString("StopListen", resourceCulture);
             }
         }
         
