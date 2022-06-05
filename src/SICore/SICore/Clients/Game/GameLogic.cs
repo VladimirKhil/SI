@@ -21,7 +21,7 @@ using R = SICore.Properties.Resources;
 namespace SICore
 {
     /// <summary>
-    /// Логика игры
+    /// Executes SIGame logic implemented as a state machine.
     /// </summary>
     public sealed class GameLogic : Logic<GameData>, SIEngine.IEngineSettingsProvider
     {
@@ -35,7 +35,11 @@ namespace SICore
 
         private readonly Action _autoGame;
 
+        private readonly HistoryLog _tasksHistory = new HistoryLog();
+
         public SIEngine.EngineBase Engine { get; private set; }
+
+        public bool IsRunning { get; set; }
 
         public event Action<GameStages, string> StageChanged;
         public event Action<string, int, int> AdShown;
@@ -63,8 +67,8 @@ namespace SICore
             Engine.Round += Engine_Round;
             Engine.RoundThemes += Engine_RoundThemes;
             Engine.Theme += Engine_Theme;
-            Engine.Question += Engine_Question; // Вопрос в упрощённой версии
-            Engine.QuestionSelected += Engine_QuestionSelected; // Вопрос в классической версии
+            Engine.Question += Engine_Question; // Simple game mode question
+            Engine.QuestionSelected += Engine_QuestionSelected; // Classic game mode question
 
             Engine.QuestionText += Engine_QuestionText;
             Engine.QuestionOral += Engine_QuestionOral;
@@ -97,7 +101,7 @@ namespace SICore
 
             if (_data.Settings.IsAutomatic)
             {
-                // Необходимо запустить игру автоматически
+                // The game should be started automatically
                 ScheduleExecution(Tasks.AutoGame, Constants.AutomaticGameStartDuration);
                 _data.TimerStartTime[2] = DateTime.UtcNow;
 
@@ -128,6 +132,11 @@ namespace SICore
         private void Engine_Package(Package package)
         {
             _data.Package = package;
+            _data.Rounds = _data.Package.Rounds
+                .Select((round, index) => (round, index))
+                .Where(roundTuple => Engine.AcceptRound(roundTuple.round))
+                .Select(roundTuple => new RoundInfo { Index = roundTuple.index, Name = roundTuple.round.Name })
+                .ToArray();
 
             if (_data.Package.Info.Comments.Text.StartsWith("{random}"))
             {
@@ -195,7 +204,7 @@ namespace SICore
 
             InitThemes(themes);
 
-            // Заполним изначальную таблицу вопросов
+            // Filling initial questions table
             _data.ThemeInfo = new bool[themes.Length];
 
             var maxQuests = themes.Max(t => t.Questions.Count);
@@ -298,8 +307,11 @@ namespace SICore
 
             if (_data.IsPartial)
             {
-                // "и" symbol is used as an arbitrary symbol with medium width
+                // "и" symbol is used as an arbitrary symbol with medium width to define the question text shape
                 // It does not need to be localized
+                // Real question text is sent later and it sequentially replaces test shape
+                // Text shape is required to display partial question on the screen correctly
+                // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
                 _gameActions.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
 
                 _data.Text = text;
@@ -319,9 +331,8 @@ namespace SICore
         }
 
         /// <summary>
-        /// Будет ли вопрос выводиться по частям
+        /// Should the question be displayed partially.
         /// </summary>
-        /// <returns></returns>
         private bool IsPartial() =>
             _data.Round != null
                 && _data.Round.Type != RoundTypes.Final
@@ -415,6 +426,7 @@ namespace SICore
         {
             _data.IsPartial = false;
             ShareMedia(image, AtomTypes.Image);
+
             if (sound != null)
             {
                 _data.MediaOk = ShareMedia(sound, AtomTypes.Audio, true);
@@ -1338,11 +1350,7 @@ namespace SICore
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
         }
 
-        private readonly HistoryLog _tasksHistory = new HistoryLog();
-
         internal string PrintHistory() => _tasksHistory.ToString();
-
-        public bool IsRunning { get; set; }
 
         internal void ScheduleExecution(Tasks task, double taskTime, int arg = 0, bool force = false)
         {
@@ -1362,7 +1370,7 @@ namespace SICore
         internal string PrintOldTasks() => string.Join("|", OldTasks.Select(t => $"{(Tasks)t.Item1}:{t.Item2}"));
 
         /// <summary>
-        /// Выполнение текущей задачи
+        /// Executes current task of the game state machine.
         /// </summary>
         override protected void ExecuteTask(int taskId, int arg)
         {
@@ -1386,7 +1394,7 @@ namespace SICore
 
                         _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
 
-                        // Прекратить обычное выполнение
+                        // Interrupt standard execution and try to do something urgent
                         switch (_stopReason)
                         {
                             case StopReason.Pause:
@@ -1416,10 +1424,10 @@ namespace SICore
                                     case -2:
                                         if (Engine.CanMoveBackRound)
                                         {
-                                            FinishRound(false);
                                             stop = Engine.MoveBackRound();
                                             if (stop)
                                             {
+                                                FinishRound(false);
                                                 _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
                                             }
                                             else
@@ -1447,7 +1455,7 @@ namespace SICore
                                         break;
 
                                     case 1:
-                                        // Просто выполняем текущую задачу, дополнительной обработки делать не надо
+                                        // Just perform the current task, no additional processing is required
                                         stop = false;
 
                                         if (task == Tasks.PrintPartial) // Skip partial printing
@@ -1465,11 +1473,32 @@ namespace SICore
                                     case 2:
                                         if (Engine.CanMoveNextRound)
                                         {
-                                            FinishRound(false);
                                             stop = Engine.MoveNextRound();
                                             if (stop)
                                             {
+                                                FinishRound(false);
                                                 _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToNextRound)]);
+                                            }
+                                            else
+                                            {
+                                                _stopReason = StopReason.None;
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            stop = false;
+                                        }
+                                        break;
+
+                                    case 3:
+                                        if (Engine.CanMoveNextRound || Engine.CanMoveBackRound)
+                                        {
+                                            stop = Engine.MoveToRound(ClientData.TargetRoundIndex);
+                                            if (stop)
+                                            {
+                                                FinishRound(false);
+                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]);
                                             }
                                             else
                                             {
@@ -2211,7 +2240,17 @@ namespace SICore
             }
             else
             {
-                _gameActions.InformStage(name: _data.Round.Name);
+                var roundIndex = -1;
+                for (int i = 0; i < _data.Rounds.Length; i++)
+                {
+                    if (_data.Rounds[i].Index == Engine.RoundIndex)
+                    {
+                        roundIndex = i;
+                        break;
+                    }
+                }
+
+                _gameActions.InformStage(name: _data.Round.Name, index: roundIndex);
                 _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
                 ScheduleExecution(Tasks.Round, 10, 2);
@@ -3948,10 +3987,21 @@ namespace SICore
                 }
 
                 var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
-                var skipRoundAnnounce = isRandomPackage && (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport
-                    && _data.Package.Rounds.Count == 2); // второй раунд - всегда финал
+                var skipRoundAnnounce = isRandomPackage &&
+                    _data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport &&
+                    _data.Package.Rounds.Count == 2; // second round is always the final in random package
 
-                _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name);
+                var roundIndex = -1;
+                for (int i = 0; i < _data.Rounds.Length; i++)
+                {
+                    if (_data.Rounds[i].Index == Engine.RoundIndex)
+                    {
+                        roundIndex = i;
+                        break;
+                    }
+                }
+
+                _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name, index: roundIndex);
 
                 if (!skipRoundAnnounce)
                 {

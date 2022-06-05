@@ -1505,6 +1505,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ведущий перевёл игру в другой раунд.
+        /// </summary>
+        public static string ShowmanSwitchedToOtherRound {
+            get {
+                return ResourceManager.GetString("ShowmanSwitchedToOtherRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ведущий перевёл игру в предыдущий раунд.
         /// </summary>
         public static string ShowmanSwitchedToPreviousRound {

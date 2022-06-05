@@ -493,5 +493,12 @@ namespace SICore
         public string DocumentPath { get; internal set; }
 
         public int ThemeIndexToDelete { get; set; } = -1;
+
+        /// <summary>
+        /// Round index to move to.
+        /// </summary>
+        public int TargetRoundIndex { get; internal set; }
+
+        public RoundInfo[] Rounds { get; internal set; } = new RoundInfo[0];
     }
 }

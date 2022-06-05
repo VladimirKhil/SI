@@ -1255,22 +1255,48 @@ namespace SICore
             {
                 case -2:
                     if (!_logic.Engine.CanMoveBackRound)
+                    {
                         return;
+                    }
                     break;
 
                 case -1:
                     if (!_logic.Engine.CanMoveBack)
+                    {
                         return;
+                    }
                     break;
 
                 case 1:
                     if (ClientData.MoveNextBlocked)
+                    {
                         return;
+                    }
                     break;
 
                 case 2:
                     if (!_logic.Engine.CanMoveNextRound)
+                    {
                         return;
+                    }
+                    break;
+
+                case 3:
+                    if (!_logic.Engine.CanMoveNextRound && !_logic.Engine.CanMoveBackRound ||
+                        ClientData.Package == null ||
+                        args.Length <= 2 ||
+                        !int.TryParse(args[2], out int roundIndex) ||
+                        roundIndex < 0)
+                    {
+                        return;
+                    }
+
+                    if (roundIndex >= ClientData.Rounds.Length)
+                    {
+                        return;
+                    }
+
+                    ClientData.TargetRoundIndex = ClientData.Rounds[roundIndex].Index;
                     break;
             }
 

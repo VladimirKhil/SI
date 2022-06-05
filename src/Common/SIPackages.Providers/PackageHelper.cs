@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace SIPackages.Providers
 {
     /// <summary>
-    /// Класс, генерирующий случайные пакеты
+    /// Generates random question packages.
     /// </summary>
     public static class PackageHelper
     {
-        private static readonly Random Rand = new Random();
+        private static readonly Random Rand = new();
 
         /// <summary>
-        /// Индикатор случайного пакета
+        /// Random package marker.
         /// </summary>
         public const string RandomIndicator = "{random}";
 
@@ -61,7 +61,7 @@ namespace SIPackages.Providers
         {
             var files = (await provider.GetPackagesAsync()).ToList();
 
-            var packageComments = new StringBuilder(RandomIndicator); // Информация для отчёта об игре
+            var packageComments = new StringBuilder(RandomIndicator); // Used in game reports
 
             for (var i = 0; i < roundsCount; i++)
             {

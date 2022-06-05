@@ -517,10 +517,10 @@
     <value>Greetings, ladies and gentlement, this is SIGame!</value>
   </data>
   <data name="ShowmanSwitchedToNextRound" xml:space="preserve">
-    <value>Host has switched the game into the next round</value>
+    <value>The showman has switched the game into the next round</value>
   </data>
   <data name="ShowmanSwitchedToPreviousRound" xml:space="preserve">
-    <value>Host has switched the game into the previous round</value>
+    <value>The showman has switched the game into the previous round</value>
   </data>
   <data name="ShowmanWaiting" xml:space="preserve">
     <value>Waiting for the host's decision...</value>
@@ -743,5 +743,8 @@
   </data>
   <data name="HostChanged" xml:space="preserve">
     <value>Game host was set {0} to {1}</value>
+  </data>
+  <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
+    <value>The showman has switched the game into other round</value>
   </data>
 </root>

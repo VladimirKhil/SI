@@ -292,7 +292,7 @@ namespace SIEngine
             }
         }
 
-        protected override bool AcceptRound(Round round) => base.AcceptRound(round) &&
+        public override bool AcceptRound(Round round) => base.AcceptRound(round) &&
             (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null));
 
         public override Tuple<int, int, int> MoveBack()
@@ -443,15 +443,38 @@ namespace SIEngine
 
         public override bool MoveNextRound(bool showSign = true)
         {
-            _history.Clear();
-            return base.MoveNextRound(showSign);
+            var result = base.MoveNextRound(showSign);
+
+            if (result)
+            {
+                _history.Clear();
+            }
+
+            return result;
+        }
+
+        public override bool MoveToRound(int roundIndex, bool showSign = true)
+        {
+            var result = base.MoveToRound(roundIndex, showSign);
+
+            if (result)
+            {
+                _history.Clear();
+            }
+
+            return result;
         }
 
         public override bool MoveBackRound()
         {
-            _history.Clear();
+            var result = base.MoveBackRound();
 
-            return base.MoveBackRound();
+            if (result)
+            {
+                _history.Clear();
+            }
+
+            return result;
         }
 
         public override bool CanNext() => _stage != GameStage.End && (_stage != GameStage.RoundTable || _forward.Count > 0)

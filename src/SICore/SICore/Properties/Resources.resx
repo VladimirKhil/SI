@@ -749,4 +749,7 @@
   <data name="HostChanged" xml:space="preserve">
     <value>Хост игры был изменён {0} на {1}</value>
   </data>
+  <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
+    <value>Ведущий перевёл игру в другой раунд</value>
+  </data>
 </root>

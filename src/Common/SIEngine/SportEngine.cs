@@ -205,7 +205,7 @@ namespace SIEngine
             return false;
         }
 
-        protected override bool AcceptRound(Round round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
+        public override bool AcceptRound(Round round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
 
         public override bool CanNext() => _stage != GameStage.End;
 

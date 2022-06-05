@@ -381,7 +381,31 @@ namespace SIEngine
             return moved;
         }
 
-        protected virtual bool AcceptRound(Round round) => _activeRound.Themes.Any(theme => theme.Questions.Any());
+        public virtual bool MoveToRound(int roundIndex, bool showSign = true)
+        {
+            if (_roundIndex == roundIndex ||
+                roundIndex < 0 ||
+                roundIndex >= _document.Package.Rounds.Count ||
+                !AcceptRound(_document.Package.Rounds[roundIndex]))
+            {
+                return false;
+            }
+
+            _roundIndex = roundIndex;
+            SetActiveRound();
+            Stage = GameStage.Round;
+
+            CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
+            CanMoveBackRound = _roundIndex > 0;
+
+            UpdateCanNext();
+            OnNextRound(showSign);
+
+            CanMoveBack = false;
+            return true;
+        }
+
+        public virtual bool AcceptRound(Round round) => round.Themes.Any(theme => theme.Questions.Any());
 
         public virtual bool MoveBackRound()
         {
