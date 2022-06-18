@@ -275,9 +275,6 @@ namespace SICore
                 _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
             }
 
-            var s = new StringBuilder(theme.Name).Append(", ").Append(question.Price);
-            _gameActions.PlayerReplic(_data.ChooserIndex, s.ToString());
-
             _data.Theme = theme;
             _data.Question = question;
 
@@ -980,7 +977,6 @@ namespace SICore
             }
             else if (_data.StakeType == StakeMode.Sum)
             {
-                _gameActions.PlayerReplic(playerIndex, Notion.FormatNumber(_data.StakeSum));
                 _data.Stake = _data.StakeSum;
                 _data.StakerIndex = playerIndex;
             }

@@ -640,57 +640,7 @@ namespace SICore
                             break;
 
                         case Messages.Stake:
-                            if (ClientData.IsWaiting && ClientData.Decision == DecisionType.AuctionStakeMaking
-                                && (ClientData.ActivePlayer != null && message.Sender == ClientData.ActivePlayer.Name
-                                || ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
-                            {
-                                #region Stake
-
-                                if (!int.TryParse(args[1], out var stakeType) || stakeType < 0 || stakeType > 3)
-                                {
-                                    return;
-                                }
-
-                                ClientData.StakeType = (StakeMode)stakeType;
-                                if (!ClientData.StakeVariants[(int)ClientData.StakeType])
-                                {
-                                    ClientData.StakeType = null;
-                                }
-                                else if (ClientData.StakeType == StakeMode.Sum)
-                                {
-                                    var minimum = ClientData.Stake != -1 ? ClientData.Stake + 100 : ClientData.CurPriceRight + 100;
-
-                                    // TODO: optimize
-                                    while (minimum % 100 != 0)
-                                    {
-                                        minimum++;
-                                    }
-
-                                    if (!int.TryParse(args[2], out var stakeSum))
-                                    {
-                                        ClientData.StakeType = null;
-                                        return;
-                                    }
-
-                                    if (stakeSum < minimum || stakeSum > ClientData.ActivePlayer.Sum || stakeSum % 100 != 0)
-                                    {
-                                        ClientData.StakeType = null;
-                                        return;
-                                    }
-
-                                    ClientData.StakeSum = stakeSum;
-                                }
-
-                                if (ClientData.IsOralNow)
-                                {
-                                    _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
-                                        ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
-                                }
-
-                                _logic.Stop(StopReason.Decision);
-
-                                #endregion
-                            }
+                            OnStake(message, args);
                             break;
 
                         case Messages.NextDelete:
@@ -833,6 +783,61 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             });
+
+        private void OnStake(Message message, string[] args)
+        {
+            if (!ClientData.IsWaiting ||
+                ClientData.Decision != DecisionType.AuctionStakeMaking ||
+                (ClientData.ActivePlayer == null || message.Sender != ClientData.ActivePlayer.Name)
+                && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
+            {
+                return;
+            }
+
+            if (!int.TryParse(args[1], out var stakeType) || stakeType < 0 || stakeType > 3)
+            {
+                return;
+            }
+
+            ClientData.StakeType = (StakeMode)stakeType;
+            if (!ClientData.StakeVariants[(int)ClientData.StakeType])
+            {
+                ClientData.StakeType = null;
+            }
+            else if (ClientData.StakeType == StakeMode.Sum)
+            {
+                var minimum = ClientData.Stake != -1 ? ClientData.Stake + 100 : ClientData.CurPriceRight + 100;
+
+                // TODO: optimize
+                while (minimum % 100 != 0)
+                {
+                    minimum++;
+                }
+
+                if (!int.TryParse(args[2], out var stakeSum))
+                {
+                    ClientData.StakeType = null;
+                    return;
+                }
+
+                if (stakeSum < minimum || stakeSum > ClientData.ActivePlayer.Sum || stakeSum % 100 != 0)
+                {
+                    ClientData.StakeType = null;
+                    return;
+                }
+
+                ClientData.StakeSum = stakeSum;
+            }
+
+            if (ClientData.IsOralNow)
+            {
+                _gameActions.SendMessage(
+                    Messages.Cancel,
+                    message.Sender == ClientData.ShowMan.Name ? ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
+            }
+
+            _logic.Stop(StopReason.Decision);
+        }
 
         private void OnInfo(Message message)
         {

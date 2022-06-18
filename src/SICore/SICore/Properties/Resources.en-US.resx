@@ -550,7 +550,7 @@
     <value>Strange error</value>
   </data>
   <data name="Sure" xml:space="preserve">
-    <value>I presume, it's #; The answer is #!;It's obviously #; The answer is #;It's # as far as I can guess;It's # for no doubt; i'm sure it's #; It's clearly #;It's # for sure;It's #I think</value>
+    <value>I presume, it's #; The answer is #!;It's obviously #; The answer is #;It's # as far as I can guess;It's # for no doubt; i'm sure it's #; It's clearly #;It's # for sure;It's # I think</value>
   </data>
   <data name="ThankYou" xml:space="preserve">
     <value>Thank you! Pay attention to the board!</value>
