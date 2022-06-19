@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -17,13 +17,15 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore SIGame dependencies
+      run: dotnet restore SIGame.sln
     - name: Build SIGame
       run: dotnet build --no-restore SIGame.sln
+    - name: Restore SIQuester dependencies
+      run: dotnet restore SIQuester.sln
     - name: Build SIQuester
       run: dotnet build --no-restore SIQuester.sln
+    - name: Restore SImulator dependencies
+      run: dotnet restore SImulator.sln
     - name: Build SImulator
       run: dotnet build --no-restore SImulator.sln
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
