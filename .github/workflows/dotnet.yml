@@ -29,5 +29,3 @@ jobs:
       run: dotnet restore SImulator.sln
     - name: Build SImulator
       run: dotnet build --no-restore SImulator.sln
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
