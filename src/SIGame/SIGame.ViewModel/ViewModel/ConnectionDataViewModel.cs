@@ -289,9 +289,8 @@ namespace SIGame.ViewModel
             var humanPlayer = Human;
             var name = humanPlayer.Name;
 
-            var data = new ViewerData
+            var data = new ViewerData(BackLink.Default)
             {
-                BackLink = BackLink.Default,
                 ServerPublicUrl = PackagesPublicBaseUrl,
                 ContentPublicUrls = ContentPublicBaseUrls,
                 ServerAddress = ServerAddress

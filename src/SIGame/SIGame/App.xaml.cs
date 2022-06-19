@@ -84,17 +84,16 @@ namespace SIGame
                     {
                         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
                             | SecurityProtocolType.Tls11
-                            | SecurityProtocolType.Tls12
-                            | SecurityProtocolType.Ssl3; // Windows 7
+                            | SecurityProtocolType.Tls12;
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(ex.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(ex.ToString(), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
 
                 Trace.TraceInformation("Game launched");
-
+                
                 UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
                 UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;

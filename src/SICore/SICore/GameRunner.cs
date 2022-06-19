@@ -45,11 +45,10 @@ namespace SICore
         {
             var client = new Client(NetworkConstants.GameName);
 
-            var gameData = new GameData
+            var gameData = new GameData(_backLink)
             {
                 Settings = _settings,
                 HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
-                BackLink = _backLink,
                 Share = _share
             };
 
@@ -66,7 +65,7 @@ namespace SICore
                 if (!_settings.Showman.IsHuman || isHost)
                 {
                     var showmanClient = new Client(_settings.Showman.Name);
-                    var showman = new Showman(showmanClient, _settings.Showman, isHost, localizer, new ViewerData { BackLink = _backLink });
+                    var showman = new Showman(showmanClient, _settings.Showman, isHost, localizer, new ViewerData(_backLink));
                     showmanClient.ConnectTo(_server);
 
                     if (isHost)
@@ -87,7 +86,7 @@ namespace SICore
                     if (!human || isHost)
                     {
                         var playerClient = new Client(_settings.Players[i].Name);
-                        var player = new Player(playerClient, _settings.Players[i], isHost, localizer, new ViewerData { BackLink = _backLink });
+                        var player = new Player(playerClient, _settings.Players[i], isHost, localizer, new ViewerData(_backLink));
                         playerClient.ConnectTo(_server);
 
                         if (isHost)
@@ -109,7 +108,7 @@ namespace SICore
                         gameData.Viewers.Add(new ViewerAccount(_settings.Viewers[i]));
                         
                         var viewerClient = new Client(_settings.Viewers[i].Name);
-                        var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData { BackLink = _backLink });
+                        var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData(_backLink));
                         viewerClient.ConnectTo(_server);
                         host = viewer;
 

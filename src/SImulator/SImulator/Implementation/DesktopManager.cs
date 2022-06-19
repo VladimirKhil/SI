@@ -23,6 +23,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using Utils;
 using Screen = System.Windows.Forms.Screen;
 
 namespace SImulator.Implementation
@@ -279,17 +280,7 @@ namespace SImulator.Implementation
         public override void ShowMessage(string text, bool error = true) =>
             MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
 
-        public override void NavigateToSite()
-        {
-            try
-            {
-                Process.Start(GameSiteUri);
-            }
-            catch (Exception exc)
-            {
-                ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message));
-            }
-        }
+        public override void NavigateToSite() => Browser.Open(GameSiteUri, exc => ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message)));
 
         public override void PlaySound(string name, Action onFinish)
         {

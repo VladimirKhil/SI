@@ -12,7 +12,7 @@ namespace SICore
     /// </summary>
     public abstract class Data : ITimeProvider, INotifyPropertyChanged
     {
-        public IGameManager BackLink { get; set; }
+        public IGameManager BackLink { get; }
 
         /// <summary>
         /// Глобальный генератор случайных чисел. Он создаётся на каждого клиента отдельно, поскольку не потокобезопасен
@@ -98,6 +98,11 @@ namespace SICore
         public StringBuilder PersonsUpdateHistory { get; } = new StringBuilder();
 
         public StringBuilder EventLog { get; } = new StringBuilder();
+
+        public Data(IGameManager gameManager)
+        {
+            BackLink = gameManager;
+        }
 
         protected static string PrintAccount(ViewerAccount viewerAccount) =>
             $"{viewerAccount?.Name}@{viewerAccount?.IsHuman}:{viewerAccount?.IsConnected}";

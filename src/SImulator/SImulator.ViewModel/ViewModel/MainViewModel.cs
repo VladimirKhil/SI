@@ -269,7 +269,7 @@ namespace SImulator.ViewModel
 
             try
             {
-                Process.Start(new ProcessStartInfo(licensesFolder));
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {licensesFolder}") { CreateNoWindow = true });
             }
             catch (Exception exc)
             {

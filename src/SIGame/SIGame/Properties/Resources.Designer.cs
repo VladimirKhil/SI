@@ -2050,7 +2050,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: тема согласно приоритету тем&quot;.
+        ///   Ищет локализованную строку, похожую на Вероятность: тема согласно приоритету тем.
         /// </summary>
         public static string Selection_UseThemePriority {
             get {

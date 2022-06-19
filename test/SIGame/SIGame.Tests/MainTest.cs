@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using SICore;
-using SICore.Connections;
 using SICore.PlatformSpecific;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
@@ -29,7 +28,7 @@ namespace SIGame.Tests
             GameRole gameRole,
             bool useSignalRConnection)
         {
-            const string GameServerUri = "https://sionline.ru/siserver/0";
+            const string GameServerUri = "https://vladimirkhil.com/siserver/0";
 
             var coreManager = new DesktopCoreManager();
             var manager = new TestManager();

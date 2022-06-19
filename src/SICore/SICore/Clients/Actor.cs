@@ -14,7 +14,7 @@ namespace SICore
     /// <typeparam name="D">Тип данных клиента</typeparam>
     /// <typeparam name="L">Тип логики клиента</typeparam>
     public abstract class Actor<D, L> : IActor
-        where D : Data, new()
+        where D : Data
         where L : class, ILogic
     {
         protected Client _client;

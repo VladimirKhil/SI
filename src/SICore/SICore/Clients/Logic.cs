@@ -1,5 +1,4 @@
 ﻿using SICore.Network;
-using SICore.Network.Contracts;
 using SICore.Utils;
 using System;
 using System.Collections.Generic;

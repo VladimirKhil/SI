@@ -571,7 +571,7 @@ namespace SICore
 
         virtual public void SetAtom(string[] mparams)
         {
-            if (TInfo.TStage != TableStage.Answer && !_data.Speaker.IsShowman)
+            if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
             {
                 _data.Speaker.Replic = "";
             }
@@ -604,7 +604,7 @@ namespace SICore
                 case AtomTypes.Text:
                 case Constants.PartialText:
                     var text = new StringBuilder();
-                    for (int i = 2; i < mparams.Length; i++)
+                    for (var i = 2; i < mparams.Length; i++)
                     {
                         text.Append(mparams[i]);
                         if (i < mparams.Length - 1)
@@ -649,7 +649,9 @@ namespace SICore
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
                                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                                    {
                                         uri = uri.Replace(Constants.GameHost, hostUri.Host);
+                                    }
                                 }
                             }
                             else if (uri.Contains(Constants.ServerHost))

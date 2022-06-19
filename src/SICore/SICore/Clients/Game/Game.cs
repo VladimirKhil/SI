@@ -2540,7 +2540,7 @@ namespace SICore
             ClientData.Players[index] = newAccount;
 
             var playerClient = new Client(newAccount.Name);
-            var player = new Player(playerClient, account, false, LO, new ViewerData { BackLink = ClientData.BackLink });
+            var player = new Player(playerClient, account, false, LO, new ViewerData(ClientData.BackLink));
 
             playerClient.ConnectTo(_client.Server);
             Inform(newAccount.Name);
@@ -2567,7 +2567,7 @@ namespace SICore
             ClientData.ShowMan = newAccount;
 
             var showmanClient = new Client(newAccount.Name);
-            var showman = new Showman(showmanClient, account, false, LO, new ViewerData { BackLink = ClientData.BackLink });
+            var showman = new Showman(showmanClient, account, false, LO, new ViewerData(ClientData.BackLink));
 
             showmanClient.ConnectTo(_client.Server);
             Inform(newAccount.Name);

@@ -694,10 +694,11 @@ namespace SIGame.ViewModel
             OnStartGame(server, host, NetworkGame, false, tempDocFolder, NetworkPort);
         }
 
-        private void Server_Error(Exception exc, bool isWarning)
-        {
-            PlatformManager.Instance.ShowMessage($"{Resources.GameEngineError}: {exc.Message} {exc.InnerException}", isWarning ? MessageType.Warning : MessageType.Error, true);
-        }
+        private void Server_Error(Exception exc, bool isWarning) =>
+            PlatformManager.Instance.ShowMessage(
+                $"{Resources.GameEngineError}: {exc.Message} {exc.InnerException}",
+                isWarning ? MessageType.Warning : MessageType.Error,
+                true);
 
         private void StorageInfo_AddPackage(PackageSource package)
         {

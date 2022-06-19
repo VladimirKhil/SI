@@ -6,7 +6,7 @@
     <Bundle AboutUrl="https://vladimirkhil.com/si/game"
             Name="SIGame"
             Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
-            Version="7.6.0"
+            Version="7.6.1"
             Manufacturer="Khil-soft"
             UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2"
             IconSourceFile="Resources\game.ico">
@@ -24,7 +24,7 @@
 	            Id="SIGame.Setup.x86"
 				Compressed="no"
                 DisplayName="SIGame"
-                SourceFile="..\SIGame.Setup\bin\Release\ru-ru\SIGame.x86.msi"
+                SourceFile="..\SIGame.Setup\bin\Release\x86\ru-ru\SIGame.x86.msi"
 				DownloadUrl="https://vladimirkhil.com/si/sigame/SIGame.x86.msi"
 	            InstallCondition="NOT VersionNT64" />
 
@@ -32,7 +32,7 @@
 			    Id="SIGame.Setup.x64"
 				Compressed="no"
 			    DisplayName="SIGame"
-			    SourceFile="..\SIGame.Setup\bin\Release\ru-ru\SIGame.x64.msi"
+			    SourceFile="..\SIGame.Setup\bin\Release\x64\ru-ru\SIGame.x64.msi"
 				DownloadUrl="https://vladimirkhil.com/si/sigame/SIGame.x64.msi"
 			    InstallCondition="VersionNT64" />
         </Chain>

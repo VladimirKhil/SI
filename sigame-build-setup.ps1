@@ -1,0 +1,1 @@
+& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\deploy\SIGame.Bootstrapper\SIGame.Bootstrapper.wixproj /p:Configuration=Release /p:Platform=$platform /p:OutputPath=bin/Release

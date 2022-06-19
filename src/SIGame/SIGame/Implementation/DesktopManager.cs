@@ -92,6 +92,8 @@ namespace SIGame.Implementation
 
         public override string SelectColor()
         {
+            // TODO: Remove Windows Forms dependency
+
             var diag = new System.Windows.Forms.ColorDialog();
             if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {

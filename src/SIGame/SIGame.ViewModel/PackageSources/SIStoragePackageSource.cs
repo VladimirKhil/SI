@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,12 +10,14 @@ namespace SIGame.ViewModel.PackageSources
     /// <summary>
     /// Источник пакета, использующий поток данных
     /// </summary>
-    internal sealed class SIStoragePackageSource: PackageSource
+    internal sealed class SIStoragePackageSource : PackageSource
     {
         private readonly Uri _packageUri = null;
         private readonly int _id;
         private readonly string _name;
-        private readonly string _packageID;
+        private readonly string _packageId;
+
+        private static readonly HttpClient Client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
 
         public override PackageSourceKey Key =>
             new PackageSourceKey
@@ -24,30 +26,26 @@ namespace SIGame.ViewModel.PackageSources
                 Data = _packageUri.AbsoluteUri,
                 ID = _id,
                 Name = _name,
-                PackageID = _packageID
+                PackageID = _packageId
             };
 
-        public SIStoragePackageSource(Uri packageUri, int id, string name, string packageID)
+        public SIStoragePackageSource(Uri packageUri, int id, string name, string packageId)
         {
             _packageUri = packageUri;
             _id = id;
             _name = name;
-            _packageID = packageID;
+            _packageId = packageId;
         }
 
         public override string Source => $"*{_name}";
 
         public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: rewrite to HttpClient
-            var request = (HttpWebRequest)WebRequest.Create(_packageUri);
-            request.UserAgent = $"{CommonSettings.AppName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";
-
-            var response = await request.GetResponseAsync();
+            var response = await Client.GetAsync(_packageUri, cancellationToken);
 
             var fileName = Path.GetTempFileName();
             using (var fs = File.OpenWrite(fileName))
-            using (var stream = response.GetResponseStream())
+            using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
             {
                 await stream.CopyToAsync(fs, 81920 /* default */, cancellationToken); 
             }
@@ -60,6 +58,6 @@ namespace SIGame.ViewModel.PackageSources
         public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult(Array.Empty<byte>());
 
-        public override string GetPackageId() => _packageID;
+        public override string GetPackageId() => _packageId;
     }
 }

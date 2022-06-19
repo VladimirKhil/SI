@@ -418,7 +418,7 @@ namespace SICore
             .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
             .ToString();
 
-        public ViewerData()
+        public ViewerData(IGameManager gameManager) : base(gameManager)
         {
             Winner = -1;
 

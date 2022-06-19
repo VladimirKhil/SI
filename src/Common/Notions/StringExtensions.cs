@@ -3,18 +3,21 @@ using System.Text;
 
 namespace Notions
 {
+    /// <summary>
+    /// Provides helper methods for manipulating strings.
+    /// </summary>
     public static class StringExtensions
     {
         /// <summary>
-        /// Транслит строки
+        /// Translits a string (converts its non-latin to cirresponding latic characters).
         /// </summary>
-        /// <param name="str">Входная строка</param>
-        /// <returns>Результат</returns>
+        /// <param name="str">Input string.</param>
+        /// <returns>Translitted value.</returns>
         public static string Translit(this string str)
         {
             var res = new StringBuilder();
-            int l = str.Length;
-            for (int i = 0; i < l; i++)
+            var length = str.Length;
+            for (var i = 0; i < length; i++)
             {
                 switch (str[i])
                 {
@@ -302,10 +305,7 @@ namespace Notions
         /// <param name="str">Входная строка</param>
         /// <param name="n">Пределная длина</param>
         /// <returns>Результирующая обрезанная строка</returns>
-        public static string LeaveFirst(this string str, int n)
-        {
-            return (str.Length > n) ? str.Substring(n) + "…" : str;
-        }
+        public static string LeaveFirst(this string str, int n) => (str.Length > n) ? str.Substring(n - 1) + "…" : str;
 
         public static string FormatNumber(this string s, bool format = false)
         {

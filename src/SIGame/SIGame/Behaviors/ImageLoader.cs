@@ -3,8 +3,8 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -13,7 +13,7 @@ namespace SIGame.Behaviors
 {
     public static class ImageLoader
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
 
         public static PersonAccount GetImageSource(DependencyObject obj)
         {

@@ -1471,6 +1471,7 @@ namespace SICore
 
                     account.Name = replacer;
                     account.IsMale = replacerIsMale;
+                    account.Ready = false;
                 }
                 finally
                 {

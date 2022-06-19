@@ -329,7 +329,7 @@ namespace SICore
         /// </summary>
         internal GamePersonAccount ShowMan
         {
-            get { return _showMan; }
+            get => _showMan;
             set
             {
                 _showMan = value;
@@ -482,6 +482,7 @@ namespace SICore
         public bool IsThinking { get; internal set; }
         public bool IsThinkingPaused { get; internal set; }
         public double TimeThinking { get; internal set; }
+
         [Obsolete]
         public DateTime StartTryTime { get; internal set; }
 
@@ -500,5 +501,10 @@ namespace SICore
         public int TargetRoundIndex { get; internal set; }
 
         public RoundInfo[] Rounds { get; internal set; } = new RoundInfo[0];
+
+        public GameData(IGameManager gameManager) : base(gameManager)
+        {
+
+        }
     }
 }

@@ -535,7 +535,7 @@
     <value>Вероятность: вопрос согласно приоритету</value>
   </data>
   <data name="Selection_UseThemePriority" xml:space="preserve">
-    <value>Вероятность: тема согласно приоритету тем"</value>
+    <value>Вероятность: тема согласно приоритету тем</value>
   </data>
   <data name="Sums" xml:space="preserve">
     <value>Суммы</value>

@@ -13,7 +13,7 @@
 
         public override bool Equals(object obj)
         {
-            if (!(obj is Point other))
+            if (obj is not Point other)
                 return base.Equals(obj);
 
             return X == other.X && Y == other.Y;
