@@ -115,6 +115,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка завершения прослушивания клавиатуры.
+        /// </summary>
+        internal static string KeyboardDetachError {
+            get {
+                return ResourceManager.GetString("KeyboardDetachError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка прослушивания клавиатуры.
+        /// </summary>
+        internal static string KeyboardListeningError {
+            get {
+                return ResourceManager.GetString("KeyboardListeningError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Папка для записи логов &quot;{0}&quot; не найдена.
         /// </summary>
         internal static string LogsFolderNotFound {

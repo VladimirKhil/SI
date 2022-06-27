@@ -31,13 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SImulator", "src\SImulator\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "src\Common\Utils\Utils.csproj", "{349CBBC7-36F8-4ED6-B45B-7B34D5B970DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppService.Client", "src\Common\AppService.Client\AppService.Client.csproj", "{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Common\SIService.Client\SIService.Client.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
-		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
-		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
-		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -193,6 +189,22 @@ Global
 		{349CBBC7-36F8-4ED6-B45B-7B34D5B970DD}.Release|x64.Build.0 = Release|Any CPU
 		{349CBBC7-36F8-4ED6-B45B-7B34D5B970DD}.Release|x86.ActiveCfg = Release|Any CPU
 		{349CBBC7-36F8-4ED6-B45B-7B34D5B970DD}.Release|x86.Build.0 = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|ARM.Build.0 = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|x64.Build.0 = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Debug|x86.Build.0 = Debug|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|ARM.Build.0 = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|x64.ActiveCfg = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|x64.Build.0 = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|x86.ActiveCfg = Release|Any CPU
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,8 +220,15 @@ Global
 		{CB2B8CE7-876C-4D16-BFA4-E1F67F949280} = {F7CE4B38-4286-47BA-B5BA-0E4FA77E594E}
 		{7BF7F1CE-2187-4372-9A31-CC0048031E09} = {117739F8-28CD-4CC4-950C-E3513265A87D}
 		{349CBBC7-36F8-4ED6-B45B-7B34D5B970DD} = {069B16F1-8F70-4CFC-8651-E4763D225B60}
+		{A53AC5CA-4073-4A16-8BE2-BA881ADF800B} = {069B16F1-8F70-4CFC-8651-E4763D225B60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F89D1FB6-3468-4F5A-A264-5FA73A287D25}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\Common\SIService.Client\SIService.Client.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{206d6f95-54d5-4029-8b7f-9a7841e2ce02}*SharedItemsImports = 5
+		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
+		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

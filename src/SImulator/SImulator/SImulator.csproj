@@ -7,10 +7,13 @@
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <Version>2.9.0</Version>
+    <Version>2.9.1</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+
+	<!--Keyboard hooks do not work without this option-->
+	<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
   </PropertyGroup>
   <PropertyGroup>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
@@ -48,6 +51,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\AppService.Client\AppService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />

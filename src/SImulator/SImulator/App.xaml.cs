@@ -1,9 +1,13 @@
-﻿using SImulator.Implementation;
+﻿using AppService.Client;
+using AppService.Client.Models;
+using SImulator.Implementation;
 using SImulator.ViewModel;
 using SIUI.ViewModel.Core;
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using Settings = SImulator.ViewModel.Model.AppSettings;
@@ -15,6 +19,8 @@ namespace SImulator
     /// </summary>
     public partial class App : Application
     {
+        private const string AppServiceUri = null; // vendor-specific url
+
 #pragma warning disable IDE0052
         private readonly DesktopManager _manager = new();
 #pragma warning restore IDE0052
@@ -46,6 +52,8 @@ namespace SImulator
                     Description = SImulator.Properties.Resources.TestPackage
                 },
                 new Uri("https://vladimirkhil.com/sistorage/Основные/1.siq"));
+#else
+            ProcessAsync();
 #endif
 
             MainWindow = new CommandWindow { DataContext = main };
@@ -114,7 +122,33 @@ namespace SImulator
             return Settings.Create();
         }
 
-        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        private async void ProcessAsync()
+        {
+            if (AppServiceUri == null)
+            {
+                return;
+            }
+
+            var appService = new AppServiceClient(AppServiceUri);
+            try
+            {
+                // Увеличим счётчик запусков программы
+                await appService.GetProductAsync("SImulator");
+
+                var delayedErrors = Settings.DelayedErrors;
+                while (delayedErrors.Count > 0)
+                {
+                    var error = delayedErrors[0];
+                    await appService.SendErrorReportAsync("SImulator", error.Error, Version.Parse(error.Version), error.Time);
+                    delayedErrors.RemoveAt(0);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             var msg = e.Exception.ToString();
 
@@ -147,6 +181,46 @@ namespace SImulator
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+            else if (e.Exception is Win32Exception)
+            {
+                MessageBox.Show(
+                    e.Exception.Message,
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+#if !DEBUG
+            else if (AppServiceUri != null &&
+                MessageBox.Show(string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message), MainViewModel.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                var appService = new AppServiceClient(AppServiceUri);
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
+                var errorMessage = e.Exception.ToString();
+                try
+                {
+                    var result = await appService.SendErrorReportAsync("SImulator", errorMessage, version, DateTime.Now);
+
+                    switch (result)
+                    {
+                        case ErrorStatus.Fixed:
+                            MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                            break;
+
+                        case ErrorStatus.CannotReproduce:
+                            MessageBox.Show("Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    if (Settings.DelayedErrors.Count < 10)
+                    {
+                        Settings.DelayedErrors.Add(new ViewModel.Core.ErrorInfo { Time = DateTime.Now, Error = errorMessage, Version = version.ToString() });
+                    }
+                }
+            }
+#endif
             else
             {
                 MessageBox.Show(

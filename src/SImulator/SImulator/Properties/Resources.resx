@@ -135,6 +135,12 @@
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Классическая</value>
   </data>
+  <data name="KeyboardDetachError" xml:space="preserve">
+    <value>Ошибка завершения прослушивания клавиатуры</value>
+  </data>
+  <data name="KeyboardListeningError" xml:space="preserve">
+    <value>Ошибка прослушивания клавиатуры</value>
+  </data>
   <data name="LogsFolderNotFound" xml:space="preserve">
     <value>Папка для записи логов "{0}" не найдена</value>
   </data>
