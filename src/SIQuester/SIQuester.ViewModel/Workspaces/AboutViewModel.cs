@@ -1,18 +1,17 @@
-﻿using SIQuester.ViewModel.Helpers;
-using SIQuester.ViewModel.Properties;
+﻿using SIQuester.ViewModel.Properties;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Input;
+using Utils;
 
 namespace SIQuester.ViewModel
 {
     /// <summary>
     /// Информация о программе
     /// </summary>
-    public sealed class AboutViewModel: WorkspaceViewModel
+    public sealed class AboutViewModel : WorkspaceViewModel
     {
         private const string _LicensesFolder = "Licenses";
 
@@ -73,6 +72,16 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void GoToUrl(string url) => Browser.Open(url, OnError);
+        private void GoToUrl(string url)
+        {
+            try
+            {
+                Browser.Open(url);
+            }
+            catch (Exception exc)
+            {
+                OnError(exc);
+            }
+        }
     }
 }

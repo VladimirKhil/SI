@@ -12,6 +12,8 @@
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    Startup="Application_Startup"
+    Exit="Application_Exit"
     DispatcherUnhandledException="Application_DispatcherUnhandledException">
     <Application.Resources>
 

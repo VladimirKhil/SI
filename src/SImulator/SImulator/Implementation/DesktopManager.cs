@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using Services.SI.ViewModel;
-using SIEngine;
 using SImulator.Implementation.ButtonManagers;
 using SImulator.Properties;
 using SImulator.ViewModel;
@@ -10,13 +9,11 @@ using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.DirectoryServices;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
-using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -280,7 +277,17 @@ namespace SImulator.Implementation
         public override void ShowMessage(string text, bool error = true) =>
             MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
 
-        public override void NavigateToSite() => Browser.Open(GameSiteUri, exc => ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message)));
+        public override void NavigateToSite()
+        {
+            try
+            {
+                Browser.Open(GameSiteUri);
+            }
+            catch (Exception exc)
+            {
+                ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message));
+            }
+        }
 
         public override void PlaySound(string name, Action onFinish)
         {

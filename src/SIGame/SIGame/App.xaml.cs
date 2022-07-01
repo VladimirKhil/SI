@@ -1,7 +1,6 @@
 ﻿using SICore.PlatformSpecific;
 using SIGame.Implementation;
 using SIGame.ViewModel;
-using SIUI.ViewModel.Core;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -12,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Utils;
 
 namespace SIGame
 {
@@ -93,7 +93,7 @@ namespace SIGame
                 }
 
                 Trace.TraceInformation("Game launched");
-                
+
                 UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
                 UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;
@@ -187,7 +187,8 @@ namespace SIGame
             if (inner is System.Windows.Markup.XamlParseException
                 || inner is NotImplementedException
                 || inner is TypeInitializationException
-                || inner is FileFormatException)
+                || inner is FileFormatException
+                || inner is SEHException)
             {
                 MessageBox.Show(
                     $"{SIGame.Properties.Resources.Error_RuntimeBroken}: {inner.Message}",

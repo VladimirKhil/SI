@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using Microsoft.Extensions.Logging;
+using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Properties;
@@ -66,9 +67,14 @@ namespace SIQuester.ViewModel
 
         private readonly StorageContextViewModel _storageContextViewModel;
 
-        public NewViewModel(StorageContextViewModel storageContextViewModel)
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<NewViewModel> _logger;
+
+        public NewViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
         {
             _storageContextViewModel = storageContextViewModel;
+            _loggerFactory = loggerFactory;
+            _logger = _loggerFactory.CreateLogger<NewViewModel>();
 
             Create = new SimpleCommand(Create_Executed);
         }
@@ -134,7 +140,9 @@ namespace SIQuester.ViewModel
                         break;
                 }
 
-                OnNewItem(new QDocument(doc, _storageContextViewModel) { FileName = doc.Package.Name });
+                OnNewItem(new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name });
+
+                _logger.LogInformation("New document created. Name: {name}", doc.Package.Name);
 
                 OnClosed();
             }

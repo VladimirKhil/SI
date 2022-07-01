@@ -14,6 +14,8 @@ namespace SIQuester.ViewModel.PlatformSpecific
     {
         internal static PlatformManager Instance;
 
+        public IServiceProvider ServiceProvider { get; set; }
+
         protected PlatformManager()
         {
             Instance = this;

@@ -1,8 +1,8 @@
 ﻿using Lingware.Spard.Expressions;
+using Microsoft.Extensions.Logging;
 using QTxtConverter;
 using SIPackages;
 using SIQuester.Model;
-using SIQuester.ViewModel.Core;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System;
@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using Utils;
 
 namespace SIQuester.ViewModel
 {
@@ -271,10 +272,13 @@ namespace SIQuester.ViewModel
 
         public event Action<int, int, Color?, bool> SelectText;
 
-        public ImportTextViewModel(object arg, StorageContextViewModel storageContextViewModel)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public ImportTextViewModel(object arg, StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
         {
             _arg = arg;
             _storageContextViewModel = storageContextViewModel;
+            _loggerFactory = loggerFactory;
             _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
             #region Aliases
@@ -387,7 +391,7 @@ namespace SIQuester.ViewModel
                     if (!task.IsCanceled)
                     {
                         PlatformManager.Instance.Inform($"{Resources.Success} {themesNum}.");
-                        OnNewItem(new QDocument(_existing, _storageContextViewModel) { FileName = _existing.Package.Name });
+                        OnNewItem(new QDocument(_existing, _storageContextViewModel, _loggerFactory) { FileName = _existing.Package.Name });
                     }
                 }
             }
@@ -631,7 +635,7 @@ namespace SIQuester.ViewModel
                         TaskCreationOptions.None,
                         UI.Scheduler);
 
-                    OnNewItem(new QDocument(_existing, _storageContextViewModel) { FileName = _existing.Package.Name });
+                    OnNewItem(new QDocument(_existing, _storageContextViewModel, _loggerFactory) { FileName = _existing.Package.Name });
                 }
             }
 

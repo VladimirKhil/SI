@@ -1,4 +1,5 @@
-﻿using Notions;
+﻿using Microsoft.Extensions.Logging;
+using Notions;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
@@ -66,9 +67,12 @@ namespace SIQuester.ViewModel
 
         private readonly StorageContextViewModel _storageContextViewModel;
 
-        public ImportDBStorageViewModel(StorageContextViewModel storageContextViewModel)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public ImportDBStorageViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
         {
             _storageContextViewModel = storageContextViewModel;
+            _loggerFactory = loggerFactory;
         }
 
         public void Select(DBNode item)
@@ -76,7 +80,7 @@ namespace SIQuester.ViewModel
             async Task<QDocument> loader()
             {
                 var siDoc = await SelectAsync(item);
-                return new QDocument(siDoc, _storageContextViewModel) { FileName = siDoc.Package.Name, Changed = true };
+                return new QDocument(siDoc, _storageContextViewModel, _loggerFactory) { FileName = siDoc.Package.Name, Changed = true };
             };
 
             OnNewItem(new DocumentLoaderViewModel(item.Name, loader));

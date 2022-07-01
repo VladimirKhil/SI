@@ -1,13 +1,13 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
-using SIQuester.ViewModel.Core;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SIQuester.ViewModel
 {

@@ -502,11 +502,16 @@ namespace SIGame.ViewModel
                     break;
 
                 case PackageSourceTypes.VK:
-                    Browser.Open(
-                        Resources.ThemesLink,
-                        exc => PlatformManager.Instance.ShowMessage(
+                    try
+                    {
+                        Browser.Open(Resources.ThemesLink);
+                    }
+                    catch (Exception exc)
+                    {
+                        PlatformManager.Instance.ShowMessage(
                             string.Format(Resources.VKThemesError + "\r\n{1}", Resources.ThemesLink, exc.Message),
-                            MessageType.Error));
+                            MessageType.Error);
+                    }
                     break;
             }
         }

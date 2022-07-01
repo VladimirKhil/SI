@@ -1,9 +1,10 @@
-﻿using Notions;
+﻿using Microsoft.Extensions.Logging;
+using Notions;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Commands;
-using SIQuester.ViewModel.Core;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Workspaces.Dialogs;
@@ -22,14 +23,24 @@ using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using System.Xml.Xsl;
+using Utils;
 
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Документ, открытый в редакторе
+    /// Represents a document opened inside the editor.
     /// </summary>
-    public sealed class QDocument: WorkspaceViewModel
+    public sealed class QDocument : WorkspaceViewModel
     {
+        /// <summary>
+        /// Overriden file path which will be used for file saving.
+        /// </summary>
+        public string OverridePath { get; set; }
+
+        public string OriginalPath { get; set; }
+
+        internal Lock Lock { get; }
+
         /// <summary>
         /// Созданный объект
         /// </summary>
@@ -52,40 +63,27 @@ namespace SIQuester.ViewModel
         public MediaStorageViewModel Audio { get; private set; }
         public MediaStorageViewModel Video { get; private set; }
 
+        private readonly ILogger<QDocument> _logger;
+
         private bool _isProgress;
 
         public bool IsProgress
         {
-            get { return _isProgress; }
+            get => _isProgress;
             set { if (_isProgress != value) { _isProgress = value; OnPropertyChanged(); } }
-        }
-
-        private bool _isLocked = false;
-
-        public bool IsLocked
-        {
-            get { return _isLocked; }
-            set
-            {
-                if (_isLocked != value)
-                {
-                    _isLocked = value;
-
-                    SendToGame.CanBeExecuted = !value;
-                }
-            }
         }
 
         private object _dialog = null;
 
         public object Dialog
         {
-            get { return _dialog; }
+            get => _dialog;
             set
             {
                 if (_dialog != value)
                 {
                     _dialog = value;
+
                     if (_dialog is WorkspaceViewModel workspace)
                     {
                         workspace.Closed += Workspace_Closed;
@@ -260,7 +258,6 @@ namespace SIQuester.ViewModel
         /// Имеются ли какие-то ссылки в документе на мультимедиа
         /// </summary>
         /// <param name="link"></param>
-        /// <returns></returns>
         private bool HasLinksTo(string link)
         {
             foreach (var round in Document.Package.Rounds)
@@ -377,7 +374,7 @@ namespace SIQuester.ViewModel
         /// </summary>
         public IItemViewModel ActiveNode
         {
-            get { return _activeNode; }
+            get => _activeNode;
             set
             {
                 if (_activeNode != value)
@@ -393,7 +390,7 @@ namespace SIQuester.ViewModel
 
         public object ActiveItem
         {
-            get { return _activeItem; }
+            get => _activeItem;
             set
             {
                 if (_activeItem != value)
@@ -438,11 +435,6 @@ namespace SIQuester.ViewModel
 
         public SIDocument Document { get; private set; } = null;
 
-        /// <summary>
-        /// Объект синхронизации, гарантирующий то, что в момент доступа к медиа-файлам пакет не будет меняться или закрываться
-        /// </summary>
-        public object Sync { get; } = new object();
-
         public PackageViewModel Package { get; }
 
         public PackageViewModel[] Packages => new PackageViewModel[] { Package };
@@ -460,6 +452,7 @@ namespace SIQuester.ViewModel
                 if (_path != value)
                 {
                     _path = value;
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(Header));
                     OnPropertyChanged(nameof(ToolTip));
@@ -469,114 +462,70 @@ namespace SIQuester.ViewModel
 
         public override string ToolTip => _path;
 
-        private bool NeedSave()
-        {
-            return Changed || string.IsNullOrEmpty(_path);
-        }
+        private bool NeedSave() => Changed || string.IsNullOrEmpty(_path);
 
-        private static string EncodePath(string path)
-        {
-            var result = new StringBuilder();
-
-            for (int i = 0; i < path.Length; i++)
-            {
-                var c = path[i];
-                if (c == '%')
-                    result.Append("%%");
-                else if (c == '\\')
-                    result.Append("%)");
-                else if (c == '/')
-                    result.Append("%(");
-                else if (c == ':')
-                    result.Append("%;");
-                else
-                    result.Append(c);
-            }
-
-            return result.ToString();
-        }
-
-        internal static string DecodePath(string path)
-        {
-            var result = new StringBuilder();
-
-            for (int i = 0; i < path.Length; i++)
-            {
-                var c = path[i];
-                if (c == '%' && i + 1 < path.Length)
-                {
-                    var c1 = path[++i];
-                    if (c1 == '%')
-                        result.Append('%');
-                    else if (c1 == ')')
-                        result.Append('\\');
-                    else if (c1 == '(')
-                        result.Append('/');
-                    else if (c1 == ';')
-                        result.Append(':');
-                    else
-                        result.Append(c).Append(c1);
-                }
-                else
-                    result.Append(c);
-            }
-
-            return result.ToString();
-        }
-
-        protected internal override async Task SaveIfNeeded(bool temp)
+        protected internal override async Task SaveIfNeeded(bool temp, bool full)
         {
             if (temp)
             {
                 if (_changed && _lastChangedTime > _lastSavedTime && _path.Length > 0)
                 {
-                    lock (Sync)
-                    {
-                        if (IsLocked)
-                            return;
-
-                        IsLocked = true;
-                    }
-
-                    try
+                    await Lock.WithLockAsync(async () =>
                     {
                         // Автосохранение документа по временном пути
-                        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester");
+                        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), full ? "SIQuester" : "SIQuesterData");
                         Directory.CreateDirectory(path);
 
-                        var tempName = System.IO.Path.Combine(path, EncodePath(_path));
-                        using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
+                        if (full)
                         {
-                            using var tempDoc = Document.SaveAs(stream, !temp);
-                            if (Images.HasPendingChanges)
-                                await Images.ApplyToAsync(tempDoc.Images);
+                            var tempName = System.IO.Path.Combine(path, PathHelper.EncodePath(_path));
+                            using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
+                            {
+                                using var tempDoc = Document.SaveAs(stream, false);
 
-                            if (Audio.HasPendingChanges)
-                                await Audio.ApplyToAsync(tempDoc.Audio);
+                                if (Images.HasPendingChanges)
+                                {
+                                    await Images.ApplyToAsync(tempDoc.Images);
+                                }
 
-                            if (Video.HasPendingChanges)
-                                await Video.ApplyToAsync(tempDoc.Video);
+                                if (Audio.HasPendingChanges)
+                                {
+                                    await Audio.ApplyToAsync(tempDoc.Audio);
+                                }
 
-                            tempDoc.FinalizeSave();
+                                if (Video.HasPendingChanges)
+                                {
+                                    await Video.ApplyToAsync(tempDoc.Video);
+                                }
+
+                                tempDoc.FinalizeSave();
+                            }
+
+                            _logger.LogInformation("Document has been autosaved to {path}", tempName);
+
+                            _lastSavedTime = DateTime.Now;
                         }
-
-                        _lastSavedTime = DateTime.Now;
-                    }
-                    finally
-                    {
-                        SetUnlock();
-                    }
+                        else
+                        {
+                            var tempName = System.IO.Path.Combine(path, Uri.EscapeDataString(Package.Model.Name) + ".xml");
+                            using var stream = File.Create(tempName);
+                            using var writer = XmlWriter.Create(stream);
+                            Document.Package.WriteXml(writer);
+                        }
+                    });
                 }
             }
             else if (NeedSave())
+            {
                 await Save.ExecuteAsync(null);
+            }
         }
 
         private string _filename = null;
 
         public string FileName
         {
-            get { return _filename; }
+            get => _filename;
             set
             {
                 if (_filename != value)
@@ -593,10 +542,7 @@ namespace SIQuester.ViewModel
         /// </summary>
         public bool Changed
         {
-            get
-            {
-                return _changed;
-            }
+            get => _changed;
             set
             {
                 if (_changed != value)
@@ -607,7 +553,9 @@ namespace SIQuester.ViewModel
                 }
 
                 if (_changed)
+                {
                     _lastChangedTime = DateTime.Now;
+                }
             }
         }
 
@@ -617,8 +565,6 @@ namespace SIQuester.ViewModel
         public override string Header => $"{FileName}{(NeedSave() ? "*" : "")}";
 
         public SearchResults SearchResults { get; private set; } = null;
-
-
 
         private AuthorsStorageViewModel _authors;
 
@@ -671,28 +617,36 @@ namespace SIQuester.ViewModel
         {
             Package.Model.PropertyChanged += Object_PropertyValueChanged;
             Package.Rounds.CollectionChanged += Object_CollectionChanged;
+
             Listen(Package);
+
             foreach (var round in Package.Rounds)
             {
                 round.Model.PropertyChanged += Object_PropertyValueChanged;
                 round.Themes.CollectionChanged += Object_CollectionChanged;
+
                 Listen(round);
+
                 foreach (var theme in round.Themes)
                 {
                     theme.Model.PropertyChanged += Object_PropertyValueChanged;
                     theme.Questions.CollectionChanged += Object_CollectionChanged;
+
                     Listen(theme);
+
                     foreach (var question in theme.Questions)
                     {
                         question.Model.PropertyChanged += Object_PropertyValueChanged;
                         question.Type.PropertyChanged += Object_PropertyValueChanged;
                         question.Type.Params.CollectionChanged += Object_CollectionChanged;
+
                         foreach (var param in question.Type.Params)
                         {
                             param.PropertyChanged += Object_PropertyValueChanged;
                         }
 
                         question.Scenario.CollectionChanged += Object_CollectionChanged;
+
                         foreach (var atom in question.Model.Scenario)
                         {
                             atom.PropertyChanged += Object_PropertyValueChanged;
@@ -700,20 +654,23 @@ namespace SIQuester.ViewModel
 
                         question.Right.CollectionChanged += Object_CollectionChanged;
                         question.Wrong.CollectionChanged += Object_CollectionChanged;
+
                         Listen(question);
                     }
                 }
             }
 
-            Images.HasChanged += Images_Commited;
-            Audio.HasChanged += Images_Commited;
-            Video.HasChanged += Images_Commited;
+            Images.HasChanged += Media_Commited;
+            Audio.HasChanged += Media_Commited;
+            Video.HasChanged += Media_Commited;
         }
 
         private void Object_PropertyValueChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_isMakingUndo)
+            {
                 return;
+            }
 
             if (e.PropertyName == nameof(Question.Price) || e.PropertyName == nameof(Atom.AtomTime))
             {
@@ -730,6 +687,7 @@ namespace SIQuester.ViewModel
                 if (sender is QuestionTypeViewModel questionType)
                 {
                     BeginChange();
+
                     try
                     {
                         AddChange(new SimplePropertyValueChange { Element = sender, PropertyName = e.PropertyName, Value = ext.OldValue });
@@ -740,17 +698,23 @@ namespace SIQuester.ViewModel
                         }
 
                         var typeName = questionType.Model.Name;
-                        if (typeName == QuestionTypes.Cat || typeName == QuestionTypes.BagCat || typeName == QuestionTypes.Auction
-                            || typeName == QuestionTypes.Simple || typeName == QuestionTypes.Sponsored)
+                        if (typeName == QuestionTypes.Cat ||
+                            typeName == QuestionTypes.BagCat ||
+                            typeName == QuestionTypes.Auction ||
+                            typeName == QuestionTypes.Simple ||
+                            typeName == QuestionTypes.Sponsored)
                         {
                             while (questionType.Params.Count > 0) // Очистим по одному, чтобы иметь возможность отката (Undo reset не работает)
+                            {
                                 questionType.Params.RemoveAt(0);
+                            }
                         }
 
                         if (typeName == QuestionTypes.Cat || typeName == QuestionTypes.BagCat)
                         {
                             questionType.AddParam(QuestionTypeParams.Cat_Theme, "");
                             questionType.AddParam(QuestionTypeParams.Cat_Cost, "0");
+
                             if (typeName == QuestionTypes.BagCat)
                             {
                                 questionType.AddParam(QuestionTypeParams.BagCat_Self, QuestionTypeParams.BagCat_Self_Value_False);
@@ -778,10 +742,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void Images_Commited()
-        {
-            Changed = true;
-        }
+        private void Media_Commited() => Changed = true;
 
         private void Listen(IItemViewModel owner)
         {
@@ -800,7 +761,9 @@ namespace SIQuester.ViewModel
         private void AddChange(IChange change)
         {
             if (_isMakingUndo)
+            {
                 return;
+            }
 
             if (_changeGroup != null)
             {
@@ -811,7 +774,9 @@ namespace SIQuester.ViewModel
                 if (_undoList.Any())
                 {
                     if (_undoList.Peek().Equals(change))
+                    {
                         return;
+                    }
 
                     if (_undoList.Count == MaxUndoListCount * 2)
                     {
@@ -826,8 +791,10 @@ namespace SIQuester.ViewModel
 
                 _undoList.Push(change);
                 CheckUndoCanBeExecuted();
+
                 _redoList.Clear();
                 CheckRedoCanBeExecuted();
+
                 Changed = true;
             }
         }
@@ -835,7 +802,9 @@ namespace SIQuester.ViewModel
         private void Object_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_isMakingUndo)
+            {
                 return;
+            }
 
             switch (e.Action)
             {
@@ -847,30 +816,40 @@ namespace SIQuester.ViewModel
                             Listen(itemViewModel);
                             itemViewModel.GetModel().PropertyChanged += Object_PropertyValueChanged;
                             if (itemViewModel is PackageViewModel package)
+                            {
                                 package.Rounds.CollectionChanged += Object_CollectionChanged;
+                            }
                             else
                             {
                                 if (itemViewModel is RoundViewModel round)
+                                {
                                     round.Themes.CollectionChanged += Object_CollectionChanged;
+                                }
                                 else
                                 {
                                     if (itemViewModel is ThemeViewModel theme)
+                                    {
                                         theme.Questions.CollectionChanged += Object_CollectionChanged;
+                                    }
                                     else
                                     {
                                         var questionViewModel = (QuestionViewModel)itemViewModel;
 
                                         questionViewModel.Type.PropertyChanged += Object_PropertyValueChanged;
                                         questionViewModel.Type.Params.CollectionChanged += Object_CollectionChanged;
+
                                         foreach (var param in questionViewModel.Type.Params)
                                         {
                                             param.PropertyChanged += Object_PropertyValueChanged;
                                         }
+
                                         questionViewModel.Scenario.CollectionChanged += Object_CollectionChanged;
+
                                         foreach (var atom in questionViewModel.Scenario)
                                         {
                                             atom.PropertyChanged += Object_PropertyValueChanged;
                                         }
+
                                         questionViewModel.Right.CollectionChanged += Object_CollectionChanged;
                                         questionViewModel.Wrong.CollectionChanged += Object_CollectionChanged;
                                     }
@@ -943,6 +922,7 @@ namespace SIQuester.ViewModel
                     if (e.NewItems.Count == e.OldItems.Count)
                     {
                         bool equals = true;
+
                         for (int i = 0; i < e.NewItems.Count; i++)
                         {
                             if (!e.NewItems[i].Equals(e.OldItems[i]))
@@ -951,8 +931,11 @@ namespace SIQuester.ViewModel
                                 break;
                             }
                         }
+
                         if (equals)
+                        {
                             return;
+                        }
                     }
                     break;
 
@@ -965,8 +948,15 @@ namespace SIQuester.ViewModel
 
         public StorageContextViewModel StorageContext { get; set; }
 
-        internal QDocument(SIDocument document, StorageContextViewModel storageContextViewModel)
+        private readonly ILoggerFactory _loggerFactory;
+
+        internal QDocument(SIDocument document, StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
         {
+            Lock = new Lock(document.Package.Name);
+
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<QDocument>();
+
             StorageContext = storageContextViewModel;
 
             ImportSiq = new SimpleCommand(ImportSiq_Executed);
@@ -1020,6 +1010,7 @@ namespace SIQuester.ViewModel
             Package.IsExpanded = true;
             Package.IsSelected = true;
             ActiveNode = Package;
+
             foreach (var round in Package.Rounds)
             {
                 round.IsExpanded = true;
@@ -1044,7 +1035,7 @@ namespace SIQuester.ViewModel
         {
             try
             {
-                await SaveIfNeeded(false);
+                await SaveIfNeeded(false, true);
 
                 var checkResult = Validate();
                 if (!string.IsNullOrWhiteSpace(checkResult))
@@ -1061,61 +1052,25 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void SetUnlock()
-        {
-            lock (Sync)
-            {
-                IsLocked = false;
-            }
-
-            Dialog = null;
-        }
-
-        private async Task<bool> SetLock()
-        {
-            var retry = false;
-            lock (Sync)
-            {
-                if (IsLocked)
-                    retry = true;
-                else
-                    IsLocked = true;
-            }
-
-            if (retry)
-            {
-                await Task.Delay(5000);
-                lock (Sync)
-                {
-                    if (IsLocked)
-                    {
-                        PlatformManager.Instance.ShowExclamationMessage("Не удалось выполнить операцию! Пожалуйста, попробуйте ещё раз.");
-                        return false;
-                    }
-                    else
-                        IsLocked = true;
-                }
-            }
-
-            Dialog = new WaitDialogViewModel();
-            return true;
-        }
-
         public string Validate()
         {
             if (string.IsNullOrWhiteSpace(Package.Model.ID))
+            {
                 Package.Model.ID = Guid.NewGuid().ToString();
+            }
 
             return CheckLinks();
         }
 
-        private void FillFiles(List<string> files, MediaStorageViewModel mediaStorage, List<string> errors)
+        private static void FillFiles(List<string> files, MediaStorageViewModel mediaStorage, List<string> errors)
         {
             foreach (var item in mediaStorage.Files)
             {
                 var name = item.Model.Name;
                 if (files.Contains(name))
+                {
                     errors.Add($"Файл \"{name}\" содержится в пакете дважды!");
+                }
 
                 files.Add(name);
             }
@@ -1124,7 +1079,6 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Проверка битых ссылок и лишних файлов
         /// </summary>
-        /// <returns></returns>
         internal string CheckLinks(bool allowExternal = false)
         {
             var images = new List<string>();
@@ -1444,19 +1398,28 @@ namespace SIQuester.ViewModel
             {
                 if (OverridePath != null)
                 {
-                    await SaveAsInternal(OverridePath);
+                    await SaveAsInternalAsync(OverridePath);
                     OverridePath = null;
 
                     File.Delete(OriginalPath);
+
+                    _logger.LogInformation("Original file deleted. Path: {path}", OriginalPath);
+
                     OriginalPath = null;
                 }
                 else if (_path.Length > 0)
-                    await SaveInternal();
+                {
+                    await SaveInternalAsync();
+                }
                 else
+                {
                     await SaveAs();
+                }
             }
             catch (Exception exc)
             {
+                _logger.LogError(exc, "Saving error: {error}", exc.Message);
+
                 OnError(exc);
             }
         }
@@ -1711,7 +1674,9 @@ namespace SIQuester.ViewModel
         private void Navigate_Executed(object arg)
         {
             if (_activeNode != null)
+            {
                 _activeNode.IsSelected = false;
+            }
 
             if (arg == null)
             {
@@ -1734,105 +1699,116 @@ namespace SIQuester.ViewModel
             ActiveItem = null;
         }
 
-        internal async Task SaveInternal()
-        {
-            if (!await SetLock())
-                return;
+        internal ValueTask SaveInternalAsync() =>
+             Lock.WithLockAsync(async () =>
+             {
+                 // Saving at temporary path to validate saved file first
+                 var tempPath = System.IO.Path.GetTempFileName();
+                 var tempStream = File.Open(tempPath, FileMode.Open, FileAccess.ReadWrite);
 
-            try
+                 Document.SaveAs(tempStream, true);
+
+                 if (Images.HasPendingChanges)
+                 {
+                     await Images.CommitAsync(Document.Images);
+                 }
+
+                 if (Audio.HasPendingChanges)
+                 {
+                     await Audio.CommitAsync(Document.Audio);
+                 }
+
+                 if (Video.HasPendingChanges)
+                 {
+                     await Video.CommitAsync(Document.Video);
+                 }
+
+                 Document.Dispose(); // tempStream is disposed here
+
+                 _logger.LogInformation("SaveInternalAsync: document has been saved to temp path: {path}", tempPath);
+
+                 try
+                 {
+                     // Checking saved document
+                     var testStream = File.Open(tempPath, FileMode.Open, FileAccess.Read);
+
+                     using (SIDocument.Load(testStream)) { }
+
+                     File.Copy(tempPath, _path, true);
+
+                     _logger.LogInformation("SaveInternalAsync: document has been validated and saved to final path: {path}", _path);
+                 }
+                 finally
+                 {
+                     File.Delete(tempPath);
+                 }
+
+                 Changed = false;
+
+                 ClearTempFile(_path);
+
+                 var stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
+
+                 Document.ResetTo(stream);
+             });
+
+        internal ValueTask SaveAsInternalAsync(string path) =>
+            Lock.WithLockAsync(async () =>
             {
-                // Сначала сохраним во временный файл (для надёжности)
-                // А то бывают случаи, когда сохранённый файл оказывался нечитаем
-                var tempPath = System.IO.Path.GetTempFileName();
-                var tempStream = File.Open(tempPath, FileMode.Open, FileAccess.ReadWrite);
-
-                Document.SaveAs(tempStream, true);
-
-                if (Images.HasPendingChanges)
-                    await Images.CommitAsync(Document.Images);
-
-                if (Audio.HasPendingChanges)
-                    await Audio.CommitAsync(Document.Audio);
-
-                if (Video.HasPendingChanges)
-                    await Video.CommitAsync(Document.Video);
-
-                Document.Dispose();
-                // Проверим качество сохранения
-
-                var testStream = File.Open(tempPath, FileMode.Open, FileAccess.Read);
-                using (SIDocument.Load(testStream)) { }
-
-                File.Copy(tempPath, _path, true);
-                File.Delete(tempPath);
-
-                Changed = false;
-
-                ClearTempFile(_path);
-
-                var stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
-                Document.ResetTo(stream);
-            }
-            finally
-            {
-                SetUnlock();
-            }
-        }
-
-        internal async Task SaveAsInternal(string path)
-        {
-            if (!await SetLock())
-                return;
-
-            FileStream stream = null;
-            try
-            {
-                stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
-                Document.SaveAs(stream, true);
-
-                if (Images.HasPendingChanges)
-                    await Images.CommitAsync(Document.Images);
-
-                if (Audio.HasPendingChanges)
-                    await Audio.CommitAsync(Document.Audio);
-
-                if (Video.HasPendingChanges)
-                    await Video.CommitAsync(Document.Video);
-
-                Document.Dispose();
-                ClearTempFile(_path);
-
-                Path = path;
-                Changed = false;
-
-                FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
-
-                stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
-                Document.ResetTo(stream);
-            }
-            catch
-            {
-                if (stream != null)
+                FileStream stream = null;
+                try
                 {
-                    stream.Dispose();
-                }
+                    stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
+                    Document.SaveAs(stream, true);
 
-                throw;
-            }
-            finally
-            {
-                SetUnlock();
-            }
-        }
+                    if (Images.HasPendingChanges)
+                    {
+                        await Images.CommitAsync(Document.Images);
+                    }
+
+                    if (Audio.HasPendingChanges)
+                    {
+                        await Audio.CommitAsync(Document.Audio);
+                    }
+
+                    if (Video.HasPendingChanges)
+                    {
+                        await Video.CommitAsync(Document.Video);
+                    }
+
+                    Document.Dispose(); // stream is disposed here
+                    _logger.LogInformation("SaveAsInternalAsync: document has been saved as {path}", path);
+
+                    ClearTempFile(_path);
+
+                    Path = path;
+                    Changed = false;
+
+                    FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
+
+                    stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
+                    Document.ResetTo(stream);
+                }
+                catch
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                    }
+
+                    throw;
+                }
+            });
 
         private void ClearTempFile(string path)
         {
-            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester", EncodePath(path));
+            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester", PathHelper.EncodePath(path));
             if (File.Exists(tempPath))
             {
                 try
                 {
                     File.Delete(tempPath);
+                    _logger.LogInformation("Temporary file deleted. File path: {path}", tempPath);
                 }
                 catch (Exception exc)
                 {
@@ -1865,12 +1841,14 @@ namespace SIQuester.ViewModel
 
                 if (PlatformManager.Instance.ShowSaveUI(null, "siq", filter, ref filename))
                 {
-                    await SaveAsInternal(filename);
+                    await SaveAsInternalAsync(filename);
                     AppSettings.Default.History.Add(filename);
                 }
             }
             catch (Exception exc)
             {
+                _logger.LogError(exc, "SavingAs error: {error}", exc.Message);
+
                 OnError(exc);
             }
         }
@@ -2080,18 +2058,26 @@ namespace SIQuester.ViewModel
         private void WikifyAsync()
         {
             WikifyInfoOwner(Package);
+
             foreach (var round in Package.Rounds)
             {
                 WikifyInfoOwner(round);
+
                 foreach (var theme in round.Themes)
                 {
                     WikifyInfoOwner(theme);
+
                     theme.Model.Name = theme.Model.Name.Wikify();
+
                     foreach (var quest in theme.Questions)
                     {
                         foreach (var atom in quest.Scenario)
+                        {
                             if (atom.Model.Type == AtomTypes.Text)
+                            {
                                 atom.Model.Text = atom.Model.Text.Wikify();
+                            }
+                        }
 
                         for (int i = 0; i < quest.Right.Count; i++)
                         {
@@ -2100,6 +2086,7 @@ namespace SIQuester.ViewModel
                             if (newValue != value)
                             {
                                 var index = i;
+                                // ObservableCollection should be modified in the UI thread
                                 Task.Factory.StartNew(() => { quest.Right[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
                             }
                         }
@@ -2111,6 +2098,7 @@ namespace SIQuester.ViewModel
                             if (newValue != value)
                             {
                                 var index = i;
+                                // ObservableCollection should be modified in the UI thread
                                 Task.Factory.StartNew(() => { quest.Wrong[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
                             }
                         }
@@ -2504,7 +2492,7 @@ namespace SIQuester.ViewModel
 
         private void SelectThemes_Executed(object arg)
         {
-            var selectThemesViewModel = new SelectThemesViewModel(this);
+            var selectThemesViewModel = new SelectThemesViewModel(this, _loggerFactory);
             selectThemesViewModel.NewItem += OnNewItem;
             Dialog = selectThemesViewModel;
         }
@@ -2512,6 +2500,7 @@ namespace SIQuester.ViewModel
         private void ExpandAll_Executed(object arg)
         {
             var expand = Convert.ToBoolean(arg);
+
             foreach (var round in Package.Rounds)
             {
                 foreach (var theme in round.Themes)
@@ -2582,15 +2571,14 @@ namespace SIQuester.ViewModel
             if (OriginalPath != null)
             {
                 File.Delete(OriginalPath);
+
+                _logger.LogInformation("Dispose: original file deleted. Path: {path}", OriginalPath);
+
                 OriginalPath = null;
             }
 
             base.Dispose(disposing);
         }
-
-        public string OverridePath { get; set; }
-
-        public string OriginalPath { get; set; }
 
         internal IMedia Wrap(AtomViewModel atomViewModel)
         {

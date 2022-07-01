@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
     <Version>7.6.0</Version>
-    <LangVersion>8</LangVersion>
     <Description>SIGame data</Description>
     <Copyright>Copyright © Khil-soft 2012 - 2022</Copyright>
   </PropertyGroup>
@@ -17,7 +16,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />

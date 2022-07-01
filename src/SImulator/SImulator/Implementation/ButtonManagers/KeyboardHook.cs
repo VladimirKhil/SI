@@ -5,6 +5,7 @@ using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -26,7 +27,11 @@ namespace SImulator.Implementation.ButtonManagers
 
         public override bool Run()
         {
-            _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, Marshal.GetHINSTANCE(Application.Current.GetType().Module), 0);
+            using (var process = Process.GetCurrentProcess())
+            using (var module = process.MainModule)
+            {
+                _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, module.BaseAddress, 0);
+            }
 
             if (_hookPtr == IntPtr.Zero)
             {

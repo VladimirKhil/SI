@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Utils;
 using R = SICore.Properties.Resources;
 
 namespace SICore
@@ -507,7 +508,10 @@ namespace SICore
                     {
                         _data.BackLink.SendError(exc);
                     }
-                }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                },
+                CancellationToken.None,
+                TaskCreationOptions.None,
+                UI.Scheduler);
         }
 
         virtual public async void Choice()

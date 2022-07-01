@@ -17,6 +17,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SImulator.ViewModel
 {

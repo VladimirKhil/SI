@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Windows.Input;
 using System.Threading;
 using System.Threading.Tasks;
-using SIUI.ViewModel.Core;
+using System.Windows.Input;
+using Utils;
 
 namespace SIUI.ViewModel
 {

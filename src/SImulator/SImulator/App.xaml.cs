@@ -1,15 +1,21 @@
 ﻿using AppService.Client;
 using AppService.Client.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
-using SIUI.ViewModel.Core;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using Utils;
 using Settings = SImulator.ViewModel.Model.AppSettings;
 
 namespace SImulator
@@ -19,7 +25,7 @@ namespace SImulator
     /// </summary>
     public partial class App : Application
     {
-        private const string AppServiceUri = null; // vendor-specific url
+        private IHost _host;
 
 #pragma warning disable IDE0052
         private readonly DesktopManager _manager = new();
@@ -31,6 +37,50 @@ namespace SImulator
         private const string ConfigFileName = "user.config";
 
         internal Settings Settings { get; } = LoadSettings();
+
+        private IConfiguration _configuration;
+
+        private bool _useAppService;
+
+        private async void Application_Startup(object sender, StartupEventArgs e)
+        {
+            _host = new HostBuilder()
+#if DEBUG
+                .UseEnvironment("Development")
+#endif
+                .ConfigureAppConfiguration((context, configurationBuilder) =>
+                {
+                    var env = context.HostingEnvironment;
+
+                    configurationBuilder
+                        .SetBasePath(context.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile("appsettings.json", optional: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                    _configuration = configurationBuilder.Build();
+                })
+                .ConfigureServices(ConfigureServices)
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
+                })
+                .UseNLog()
+                .Build();
+
+            await _host.StartAsync();
+
+            var options = _configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
+            var appServiceClientOptions = options.Get<AppServiceClientOptions>();
+
+            _useAppService = appServiceClientOptions.ServiceUri != null;
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddAppServiceClient(_configuration);
+
+            services.AddTransient<CommandWindow>();
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -58,6 +108,11 @@ namespace SImulator
 
             MainWindow = new CommandWindow { DataContext = main };
             MainWindow.Show();
+        }
+
+        private async void Application_Exit(object sender, ExitEventArgs e)
+        {
+            await _host.StopAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -124,12 +179,12 @@ namespace SImulator
 
         private async void ProcessAsync()
         {
-            if (AppServiceUri == null)
+            if (!_useAppService)
             {
                 return;
             }
 
-            var appService = new AppServiceClient(AppServiceUri);
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
             try
             {
                 // Увеличим счётчик запусков программы
@@ -189,38 +244,59 @@ namespace SImulator
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
-#if !DEBUG
-            else if (AppServiceUri != null &&
-                MessageBox.Show(string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message), MainViewModel.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            else if (_useAppService &&
+                MessageBox.Show(
+                    string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message),
+                    MainViewModel.ProductName,
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                var appService = new AppServiceClient(AppServiceUri);
+                using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
                 var version = Assembly.GetExecutingAssembly().GetName().Version;
-                var errorMessage = e.Exception.ToString();
+                var errorMessage = e.Exception.ToStringDemystified();
                 try
                 {
-                    var result = await appService.SendErrorReportAsync("SImulator", errorMessage, version, DateTime.Now);
+                    var result = await appService.SendErrorReportAsync("SImulator", errorMessage, version, DateTime.UtcNow);
 
                     switch (result)
                     {
                         case ErrorStatus.Fixed:
-                            MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                            MessageBox.Show(
+                                "Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.",
+                                MainViewModel.ProductName,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
                             break;
 
                         case ErrorStatus.CannotReproduce:
-                            MessageBox.Show("Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Information);
+                            MessageBox.Show(
+                                "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
+                                MainViewModel.ProductName,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information);
                             break;
                     }
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        "Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.",
+                        MainViewModel.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
                     if (Settings.DelayedErrors.Count < 10)
                     {
-                        Settings.DelayedErrors.Add(new ViewModel.Core.ErrorInfo { Time = DateTime.Now, Error = errorMessage, Version = version.ToString() });
+                        Settings.DelayedErrors.Add(
+                            new ViewModel.Core.ErrorInfo
+                            {
+                                Time = DateTime.Now,
+                                Error = errorMessage,
+                                Version = version.ToString()
+                            });
                     }
                 }
             }
-#endif
             else
             {
                 MessageBox.Show(

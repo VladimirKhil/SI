@@ -381,11 +381,11 @@ namespace SIQuester.ViewModel
                 return new Media(p.Value.Item1);
             }
 
-            lock (_document.Sync)
+            return _document.Lock.WithLock(() =>
             {
                 var collection = _document.GetCollection(_name);
                 return PlatformSpecific.PlatformManager.Instance.PrepareMedia(new Media(() => collection.GetFile(link), link), collection.Name);
-            }
+            });
         }
     }
 }

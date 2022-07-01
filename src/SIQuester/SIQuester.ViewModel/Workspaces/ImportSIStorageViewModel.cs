@@ -1,4 +1,5 @@
-﻿using Services.SI.ViewModel;
+﻿using Microsoft.Extensions.Logging;
+using Services.SI.ViewModel;
 using SIQuester.ViewModel.Properties;
 using System;
 using System.ComponentModel;
@@ -20,9 +21,12 @@ namespace SIQuester.ViewModel
 
         public bool IsProgress => Storage.IsLoading || Storage.IsLoadingPackages;
 
-        public ImportSIStorageViewModel(StorageContextViewModel storageContextViewModel)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public ImportSIStorageViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
         {
             _storageContextViewModel = storageContextViewModel;
+            _loggerFactory = loggerFactory;
 
             Storage.Error += OnError;
             Storage.PropertyChanged += Storage_PropertyChanged;
@@ -62,7 +66,7 @@ namespace SIQuester.ViewModel
                 ms.Position = 0;
                 var doc = SIPackages.SIDocument.Load(ms);
 
-                return new QDocument(doc, _storageContextViewModel) { FileName = doc.Package.Name };
+                return new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name };
             };
 
             OnNewItem(new DocumentLoaderViewModel(Storage.CurrentPackage.Description, loader));

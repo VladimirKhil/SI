@@ -1,20 +1,24 @@
 ﻿using AppService.Client.Models;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
 
 namespace AppService.Client
 {
-    public sealed class AppServiceClient
+    public sealed class AppServiceClient : IAppServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
-        private static readonly HttpClient Client = new();
 
-        private readonly string _address;
+        private readonly HttpClient _client;
+        private readonly AppServiceClientOptions _options;
 
-        public AppServiceClient(string address)
+        public AppServiceClient(HttpClient client, IOptions<AppServiceClientOptions> options)
         {
-            _address = address;
+            _options = options.Value;
+
+            _client = client;
+            _client.BaseAddress = _options.ServiceUri;
         }
 
         public async Task<AppInfo> GetProductAsync(string name)
@@ -59,7 +63,7 @@ namespace AppService.Client
 
             var content = new StringContent(sb.ToString(), Encoding.UTF8, "application/json");
 
-            using var response = await Client.PostAsync(_address + "/SendErrorReport2", content);
+            using var response = await _client.PostAsync("SendErrorReport2", content);
             using var stream = await response.Content.ReadAsStreamAsync();
             using var reader = new StreamReader(stream);
 
@@ -68,10 +72,12 @@ namespace AppService.Client
 
         private async Task<T?> CallAsync<T>(string request)
         {
-            using var stream = await Client.GetStreamAsync(_address + "/" + request);
+            using var stream = await _client.GetStreamAsync(request);
             using var reader = new StreamReader(stream);
 
             return (T?)Serializer.Deserialize(reader, typeof(T));
         }
+
+        public void Dispose() => _client.Dispose();
     }
 }
