@@ -3,7 +3,10 @@ using SICore.BusinessLogic;
 using SICore.Connections;
 using SICore.Network;
 using SICore.Network.Clients;
+using SIPackages;
+using SIPackages.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using R = SICore.Properties.Resources;
@@ -170,20 +173,21 @@ namespace SICore
         }
 
         /// <summary>
-        /// Информация о табло
+        /// Informs receiver about round table state.
         /// </summary>
-        public void InformTablo(string receiver = NetworkConstants.Everybody)
+        public void InformTable(string receiver = NetworkConstants.Everybody)
         {
             var message2 = new StringBuilder(Messages.Table);
 
-            for (int i = 0; i < _gameData.TInfo.RoundInfo.Count; i++)
+            for (var i = 0; i < _gameData.TInfo.RoundInfo.Count; i++)
             {
-                for (int j = 0; j < _gameData.TInfo.RoundInfo[i].Questions.Count; j++)
+                for (var j = 0; j < _gameData.TInfo.RoundInfo[i].Questions.Count; j++)
                 {
                     message2.Append(Message.ArgsSeparatorChar);
                     message2.Append(_gameData.TInfo.RoundInfo[i].Questions[j].Price);
                 }
-                message2.Append(Message.ArgsSeparatorChar); // Новый формат сообщения предусматривает разделение вопросов одной темы
+
+                message2.Append(Message.ArgsSeparatorChar);
             }
 
             SendMessage(message2.ToString(), receiver);
@@ -213,6 +217,92 @@ namespace SICore
                 .Append(string.Join(Message.ArgsSeparator, _gameData.TInfo.RoundInfo.Select(info => info.Name)));
 
             SendMessage(msg.ToString(), person);
+        }
+
+        /// <summary>
+        /// Sends links to all round media content to the person. This allows the person to preload content in advance.
+        /// </summary>
+        /// <param name="person">Person name (everybody by default).</param>
+        internal void InformRoundContent(string person = NetworkConstants.Everybody)
+        {
+            if (!_gameData.Settings.AppSettings.PreloadRoundContent)
+            {
+                return;
+            }
+
+            IEnumerable<string> persons;
+            if (person != NetworkConstants.Everybody)
+            {
+                if (Client.CurrentServer.Contains(person))
+                {
+                    return; // local person does not need to preload anything
+                }
+
+                persons = new string[] { person };
+            }
+            else
+            {
+                // local persons do not need to preload anything
+                var personsList = _gameData.AllPersons.Keys.Where(name => !Client.CurrentServer.Contains(name)).ToList();
+
+                if (personsList.Count == 0)
+                {
+                    return;
+                }
+
+                persons = personsList;
+            }
+
+            var contentUris = new List<string>();
+
+            foreach (var theme in _gameData.Round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    foreach (var atom in question.Scenario)
+                    {
+                        var atomType = atom.Type;
+                        if (atomType == AtomTypes.Image || atomType == AtomTypes.Audio || atomType == AtomTypes.Video)
+                        {
+                            var link = _gameData.PackageDoc.GetLink(atom);
+
+                            if (link.GetStream == null) // External link
+                            {
+                                if (Uri.TryCreate(link.Uri, UriKind.Absolute, out _))
+                                {
+                                    contentUris.Add(link.Uri);
+                                }
+                            }
+                            else
+                            {
+                                var mediaCategory = atomType == AtomTypes.Image
+                                    ? SIDocument.ImagesStorageName
+                                    : (atomType == AtomTypes.Audio
+                                        ? SIDocument.AudioStorageName
+                                        : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+
+                                var uri = _gameData.Share.CreateURI(link.Uri, link.GetStream, mediaCategory);
+                                contentUris.Add(uri.Replace("http://localhost", "http://" + Constants.GameHost));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (contentUris.Count > 0)
+            {
+                var msg = new StringBuilder(Messages.RoundContent);
+
+                foreach (var uri in contentUris)
+                {
+                    msg.Append(Message.ArgsSeparatorChar).Append(uri);
+                }
+
+                foreach (var name in persons)
+                {
+                    SendMessage(msg.ToString(), name);
+                }
+            }
         }
     }
 }

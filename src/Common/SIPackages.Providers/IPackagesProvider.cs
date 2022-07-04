@@ -6,6 +6,7 @@ namespace SIPackages.Providers
     public interface IPackagesProvider
     {
         Task<IEnumerable<string>> GetPackagesAsync();
+
         Task<SIDocument> GetPackageAsync(string name);
     }
 }

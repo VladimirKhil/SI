@@ -55,6 +55,7 @@ namespace Services.SI
             }
 
             var packageFilter = queryString.Length > 0 ? $"?{queryString}" : "";
+
             return GetAsync<string[]>($"PackagesByTag{packageFilter}", cancellationToken);
         }
 
@@ -154,13 +155,17 @@ namespace Services.SI
             try
             {
                 using var responseMessage = await Client.GetAsync($"{_serverUri}/{request}", cancellationToken);
+
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    throw new Exception($"GetAsync error: {await responseMessage.Content.ReadAsStringAsync()}");
+                    throw new Exception(
+                        $"GetAsync {_serverUri}/{request} error ({responseMessage.StatusCode}): " +
+                        $"{await responseMessage.Content.ReadAsStringAsync(cancellationToken)}");
                 }
                 
-                using var responseStream = await responseMessage.Content.ReadAsStreamAsync();
+                using var responseStream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
                 using var reader = new StreamReader(responseStream);
+
                 return (T)Serializer.Deserialize(reader, typeof(T));
             }
             catch (SocketException exc)

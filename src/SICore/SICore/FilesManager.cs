@@ -1,10 +1,9 @@
 ﻿using SIPackages.Core;
 using System;
-using System.IO;
 
 namespace SICore
 {
-    public sealed class FilesManager: ShareBase, IFilesManager
+    public sealed class FilesManager : ShareBase, IFilesManager
     {
         private readonly int _gameID = -1;
         private readonly int _multimediaPort = -1;
@@ -35,7 +34,9 @@ namespace SICore
             lock (_filesSync)
             {
                 if (!_files.TryGetValue(Uri.UnescapeDataString(file), out response) && !_files.TryGetValue(file, out response))
+                {
                     return null;
+                }
             }
 
             return response();

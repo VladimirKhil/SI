@@ -380,7 +380,7 @@ namespace SICore.Network.Servers
         }
 
         /// <summary>
-        /// Закрытие сервера
+        /// Disposes the server.
         /// </summary>
         protected virtual ValueTask DisposeAsync(bool disposing)
         {

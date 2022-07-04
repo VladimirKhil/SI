@@ -12,7 +12,7 @@ using System.Text;
 namespace SICore
 {
     /// <summary>
-    /// Данные игры
+    /// Defines a game data.
     /// </summary>
     public sealed class GameData : Data
     {
@@ -49,15 +49,18 @@ namespace SICore
         internal GamePlayerAccount ActivePlayer { get; set; }
 
         /// <summary>
-        /// Текущий отвечающий игрок
+        /// Current answerer info.
         /// </summary>
         internal GamePlayerAccount Answerer { get; private set; }
 
         private int _answererIndex;
 
+        /// <summary>
+        /// Current answerer index.
+        /// </summary>
         internal int AnswererIndex
         {
-            get { return _answererIndex; }
+            get => _answererIndex;
             set
             {
                 _answererIndex = value;
@@ -119,7 +122,7 @@ namespace SICore
 
         public BagCatInfo CatInfo
         {
-            get { return _catInfo; }
+            get => _catInfo;
             set
             {
                 if (_catInfo != value)
@@ -154,7 +157,7 @@ namespace SICore
 
         public int AppelaerIndex
         {
-            get { return _appelaerIndex; }
+            get => _appelaerIndex;
             set
             {
                 if (value < -1 && value >= Players.Count)
@@ -165,7 +168,9 @@ namespace SICore
                 _appelaerIndex = value;
             }
         }
+
         public bool IsAppelationForRightAnswer { get; set; }
+
         public string AppellationSource { get; set; }
 
         /// <summary>
@@ -192,7 +197,9 @@ namespace SICore
             {
                 _isWaiting = value;
                 if (_isWaiting)
+                {
                     WaitingMessage = true;
+                }
             }
             get
             {
@@ -231,7 +238,7 @@ namespace SICore
         /// </summary>
         public int StakerIndex
         {
-            get { return _stakerIndex; }
+            get => _stakerIndex;
             set
             {
                 if (value < -1 && value >= Players.Count)
@@ -287,9 +294,9 @@ namespace SICore
         /// </summary>
         internal bool IsQuestionPlaying { get; set; }
 
-        internal int TabloInformStage { get; set; }
+        internal int TableInformStage { get; set; }
 
-        internal object TabloInformStageLock { get; } = new object();
+        internal object TableInformStageLock { get; } = new object();
 
         /// <summary>
         /// Количество ставящих в финале
@@ -310,6 +317,7 @@ namespace SICore
         /// Количество полученных ответов на апелляцию
         /// </summary>
         public int AppellationAnswersReceivedCount { get; set; }
+
         /// <summary>
         /// Количество полученных положительных ответов на апелляцию
         /// </summary>
@@ -398,7 +406,7 @@ namespace SICore
             }
         }
 
-        private Dictionary<string, ViewerAccount> _allPersons = new Dictionary<string, ViewerAccount>();
+        private Dictionary<string, ViewerAccount> _allPersons = new();
 
         /// <summary>
         /// Все участники
@@ -430,10 +438,13 @@ namespace SICore
         }
 
         public int ReportsCount { get; set; }
+
         public int AcceptedReports { get; set; }
 
-        internal List<string> OpenedFiles { get; set; } = new List<string>();
+        internal HashSet<string> OpenedFiles { get; set; } = new();
+
         public bool AnnounceAnswer { get; set; }
+
         public bool AllowAppellation { get; set; }
 
         internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
@@ -451,7 +462,11 @@ namespace SICore
 
         public DateTime AtomStart { get; set; }
 
-        public int MoveDirection { get; set; }
+        /// <summary>
+        /// Game move direction.
+        /// </summary>
+        public MoveDirections MoveDirection { get; set; }
+
         /// <summary>
         /// Устная игра
         /// </summary>
@@ -471,16 +486,22 @@ namespace SICore
         public bool IsDeferringAnswer { get; internal set; }
 
         public ThemeDeletersEnumerator ThemeDeleters { get; internal set; }
+
         public string Text { get; internal set; }
+
         /// <summary>
         /// Выводится ли текст вопроса по частям
         /// </summary>
         public bool IsPartial { get; internal set; }
+
         public bool MediaOk { get; internal set; }
+
         public int TextLength { get; internal set; }
 
         public bool IsThinking { get; internal set; }
+
         public bool IsThinkingPaused { get; internal set; }
+
         public double TimeThinking { get; internal set; }
 
         [Obsolete]
@@ -491,6 +512,7 @@ namespace SICore
         public bool IsPlayingMedia { get; set; }
 
         public bool IsPlayingMediaPaused { get; set; }
+
         public string DocumentPath { get; internal set; }
 
         public int ThemeIndexToDelete { get; set; } = -1;

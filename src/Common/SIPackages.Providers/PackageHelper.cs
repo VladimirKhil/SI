@@ -47,6 +47,7 @@ namespace SIPackages.Providers
             int baseCost = 100)
         {
             var doc = SIDocument.Create(name, author, folder);
+
             return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName);
         }
 
@@ -94,6 +95,7 @@ namespace SIPackages.Providers
             }
 
             doc.Package.Rounds.Add(new Round { Type = RoundTypes.Final, Name = finalName });
+
             for (var j = 0; j < 7; j++)
             {
                 if (files.Count == 0)

@@ -32,8 +32,11 @@ namespace SI.GameServer.Client
         event Action<Message> IncomingMessage;
 
         Task OpenAsync(string userName, CancellationToken token = default);
+
         Task<Contract.HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
+
         Task<string> GetNewsAsync(CancellationToken cancellationToken = default);
+
         Task<string[]> GetUsersAsync(CancellationToken cancellationToken = default);
 
         Task<Contract.Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default);
@@ -49,6 +52,7 @@ namespace SI.GameServer.Client
             CancellationToken cancellationToken = default);
 
         Task<string> HasImageAsync(FileKey imageKey, CancellationToken cancellationToken = default);
+
         Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default);
 
         Task SayAsync(string message);

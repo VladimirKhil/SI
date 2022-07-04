@@ -202,7 +202,14 @@ namespace SICore.Network
             {
                 if (lockAquired)
                 {
-                    _semaphore.Release();
+                    try
+                    {
+                        _semaphore.Release();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+
+                    }
                 }
             }
 

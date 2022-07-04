@@ -80,13 +80,25 @@ namespace SICore.Clients.Game
         /// </summary>
         public IndexInfo Current => _order[_orderIndex];
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ThemeDeletersEnumerator" /> class.
+        /// </summary>
+        /// <param name="players">Game players.</param>
+        /// <param name="themesCount">Numbers of themes in round.</param>
+        /// <exception cref="InvalidOperationException">Invalid players collection has been provided.</exception>
         public ThemeDeletersEnumerator(IList<GamePlayerAccount> players, int themesCount)
         {
             var playersCount = players.Count;
 
-            // Убираем так, чтобы лидер по сумме убирал тему последним
+            // The player with the highest score should be the last to remove the theme
             var goodPlayers = players.Where(p => p.InGame).ToArray();
             var deletersCount = goodPlayers.Length;
+
+            if (deletersCount == 0)
+            {
+                throw new InvalidOperationException("No InGame players found!");
+            }
+
             _order = new IndexInfo[deletersCount];
 
             var leftThemesCount = (themesCount - 1) % deletersCount;
@@ -96,15 +108,17 @@ namespace SICore.Clients.Game
                 leftThemesCount = deletersCount;
             }
 
-            // Классы игроков по суммам
+            // Split players to classes accourding to their sums
             var levels = goodPlayers.GroupBy(p => p.Sum).OrderByDescending(g => g.Key).ToArray();
             var k = leftThemesCount - 1;
+
             for (var levelIndex = 0; levelIndex < levels.Length; levelIndex++)
             {
                 var level = levels[levelIndex];
                 if (level.Count() == 1)
                 {
                     _order[k--] = new IndexInfo(players.IndexOf(level.First()));
+
                     if (k == -1)
                     {
                         k += deletersCount;
@@ -117,6 +131,7 @@ namespace SICore.Clients.Game
                     {
                         indicies.Add(players.IndexOf(item));
                         _order[k--] = new IndexInfo(indicies);
+
                         if (k == -1)
                         {
                             k += deletersCount;
@@ -131,7 +146,7 @@ namespace SICore.Clients.Game
             _order = order;
         }
 
-        private readonly List<string> _removeLog = new List<string>(); // Temporary object to catch errors
+        private readonly List<string> _removeLog = new(); // Temporary object to catch errors
 
         public string GetRemoveLog() => string.Join(Environment.NewLine, _removeLog);
 

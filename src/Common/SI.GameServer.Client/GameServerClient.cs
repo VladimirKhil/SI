@@ -124,79 +124,6 @@ namespace SI.GameServer.Client
             return new Slice<SICore.GameInfo> { Data = slice.Data.Select(ToSICoreGame).ToArray(), IsLastSlice = slice.IsLastSlice };
         }
 
-        private SICore.GameInfo ToSICoreGame(Contract.GameInfo gameInfo) => new SICore.GameInfo
-        {
-            GameID = gameInfo.GameID,
-            GameName = gameInfo.GameName,
-            Mode = gameInfo.Mode,
-            Owner = gameInfo.Owner,
-            PackageName = gameInfo.PackageName,
-            PasswordRequired = gameInfo.PasswordRequired,
-            Persons = gameInfo.Persons,
-            RealStartTime = gameInfo.RealStartTime == DateTime.MinValue ? DateTime.MinValue : gameInfo.RealStartTime.ToLocalTime(),
-            Rules = BuildRules(gameInfo),
-            Stage = BuildStage(gameInfo),
-            Started = gameInfo.Started,
-            StartTime = gameInfo.StartTime.ToLocalTime()
-        };
-
-        private static string BuildStage(Contract.GameInfo gameInfo) => gameInfo.Stage switch
-        {
-            GameStages.Created => Resources.GameStage_Created,
-            GameStages.Started => Resources.GameStage_Started,
-            GameStages.Round => $"{Resources.GameStage_Round}: {gameInfo.StageName}",
-            GameStages.Final => Resources.GameStage_Final,
-            _ => Resources.GameStage_Finished,
-        };
-
-        private static string BuildRules(Contract.GameInfo gameInfo)
-        {
-            var rules = gameInfo.Rules;
-            var sb = new StringBuilder();
-
-            if (gameInfo.Mode == SIEngine.GameModes.Sport)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_Sport);
-            }
-
-            if ((rules & GameRules.FalseStart) == 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_NoFalseStart);
-            }
-
-            if ((rules & GameRules.Oral) > 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_Oral);
-            }
-
-            if ((rules & GameRules.IgnoreWrong) > 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_IgnoreWrong);
-            }
-
-            return sb.ToString();
-        }
-
         public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync<HostInfo>("GetGamesHostInfo", cancellationToken);
 
@@ -307,21 +234,6 @@ namespace SI.GameServer.Client
             _isOpened = true;
         }
 
-        private Task OnConnectionClosedAsync(Exception exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
-
-        private void OnUI(Action action)
-        {
-            if (_uIThreadExecutor != null)
-            {
-                _uIThreadExecutor.ExecuteOnUIThread(action);
-                return;
-            }
-
-            action();
-        }
-
-        private void MessageHandler_HttpSendProgress(object sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
-
         public Task SayAsync(string message) => _connection.InvokeAsync("Say", message);
 
         public async Task UploadPackageAsync(FileKey packageKey, Stream stream, CancellationToken cancellationToken = default)
@@ -354,24 +266,6 @@ namespace SI.GameServer.Client
 
                 throw exc;
             }
-        }
-
-        private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
-        {
-            var serverError = await response.Content.ReadAsStringAsync();
-
-            if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
-                response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
-            {
-                return Resources.FileTooLarge;
-            }
-            
-            if (response.StatusCode == HttpStatusCode.BadGateway)
-            {
-                return $"{response.StatusCode}: Bad Gateway";
-            }
-
-            return $"{response.StatusCode}: {serverError}";
         }
 
         public async Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default)
@@ -410,5 +304,111 @@ namespace SI.GameServer.Client
 
         public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync("LeaveGame", cancellationToken);
+
+        private SICore.GameInfo ToSICoreGame(Contract.GameInfo gameInfo) => new SICore.GameInfo
+        {
+            GameID = gameInfo.GameID,
+            GameName = gameInfo.GameName,
+            Mode = gameInfo.Mode,
+            Owner = gameInfo.Owner,
+            PackageName = gameInfo.PackageName,
+            PasswordRequired = gameInfo.PasswordRequired,
+            Persons = gameInfo.Persons,
+            RealStartTime = gameInfo.RealStartTime == DateTime.MinValue ? DateTime.MinValue : gameInfo.RealStartTime.ToLocalTime(),
+            Rules = BuildRules(gameInfo),
+            Stage = BuildStage(gameInfo),
+            Started = gameInfo.Started,
+            StartTime = gameInfo.StartTime.ToLocalTime()
+        };
+
+        private static string BuildStage(Contract.GameInfo gameInfo) => gameInfo.Stage switch
+        {
+            GameStages.Created => Resources.GameStage_Created,
+            GameStages.Started => Resources.GameStage_Started,
+            GameStages.Round => $"{Resources.GameStage_Round}: {gameInfo.StageName}",
+            GameStages.Final => Resources.GameStage_Final,
+            _ => Resources.GameStage_Finished,
+        };
+
+        private static string BuildRules(Contract.GameInfo gameInfo)
+        {
+            var rules = gameInfo.Rules;
+            var sb = new StringBuilder();
+
+            if (gameInfo.Mode == SIEngine.GameModes.Sport)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_Sport);
+            }
+
+            if ((rules & GameRules.FalseStart) == 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_NoFalseStart);
+            }
+
+            if ((rules & GameRules.Oral) > 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_Oral);
+            }
+
+            if ((rules & GameRules.IgnoreWrong) > 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_IgnoreWrong);
+            }
+
+            return sb.ToString();
+        }
+
+        private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
+        {
+            var serverError = await response.Content.ReadAsStringAsync();
+
+            if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
+                response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
+            {
+                return Resources.FileTooLarge;
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadGateway)
+            {
+                return $"{response.StatusCode}: Bad Gateway";
+            }
+
+            return $"{response.StatusCode}: {serverError}";
+        }
+
+        private Task OnConnectionClosedAsync(Exception exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
+
+        private void OnUI(Action action)
+        {
+            if (_uIThreadExecutor != null)
+            {
+                _uIThreadExecutor.ExecuteOnUIThread(action);
+                return;
+            }
+
+            action();
+        }
+
+        private void MessageHandler_HttpSendProgress(object sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
     }
 }

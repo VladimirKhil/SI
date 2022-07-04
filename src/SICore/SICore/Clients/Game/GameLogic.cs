@@ -126,7 +126,7 @@ namespace SICore
                 _data.IsPlayingMedia = false;
             }
 
-            ScheduleExecution(Tasks.QuestSourComm, 1, 1);
+            ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
         }
 
         private void Engine_Package(Package package)
@@ -169,6 +169,7 @@ namespace SICore
             _data.AnswererIndex = -1;
             _data.StakerIndex = -1;
             _data.Type = null;
+
             ProcessRound(round, 1);
 
             if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
@@ -188,10 +189,10 @@ namespace SICore
 
             _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.RoundThemes)]));
 
-            lock (_data.TabloInformStageLock)
+            lock (_data.TableInformStageLock)
             {
                 _gameActions.InformRoundThemes();
-                _data.TabloInformStage = 1;
+                _data.TableInformStage = 1;
             }
         }
 
@@ -207,22 +208,26 @@ namespace SICore
             // Filling initial questions table
             _data.ThemeInfo = new bool[themes.Length];
 
-            var maxQuests = themes.Max(t => t.Questions.Count);
+            var maxQuestionsInTheme = themes.Max(t => t.Questions.Count);
             for (var i = 0; i < themes.Length; i++)
             {
                 var questionsCount = themes[i].Questions.Count;
                 _data.TInfo.RoundInfo[i].Questions.Clear();
 
-                for (var j = 0; j < maxQuests; j++)
+                for (var j = 0; j < maxQuestionsInTheme; j++)
                 {
-                    _data.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = j < questionsCount ? themes[i].Questions[j].Price : QuestionHelper.InvalidQuestionPrice });
+                    _data.TInfo.RoundInfo[i].Questions.Add(
+                        new QuestionInfo
+                        {
+                            Price = j < questionsCount ? themes[i].Questions[j].Price : Question.InvalidPrice
+                        });
                 }
             }
 
-            lock (_data.TabloInformStageLock)
+            lock (_data.TableInformStageLock)
             {
-                _gameActions.InformTablo();
-                _data.TabloInformStage = 2;
+                _gameActions.InformTable();
+                _data.TableInformStage = 2;
             }
 
             _data.IsQuestionPlaying = false;
@@ -479,7 +484,7 @@ namespace SICore
                 return;
             }
 
-            ScheduleExecution(Tasks.MoveNext, atomTime, force: true);
+            ScheduleExecution(Tasks.MoveNext, atomTime);
             _data.TimeThinking = 0.0;
         }
 
@@ -521,7 +526,7 @@ namespace SICore
                 }
                 else
                 {
-                    // Добавим случайное смещение, чтобы было трудно заранее (до появления рамки) нажать на кнопку
+                    // Let's add a random offset so it will be difficult to press the button in advance (before the frame appears)
                     ScheduleExecution(Tasks.AskToTry, 1 + (_data.Settings.AppSettings.Managed ? 0 : ClientData.Rand.Next(10)), force: true);
                 }
             }
@@ -578,7 +583,7 @@ namespace SICore
 
         private void Engine_NextQuestion()
         {
-            if (_data.OpenedFiles.Count > 0)
+            if (_data.OpenedFiles.Count > 0 && !_data.Settings.AppSettings.PreloadRoundContent)
             {
                 _data.Share.StopURI(_data.OpenedFiles);
                 _data.OpenedFiles.Clear();
@@ -616,7 +621,7 @@ namespace SICore
 
         private void Engine_EndQuestion(int themeIndex, int questionIndex)
         {
-            _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = QuestionHelper.InvalidQuestionPrice;
+            _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
         }
 
         private void FinishRound(bool move = true)
@@ -639,6 +644,7 @@ namespace SICore
             _data.Decision = DecisionType.None;
 
             _data.IsRoundEnding = true;
+
             if (move)
             {
                 ScheduleExecution(Tasks.MoveNext, 40);
@@ -653,6 +659,7 @@ namespace SICore
         private void Engine_RoundEmpty()
         {
             _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllQuestions)]));
+
             FinishRound();
         }
 
@@ -660,6 +667,7 @@ namespace SICore
         {
             _gameActions.SendMessage(Messages.Timeout);
             _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.AllTime)]));
+
             FinishRound();
         }
 
@@ -679,9 +687,12 @@ namespace SICore
         {
             if (themeIndex < 0 || themeIndex >= _data.TInfo.RoundInfo.Count)
             {
-                var errorMessage = new StringBuilder(themeIndex.ToString()).Append(' ')
-                    .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})"))).Append(' ')
-                    .Append(_data.ThemeIndexToDelete).Append(' ')
+                var errorMessage = new StringBuilder(themeIndex.ToString())
+                    .Append(' ')
+                    .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})")))
+                    .Append(' ')
+                    .Append(_data.ThemeIndexToDelete)
+                    .Append(' ')
                     .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
 
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
@@ -691,6 +702,7 @@ namespace SICore
 
             var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
             var themeName = _data.TInfo.RoundInfo[themeIndex].Name;
+
             _gameActions.PlayerReplic(playerIndex, themeName);
         }
 
@@ -1383,153 +1395,14 @@ namespace SICore
 
                     if (_stopReason != StopReason.None)
                     {
-                        var stop = true;
+                        var (stop, newTask) = ProcessStopReason(task, arg);
 
-                        var stopReasonDetails = _stopReason == StopReason.Move ? _data.MoveDirection.ToString()
-                            : (_stopReason == StopReason.Decision ? ClientData.Decision.ToString() : "");
-
-                        _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
-
-                        // Interrupt standard execution and try to do something urgent
-                        switch (_stopReason)
-                        {
-                            case StopReason.Pause:
-                                _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
-                                PauseExecution(taskId, arg);
-                                break;
-
-                            case StopReason.Decision:
-                                stop = OnDecision();
-                                break;
-
-                            case StopReason.Answer:
-                                ScheduleExecution(Tasks.AskAnswer, 7, force: true);
-                                break;
-
-                            case StopReason.Appellation:
-                                var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : task;
-
-                                _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({PrintOldTasks()})");
-                                PauseExecution((int)savedTask, arg);
-                                ScheduleExecution(Tasks.PrintAppellation, 10);
-                                break;
-
-                            case StopReason.Move:
-                                switch (_data.MoveDirection)
-                                {
-                                    case -2:
-                                        if (Engine.CanMoveBackRound)
-                                        {
-                                            stop = Engine.MoveBackRound();
-                                            if (stop)
-                                            {
-                                                FinishRound(false);
-                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
-                                            }
-                                            else
-                                            {
-                                                _stopReason = StopReason.None;
-                                                return;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            stop = false;
-                                        }
-
-                                        break;
-
-                                    case -1:
-                                        if (Engine.CanMoveBack)
-                                        {
-                                            Engine.MoveBack();
-                                        }
-                                        else
-                                        {
-                                            stop = false;
-                                        }
-                                        break;
-
-                                    case 1:
-                                        // Just perform the current task, no additional processing is required
-                                        stop = false;
-
-                                        if (task == Tasks.PrintPartial) // Skip partial printing
-                                        {
-                                            var subText = _data.Text.Substring(_data.TextLength);
-
-                                            _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
-                                            _gameActions.SystemReplic(subText);
-
-                                            task = Tasks.MoveNext;
-                                        }
-
-                                        break;
-
-                                    case 2:
-                                        if (Engine.CanMoveNextRound)
-                                        {
-                                            stop = Engine.MoveNextRound();
-                                            if (stop)
-                                            {
-                                                FinishRound(false);
-                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToNextRound)]);
-                                            }
-                                            else
-                                            {
-                                                _stopReason = StopReason.None;
-                                                return;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            stop = false;
-                                        }
-                                        break;
-
-                                    case 3:
-                                        if (Engine.CanMoveNextRound || Engine.CanMoveBackRound)
-                                        {
-                                            stop = Engine.MoveToRound(ClientData.TargetRoundIndex);
-                                            if (stop)
-                                            {
-                                                FinishRound(false);
-                                                _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]);
-                                            }
-                                            else
-                                            {
-                                                _stopReason = StopReason.None;
-                                                return;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            stop = false;
-                                        }
-                                        break;
-
-                                    default:
-                                        stop = false;
-                                        break;
-                                }
-
-                                if (stop)
-                                {
-                                    ScheduleExecution(Tasks.MoveNext, 10);
-                                }
-
-                                break;
-
-                            case StopReason.Wait:
-                                ScheduleExecution(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
-                                break;
-                        }
-
-                        _stopReason = StopReason.None;
                         if (stop)
                         {
                             return;
                         }
+
+                        task = newTask;
                     }
 
                     _tasksHistory.AddLogEntry($"{task}:{arg}");
@@ -1752,6 +1625,157 @@ namespace SICore
                     _gameActions.SpecialReplic("Game ERROR");
                 }
             });
+        }
+
+        private (bool, Tasks) ProcessStopReason(Tasks task, int arg)
+        {
+            var stop = true;
+            var newTask = task;
+
+            var stopReasonDetails = _stopReason == StopReason.Move
+                ? _data.MoveDirection.ToString()
+                : (_stopReason == StopReason.Decision ? ClientData.Decision.ToString() : "");
+
+            _tasksHistory.AddLogEntry($"StopReason {_stopReason} {stopReasonDetails}");
+
+            // Interrupt standard execution and try to do something urgent
+            switch (_stopReason)
+            {
+                case StopReason.Pause:
+                    _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
+                    PauseExecution((int)task, arg);
+                    break;
+
+                case StopReason.Decision:
+                    stop = OnDecision();
+                    break;
+
+                case StopReason.Answer:
+                    ScheduleExecution(Tasks.AskAnswer, 7, force: true);
+                    break;
+
+                case StopReason.Appellation:
+                    var savedTask = task == Tasks.WaitChoose ? Tasks.AskToChoose : task;
+
+                    _tasksHistory.AddLogEntry($"Appellation PauseExecution {savedTask} {arg} ({PrintOldTasks()})");
+                    PauseExecution((int)savedTask, arg);
+                    ScheduleExecution(Tasks.PrintAppellation, 10);
+                    break;
+
+                case StopReason.Move:
+                    switch (_data.MoveDirection)
+                    {
+                        case MoveDirections.RoundBack:
+                            if (Engine.CanMoveBackRound)
+                            {
+                                stop = Engine.MoveBackRound();
+                                if (stop)
+                                {
+                                    FinishRound(false);
+                                    _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToPreviousRound)]);
+                                }
+                                else
+                                {
+                                    _stopReason = StopReason.None;
+                                    return (true, task);
+                                }
+                            }
+                            else
+                            {
+                                stop = false;
+                            }
+
+                            break;
+
+                        case MoveDirections.Back:
+                            if (Engine.CanMoveBack)
+                            {
+                                Engine.MoveBack();
+                            }
+                            else
+                            {
+                                stop = false;
+                            }
+                            break;
+
+                        case MoveDirections.Next:
+                            // Just perform the current task, no additional processing is required
+                            stop = false;
+
+                            if (task == Tasks.PrintPartial) // Skip partial printing
+                            {
+                                var subText = _data.Text.Substring(_data.TextLength);
+
+                                _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
+                                _gameActions.SystemReplic(subText);
+
+                                newTask = Tasks.MoveNext;
+                            }
+
+                            break;
+
+                        case MoveDirections.RoundNext:
+                            if (Engine.CanMoveNextRound)
+                            {
+                                stop = Engine.MoveNextRound();
+                                if (stop)
+                                {
+                                    FinishRound(false);
+                                    _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToNextRound)]);
+                                }
+                                else
+                                {
+                                    _stopReason = StopReason.None;
+                                    return (true, task);
+                                }
+                            }
+                            else
+                            {
+                                stop = false;
+                            }
+                            break;
+
+                        case MoveDirections.Round:
+                            if (Engine.CanMoveNextRound || Engine.CanMoveBackRound)
+                            {
+                                stop = Engine.MoveToRound(ClientData.TargetRoundIndex);
+                                if (stop)
+                                {
+                                    FinishRound(false);
+                                    _gameActions.SpecialReplic(LO[nameof(R.ShowmanSwitchedToOtherRound)]);
+                                }
+                                else
+                                {
+                                    _stopReason = StopReason.None;
+                                    return (true, task);
+                                }
+                            }
+                            else
+                            {
+                                stop = false;
+                            }
+                            break;
+
+                        default:
+                            stop = false;
+                            break;
+                    }
+
+                    if (stop)
+                    {
+                        ScheduleExecution(Tasks.MoveNext, _data.MoveDirection == MoveDirections.Next ? 10 : 30);
+                    }
+
+                    break;
+
+                case StopReason.Wait:
+                    ScheduleExecution(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
+                    break;
+            }
+
+            _stopReason = StopReason.None;
+
+            return (stop, newTask);
         }
 
         private void GoodLuck()
@@ -2192,6 +2216,7 @@ namespace SICore
             {
                 var s = new StringBuilder(Messages.FinalRound);
                 var playFinal = false;
+
                 for (var i = 0; i < _data.Players.Count; i++)
                 {
                     if (_data.Players[i].Sum <= 0)
@@ -2230,7 +2255,7 @@ namespace SICore
                 }
                 else
                 {
-                    _gameActions.ShowmanReplic(_data.Players[arg - 2].Name + " " + LO[nameof(R.NotInFinal)]);
+                    _gameActions.ShowmanReplic($"{_data.Players[arg - 2].Name} {LO[nameof(R.NotInFinal)]}");
                     ScheduleExecution(Tasks.PrintFinal, 15, arg + 1);
                 }
             }
@@ -2247,6 +2272,8 @@ namespace SICore
                 }
 
                 _gameActions.InformStage(name: _data.Round.Name, index: roundIndex);
+                _gameActions.InformRoundContent();
+
                 _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
                 ScheduleExecution(Tasks.Round, 10, 2);
@@ -2266,6 +2293,7 @@ namespace SICore
                     {
                         var s = new StringBuilder(_data.Players[i].Name).Append(", ");
                         s.Append(GetRandomString(LO[nameof(R.YouWin)]));
+
                         _gameActions.ShowmanReplic(s.ToString());
                         _gameActions.SendMessageWithArgs(Messages.Winner, i);
                         break;
@@ -2352,7 +2380,7 @@ namespace SICore
 
             if (isBagCat)
             {
-                ScheduleExecution(Tasks.AskCatCost, taskTime);
+                ScheduleExecution(Tasks.AskCatCost, taskTime, force: !isCat);
             }
             else
             {
@@ -2587,6 +2615,8 @@ namespace SICore
 
         private void QuestionSourcesAndComments(int arg)
         {
+            var informed = false;
+
             var textTime = 20;
             if (arg == 1)
             {
@@ -2596,6 +2626,7 @@ namespace SICore
                     var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                     _gameActions.ShowmanReplic(text);
                     textTime = GetReadingDurationForTextLength(text.Length);
+                    informed = true;
                 }
                 else
                 {
@@ -2610,6 +2641,7 @@ namespace SICore
                     var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfQuestion)], _data.Question.Info.Comments.Text);
                     _gameActions.ShowmanReplic(text);
                     textTime = GetReadingDurationForTextLength(text.Length);
+                    informed = true;
                 }
                 else
                 {
@@ -2623,7 +2655,7 @@ namespace SICore
             }
             else
             {
-                ScheduleExecution(Tasks.MoveNext, 1);
+                ScheduleExecution(Tasks.MoveNext, 1, force: !informed);
             }
         }
 
@@ -2722,11 +2754,11 @@ namespace SICore
                 case 1:
                     _gameActions.ShowmanReplic(LO[nameof(R.ShowmanGreeting)]);
                     var settings = ClientData.Settings.AppSettings;
-                    nextArg = !settings.FalseStart || settings.Oral || settings.GameMode == SIEngine.GameModes.Sport || settings.IgnoreWrong || settings.Managed ? 2 : -1;
+                    nextArg = 2;
                     break;
 
                 case 2:
-                    _gameActions.ShowmanReplic(LO[nameof(R.GameRules)] + ": " + BuildRulesString(ClientData.Settings.AppSettings));
+                    _gameActions.ShowmanReplic($"{LO[nameof(R.GameRules)]}: {BuildRulesString(ClientData.Settings.AppSettings)}");
                     nextArg = -1;
                     extraTime = 20;
                     break;
@@ -2784,6 +2816,11 @@ namespace SICore
                     sb.Append(", ");
 
                 sb.Append(LO[nameof(R.TypeManaged)]);
+            }
+
+            if (sb.Length == 0)
+            {
+                sb.Append(LO[nameof(R.TypeClassic)]);
             }
 
             return sb.ToString();
@@ -3458,7 +3495,7 @@ namespace SICore
                     _data.StakerIndex = playerIndex;
                     _data.Stake = cost;
                     _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 1, cost);
-                    ScheduleExecution(Tasks.AskStake, 5);
+                    ScheduleExecution(Tasks.AskStake, 5, force: true);
                     return;
                 }
 
@@ -3807,7 +3844,7 @@ namespace SICore
                 }
                 else if (_data.Round.Type != RoundTypes.Final)
                 {
-                    ScheduleExecution(Tasks.QuestionType, 1, 1);
+                    ScheduleExecution(Tasks.QuestionType, 1, 1, force: !informed);
                 }
                 else
                 {
@@ -3836,27 +3873,27 @@ namespace SICore
                 if (!isRandomPackage)
                 {
                     _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
-
-                    var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
+                    informed = true;
 
                     var packageLogo = _data.Package.Logo;
-                    if (!string.IsNullOrEmpty(packageLogo) && packageLogo.Length > 0)
+
+                    if (!string.IsNullOrWhiteSpace(packageLogo))
                     {
                         var uri = _data.Share.CreateURI(packageLogo.Substring(1), () => _data.PackageDoc.Images.GetFile(packageLogo.Substring(1)), SIDocument.ImagesStorageName);
 
                         foreach (var person in _data.AllPersons.Keys)
                         {
-                            var msg2 = new StringBuilder(msg.ToString());
+                            var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
                             if (_gameActions.Client.CurrentServer.Contains(person))
                             {
-                                msg2.Append(uri);
+                                msg.Append(uri);
                             }
                             else
                             {
-                                msg2.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
+                                msg.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                             }
 
-                            _gameActions.SendMessage(msg2.ToString(), person);
+                            _gameActions.SendMessage(msg.ToString(), person);
                         }
                     }
                 }
@@ -3945,7 +3982,7 @@ namespace SICore
 
             if (arg < 6)
             {
-                ScheduleExecution(Tasks.Package, 15, arg + 1);
+                ScheduleExecution(Tasks.Package, 15, arg + 1, force: !informed);
             }
             else if (informed)
             {
@@ -3953,7 +3990,7 @@ namespace SICore
             }
             else
             {
-                ScheduleExecution(Tasks.MoveNext, 1);
+                ScheduleExecution(Tasks.MoveNext, 1, force: !informed);
             }
         }
 
@@ -3966,7 +4003,7 @@ namespace SICore
             {
                 _gameActions.InformSums();
 
-                _data.TabloInformStage = 0;
+                _data.TableInformStage = 0;
                 _data.IsRoundEnding = false;
 
                 if (round.Type == RoundTypes.Final)
@@ -3988,9 +4025,9 @@ namespace SICore
                     _data.Package.Rounds.Count == 2; // second round is always the final in random package
 
                 var roundIndex = -1;
-                for (int i = 0; i < _data.Rounds.Length; i++)
+                for (var i = 0; i < _data.Rounds.Length; i++)
                 {
-                    if (_data.Rounds[i].Index == Engine.RoundIndex)
+                    if (_data.Rounds[i].Index == Engine.RoundIndex) // this logic skips empty rounds
                     {
                         roundIndex = i;
                         break;
@@ -3998,6 +4035,7 @@ namespace SICore
                 }
 
                 _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name, index: roundIndex);
+                _gameActions.InformRoundContent();
 
                 if (!skipRoundAnnounce)
                 {
@@ -4082,6 +4120,7 @@ namespace SICore
                         _gameActions.SendMessageWithArgs(Messages.Ads, ad);
 
 #if !DEBUG
+                        // Advertisement could not be skipped
                         ClientData.MoveNextBlocked = true;
 #endif
                         adShown = true;
@@ -4323,10 +4362,7 @@ namespace SICore
             _gameActions.ShowmanReplic(s.ToString());
         }
 
-        public bool IsPressMode(bool isMultimediaQuestion)
-        {
-            return true;
-        }
+        public bool IsPressMode(bool isMultimediaQuestion) => true;
 
         public bool ShowRight => true;
 

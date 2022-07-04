@@ -119,30 +119,20 @@ namespace SICore.Connections
         {
             if (obj is Message message)
             {
-                return message.IsPrivate == IsPrivate && message.IsSystem == IsSystem
-                    && message.Sender == Sender && message.Receiver == Receiver && message.Text == Text;
+                return message.IsPrivate == IsPrivate &&
+                    message.IsSystem == IsSystem &&
+                    message.Sender == Sender &&
+                    message.Receiver == Receiver &&
+                    message.Text == Text;
             }
 
             return base.Equals(obj);
         }
 
-        public override int GetHashCode()
-        {
-            var hash = Text.GetHashCode();
-            hash = hash * 31 + Sender.GetHashCode();
-            hash = hash * 31 + Receiver.GetHashCode();
+        public override int GetHashCode() => System.HashCode.Combine(Text, Sender, Receiver);
 
-            return hash;
-        }
+        public static bool operator ==(Message left, Message right) => left.Equals(right);
 
-        public static bool operator ==(Message left, Message right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Message left, Message right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Message left, Message right) => !(left == right);
     }
 }

@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
@@ -12,7 +10,6 @@
     <Version>7.6.0</Version>
     <Authors>Vladimir Khil</Authors>
     <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
-    <LangVersion>9</LangVersion>
     <PackageProjectUrl>https://github.com/VladimirKhil/SI</PackageProjectUrl>
     <RepositoryUrl>https://github.com/VladimirKhil/SI</RepositoryUrl>
     <PackageTags>SIGame</PackageTags>

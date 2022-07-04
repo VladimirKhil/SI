@@ -752,4 +752,7 @@
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>Ведущий перевёл игру в другой раунд</value>
   </data>
+  <data name="TypeClassic" xml:space="preserve">
+    <value>классическая</value>
+  </data>
 </root>

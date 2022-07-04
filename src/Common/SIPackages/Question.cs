@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,20 +7,25 @@ using System.Linq;
 namespace SIPackages
 {
     /// <summary>
-    /// Вопрос игры
+    /// Defines a game question.
     /// </summary>
     public sealed class Question : InfoOwner
     {
+        /// <summary>
+        /// Question price that means empty question.
+        /// </summary>
+        public const int InvalidPrice = -1;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _price;
 
         /// <summary>
-        /// Номинальная стоимость
+        /// Question base price.
         /// </summary>
         [DefaultValue(0)]
         public int Price
         {
-            get { return _price; }
+            get => _price;
             set { var oldValue = _price; if (oldValue != value) { _price = value; OnPropertyChanged(oldValue); } }
         }
 
@@ -56,10 +60,12 @@ namespace SIPackages
         /// </summary>
         public override string Name => null;
 
-        public override bool Contains(string value)
-        {
-            return base.Contains(value) || Type.Contains(value) || Scenario.ContainsQuery(value) || Right.ContainsQuery(value) || Wrong.ContainsQuery(value);
-        }
+        public override bool Contains(string value) =>
+            base.Contains(value) ||
+            Type.Contains(value) ||
+            Scenario.ContainsQuery(value) ||
+            Right.ContainsQuery(value) ||
+            Wrong.ContainsQuery(value);
 
         public override IEnumerable<SearchData> Search(string value)
         {

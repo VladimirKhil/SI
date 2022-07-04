@@ -861,17 +861,19 @@ namespace SICore
 
             if (ClientData.Stage == GameStage.Round)
             {
-                lock (ClientData.TabloInformStageLock)
+                lock (ClientData.TableInformStageLock)
                 {
-                    if (ClientData.TabloInformStage > 0)
+                    if (ClientData.TableInformStage > 0)
                     {
                         _gameActions.InformRoundThemes(message.Sender, false);
-                        if (ClientData.TabloInformStage > 1)
+                        if (ClientData.TableInformStage > 1)
                         {
-                            _gameActions.InformTablo(message.Sender);
+                            _gameActions.InformTable(message.Sender);
                         }
                     }
                 }
+
+                _gameActions.InformRoundContent(message.Sender);
             }
             else if (ClientData.Stage == GameStage.Before && ClientData.Settings.IsAutomatic)
             {
@@ -976,7 +978,7 @@ namespace SICore
 
                     _logic.AddHistory($"Managed game move autostarted.");
 
-                    ClientData.MoveDirection = 1; // Дальше
+                    ClientData.MoveDirection = MoveDirections.Next;
                     _logic.Stop(StopReason.Move);
                 }
             }
@@ -1247,56 +1249,59 @@ namespace SICore
                 return;
             }
 
+            var moveDirection = (MoveDirections)direction;
+
+            if (moveDirection < MoveDirections.RoundBack || moveDirection > MoveDirections.Round)
+            {
+                return;
+            }
+
             // Is paused or is pause pending
-            if ((ClientData.TInfo.Pause || _logic.StopReason == StopReason.Pause) && direction == 1)
+            if ((ClientData.TInfo.Pause || _logic.StopReason == StopReason.Pause) && moveDirection == MoveDirections.Next)
             {
                 OnPauseCore(false);
                 return;
             }
 
-            ClientData.MoveDirection = direction;
+            ClientData.MoveDirection = moveDirection;
 
-            switch (direction)
+            switch (moveDirection)
             {
-                case -2:
+                case MoveDirections.RoundBack:
                     if (!_logic.Engine.CanMoveBackRound)
                     {
                         return;
                     }
                     break;
 
-                case -1:
+                case MoveDirections.Back:
                     if (!_logic.Engine.CanMoveBack)
                     {
                         return;
                     }
                     break;
 
-                case 1:
+                case MoveDirections.Next:
                     if (ClientData.MoveNextBlocked)
                     {
                         return;
                     }
                     break;
 
-                case 2:
+                case MoveDirections.RoundNext:
                     if (!_logic.Engine.CanMoveNextRound)
                     {
                         return;
                     }
                     break;
 
-                case 3:
+                case MoveDirections.Round:
                     if (!_logic.Engine.CanMoveNextRound && !_logic.Engine.CanMoveBackRound ||
                         ClientData.Package == null ||
                         args.Length <= 2 ||
                         !int.TryParse(args[2], out int roundIndex) ||
-                        roundIndex < 0)
-                    {
-                        return;
-                    }
-
-                    if (roundIndex >= ClientData.Rounds.Length)
+                        roundIndex < 0 ||
+                        roundIndex >= ClientData.Rounds.Length)
                     {
                         return;
                     }
@@ -1587,9 +1592,10 @@ namespace SICore
                 return;
             }
 
-            if (ClientData.ShowMan != null && message.Sender == ClientData.ShowMan.Name && ClientData.Answerer != null &&
-                    (ClientData.Decision == DecisionType.AnswerValidating
-                    || ClientData.IsOralNow && ClientData.Decision == DecisionType.Answering))
+            if (ClientData.ShowMan != null &&
+                message.Sender == ClientData.ShowMan.Name &&
+                ClientData.Answerer != null &&
+                (ClientData.Decision == DecisionType.AnswerValidating || ClientData.IsOralNow && ClientData.Decision == DecisionType.Answering))
             {
                 ClientData.Decision = DecisionType.AnswerValidating;
                 ClientData.Answerer.AnswerIsRight = args[1] == "+";
@@ -1902,7 +1908,7 @@ namespace SICore
             }
             else if (ClientData.AnswererIndex == playerIndex)
             {
-                // Сбросим индекс отвечающего
+                // Drop answerer index
                 ClientData.AnswererIndex = -1;
 
                 var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
@@ -1910,9 +1916,10 @@ namespace SICore
                 Logic.AddHistory($"AnswererIndex dropped; nextTask = {nextTask};" +
                     $" ClientData.Decision = {ClientData.Decision}; Logic.IsFinalRound() = {Logic.IsFinalRound()}");
 
-                if (ClientData.Decision == DecisionType.Answering && !Logic.IsFinalRound())
+                if ((ClientData.Decision == DecisionType.Answering ||
+                    ClientData.Decision == DecisionType.AnswerValidating) && !Logic.IsFinalRound())
                 {
-                    // Отвечающего удалили. Нужно продвинуть игру дальше
+                    // Answerer has been dropped. The game should be moved forward
                     Logic.StopWaiting();
 
                     if (ClientData.IsOralNow)
@@ -1975,11 +1982,14 @@ namespace SICore
             }
 
             var currentOrder = ClientData.Order;
+
             if (currentOrder != null && ClientData.Type != null && ClientData.Type.Name == QuestionTypes.Auction)
             {
-                ClientData.OrderHistory.Append("Before ")
+                ClientData.OrderHistory
+                    .Append("Before ")
                     .Append(playerIndex)
-                    .Append(' ').Append(string.Join(",", currentOrder))
+                    .Append(' ')
+                    .Append(string.Join(",", currentOrder))
                     .AppendFormat(" {0}", ClientData.OrderIndex)
                     .AppendLine();
 
@@ -2044,37 +2054,52 @@ namespace SICore
                 }
             }
 
-            if (Logic.IsFinalRound() && ClientData.ThemeDeleters != null)
+            if (Logic.IsFinalRound())
             {
-                ClientData.ThemeDeleters.RemoveAt(playerIndex);
-                if (ClientData.ThemeDeleters.IsEmpty())
+                bool noPlayersLeft;
+
+                if (ClientData.ThemeDeleters != null)
                 {
-                    // Удалили вообще всех, кто мог играть в финале. Завершаем раунд
+                    ClientData.ThemeDeleters.RemoveAt(playerIndex);
+                    noPlayersLeft = ClientData.ThemeDeleters.IsEmpty();
+                }
+                else
+                {
+                    noPlayersLeft = ClientData.Players.All(p => !p.InGame);
+                }
+
+                if (noPlayersLeft)
+                {
+                    // All players that could play are removed
                     if (Logic.Engine.CanMoveNextRound)
                     {
-                        Logic.Engine.MoveNextRound();
+                        Logic.Engine.MoveNextRound(); // Finishing current round
                     }
                     else
                     {
-                        PlanExecution(Tasks.Winner, 10); // Делать нечего. Завершаем игру
+                        // TODO: it is better to provide a correct command to the game engine
+                        PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
                     }
                 }
             }
 
             var newHistory = new List<AnswerResult>();
+
             for (var i = 0; i < ClientData.QuestionHistory.Count; i++)
             {
                 var answerResult = ClientData.QuestionHistory[i];
+
                 if (answerResult.PlayerIndex == playerIndex)
                 {
                     continue;
                 }
 
-                newHistory.Add(new AnswerResult
-                {
-                    IsRight = answerResult.IsRight,
-                    PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
-                });
+                newHistory.Add(
+                    new AnswerResult
+                    {
+                        IsRight = answerResult.IsRight,
+                        PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
+                    });
             }
 
             ClientData.QuestionHistory.Clear();
@@ -2088,7 +2113,7 @@ namespace SICore
             switch (ClientData.Decision)
             {
                 case DecisionType.StarterChoosing:
-                    // Спросим заново
+                    // Asking again
                     _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
                     _logic.StopWaiting();
                     PlanExecution(Tasks.AskFirst, 20);
@@ -2132,7 +2157,6 @@ namespace SICore
 
             GamePersonAccount account;
             int index = -1;
-
             var isPlayer = personType == Constants.Player;
 
             if (isPlayer)
@@ -2177,6 +2201,7 @@ namespace SICore
                 }
 
                 account.Ready = false;
+
                 ClientData.Viewers.Add(account);
             }
             finally
@@ -2278,6 +2303,7 @@ namespace SICore
                 if (_defaultShowmans[j].Name == replacer)
                 {
                     _client.Server.DeleteClient(oldName);
+
                     return CreateNewComputerShowman(_defaultShowmans[j]);
                 }
             }
@@ -2293,6 +2319,7 @@ namespace SICore
                 if (_defaultPlayers[j].Name == replacer)
                 {
                     _client.Server.DeleteClient(oldName);
+
                     return CreateNewComputerPlayer(index, _defaultPlayers[j]);
                 }
             }
@@ -2346,6 +2373,7 @@ namespace SICore
                             {
                                 otherAccount = ClientData.Viewers[i];
                                 otherIndex = i;
+
                                 if (account.IsConnected)
                                 {
                                     ClientData.Viewers[i] = new ViewerAccount(account) { IsConnected = true };
@@ -2354,6 +2382,7 @@ namespace SICore
                                 {
                                     ClientData.Viewers.RemoveAt(i);
                                 }
+
                                 break;
                             }
                         }

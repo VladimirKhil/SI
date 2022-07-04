@@ -326,6 +326,11 @@
         public const string Replic = "REPLIC";
 
         /// <summary>
+        /// Round media content links.
+        /// </summary>
+        public const string RoundContent = "ROUNDCONTENT";
+
+        /// <summary>
         /// Package rounds names. Only rounds with at least one question are taken into account.
         /// </summary>
         public const string RoundsNames = "ROUNDSNAMES";

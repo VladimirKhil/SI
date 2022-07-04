@@ -405,7 +405,8 @@ namespace SIEngine
             return true;
         }
 
-        public virtual bool AcceptRound(Round round) => round.Themes.Any(theme => theme.Questions.Any());
+        public virtual bool AcceptRound(Round round) =>
+            round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice));
 
         public virtual bool MoveBackRound()
         {

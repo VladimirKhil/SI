@@ -97,7 +97,10 @@ namespace SIEngine
                     {
                         for (int j = 0; j < _activeRound.Themes[i].Questions.Count; j++)
                         {
-                            _questionsTable.Add(Tuple.Create(i, j));
+                            if (_activeRound.Themes[i].Questions[j].Price != SIPackages.Question.InvalidPrice)
+                            {
+                                _questionsTable.Add(Tuple.Create(i, j));
+                            }
                         }
                     }
 
@@ -169,13 +172,13 @@ namespace SIEngine
 
                     OnEndQuestion(_themeIndex, _questionIndex);
 
-                    if (_timeout) // Закончилось время раунда
+                    if (_timeout) // Round timeout
                     {
                         OnSound("timeout.wav");
                         OnRoundTimeout();
                         DoFinishRound();
                     }
-                    else if (_questionsTable.Any()) // Не закончились вопросы
+                    else if (_questionsTable.Any()) // There are still questions in round
                     {
                         Stage = GameStage.RoundTable;
                         OnNextQuestion();
@@ -183,7 +186,7 @@ namespace SIEngine
 
                         AutoNext(3000);
                     }
-                    else // Закончились вопросы
+                    else // No questions left
                     {
                         OnRoundEmpty();
                         DoFinishRound();

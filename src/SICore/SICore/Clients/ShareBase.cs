@@ -36,7 +36,9 @@ namespace SICore
             lock (_filesSync)
             {
                 if (ContainsURI(file))
+                {
                     return MakeURI(file, category);
+                }
 
                 _files[file] = getStream;
             }

@@ -747,4 +747,7 @@
   <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
     <value>The showman has switched the game into other round</value>
   </data>
+  <data name="TypeClassic" xml:space="preserve">
+    <value>classic</value>
+  </data>
 </root>

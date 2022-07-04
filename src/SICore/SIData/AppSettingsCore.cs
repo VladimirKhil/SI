@@ -7,8 +7,8 @@ using System.Xml.Serialization;
 
 namespace SIData
 {
-    [DataContract]
-    public class AppSettingsCore: IAppSettingsCore, INotifyPropertyChanged
+    /// <inheritdoc cref="IAppSettingsCore" />
+    public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         public const int DefaultMultimediaPort = 6999;
         public const int DefaultReadingSpeed = 20;
@@ -19,15 +19,15 @@ namespace SIData
         public const bool DefaultManaged = false;
         public const bool DefaultIgnoreWrong = false;
         public const bool DefaultUsePingPenalty = false;
+        public const bool DefaultPreloadRoundContent = true;
         public const GameModes DefaultGameMode = GameModes.Tv;
         public const int DefaultRandomRoundsCount = 3;
         public const int DefaultRandomThemesCount = 6;
         public const int DefaultRandomQuestionsBasePrice = 100;
 
         /// <summary>
-        /// Настройки времени
+        /// Time settings.
         /// </summary>
-        [DataMember]
         public TimeSettings TimeSettings { get; set; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -38,7 +38,6 @@ namespace SIData
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultMultimediaPort)]
-        [DataMember]
         public int MultimediaPort
         {
             get { return _multimediaPort; }
@@ -53,7 +52,6 @@ namespace SIData
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultReadingSpeed)]
-        [DataMember]
         public int ReadingSpeed
         {
             get { return _readingSpeed; }
@@ -68,7 +66,6 @@ namespace SIData
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultFalseStart)]
-        [DataMember]
         public bool FalseStart
         {
             get { return _falseStart; }
@@ -81,9 +78,9 @@ namespace SIData
         /// <summary>
         /// Игра с фальстартами
         /// </summary>
+
         [XmlAttribute]
         [DefaultValue(DefaultHintShowman)]
-        [DataMember]
         public bool HintShowman
         {
             get { return _hintShowman; }
@@ -98,7 +95,6 @@ namespace SIData
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultPartialText)]
-        [DataMember]
         public bool PartialText
         {
             get { return _partialText; }
@@ -109,14 +105,14 @@ namespace SIData
         private bool _oral = DefaultOral;
 
         /// <summary>
-        /// Устная игра
+        /// Oral game flag.
         /// </summary>
+
         [XmlAttribute]
         [DefaultValue(DefaultOral)]
-        [DataMember]
         public bool Oral
         {
-            get { return _oral; }
+            get => _oral;
             set { _oral = value; OnPropertyChanged(); }
         }
 
@@ -124,14 +120,13 @@ namespace SIData
         private bool _managed = DefaultManaged;
 
         /// <summary>
-        /// Управляемая игра
+        /// Managed game flag.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultManaged)]
-        [DataMember]
         public bool Managed
         {
-            get { return _managed; }
+            get => _managed;
             set { _managed = value; OnPropertyChanged(); }
         }
 
@@ -139,14 +134,13 @@ namespace SIData
         private bool _ignoreWrong = DefaultIgnoreWrong;
 
         /// <summary>
-        /// Неправильный ответ не снимает очки
+        /// Wrong answer did not lead to penalty.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultIgnoreWrong)]
-        [DataMember]
         public bool IgnoreWrong
         {
-            get { return _ignoreWrong; }
+            get => _ignoreWrong;
             set { _ignoreWrong = value; OnPropertyChanged(); }
         }
 
@@ -154,58 +148,55 @@ namespace SIData
         private bool _usePingPenalty = DefaultUsePingPenalty;
 
         /// <summary>
-        /// Штрафовать ли за хороший пинг (выравнивание пинга)
+        /// Should the players with good ping get penalty.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultUsePingPenalty)]
-        [DataMember]
         public bool UsePingPenalty
         {
-            get { return _usePingPenalty; }
+            get => _usePingPenalty;
             set { _usePingPenalty = value; OnPropertyChanged(); }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _preloadRoundContent = DefaultPreloadRoundContent;
+
+        /// <summary>
+        /// Allows players to download round media content at the beginng of the round.
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(DefaultPreloadRoundContent)]
+        public bool PreloadRoundContent
+        {
+            get => _preloadRoundContent;
+            set { _preloadRoundContent = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private GameModes _gameMode = DefaultGameMode;
 
         /// <summary>
-        /// Режим игры
+        /// Game mode.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultGameMode)]
-        [DataMember]
         public GameModes GameMode
         {
-            get { return _gameMode; }
+            get => _gameMode;
             set { _gameMode = value; OnPropertyChanged(); }
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _customBackgroundUri = null;
-
-        /// <summary>
-        /// Настроенное фоновое изображение
-        /// </summary>
-        [XmlAttribute]
-        [DataMember]
-        public string CustomBackgroundUri
-        {
-            get { return _customBackgroundUri; }
-            set { _customBackgroundUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _randomRoundsCount = DefaultRandomRoundsCount;
 
         /// <summary>
-        /// Число случайных раундов
+        /// Random rounds count.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultRandomRoundsCount)]
-        [DataMember]
         public int RandomRoundsCount
         {
-            get { return _randomRoundsCount; }
+            get => _randomRoundsCount;
             set { _randomRoundsCount = value; OnPropertyChanged(); }
         }
 
@@ -213,11 +204,10 @@ namespace SIData
         private int _randomThemesCount = DefaultRandomThemesCount;
 
         /// <summary>
-        /// Число случайных тем
+        /// Random themes count.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultRandomThemesCount)]
-        [DataMember]
         public int RandomThemesCount
         {
             get { return _randomThemesCount; }
@@ -228,11 +218,10 @@ namespace SIData
         private int _randomQuestionsBasePrice = DefaultRandomQuestionsBasePrice;
 
         /// <summary>
-        /// Число случайных тем
+        /// Random questions base price.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultRandomQuestionsBasePrice)]
-        [DataMember]
         public int RandomQuestionsBasePrice
         {
             get { return _randomQuestionsBasePrice; }
@@ -240,11 +229,10 @@ namespace SIData
         }
 
         /// <summary>
-        /// Язык игры
+        /// Game culture.
         /// </summary>
         [XmlAttribute]
-        [DataMember]
-        [DefaultValue("ru-RU")]
+        [DefaultValue("en-US")]
         public string Culture { get; set; }
 
         public AppSettingsCore()
@@ -262,8 +250,9 @@ namespace SIData
             _hintShowman = origin._hintShowman;
             _oral = origin._oral;
             _ignoreWrong = origin._ignoreWrong;
+            _usePingPenalty = origin.UsePingPenalty;
+            _preloadRoundContent = origin.PreloadRoundContent;
             _gameMode = origin._gameMode;
-            _customBackgroundUri = origin._customBackgroundUri;
 
             _randomRoundsCount = origin._randomRoundsCount;
             _randomThemesCount = origin._randomThemesCount;
@@ -283,12 +272,14 @@ namespace SIData
             HintShowman = settings._hintShowman;
             Oral = settings._oral;
             _ignoreWrong = settings._ignoreWrong;
+            _usePingPenalty = settings.UsePingPenalty;
+            _preloadRoundContent = settings.PreloadRoundContent;
             _gameMode = settings._gameMode;
-            _customBackgroundUri = settings._customBackgroundUri;
 
             _randomRoundsCount = settings._randomRoundsCount;
             _randomThemesCount = settings._randomThemesCount;
             _randomQuestionsBasePrice = settings._randomQuestionsBasePrice;
+
             Culture = settings.Culture;
         }
 

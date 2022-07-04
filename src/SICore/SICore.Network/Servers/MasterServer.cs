@@ -10,7 +10,7 @@ using R = SICore.Network.Properties.Resources;
 namespace SICore.Network.Servers
 {
     /// <summary>
-    /// Основной сервер
+    /// Defines a main game server node.
     /// </summary>
     public class MasterServer : Server, IMasterServer
     {

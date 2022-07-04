@@ -2,6 +2,7 @@
 using SICore.Connections;
 using SICore.Utils;
 using SIData;
+using SIPackages;
 using SIUI.ViewModel;
 
 namespace SICore
@@ -83,7 +84,7 @@ namespace SICore
             lock (_data.ChoiceLock)
             lock (_data.TInfoLock)
             {
-                _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = QuestionHelper.InvalidQuestionPrice;
+                _data.TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = Question.InvalidPrice;
             }
         }
 

@@ -1694,6 +1694,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на классическая.
+        /// </summary>
+        public static string TypeClassic {
+            get {
+                return ResourceManager.GetString("TypeClassic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на право на ошибку.
         /// </summary>
         public static string TypeIgnoreWrong {

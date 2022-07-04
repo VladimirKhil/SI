@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
@@ -14,7 +11,6 @@
     <Version>7.6.0</Version>
     <Authors>Vladimir Khil</Authors>
     <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
-    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -23,15 +19,11 @@
   <ItemGroup>
     <None Include="key.snk" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\SIPackages\SIPackages.csproj" />
   </ItemGroup>
-
   <Import Project="..\SIService.Client\SIService.Client.projitems" Label="Shared" />
-
 </Project>

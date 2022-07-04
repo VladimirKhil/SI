@@ -20,7 +20,7 @@ namespace SICore.Connections
         protected TcpClient _tcpClient = null;
 
         private readonly byte[] _buffer = new byte[5000];
-        private readonly List<byte> _bufferCache = new List<byte>();
+        private readonly List<byte> _bufferCache = new();
         private int _messageSize = -1;
 
         protected int ProtocolVersion { get; set; } = 1;
@@ -182,7 +182,11 @@ namespace SICore.Connections
         }
 
         private static bool IsNormalSocketClosing(SocketException ex) =>
-            ex.NativeErrorCode == 104 || ex.NativeErrorCode == 110 || ex.NativeErrorCode == 113 || ex.NativeErrorCode == 125;
+            ex.NativeErrorCode == 101 ||
+            ex.NativeErrorCode == 104 ||
+            ex.NativeErrorCode == 110 ||
+            ex.NativeErrorCode == 113 ||
+            ex.NativeErrorCode == 125;
 
         private async Task ReadPipeAsync(PipeReader reader, CancellationToken cancellationToken = default)
         {

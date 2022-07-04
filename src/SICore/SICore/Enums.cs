@@ -471,4 +471,35 @@ namespace SICore
         Special,
         Replic
     }
+
+    /// <summary>
+    /// Defines game move directions.
+    /// </summary>
+    public enum MoveDirections
+    {
+        /// <summary>
+        /// Move one round back.
+        /// </summary>
+        RoundBack = -2,
+
+        /// <summary>
+        /// Move game back.
+        /// </summary>
+        Back = -1,
+
+        /// <summary>
+        /// Move game futher.
+        /// </summary>
+        Next = 1,
+
+        /// <summary>
+        /// Move one round next.
+        /// </summary>
+        RoundNext = 2,
+
+        /// <summary>
+        /// Move to arbitrary round.
+        /// </summary>
+        Round = 3,
+    }
 }
