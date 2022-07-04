@@ -1,2 +1,1 @@
-dotnet restore src\SImulator\SImulator\SImulator.csproj
-dotnet publish src\SImulator\SImulator\SImulator.csproj -p:Configuration=Release -p:PublishProfile=ClickOnceX86Profile.pubxml
+dotnet publish src\SImulator\SImulator\SImulator.csproj -c Release -p:PublishSingleFile=true -r win-x86 --self-contained true -p:EnableCompressionInSingleFile=true

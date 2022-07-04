@@ -1,7 +1,7 @@
-﻿using SIPackages;
+﻿using Microsoft.Extensions.Logging;
+using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
-using SIQuester.ViewModel.Core;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
@@ -14,12 +14,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using Utils;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class MainViewModel: ModelViewBase, INotifyPropertyChanged
+    public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     {
         private const string DonateUrl = "https://yoomoney.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
+
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger<MainViewModel> _logger;
 
         #region Commands
 
@@ -89,8 +93,11 @@ namespace SIQuester.ViewModel
 
         private readonly StorageContextViewModel _storageContextViewModel;
         
-        public MainViewModel(string[] args)
+        public MainViewModel(string[] args, ILoggerFactory loggerFactory)
         {
+            _loggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger<MainViewModel>();
+
             DocList = new ObservableCollection<WorkspaceViewModel>();
             DocList.CollectionChanged += DocList_CollectionChanged;
             CollectionViewSource.GetDefaultView(DocList).CurrentChanged += MainViewModel_CurrentChanged;
@@ -134,13 +141,13 @@ namespace SIQuester.ViewModel
 
         private void CanExecuteDocumentCommand(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = ActiveDocument != null;
 
-        public async void AutoSave()
+        public async void AutoSave(int autoSaveCounter)
         {
             foreach (var item in DocList.ToArray())
             {
                 try
                 {
-                    await item.SaveIfNeeded(true);
+                    await item.SaveIfNeeded(true, autoSaveCounter % 10 == 0); // Every 10th autosave is full
                 }
                 catch (Exception exc)
                 {
@@ -160,24 +167,28 @@ namespace SIQuester.ViewModel
             {
                 var tempDir = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "SIQuester"));
                 if (!tempDir.Exists)
+                {
                     return;
+                }
 
-                if (tempDir.EnumerateFiles().Any())
+                var files = tempDir.EnumerateFiles().ToArray();
+                
+                if (files.Any())
                 {
                     try
                     {
                         if (PlatformManager.Instance.Confirm("Обнаружены файлы, которые не были корректно сохранены при последней работе с программой. Восстановить их?"))
                         {
-                            foreach (var file in tempDir.EnumerateFiles())
+                            foreach (var file in files)
                             {
                                 var tmpName = Path.Combine(Path.GetTempPath(), "SIQuester", Guid.NewGuid().ToString());
                                 File.Copy(file.FullName, tmpName);
-                                OpenFile(tmpName, overridePath: QDocument.DecodePath(file.Name));
+
+                                OpenFile(tmpName, overridePath: PathHelper.DecodePath(file.Name));
                             }
                         }
                         else
                         {
-                            var files = tempDir.EnumerateFiles().ToArray();
                             foreach (var file in files)
                             {
                                 file.Delete();
@@ -192,20 +203,11 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void SearchFolder_Executed(object arg)
-        {
-            DocList.Add(new SearchFolderViewModel(this));
-        }
+        private void SearchFolder_Executed(object arg) => DocList.Add(new SearchFolderViewModel(this));
 
-        private void SetSettings_Executed(object arg)
-        {
-            DocList.Add(new SettingsViewModel());
-        }
+        private void SetSettings_Executed(object arg) => DocList.Add(new SettingsViewModel());
 
-        private void Help_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            DocList.Add(new HowToViewModel());
-        }
+        private void Help_Executed(object sender, ExecutedRoutedEventArgs e) => DocList.Add(new HowToViewModel());
 
         private async void Close_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -229,9 +231,21 @@ namespace SIQuester.ViewModel
             return true;
         }
 
-        private void Feedback_Executed(object arg) => Browser.Open(Uri.EscapeDataString(Resources.AuthorSiteUrl), ShowError);
+        private void Feedback_Executed(object arg) => OpenUri(Uri.EscapeDataString(Resources.AuthorSiteUrl));
 
-        private void Donate_Executed(object arg) => Browser.Open(DonateUrl, ShowError);
+        private void Donate_Executed(object arg) => OpenUri(DonateUrl);
+
+        private void OpenUri(string uri)
+        {
+            try
+            {
+                Browser.Open(uri);
+            }
+            catch (Exception exc)
+            {
+                ShowError(exc);
+            }
+        }
 
         private void About_Executed(object arg) => DocList.Add(new AboutViewModel());
 
@@ -296,7 +310,7 @@ namespace SIQuester.ViewModel
         /// <param name="e"></param>
         private void New_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DocList.Add(new NewViewModel(_storageContextViewModel));
+            DocList.Add(new NewViewModel(_storageContextViewModel, _loggerFactory));
         }
 
         /// <summary>
@@ -332,10 +346,12 @@ namespace SIQuester.ViewModel
         }
 
         /// <summary>
-        /// Открытие существующего файла
+        /// Opens the existing file.
         /// </summary>
-        /// <param name="path">Имя файла</param>
-        /// <param name="fileStream">Открытый для чтения файл</param>
+        /// <param name="path">File path.</param>
+        /// <param name="search">Text to search in file after opening.</param>
+        /// <param name="overridePath">Overriden file path which will be used for file saving.</param>
+        /// <param name="onSuccess">Action to execute after successfull opening.</param>
         internal void OpenFile(string path, string search = null, string overridePath = null, Action onSuccess = null)
         {
             var savingPath = overridePath ?? path;
@@ -347,18 +363,21 @@ namespace SIQuester.ViewModel
                 {
                     stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
 
-                    // Раньше было read = false
-                    // Но из-за этого при каждом открытии, даже если файл не изменялся, менялась дата его изменения
+                    // Loads in read only mode to keep file LastUpdate time unmodified
                     var doc = SIDocument.Load(stream);
 
-                    var docViewModel = new QDocument(doc, _storageContextViewModel)
+                    _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
+
+                    var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
                     {
                         Path = savingPath,
                         FileName = Path.GetFileNameWithoutExtension(savingPath)
                     };
 
                     if (search != null)
+                    {
                         docViewModel.SearchText = search;
+                    }
 
                     if (overridePath != null)
                     {
@@ -383,32 +402,37 @@ namespace SIQuester.ViewModel
 
                     throw;
                 }
-            }).ContinueWith(task =>
-            {
-                if (task.IsFaulted)
+            }).ContinueWith(
+                task =>
                 {
-                    if (task.Exception.InnerException is FileNotFoundException)
+                    if (task.IsFaulted)
                     {
-                        AppSettings.Default.History.Remove(path);
+                        if (task.Exception.InnerException is FileNotFoundException)
+                        {
+                            AppSettings.Default.History.Remove(path);
+                        }
+
+                        throw task.Exception.InnerException;
                     }
 
-                    throw task.Exception.InnerException;
-                }
+                    return task.Result;
+                },
+                TaskScheduler.FromCurrentSynchronizationContext());
 
-                return task.Result;
-            }, TaskScheduler.FromCurrentSynchronizationContext());
+            DocList.Add(new DocumentLoaderViewModel(
+                path,
+                loader,
+                () =>
+                {
+                    AppSettings.Default.History.Add(savingPath);
 
-            DocList.Add(new DocumentLoaderViewModel(path, loader, () =>
-            {
-                AppSettings.Default.History.Add(savingPath);
-
-                onSuccess?.Invoke();
-            }));
+                    onSuccess?.Invoke();
+                }));
         }
 
         private void ImportTxt_Executed(object arg)
         {
-            var model = new ImportTextViewModel(arg, _storageContextViewModel);
+            var model = new ImportTextViewModel(arg, _storageContextViewModel, _loggerFactory);
             DocList.Add(model);
             model.Start();
         }
@@ -419,7 +443,7 @@ namespace SIQuester.ViewModel
         /// <param name="arg"></param>
         private void ImportClipboardTxt_Executed(object arg)
         {
-            var model = new ImportTextViewModel(typeof(Clipboard), _storageContextViewModel);
+            var model = new ImportTextViewModel(typeof(Clipboard), _storageContextViewModel, _loggerFactory);
             DocList.Add(model);
             model.Start();
         }
@@ -437,7 +461,7 @@ namespace SIQuester.ViewModel
                 using var stream = File.OpenRead(file);
                 var doc = SIDocument.LoadXml(stream);
 
-                var docViewModel = new QDocument(doc, _storageContextViewModel) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
+                var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
 
                 LoadMediaFromFolder(docViewModel, Path.GetDirectoryName(file));
 
@@ -497,15 +521,9 @@ namespace SIQuester.ViewModel
         /// Импортировать пакет из Базы вопросов
         /// </summary>
         /// <param name="arg"></param>
-        private void ImportBase_Executed(object arg)
-        {
-            DocList.Add(new ImportDBStorageViewModel(_storageContextViewModel));
-        }
+        private void ImportBase_Executed(object arg) => DocList.Add(new ImportDBStorageViewModel(_storageContextViewModel, _loggerFactory));
 
-        private void ImportFromSIStore_Executed(object arg)
-        {
-            DocList.Add(new ImportSIStorageViewModel(_storageContextViewModel));
-        }
+        private void ImportFromSIStore_Executed(object arg) => DocList.Add(new ImportSIStorageViewModel(_storageContextViewModel, _loggerFactory));
 
         private async void SaveAll_Executed(object arg)
         {
@@ -513,7 +531,7 @@ namespace SIQuester.ViewModel
             {
                 try
                 {
-                    await item.SaveIfNeeded(false);
+                    await item.SaveIfNeeded(false, true);
                 }
                 catch (Exception exc)
                 {

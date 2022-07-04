@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29201.188
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D8DC2EF3-36A3-475B-A88F-861AB1E112F6}"
 EndProject
@@ -32,6 +32,8 @@ EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SIQuester.Bootstrapper", "deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj", "{80E6576A-4906-4D07-B473-A994EDDD13AC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{29A5EB8A-6B88-4AE9-A83B-0C9793134565}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "src\Common\Utils\Utils.csproj", "{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -107,6 +109,14 @@ Global
 		{80E6576A-4906-4D07-B473-A994EDDD13AC}.Release|Any CPU.ActiveCfg = Release|x86
 		{80E6576A-4906-4D07-B473-A994EDDD13AC}.Release|x86.ActiveCfg = Release|x86
 		{80E6576A-4906-4D07-B473-A994EDDD13AC}.Release|x86.Build.0 = Release|x86
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Debug|x86.Build.0 = Debug|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Release|x86.ActiveCfg = Release|Any CPU
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +134,7 @@ Global
 		{BD1AE59E-2B61-42B6-B695-D1C89AA74A1B} = {03BB87B1-7EA0-49F8-B8A5-46A64E7A6E0C}
 		{191BE083-3920-4C18-8130-4D6B2BF0AB59} = {9BD30589-9C99-4E58-8447-2DDB33A7F0FC}
 		{80E6576A-4906-4D07-B473-A994EDDD13AC} = {9BD30589-9C99-4E58-8447-2DDB33A7F0FC}
+		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {080C13E0-0C5D-41FE-9CBB-EE7ED6CB69F3}

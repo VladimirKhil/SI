@@ -27,6 +27,7 @@ namespace SIQuester
 
         private bool _closingFromThumbnail = false;
         private DispatcherTimer _autoSaveTimer;
+        private int _autoSaveCounter = 0;
 
         public MainWindow()
         {
@@ -38,7 +39,7 @@ namespace SIQuester
             }
         }
 
-        private void AutoSave(object sender, EventArgs args) => ((MainViewModel)DataContext)?.AutoSave();
+        private void AutoSave(object sender, EventArgs args) => ((MainViewModel)DataContext)?.AutoSave(++_autoSaveCounter);
 
         /// <summary>
         /// Поскольку TabControl при привязке к коллекции элементов ведёт себя достаточно странно, обеспечим создание и уничтожение вкладок самостоятельно

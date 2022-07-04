@@ -54,8 +54,12 @@ namespace SIGame.Implementation
             };
 
             var docViewer = new System.Windows.Controls.DocumentViewer { Document = document.GetFixedDocumentSequence() };
-            var frame = new System.Windows.Controls.Frame { NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden };
-            frame.Content = docViewer;
+            var frame = new System.Windows.Controls.Frame
+            {
+                NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden,
+                Content = docViewer
+            };
+
             helpWindow.Content = frame;
 
             helpWindow.Closed += (sender, e) =>
@@ -69,11 +73,16 @@ namespace SIGame.Implementation
                 {
                     if (e.Uri.IsAbsoluteUri && e.Uri.Scheme == "http")
                     {
-                        Browser.Open(
-                            e.Uri.ToString(),
-                            exc => MessageBox.Show(
+                        try
+                        {
+                            Browser.Open(e.Uri.ToString());
+                        }
+                        catch (Exception exc)
+                        {
+                            MessageBox.Show(
                                 string.Format(Resources.SiteNavigationError + "\r\n{1}", e.Uri, exc.Message),
-                                CommonSettings.AppName));
+                                CommonSettings.AppName);
+                        }
 
                         e.Handled = true;
                     }

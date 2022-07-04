@@ -1,6 +1,12 @@
 ﻿#if !DEBUG
 using Microsoft.WindowsAPICodePack.Dialogs;
 #endif
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
@@ -21,6 +27,8 @@ namespace SIQuester
     /// </summary>
     public partial class App : Application
     {
+        private IHost _host;
+
         /// <summary>
         /// Имя конфигурационного файла пользовательских настроек
         /// </summary>
@@ -52,35 +60,63 @@ namespace SIQuester
         
         private bool _hasError = false;
 
+        private ILogger<App> _logger;
+
+        private async void Application_Startup(object sender, StartupEventArgs e)
+        {
+            AppSettings.Default = LoadSettings();
+
+            if (!IsWindows8_1OrLater)
+            {
+                AppSettings.Default.SpellChecking = false;
+            }
+
+            if (e.Args.Length > 0)
+            {
+                if (e.Args[0] == "backup")
+                {
+                    // Бэкап хранилища вопросов
+                    var folder = e.Args[1];
+                    Backup(folder);
+                    return;
+                }
+            }
+
+#if !DEBUG
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+#endif
+
+            _host = new HostBuilder()
+                .ConfigureAppConfiguration((context, configurationBuilder) =>
+                {
+                    configurationBuilder.SetBasePath(context.HostingEnvironment.ContentRootPath);
+                    configurationBuilder.AddJsonFile("appsettings.json", optional: true);
+                })
+                .ConfigureServices(ConfigureServices)
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
+                })
+                .UseNLog()
+                .Build();
+
+            await _host.StartAsync();
+
+            _manager.ServiceProvider = _host.Services;
+
+            _logger = _host.Services.GetRequiredService<ILogger<App>>();
+            _logger.LogInformation("Application started");
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             try
             {
-                AppSettings.Default = LoadSettings();
+                var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-                if (!IsWindows8_1OrLater)
-                {
-                    AppSettings.Default.SpellChecking = false;
-                }
-
-                if (e.Args.Length > 0)
-                {
-                    if (e.Args[0] == "backup")
-                    {
-                        // Бэкап хранилища вопросов
-                        var folder = e.Args[1];
-                        Backup(folder);
-                        return;
-                    }
-                }
-
-#if !DEBUG
-                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-#endif
-
-                MainWindow = new MainWindow { DataContext = new MainViewModel(e.Args) };
+                MainWindow = new MainWindow { DataContext = new MainViewModel(e.Args, loggerFactory) };
                 MainWindow.Show();
             }
             catch (Exception exc)
@@ -90,11 +126,16 @@ namespace SIQuester
             }
         }
 
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddTransient(typeof(MainWindow));
+        }
+
         /// <summary>
         /// Backups SIStorage to folder. This method is called from the console.
         /// </summary>
         /// <param name="folder">Folder to backup.</param>
-        private async void Backup(string folder)
+        private static async void Backup(string folder)
         {
             int code = 0;
             try
@@ -138,6 +179,8 @@ namespace SIQuester
             }
 
             _hasError = true;
+
+            _logger.LogError(e.Exception, "Application error: {message}", e.Exception.Message);
 
             if (e.Exception is OutOfMemoryException)
             {
@@ -248,6 +291,13 @@ namespace SIQuester
 
             e.Handled = true;
             Shutdown();
+        }
+
+        private async void Application_Exit(object sender, ExitEventArgs e)
+        {
+            _logger.LogInformation("Application exited");
+
+            await _host.StopAsync();
         }
 
         protected override void OnExit(ExitEventArgs e)

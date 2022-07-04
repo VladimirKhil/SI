@@ -1,8 +1,8 @@
-﻿using SIQuester.ViewModel.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SIQuester.ViewModel
 {

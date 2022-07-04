@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SIUI.ViewModel.Core
+namespace Utils
 {
     public static class UI
     {

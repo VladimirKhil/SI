@@ -31,6 +31,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="MahApps.Metro" Version="2.4.5" />
@@ -46,6 +48,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\..\Common\Utils\Utils.csproj" />
     <ProjectReference Include="..\QTxtConverter\QTxtConverter.csproj" />
   </ItemGroup>
   <ItemGroup>

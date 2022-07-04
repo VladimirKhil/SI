@@ -41,17 +41,23 @@ namespace SIGame.ViewModel
                 if (_model.Address != newValue)
                 {
                     Connect.CanBeExecuted = false;
-                    _model.Address = newValue;
-                    OnPropertyChanged();
-                    var match = AddressRegex.Match(newValue);
 
-                    if (!match.Success || !int.TryParse(match.Groups["port"].Value, out int val))
+                    try
                     {
-                        Error = Resources.WrongAddressFormat;
-                        return;
-                    }
+                        var match = AddressRegex.Match(newValue);
+                        if (!match.Success || !int.TryParse(match.Groups["port"].Value, out _))
+                        {
+                            Error = Resources.WrongAddressFormat;
+                            return;
+                        }
 
-                    Connect.CanBeExecuted = true;
+                        _model.Address = newValue;
+                        OnPropertyChanged();
+                    }
+                    finally
+                    {
+                        Connect.CanBeExecuted = true;
+                    }
                 }
             }
         }
@@ -99,8 +105,16 @@ namespace SIGame.ViewModel
         private async void Connect_Executed(object arg)
         {
             var match = AddressRegex.Match(_model.Address);
+
+            if (!match.Success || !int.TryParse(match.Groups["port"].Value, out var port))
+            {
+                Error = Resources.WrongAddressFormat;
+                return;
+            }
+
             ServerAddress = "http://" + _model.Address;
-            await ConnectToServerAsync(match.Groups["host"].Value, int.Parse(match.Groups["port"].Value));
+
+            await ConnectToServerAsync(match.Groups["host"].Value, port);
         }
 
         private async Task ConnectToServerAsync(string address, int port)

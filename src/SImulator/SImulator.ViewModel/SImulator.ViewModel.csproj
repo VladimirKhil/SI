@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <TargetFramework>net6.0</TargetFramework>
+	<SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
@@ -11,9 +9,8 @@
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Company>Khil-soft</Company>
-    <Version>2.9.0</Version>
+    <Version>2.9.1</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-	  <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>

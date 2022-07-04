@@ -47,6 +47,6 @@ namespace SIQuester.ViewModel
 
         protected void OnNewItem(WorkspaceViewModel viewModel) => NewItem?.Invoke(viewModel);
 
-        protected internal virtual Task SaveIfNeeded(bool temp) => Task.CompletedTask;
+        protected internal virtual Task SaveIfNeeded(bool temp, bool full) => Task.CompletedTask;
     }
 }

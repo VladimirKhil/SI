@@ -1,5 +1,6 @@
 ﻿using SICore;
 using SIGame.ViewModel.Properties;
+using System;
 using System.Windows.Input;
 using Utils;
 
@@ -22,11 +23,16 @@ namespace SIGame.ViewModel
 
         private void NavigateToVK_Executed(object arg)
         {
-            Browser.Open(
-                Resources.GroupLink,
-                exc => PlatformSpecific.PlatformManager.Instance.ShowMessage(
+            try
+            {
+                Browser.Open(Resources.GroupLink);
+            }
+            catch (Exception exc)
+            {
+                PlatformSpecific.PlatformManager.Instance.ShowMessage(
                     string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
-                    PlatformSpecific.MessageType.Error));
+                    PlatformSpecific.MessageType.Error);
+            }
         }
     }
 }

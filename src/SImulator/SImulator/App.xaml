@@ -1,11 +1,14 @@
-﻿<Application x:Class="SImulator.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
-             xmlns:lb="clr-namespace:SImulator.Behaviors"
-             xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException"
-             ShutdownMode="OnMainWindowClose">
+﻿<Application
+    x:Class="SImulator.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
+    xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
+    DispatcherUnhandledException="Application_DispatcherUnhandledException"
+    Startup="Application_Startup"
+    Exit="Application_Exit"
+    ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
         <SolidColorBrush x:Key="ImageBrush" Color="#FF232323" />

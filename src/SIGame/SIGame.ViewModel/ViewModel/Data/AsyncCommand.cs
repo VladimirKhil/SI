@@ -1,7 +1,7 @@
-﻿using SIUI.ViewModel.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SIGame.ViewModel
 {
@@ -24,10 +24,16 @@ namespace SIGame.ViewModel
                     {
                         if (SynchronizationContext.Current == null)
                         {
-                            Task.Factory.StartNew(() => CanExecuteChanged?.Invoke(this, EventArgs.Empty), CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                            Task.Factory.StartNew(
+                                () => CanExecuteChanged?.Invoke(this, EventArgs.Empty),
+                                CancellationToken.None,
+                                TaskCreationOptions.None,
+                                UI.Scheduler);
                         }
                         else
+                        {
                             CanExecuteChanged(this, EventArgs.Empty);
+                        }
                     }
                 }
             }

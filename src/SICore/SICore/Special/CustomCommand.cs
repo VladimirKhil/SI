@@ -1,8 +1,8 @@
-﻿using SIUI.ViewModel.Core;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SICore
 {
@@ -29,10 +29,16 @@ namespace SICore
                     {
                         if (SynchronizationContext.Current == null)
                         {
-                            Task.Factory.StartNew(() => CanExecuteChanged?.Invoke(this, EventArgs.Empty), CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                            Task.Factory.StartNew(
+                                () => CanExecuteChanged?.Invoke(this, EventArgs.Empty),
+                                CancellationToken.None,
+                                TaskCreationOptions.None,
+                                UI.Scheduler);
                         }
                         else
+                        {
                             CanExecuteChanged(this, EventArgs.Empty);
+                        }
                     }
                 }
             }

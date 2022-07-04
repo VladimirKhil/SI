@@ -1,11 +1,14 @@
-﻿using System;
-using System.Windows.Input;
-using System.Windows;
-using System.Runtime.InteropServices;
-using SImulator.Implementation.WinAPI;
-using SImulator.ViewModel.Core;
-using SImulator.ViewModel.ButtonManagers;
+﻿using SImulator.Implementation.WinAPI;
+using SImulator.Properties;
 using SImulator.ViewModel;
+using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.Core;
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Input;
 
 namespace SImulator.Implementation.ButtonManagers
 {
@@ -24,11 +27,21 @@ namespace SImulator.Implementation.ButtonManagers
 
         public override bool Run()
         {
-            _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, Marshal.GetHINSTANCE(Application.Current.GetType().Module), 0);
+            using (var process = Process.GetCurrentProcess())
+            using (var module = process.MainModule)
+            {
+                _hookPtr = Win32.SetWindowsHookEx(Win32.WH_KEYBOARD_LL, _callbackPtr, module.BaseAddress, 0);
+            }
 
             if (_hookPtr == IntPtr.Zero)
             {
-                MessageBox.Show("Ошибка прослушивания клавиатуры", MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                var errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+
+                MessageBox.Show(
+                    $"{Resources.KeyboardListeningError}: {errorMessage}",
+                    MainViewModel.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
 
             return true;
@@ -38,7 +51,19 @@ namespace SImulator.Implementation.ButtonManagers
         {
             if (_hookPtr != IntPtr.Zero)
             {
-                Win32.UnhookWindowsHookEx(_hookPtr);
+                var result = Win32.UnhookWindowsHookEx(_hookPtr);
+
+                if (result == 0)
+                {
+                    var errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+
+                    MessageBox.Show(
+                        $"{Resources.KeyboardDetachError}: {errorMessage}",
+                        MainViewModel.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+
                 _hookPtr = IntPtr.Zero;
             }
         }

@@ -2,12 +2,12 @@
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
-using SIUI.ViewModel.Core;
 using System;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Utils;
 
 namespace SImulator.ViewModel
 {

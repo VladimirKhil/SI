@@ -47,19 +47,32 @@ namespace SIGame.ViewModel
                 return;
             }
 
-            Browser.Open(
-                licensesFolder,
-                exc => PlatformManager.Instance.ShowMessage(
+            try
+            {
+                Browser.Open(licensesFolder);
+            }
+            catch (Exception exc)
+            {
+                PlatformManager.Instance.ShowMessage(
                     string.Format(Resources.OpenLicensesError, exc.Message),
-                    MessageType.Error));
+                    MessageType.Error);
+            }
         }
 
         private void OpenPublicDomain_Executed(object arg) => OpenSite("https://en.wikipedia.org/wiki/Wikipedia:Public_domain");
 
-        private static void OpenSite(string url) => Browser.Open(
-            url,
-            exc => PlatformManager.Instance.ShowMessage(
-                $"{string.Format(Resources.ErrorMovingToSite, url)}{Environment.NewLine}{exc.Message}",
-                MessageType.Error));
+        private static void OpenSite(string url)
+        {
+            try
+            {
+                Browser.Open(url);
+            }
+            catch (Exception exc)
+            {
+                PlatformManager.Instance.ShowMessage(
+                    $"{string.Format(Resources.ErrorMovingToSite, url)}{Environment.NewLine}{exc.Message}",
+                    MessageType.Error);
+            }
+        }
     }
 }

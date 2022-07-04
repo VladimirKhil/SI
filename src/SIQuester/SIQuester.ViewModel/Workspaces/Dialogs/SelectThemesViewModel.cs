@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using Microsoft.Extensions.Logging;
+using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
 using System;
@@ -54,9 +55,13 @@ namespace SIQuester.ViewModel
         public ICommand Select { get; private set; }
         public ICommand Select2 { get; private set; }
 
-        public SelectThemesViewModel(QDocument document)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public SelectThemesViewModel(QDocument document, ILoggerFactory loggerFactory)
         {
             _document = document;
+            _loggerFactory = loggerFactory;
+
             Themes = _document.Document.Package.Rounds
                 .SelectMany(round => round.Themes)
                 .Select(theme => new SelectableTheme(theme))
@@ -87,7 +92,7 @@ namespace SIQuester.ViewModel
                     await _document.Document.CopyCollections(newDocument, allthemes[index - 1]);
                 }
 
-                OnNewItem(new QDocument(newDocument, _document.StorageContext) { FileName = newDocument.Package.Name });
+                OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
             }
             catch (Exception exc)
             {
@@ -114,7 +119,7 @@ namespace SIQuester.ViewModel
                     await _document.Document.CopyCollections(newDocument, theme);
                 }
 
-                OnNewItem(new QDocument(newDocument, _document.StorageContext) { FileName = newDocument.Package.Name });
+                OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
             }
             catch (Exception exc)
             {
