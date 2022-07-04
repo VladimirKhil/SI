@@ -240,6 +240,3 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
-Debug
-Release
-/SIServer/SIGameServer/logs

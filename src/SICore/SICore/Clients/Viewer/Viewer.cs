@@ -910,9 +910,11 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.FinalThink:
                         _logic.FinalThink();
                         break;
+
                     case Messages.Picture:
                         {
                             #region Picture
@@ -927,6 +929,7 @@ namespace SICore
                             #endregion
                             break;
                         }
+
                     case Messages.SetChooser:
                         {
                             var index = int.Parse(mparams[1]);

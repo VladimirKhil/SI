@@ -298,12 +298,6 @@ namespace SIGame
 
             var settings = (UserSettings)serializer.Deserialize(stream);
 
-            if (settings.GameSettings.AppSettings.CustomBackgroundUri != null)
-            {
-                settings.GameSettings.AppSettings.ThemeSettings.CustomBackgroundUri = settings.GameSettings.AppSettings.CustomBackgroundUri;
-                settings.GameSettings.AppSettings.CustomBackgroundUri = null;
-            }
-
             return settings;
         }
 

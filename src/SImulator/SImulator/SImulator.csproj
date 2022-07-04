@@ -94,34 +94,34 @@
     <None Update="licenses\SharpDX.LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\final_delete.mp3">
+    <None Update="sounds\final_delete.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\final_think.mp3">
+    <None Update="sounds\final_think.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\game_begin.mp3">
+    <None Update="sounds\game_begin.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\question_noanswers.mp3">
+    <None Update="sounds\question_noanswers.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\question_norisk.mp3">
+    <None Update="sounds\question_norisk.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\question_secret.mp3">
+    <None Update="sounds\question_secret.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\question_stake.mp3">
+    <None Update="sounds\question_stake.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\round_begin.mp3">
+    <None Update="sounds\round_begin.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\round_themes.mp3">
+    <None Update="sounds\round_themes.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sounds\round_timeout.mp3">
+    <None Update="sounds\round_timeout.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="wwwroot\index.html">
