@@ -7,12 +7,22 @@ using Utils;
 
 namespace SIGame.ViewModel
 {
+    /// <summary>
+    /// Describes a command that can be executed only with a fixed set of valid arguments.
+    /// </summary>
+    /// <inheritdoc cref="ICommand" />
     public sealed class ExtendedCommand : ICommand
     {
         private readonly Action<object> _execute = null;
 
+        /// <summary>
+        /// A set of valid command arguments.
+        /// </summary>
         public HashSet<object> ExecutionArea { get; } = new HashSet<object>();
 
+        /// <summary>
+        /// Raises <see cref="CanExecuteChanged" /> event in a synchronization context-bound thread.
+        /// </summary>
         public void OnCanBeExecutedChanged()
         {
             if (CanExecuteChanged != null)
@@ -32,21 +42,12 @@ namespace SIGame.ViewModel
             }
         }
 
-        public ExtendedCommand(Action<object> execute)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        }
+        public ExtendedCommand(Action<object> execute) => _execute = execute ?? throw new ArgumentNullException(nameof(execute));
 
-        public bool CanExecute(object parameter)
-        {
-            return ExecutionArea.Contains(parameter);
-        }
+        public bool CanExecute(object parameter) => ExecutionArea.Contains(parameter);
 
         public event EventHandler CanExecuteChanged;
 
-        public void Execute(object parameter)
-        {
-            _execute(parameter);
-        }
+        public void Execute(object parameter) => _execute(parameter);
     }
 }

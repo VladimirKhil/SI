@@ -10,9 +10,9 @@
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
     xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:local="clr-namespace:SImulator"
-    xmlns:se="clr-namespace:SIEngine;assembly=SIEngine"
     xmlns:vmc="clr-namespace:SImulator.ViewModel.Core;assembly=SImulator.ViewModel"
     xmlns:vm="clr-namespace:SImulator.ViewModel;assembly=SImulator.ViewModel"
+    xmlns:vmm="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
     xmlns:my="clr-namespace:SImulator.Converters"
     xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
     xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
@@ -60,10 +60,10 @@
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
                         <sys:String x:Key="{x:Static pc:QuestionTypes.Simple}">Простой</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Auction}">Аукцион</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Cat}">Кот в мешке</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.BagCat}">Кот в мешке</sys:String>
-                        <sys:String x:Key="{x:Static pc:QuestionTypes.Sponsored}">Вопрос от спонсора</sys:String>
+                        <sys:String x:Key="{x:Static pc:QuestionTypes.Auction}">Вопрос со ставкой</sys:String>
+                        <sys:String x:Key="{x:Static pc:QuestionTypes.Cat}">Вопрос с секретом</sys:String>
+                        <sys:String x:Key="{x:Static pc:QuestionTypes.BagCat}">Вопрос с секретом</sys:String>
+                        <sys:String x:Key="{x:Static pc:QuestionTypes.Sponsored}">Вопрос без риска</sys:String>
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -116,7 +116,7 @@
             </LinearGradientBrush>
 
             <my:FontFamilyConverter x:Key="FontFamilyConverter1" />
-            <my:EnumConverter x:Key="EnumConverter" EnumType="{x:Type se:GameModes}" />
+            <my:EnumConverter x:Key="EnumConverter" EnumType="{x:Type vmm:GameModes}" />
 
             <Style x:Key="Title" TargetType="TextBlock">
                 <Setter Property="FontSize" Value="18" />

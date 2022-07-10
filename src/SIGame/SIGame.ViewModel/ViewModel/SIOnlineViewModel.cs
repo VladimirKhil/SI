@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,11 +23,16 @@ using Utils;
 
 namespace SIGame.ViewModel
 {
+    /// <summary>
+    /// Provides a view model for game server lobby.
+    /// </summary>
     public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         private SI.GameServer.Contract.HostInfo _gamesHostInfo;
 
         public string ServerName => _gamesHostInfo?.Name ?? "SIGame";
+
+        public string ServerLicense => _gamesHostInfo?.License;
 
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -41,6 +47,7 @@ namespace SIGame.ViewModel
                 {
                     _currentGame = value;
                     OnPropertyChanged();
+
                     if (value != null)
                     {
                         UpdateJoinCommand(value.Persons);
@@ -314,8 +321,6 @@ namespace SIGame.ViewModel
             get => _userSettings.GameSettings.AppSettings.IsChatShown;
             set { _userSettings.GameSettings.AppSettings.IsChatShown = value; OnPropertyChanged(); }
         }
-
-        protected override string PackagesPublicBaseUrl => _gamesHostInfo.PackagesPublicBaseUrl;
 
         protected override string[] ContentPublicBaseUrls => _gamesHostInfo.ContentPublicBaseUrls;
 
@@ -911,7 +916,7 @@ namespace SIGame.ViewModel
             byte[] fileHash = null;
             using (var stream = File.OpenRead(avatarUri))
             {
-                using var sha1 = new System.Security.Cryptography.SHA1Managed();
+                using var sha1 = SHA1.Create();
                 fileHash = sha1.ComputeHash(stream);
             }
 

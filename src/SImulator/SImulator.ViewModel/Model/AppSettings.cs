@@ -1,5 +1,4 @@
-﻿using SIEngine;
-using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Core;
 using SIUI.ViewModel.Core;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

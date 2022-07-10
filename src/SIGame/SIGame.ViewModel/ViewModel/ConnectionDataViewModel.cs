@@ -48,8 +48,6 @@ namespace SIGame.ViewModel
         protected IViewerClient _host;
         protected Connector _connector;
 
-        protected virtual string PackagesPublicBaseUrl { get; } = null;
-
         protected virtual string[] ContentPublicBaseUrls { get; } = null;
 
         protected void UpdateJoinCommand(ConnectionPersonData[] persons)
@@ -59,11 +57,15 @@ namespace SIGame.ViewModel
             // Можно под кем-то подключиться
             var showman = persons.FirstOrDefault(p => p.Role == GameRole.Showman);
             if (showman != null && !showman.IsOnline)
+            {
                 _join.ExecutionArea.Add(GameRole.Showman);
+            }
 
             var players = persons.Where(p => p.Role == GameRole.Player);
             if (players.Any(p => !p.IsOnline))
+            {
                 _join.ExecutionArea.Add(GameRole.Player);
+            }
 
             _join.ExecutionArea.Add(GameRole.Viewer);
 
@@ -292,7 +294,7 @@ namespace SIGame.ViewModel
 
             var data = new ViewerData(BackLink.Default)
             {
-                ServerPublicUrl = PackagesPublicBaseUrl,
+                ServerPublicUrl = ContentPublicBaseUrls.FirstOrDefault(),
                 ContentPublicUrls = ContentPublicBaseUrls,
                 ServerAddress = ServerAddress
             };

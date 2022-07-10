@@ -1017,4 +1017,7 @@
   <data name="UsePingPenalty" xml:space="preserve">
     <value>Slow down the players with good ping</value>
   </data>
+  <data name="ServerLicense" xml:space="preserve">
+    <value>Server license</value>
+  </data>
 </root>

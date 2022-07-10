@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:SIGame"
     xmlns:localc="clr-namespace:SIGame.Converters"
-    xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:vmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
@@ -16,7 +15,8 @@
     FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     mc:Ignorable="d"
     d:DesignWidth="758"
-    d:DesignHeight="416.8">
+    d:DesignHeight="416.8"
+    d:DataContext="{d:DesignInstance lvm:SIOnlineViewModel}">
     <UserControl.Resources>
         <localc:RequiredToColorConverter x:Key="RequiredToColorConverter" ErrorBrush="{StaticResource ErrorColor}" />
         <localc:PersonsConverter x:Key="PersonsConverter" />
@@ -103,10 +103,64 @@
                 </Button>
                 <TextBlock Margin="15,15,7,2" Text="{x:Static vmp:Resources.MainMenu_OnlineGame}" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontSize="40" FontWeight="Bold" />
             </DockPanel>
-            <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Foreground="{StaticResource MainColor}" FontWeight="Bold" FontSize="22" HorizontalAlignment="Right"
-                       Margin="0,10,10,0" ToolTip="{x:Static lp:Resources.ServerName}">
-                <Run Text="{x:Static lp:Resources.Server}" /><Run Text=": " /><Run Text="{Binding ServerName, Mode=OneWay}" />
-            </TextBlock>
+            <DockPanel
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                Margin="0,10,10,0">
+                <local:DropDownButton
+                    Style="{StaticResource SIButtonSimple}"
+                    DockPanel.Dock="Right"
+                    BorderThickness="0"
+                    VerticalAlignment="Center"                    
+                    FontSize="22"
+                    Margin="10,0,0,0"
+                    Padding="10,5"
+                    ToolTip="{x:Static lp:Resources.ServerLicense}">
+                    ⓘ
+                    <local:DropDownButton.DropDown>
+                        <ContextMenu>
+                            <TextBlock
+                                Text="{Binding ServerLicense}"
+                                Foreground="White"
+                                FontSize="16"
+                                LineHeight="28"
+                                Margin="20"
+                                MaxWidth="500"
+                                TextWrapping="Wrap" />
+                            <ContextMenu.Template>
+                                <ControlTemplate TargetType="ContextMenu">
+                                    <Border x:Name="Border" Background="#000451" BorderBrush="Gray" BorderThickness="1">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="0" HorizontalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </ContextMenu.Template>
+                            <ContextMenu.Resources>
+                                <Style TargetType="{x:Type MenuItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                                    <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ContextMenu.Resources>
+                        </ContextMenu>
+                    </local:DropDownButton.DropDown>
+                </local:DropDownButton>
+                <TextBlock
+                    Foreground="{StaticResource MainColor}"
+                    FontWeight="Bold"
+                    FontSize="22"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    ToolTip="{x:Static lp:Resources.ServerName}">
+                    <Run Text="{x:Static lp:Resources.Server}" /><Run Text=": " /><Run Text="{Binding ServerName, Mode=OneWay}" />
+                </TextBlock>
+            </DockPanel>
             <DockPanel Grid.Row="1">
                 <TextBlock DockPanel.Dock="Left" Margin="15,8,15,3" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontWeight="Bold" FontSize="22" VerticalAlignment="Center">
                     <Run Text="{x:Static lp:Resources.Tab_Games}" /><Run Text=" " /><Run Text="{Binding ServerGames.Count, StringFormat=(\{0\}), Mode=OneWay}" />

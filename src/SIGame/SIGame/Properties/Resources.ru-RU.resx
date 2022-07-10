@@ -1017,4 +1017,7 @@
   <data name="UsePingPenalty" xml:space="preserve">
     <value>Замедлять игроков с хорошим пингом</value>
   </data>
+  <data name="ServerLicense" xml:space="preserve">
+    <value>Лицензия сервера</value>
+  </data>
 </root>

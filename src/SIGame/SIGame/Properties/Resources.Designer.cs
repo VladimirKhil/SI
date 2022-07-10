@@ -2149,6 +2149,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Server license.
+        /// </summary>
+        public static string ServerLicense {
+            get {
+                return ResourceManager.GetString("ServerLicense", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Server name.
         /// </summary>
         public static string ServerName {
