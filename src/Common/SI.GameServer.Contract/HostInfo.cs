@@ -16,5 +16,10 @@ namespace SI.GameServer.Contract
         public string[] ContentPublicBaseUrls { get; set; }
 
         public string License { get; set; }
+
+        /// <summary>
+        /// Maximum allowed package size in MB.
+        /// </summary>
+        public int MaxPackageSizeMb { get; set; } = 100;
     }
 }

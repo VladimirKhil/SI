@@ -557,6 +557,12 @@ namespace SIGame.ViewModel
 
                 _gamesHostInfo = await _gameServerClient.GetGamesHostInfoAsync(_cancellationTokenSource.Token);
 
+                if (_gamesHostInfo.MaxPackageSizeMb == 0)
+                {
+                    // For backward compatibility
+                    _gamesHostInfo.MaxPackageSizeMb = 100;
+                }
+
                 OnPropertyChanged(nameof(ServerName));
 
                 await ReloadGamesAsync(_cancellationTokenSource.Token);
@@ -759,7 +765,7 @@ namespace SIGame.ViewModel
 
                     if (data.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
                     {
-                        throw new Exception(Resources.FileTooLarge + ". " + string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb));
+                        throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
                     }
 
                     GameSettings.Message = Resources.SendingPackageToServer;
