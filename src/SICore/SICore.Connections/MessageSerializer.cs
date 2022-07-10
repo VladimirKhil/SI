@@ -1,8 +1,12 @@
-﻿using System.Buffers;
+﻿using SIData;
+using System.Buffers;
 using System.Text;
 
 namespace SICore.Connections
 {
+    /// <summary>
+    /// Serializes and deserializes <see cref="Message" /> object to and from binary format.
+    /// </summary>
     internal static class MessageSerializer
     {
         // Message buffer format:

@@ -1,4 +1,5 @@
-﻿using Notions;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Notions;
 using SICore;
 using SICore.PlatformSpecific;
 using SICore.Results;
@@ -7,20 +8,24 @@ using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class BackLink: BackLinkCore
+    public sealed class BackLink : BackLinkCore
     {
         internal static BackLink Default { get; set; }
 
         private readonly AppSettingsViewModel _settings;
         private readonly UserSettings _userSettings;
+        private readonly IServiceProvider _serviceProvider;
 
-        internal BackLink(AppSettingsViewModel settings, UserSettings userSettings)
+        internal BackLink(AppSettingsViewModel settings, UserSettings userSettings, IServiceProvider serviceProvider)
         {
             _settings = settings;
             _userSettings = userSettings;
+            _serviceProvider = serviceProvider;
         }
 
         public override void OnFlash(bool flash = true) => PlatformSpecific.PlatformManager.Instance.Activate();
@@ -42,11 +47,42 @@ namespace SIGame.ViewModel
         public override void SendError(Exception exc, bool isWarning = false) => PlatformSpecific.PlatformManager.Instance.SendErrorReport(exc);
 
         /// <summary>
-        /// Отправить информацию о результатах игры на сервер
+        /// Sends game results info to server.
         /// </summary>
-        public override void SaveReport(GameResult gameResult)
+        public override async Task SaveReportAsync(GameResult gameResult)
         {
-            
+            SI.GameResultService.Client.AnswerInfo answerConverter(AnswerInfo q) =>
+                new SI.GameResultService.Client.AnswerInfo { Answer = q.Answer, Question = q.Question, Theme = q.Theme, Round = q.Round };
+
+            SI.GameResultService.Client.PersonResult personResultConverter(PersonResult p) =>
+                new SI.GameResultService.Client.PersonResult { Name = p.Name, Sum = p.Sum };
+
+            var result = new SI.GameResultService.Client.GameResult
+            {
+                ApellatedQuestions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.ApellatedQuestions.Select(answerConverter)),
+                Comments = gameResult.Comments,
+                ErrorLog = gameResult.ErrorLog,
+                MarkedQuestions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.MarkedQuestions.Select(answerConverter)),
+                PackageID = gameResult.PackageID,
+                PackageName = gameResult.PackageName,
+                Results = new List<SI.GameResultService.Client.PersonResult>(gameResult.Results.Select(personResultConverter)),
+                WrongVersions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.WrongVersions.Select(answerConverter))
+            };
+
+            var gameResultService = _serviceProvider.GetRequiredService<SI.GameResultService.Client.IGameResultServiceClient>();
+            try
+            {
+                await gameResultService.SendGameReportAsync(result);
+            }
+            catch (Exception)
+            {
+                PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.Error_SendingReport, PlatformSpecific.MessageType.Warning, true);
+
+                if (CommonSettings.Default.DelayedResultsNew.Count < 10)
+                {
+                    CommonSettings.Default.DelayedResultsNew.Add(result);
+                }
+            }
         }
 
         public override void OnPictureError(string remoteUri)

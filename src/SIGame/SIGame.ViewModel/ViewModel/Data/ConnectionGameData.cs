@@ -1,4 +1,4 @@
-﻿using SICore;
+﻿using SIData;
 
 namespace SIGame
 {
@@ -8,6 +8,7 @@ namespace SIGame
     public sealed class ConnectionGameData
     {
         public string GameName { get; set; }
+
         public string Host { get; set; }
 
         public ConnectionPersonData[] Persons { get; set; }

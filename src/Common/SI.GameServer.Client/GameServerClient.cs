@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SI.GameServer.Client.Properties;
 using SI.GameServer.Contract;
-using SICore;
-using SICore.Connections;
 using SIData;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Handlers;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,18 +30,18 @@ namespace SI.GameServer.Client
 
         private readonly GameServerClientOptions _options;
 
-        private CookieContainer _cookieContainer;
-        private HttpClientHandler _httpClientHandler;
-        private HttpClient _client;
-        private ProgressMessageHandler _progressMessageHandler;
+        private readonly CookieContainer _cookieContainer;
+        private readonly HttpClientHandler _httpClientHandler;
+        private readonly HttpClient _client;
+        private readonly ProgressMessageHandler _progressMessageHandler;
 
         private HubConnection _connection;
 
         public string ServiceUri => _options.ServiceUri;
 
-        public event Action<SICore.GameInfo> GameCreated;
+        public event Action<GameInfo> GameCreated;
         public event Action<int> GameDeleted;
-        public event Action<SICore.GameInfo> GameChanged;
+        public event Action<GameInfo> GameChanged;
         public event Action<string> Joined;
         public event Action<string> Leaved;
         public event Action<string, string> Receieve;
@@ -52,12 +52,25 @@ namespace SI.GameServer.Client
         public event Func<Exception, Task> Reconnecting;
         public event Func<string, Task> Reconnected;
 
-        private readonly IUIThreadExecutor _uIThreadExecutor;
+        private readonly IUIThreadExecutor? _uIThreadExecutor;
 
-        public GameServerClient(GameServerClientOptions options, IUIThreadExecutor uIThreadExecutor = null)
+        public GameServerClient(IOptions<GameServerClientOptions> options, IUIThreadExecutor? uIThreadExecutor = null)
         {
-            _options = options;
+            _options = options.Value;
             _uIThreadExecutor = uIThreadExecutor;
+
+            _cookieContainer = new CookieContainer();
+            _httpClientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
+
+            _progressMessageHandler = new ProgressMessageHandler(_httpClientHandler);
+            _progressMessageHandler.HttpSendProgress += MessageHandler_HttpSendProgress;
+
+            _client = new HttpClient(_progressMessageHandler)
+            {
+                BaseAddress = new Uri(ServiceUri),
+                Timeout = _options.Timeout,
+                DefaultRequestVersion = HttpVersion.Version20
+            };
         }
 
         public Task<GameCreationResult> CreateGameAsync(
@@ -104,25 +117,12 @@ namespace SI.GameServer.Client
                 _connection = null;
             }
 
-            if (_client != null)
-            {
-                _client.Dispose();
-                _client = null;
-            }
-
-            if (_httpClientHandler != null)
-            {
-                _httpClientHandler.Dispose();
-                _httpClientHandler = null;
-            }
+            _client?.Dispose();
+            _httpClientHandler?.Dispose();
         }
 
-        public async Task<Slice<SICore.GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default)
-        {
-            var slice = await _connection.InvokeAsync<Slice<Contract.GameInfo>>("GetGamesSlice", fromId, cancellationToken);
-
-            return new Slice<SICore.GameInfo> { Data = slice.Data.Select(ToSICoreGame).ToArray(), IsLastSlice = slice.IsLastSlice };
-        }
+        public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
+            _connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 
         public Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync<HostInfo>("GetGamesHostInfo", cancellationToken);
@@ -156,14 +156,14 @@ namespace SI.GameServer.Client
             var response = await _client.PostAsync(uri, content, cancellationToken);
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync(cancellationToken);
             }
 
             throw response.StatusCode switch
             {
                 HttpStatusCode.Conflict => new Exception(Resources.OnlineUserConflict),
                 HttpStatusCode.Forbidden => new Exception(Resources.LoginForbidden),
-                _ => new Exception($"Error ({response.StatusCode}): {await response.Content.ReadAsStringAsync()}"),
+                _ => new Exception($"Error ({response.StatusCode}): {await response.Content.ReadAsStringAsync(cancellationToken)}"),
             };
         }
 
@@ -173,18 +173,6 @@ namespace SI.GameServer.Client
             {
                 throw new InvalidOperationException("Client has been already opened");
             }
-
-            _cookieContainer = new CookieContainer();
-            _httpClientHandler = new HttpClientHandler { CookieContainer = _cookieContainer };
-
-            _progressMessageHandler = new ProgressMessageHandler(_httpClientHandler);
-            _progressMessageHandler.HttpSendProgress += MessageHandler_HttpSendProgress;
-
-            _client = new HttpClient(_progressMessageHandler)
-            {
-                BaseAddress = new Uri(ServiceUri),
-                Timeout = _options.Timeout
-            };
             
             var token = await AuthenticateUserAsync(userName, "", cancellationToken);
 
@@ -222,9 +210,9 @@ namespace SI.GameServer.Client
             _connection.HandshakeTimeout = TimeSpan.FromMinutes(2);
             
             _connection.On<string, string>("Say", (user, text) => OnUI(() => Receieve?.Invoke(user, text)));
-            _connection.On<Contract.GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(ToSICoreGame(gameInfo))));
+            _connection.On<GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(gameInfo)));
             _connection.On<int>("GameDeleted", (gameId) => OnUI(() => GameDeleted?.Invoke(gameId)));
-            _connection.On<Contract.GameInfo>("GameChanged", (gameInfo) => OnUI(() => GameChanged?.Invoke(ToSICoreGame(gameInfo))));
+            _connection.On<GameInfo>("GameChanged", (gameInfo) => OnUI(() => GameChanged?.Invoke(gameInfo)));
             _connection.On<string>("Joined", (user) => OnUI(() => Joined?.Invoke(user)));
             _connection.On<string>("Leaved", (user) => OnUI(() => Leaved?.Invoke(user)));
             _connection.On<Message>("Receive", (message) => IncomingMessage?.Invoke(message));
@@ -253,9 +241,13 @@ namespace SI.GameServer.Client
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    var errorMessage = await GetErrorMessageAsync(response);
+                    var errorMessage = await GetErrorMessageAsync(response, cancellationToken);
                     throw new Exception(errorMessage);
                 }
+            }
+            catch (HttpRequestException exc)
+            {
+                throw new Exception(Resources.UploadPackageConnectionError, exc.InnerException ?? exc);
             }
             catch (TaskCanceledException exc)
             {
@@ -285,10 +277,10 @@ namespace SI.GameServer.Client
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(await response.Content.ReadAsStringAsync());
+                throw new Exception(await response.Content.ReadAsStringAsync(cancellationToken));
             }
 
-            return await response.Content.ReadAsStringAsync();
+            return await response.Content.ReadAsStringAsync(cancellationToken);
         }
 
         public Task<GameCreationResult> JoinGameAsync(
@@ -305,82 +297,9 @@ namespace SI.GameServer.Client
         public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
             _connection.InvokeAsync("LeaveGame", cancellationToken);
 
-        private SICore.GameInfo ToSICoreGame(Contract.GameInfo gameInfo) => new SICore.GameInfo
+        private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            GameID = gameInfo.GameID,
-            GameName = gameInfo.GameName,
-            Mode = gameInfo.Mode,
-            Owner = gameInfo.Owner,
-            PackageName = gameInfo.PackageName,
-            PasswordRequired = gameInfo.PasswordRequired,
-            Persons = gameInfo.Persons,
-            RealStartTime = gameInfo.RealStartTime == DateTime.MinValue ? DateTime.MinValue : gameInfo.RealStartTime.ToLocalTime(),
-            Rules = BuildRules(gameInfo),
-            Stage = BuildStage(gameInfo),
-            Started = gameInfo.Started,
-            StartTime = gameInfo.StartTime.ToLocalTime()
-        };
-
-        private static string BuildStage(Contract.GameInfo gameInfo) => gameInfo.Stage switch
-        {
-            GameStages.Created => Resources.GameStage_Created,
-            GameStages.Started => Resources.GameStage_Started,
-            GameStages.Round => $"{Resources.GameStage_Round}: {gameInfo.StageName}",
-            GameStages.Final => Resources.GameStage_Final,
-            _ => Resources.GameStage_Finished,
-        };
-
-        private static string BuildRules(Contract.GameInfo gameInfo)
-        {
-            var rules = gameInfo.Rules;
-            var sb = new StringBuilder();
-
-            if (gameInfo.Mode == SIEngine.GameModes.Sport)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_Sport);
-            }
-
-            if ((rules & GameRules.FalseStart) == 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_NoFalseStart);
-            }
-
-            if ((rules & GameRules.Oral) > 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_Oral);
-            }
-
-            if ((rules & GameRules.IgnoreWrong) > 0)
-            {
-                if (sb.Length > 0)
-                {
-                    sb.Append(", ");
-                }
-
-                sb.Append(Resources.GameRule_IgnoreWrong);
-            }
-
-            return sb.ToString();
-        }
-
-        private static async Task<string> GetErrorMessageAsync(HttpResponseMessage response)
-        {
-            var serverError = await response.Content.ReadAsStringAsync();
+            var serverError = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (response.StatusCode == HttpStatusCode.RequestEntityTooLarge ||
                 response.StatusCode == HttpStatusCode.BadRequest && serverError == "Request body too large.")
@@ -409,6 +328,6 @@ namespace SI.GameServer.Client
             action();
         }
 
-        private void MessageHandler_HttpSendProgress(object sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
+        private void MessageHandler_HttpSendProgress(object? sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
     }
 }

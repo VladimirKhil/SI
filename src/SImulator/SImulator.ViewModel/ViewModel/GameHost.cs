@@ -41,7 +41,7 @@ namespace SImulator.ViewModel
             {
                 ((TvEngine)_engine).SelectQuestion(theme, question);
             }
-            catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
+            catch (TimeoutException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
@@ -54,10 +54,6 @@ namespace SImulator.ViewModel
                 ((TvEngine)_engine).SelectTheme(themeIndex);
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
@@ -124,10 +120,6 @@ namespace SImulator.ViewModel
                     ThemeDeleted?.Invoke(result);
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }

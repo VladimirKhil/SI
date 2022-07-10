@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using SICore;
 using SIGame.ViewModel.Properties;
+using SIData;
 
 namespace SIGame.ViewModel
 {
@@ -69,8 +70,11 @@ namespace SIGame.ViewModel
             : base(account)
         {
             Origin = origin;
+
             if (Origin != null)
+            {
                 CheckComputerAccount();
+            }
         }
 
         protected override void Initialize()

@@ -24,8 +24,7 @@
     <ProjectReference Include="..\..\Common\SI.GameServer.Client\SI.GameServer.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
-    <ProjectReference Include="..\..\Common\SI.GameServer.Contract\SI.GameServer.Contract.csproj" />
-    <ProjectReference Include="..\..\Common\Utils\Utils.csproj" />
+    <ProjectReference Include="..\SI.GameResultService.Client\SI.GameResultService.Client.csproj" />
     <ProjectReference Include="..\SIGame.ViewModel.Web\SIGame.ViewModel.Web.csproj" />
   </ItemGroup>
   <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
@@ -38,12 +37,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.en-US.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
 

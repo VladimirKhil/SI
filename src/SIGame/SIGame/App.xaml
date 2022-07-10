@@ -1,16 +1,19 @@
-﻿<Application x:Class="SIGame.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
-             xmlns:l="clr-namespace:SIGame"
-             xmlns:lp="clr-namespace:SIGame.Properties"
-             xmlns:local="clr-namespace:SIGame;assembly=SIGame.ViewModel"
-             xmlns:localc="clr-namespace:SIGame.Converters"
-             xmlns:lb="clr-namespace:SIGame.Behaviors"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
+﻿<Application
+    x:Class="SIGame.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"             
+    xmlns:l="clr-namespace:SIGame"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:local="clr-namespace:SIGame;assembly=SIGame.ViewModel"
+    xmlns:localc="clr-namespace:SIGame.Converters"
+    xmlns:lb="clr-namespace:SIGame.Behaviors"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
              
-             DispatcherUnhandledException="Application_DispatcherUnhandledException"
-             ShutdownMode="OnMainWindowClose">
+    DispatcherUnhandledException="Application_DispatcherUnhandledException"
+    Startup="Application_Startup"
+    Exit="Application_Exit"
+    ShutdownMode="OnMainWindowClose">
     <Application.Resources>
 
         <SolidColorBrush x:Key="MenuItem.Highlight.Background" Color="#3D26A0DA"/>

@@ -25,7 +25,7 @@
 				Compressed="no"
                 DisplayName="SIGame"
                 SourceFile="..\SIGame.Setup\bin\Release\x86\ru-ru\SIGame.x86.msi"
-				DownloadUrl="https://vladimirkhil.com/si/sigame/SIGame.x86.msi"
+				DownloadUrl="https://vladimirkhil.com/si/game/SIGame.x86.msi"
 	            InstallCondition="NOT VersionNT64" />
 
 			<MsiPackage
@@ -33,7 +33,7 @@
 				Compressed="no"
 			    DisplayName="SIGame"
 			    SourceFile="..\SIGame.Setup\bin\Release\x64\ru-ru\SIGame.x64.msi"
-				DownloadUrl="https://vladimirkhil.com/si/sigame/SIGame.x64.msi"
+				DownloadUrl="https://vladimirkhil.com/si/game/SIGame.x64.msi"
 			    InstallCondition="VersionNT64" />
         </Chain>
     </Bundle>

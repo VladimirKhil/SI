@@ -14,7 +14,7 @@ namespace SIGame.ViewModel
 
         public bool CanBeExecuted
         {
-            get { return _canBeExecuted; }
+            get => _canBeExecuted;
             set
             {
                 if (_canBeExecuted != value)
@@ -44,19 +44,10 @@ namespace SIGame.ViewModel
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
         }
 
-        public bool CanExecute(object parameter)
-        {
-            return _canBeExecuted;
-        }
+        public bool CanExecute(object parameter) => _canBeExecuted;
 
-        public async void Execute(object parameter)
-        {
-            await _execute(parameter);
-        }
+        public async void Execute(object parameter) => await _execute(parameter);
 
-        public Task ExecuteAsync(object parameter)
-        {
-            return _execute(parameter);
-        }
+        public Task ExecuteAsync(object parameter) => _execute(parameter);
     }
 }

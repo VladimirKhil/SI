@@ -1,0 +1,761 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AllQuestions" xml:space="preserve">
+    <value>Разыграны все вопросы;Итак, мы разыграли все вопросы</value>
+  </data>
+  <data name="AllTime" xml:space="preserve">
+    <value>Время раунда вышло;Время истекло</value>
+  </data>
+  <data name="Answer" xml:space="preserve">
+    <value>Ответ</value>
+  </data>
+  <data name="Bravo" xml:space="preserve">
+    <value>Браво!!!;Великолепно!!!;Абсолютно верно!!!;Именно так, поздравляю!!!;Вы дали совершенно верный ответ!!!;Вы абсолютно правы!!!</value>
+  </data>
+  <data name="Change1" xml:space="preserve">
+    <value>изменил сумму на счёте</value>
+  </data>
+  <data name="Change2" xml:space="preserve">
+    <value>на</value>
+  </data>
+  <data name="Change3" xml:space="preserve">
+    <value>, и теперь на счёте</value>
+  </data>
+  <data name="ChooseQuest" xml:space="preserve">
+    <value>выбирайте вопрос!;прошу вас!;выбирайте!;сделайте выбор!;вы выбираете;вы выбираете следующий вопрос</value>
+  </data>
+  <data name="ClientWithThisNameAlreadyExists" xml:space="preserve">
+    <value>Клиент с таким именем уже существует!</value>
+  </data>
+  <data name="Cost" xml:space="preserve">
+    <value>стоимость</value>
+  </data>
+  <data name="DeleteTheme" xml:space="preserve">
+    <value>уберите тему, которая вам не нравится;уберите, пожалуйста, одну из тем</value>
+  </data>
+  <data name="GameResults" xml:space="preserve">
+    <value>Результаты игры</value>
+  </data>
+  <data name="GameResumed" xml:space="preserve">
+    <value>Игра возобновлена!</value>
+  </data>
+  <data name="GameStarted" xml:space="preserve">
+    <value>Игра началась</value>
+  </data>
+  <data name="GameThemes" xml:space="preserve">
+    <value>А вот и темы сегодняшней игры;Предлагаю вашему вниманию темы сегодняшней игры</value>
+  </data>
+  <data name="GameWillResume" xml:space="preserve">
+    <value>Игра пропустит вопрос, ведущий может разыграть его самостоятельно (взяв паузу). Игра возобновится через 15 секунд)</value>
+  </data>
+  <data name="GiveCat" xml:space="preserve">
+    <value>кому вы отдадите вопрос?</value>
+  </data>
+  <data name="GoodAfternoon" xml:space="preserve">
+    <value>Добрый день!</value>
+  </data>
+  <data name="GoodEvening" xml:space="preserve">
+    <value>Добрый вечер!</value>
+  </data>
+  <data name="GoodLuck" xml:space="preserve">
+    <value>Всем спасибо за внимание. Всего доброго, увидимся, пока!</value>
+  </data>
+  <data name="GoodMorning" xml:space="preserve">
+    <value>Доброе утро!</value>
+  </data>
+  <data name="Greeting" xml:space="preserve">
+    <value>Добро пожаловать на «SIGame»!
+ПРАВИЛА
+В данном текстовом окне отображается игровой чат. Сюда можно отправлять свои сообщения. Наберите текст сообщения и нажмите “Enter”.
+В центре экрана представлена сама игра. Слева от игрового табло вы увидите полоски, отвечающие за время, прошедшее с момента начала раунда, время для ответа на вопрос и время на принятие различных решений. Когда полоска заполнится до конца, соответствующий интервал времени истечёт.
+Также вы можете видеть имена и изображения ведущего и игроков и суммы игроков.
+Игра начнется, как только все игроки и ведущий нажмут кнопку «Готов».</value>
+  </data>
+  <data name="GreetingNew" xml:space="preserve">
+    <value>, приветствую!</value>
+  </data>
+  <data name="Hint" xml:space="preserve">
+    <value>Подсказка: игровую кнопку можно нажимать в любой точке окна при помощи правой кнопки мыши или клавиши {0}. </value>
+  </data>
+  <data name="IDontKnow" xml:space="preserve">
+    <value>Не знаю</value>
+  </data>
+  <data name="InformChooser" xml:space="preserve">
+    <value>Игру начнёт {0};Игру будет начинать {0}</value>
+  </data>
+  <data name="ItsShowmanIs" xml:space="preserve">
+    <value>Её ведущий — </value>
+  </data>
+  <data name="LastQuest" xml:space="preserve">
+    <value>последний вопрос ваш!;и последний вопрос...;остался один вопрос</value>
+  </data>
+  <data name="LetsSee" xml:space="preserve">
+    <value>Итак, давайте ознакомимся с ответами наших игроков;Пришло время узнать, что же ответили игроки</value>
+  </data>
+  <data name="MakeStake" xml:space="preserve">
+    <value>Уважаемые игроки, делайте, пожалуйста, ваши ставки;Господа, делайте, пожалуйста, ваши ставки</value>
+  </data>
+  <data name="NobodyInFinal" xml:space="preserve">
+    <value>Сейчас мог бы быть финал, но никто в него не попадает!</value>
+  </data>
+  <data name="Nominal" xml:space="preserve">
+    <value>Номинал</value>
+  </data>
+  <data name="NotInFinal" xml:space="preserve">
+    <value>имеет отрицательную сумму и не участвует в финале</value>
+  </data>
+  <data name="NotSure" xml:space="preserve">
+    <value>Возможно, #?;#?;Наверное, #;#, полагаю;Неужели #?;Наверное, ответ #;Думаю, что ответ #;#, я так думаю;Кажется, #;А не # ли это?;Неужели #?;Видимо #;Я так думаю, #;#, по-видимому;Сдаётся мне, это #;Скорее всего, это #;Полагаю, что #;По-видимому, ответ #</value>
+  </data>
+  <data name="NoWinner" xml:space="preserve">
+    <value>Сегодня у нас нет победителя</value>
+  </data>
+  <data name="NowPlays" xml:space="preserve">
+    <value>Итак, играет</value>
+  </data>
+  <data name="OfPackage" xml:space="preserve">
+    <value>пакета</value>
+  </data>
+  <data name="OfQuestion" xml:space="preserve">
+    <value>вопроса</value>
+  </data>
+  <data name="OfRound" xml:space="preserve">
+    <value>раунда</value>
+  </data>
+  <data name="OfTheme" xml:space="preserve">
+    <value>темы</value>
+  </data>
+  <data name="OnTheFifthTable" xml:space="preserve">
+    <value>за пятым игровым столом —</value>
+  </data>
+  <data name="OnTheFirstTable" xml:space="preserve">
+    <value>За первым игровым столом —</value>
+  </data>
+  <data name="OnTheForthTable" xml:space="preserve">
+    <value>за четвёртым игровым столом —</value>
+  </data>
+  <data name="OnTheSecondTable" xml:space="preserve">
+    <value>за вторым игровым столом —</value>
+  </data>
+  <data name="Pass" xml:space="preserve">
+    <value>Пас</value>
+  </data>
+  <data name="PauseInGame" xml:space="preserve">
+    <value>Пауза в игре...</value>
+  </data>
+  <data name="PAuthors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
+  <data name="PComments" xml:space="preserve">
+    <value>Комментарии</value>
+  </data>
+  <data name="PlayTheme" xml:space="preserve">
+    <value>Итак, мы играем тему;Мы играем тему</value>
+  </data>
+  <data name="PName" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="PressButton" xml:space="preserve">
+    <value>Старайтесь жать на кнопку сразу после загорания рамки на экране, пожалуйста</value>
+  </data>
+  <data name="Private" xml:space="preserve">
+    <value>лично</value>
+  </data>
+  <data name="PSources" xml:space="preserve">
+    <value>Источники</value>
+  </data>
+  <data name="Right" xml:space="preserve">
+    <value>Верно!;Вы правы!;Да, это так!;Да!;Совершенно верно!;Именно!;Разумеется!;Ну конечно!;Конечно!;Ну в общем-то да!;Да, это так;Вы дали правильный ответ!;Абсолютно верно!;В принципе, вы правы</value>
+  </data>
+  <data name="RightAnswer" xml:space="preserve">
+    <value>Правильный ответ</value>
+  </data>
+  <data name="RoundThemes" xml:space="preserve">
+    <value>Темы раунда;А вот и темы нашего раунда</value>
+  </data>
+  <data name="Score" xml:space="preserve">
+    <value>Счёт</value>
+  </data>
+  <data name="ShowmanGreeting" xml:space="preserve">
+    <value>Здравствуйте, здравствуйте, добрый день, это «SIGame»!</value>
+  </data>
+  <data name="ShowmanWaiting" xml:space="preserve">
+    <value>Ожидаем решение ведущего...</value>
+  </data>
+  <data name="Stake" xml:space="preserve">
+    <value>Ставка</value>
+  </data>
+  <data name="StakeMakes" xml:space="preserve">
+    <value>Ставку делает</value>
+  </data>
+  <data name="StartThink" xml:space="preserve">
+    <value>Думайте!</value>
+  </data>
+  <data name="Sure" xml:space="preserve">
+    <value>Считаю, что #;Ответ #!;#, очевидно;Ответ #;#!;#;Это #;Насколько я понимаю, это #;Несомненно, это #;Я уверен{0}, что это #;Ну это понятно, #;#, разумеется;#, насколько я в курсе</value>
+  </data>
+  <data name="ThankYou" xml:space="preserve">
+    <value>Благодарю вас! Внимание, вопрос!</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="ThemeDeletes" xml:space="preserve">
+    <value>Тему убирает</value>
+  </data>
+  <data name="TodayPlays" xml:space="preserve">
+    <value>Сегодня у нас играют:</value>
+  </data>
+  <data name="UnknownType" xml:space="preserve">
+    <value>Обнаружен неподдерживаемый тип вопроса</value>
+  </data>
+  <data name="VaBank" xml:space="preserve">
+    <value>ВА-БАНК!!!</value>
+  </data>
+  <data name="WeBeginRound" xml:space="preserve">
+    <value>Итак, мы начинаем;Мы начинаем</value>
+  </data>
+  <data name="With" xml:space="preserve">
+    <value>за</value>
+  </data>
+  <data name="WithParams" xml:space="preserve">
+    <value>с параметрами</value>
+  </data>
+  <data name="Wrong" xml:space="preserve">
+    <value>Да что вы!;Неправильно!;Увы, это не так!;Нет, вы не правы;К сожалению, вы ошиблись;Вы дали неверный ответ!;Неверно;Нет;Нет, вы ошиблись;Нет, вы не правы;Да нет!;Ваш ответ неверен</value>
+  </data>
+  <data name="WrongAnswer" xml:space="preserve">
+    <value>Пушкин;Ой, забыл;Э-э-э...</value>
+  </data>
+  <data name="YouCanSayOnly" xml:space="preserve">
+    <value>вы можете сказать только</value>
+  </data>
+  <data name="YouGetAuction" xml:space="preserve">
+    <value>Вам достаётся Вопрос со ставкой!</value>
+  </data>
+  <data name="YourAnswer" xml:space="preserve">
+    <value>, каков же ваш ответ?;, ваш ответ?;?;, отвечайте!;, я вас слушаю;, прошу, отвечайте</value>
+  </data>
+  <data name="YouReceiveCat" xml:space="preserve">
+    <value>Вам достается Вопрос с секретом! Вопрос нужно отдать</value>
+  </data>
+  <data name="YourStake" xml:space="preserve">
+    <value>ваша ставка?;сделайте ставку</value>
+  </data>
+  <data name="YouWin" xml:space="preserve">
+    <value>поздравляю вас, вы победили!;примите мои поздравления!;с победой вас!</value>
+  </data>
+  <data name="OnTheEigthTable" xml:space="preserve">
+    <value>за восьмым игровым столом —</value>
+  </data>
+  <data name="OnTheNinethTable" xml:space="preserve">
+    <value>за девятым игровым столом —</value>
+  </data>
+  <data name="OnTheSeventhTable" xml:space="preserve">
+    <value>за седьмым игровым столом —</value>
+  </data>
+  <data name="OnTheSixthTable" xml:space="preserve">
+    <value>за шестым игровым столом —</value>
+  </data>
+  <data name="OnTheThirdTable" xml:space="preserve">
+    <value>за третьим игровым столом —</value>
+  </data>
+  <data name="RightAnswerInOnTheScreen" xml:space="preserve">
+    <value>Правильный ответ на экране</value>
+  </data>
+  <data name="TypeIgnoreWrong" xml:space="preserve">
+    <value>право на ошибку</value>
+  </data>
+  <data name="TypeNoFalseStart" xml:space="preserve">
+    <value>без фальстартов</value>
+  </data>
+  <data name="TypeOral" xml:space="preserve">
+    <value>устная</value>
+  </data>
+  <data name="TypeSport" xml:space="preserve">
+    <value>упрощённая</value>
+  </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Дата создания</value>
+  </data>
+  <data name="Restrictions" xml:space="preserve">
+    <value>Ограничения</value>
+  </data>
+  <data name="Ads" xml:space="preserve">
+    <value>Рекламное сообщение</value>
+  </data>
+  <data name="AnswerIsOral" xml:space="preserve">
+    <value>ответ даётся устно</value>
+  </data>
+  <data name="ApellationAccepted" xml:space="preserve">
+    <value>Апелляция была принята</value>
+  </data>
+  <data name="ApellationDenied" xml:space="preserve">
+    <value>Апелляция была отклонена</value>
+  </data>
+  <data name="CatIsYours" xml:space="preserve">
+    <value>Вопрос достаётся Вам</value>
+  </data>
+  <data name="EasyCat" xml:space="preserve">
+    <value>А вопроса на самом деле нет! Деньги просто перечисляются на ваш счёт. Поздравляю!</value>
+  </data>
+  <data name="Final" xml:space="preserve">
+    <value>Финал</value>
+  </data>
+  <data name="GameRules" xml:space="preserve">
+    <value>Правила игры</value>
+  </data>
+  <data name="HeGave" xml:space="preserve">
+    <value>он дал</value>
+  </data>
+  <data name="IsApellating" xml:space="preserve">
+    <value>апеллирует свой ответ</value>
+  </data>
+  <data name="IsConsideringWrong" xml:space="preserve">
+    <value>считает, что ответ {0} неверен</value>
+  </data>
+  <data name="ManuallyPlayedQuestion" xml:space="preserve">
+    <value>Этот вопрос разыгрывается вручную (при паузе). Игра продолжится через 15 секунд</value>
+  </data>
+  <data name="MinMaxChoice" xml:space="preserve">
+    <value>Минимум или максимум в раунде (на выбор)</value>
+  </data>
+  <data name="PleaseCheckApellation" xml:space="preserve">
+    <value>Уважаемые игроки, прошу вас определить, правилен ли ответ {0} на прозвучавший вопрос</value>
+  </data>
+  <data name="PleaseChooseCatCost" xml:space="preserve">
+    <value>выберите стоимость вопроса, пожалуйста</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
+  <data name="SheGave" xml:space="preserve">
+    <value>она дала</value>
+  </data>
+  <data name="ShowmanSwitchedToNextRound" xml:space="preserve">
+    <value>Ведущий перевёл игру в следующий раунд</value>
+  </data>
+  <data name="ShowmanSwitchedToPreviousRound" xml:space="preserve">
+    <value>Ведущий перевёл игру в предыдущий раунд</value>
+  </data>
+  <data name="SponsoredQuestion" xml:space="preserve">
+    <value>Вам достаётся Вопрос без риска!</value>
+  </data>
+  <data name="SponsoredQuestionInfo" xml:space="preserve">
+    <value>вопрос звучит только для вас. В случае верного ответа вы получите {0}, в случае неверного ничего не потеряете</value>
+  </data>
+  <data name="StageFinished" xml:space="preserve">
+    <value>Игра окончена</value>
+  </data>
+  <data name="StrangeError" xml:space="preserve">
+    <value>Странная ошибка</value>
+  </data>
+  <data name="YouCanKeepCat" xml:space="preserve">
+    <value>Этот вопрос можно оставить себе</value>
+  </data>
+  <data name="HintChangeSum" xml:space="preserve">
+    <value>Измените сумму</value>
+  </data>
+  <data name="HintCheckAnswer" xml:space="preserve">
+    <value>Определите правильность ответа игрока</value>
+  </data>
+  <data name="HintChooseCatPrice" xml:space="preserve">
+    <value>Выберите стоимость вопроса</value>
+  </data>
+  <data name="HintInitError" xml:space="preserve">
+    <value>Ошибка инициализации информации об игроке!</value>
+  </data>
+  <data name="HintMakeAStake" xml:space="preserve">
+    <value>Сделайте ставку</value>
+  </data>
+  <data name="HintSelectCatPlayer" xml:space="preserve">
+    <value>Выберите игрока, которому вы отдаёте вопрос</value>
+  </data>
+  <data name="HintSelectCatPlayerForPlayer" xml:space="preserve">
+    <value>Выберите игрока, которому игрок отдаёт вопрос</value>
+  </data>
+  <data name="HintSelectPlayerForSumChange" xml:space="preserve">
+    <value>Выберите игрока для изменения суммы</value>
+  </data>
+  <data name="HintSelectQuestion" xml:space="preserve">
+    <value>Выберите вопрос на табло</value>
+  </data>
+  <data name="HintSelectStaker" xml:space="preserve">
+    <value>Выберите ставящего</value>
+  </data>
+  <data name="HintSelectStarter" xml:space="preserve">
+    <value>Выберите начинающего раунд</value>
+  </data>
+  <data name="HintSelectTheme" xml:space="preserve">
+    <value>Уберите тему на табло</value>
+  </data>
+  <data name="HintThemeDeleter" xml:space="preserve">
+    <value>Выберите убирающего тему</value>
+  </data>
+  <data name="Computer" xml:space="preserve">
+    <value>Компьютер</value>
+  </data>
+  <data name="FromTable" xml:space="preserve">
+    <value>из-за стола</value>
+  </data>
+  <data name="GameTableNumber" xml:space="preserve">
+    <value>игровой стол номер</value>
+  </data>
+  <data name="Human" xml:space="preserve">
+    <value>Человек</value>
+  </data>
+  <data name="NewGameTable" xml:space="preserve">
+    <value>новый игровой стол</value>
+  </data>
+  <data name="PersonType" xml:space="preserve">
+    <value>тип участника</value>
+  </data>
+  <data name="Sex_Added" xml:space="preserve">
+    <value>добавил;добавила</value>
+  </data>
+  <data name="Sex_Changed" xml:space="preserve">
+    <value>изменил;изменила</value>
+  </data>
+  <data name="Sex_Deleted" xml:space="preserve">
+    <value>удалил;удалила</value>
+  </data>
+  <data name="Sex_Free" xml:space="preserve">
+    <value>освободил;освободила</value>
+  </data>
+  <data name="Sex_Replaced" xml:space="preserve">
+    <value>заменил;заменила</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>на</value>
+  </data>
+  <data name="TypeManaged" xml:space="preserve">
+    <value>управляемая</value>
+  </data>
+  <data name="And" xml:space="preserve">
+    <value>И</value>
+  </data>
+  <data name="QuestionWithSpecialTheme" xml:space="preserve">
+    <value>Вопрос на специальную тему</value>
+  </data>
+  <data name="AnswerNotSet" xml:space="preserve">
+    <value>Ответ не задан!</value>
+  </data>
+  <data name="ReconnectEntered" xml:space="preserve">
+    <value>Вход в игру осуществлён!</value>
+  </data>
+  <data name="ReconnectOK" xml:space="preserve">
+    <value>Подключение установлено…</value>
+  </data>
+  <data name="TryReconnect" xml:space="preserve">
+    <value>Попытка переподключиться…</value>
+  </data>
+  <data name="Banned" xml:space="preserve">
+    <value>{0} выгнал(а) из игры и забанил {1}</value>
+  </data>
+  <data name="CannotBanBots" xml:space="preserve">
+    <value>Компьютерных участников нельзя забанить!</value>
+  </data>
+  <data name="CannotBanYourself" xml:space="preserve">
+    <value>Себя забанить нельзя!</value>
+  </data>
+  <data name="CannotKickBots" xml:space="preserve">
+    <value>Компьютерных участников нельзя выгнать!</value>
+  </data>
+  <data name="CannotKickYouself" xml:space="preserve">
+    <value>Себя выгнать нельзя!</value>
+  </data>
+  <data name="Connected_Female" xml:space="preserve">
+    <value>Подключилась</value>
+  </data>
+  <data name="Connected_Male" xml:space="preserve">
+    <value>Подключился</value>
+  </data>
+  <data name="Disconnected_Female" xml:space="preserve">
+    <value>Отключилась</value>
+  </data>
+  <data name="Disconnected_Male" xml:space="preserve">
+    <value>Отключился</value>
+  </data>
+  <data name="GameBeginning" xml:space="preserve">
+    <value>Начало игры</value>
+  </data>
+  <data name="Kicked" xml:space="preserve">
+    <value>{0} выгнал(а) из игры {1}</value>
+  </data>
+  <data name="NoAnswer" xml:space="preserve">
+    <value>Нет ответа</value>
+  </data>
+  <data name="NoFreePlaceForName" xml:space="preserve">
+    <value>Свободного места с таким именем не обнаружено!</value>
+  </data>
+  <data name="PersonWithSuchNameIsAlreadyInGame" xml:space="preserve">
+    <value>Человек с именем {0} уже есть в игре!</value>
+  </data>
+  <data name="PlaceIsOccupied" xml:space="preserve">
+    <value>Место уже занято!</value>
+  </data>
+  <data name="PositionNotFoundByIndex" xml:space="preserve">
+    <value>Позиция с данным номером не обнаружена!</value>
+  </data>
+  <data name="WrongConnectionParameters" xml:space="preserve">
+    <value>Неверные параметры подключения!</value>
+  </data>
+  <data name="WrongPassword" xml:space="preserve">
+    <value>Неверный пароль!</value>
+  </data>
+  <data name="ToMyself" xml:space="preserve">
+    <value>Себе</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>От</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>или</value>
+  </data>
+  <data name="StakeTo" xml:space="preserve">
+    <value>до</value>
+  </data>
+  <data name="WithStepOf" xml:space="preserve">
+    <value>с шагом в</value>
+  </data>
+  <data name="YourChoice" xml:space="preserve">
+    <value>на выбор</value>
+  </data>
+  <data name="Mixed" xml:space="preserve">
+    <value>Разные</value>
+  </data>
+  <data name="RandomThemes" xml:space="preserve">
+    <value>Случайный набор тем</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>Не задан</value>
+  </data>
+  <data name="StringParseError" xml:space="preserve">
+    <value>Ошибка разбора строки</value>
+  </data>
+  <data name="UnknownPerson" xml:space="preserve">
+    <value>Личность не установлена</value>
+  </data>
+  <data name="BadTextInLog" xml:space="preserve">
+    <value>Ошибочный текст в протоколе</value>
+  </data>
+  <data name="ErrorWritingLogs" xml:space="preserve">
+    <value>Файл лога сохранить не удалось из-за проблем доступа на запись в папку логов</value>
+  </data>
+  <data name="ErrorWritingLogToDisc" xml:space="preserve">
+    <value>Ошибка записи лога на дискs</value>
+  </data>
+  <data name="Label_Auction" xml:space="preserve">
+    <value>ВОПРОС СО СТАВКОЙ</value>
+  </data>
+  <data name="Label_CatInBag" xml:space="preserve">
+    <value>ВОПРОС С СЕКРЕТОМ</value>
+  </data>
+  <data name="Label_Sponsored" xml:space="preserve">
+    <value>ВОПРОС БЕЗ РИСКА</value>
+  </data>
+  <data name="LogTitle" xml:space="preserve">
+    <value>Протокол "SIGame"</value>
+  </data>
+  <data name="CannotConnectToServer" xml:space="preserve">
+    <value>Не удалось подключиться к серверу</value>
+  </data>
+  <data name="ConnectionDenied" xml:space="preserve">
+    <value>Подключение к данной игре вам запрещено</value>
+  </data>
+  <data name="Until" xml:space="preserve">
+    <value>до</value>
+  </data>
+  <data name="AvatarTooBig" xml:space="preserve">
+    <value>Ваш аватар по размеру превышает 1 Мб и не будет виден другим участникам!</value>
+  </data>
+  <data name="UnknownSenderMessage" xml:space="preserve">
+    <value>Сообщение от неизвестного отправителя</value>
+  </data>
+  <data name="DisconnectMessage" xml:space="preserve">
+    <value>Разрыв соединения с игрой</value>
+  </data>
+  <data name="NetworkOpeningError" xml:space="preserve">
+    <value>Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны.</value>
+  </data>
+  <data name="WrongGameState" xml:space="preserve">
+    <value>Некорректное состояние игры</value>
+  </data>
+  <data name="ReportTip" xml:space="preserve">
+    <value>Ваш комментарий об игре и вопросах:</value>
+  </data>
+  <data name="ReportTitle" xml:space="preserve">
+    <value>Содержимое отчёта об игре</value>
+  </data>
+  <data name="DeleteTableHint" xml:space="preserve">
+    <value>Выберите стол для удаления</value>
+  </data>
+  <data name="ExternalLink" xml:space="preserve">
+    <value>Внешняя ссылка: {0} . Включить автоматическую загрузку внешних ссылок можно в настройках игры</value>
+  </data>
+  <data name="ApellatedAnswers" xml:space="preserve">
+    <value>Апеллированные ответы</value>
+  </data>
+  <data name="Apellation" xml:space="preserve">
+    <value>Апелляция</value>
+  </data>
+  <data name="ErrorMessages" xml:space="preserve">
+    <value>Сообщения об ошибках</value>
+  </data>
+  <data name="PackageName" xml:space="preserve">
+    <value>Имя пакета</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
+  <data name="WrongAns" xml:space="preserve">
+    <value>Неверный ответ</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Неверные ответы</value>
+  </data>
+  <data name="MediaNotFound" xml:space="preserve">
+    <value>Файл {0} не найден в пакете!</value>
+  </data>
+  <data name="MediaFileNotSupported" xml:space="preserve">
+    <value>Медиафайл не поддерживается</value>
+  </data>
+  <data name="MediaLoadError" xml:space="preserve">
+    <value>Ошибка загрузки медиа</value>
+  </data>
+  <data name="SureFemaleEnding" xml:space="preserve">
+    <value>а</value>
+  </data>
+  <data name="ByGame" xml:space="preserve">
+    <value>игрой</value>
+  </data>
+  <data name="HostChanged" xml:space="preserve">
+    <value>Хост игры был изменён {0} на {1}</value>
+  </data>
+  <data name="ShowmanSwitchedToOtherRound" xml:space="preserve">
+    <value>Ведущий перевёл игру в другой раунд</value>
+  </data>
+  <data name="TypeClassic" xml:space="preserve">
+    <value>классическая</value>
+  </data>
+  <data name="DownloadFileError" xml:space="preserve">
+    <value>Ошибка загрузки файла</value>
+  </data>
+</root>

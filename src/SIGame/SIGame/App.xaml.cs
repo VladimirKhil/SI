@@ -12,6 +12,22 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Utils;
+using AppService.Client;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using NLog.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using NLog.Web;
+using SI.GameServer.Client;
+using SI.GameResultService.Client;
+using SIGame.Contracts;
+#if !DEBUG
+using AppService.Client.Models;
+using SICore;
+using System.Reflection;
+using System.Net.Http;
+using System.Threading.Tasks;
+#endif
 
 namespace SIGame
 {
@@ -20,6 +36,9 @@ namespace SIGame
     /// </summary>
     public partial class App : Application
     {
+        private IHost _host;
+        private IConfiguration _configuration;
+
 #pragma warning disable IDE0052
         private readonly DesktopCoreManager _coreManager = new DesktopCoreManager();
 #pragma warning restore IDE0052
@@ -31,6 +50,46 @@ namespace SIGame
         /// Имя приложения
         /// </summary>
         public static string ProductName => "SIGame";
+
+        private async void Application_Startup(object sender, StartupEventArgs e)
+        {
+            _host = new HostBuilder()
+#if DEBUG
+                .UseEnvironment("Development")
+#endif
+                .ConfigureAppConfiguration((context, configurationBuilder) =>
+                {
+                    var env = context.HostingEnvironment;
+
+                    configurationBuilder
+                        .SetBasePath(context.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile("appsettings.json", optional: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                    _configuration = configurationBuilder.Build();
+                })
+                .ConfigureServices(ConfigureServices)
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
+                })
+                .UseNLog()
+                .Build();
+
+            await _host.StartAsync();
+
+            _manager.ServiceProvider = _host.Services;
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddAppServiceClient(_configuration);
+            services.AddSIGameServerClient(_configuration);
+            services.AddGameResultServiceClient(_configuration);
+
+            services.AddSingleton<IUIThreadExecutor>(_manager);
+            services.AddTransient<IErrorManager, ErrorManager>();
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -94,16 +153,26 @@ namespace SIGame
 
                 Trace.TraceInformation("Game launched");
 
-                UserSettings.Default.GameServerUri = SIGame.Properties.Settings.Default.GameServerUri;
                 UserSettings.Default.UseSignalRConnection = UseSignalRConnection;
                 UserSettings.Default.PropertyChanged += Default_PropertyChanged;
 
                 MainWindow = new MainWindow
                 {
-                    DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default)
+                    DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default, _host.Services)
                 };
-                
+
+#if !DEBUG
+				if (UserSettings.Default.SearchForUpdates)
+				{
+					CheckUpdate();
+				}
+
+                var errorManager = _host.Services.GetRequiredService<IErrorManager>();
+                errorManager.SendDelayedReports();
+#endif
+
                 MainWindow.Show();
+
                 if (UserSettings.Default.FullScreen)
                 {
                     ((MainWindow)MainWindow).Maximize();
@@ -150,6 +219,88 @@ namespace SIGame
             }
         }
 
+#if !DEBUG
+        private async void CheckUpdate()
+        {
+            try
+            {
+                var updateInfo = await SearchForUpdatesAsync();
+                if (updateInfo != null)
+                {
+                    SearchForUpdatesFinished(updateInfo);
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Произвести поиск обновлений
+        /// </summary>
+        /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
+        private async Task<AppInfo> SearchForUpdatesAsync()
+        {
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+            var currentVersion = Assembly.GetAssembly(typeof(MainViewModel)).GetName().Version;
+            var product = await appService.GetProductAsync("SI");
+
+            if (product.Version > currentVersion)
+            {
+                return product;
+            }
+
+            return null;
+        }
+
+        private void SearchForUpdatesFinished(AppInfo updateInfo)
+        {
+            var updateUri = updateInfo.Uri;
+
+            ((MainViewModel)MainWindow.DataContext).UpdateVersion = updateInfo.Version;
+            ((MainViewModel)MainWindow.DataContext).Update = new CustomCommand(obj => Update_Executed(updateUri));
+        }
+
+        private bool _isUpdating = false;
+
+        private async void Update_Executed(Uri updateUri)
+        {
+            if (_isUpdating)
+            {
+                return;
+            }
+
+            _isUpdating = true;
+
+            try
+            {
+                var localFile = Path.Combine(Path.GetTempPath(), "SIGame.Setup.exe");
+
+                using (var httpClient = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 })
+                using (var stream = await httpClient.GetStreamAsync(updateUri))
+                using (var fs = File.Create(localFile))
+                {
+                    await stream.CopyToAsync(fs);
+                }
+
+                Process.Start(localFile, "/passive");
+                Current.Shutdown();
+            }
+            catch (Exception exc)
+            {
+                _isUpdating = false;
+                MessageBox.Show(exc.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+#endif
+
+        private async void Application_Exit(object sender, ExitEventArgs e)
+        {
+            await _host.StopAsync();
+        }
+
         protected override void OnExit(ExitEventArgs e)
         {
             if (CommonSettings.Default != null)
@@ -163,7 +314,7 @@ namespace SIGame
             }
 
             base.OnExit(e);
-        }        
+        }
 
         private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
@@ -271,7 +422,8 @@ namespace SIGame
                 return;
             }
 
-            MessageBox.Show(e.Exception.ToString());
+            var errorManager = _host.Services.GetRequiredService<IErrorManager>();
+            errorManager.SendErrorReport(e.Exception);
             e.Handled = true;
         }
 
@@ -296,7 +448,6 @@ namespace SIGame
         /// <summary>
         /// Загрузить общие настройки
         /// </summary>
-        /// <returns></returns>
         public static CommonSettings LoadCommonSettings()
         {
             try
@@ -361,7 +512,6 @@ namespace SIGame
         /// <summary>
         /// Сохранить общие настройки
         /// </summary>
-        /// <param name="settings"></param>
         private static void SaveCommonSettings(CommonSettings settings)
         {
             try
@@ -461,7 +611,6 @@ namespace SIGame
         /// <summary>
         /// Сохранить общие настройки
         /// </summary>
-        /// <param name="settings"></param>
         private static void SaveUserSettings(UserSettings settings)
         {
             try

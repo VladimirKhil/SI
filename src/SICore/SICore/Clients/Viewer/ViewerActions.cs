@@ -2,6 +2,7 @@
 using SICore.Connections;
 using SICore.Network;
 using SICore.Network.Clients;
+using SIData;
 
 namespace SICore
 {
@@ -26,9 +27,11 @@ namespace SICore
         /// <param name="text">Текст сообщения</param>
         public void SendMessage(string text) => Client.SendMessage(text, receiver: NetworkConstants.GameName);
 
-        public void SendMessage(params string[] args) => Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
+        public void SendMessage(params string[] args) =>
+            Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
-        public void SendMessageWithArgs(params object[] args) => Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
+        public void SendMessageWithArgs(params object[] args) =>
+            Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
 
         /// <summary>
         /// Жмёт на игровую кнопку

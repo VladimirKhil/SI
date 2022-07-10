@@ -6,15 +6,12 @@ using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
 using SIUI.ViewModel;
-using SIUI.ViewModel.Core;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Utils;
@@ -393,13 +390,6 @@ namespace SImulator.ViewModel
                 await EndGameAsync();
                 return;
             }
-        }
-
-        public static Binding GetBinding()
-        {
-            var binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.None;
-            return binding;
         }
 
         private void GameEngine_Closed(object sender, EventArgs e) =>

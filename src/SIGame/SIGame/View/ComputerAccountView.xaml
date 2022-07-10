@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SIGame"
              xmlns:localc="clr-namespace:SIGame.Converters"
-             xmlns:sc="clr-namespace:SICore;assembly=SICore"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Loaded="UserControl_Loaded">
+             xmlns:data="clr-namespace:SIData;assembly=SIData"
+             mc:Ignorable="d"
+             Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Style x:Key="{x:Type local:NumericTextBox}" TargetType="{x:Type local:NumericTextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -44,12 +45,12 @@
         
         <RoutedCommand x:Key="SelectPathCommand" />
 
-        <localc:EnumConverter x:Key="StyleConverter" EnumType="{x:Type sc:PlayerStyle}" />
+        <localc:EnumConverter x:Key="StyleConverter" EnumType="{x:Type data:PlayerStyle}" />
         <localc:SpeedConverter x:Key="SpeedConverter" />
         
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="sc:PlayerStyle" />
+                <x:Type TypeName="data:PlayerStyle" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>

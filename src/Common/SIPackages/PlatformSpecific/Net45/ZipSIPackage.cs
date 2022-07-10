@@ -14,7 +14,7 @@ namespace SIPackages.PlatformSpecific.Net45
         private readonly Stream _stream;
         private readonly ZipArchive _zipArchive;
 
-        private Dictionary<string, string> _contentTypes = new Dictionary<string, string>();
+        private Dictionary<string, string> _contentTypes = new();
 
         private ZipSIPackage(Stream stream, ZipArchive zipArchive)
         {
@@ -83,11 +83,11 @@ namespace SIPackages.PlatformSpecific.Net45
         }
 
         public StreamInfo GetStream(string category, string name, bool read = true) =>
-            GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
+            GetStream($"{category}/{Uri.EscapeDataString(name)}", read);
 
         public void CreateStream(string name, string contentType)
         {
-            _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
+            _zipArchive.CreateEntry(Uri.EscapeDataString(name), CompressionLevel.Optimal);
             AddContentTypeInfo(name, contentType);
         }
 
@@ -96,7 +96,7 @@ namespace SIPackages.PlatformSpecific.Net45
             var extension = Path.GetExtension(name);
             if (extension.StartsWith("."))
             {
-                extension = extension.Substring(1);
+                extension = extension[1..];
             }
 
             var ext = extension.ToLower();
@@ -108,13 +108,13 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void CreateStream(string category, string name, string contentType)
         {
-            _zipArchive.CreateEntry(category + "/" + Uri.EscapeUriString(name), CompressionLevel.Optimal);
+            _zipArchive.CreateEntry(category + "/" + Uri.EscapeDataString(name), CompressionLevel.Optimal);
             AddContentTypeInfo(name, contentType);
         }
 
         public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
         {
-            var entry = _zipArchive.CreateEntry(category + "/" + Uri.EscapeUriString(name), CompressionLevel.Optimal);
+            var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeDataString(name)}", CompressionLevel.Optimal);
             using (var writeStream = entry.Open())
             {
                 await stream.CopyToAsync(writeStream);
@@ -125,7 +125,7 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void DeleteStream(string category, string name)
         {
-            _zipArchive.GetEntry(category + "/" + Uri.EscapeUriString(name)).Delete();
+            _zipArchive.GetEntry($"{category}/{Uri.EscapeDataString(name)}").Delete();
         }
 
         public ISIPackage CopyTo(Stream stream, bool closeCurrent, out bool isNew)

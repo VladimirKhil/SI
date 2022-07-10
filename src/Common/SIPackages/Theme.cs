@@ -6,7 +6,7 @@ using System.Linq;
 namespace SIPackages
 {
     /// <summary>
-    /// Тема
+    /// Represents a package theme.
     /// </summary>
     public sealed class Theme : InfoOwner
     {
@@ -15,48 +15,57 @@ namespace SIPackages
         /// </summary>
         public List<Question> Questions { get; } = new List<Question>();
 
-        /// <summary>
-        /// Строковое представление темы
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string ToString() => $"{Resources.Theme}: {Name}";
 
         /// <summary>
-        /// Создание нового вопроса в теме
+        /// Creates a new question in the theme.
         /// </summary>
-        /// <param name="price">Цена вопроса</param>
+        /// <param name="price">Question price.</param>
+        /// <param name="isFinal">Does the question belong to the final round.</param>
         public Question CreateQuestion(int price = -1, bool isFinal = false)
         {
-            int qPrice;
-            if (price == -1)
-            {
-                var n = Questions.Count;
-                if (n > 1)
-                {
-                    var add = Questions[1].Price - Questions[0].Price;
-                    qPrice = Math.Max(0, Questions[n - 1].Price + add);
-                }
-                else if (n > 0)
-                    qPrice = Questions[0].Price * 2;
-                else
-                    if (isFinal)
-                        qPrice = 0;
-                    else
-                        qPrice = 100;
-            }
-            else
-                qPrice = price;
+            int qPrice = DetectQuestionPrice(price, isFinal);
 
             var quest = new Question
             {
                 Price = qPrice
             };
-            var atom = new Atom();
-            quest.Scenario.Add(atom);
+
+            quest.Scenario.Add(new Atom());
             quest.Right.Add("");
+
             Questions.Add(quest);
 
             return quest;
+        }
+
+        private int DetectQuestionPrice(int price, bool isFinal)
+        {
+            if (price != -1)
+            {
+                return price;
+            }
+
+            var questionCount = Questions.Count;
+
+            if (questionCount > 1)
+            {
+                var stepValue = Questions[1].Price - Questions[0].Price;
+                return Math.Max(0, Questions[questionCount - 1].Price + stepValue);
+            }
+
+            if (questionCount > 0)
+            {
+                return Questions[0].Price * 2;
+            }
+
+            if (isFinal)
+            {
+                return 0;
+            }
+
+            return 100;
         }
 
         /// <summary>

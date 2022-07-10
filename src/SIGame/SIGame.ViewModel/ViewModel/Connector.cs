@@ -1,8 +1,8 @@
 ﻿using SICore;
-using SICore.Connections;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
+using SIData;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class Connector: IDisposable
+    public sealed class Connector : IDisposable
     {
         private readonly SlaveServer _server;
         private readonly Client _client;

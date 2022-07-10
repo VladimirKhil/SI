@@ -12,6 +12,7 @@ using SICore.Network.Servers;
 using SICore.Network;
 using SICore.Network.Configuration;
 using System.Diagnostics;
+using SIData;
 
 namespace SIGame.ViewModel
 {
@@ -26,7 +27,7 @@ namespace SIGame.ViewModel
     /// При реконнекте всегда выполняются только пункты 2 и 4.
     /// Всё API сделано асинхронным, чтобы не блокировать пользовательский интерфейс.
     /// </summary>
-    public abstract class ConnectionDataViewModel: ViewModelWithNewAccount<ConnectionData>, IAsyncDisposable
+    public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<ConnectionData>, IAsyncDisposable
     {
         #region Commands
 

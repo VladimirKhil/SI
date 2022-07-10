@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SIGame"
              xmlns:localc="clr-namespace:SIGame.Converters"
-             xmlns:sc="clr-namespace:SICore;assembly=SICore"
              xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
              xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
              xmlns:lp="clr-namespace:SIGame.Properties"
+             xmlns:data="clr-namespace:SIData;assembly=SIData"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=lvm:SINetworkViewModel}"
              FontSize="16"
@@ -75,9 +75,9 @@
                         </Style.Triggers>
                     </Style>
                 </UniformGrid.Style>
-                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static sc:GameRole.Showman}" Content="{x:Static lp:Resources.JoinAsShowman}" FontSize="25" TextBlock.LineHeight="25" />
-                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static sc:GameRole.Player}" Content="{x:Static lp:Resources.JoinAsPlayer}" FontSize="25" TextBlock.LineHeight="25" />
-                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static sc:GameRole.Viewer}" Content="{x:Static lp:Resources.JoinAsViewer}" FontSize="25" TextBlock.LineHeight="25" />
+                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static data:GameRole.Showman}" Content="{x:Static lp:Resources.JoinAsShowman}" FontSize="25" TextBlock.LineHeight="25" />
+                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static data:GameRole.Player}" Content="{x:Static lp:Resources.JoinAsPlayer}" FontSize="25" TextBlock.LineHeight="25" />
+                <Button Padding="5" Style="{StaticResource SIButton}" Command="{Binding Join}" CommandParameter="{x:Static data:GameRole.Viewer}" Content="{x:Static lp:Resources.JoinAsViewer}" FontSize="25" TextBlock.LineHeight="25" />
             </UniformGrid>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Background="#FF5A95E2">
                 <ContentControl Background="#FFA1C2DE" Margin="5,10">
@@ -114,11 +114,11 @@
                         <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.Host}" Margin="0,10,0,0" FontWeight="Bold" />
                         <TextBlock Grid.Row="2" Style="{StaticResource ValueBox}" Text="{Binding Host}" />
                         <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.Showman}" Margin="0,10,0,0" FontWeight="Bold" />
-                        <TextBlock Grid.Row="3" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Showman}}" />
+                        <TextBlock Grid.Row="3" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static data:GameRole.Showman}}" />
                         <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Players}" Margin="0,10,0,0" FontWeight="Bold" />
-                        <TextBlock Grid.Row="4" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Player}}" />
+                        <TextBlock Grid.Row="4" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static data:GameRole.Player}}" />
                         <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Viewers}" Margin="0,10,0,0" FontWeight="Bold" />
-                        <TextBlock Grid.Row="5" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static sc:GameRole.Viewer}}" />
+                        <TextBlock Grid.Row="5" Style="{StaticResource ValueBox}" Text="{Binding Persons, Converter={StaticResource PersonsConverter}, ConverterParameter={x:Static data:GameRole.Viewer}}" />
                     </Grid>
                 </ContentControl>
             </StackPanel>            

@@ -1,4 +1,5 @@
 ﻿using SICore.Connections.Errors;
+using SIData;
 using System;
 using System.Buffers;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace SICore.Connections
     /// <summary>
     /// Представляет внешний сервер и доступных на нём клиентов
     /// </summary>
-    public sealed class Connection: TcpReadConnection
+    public sealed class Connection : TcpReadConnection
     {
         /// <summary>
         /// Пинг
@@ -78,6 +79,7 @@ namespace SICore.Connections
 
             var upgradeText = $"GET / HTTP/1.1\nHost: {serverAddress}\nConnection: Upgrade{connectionIdHeader}\nUpgrade: sigame2\n\n";
             var bytes = Encoding.UTF8.GetBytes(upgradeText);
+            // TODO: use Memory
             await _tcpClient.GetStream().WriteAsync(bytes, 0, bytes.Length);
 
             var buffer = new byte[5000];
@@ -85,6 +87,7 @@ namespace SICore.Connections
             var upgradeMessage = new StringBuilder();
             do
             {
+                // TODO: use Memory
                 var bytesRead = await _tcpClient.GetStream().ReadAsync(buffer, 0, buffer.Length);
                 if (bytesRead < 1)
                 {
@@ -136,6 +139,7 @@ namespace SICore.Connections
                     try
                     {
                         MessageSerializer.SerializeMessage(message, buffer);
+                        // TODO: use Memory
                         await _tcpClient.GetStream().WriteAsync(buffer, 0, bufferSize);
                     }
                     finally

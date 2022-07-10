@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:SIUI"
+    xmlns:lp="clr-namespace:SIUI.Properties"
     xmlns:lb="clr-namespace:SIUI.Behaviors"
     xmlns:localc="clr-namespace:SIUI.Converters"
     xmlns:locals="clr-namespace:SIUI.Selectors"
@@ -457,7 +458,15 @@
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:TableStage.Void}" />
                             <DataTemplate x:Key="{x:Static vm:TableStage.Sign}">
-                                <Image Source="{Binding Settings.Model.LogoUri, Converter={StaticResource LogoConverter}}" Stretch="Uniform" />
+                                <DockPanel>
+                                    <TextBlock
+                                        DockPanel.Dock="Bottom"
+                                        TextAlignment="Right"
+                                        FontSize="40"
+                                        Margin="0,15,50,15"
+                                        Text="{x:Static lp:Resources.GameAuthor}" />
+                                    <Image Source="{Binding Settings.Model.LogoUri, Converter={StaticResource LogoConverter}}" Stretch="Uniform" />
+                                </DockPanel>
                             </DataTemplate>
                             <DataTemplate x:Key="{x:Static vm:TableStage.GameThemes}">
                                 <StackPanel Orientation="Vertical" ClipToBounds="True">

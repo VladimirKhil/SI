@@ -1,6 +1,7 @@
-﻿using System;
+﻿using SIData;
+using System;
+using System.Globalization;
 using System.Windows.Data;
-using SICore;
 
 namespace SIGame.Converters
 {
@@ -9,14 +10,8 @@ namespace SIGame.Converters
     {
         public GameRole Role { get; set; }
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return (GameRole)value == Role;
-        }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => (GameRole)value == Role;
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

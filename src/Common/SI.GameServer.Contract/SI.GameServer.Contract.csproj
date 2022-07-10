@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
+    <ProjectReference Include="..\..\SICore\SIData\SIData.csproj" />
   </ItemGroup>
 
 </Project>

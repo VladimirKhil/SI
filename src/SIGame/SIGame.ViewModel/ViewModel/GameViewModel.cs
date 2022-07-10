@@ -11,12 +11,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class GameViewModel: IAsyncDisposable, INotifyPropertyChanged
+    public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         private readonly Server _server;
 
@@ -296,25 +298,23 @@ namespace SIGame.ViewModel
             Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector.GameId}");
         }
 
-        private async void PrintNetworkInformation()
+        private async void PrintNetworkInformation(CancellationToken cancellationToken = default)
         {
             var ips = new List<string>();
 
             try
             {
-                var request = WebRequest.CreateHttp("https://api.ipify.org?format=json");
-                var response = await request.GetResponseAsync();
+                using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
+                var response = await client.GetAsync("https://api.ipify.org?format=json", cancellationToken);
 
-                using (var stream = response.GetResponseStream())
-                using (var reader = new StreamReader(stream))
-                using (var jsonReader = new JsonTextReader(reader))
+                using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                using var reader = new StreamReader(stream);
+                using var jsonReader = new JsonTextReader(reader);
+                var ipInfo = JsonSerializer.CreateDefault().Deserialize<IpResponse>(jsonReader);
+
+                if (ipInfo != null && ipInfo.Ip != null)
                 {
-                    var ipInfo = JsonSerializer.CreateDefault().Deserialize<IpResponse>(jsonReader);
-
-                    if (ipInfo != null && ipInfo.Ip != null)
-                    {
-                        ips.Add($"{ipInfo.Ip}:{NetworkGamePort}");
-                    }
+                    ips.Add($"{ipInfo.Ip}:{NetworkGamePort}");
                 }
             }
             catch
@@ -322,12 +322,12 @@ namespace SIGame.ViewModel
 
             }
 
-            foreach (var ip in await Dns.GetHostAddressesAsync(Environment.MachineName))
+            foreach (var ip in await Dns.GetHostAddressesAsync(Environment.MachineName, cancellationToken))
             {
-                ips.Add(ip.ToString() + ":" + NetworkGamePort);
+                ips.Add($"{ip}:{NetworkGamePort}");
             }
 
-            await Task.Delay(2000);
+            await Task.Delay(2000, cancellationToken);
 
             Host.AddLog($"IP:\n{string.Join("\n", ips)}");
         }

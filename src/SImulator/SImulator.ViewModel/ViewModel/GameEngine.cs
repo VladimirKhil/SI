@@ -227,10 +227,6 @@ namespace SImulator.ViewModel
                         {
                             PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
                         }
-                        catch (CommunicationException exc)
-                        {
-                            PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-                        }
 
                         if (_gameHost.IsMediaEnded)
                         {
@@ -423,10 +419,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
             catch (ObjectDisposedException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
@@ -466,10 +458,6 @@ namespace SImulator.ViewModel
                 }
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
@@ -565,10 +553,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
         }
 
         private void PreviousRound_Executed(object arg)
@@ -583,10 +567,6 @@ namespace SImulator.ViewModel
                 _engine.MoveBackRound();
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
@@ -647,10 +627,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
         }
 
         private void StopMediaTimer_Executed(object arg)
@@ -661,10 +637,6 @@ namespace SImulator.ViewModel
                 ActiveMediaCommand = RunMediaTimer;
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
@@ -688,10 +660,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
         }
 
         private void RemovePlayer_Executed(object arg)
@@ -711,10 +679,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
         }
 
         private void ClearPlayers_Executed(object arg)
@@ -725,10 +689,6 @@ namespace SImulator.ViewModel
                 UserInterface.ClearPlayers();
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
@@ -767,7 +727,7 @@ namespace SImulator.ViewModel
 
         private void AddWrong_Executed(object arg)
         {
-            if (!(arg is PlayerInfo player))
+            if (arg is not PlayerInfo player)
             {
                 if (_selectedPlayer == null)
                 {
@@ -808,10 +768,6 @@ namespace SImulator.ViewModel
                 UserInterface.Start();
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
             }
@@ -932,10 +888,6 @@ namespace SImulator.ViewModel
                 _engine.MoveNext();
             }
             catch (TimeoutException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
-            catch (CommunicationException exc)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
@@ -1281,10 +1233,6 @@ namespace SImulator.ViewModel
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
-            catch (CommunicationException exc)
-            {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-            }
         }
 
         /// <summary>
@@ -1319,7 +1267,6 @@ namespace SImulator.ViewModel
                     {
                         UserInterface.SetSound("");
                     }
-                    catch (CommunicationException) { }
                     catch (TimeoutException) { }
                     catch (ObjectDisposedException) { }
 
@@ -1671,7 +1618,7 @@ namespace SImulator.ViewModel
                 UserInterface.SetSound(Settings.Model.Sounds.PlayerPressed);
                 UserInterface.SetPlayer(index);
             }
-            catch (Exception exc) when (exc is TimeoutException || exc is CommunicationException)
+            catch (Exception exc) when (exc is TimeoutException)
             {
                 PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
             }
@@ -1720,10 +1667,6 @@ namespace SImulator.ViewModel
                     UserInterface.StopGame();
             }
             catch (TimeoutException)
-            {
-
-            }
-            catch (CommunicationException)
             {
 
             }

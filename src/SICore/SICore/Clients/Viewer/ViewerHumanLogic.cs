@@ -25,6 +25,8 @@ namespace SICore
     {
         private bool _disposed = false;
 
+        private readonly LocalFileManager _localFileManager = new();
+
         protected readonly ViewerActions _viewerActions;
         protected readonly ILocalizer _localizer;
 
@@ -114,7 +116,7 @@ namespace SICore
             }
         }
 
-        private static readonly XmlReaderSettings ReaderSettings = new XmlReaderSettings { ConformanceLevel = ConformanceLevel.Fragment };
+        private static readonly XmlReaderSettings ReaderSettings = new() { ConformanceLevel = ConformanceLevel.Fragment };
 
         /// <summary>
         /// Вывод текста в протокол и в форму
@@ -156,7 +158,7 @@ namespace SICore
             if (isPrintable)
             {
                 var pair = toFormStr.Split(':');
-                var speech = (pair.Length > 1 && pair[0].Length + 2 < toFormStr.Length) ? toFormStr.Substring(pair[0].Length + 2) : toFormStr;
+                var speech = (pair.Length > 1 && pair[0].Length + 2 < toFormStr.Length) ? toFormStr[(pair[0].Length + 2)..] : toFormStr;
 
                 if (_data.Speaker != null)
                 {
@@ -214,7 +216,7 @@ namespace SICore
             }
             else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
             {
-                var indexString = replicCode.Substring(1);
+                var indexString = replicCode[1..];
                 if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
                 {
                     if (_data.Speaker != null)
@@ -326,12 +328,14 @@ namespace SICore
                     {
                         isPrintable = true;
 
-                        int.TryParse(content, out var playerIndex);
-                        var speaker = $"<span class=\"sr n{playerIndex}\">";
+                        if (int.TryParse(content, out var playerIndex))
+                        {
+                            var speaker = $"<span class=\"sr n{playerIndex}\">";
 
-                        var playerName = playerIndex < _data.Players.Count ? _data.Players[playerIndex].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
-                        chatMessageBuilder.AppendFormat("{0}: ", playerName);
-                        logMessageBuilder.AppendFormat("{0}{1}: </span>", speaker, playerName);
+                            var playerName = playerIndex < _data.Players.Count ? _data.Players[playerIndex].Name : "<" + _localizer[nameof(R.UnknownPerson)] + ">";
+                            chatMessageBuilder.AppendFormat("{0}: ", playerName);
+                            logMessageBuilder.AppendFormat("{0}{1}: </span>", speaker, playerName);
+                        }
                     }
                     break;
 
@@ -624,9 +628,9 @@ namespace SICore
 
                         var tailIndex = TInfo.TextLength + newTextLength;
 
-                        TInfo.Text = currentText.Substring(0, TInfo.TextLength)
+                        TInfo.Text = currentText[..TInfo.TextLength]
                             + text
-                            + (currentText.Length > tailIndex ? currentText.Substring(tailIndex) : "");
+                            + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
 
                         TInfo.TextLength += newTextLength;
                     }
@@ -679,6 +683,8 @@ namespace SICore
                         return;
                     }
 
+                    uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+
                     if (_data.AtomType == AtomTypes.Image)
                     {
                         TInfo.MediaSource = new MediaSource(uri);
@@ -689,13 +695,13 @@ namespace SICore
                     {
                         if (_data.AtomType == AtomTypes.Audio)
                         {
-                            TInfo.SoundSource = new MediaSource(mediaUri.ToString());
+                            TInfo.SoundSource = new MediaSource(uri);
                             TInfo.QuestionContentType = QuestionContentType.None;
                             TInfo.Sound = true;
                         }
                         else
                         {
-                            TInfo.MediaSource = new MediaSource(mediaUri.ToString());
+                            TInfo.MediaSource = new MediaSource(uri);
                             TInfo.QuestionContentType = QuestionContentType.Video;
                             TInfo.Sound = false;
                         }
@@ -749,7 +755,9 @@ namespace SICore
                         return;
                     }
 
-                    TInfo.SoundSource = new MediaSource(mediaUri.ToString());
+                    uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+
+                    TInfo.SoundSource = new MediaSource(uri);
                     TInfo.Sound = true;
 
                     break;
@@ -967,7 +975,7 @@ namespace SICore
                 _data.ProtocolWriter = null;
             }
 
-            _data.BackLink.ClearTempFile();
+            _localFileManager.Dispose();
 
             return base.DisposeAsync(disposing);
         }
@@ -1205,7 +1213,7 @@ namespace SICore
                 uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
             }
 
-            if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out Uri mediaUri))
+            if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out _))
             {
                 return;
             }
@@ -1218,9 +1226,46 @@ namespace SICore
         public void OnPersonPass(int playerIndex)
         {
             if (playerIndex < 0 || playerIndex >= _data.Players.Count)
+            {
                 return;
+            }
 
             _data.Players[playerIndex].State = PlayerState.Pass;
+        }
+
+        public void OnRoundContent(string[] mparams)
+        {
+            for (var i = 1; i < mparams.Length; i++)
+            {
+                var uri = mparams[i];
+
+                if (uri.Contains(Constants.GameHost))
+                {
+                    var address = ClientData.ServerAddress;
+                    if (!string.IsNullOrWhiteSpace(address))
+                    {
+                        if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                        {
+                            uri = uri.Replace(Constants.GameHost, hostUri.Host);
+                        }
+                    }
+                }
+                else if (uri.Contains(Constants.ServerHost))
+                {
+                    uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
+                }
+                else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
+                {
+                    continue;
+                }
+
+                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
+                {
+                    continue;
+                }
+
+                _localFileManager.AddFile(mediaUri, e => _data.OnAddString($"File {mediaUri} loading error", e.Message, LogMode.Protocol));
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using SICore.Connections;
-using SICore.Network.Contracts;
+﻿using SICore.Network.Contracts;
+using SIData;
 using System;
 using System.Diagnostics;
 using System.Threading.Channels;

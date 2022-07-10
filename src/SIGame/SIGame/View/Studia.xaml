@@ -350,8 +350,9 @@
         </Style>
     </UserControl.Resources>
     <UserControl.Background>
-        <ImageBrush ImageSource="{Binding UserSettings.GameSettings.AppSettings.ThemeSettings.CustomBackgroundUri, Converter={StaticResource BackgroundConverter}}"
-                    Stretch="Fill" />
+        <ImageBrush
+            ImageSource="{Binding UserSettings.GameSettings.AppSettings.ThemeSettings.CustomBackgroundUri, Converter={StaticResource BackgroundConverter}}"
+            Stretch="Fill" />
     </UserControl.Background>
     <Grid Name="root">
         <Grid Name="base">
@@ -369,10 +370,16 @@
 
             <ui:Table x:Name="table" Grid.Column="2" Margin="0,0,0,0" MediaElement.MediaEnded="Table_MediaEnded" TextOptions.TextFormattingMode="Display" SnapsToDevicePixels="True" DataContext="{Binding TInfo}" />
 
-            <ProgressBar Grid.Column="2" Height="10" Foreground="#ffa000" VerticalAlignment="Top" Style="{StaticResource SIProgressBar}"
-                         Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
-                         ToolTip="{x:Static lp:Resources.Time_Decide}" Opacity="1"
-                         Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+            <ProgressBar
+                Grid.Column="2"
+                Height="10"
+                Foreground="#ffa000"
+                VerticalAlignment="Top"
+                Style="{StaticResource SIProgressBar}"
+                Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
+                ToolTip="{x:Static lp:Resources.Time_Decide}"
+                Opacity="1"
+                Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}" />
             
             <ContentControl Grid.Column="2" Margin="0,0,0,0" Visibility="{Binding TInfo.Pause,Converter={StaticResource BooleanToVisibilityConverter1}}">
                 <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#88000000">
@@ -387,10 +394,18 @@
 
             <ContentControl Grid.Column="2" Margin="0,0,0,0" Visibility="{Binding Ad,Converter={StaticResource NotNullToVisibilityConverter1}}">
                 <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="{StaticResource MainColor}"
-                               Text="{Binding Ad}"
-                               lb:NavigationService.Text="{Binding Ad}" uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="150"
-                               FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed">
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="{StaticResource MainColor}"
+                        Text="{Binding Ad}"
+                        TextWrapping="Wrap"
+                        TextAlignment="Center"
+                        Margin="15"
+                        lb:NavigationService.Text="{Binding Ad}"
+                        uib:FillManager.Fill="True"
+                        uib:FillManager.MaxFontSize="130"
+                        FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed">
                         <TextBlock.Effect>
                             <DropShadowEffect BlurRadius="2" Opacity="1" ShadowDepth="1" />
                         </TextBlock.Effect>

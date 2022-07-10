@@ -1,11 +1,16 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using SI.GameServer.Client;
 using SICore;
 using SICore.PlatformSpecific;
+using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
 using SIUI.ViewModel;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,7 +20,7 @@ namespace SIGame.Tests
     [TestFixture]
     public class MainTest
     {
-        private static readonly HttpClient HttpClient = new();
+        private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
         [TestCase(PackageSourceTypes.RandomServer, GameRole.Player, true)]
         [TestCase(PackageSourceTypes.SIStorage, GameRole.Player, true)]
@@ -28,8 +33,6 @@ namespace SIGame.Tests
             GameRole gameRole,
             bool useSignalRConnection)
         {
-            const string GameServerUri = "https://vladimirkhil.com/siserver/0";
-
             var coreManager = new DesktopCoreManager();
             var manager = new TestManager();
 
@@ -38,11 +41,23 @@ namespace SIGame.Tests
 
             var userSettings = new UserSettings
             {
-                GameServerUri = GameServerUri,
                 UseSignalRConnection = useSignalRConnection
             };
 
-            var mainViewModel = new MainViewModel(commonSettings, userSettings);
+            var configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.AddJsonFile("appsettings.json");
+
+            var configuration = configurationBuilder.Build();
+
+            var services = new ServiceCollection();
+
+            services.AddSIGameServerClient(configuration);
+            services.AddSingleton<IUIThreadExecutor>(manager);
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            var mainViewModel = new MainViewModel(commonSettings, userSettings, serviceProvider);
 
             await mainViewModel.Open.ExecuteAsync(null);
 

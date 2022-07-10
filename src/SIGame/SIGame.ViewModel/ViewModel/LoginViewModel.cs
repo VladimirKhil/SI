@@ -1,11 +1,8 @@
-﻿using Services.SI;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SI.GameServer.Client;
 using SICore;
-using SIGame.ViewModel.Properties;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -17,8 +14,6 @@ namespace SIGame.ViewModel
 {
     public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
     {
-        private const int ClientProtocolVersion = 1;
-
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         private bool _isDisposed = false;
@@ -63,11 +58,11 @@ namespace SIGame.ViewModel
 
         internal event Func<string, IGameServerClient, Task> Entered;
 
-        private readonly UserSettings _userSettings;
+        private readonly IGameServerClientFactory _gameServerClientFactory;
 
-        public LoginViewModel(UserSettings userSettings)
+        public LoginViewModel(IGameServerClientFactory gameServerClientFactory)
         {
-            _userSettings = userSettings;
+            _gameServerClientFactory = gameServerClientFactory;
 
             Enter = new AsyncCommand(Enter_ExecutedAsync);
             ShowFullError = new CustomCommand(ShowFullError_Executed);
@@ -87,40 +82,16 @@ namespace SIGame.ViewModel
 
                 IsProgress = true;
             }
-
+            
             Error = "";
             FullError = null;
             Enter.CanBeExecuted = false;
 
             IGameServerClient client = null;
 
-            NewServerInfo serverInfo;
             try
             {
-                serverInfo = await GetGameServerUriAsync();
-            }
-            catch (Exception exc)
-            {
-                Error = $"{Resources.CannotGetServerAddress} {exc.Message}";
-                return;
-            }
-
-            try
-            {
-                if (serverInfo.ProtocolVersion > ClientProtocolVersion)
-                {
-                    IsProgress = false;
-                    Enter.CanBeExecuted = true;
-                    Error = Resources.ObsoleClient;
-                    return;
-                }
-
-                var gameServerClientOptions = new GameServerClientOptions
-                {
-                    ServiceUri = serverInfo.Uri + (serverInfo.Uri.EndsWith("/") ? "" : "/")
-                };
-
-                client = new GameServerClient(gameServerClientOptions, PlatformSpecific.PlatformManager.Instance);
+                client = await _gameServerClientFactory.CreateClientAsync(_cancellationTokenSource.Token);
 
                 await client.OpenAsync(_login, _cancellationTokenSource.Token);
 
@@ -164,23 +135,6 @@ namespace SIGame.ViewModel
                 IsProgress = false; // no lock required
                 Enter.CanBeExecuted = true;
             }
-        }
-
-        private async Task<NewServerInfo> GetGameServerUriAsync()
-        {
-            if (!string.IsNullOrEmpty(_userSettings.GameServerUri))
-            {
-                return new NewServerInfo
-                {
-                    Uri = _userSettings.GameServerUri,
-                    ProtocolVersion = ClientProtocolVersion
-                };
-            }
-
-            var siStorageServiceClient = new SIStorageServiceClient();
-            var uris = await siStorageServiceClient.GetGameServersUrisAsync(_cancellationTokenSource.Token);
-
-            return uris?.FirstOrDefault();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

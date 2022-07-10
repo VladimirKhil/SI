@@ -1,19 +1,30 @@
-﻿using System;
+﻿using SIData;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SICore.Connections
 {
     /// <summary>
-    /// Ссылка на внешнее подключение
+    /// Represents a connection to an external node.
     /// </summary>
-    public interface IConnection: IAsyncDisposable
+    public interface IConnection : IAsyncDisposable
     {
         object ClientsSync { get; }
+
         string ConnectionId { get; }
+
         string Id { get; }
 
         List<string> Clients { get; }
+
+        string RemoteAddress { get; }
+
+        bool IsAuthenticated { get; set; }
+
+        int GameId { get; set; }
+
+        string UserName { get; set; }
 
         event Action<IConnection, Message> MessageReceived;
         event Action<IConnection, bool> ConnectionClose;
@@ -25,10 +36,5 @@ namespace SICore.Connections
 
         ValueTask SendMessageAsync(Message m);
         void Close();
-
-        string RemoteAddress { get; }
-        bool IsAuthenticated { get; set; }
-        int GameId { get; set; }
-        string UserName { get; set; }
     }
 }

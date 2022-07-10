@@ -76,8 +76,8 @@ namespace SICore.Network.Servers
 
                 try
                 {
-                    var tcpClient = await _listener.AcceptTcpClientAsync();
-                    await AddConnectionAsync(tcpClient);
+                    var tcpClient = await _listener.AcceptTcpClientAsync(_cancellation.Token);
+                    await AddConnectionAsync(tcpClient, _cancellation.Token);
 
                     lock (_listenerSync)
                     {
@@ -87,6 +87,7 @@ namespace SICore.Network.Servers
                         }
                     }
                 }
+                catch (OperationCanceledException) { }
                 catch (InvalidOperationException) { }
                 catch (SocketException) { }
                 catch (Exception e)
@@ -115,10 +116,10 @@ namespace SICore.Network.Servers
             return base.DisposeAsync(disposing);
         }
 
-        public async Task AddConnectionAsync(TcpClient tcpClient)
+        public async Task AddConnectionAsync(TcpClient tcpClient, CancellationToken cancellationToken)
         {
             var connection = new Connection(tcpClient, null);
-            await AddConnectionAsync(connection);
+            await AddConnectionAsync(connection, cancellationToken);
             connection.StartRead(false);
         }
     }

@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Xml.Serialization;
-using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
-using System;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace SIData
 {
     /// <summary>
-    /// Аккаунт участника
+    /// Defines a person account.
     /// </summary>
     [DataContract]
-    public class Account: INotifyPropertyChanged
+    public class Account : INotifyPropertyChanged
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _name = "";
@@ -25,7 +24,7 @@ namespace SIData
         private bool _isHuman = false;
 
         /// <summary>
-        /// Имя
+        /// Account name.
         /// </summary>
         [XmlAttribute]
         [DataMember]
@@ -36,7 +35,7 @@ namespace SIData
         }
 
         /// <summary>
-        /// Мужской пол
+        /// Account male flag (otherwise - woman).
         /// </summary>
         [XmlAttribute]
         [DefaultValue(true)]
@@ -48,7 +47,7 @@ namespace SIData
         }
 
         /// <summary>
-        /// Адрес картинки
+        /// Account avatar.
         /// </summary>
         [XmlAttribute]
         [DefaultValue("")]
@@ -60,7 +59,7 @@ namespace SIData
         }
 
         /// <summary>
-        /// Может ли аккаунт быть удалён (встроенные аккаунты не могут быть удалены)
+        /// Can the account be deleted (otherwise it a built-in account).
         /// </summary>
         [XmlAttribute]
         [DefaultValue(false)]
@@ -71,6 +70,9 @@ namespace SIData
             set { if (_canBeDeleted != value) { _canBeDeleted = value; OnPropertyChanged(); } }
         }
 
+        /// <summary>
+        /// It this is a human account.
+        /// </summary>
         [XmlIgnore]
         [DataMember]
         public bool IsHuman
@@ -99,10 +101,6 @@ namespace SIData
 
         public override string ToString() => _name;
 
-        /// <summary>
-        /// Изменилось значение свойства
-        /// </summary>
-        /// <param name="name">Имя свойства</param>
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

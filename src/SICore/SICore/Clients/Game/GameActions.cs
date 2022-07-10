@@ -1,8 +1,8 @@
 ﻿using Notions;
 using SICore.BusinessLogic;
-using SICore.Connections;
 using SICore.Network;
 using SICore.Network.Clients;
+using SIData;
 using SIPackages;
 using SIPackages.Core;
 using System;
@@ -97,7 +97,9 @@ namespace SICore
 
             var person = messageType == MessageTypes.System ? ReplicCodes.System.ToString()
                 : messageType == MessageTypes.Special ? ReplicCodes.Special.ToString() :
-                (personRole == GameRole.Player ? ReplicCodes.Player + personIndex.Value.ToString() : ReplicCodes.Showman.ToString());
+                (personRole == GameRole.Player
+                ? ReplicCodes.Player + personIndex.Value.ToString()
+                : ReplicCodes.Showman.ToString());
 
             SendMessageWithArgs(Messages.Replic, person, text);
         }

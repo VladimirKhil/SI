@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class SINetworkViewModel: ConnectionDataViewModel
+    public sealed class SINetworkViewModel : ConnectionDataViewModel
     {
         private static readonly Regex AddressRegex = new Regex(@"^(?<host>(\d{1,3}\.){3}\d{1,3})\:(?<port>\d+)$");
 
@@ -24,8 +24,11 @@ namespace SIGame.ViewModel
                 {
                     _gameData = value;
                     OnPropertyChanged();
+
                     if (value != null)
+                    {
                         UpdateJoinCommand(value.Persons);
+                    }
                 }
             }
         }

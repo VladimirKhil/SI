@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SIData;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +14,9 @@ using System.Xml;
 namespace SICore.Connections
 {
     /// <summary>
-    /// Клиент, получающий сообщения от сервера по каналу TCP
+    /// Represents a connection that receives incoming messages via TCP.
     /// </summary>
-    public abstract class TcpReadConnection: ConnectionBase
+    public abstract class TcpReadConnection : ConnectionBase
     {
         protected TcpClient _tcpClient = null;
 
@@ -79,6 +80,7 @@ namespace SICore.Connections
                 ns.ReadTimeout = 20 * 1000;
                 while (true)
                 {
+                    // TODO: use Memory
                     var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length);
                     if (bytesRead < 1)
                     {
@@ -139,6 +141,7 @@ namespace SICore.Connections
                 //var memory = writer.GetMemory(_buffer.Length);
                 try
                 {
+                    // TODO: use Memory
                     var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken);
                     if (bytesRead < 1)
                     {
@@ -226,6 +229,7 @@ namespace SICore.Connections
             var upgradeMessage = new StringBuilder();
             do
             {
+                // TODO: use Memory
                 var bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
                 if (bytesRead < 1)
                 {
@@ -272,6 +276,7 @@ namespace SICore.Connections
 
             var response = $"HTTP/1.1 101 Switching Protocols\nUpgrade: {protocol}\nConnection: Upgrade{connectionIdHeader}\n\n";
             var bytes = Encoding.UTF8.GetBytes(response);
+            // TODO: use Memory
             await networkStream.WriteAsync(bytes, 0, bytes.Length);
         }
 

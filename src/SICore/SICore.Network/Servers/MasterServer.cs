@@ -1,6 +1,7 @@
 ﻿using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
+using SIData;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -47,8 +48,7 @@ namespace SICore.Network.Servers
                 await connection.SendMessageAsync(
                     new Message(
                         $"{SystemMessages.Refuse}\n{_localizer[nameof(R.ConnectionDenied)]}{(date == DateTime.MaxValue ? "" : ($" {_localizer[nameof(R.Until)]} " + date.ToString(_localizer.Culture)))}\r\n",
-                        NetworkConstants.GameName)
-                );
+                        NetworkConstants.GameName));
 
                 DropConnection(connection);
                 return false;

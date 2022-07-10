@@ -1,5 +1,6 @@
 ﻿using SICore.Clients.Player;
 using SICore.Connections;
+using SICore.Extensions;
 using SICore.Utils;
 using SIData;
 using SIPackages.Core;
@@ -1504,7 +1505,7 @@ namespace SICore
             }
             catch (Exception exc)
             {
-                _data.SystemLog.AppendFormat("Ошибка при выборе вопроса. Описание ошибки: {0}", exc).AppendLine();
+                _data.SystemLog.AppendFormat("Ошибка при выборе вопроса. Описание ошибки: {0}", exc.ToString()).AppendLine();
             }
         }
 

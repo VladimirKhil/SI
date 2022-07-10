@@ -1,14 +1,15 @@
-﻿using System;
-using System.Windows.Data;
-using SICore;
+﻿using SIData;
 using SIGame.Properties;
+using System;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace SIGame.Converters
 {
     [ValueConversion(typeof(ComputerAccount), typeof(string))]
     public sealed class StrengthConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is ComputerAccount account))
                 return null;
@@ -23,9 +24,6 @@ namespace SIGame.Converters
                 return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

@@ -177,6 +177,7 @@ namespace SImulator
             return Settings.Create();
         }
 
+#if !DEBUG
         private async void ProcessAsync()
         {
             if (!_useAppService)
@@ -202,6 +203,7 @@ namespace SImulator
             {
             }
         }
+#endif
 
         private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {

@@ -2,10 +2,11 @@
 using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SICore
 {
-    public interface IGameManager: IPlatformManager
+    public interface IGameManager : IPlatformManager
     {
         void OnFlash(bool flash = true);
         void OnError(Exception exc);
@@ -26,7 +27,7 @@ namespace SICore
         string GetPhotoUri(string name);
 
         void SendError(Exception exc, bool isWarning = false);
-        void SaveReport(Results.GameResult result);
+        Task SaveReportAsync(Results.GameResult result);
         void OnPictureError(string remoteUri);
 
         void SaveBestPlayers(IEnumerable<PlayerAccount> players);

@@ -1,5 +1,4 @@
 ﻿using AppService.Client.Models;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Reflection;
 using System.Text;
@@ -11,17 +10,13 @@ namespace AppService.Client
         private static readonly JsonSerializer Serializer = new();
 
         private readonly HttpClient _client;
-        private readonly AppServiceClientOptions _options;
 
-        public AppServiceClient(HttpClient client, IOptions<AppServiceClientOptions> options)
+        public AppServiceClient(HttpClient client)
         {
-            _options = options.Value;
-
             _client = client;
-            _client.BaseAddress = _options.ServiceUri;
         }
 
-        public async Task<AppInfo> GetProductAsync(string name)
+        public async Task<AppInfo?> GetProductAsync(string name)
         {
             var appInfo = await CallAsync<AppInfo>("Product?name=" + name + "&osVersion=" + Environment.OSVersion.Version);
             

@@ -37,14 +37,7 @@ namespace SImulator.ViewModel
                     {
                         TInfo.MediaStart += () =>
                             {
-                                try
-                                {
-                                    _gameHost?.OnMediaStart();
-                                }
-                                catch (CommunicationObjectAbortedException)
-                                {
-
-                                }
+                                _gameHost?.OnMediaStart();
                             };
 
                         TInfo.MediaEnd += () =>
@@ -61,14 +54,7 @@ namespace SImulator.ViewModel
 
                         TInfo.MediaProgress += progress =>
                         {
-                            try
-                            {
-                                _gameHost?.OnMediaProgress(progress);
-                            }
-                            catch (CommunicationObjectAbortedException)
-                            {
-
-                            }
+                            _gameHost?.OnMediaProgress(progress);
                         };
                     }
                 }

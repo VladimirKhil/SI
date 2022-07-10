@@ -1,8 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.Core;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel.Tests
@@ -18,11 +16,11 @@ namespace SImulator.ViewModel.Tests
         public ICommand PreviousRound { get => throw new NotImplementedException(); set { } }
         public ICommand Stop { get => throw new NotImplementedException(); set { } }
 
-        public event Action<int> ThemeDeleted;
-        public event Action MediaStart;
-        public event Action MediaEnd;
-        public event Action<double> MediaProgress;
-        public event Action RoundThemesFinished;
+        public event Action<int> ThemeDeleted { add { } remove { } }
+        public event Action MediaStart { add { } remove { } }
+        public event Action MediaEnd { add { } remove { } }
+        public event Action<double> MediaProgress { add { } remove { } }
+        public event Action RoundThemesFinished { add { } remove { } }
 
         public TestGameHost(EngineBase engine)
         {

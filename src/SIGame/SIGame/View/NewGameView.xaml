@@ -11,13 +11,14 @@
     xmlns:ps="clr-namespace:SIGame.ViewModel.PackageSources;assembly=SIGame.ViewModel"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:data="clr-namespace:SIData;assembly=SIData"
     FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     mc:Ignorable="d">
     <UserControl.Resources>
         <lc:PlusOneConverter x:Key="PlusOneConverter"/>
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="sc:GameRole"/>
+                <x:Type TypeName="data:GameRole"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
@@ -28,7 +29,7 @@
         </ObjectDataProvider>
 
         <lc:IsPlayerConverter x:Key="IsPlayer" />
-        <lc:EnumConverter x:Key="GameRoleConverter1" EnumType="{x:Type sc:GameRole}" />
+        <lc:EnumConverter x:Key="GameRoleConverter1" EnumType="{x:Type data:GameRole}" />
         <lc:EnumConverter x:Key="AccountTypes" EnumType="{x:Type lvm:AccountTypes}" />
         <lc:EnumConverter x:Key="NetworkGameTypes" EnumType="{x:Type lvm:NetworkGameType}" />
         <lc:PlayerIndiciesConverter x:Key="PlayerIndiciesConverter" />
@@ -152,7 +153,7 @@
             </Setter>
         </Style>
 
-        <DataTemplate DataType="{x:Type sc:ComputerAccount}">
+        <DataTemplate DataType="{x:Type data:ComputerAccount}">
             <DockPanel Style="{StaticResource ToolTippedElement}" Background="Transparent">
                 <Image DockPanel.Dock="Left" Source="{Binding Picture, Converter={StaticResource ImageConverter}}" Stretch="Uniform"
                        Width="50" Height="75" />

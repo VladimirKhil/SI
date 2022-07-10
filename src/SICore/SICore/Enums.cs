@@ -318,28 +318,6 @@ namespace SICore
     }
 
     /// <summary>
-    /// Стиль игры
-    /// </summary>
-    public enum PlayerStyle
-    {
-        /// <summary>
-        /// Агрессивный
-        /// </summary>
-        [Display(Description = "PlayerStyle_Agressive")]
-        Agressive,
-        /// <summary>
-        /// Спокойный
-        /// </summary>
-        [Display(Description = "PlayerStyle_Normal")]
-        Normal,
-        /// <summary>
-        /// Осторожный
-        /// </summary>
-        [Display(Description = "PlayerStyle_Careful")]
-        Careful
-    }
-
-    /// <summary>
     /// Состояние игрока
     /// </summary>
     public enum PlayerState
@@ -430,28 +408,6 @@ namespace SICore
         /// Throttling on button hit was started.
         /// </summary>
         Wait
-    }
-
-    /// <summary>
-    /// Describes game agent roles.
-    /// </summary>
-    public enum GameRole
-    {
-        /// <summary>
-        /// Game viewer.
-        /// </summary>
-        [Display(Description = "GameRole_Viewer")]
-        Viewer,
-        /// <summary>
-        /// Game player.
-        /// </summary>
-        [Display(Description = "GameRole_Player")]
-        Player,
-        /// <summary>
-        /// Game showman.
-        /// </summary>
-        [Display(Description = "GameRole_Showman")]
-        Showman
     }
 
     [Flags]

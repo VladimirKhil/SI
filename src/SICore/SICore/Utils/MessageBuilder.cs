@@ -1,26 +1,23 @@
-﻿using SICore.Connections;
+﻿using SIData;
 using System.Collections.Generic;
 
 namespace SICore.Utils
 {
+    /// <summary>
+    /// Allows to build a well-formed SIGame message text.
+    /// </summary>
     public sealed class MessageBuilder
     {
-        private readonly List<object> _messageArgs = new List<object>();
+        private readonly List<object> _messageArgs = new();
 
         public MessageBuilder()
         {
 
         }
 
-        public MessageBuilder(object arg)
-        {
-            _messageArgs.Add(arg);
-        }
+        public MessageBuilder(object arg) => _messageArgs.Add(arg);
 
-        public MessageBuilder(params object[] args)
-        {
-            _messageArgs.AddRange(args);
-        }
+        public MessageBuilder(params object[] args) => _messageArgs.AddRange(args);
 
         public MessageBuilder Add(object arg)
         {

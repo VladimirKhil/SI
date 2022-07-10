@@ -14,9 +14,9 @@ using SICore;
 namespace SIGame
 {
     /// <summary>
-    /// Пользовательские настройки игры
+    /// Provides user-level app settings.
     /// </summary>
-    public sealed class UserSettings: INotifyPropertyChanged
+    public sealed class UserSettings : INotifyPropertyChanged
     {
         public static UserSettings Default { get; set; }
 
@@ -246,9 +246,6 @@ namespace SIGame
                 }
             }
         }
-
-        [XmlIgnore]
-        public string GameServerUri { get; set; }
 
         [XmlIgnore]
         public bool UseSignalRConnection { get; set; }

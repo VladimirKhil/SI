@@ -406,25 +406,6 @@ namespace SICore
                             }
                             break;
                         }
-                    case Messages.Studia:
-                        {
-                            #region Studia
-                            var studia = mparams[1];
-
-                            if (Connector != null && studia.Contains(Constants.GameHost))
-                            {
-                                var address = Connector.ServerAddress;
-                                if (!string.IsNullOrWhiteSpace(address))
-                                {
-                                    if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
-                                        studia = studia.Replace(Constants.GameHost, hostUri.Host);
-                                }
-                            }
-
-                            ClientData.Studia = studia;
-                            #endregion
-                            break;
-                        }
 
                     case Messages.Print:
                         OnPrint(mparams);
@@ -590,6 +571,10 @@ namespace SICore
 
                     case Messages.RoundThemes:
                         OnRoundThemes(mparams);
+                        break;
+
+                    case Messages.RoundContent:
+                        _logic.OnRoundContent(mparams);
                         break;
 
                     case Messages.Theme:
@@ -2051,7 +2036,7 @@ namespace SICore
                     }
                     catch (Exception exc)
                     {
-                        ClientData.BackLink.SendError(exc, true);
+                        ClientData.BackLink.SendError(exc, false);
                     }
 
                     if (data == null)

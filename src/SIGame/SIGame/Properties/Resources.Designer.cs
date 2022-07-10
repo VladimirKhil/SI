@@ -61,7 +61,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Автор: Владимир Хиль.
+        ///   Ищет локализованную строку, похожую на Author: Vladimir Khil.
         /// </summary>
         public static string About_Author {
             get {
@@ -70,7 +70,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Композитор.
+        ///   Ищет локализованную строку, похожую на Composer.
         /// </summary>
         public static string About_Composer {
             get {
@@ -79,7 +79,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дизайнер: Александр Кузнецов.
+        ///   Ищет локализованную строку, похожую на Designer: Alexander Kuznetsov.
         /// </summary>
         public static string About_Design {
             get {
@@ -88,7 +88,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображения участников находятся в общественном достоянии и взяты с сайта wikipedia.org.
+        ///   Ищет локализованную строку, похожую на Images of participants are in the public domain and are taken from wikipedia.org.
         /// </summary>
         public static string About_Images {
             get {
@@ -97,7 +97,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сайт программы.
+        ///   Ищет локализованную строку, похожую на Website.
         /// </summary>
         public static string About_Site {
             get {
@@ -106,7 +106,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Компьютер.
+        ///   Ищет локализованную строку, похожую на Computer.
         /// </summary>
         public static string AccountTypes_Computer {
             get {
@@ -115,7 +115,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Человек.
+        ///   Ищет локализованную строку, похожую на Human.
         /// </summary>
         public static string AccountTypes_Human {
             get {
@@ -124,7 +124,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Адрес.
+        ///   Ищет локализованную строку, похожую на Address.
         /// </summary>
         public static string Address {
             get {
@@ -133,7 +133,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить стол.
+        ///   Ищет локализованную строку, похожую на Add table.
         /// </summary>
         public static string AddTable {
             get {
@@ -142,7 +142,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Все.
+        ///   Ищет локализованную строку, похожую на All.
         /// </summary>
         public static string All {
             get {
@@ -151,7 +151,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: ВА-БАНК на вопросе 1 категории.
+        ///   Ищет локализованную строку, похожую на Odds: All-in in a question of the 1st category.
         /// </summary>
         public static string AllInOnQuestion1 {
             get {
@@ -160,7 +160,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: ВА-БАНК на вопросе 5 категории.
+        ///   Ищет локализованную строку, похожую на Odds: All-in in a question of the 5th category.
         /// </summary>
         public static string AllInOnQuestion5 {
             get {
@@ -169,7 +169,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проверка ответа.
+        ///   Ищет локализованную строку, похожую на Answer check.
         /// </summary>
         public static string AnswerCheck {
             get {
@@ -178,7 +178,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Будут отображаться внизу экрана.
+        ///   Ищет локализованную строку, похожую на Will appear at the bottom of the screen.
         /// </summary>
         public static string AnswersAtBottom {
             get {
@@ -187,7 +187,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Я прав!.
+        ///   Ищет локализованную строку, похожую на I am right!.
         /// </summary>
         public static string Apellate_Right {
             get {
@@ -196,7 +196,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Я ответил верно.
+        ///   Ищет локализованную строку, похожую на I answered right!.
         /// </summary>
         public static string Apellate_Right_Hint {
             get {
@@ -205,7 +205,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Я против!.
+        ///   Ищет локализованную строку, похожую на I disagree!.
         /// </summary>
         public static string Apellate_Wrong {
             get {
@@ -214,7 +214,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Другой ответил неверно.
+        ///   Ищет локализованную строку, похожую на Another player answered wrong.
         /// </summary>
         public static string Apellate_Wrong_Hint {
             get {
@@ -223,7 +223,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Язык приложения.
+        ///   Ищет локализованную строку, похожую на Application language.
         /// </summary>
         public static string AppLanguage {
             get {
@@ -232,7 +232,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приложение.
+        ///   Ищет локализованную строку, похожую на Application.
         /// </summary>
         public static string Application {
             get {
@@ -241,7 +241,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки приложения.
+        ///   Ищет локализованную строку, похожую на Application settings.
         /// </summary>
         public static string AppSettings {
             get {
@@ -250,7 +250,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         public static string AppTheme {
             get {
@@ -259,7 +259,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на по возрастанию.
+        ///   Ищет локализованную строку, похожую на Ascending.
         /// </summary>
         public static string Ascending {
             get {
@@ -268,7 +268,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за.
+        ///   Ищет локализованную строку, похожую на At.
         /// </summary>
         public static string At {
             get {
@@ -277,7 +277,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы.
+        ///   Ищет локализованную строку, похожую на Authors.
         /// </summary>
         public static string Authors {
             get {
@@ -286,7 +286,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Аватар….
+        ///   Ищет локализованную строку, похожую на Avatar....
         /// </summary>
         public static string Avatar {
             get {
@@ -295,7 +295,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Назад.
+        ///   Ищет локализованную строку, похожую на Back.
         /// </summary>
         public static string Back {
             get {
@@ -304,7 +304,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Забанить.
+        ///   Ищет локализованную строку, похожую на Ban.
         /// </summary>
         public static string Ban {
             get {
@@ -313,7 +313,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Базовая стоимость вопроса в случайном пакете.
+        ///   Ищет локализованную строку, похожую на Base cost of a question in a random pack.
         /// </summary>
         public static string BaseCostForRandomPackage {
             get {
@@ -322,7 +322,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата рождения.
+        ///   Ищет локализованную строку, похожую на Date of birth.
         /// </summary>
         public static string BirthDate {
             get {
@@ -331,7 +331,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Смелость.
+        ///   Ищет локализованную строку, похожую на Bravery.
         /// </summary>
         public static string Bravery {
             get {
@@ -340,7 +340,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отмена готовности.
+        ///   Ищет локализованную строку, похожую на Cancel readiness.
         /// </summary>
         public static string CancelReady {
             get {
@@ -349,7 +349,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стоимость Вопроса с секретом.
+        ///   Ищет локализованную строку, похожую на Secret question cost.
         /// </summary>
         public static string CatCost {
             get {
@@ -358,7 +358,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Категории.
+        ///   Ищет локализованную строку, похожую на Categories.
         /// </summary>
         public static string Categories {
             get {
@@ -367,7 +367,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Категория.
+        ///   Ищет локализованную строку, похожую на Category.
         /// </summary>
         public static string Category {
             get {
@@ -376,7 +376,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменить тип на Компьютер.
+        ///   Ищет локализованную строку, похожую на Change to Computer.
         /// </summary>
         public static string ChangeToComputer {
             get {
@@ -385,7 +385,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменить тип на Человек.
+        ///   Ищет локализованную строку, похожую на Change to Human.
         /// </summary>
         public static string ChangeToHuman {
             get {
@@ -394,7 +394,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Cимволов в секунду.
+        ///   Ищет локализованную строку, похожую на Characters per second.
         /// </summary>
         public static string CharactersPerSecond {
             get {
@@ -403,7 +403,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Очистить.
+        ///   Ищет локализованную строку, похожую на Clear.
         /// </summary>
         public static string Clear {
             get {
@@ -412,7 +412,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Закрыть.
+        ///   Ищет локализованную строку, похожую на Close.
         /// </summary>
         public static string Close {
             get {
@@ -421,7 +421,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Общее.
+        ///   Ищет локализованную строку, похожую на Common.
         /// </summary>
         public static string Common {
             get {
@@ -430,7 +430,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подключиться.
+        ///   Ищет локализованную строку, похожую на Connect.
         /// </summary>
         public static string Connect {
             get {
@@ -439,7 +439,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Продолжить.
+        ///   Ищет локализованную строку, похожую на Continue.
         /// </summary>
         public static string Continue {
             get {
@@ -448,7 +448,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создана.
+        ///   Ищет локализованную строку, похожую на Is created.
         /// </summary>
         public static string Created {
             get {
@@ -457,7 +457,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число вопросов в конце раунда для мобилизации.
+        ///   Ищет локализованную строку, похожую на Critical questions count for mobilization.
         /// </summary>
         public static string CriticalQuestionsCount {
             get {
@@ -466,7 +466,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на % своей суммы от денег лидера для мобилизации.
+        ///   Ищет локализованную строку, похожую на Critical score partition for mobilization.
         /// </summary>
         public static string CriticalSumPartition {
             get {
@@ -475,7 +475,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (по умолчанию).
+        ///   Ищет локализованную строку, похожую на (default).
         /// </summary>
         public static string Default {
             get {
@@ -484,7 +484,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Будут использованы настройки по умолчанию..
+        ///   Ищет локализованную строку, похожую на Default settings will be used.
         /// </summary>
         public static string DefaultSettingsWillBeUsed {
             get {
@@ -493,7 +493,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить стол.
+        ///   Ищет локализованную строку, похожую на Delete table.
         /// </summary>
         public static string DeleteTable {
             get {
@@ -502,7 +502,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нельзя нажимать на кнопку до окончания чтения вопроса.
+        ///   Ищет локализованную строку, похожую на You cannot press the button during question reading.
         /// </summary>
         public static string DenyPressWhileReading {
             get {
@@ -511,7 +511,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на по убыванию.
+        ///   Ищет локализованную строку, похожую на Descending.
         /// </summary>
         public static string Descending {
             get {
@@ -520,7 +520,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поблагодарить автора….
+        ///   Ищет локализованную строку, похожую на Donate....
         /// </summary>
         public static string Donate {
             get {
@@ -529,7 +529,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не отправлять.
+        ///   Ищет локализованную строку, похожую на Close.
         /// </summary>
         public static string DoNotSendReport {
             get {
@@ -538,7 +538,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Английский.
+        ///   Ищет локализованную строку, похожую на English.
         /// </summary>
         public static string English {
             get {
@@ -547,7 +547,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВХОД В ИГРУ.
+        ///   Ищет локализованную строку, похожую на Entrance.
         /// </summary>
         public static string Entrance {
             get {
@@ -556,7 +556,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось запустить игру, так как повреждена система отрисовки DirectX 9.
+        ///   Ищет локализованную строку, похожую на Can&apos;t run the game. DirectX 9 is broken.
         /// </summary>
         public static string Error_DirectXBroken {
             get {
@@ -565,7 +565,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось запустить игру, так как файлы игры повреждены.
+        ///   Ищет локализованную строку, похожую на Can&apos;t run the game. Game files are broken.
         /// </summary>
         public static string Error_FilesBroken {
             get {
@@ -574,7 +574,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Недостаточно памяти для запуска программы!.
+        ///   Ищет локализованную строку, похожую на Insufficient memory to run the program.
         /// </summary>
         public static string Error_IncifficientResources {
             get {
@@ -583,7 +583,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
+        ///   Ищет локализованную строку, похожую на Insufficient memory to execute the program.
         /// </summary>
         public static string Error_IncifficientResourcesForExecution {
             get {
@@ -592,7 +592,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ. Попробуйте переустановить .NET Framework 4..
+        ///   Ищет локализованную строку, похожую на Can&apos;t create the main window of the game. Your software environment seems to be broken. Try to reinstall .NET Framework 4.
         /// </summary>
         public static string Error_NetBroken {
             get {
@@ -601,7 +601,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обнаружено повреждение операционной системы. Запуск игры невозможен..
+        ///   Ищет локализованную строку, похожую на Your OS is broken. Can&apos;t run the game..
         /// </summary>
         public static string Error_OSBroken {
             get {
@@ -610,7 +610,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать главное окно игры! Похоже, на вашем компьютере повреждена среда выполнения программ.
+        ///   Ищет локализованную строку, похожую на Can&apos;t create the main window of the game. Your software environment seems to be broken..
         /// </summary>
         public static string Error_RuntimeBroken {
             get {
@@ -619,7 +619,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при загрузке настроек программы.
+        ///   Ищет локализованную строку, похожую на An error occured while loading game settings.
         /// </summary>
         public static string Error_SettingsLoading {
             get {
@@ -628,7 +628,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при сохранении настроек программы.
+        ///   Ищет локализованную строку, похожую на An error occured while saving game settings.
         /// </summary>
         public static string Error_SettingsSaving {
             get {
@@ -637,7 +637,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка с системными шрифтами. Запуск игры невозможен.
+        ///   Ищет локализованную строку, похожую на System fonts error. Cannot run the game.
         /// </summary>
         public static string Error_Typography {
             get {
@@ -646,7 +646,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка старта игры, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице игры). Если ничего не поможет, свяжитесь, пожалуйста, с автором игры..
+        ///   Ищет локализованную строку, похожую на Windows Automation error. Try to update your OS for .NET Framework 4 or install API Windows automation library (the link is on the game website). If it doesn&apos;t help, please, connect the author of the game..
         /// </summary>
         public static string Error_WindowsAutomationBroken {
             get {
@@ -655,7 +655,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Опишите, пожалуйста, ваши действия в момент возникновения ошибки.
+        ///   Ищет локализованную строку, похожую на Please describe your actions at the time the error occurred.
         /// </summary>
         public static string ErrorDescribe {
             get {
@@ -664,7 +664,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста..
+        ///   Ищет локализованную строку, похожую на This error is fixed in the new version of the program. Please update..
         /// </summary>
         public static string ErrorFixed {
             get {
@@ -673,7 +673,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка в .NET Framework: {0}. Попробуйте установить обновления операционной системы или переустановить .NET Framework..
+        ///   Ищет локализованную строку, похожую на An error occurred in the .NET Framework: {0}. Try installing operating system updates or reinstalling the .NET Framework..
         /// </summary>
         public static string ErrorNET {
             get {
@@ -682,7 +682,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста..
+        ///   Ищет локализованную строку, похожую на This error is not reproducible. If you can surely reproduce it, please contact the author..
         /// </summary>
         public static string ErrorNotReproduced {
             get {
@@ -691,7 +691,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эрудиция.
+        ///   Ищет локализованную строку, похожую на Erudition.
         /// </summary>
         public static string Erudition {
             get {
@@ -700,7 +700,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выход.
+        ///   Ищет локализованную строку, похожую на Exit.
         /// </summary>
         public static string Exit {
             get {
@@ -709,7 +709,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выйти.
+        ///   Ищет локализованную строку, похожую на Exit.
         /// </summary>
         public static string Exit_Button {
             get {
@@ -718,7 +718,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выход из игры.
+        ///   Ищет локализованную строку, похожую на Exit game.
         /// </summary>
         public static string ExitGame {
             get {
@@ -727,7 +727,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Действительно выйти?.
+        ///   Ищет локализованную строку, похожую на Do you really want to exit?.
         /// </summary>
         public static string ExitPrompt {
             get {
@@ -736,7 +736,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фальстарты.
+        ///   Ищет локализованную строку, похожую на False starts.
         /// </summary>
         public static string FalseStart {
             get {
@@ -745,7 +745,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на В приложении возникла неустранимая ошибка. Программа будет закрыта. Отправить информацию об ошибке автору?.
+        ///   Ищет локализованную строку, похожую на A fatal error has occurred in the application. The program will be closed. Do you want to send error information to the game author?.
         /// </summary>
         public static string FatalErrorMessage {
             get {
@@ -754,7 +754,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Замечания и предложения….
+        ///   Ищет локализованную строку, похожую на Feedback...
         /// </summary>
         public static string Feedback {
             get {
@@ -763,7 +763,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Файл….
+        ///   Ищет локализованную строку, похожую на File....
         /// </summary>
         public static string File {
             get {
@@ -772,7 +772,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Слишком большой файл (больше 1 Мб)!.
+        ///   Ищет локализованную строку, похожую на File is too large (over 1 Mb)!.
         /// </summary>
         public static string FileLarger1Mb {
             get {
@@ -781,7 +781,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фильтр.
+        ///   Ищет локализованную строку, похожую на Filter.
         /// </summary>
         public static string Filter {
             get {
@@ -790,7 +790,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (все).
+        ///   Ищет локализованную строку, похожую на (all).
         /// </summary>
         public static string Filter_All {
             get {
@@ -799,7 +799,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (не задано).
+        ///   Ищет локализованную строку, похожую на (not set).
         /// </summary>
         public static string Filter_NotSet {
             get {
@@ -808,7 +808,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на НАЧАТЬ ИГРУ.
+        ///   Ищет локализованную строку, похожую на START THE GAME.
         /// </summary>
         public static string ForceStartGame {
             get {
@@ -817,7 +817,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начать, не дожидаясь готовности участников.
+        ///   Ищет локализованную строку, похожую на Force the start.
         /// </summary>
         public static string ForceStartGame_Hint {
             get {
@@ -826,7 +826,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дальше.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         public static string Forward {
             get {
@@ -835,7 +835,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Освободить.
+        ///   Ищет локализованную строку, похожую на Free.
         /// </summary>
         public static string Free {
             get {
@@ -844,7 +844,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Полноэкранный режим.
+        ///   Ищет локализованную строку, похожую на Fullscreen mode.
         /// </summary>
         public static string FullScreen {
             get {
@@ -853,7 +853,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игровая кнопка.
+        ///   Ищет локализованную строку, похожую на Game button.
         /// </summary>
         public static string GameButton_Hint {
             get {
@@ -862,7 +862,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клавиша игровой кнопки.
+        ///   Ищет локализованную строку, похожую на Game button key.
         /// </summary>
         public static string GameButtonKey {
             get {
@@ -871,7 +871,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управление игрой.
+        ///   Ищет локализованную строку, похожую на Game management.
         /// </summary>
         public static string GameManagement {
             get {
@@ -880,7 +880,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Упрощённая.
+        ///   Ищет локализованную строку, похожую на Simple.
         /// </summary>
         public static string GameModes_Sport {
             get {
@@ -889,7 +889,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Классическая.
+        ///   Ищет локализованную строку, похожую на Classic.
         /// </summary>
         public static string GameModes_Tv {
             get {
@@ -898,7 +898,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название игры.
+        ///   Ищет локализованную строку, похожую на Game name.
         /// </summary>
         public static string GameName {
             get {
@@ -907,7 +907,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игрок.
+        ///   Ищет локализованную строку, похожую на Player.
         /// </summary>
         public static string GameRole_Player {
             get {
@@ -916,7 +916,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущий.
+        ///   Ищет локализованную строку, похожую на Showman.
         /// </summary>
         public static string GameRole_Showman {
             get {
@@ -925,7 +925,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Зритель.
+        ///   Ищет локализованную строку, похожую на Viewer.
         /// </summary>
         public static string GameRole_Viewer {
             get {
@@ -934,7 +934,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правила игры.
+        ///   Ищет локализованную строку, похожую на Game rules.
         /// </summary>
         public static string GameRules {
             get {
@@ -943,7 +943,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стиль игры.
+        ///   Ищет локализованную строку, похожую на Game style.
         /// </summary>
         public static string GameStyle {
             get {
@@ -952,7 +952,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на игровым столом.
+        ///   Ищет локализованную строку, похожую на game table.
         /// </summary>
         public static string GameTable {
             get {
@@ -961,7 +961,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип игры.
+        ///   Ищет локализованную строку, похожую на Game type.
         /// </summary>
         public static string GameType {
             get {
@@ -970,7 +970,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: отдать &quot;Вопрос с секретом&quot; тому, у кого меньше денег.
+        ///   Ищет локализованную строку, похожую на Odds: give the Secret question to a player with the lowest score.
         /// </summary>
         public static string GiveCatToWorst {
             get {
@@ -979,7 +979,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Помощь….
+        ///   Ищет локализованную строку, похожую на Help....
         /// </summary>
         public static string Help {
             get {
@@ -988,7 +988,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Help_ru.xps.
+        ///   Ищет локализованную строку, похожую на Help_en.xps.
         /// </summary>
         public static string HelpFile {
             get {
@@ -997,7 +997,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Скрыть чат.
+        ///   Ищет локализованную строку, похожую на Hide chat.
         /// </summary>
         public static string HideChat {
             get {
@@ -1006,7 +1006,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сообщать ведущему правильные ответы заранее.
+        ///   Ищет локализованную строку, похожую на Show correct answers to the host beforehand.
         /// </summary>
         public static string HintShowman {
             get {
@@ -1015,7 +1015,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Хост.
+        ///   Ищет локализованную строку, похожую на Host.
         /// </summary>
         public static string Host {
             get {
@@ -1024,7 +1024,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изображения.
+        ///   Ищет локализованную строку, похожую на Image.
         /// </summary>
         public static string Images {
             get {
@@ -1033,7 +1033,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Войти игроком.
+        ///   Ищет локализованную строку, похожую на Join as player.
         /// </summary>
         public static string JoinAsPlayer {
             get {
@@ -1042,7 +1042,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Войти ведущим.
+        ///   Ищет локализованную строку, похожую на Join as showman.
         /// </summary>
         public static string JoinAsShowman {
             get {
@@ -1051,7 +1051,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Войти зрителем.
+        ///   Ищет локализованную строку, похожую на Join as viewer.
         /// </summary>
         public static string JoinAsViewer {
             get {
@@ -1060,7 +1060,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Замечания.
+        ///   Ищет локализованную строку, похожую на Feedback.
         /// </summary>
         public static string JumpList_Feedback {
             get {
@@ -1069,7 +1069,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Написать замечания автору игры.
+        ///   Ищет локализованную строку, похожую на Send your feedback to game author.
         /// </summary>
         public static string JumpList_Feedback_Hint {
             get {
@@ -1078,7 +1078,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Помощь.
+        ///   Ищет локализованную строку, похожую на Help.
         /// </summary>
         public static string JumpList_Help {
             get {
@@ -1087,7 +1087,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть файл помощи.
+        ///   Ищет локализованную строку, похожую на Open help file.
         /// </summary>
         public static string JumpList_Help_Hint {
             get {
@@ -1096,7 +1096,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Логи.
+        ///   Ищет локализованную строку, похожую на Logs.
         /// </summary>
         public static string JumpList_Logs {
             get {
@@ -1105,7 +1105,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Открыть папку логов игры.
+        ///   Ищет локализованную строку, похожую на Open logs folder.
         /// </summary>
         public static string JumpList_Logs_Hint {
             get {
@@ -1114,7 +1114,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выгнать.
+        ///   Ищет локализованную строку, похожую на Kick.
         /// </summary>
         public static string Kick {
             get {
@@ -1123,7 +1123,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Лицензии.
+        ///   Ищет локализованную строку, похожую на Licenses.
         /// </summary>
         public static string Licenses {
             get {
@@ -1132,7 +1132,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Межстрочный интервал в вопросе.
+        ///   Ищет локализованную строку, похожую на Line height in questions.
         /// </summary>
         public static string LineHeight {
             get {
@@ -1150,7 +1150,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загружать мультимедиа со сторонних ресурсов.
+        ///   Ищет локализованную строку, похожую на Load multimedia from external resources.
         /// </summary>
         public static string LoadExternalMedia {
             get {
@@ -1159,7 +1159,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Для игры по локальной сети.
+        ///   Ищет локализованную строку, похожую на To play in LAN.
         /// </summary>
         public static string LocalNetworkOnly {
             get {
@@ -1168,7 +1168,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Логика.
+        ///   Ищет локализованную строку, похожую на Logic.
         /// </summary>
         public static string Logic {
             get {
@@ -1177,7 +1177,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на НИКНЕЙМ.
+        ///   Ищет локализованную строку, похожую на Login.
         /// </summary>
         public static string Login {
             get {
@@ -1186,7 +1186,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВОЙТИ.
+        ///   Ищет локализованную строку, похожую на Login.
         /// </summary>
         public static string Logon {
             get {
@@ -1195,7 +1195,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Логи….
+        ///   Ищет локализованную строку, похожую на Logs....
         /// </summary>
         public static string Logs {
             get {
@@ -1204,7 +1204,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Основной фон.
+        ///   Ищет локализованную строку, похожую на Main background.
         /// </summary>
         public static string MainBackground {
             get {
@@ -1213,7 +1213,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия главного меню.
+        ///   Ищет локализованную строку, похожую на Main menu sound.
         /// </summary>
         public static string MainMenuSound {
             get {
@@ -1222,7 +1222,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Основной.
+        ///   Ищет локализованную строку, похожую на Main.
         /// </summary>
         public static string MainPort {
             get {
@@ -1231,7 +1231,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на мужчина.
+        ///   Ищет локализованную строку, похожую на Male.
         /// </summary>
         public static string Man {
             get {
@@ -1240,7 +1240,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра.
+        ///   Ищет локализованную строку, похожую на Game.
         /// </summary>
         public static string Manage {
             get {
@@ -1249,7 +1249,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управление ходом игры.
+        ///   Ищет локализованную строку, похожую на Manage the game.
         /// </summary>
         public static string Manage_Hint {
             get {
@@ -1258,7 +1258,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управляемая игра.
+        ///   Ищет локализованную строку, похожую на Managed game.
         /// </summary>
         public static string ManagedGame {
             get {
@@ -1267,7 +1267,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра продолжается только по нажатию кнопки &quot;Дальше&quot;.
+        ///   Ищет локализованную строку, похожую на The game continues only when you preess &quot;Next&quot;.
         /// </summary>
         public static string ManagedGame_Hint {
             get {
@@ -1276,7 +1276,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управление.
+        ///   Ищет локализованную строку, похожую на Management.
         /// </summary>
         public static string Management {
             get {
@@ -1285,7 +1285,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Порт изображений и мультимедиа-вопросов.
+        ///   Ищет локализованную строку, похожую на Multimedia port.
         /// </summary>
         public static string MediaPort {
             get {
@@ -1294,7 +1294,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на СООБЩЕНИЯ.
+        ///   Ищет локализованную строку, похожую на MESSAGES.
         /// </summary>
         public static string Messages {
             get {
@@ -1303,7 +1303,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Переместить….
+        ///   Ищет локализованную строку, похожую на Move....
         /// </summary>
         public static string Move {
             get {
@@ -1312,7 +1312,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мультимедиа.
+        ///   Ищет локализованную строку, похожую на Multimedia.
         /// </summary>
         public static string MultimediaPort {
             get {
@@ -1321,7 +1321,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя.
+        ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string Name {
             get {
@@ -1330,7 +1330,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Повреждена среда выполнения программы! Переустановите .NET Framework 4.6..
+        ///   Ищет локализованную строку, похожую на App runtime is corrupted! Try reinstall .NET Framework 4.6..
         /// </summary>
         public static string NETFrameworkCorrupted {
             get {
@@ -1339,7 +1339,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Для создания сетевой игры нужно играть по локальной сети, иметь реальный IP или настроить NAT.
+        ///   Ищет локализованную строку, похожую на To creat a Network game you should play in LAN, have a real IP and set up NAT.
         /// </summary>
         public static string NetworkGameHint {
             get {
@@ -1348,7 +1348,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Локальная сеть.
+        ///   Ищет локализованную строку, похожую на Direct connection.
         /// </summary>
         public static string NetworkGameType_DirectConnection {
             get {
@@ -1357,7 +1357,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Интернет.
+        ///   Ищет локализованную строку, похожую на Internet.
         /// </summary>
         public static string NetworkGameType_NetworkGameServer {
             get {
@@ -1366,7 +1366,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на НОВАЯ ИГРА.
+        ///   Ищет локализованную строку, похожую на NEW GAME.
         /// </summary>
         public static string NewGame {
             get {
@@ -1375,7 +1375,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Следующий.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         public static string Next {
             get {
@@ -1384,7 +1384,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Следующий раунд.
+        ///   Ищет локализованную строку, похожую на Next round.
         /// </summary>
         public static string NextRound {
             get {
@@ -1393,7 +1393,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на НЕТ.
+        ///   Ищет локализованную строку, похожую на NO.
         /// </summary>
         public static string No {
             get {
@@ -1402,7 +1402,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не снимать очки за неверный ответ.
+        ///   Ищет локализованную строку, похожую на No penalty for wrong answer.
         /// </summary>
         public static string NoPenaltyForWrongAnswer {
             get {
@@ -1411,7 +1411,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не задан.
+        ///   Ищет локализованную строку, похожую на Not set.
         /// </summary>
         public static string NotSet {
             get {
@@ -1420,7 +1420,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Опции.
+        ///   Ищет локализованную строку, похожую на Options.
         /// </summary>
         public static string Options {
             get {
@@ -1429,7 +1429,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Устная игра.
+        ///   Ищет локализованную строку, похожую на Oral game.
         /// </summary>
         public static string OralGame {
             get {
@@ -1438,7 +1438,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Если ведущий – человек. Хорошо подходит для стримов. Игроки делают выбор и дают ответ голосом.
+        ///   Ищет локализованную строку, похожую на If the host is a human. Good for streamers. Players make choice and give an oral answer.
         /// </summary>
         public static string OralGame_Hint {
             get {
@@ -1447,7 +1447,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Прочее.
+        ///   Ищет локализованную строку, похожую на Other.
         /// </summary>
         public static string Other {
             get {
@@ -1456,7 +1456,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет.
+        ///   Ищет локализованную строку, похожую на Pack.
         /// </summary>
         public static string Package {
             get {
@@ -1465,7 +1465,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Частичный текст вопросов.
+        ///   Ищет локализованную строку, похожую на Partial questions.
         /// </summary>
         public static string PartialQuestions {
             get {
@@ -1474,7 +1474,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на При игре без фальстартов текст выводится порционно.
+        ///   Ищет локализованную строку, похожую на The text appears in portions if you play without false starts.
         /// </summary>
         public static string PartialQuestions_Hint {
             get {
@@ -1483,7 +1483,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пас.
+        ///   Ищет локализованную строку, похожую на Pass.
         /// </summary>
         public static string Pass {
             get {
@@ -1492,7 +1492,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: ПАС на вопросе 1 категории.
+        ///   Ищет локализованную строку, похожую на Odds: passing on a question of the first category.
         /// </summary>
         public static string PassOnQuestion1 {
             get {
@@ -1501,7 +1501,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: ПАС на вопросе 5 категории.
+        ///   Ищет локализованную строку, похожую на Odds: passing on a question of the fifth category.
         /// </summary>
         public static string PassOnQuestion5 {
             get {
@@ -1510,7 +1510,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пароль.
+        ///   Ищет локализованную строку, похожую на Password.
         /// </summary>
         public static string Password {
             get {
@@ -1519,7 +1519,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пауза.
+        ///   Ищет локализованную строку, похожую на Pause.
         /// </summary>
         public static string Pause {
             get {
@@ -1528,7 +1528,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменить.
+        ///   Ищет локализованную строку, похожую на Change.
         /// </summary>
         public static string Person_Change {
             get {
@@ -1537,7 +1537,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить.
+        ///   Ищет локализованную строку, похожую на Delete.
         /// </summary>
         public static string Person_Delete {
             get {
@@ -1546,7 +1546,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на УЧАСТНИКИ.
+        ///   Ищет локализованную строку, похожую на PERSONS.
         /// </summary>
         public static string Persons {
             get {
@@ -1555,7 +1555,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игроки.
+        ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Players {
             get {
@@ -1564,7 +1564,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Агрессивный.
+        ///   Ищет локализованную строку, похожую на Agressive.
         /// </summary>
         public static string PlayerStyle_Agressive {
             get {
@@ -1573,7 +1573,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Осторожный.
+        ///   Ищет локализованную строку, похожую на Careful.
         /// </summary>
         public static string PlayerStyle_Careful {
             get {
@@ -1582,7 +1582,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Спокойный.
+        ///   Ищет локализованную строку, похожую на Normal.
         /// </summary>
         public static string PlayerStyle_Normal {
             get {
@@ -1591,7 +1591,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сумма игрока:.
+        ///   Ищет локализованную строку, похожую на Player&apos;s score.
         /// </summary>
         public static string PlayerSum {
             get {
@@ -1600,7 +1600,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер порта.
+        ///   Ищет локализованную строку, похожую на Port number.
         /// </summary>
         public static string PortNumber {
             get {
@@ -1609,7 +1609,16 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нажмите клавишу.
+        ///   Ищет локализованную строку, похожую на Preload media content for all persons at the beginning of the round.
+        /// </summary>
+        public static string PreloadRoundContent {
+            get {
+                return ResourceManager.GetString("PreloadRoundContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Press the button.
         /// </summary>
         public static string PressTheButton {
             get {
@@ -1618,7 +1627,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Предыдущий раунд.
+        ///   Ищет локализованную строку, похожую на Previous round.
         /// </summary>
         public static string PreviousRound {
             get {
@@ -1627,7 +1636,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Профиль.
+        ///   Ищет локализованную строку, похожую на Profile.
         /// </summary>
         public static string Profile {
             get {
@@ -1636,7 +1645,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата публикации.
+        ///   Ищет локализованную строку, похожую на Publication date.
         /// </summary>
         public static string PublishedDate {
             get {
@@ -1645,7 +1654,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Издатель.
+        ///   Ищет локализованную строку, похожую на Publisher.
         /// </summary>
         public static string Publisher {
             get {
@@ -1654,7 +1663,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Библиотека вопросов….
+        ///   Ищет локализованную строку, похожую на Questions library.
         /// </summary>
         public static string QuestionLibrary {
             get {
@@ -1663,7 +1672,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет вопросов.
+        ///   Ищет локализованную строку, похожую на Questions pack.
         /// </summary>
         public static string QuestionPack {
             get {
@@ -1672,7 +1681,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число раундов в случайном пакете.
+        ///   Ищет локализованную строку, похожую на Rounds amount in a random pack.
         /// </summary>
         public static string RandomRoundsCount {
             get {
@@ -1681,7 +1690,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Случайный набор тем сервера.
+        ///   Ищет локализованную строку, похожую на Random server themes set.
         /// </summary>
         public static string RandomServer {
             get {
@@ -1690,7 +1699,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на случайные спецвопросы.
+        ///   Ищет локализованную строку, похожую на Random special questions.
         /// </summary>
         public static string RandomSpecials {
             get {
@@ -1699,7 +1708,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Случайный набор тем.
+        ///   Ищет локализованную строку, похожую на Random themes set.
         /// </summary>
         public static string RandomThemes {
             get {
@@ -1708,7 +1717,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Число тем в случайном пакете.
+        ///   Ищет локализованную строку, похожую на Random pack themes count.
         /// </summary>
         public static string RandomThemesCount {
             get {
@@ -1717,7 +1726,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Скорость реакции.
+        ///   Ищет локализованную строку, похожую на Reaction speed.
         /// </summary>
         public static string ReactionSpeed {
             get {
@@ -1726,7 +1735,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Скорость чтения вопроса.
+        ///   Ищет локализованную строку, похожую на Reading speed.
         /// </summary>
         public static string ReadingSpeed {
             get {
@@ -1735,7 +1744,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Готов.
+        ///   Ищет локализованную строку, похожую на Ready.
         /// </summary>
         public static string Ready {
             get {
@@ -1744,7 +1753,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Заменить на.
+        ///   Ищет локализованную строку, похожую на Replace with.
         /// </summary>
         public static string ReplaceTo {
             get {
@@ -1753,7 +1762,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отчёт об игре содержит информацию об итогах игры, об апеллированных ответах и ваших неправильных версиях. Он позволяет сделать игру лучше.
+        ///   Ищет локализованную строку, похожую на The report contains information about the game results, appealed answers and your wrong answers. It helps to make the game better.
         /// </summary>
         public static string Report_Info {
             get {
@@ -1762,7 +1771,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее..
+        ///   Ищет локализованную строку, похожую на Cannot connect to server while sending error report. The report will be sent later.
         /// </summary>
         public static string ReportDelayed {
             get {
@@ -1771,7 +1780,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваши впечатления от игры.
+        ///   Ищет локализованную строку, похожую на Your gaming experience.
         /// </summary>
         public static string ReportTitle {
             get {
@@ -1780,7 +1789,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на (требуется перезапуск).
+        ///   Ищет локализованную строку, похожую на Restart is required.
         /// </summary>
         public static string RestartRequired {
             get {
@@ -1789,7 +1798,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ограничение.
+        ///   Ищет локализованную строку, похожую на Restriction.
         /// </summary>
         public static string Restriction {
             get {
@@ -1798,7 +1807,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Результат.
+        ///   Ищет локализованную строку, похожую на Result.
         /// </summary>
         public static string Result {
             get {
@@ -1807,7 +1816,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Верные ответы.
+        ///   Ищет локализованную строку, похожую на Right answers.
         /// </summary>
         public static string RightAnswers {
             get {
@@ -1816,7 +1825,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Роль.
+        ///   Ищет локализованную строку, похожую на Role.
         /// </summary>
         public static string Role {
             get {
@@ -1825,7 +1834,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правила игры.
+        ///   Ищет локализованную строку, похожую на Game rules.
         /// </summary>
         public static string Rules {
             get {
@@ -1834,7 +1843,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настроить игру голосом, фальстарты, частичный вывод вопросов и многое другое.
+        ///   Ищет локализованную строку, похожую на Set oral game, false starts, partial question rendering and so on.
         /// </summary>
         public static string RulesHint {
             get {
@@ -1843,7 +1852,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновить.
+        ///   Ищет локализованную строку, похожую на Update.
         /// </summary>
         public static string RunUpdate {
             get {
@@ -1852,7 +1861,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Русский.
+        ///   Ищет локализованную строку, похожую на Russian.
         /// </summary>
         public static string Russian {
             get {
@@ -1861,7 +1870,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поиск обновлений.
+        ///   Ищет локализованную строку, похожую на Searching for updates.
         /// </summary>
         public static string SeacrhForUpdates {
             get {
@@ -1870,7 +1879,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поиск.
+        ///   Ищет локализованную строку, похожую на Search.
         /// </summary>
         public static string Search {
             get {
@@ -1879,7 +1888,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать.
+        ///   Ищет локализованную строку, похожую на Select.
         /// </summary>
         public static string Select {
             get {
@@ -1888,7 +1897,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите аватар.
+        ///   Ищет локализованную строку, похожую на Select avatar.
         /// </summary>
         public static string SelectAvatar {
             get {
@@ -1897,7 +1906,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбрать….
+        ///   Ищет локализованную строку, похожую на Select....
         /// </summary>
         public static string SelectBackground {
             get {
@@ -1906,7 +1915,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите имя файла для экспорта.
+        ///   Ищет локализованную строку, похожую на Select export filename.
         /// </summary>
         public static string SelectExportFileName {
             get {
@@ -1915,7 +1924,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите файл логотипа игры.
+        ///   Ищет локализованную строку, похожую на Select game logo.
         /// </summary>
         public static string SelectGameLogoFileName {
             get {
@@ -1924,7 +1933,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игровой пакет.
+        ///   Ищет локализованную строку, похожую на Select game package.
         /// </summary>
         public static string SelectGamePackage {
             get {
@@ -1933,7 +1942,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите имя файла для импорта.
+        ///   Ищет локализованную строку, похожую на Select import filename.
         /// </summary>
         public static string SelectImportFileName {
             get {
@@ -1942,7 +1951,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: вопрос дешевле, чем был.
+        ///   Ищет локализованную строку, похожую на Odds: the question is cheaper than the previous.
         /// </summary>
         public static string Selection_CheapQuestion {
             get {
@@ -1951,7 +1960,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: вопрос дороже, чем был.
+        ///   Ищет локализованную строку, похожую на Odds: the question is more expensive than the previous.
         /// </summary>
         public static string Selection_ExpensiveQuestion {
             get {
@@ -1960,7 +1969,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: тема останется той же, что и была.
+        ///   Ищет локализованную строку, похожую на Odds: the theme is the same and the previous.
         /// </summary>
         public static string Selection_KeepTheme {
             get {
@@ -1969,7 +1978,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор вопроса согласно номеру вопроса.
+        ///   Ищет локализованную строку, похожую на Question choice according to the number of the question.
         /// </summary>
         public static string Selection_PreferQuestionNumber {
             get {
@@ -1978,7 +1987,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: выбор вопроса согласно номеру темы, а не номеру вопроса.
+        ///   Ищет локализованную строку, похожую на Odds: question choice according to the theme number, not the question number.
         /// </summary>
         public static string Selection_PreferTheme {
             get {
@@ -1987,7 +1996,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор вопроса согласно номеру темы.
+        ///   Ищет локализованную строку, похожую на Question choice according to the number of the theme.
         /// </summary>
         public static string Selection_PreferThemeNumber {
             get {
@@ -1996,7 +2005,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приоритет вопросов.
+        ///   Ищет локализованную строку, похожую на Question priority.
         /// </summary>
         public static string Selection_QuestionPriority {
             get {
@@ -2005,7 +2014,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: случайный вопрос.
+        ///   Ищет локализованную строку, похожую на Odds: random question.
         /// </summary>
         public static string Selection_RandomQuestion {
             get {
@@ -2014,7 +2023,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: случайная тема.
+        ///   Ищет локализованную строку, похожую на Odds: random theme.
         /// </summary>
         public static string Selection_RandomTheme {
             get {
@@ -2023,7 +2032,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: вопрос той же цены.
+        ///   Ищет локализованную строку, похожую на Odds: question of the same cost.
         /// </summary>
         public static string Selection_SamePriceQuestion {
             get {
@@ -2032,7 +2041,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Приоритет тем.
+        ///   Ищет локализованную строку, похожую на Theme priority.
         /// </summary>
         public static string Selection_ThemePriority {
             get {
@@ -2041,7 +2050,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: вопрос согласно приоритету.
+        ///   Ищет локализованную строку, похожую на Odds: questions according to priority.
         /// </summary>
         public static string Selection_UseQuestionPriority {
             get {
@@ -2050,7 +2059,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вероятность: тема согласно приоритету тем.
+        ///   Ищет локализованную строку, похожую на Odds: a theme according to themes priority.
         /// </summary>
         public static string Selection_UseThemePriority {
             get {
@@ -2059,7 +2068,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор вопроса.
+        ///   Ищет локализованную строку, похожую на Question choice.
         /// </summary>
         public static string SelectionStyle {
             get {
@@ -2068,7 +2077,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите новую папку для хранения логов.
+        ///   Ищет локализованную строку, похожую на Select new logs folder.
         /// </summary>
         public static string SelectLogsFolder {
             get {
@@ -2077,7 +2086,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите файл для главного фонового изображения.
+        ///   Ищет локализованную строку, похожую на Select main background.
         /// </summary>
         public static string SelectMainBackgroundFIleName {
             get {
@@ -2086,7 +2095,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите мелодию.
+        ///   Ищет локализованную строку, похожую на Select sound.
         /// </summary>
         public static string SelectSoundFile {
             get {
@@ -2095,7 +2104,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите файл для фонового изображения студии.
+        ///   Ищет локализованную строку, похожую на Select studia background.
         /// </summary>
         public static string SelectStudiaBackgroundFileName {
             get {
@@ -2104,7 +2113,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправить.
+        ///   Ищет локализованную строку, похожую на Send.
         /// </summary>
         public static string Send {
             get {
@@ -2113,7 +2122,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправлять отчёт об игре.
+        ///   Ищет локализованную строку, похожую на Send game reports.
         /// </summary>
         public static string SendGameReport {
             get {
@@ -2122,7 +2131,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправить отчёт.
+        ///   Ищет локализованную строку, похожую на Send.
         /// </summary>
         public static string SendReport {
             get {
@@ -2131,7 +2140,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сервер.
+        ///   Ищет локализованную строку, похожую на Server.
         /// </summary>
         public static string Server {
             get {
@@ -2140,7 +2149,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя сервера.
+        ///   Ищет локализованную строку, похожую на Server name.
         /// </summary>
         public static string ServerName {
             get {
@@ -2149,7 +2158,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на По умолчанию.
+        ///   Ищет локализованную строку, похожую на Reset to default.
         /// </summary>
         public static string Settings_Default {
             get {
@@ -2158,7 +2167,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Экспорт….
+        ///   Ищет локализованную строку, похожую на Export….
         /// </summary>
         public static string Settings_Export {
             get {
@@ -2167,7 +2176,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Импорт….
+        ///   Ищет локализованную строку, похожую на Import….
         /// </summary>
         public static string Settings_Import {
             get {
@@ -2176,7 +2185,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управление настройками.
+        ///   Ищет локализованную строку, похожую на Settings management.
         /// </summary>
         public static string SettingsManagement {
             get {
@@ -2185,7 +2194,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пол.
+        ///   Ищет локализованную строку, похожую на Sex.
         /// </summary>
         public static string Sex {
             get {
@@ -2194,7 +2203,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на 3D-анимации на табло.
+        ///   Ищет локализованную строку, похожую на Show 3D-animations on the table.
         /// </summary>
         public static string ShowAnimations {
             get {
@@ -2203,7 +2212,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показывать рамку в начале чтения вопроса при игре без фальстартов.
+        ///   Ищет локализованную строку, похожую на Show the frame at the beginning of the question while playing without false starts.
         /// </summary>
         public static string ShowBorderOnFalseStart {
             get {
@@ -2212,7 +2221,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Показать чат.
+        ///   Ищет локализованную строку, похожую на Show chat.
         /// </summary>
         public static string ShowChat {
             get {
@@ -2221,7 +2230,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущий.
+        ///   Ищет локализованную строку, похожую на Showman.
         /// </summary>
         public static string Showman {
             get {
@@ -2230,7 +2239,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подробнее.
+        ///   Ищет локализованную строку, похожую на Show more.
         /// </summary>
         public static string ShowMore {
             get {
@@ -2239,7 +2248,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопросы SIGame.
+        ///   Ищет локализованную строку, похожую на SIGame questions.
         /// </summary>
         public static string SIQuestions {
             get {
@@ -2248,7 +2257,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки SIGame.
+        ///   Ищет локализованную строку, похожую на SIGame settings.
         /// </summary>
         public static string SISettings {
             get {
@@ -2257,7 +2266,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт {0}. Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на Error while navigating to site {0}. Be sure that you have default browser..
         /// </summary>
         public static string SiteNavigationError {
             get {
@@ -2266,7 +2275,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пропустить.
+        ///   Ищет локализованную строку, похожую на Skip.
         /// </summary>
         public static string Skip {
             get {
@@ -2275,7 +2284,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сортировка.
+        ///   Ищет локализованную строку, похожую на Sort by.
         /// </summary>
         public static string Sort {
             get {
@@ -2284,7 +2293,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Звук.
+        ///   Ищет локализованную строку, похожую на Sound.
         /// </summary>
         public static string Sound {
             get {
@@ -2293,7 +2302,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия начала раунда.
+        ///   Ищет локализованную строку, похожую на Begin round sound.
         /// </summary>
         public static string Sound_BeginRound {
             get {
@@ -2302,7 +2311,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия финального размышления.
+        ///   Ищет локализованную строку, похожую на Final question sound.
         /// </summary>
         public static string Sound_FinalQuestion {
             get {
@@ -2311,7 +2320,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия главного меню.
+        ///   Ищет локализованную строку, похожую на Main menu sound.
         /// </summary>
         public static string Sound_MainMenu {
             get {
@@ -2320,7 +2329,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия отсутствия ответов.
+        ///   Ищет локализованную строку, похожую на No answers sound.
         /// </summary>
         public static string Sound_NoAnswer {
             get {
@@ -2329,7 +2338,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия вопроса без риска.
+        ///   Ищет локализованную строку, похожую на No risk question sound.
         /// </summary>
         public static string Sound_NoRiskQuestion {
             get {
@@ -2338,7 +2347,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия тем раунда.
+        ///   Ищет локализованную строку, похожую на Round themes sound.
         /// </summary>
         public static string Sound_RoundThemes {
             get {
@@ -2347,7 +2356,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия окончания времени раунда.
+        ///   Ищет локализованную строку, похожую на Round timeout sound.
         /// </summary>
         public static string Sound_RoundTimeout {
             get {
@@ -2356,7 +2365,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия вопроса с секретом.
+        ///   Ищет локализованную строку, похожую на Secret question sound.
         /// </summary>
         public static string Sound_SecretQuestion {
             get {
@@ -2365,7 +2374,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодия вопроса со ставкой.
+        ///   Ищет локализованную строку, похожую на Stake question sound.
         /// </summary>
         public static string Sound_StakeQuestion {
             get {
@@ -2374,7 +2383,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мелодии.
+        ///   Ищет локализованную строку, похожую на Sounds.
         /// </summary>
         public static string Sounds {
             get {
@@ -2383,7 +2392,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ставка.
+        ///   Ищет локализованную строку, похожую на Bet.
         /// </summary>
         public static string Stake {
             get {
@@ -2392,7 +2401,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начата.
+        ///   Ищет локализованную строку, похожую на Is started.
         /// </summary>
         public static string Started {
             get {
@@ -2401,7 +2410,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начать игру.
+        ///   Ищет локализованную строку, похожую на Start the game.
         /// </summary>
         public static string StartGame {
             get {
@@ -2410,7 +2419,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Статус.
+        ///   Ищет локализованную строку, похожую на Status.
         /// </summary>
         public static string Status {
             get {
@@ -2419,7 +2428,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уровень сложности: высокий.
+        ///   Ищет локализованную строку, похожую на Difficulty: high.
         /// </summary>
         public static string Strength_High {
             get {
@@ -2428,7 +2437,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уровень сложности: низкий.
+        ///   Ищет локализованную строку, похожую на Difficulty: low.
         /// </summary>
         public static string Strength_Low {
             get {
@@ -2437,7 +2446,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уровень сложности: средний.
+        ///   Ищет локализованную строку, похожую на Difficulty: normal.
         /// </summary>
         public static string Strength_Middle {
             get {
@@ -2446,7 +2455,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фоновое изображение студии.
+        ///   Ищет локализованную строку, похожую на Studio background.
         /// </summary>
         public static string StudiaBackground {
             get {
@@ -2455,7 +2464,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Действует для всех участников игры.
+        ///   Ищет локализованную строку, похожую на Works for all the participants.
         /// </summary>
         public static string StudiaBackground_Hint {
             get {
@@ -2464,7 +2473,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменение суммы.
+        ///   Ищет локализованную строку, похожую на Score change.
         /// </summary>
         public static string SumChange {
             get {
@@ -2473,7 +2482,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Суммы.
+        ///   Ищет локализованную строку, похожую на Score.
         /// </summary>
         public static string Sums {
             get {
@@ -2482,7 +2491,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменить суммы участников.
+        ///   Ищет локализованную строку, похожую на Change scores of the players.
         /// </summary>
         public static string Sums_Hint {
             get {
@@ -2491,7 +2500,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Чат.
+        ///   Ищет локализованную строку, похожую на Chat.
         /// </summary>
         public static string Tab_Chat {
             get {
@@ -2500,7 +2509,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игры.
+        ///   Ищет локализованную строку, похожую на Games.
         /// </summary>
         public static string Tab_Games {
             get {
@@ -2509,7 +2518,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игроки.
+        ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Tab_Players {
             get {
@@ -2518,7 +2527,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет фона табло.
+        ///   Ищет локализованную строку, похожую на Table background color.
         /// </summary>
         public static string TableBackground {
             get {
@@ -2527,7 +2536,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет текста табло.
+        ///   Ищет локализованную строку, похожую на Table text color.
         /// </summary>
         public static string TableColor {
             get {
@@ -2536,7 +2545,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Шрифт табло.
+        ///   Ищет локализованную строку, похожую на Table font.
         /// </summary>
         public static string TableFont {
             get {
@@ -2545,7 +2554,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Эти настройки задаются до входа в комнату игры.
+        ///   Ищет локализованную строку, похожую на These settings are set before entering game room.
         /// </summary>
         public static string TheseSettingsAreChangedBeforeGame {
             get {
@@ -2554,7 +2563,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время.
+        ///   Ищет локализованную строку, похожую на Time.
         /// </summary>
         public static string Time {
             get {
@@ -2563,7 +2572,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на принятие решения.
+        ///   Ищет локализованную строку, похожую на Time to make a decision.
         /// </summary>
         public static string Time_Decide {
             get {
@@ -2572,7 +2581,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на нажатие кнопки.
+        ///   Ищет локализованную строку, похожую на Time to press the button.
         /// </summary>
         public static string Time_Press {
             get {
@@ -2581,7 +2590,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время раунда.
+        ///   Ищет локализованную строку, похожую на Round time.
         /// </summary>
         public static string Time_Round {
             get {
@@ -2590,7 +2599,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки времени.
+        ///   Ищет локализованную строку, похожую на Time settings.
         /// </summary>
         public static string TimeSettings {
             get {
@@ -2599,7 +2608,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Транслировать игру в чат.
+        ///   Ищет локализованную строку, похожую на Translate the game into the chat.
         /// </summary>
         public static string TranslateToChat {
             get {
@@ -2608,7 +2617,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Попробуйте переустановить программу.
+        ///   Ищет локализованную строку, похожую на Try to reinstall the application.
         /// </summary>
         public static string TryReinstallApp {
             get {
@@ -2617,7 +2626,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Интерфейс.
+        ///   Ищет локализованную строку, похожую на User interface.
         /// </summary>
         public static string UI {
             get {
@@ -2626,7 +2635,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновление.
+        ///   Ищет локализованную строку, похожую на Update.
         /// </summary>
         public static string Update {
             get {
@@ -2635,7 +2644,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на При поиске обновления возникла следующая ошибка: {0}.
+        ///   Ищет локализованную строку, похожую на The following exception occured while searching the update: {0}.
         /// </summary>
         public static string UpdateException {
             get {
@@ -2644,7 +2653,16 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пользовательские пакеты….
+        ///   Ищет локализованную строку, похожую на Slow down the players with good ping.
+        /// </summary>
+        public static string UsePingPenalty {
+            get {
+                return ResourceManager.GetString("UsePingPenalty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на User packs.
         /// </summary>
         public static string UserPackages {
             get {
@@ -2653,7 +2671,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Верен ли ответ игрока.
+        ///   Ищет локализованную строку, похожую на Is the answer of the player correct.
         /// </summary>
         public static string Validate_IsTrue {
             get {
@@ -2662,7 +2680,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Зрители.
+        ///   Ищет локализованную строку, похожую на Viewers.
         /// </summary>
         public static string Viewers {
             get {
@@ -2671,7 +2689,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Регулятор громкости.
+        ///   Ищет локализованную строку, похожую на Volume control.
         /// </summary>
         public static string VolumeControl {
             get {
@@ -2680,7 +2698,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добро пожаловать в СИ Онлайн!.
+        ///   Ищет локализованную строку, похожую на Welcome to SIGame Online!.
         /// </summary>
         public static string WelcomeToSIOnline {
             get {
@@ -2689,7 +2707,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на женщина.
+        ///   Ищет локализованную строку, похожую на Female.
         /// </summary>
         public static string Woman {
             get {
@@ -2698,7 +2716,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вести логи.
+        ///   Ищет локализованную строку, похожую на Write logs.
         /// </summary>
         public static string WriteLogs {
             get {
@@ -2707,7 +2725,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверные ответы.
+        ///   Ищет локализованную строку, похожую на Wrong answers.
         /// </summary>
         public static string WrongAnswers {
             get {
@@ -2716,7 +2734,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на помощь.
+        ///   Ищет локализованную строку, похожую на help.
         /// </summary>
         public static string XpsHelp {
             get {
@@ -2725,7 +2743,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ДА.
+        ///   Ищет локализованную строку, похожую на YES.
         /// </summary>
         public static string Yes {
             get {
@@ -2734,7 +2752,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваш ответ.
+        ///   Ищет локализованную строку, похожую на Your answer.
         /// </summary>
         public static string YourAnswer {
             get {

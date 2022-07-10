@@ -2,6 +2,7 @@
 using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
+using SIData;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,9 +16,7 @@ using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers
 {
-    /// <summary>
-    /// Класс, имитирующий работу сервера. Обеспечивает пересылку сообщений между клиентами
-    /// </summary>
+    /// <inheritdoc cref="IServer" />
     public abstract class Server : IServer
     {
         private const char AnonymousSenderPrefix = '\n';
@@ -25,15 +24,12 @@ namespace SICore.Network.Servers
         private readonly ServerConfiguration _serverConfiguration;
 
         /// <summary>
-        /// Список доступных клиентов
+        /// Contains a list of node clients.
         /// </summary>
-        private readonly ConcurrentDictionary<string, IClient> _clients = new ConcurrentDictionary<string, IClient>();
+        private readonly ConcurrentDictionary<string, IClient> _clients = new();
 
         public Lock ConnectionsLock { get; } = new Lock(nameof(ConnectionsLock));
 
-        /// <summary>
-        /// Является ли сервер главным
-        /// </summary>
         public abstract bool IsMain { get; }
 
         public event Action<Exception, bool> Error;
@@ -285,10 +281,6 @@ namespace SICore.Network.Servers
 
         public bool Contains(string name) => _clients.ContainsKey(name);
 
-        /// <summary>
-        /// Добавление нового клиента
-        /// </summary>
-        /// <param name="client">Добавляемый клиент</param>
         public void AddClient(IClient client)
         {
             if (_clients.Values.Contains(client))
@@ -380,7 +372,7 @@ namespace SICore.Network.Servers
         }
 
         /// <summary>
-        /// Disposes the server.
+        /// Disposes the node.
         /// </summary>
         protected virtual ValueTask DisposeAsync(bool disposing)
         {

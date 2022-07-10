@@ -1,10 +1,9 @@
-﻿using System;
+﻿using SI.GameServer.Contract;
+using SIData;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using SICore;
-using SICore.Connections;
-using SIData;
 
 namespace SI.GameServer.Client
 {

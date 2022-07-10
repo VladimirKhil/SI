@@ -2,6 +2,7 @@
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
+using SIData;
 using SIGame.ViewModel.Properties;
 using System;
 using System.Threading.Tasks;
@@ -31,7 +32,14 @@ namespace SIGame.ViewModel
 
         public int GameId { get; set; } = -1;
 
-        public ReconnectManager(SlaveServer server, Client client, IViewerClient host, HumanAccount human, GameRole role, string credentials, bool upgrade)
+        public ReconnectManager(
+            SlaveServer server,
+            Client client,
+            IViewerClient host,
+            HumanAccount human,
+            GameRole role,
+            string credentials,
+            bool upgrade)
         {
             _server = server;
             _client = client;

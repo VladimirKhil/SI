@@ -1,11 +1,12 @@
 ﻿using Newtonsoft.Json;
+using SIData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SICore
 {
-    public sealed class StoredComputerAccount: ComputerAccount
+    public sealed class StoredComputerAccount : ComputerAccount
     {
         private const string UnsetName = "#";
         private const string DefaultCulture = "en";

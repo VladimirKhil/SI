@@ -1,5 +1,6 @@
 ﻿using SICore;
 using SICore.Results;
+using SIData;
 using SIGame.ViewModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,6 +70,11 @@ namespace SIGame
         /// Компьютерные ведущие
         /// </summary>
         public List<ComputerAccount> CompShowmans2 { get; set; }
+
+        /// <summary>
+        /// Delayed game results.
+        /// </summary>
+        public List<SI.GameResultService.Client.GameResult> DelayedResultsNew { get; set; }
 
         /// <summary>
         /// Отложенные отчёты об ошибках

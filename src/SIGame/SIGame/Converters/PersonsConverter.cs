@@ -1,14 +1,16 @@
 ﻿using SICore;
+using SIData;
 using System;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
 namespace SIGame.Converters
 {
-    public sealed class PersonsConverter: IValueConverter
+    public sealed class PersonsConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
             {
@@ -38,9 +40,6 @@ namespace SIGame.Converters
             return result.ToString();
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

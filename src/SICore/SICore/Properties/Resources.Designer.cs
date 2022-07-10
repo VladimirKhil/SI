@@ -61,7 +61,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Рекламное сообщение.
+        ///   Ищет локализованную строку, похожую на Advertisment.
         /// </summary>
         public static string Ads {
             get {
@@ -70,7 +70,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разыграны все вопросы;Итак, мы разыграли все вопросы.
+        ///   Ищет локализованную строку, похожую на All the questions are taken; So, we are done with all the question.
         /// </summary>
         public static string AllQuestions {
             get {
@@ -79,7 +79,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время раунда вышло;Время истекло.
+        ///   Ищет локализованную строку, похожую на The time of the round has run out.
         /// </summary>
         public static string AllTime {
             get {
@@ -88,7 +88,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на И.
+        ///   Ищет локализованную строку, похожую на And.
         /// </summary>
         public static string And {
             get {
@@ -97,7 +97,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ.
+        ///   Ищет локализованную строку, похожую на Answer.
         /// </summary>
         public static string Answer {
             get {
@@ -106,7 +106,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ответ даётся устно.
+        ///   Ищет локализованную строку, похожую на The answer should be given orally.
         /// </summary>
         public static string AnswerIsOral {
             get {
@@ -115,7 +115,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ответ не задан!.
+        ///   Ищет локализованную строку, похожую на Answer is not defined.
         /// </summary>
         public static string AnswerNotSet {
             get {
@@ -124,7 +124,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апеллированные ответы.
+        ///   Ищет локализованную строку, похожую на Apellated answers.
         /// </summary>
         public static string ApellatedAnswers {
             get {
@@ -133,7 +133,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апелляция.
+        ///   Ищет локализованную строку, похожую на Apellation.
         /// </summary>
         public static string Apellation {
             get {
@@ -142,7 +142,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апелляция была принята.
+        ///   Ищет локализованную строку, похожую на Apellation was accepted.
         /// </summary>
         public static string ApellationAccepted {
             get {
@@ -151,7 +151,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Апелляция была отклонена.
+        ///   Ищет локализованную строку, похожую на Apellation was denied.
         /// </summary>
         public static string ApellationDenied {
             get {
@@ -160,7 +160,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваш аватар по размеру превышает 1 Мб и не будет виден другим участникам!.
+        ///   Ищет локализованную строку, похожую на Your avatar is bigger than 1 MB. Other players will not see it.
         /// </summary>
         public static string AvatarTooBig {
             get {
@@ -169,7 +169,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибочный текст в протоколе.
+        ///   Ищет локализованную строку, похожую на Bad text in log.
         /// </summary>
         public static string BadTextInLog {
             get {
@@ -178,7 +178,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} выгнал(а) из игры и забанил {1}.
+        ///   Ищет локализованную строку, похожую на {0} has kicked and banned {1}.
         /// </summary>
         public static string Banned {
             get {
@@ -187,7 +187,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Браво!!!;Великолепно!!!;Абсолютно верно!!!;Именно так, поздравляю!!!;Вы дали совершенно верный ответ!!!;Вы абсолютно правы!!!.
+        ///   Ищет локализованную строку, похожую на Bravo!!!;Excellent!!!;Absolutely right!!!;That&apos;s right, congratulation!!!;You have given the correct answer!!!; You&apos;re absolutely right!.
         /// </summary>
         public static string Bravo {
             get {
@@ -196,7 +196,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на игрой.
+        ///   Ищет локализованную строку, похожую на by game.
         /// </summary>
         public static string ByGame {
             get {
@@ -205,7 +205,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Компьютерных участников нельзя забанить!.
+        ///   Ищет локализованную строку, похожую на You can&apos;t ban bots.
         /// </summary>
         public static string CannotBanBots {
             get {
@@ -214,7 +214,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Себя забанить нельзя!.
+        ///   Ищет локализованную строку, похожую на You can&apos;t ban yourself.
         /// </summary>
         public static string CannotBanYourself {
             get {
@@ -223,7 +223,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу.
+        ///   Ищет локализованную строку, похожую на Cannot connect to server.
         /// </summary>
         public static string CannotConnectToServer {
             get {
@@ -232,7 +232,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Компьютерных участников нельзя выгнать!.
+        ///   Ищет локализованную строку, похожую на You can&apos;t kick bots.
         /// </summary>
         public static string CannotKickBots {
             get {
@@ -241,7 +241,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Себя выгнать нельзя!.
+        ///   Ищет локализованную строку, похожую на You can&apos;t kick yourself.
         /// </summary>
         public static string CannotKickYouself {
             get {
@@ -250,7 +250,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос достаётся Вам.
+        ///   Ищет локализованную строку, похожую на You are getting this question.
         /// </summary>
         public static string CatIsYours {
             get {
@@ -259,7 +259,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на изменил сумму на счёте.
+        ///   Ищет локализованную строку, похожую на Has changed the score.
         /// </summary>
         public static string Change1 {
             get {
@@ -268,7 +268,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на на.
+        ///   Ищет локализованную строку, похожую на to.
         /// </summary>
         public static string Change2 {
             get {
@@ -277,7 +277,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на , и теперь на счёте.
+        ///   Ищет локализованную строку, похожую на , and now your score is.
         /// </summary>
         public static string Change3 {
             get {
@@ -286,7 +286,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на выбирайте вопрос!;прошу вас!;выбирайте!;сделайте выбор!;вы выбираете;вы выбираете следующий вопрос.
+        ///   Ищет локализованную строку, похожую на Choose the question!;Please!;Choose!;Make a choice!;It&apos;s your choice;You&apos;re chosing the next question.
         /// </summary>
         public static string ChooseQuest {
             get {
@@ -295,7 +295,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Клиент с таким именем уже существует!.
+        ///   Ищет локализованную строку, похожую на A client with this name already exists!.
         /// </summary>
         public static string ClientWithThisNameAlreadyExists {
             get {
@@ -304,7 +304,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Компьютер.
+        ///   Ищет локализованную строку, похожую на Computer.
         /// </summary>
         public static string Computer {
             get {
@@ -313,7 +313,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подключилась.
+        ///   Ищет локализованную строку, похожую на Has connected.
         /// </summary>
         public static string Connected_Female {
             get {
@@ -322,7 +322,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подключился.
+        ///   Ищет локализованную строку, похожую на Has connected.
         /// </summary>
         public static string Connected_Male {
             get {
@@ -331,7 +331,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подключение к данной игре вам запрещено.
+        ///   Ищет локализованную строку, похожую на You are denied to connect to this game.
         /// </summary>
         public static string ConnectionDenied {
             get {
@@ -340,7 +340,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на стоимость.
+        ///   Ищет локализованную строку, похожую на Cost.
         /// </summary>
         public static string Cost {
             get {
@@ -349,7 +349,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата создания.
+        ///   Ищет локализованную строку, похожую на Date of creation.
         /// </summary>
         public static string CreationDate {
             get {
@@ -358,7 +358,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите стол для удаления.
+        ///   Ищет локализованную строку, похожую на Select table to delete.
         /// </summary>
         public static string DeleteTableHint {
             get {
@@ -367,7 +367,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на уберите тему, которая вам не нравится;уберите, пожалуйста, одну из тем.
+        ///   Ищет локализованную строку, похожую на Remove a theme you don&apos;t like;remove one of the themes, please.
         /// </summary>
         public static string DeleteTheme {
             get {
@@ -376,7 +376,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отключилась.
+        ///   Ищет локализованную строку, похожую на Has disconnected.
         /// </summary>
         public static string Disconnected_Female {
             get {
@@ -385,7 +385,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отключился.
+        ///   Ищет локализованную строку, похожую на Has disconnected.
         /// </summary>
         public static string Disconnected_Male {
             get {
@@ -394,7 +394,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разрыв соединения с игрой.
+        ///   Ищет локализованную строку, похожую на You have disconnected.
         /// </summary>
         public static string DisconnectMessage {
             get {
@@ -403,7 +403,16 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на А вопроса на самом деле нет! Деньги просто перечисляются на ваш счёт. Поздравляю!.
+        ///   Ищет локализованную строку, похожую на Downloading file error.
+        /// </summary>
+        public static string DownloadFileError {
+            get {
+                return ResourceManager.GetString("DownloadFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на There&apos;s no question here! The money was just added to your score! Congratulations!.
         /// </summary>
         public static string EasyCat {
             get {
@@ -412,7 +421,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сообщения об ошибках.
+        ///   Ищет локализованную строку, похожую на Error messages.
         /// </summary>
         public static string ErrorMessages {
             get {
@@ -421,7 +430,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Файл лога сохранить не удалось из-за проблем доступа на запись в папку логов.
+        ///   Ищет локализованную строку, похожую на Cannot save logs. Access denied.
         /// </summary>
         public static string ErrorWritingLogs {
             get {
@@ -430,7 +439,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка записи лога на дискs.
+        ///   Ищет локализованную строку, похожую на Error while writing log to disc.
         /// </summary>
         public static string ErrorWritingLogToDisc {
             get {
@@ -439,7 +448,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Внешняя ссылка: {0} . Включить автоматическую загрузку внешних ссылок можно в настройках игры.
+        ///   Ищет локализованную строку, похожую на External link: {0} . You can enable automatic loading of external links in game settings.
         /// </summary>
         public static string ExternalLink {
             get {
@@ -448,7 +457,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Финал.
+        ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string Final {
             get {
@@ -457,7 +466,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на От.
+        ///   Ищет локализованную строку, похожую на From.
         /// </summary>
         public static string From {
             get {
@@ -466,7 +475,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на из-за стола.
+        ///   Ищет локализованную строку, похожую на From the table.
         /// </summary>
         public static string FromTable {
             get {
@@ -475,7 +484,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начало игры.
+        ///   Ищет локализованную строку, похожую на Start of the game.
         /// </summary>
         public static string GameBeginning {
             get {
@@ -484,7 +493,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Результаты игры.
+        ///   Ищет локализованную строку, похожую на Game results.
         /// </summary>
         public static string GameResults {
             get {
@@ -493,7 +502,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра возобновлена!.
+        ///   Ищет локализованную строку, похожую на The game has resumed.
         /// </summary>
         public static string GameResumed {
             get {
@@ -502,7 +511,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правила игры.
+        ///   Ищет локализованную строку, похожую на Game rules.
         /// </summary>
         public static string GameRules {
             get {
@@ -511,7 +520,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра началась.
+        ///   Ищет локализованную строку, похожую на The game has started.
         /// </summary>
         public static string GameStarted {
             get {
@@ -520,7 +529,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на игровой стол номер.
+        ///   Ищет локализованную строку, похожую на Game table number.
         /// </summary>
         public static string GameTableNumber {
             get {
@@ -529,7 +538,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на А вот и темы сегодняшней игры;Предлагаю вашему вниманию темы сегодняшней игры.
+        ///   Ищет локализованную строку, похожую на Here are the themes of today&apos;s game; I offer these themes of today&apos;s game for your attention.
         /// </summary>
         public static string GameThemes {
             get {
@@ -538,7 +547,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра пропустит вопрос, ведущий может разыграть его самостоятельно (взяв паузу). Игра возобновится через 15 секунд).
+        ///   Ищет локализованную строку, похожую на The game will skip this question, host can play it himself (taking a pause). Game will resume in 15 seconds.
         /// </summary>
         public static string GameWillResume {
             get {
@@ -547,7 +556,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на кому вы отдадите вопрос?.
+        ///   Ищет локализованную строку, похожую на Who would you like to give the question to?.
         /// </summary>
         public static string GiveCat {
             get {
@@ -556,7 +565,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добрый день!.
+        ///   Ищет локализованную строку, похожую на Good afternoon!.
         /// </summary>
         public static string GoodAfternoon {
             get {
@@ -565,7 +574,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добрый вечер!.
+        ///   Ищет локализованную строку, похожую на Good evening!.
         /// </summary>
         public static string GoodEvening {
             get {
@@ -574,7 +583,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Всем спасибо за внимание. Всего доброго, увидимся, пока!.
+        ///   Ищет локализованную строку, похожую на Thank you for your attention. We wish you good luck, see you soon, good bye!.
         /// </summary>
         public static string GoodLuck {
             get {
@@ -583,7 +592,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Доброе утро!.
+        ///   Ищет локализованную строку, похожую на Good morning!.
         /// </summary>
         public static string GoodMorning {
             get {
@@ -592,11 +601,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добро пожаловать на «SIGame»!
-        ///ПРАВИЛА
-        ///В данном текстовом окне отображается игровой чат. Сюда можно отправлять свои сообщения. Наберите текст сообщения и нажмите “Enter”.
-        ///В центре экрана представлена сама игра. Слева от игрового табло вы увидите полоски, отвечающие за время, прошедшее с момента начала раунда, время для ответа на вопрос и время на принятие различных решений. Когда полоска заполнится до конца, соответствующий интервал времени истечёт.
-        ///Также вы можете видеть имена и изображения ведущего и и [остаток строки не уместился]&quot;;.
+        ///   Ищет локализованную строку, похожую на Welcome to the SIGame! The rules: Game chat is indicated in this text window. Here you can send your messages. Type the message and press &quot;Enter&quot;. The game is in the middle of the screen. At the left side of the game board you can see bars indicating the time which has passed since the beginning of the round, the time for the answer and the time for taking decisions. When the bar is filled, the corresponding time interval will expire. Also you can see the names and the pictures of the host and the players,  [остаток строки не уместился]&quot;;.
         /// </summary>
         public static string Greeting {
             get {
@@ -605,7 +610,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на , приветствую!.
+        ///   Ищет локализованную строку, похожую на , greetings!.
         /// </summary>
         public static string GreetingNew {
             get {
@@ -614,7 +619,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на он дал.
+        ///   Ищет локализованную строку, похожую на he gave.
         /// </summary>
         public static string HeGave {
             get {
@@ -623,7 +628,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подсказка: игровую кнопку можно нажимать в любой точке окна при помощи правой кнопки мыши или клавиши {0}. .
+        ///   Ищет локализованную строку, похожую на Hint: you can press the answer button at any point of the screen using right mouse button or {0} key.
         /// </summary>
         public static string Hint {
             get {
@@ -632,7 +637,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Измените сумму.
+        ///   Ищет локализованную строку, похожую на Change the sum.
         /// </summary>
         public static string HintChangeSum {
             get {
@@ -641,7 +646,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Определите правильность ответа игрока.
+        ///   Ищет локализованную строку, похожую на Define if the answer is correct.
         /// </summary>
         public static string HintCheckAnswer {
             get {
@@ -650,7 +655,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите стоимость вопроса.
+        ///   Ищет локализованную строку, похожую на Select the cost of this question.
         /// </summary>
         public static string HintChooseCatPrice {
             get {
@@ -659,7 +664,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка инициализации информации об игроке!.
+        ///   Ищет локализованную строку, похожую на Player information initialization error!.
         /// </summary>
         public static string HintInitError {
             get {
@@ -668,7 +673,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сделайте ставку.
+        ///   Ищет локализованную строку, похожую на Make a bet.
         /// </summary>
         public static string HintMakeAStake {
             get {
@@ -677,7 +682,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игрока, которому вы отдаёте вопрос.
+        ///   Ищет локализованную строку, похожую на Select a player to give the question to.
         /// </summary>
         public static string HintSelectCatPlayer {
             get {
@@ -686,7 +691,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игрока, которому игрок отдаёт вопрос.
+        ///   Ищет локализованную строку, похожую на Select a player who the question will be given to.
         /// </summary>
         public static string HintSelectCatPlayerForPlayer {
             get {
@@ -695,7 +700,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите игрока для изменения суммы.
+        ///   Ищет локализованную строку, похожую на Select a player to change his score.
         /// </summary>
         public static string HintSelectPlayerForSumChange {
             get {
@@ -704,7 +709,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите вопрос на табло.
+        ///   Ищет локализованную строку, похожую на Select a question on the board.
         /// </summary>
         public static string HintSelectQuestion {
             get {
@@ -713,7 +718,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите ставящего.
+        ///   Ищет локализованную строку, похожую на Select a player who is making a bet.
         /// </summary>
         public static string HintSelectStaker {
             get {
@@ -722,7 +727,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите начинающего раунд.
+        ///   Ищет локализованную строку, похожую на Select a player who is starting the round.
         /// </summary>
         public static string HintSelectStarter {
             get {
@@ -731,7 +736,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уберите тему на табло.
+        ///   Ищет локализованную строку, похожую на Remove a theme on the board.
         /// </summary>
         public static string HintSelectTheme {
             get {
@@ -740,7 +745,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите убирающего тему.
+        ///   Ищет локализованную строку, похожую на Select the player who is removing the theme.
         /// </summary>
         public static string HintThemeDeleter {
             get {
@@ -749,7 +754,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Хост игры был изменён {0} на {1}.
+        ///   Ищет локализованную строку, похожую на Game host was set {0} to {1}.
         /// </summary>
         public static string HostChanged {
             get {
@@ -758,7 +763,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Человек.
+        ///   Ищет локализованную строку, похожую на A human.
         /// </summary>
         public static string Human {
             get {
@@ -767,7 +772,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не знаю.
+        ///   Ищет локализованную строку, похожую на I don&apos;t know.
         /// </summary>
         public static string IDontKnow {
             get {
@@ -776,7 +781,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игру начнёт {0};Игру будет начинать {0}.
+        ///   Ищет локализованную строку, похожую на {0} will start the game; {0} is starting the game.
         /// </summary>
         public static string InformChooser {
             get {
@@ -785,7 +790,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на апеллирует свой ответ.
+        ///   Ищет локализованную строку, похожую на is apellating his own answer.
         /// </summary>
         public static string IsApellating {
             get {
@@ -794,7 +799,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на считает, что ответ {0} неверен.
+        ///   Ищет локализованную строку, похожую на is considering that the answer of {0} is wrong.
         /// </summary>
         public static string IsConsideringWrong {
             get {
@@ -803,7 +808,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Её ведущий — .
+        ///   Ищет локализованную строку, похожую на Its host is .
         /// </summary>
         public static string ItsShowmanIs {
             get {
@@ -812,7 +817,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} выгнал(а) из игры {1}.
+        ///   Ищет локализованную строку, похожую на {0} kicked {1} from the game.
         /// </summary>
         public static string Kicked {
             get {
@@ -821,7 +826,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВОПРОС СО СТАВКОЙ.
+        ///   Ищет локализованную строку, похожую на QUESTION WITH A STAKE.
         /// </summary>
         public static string Label_Auction {
             get {
@@ -830,7 +835,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВОПРОС С СЕКРЕТОМ.
+        ///   Ищет локализованную строку, похожую на QUESTION WITH A SECRET.
         /// </summary>
         public static string Label_CatInBag {
             get {
@@ -839,7 +844,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВОПРОС БЕЗ РИСКА.
+        ///   Ищет локализованную строку, похожую на QUESTION WITHOUT RISK.
         /// </summary>
         public static string Label_Sponsored {
             get {
@@ -848,7 +853,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на последний вопрос ваш!;и последний вопрос...;остался один вопрос.
+        ///   Ищет локализованную строку, похожую на the last question is yours!;and the last question is...;only one question is remaining.
         /// </summary>
         public static string LastQuest {
             get {
@@ -857,7 +862,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Итак, давайте ознакомимся с ответами наших игроков;Пришло время узнать, что же ответили игроки.
+        ///   Ищет локализованную строку, похожую на So, let&apos;s look at the players&apos; answers;It&apos;s time to look at our players&apos; answers.
         /// </summary>
         public static string LetsSee {
             get {
@@ -866,7 +871,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Протокол &quot;SIGame&quot;.
+        ///   Ищет локализованную строку, похожую на SIGame log.
         /// </summary>
         public static string LogTitle {
             get {
@@ -875,7 +880,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уважаемые игроки, делайте, пожалуйста, ваши ставки;Господа, делайте, пожалуйста, ваши ставки.
+        ///   Ищет локализованную строку, похожую на Dear players, make your bets, please;Ladies and gentlemen, make your bets, please.
         /// </summary>
         public static string MakeStake {
             get {
@@ -884,7 +889,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Этот вопрос разыгрывается вручную (при паузе). Игра продолжится через 15 секунд.
+        ///   Ищет локализованную строку, похожую на This question will be played manually (while pauses). The game will resume in 15 seconds.
         /// </summary>
         public static string ManuallyPlayedQuestion {
             get {
@@ -893,7 +898,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Медиафайл не поддерживается.
+        ///   Ищет локализованную строку, похожую на Media file is not supported.
         /// </summary>
         public static string MediaFileNotSupported {
             get {
@@ -902,7 +907,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка загрузки медиа.
+        ///   Ищет локализованную строку, похожую на Media load error.
         /// </summary>
         public static string MediaLoadError {
             get {
@@ -911,7 +916,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Файл {0} не найден в пакете!.
+        ///   Ищет локализованную строку, похожую на File {0} was not found in the game package!.
         /// </summary>
         public static string MediaNotFound {
             get {
@@ -920,7 +925,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Минимум или максимум в раунде (на выбор).
+        ///   Ищет локализованную строку, похожую на The minimum and the maximum in the round (your choice).
         /// </summary>
         public static string MinMaxChoice {
             get {
@@ -929,7 +934,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разные.
+        ///   Ищет локализованную строку, похожую на Mixed.
         /// </summary>
         public static string Mixed {
             get {
@@ -938,7 +943,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при открытии сетевого подключения: {0}. Сетевые подключения невозможны..
+        ///   Ищет локализованную строку, похожую на Error while starting listening network: {0}. Network connections are unavailable..
         /// </summary>
         public static string NetworkOpeningError {
             get {
@@ -947,7 +952,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на новый игровой стол.
+        ///   Ищет локализованную строку, похожую на new game table.
         /// </summary>
         public static string NewGameTable {
             get {
@@ -956,7 +961,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нет ответа.
+        ///   Ищет локализованную строку, похожую на No answer.
         /// </summary>
         public static string NoAnswer {
             get {
@@ -965,7 +970,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сейчас мог бы быть финал, но никто в него не попадает!.
+        ///   Ищет локализованную строку, похожую на We could have had the final round now, but none of the players reached it!.
         /// </summary>
         public static string NobodyInFinal {
             get {
@@ -974,7 +979,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Свободного места с таким именем не обнаружено!.
+        ///   Ищет локализованную строку, похожую на There&apos;s no empty space for user with such name!.
         /// </summary>
         public static string NoFreePlaceForName {
             get {
@@ -983,7 +988,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номинал.
+        ///   Ищет локализованную строку, похожую на Nominal.
         /// </summary>
         public static string Nominal {
             get {
@@ -992,7 +997,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на имеет отрицательную сумму и не участвует в финале.
+        ///   Ищет локализованную строку, похожую на has negative score and is not taking part in the final.
         /// </summary>
         public static string NotInFinal {
             get {
@@ -1001,7 +1006,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не задан.
+        ///   Ищет локализованную строку, похожую на Is not set.
         /// </summary>
         public static string NotSet {
             get {
@@ -1010,7 +1015,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возможно, #?;#?;Наверное, #;#, полагаю;Неужели #?;Наверное, ответ #;Думаю, что ответ #;#, я так думаю;Кажется, #;А не # ли это?;Неужели #?;Видимо #;Я так думаю, #;#, по-видимому;Сдаётся мне, это #;Скорее всего, это #;Полагаю, что #;По-видимому, ответ #.
+        ///   Ищет локализованную строку, похожую на Probably, #?:#?;Maybe,#;#, I think;Is it #?;I guess, the answer is#;I assume, the answer is #;#, I guess;It seems to me that the answer is #;Isn&apos;t it #?;Is it really#?;Obviously #;I presume, #;#, as far as I can see;It should be #;Probably, it is #;It&apos;s apparently #.
         /// </summary>
         public static string NotSure {
             get {
@@ -1019,7 +1024,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сегодня у нас нет победителя.
+        ///   Ищет локализованную строку, похожую на We have no winner today.
         /// </summary>
         public static string NoWinner {
             get {
@@ -1028,7 +1033,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Итак, играет.
+        ///   Ищет локализованную строку, похожую на So, the player is.
         /// </summary>
         public static string NowPlays {
             get {
@@ -1037,7 +1042,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на пакета.
+        ///   Ищет локализованную строку, похожую на of the pack.
         /// </summary>
         public static string OfPackage {
             get {
@@ -1046,7 +1051,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на вопроса.
+        ///   Ищет локализованную строку, похожую на of the question.
         /// </summary>
         public static string OfQuestion {
             get {
@@ -1055,7 +1060,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на раунда.
+        ///   Ищет локализованную строку, похожую на of the round.
         /// </summary>
         public static string OfRound {
             get {
@@ -1064,7 +1069,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на темы.
+        ///   Ищет локализованную строку, похожую на of the theme.
         /// </summary>
         public static string OfTheme {
             get {
@@ -1073,7 +1078,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за восьмым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the eighth table.
         /// </summary>
         public static string OnTheEigthTable {
             get {
@@ -1082,7 +1087,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за пятым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the fifth table.
         /// </summary>
         public static string OnTheFifthTable {
             get {
@@ -1091,7 +1096,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на За первым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the first table.
         /// </summary>
         public static string OnTheFirstTable {
             get {
@@ -1100,7 +1105,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за четвёртым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the fourth table.
         /// </summary>
         public static string OnTheForthTable {
             get {
@@ -1109,7 +1114,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за девятым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the ninth table.
         /// </summary>
         public static string OnTheNinethTable {
             get {
@@ -1118,7 +1123,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за вторым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the second table.
         /// </summary>
         public static string OnTheSecondTable {
             get {
@@ -1127,7 +1132,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за седьмым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the seventh table.
         /// </summary>
         public static string OnTheSeventhTable {
             get {
@@ -1136,7 +1141,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за шестым игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the sixth table.
         /// </summary>
         public static string OnTheSixthTable {
             get {
@@ -1145,7 +1150,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за третьим игровым столом —.
+        ///   Ищет локализованную строку, похожую на At the third table.
         /// </summary>
         public static string OnTheThirdTable {
             get {
@@ -1154,7 +1159,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на или.
+        ///   Ищет локализованную строку, похожую на or.
         /// </summary>
         public static string Or {
             get {
@@ -1163,7 +1168,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя пакета.
+        ///   Ищет локализованную строку, похожую на Package name.
         /// </summary>
         public static string PackageName {
             get {
@@ -1172,7 +1177,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пас.
+        ///   Ищет локализованную строку, похожую на Pass.
         /// </summary>
         public static string Pass {
             get {
@@ -1181,7 +1186,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пауза в игре....
+        ///   Ищет локализованную строку, похожую на The game is paused....
         /// </summary>
         public static string PauseInGame {
             get {
@@ -1190,7 +1195,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторы.
+        ///   Ищет локализованную строку, похожую на Authors.
         /// </summary>
         public static string PAuthors {
             get {
@@ -1199,7 +1204,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарии.
+        ///   Ищет локализованную строку, похожую на Comments.
         /// </summary>
         public static string PComments {
             get {
@@ -1208,7 +1213,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на тип участника.
+        ///   Ищет локализованную строку, похожую на player&apos;s type.
         /// </summary>
         public static string PersonType {
             get {
@@ -1217,7 +1222,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Человек с именем {0} уже есть в игре!.
+        ///   Ищет локализованную строку, похожую на There already is a player with nickname {0} in the game.
         /// </summary>
         public static string PersonWithSuchNameIsAlreadyInGame {
             get {
@@ -1226,7 +1231,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Место уже занято!.
+        ///   Ищет локализованную строку, похожую на The place is already occupied!.
         /// </summary>
         public static string PlaceIsOccupied {
             get {
@@ -1235,7 +1240,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Итак, мы играем тему;Мы играем тему.
+        ///   Ищет локализованную строку, похожую на So, we are taking theme; We are taking theme.
         /// </summary>
         public static string PlayTheme {
             get {
@@ -1244,7 +1249,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Уважаемые игроки, прошу вас определить, правилен ли ответ {0} на прозвучавший вопрос.
+        ///   Ищет локализованную строку, похожую на Dear players, please, check whether the answer of {0} was correct.
         /// </summary>
         public static string PleaseCheckApellation {
             get {
@@ -1253,7 +1258,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на выберите стоимость вопроса, пожалуйста.
+        ///   Ищет локализованную строку, похожую на choose the cost of the question, please.
         /// </summary>
         public static string PleaseChooseCatCost {
             get {
@@ -1262,7 +1267,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя.
+        ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string PName {
             get {
@@ -1271,7 +1276,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Позиция с данным номером не обнаружена!.
+        ///   Ищет локализованную строку, похожую на Position with such number was not found.
         /// </summary>
         public static string PositionNotFoundByIndex {
             get {
@@ -1280,7 +1285,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Старайтесь жать на кнопку сразу после загорания рамки на экране, пожалуйста.
+        ///   Ищет локализованную строку, похожую на Please, press the button right after the frame around the board appears.
         /// </summary>
         public static string PressButton {
             get {
@@ -1289,7 +1294,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на лично.
+        ///   Ищет локализованную строку, похожую на privately.
         /// </summary>
         public static string Private {
             get {
@@ -1298,7 +1303,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Источники.
+        ///   Ищет локализованную строку, похожую на Sources.
         /// </summary>
         public static string PSources {
             get {
@@ -1307,7 +1312,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос.
+        ///   Ищет локализованную строку, похожую на Question.
         /// </summary>
         public static string Question {
             get {
@@ -1316,7 +1321,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопрос на специальную тему.
+        ///   Ищет локализованную строку, похожую на A question with a special theme.
         /// </summary>
         public static string QuestionWithSpecialTheme {
             get {
@@ -1325,7 +1330,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Случайный набор тем.
+        ///   Ищет локализованную строку, похожую на Random theme set.
         /// </summary>
         public static string RandomThemes {
             get {
@@ -1334,7 +1339,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вход в игру осуществлён!.
+        ///   Ищет локализованную строку, похожую на Reconnection was successful!.
         /// </summary>
         public static string ReconnectEntered {
             get {
@@ -1343,7 +1348,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подключение установлено….
+        ///   Ищет локализованную строку, похожую на Connection was established....
         /// </summary>
         public static string ReconnectOK {
             get {
@@ -1352,7 +1357,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваш комментарий об игре и вопросах:.
+        ///   Ищет локализованную строку, похожую на Your comment about game and questions:.
         /// </summary>
         public static string ReportTip {
             get {
@@ -1361,7 +1366,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Содержимое отчёта об игре.
+        ///   Ищет локализованную строку, похожую на Game report.
         /// </summary>
         public static string ReportTitle {
             get {
@@ -1370,7 +1375,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ограничения.
+        ///   Ищет локализованную строку, похожую на Restrictions.
         /// </summary>
         public static string Restrictions {
             get {
@@ -1379,7 +1384,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Верно!;Вы правы!;Да, это так!;Да!;Совершенно верно!;Именно!;Разумеется!;Ну конечно!;Конечно!;Ну в общем-то да!;Да, это так;Вы дали правильный ответ!;Абсолютно верно!;В принципе, вы правы.
+        ///   Ищет локализованную строку, похожую на Right!;You&apos;re right!;Yes, that&apos;s correct!;Yes!;Absolutely right!;That&apos;s it!;Of course!;For sure!;No doubt!; That&apos;s it!;Yes, you&apos;re correct!;You have given the correct answer!;Correct!.
         /// </summary>
         public static string Right {
             get {
@@ -1388,7 +1393,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правильный ответ.
+        ///   Ищет локализованную строку, похожую на The right answer.
         /// </summary>
         public static string RightAnswer {
             get {
@@ -1397,7 +1402,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Правильный ответ на экране.
+        ///   Ищет локализованную строку, похожую на The right answer is on the screen.
         /// </summary>
         public static string RightAnswerInOnTheScreen {
             get {
@@ -1406,7 +1411,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string Round {
             get {
@@ -1415,7 +1420,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Темы раунда;А вот и темы нашего раунда.
+        ///   Ищет локализованную строку, похожую на Round themes are; Here are the themes of the round.
         /// </summary>
         public static string RoundThemes {
             get {
@@ -1424,7 +1429,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Счёт.
+        ///   Ищет локализованную строку, похожую на The score.
         /// </summary>
         public static string Score {
             get {
@@ -1433,7 +1438,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на добавил;добавила.
+        ///   Ищет локализованную строку, похожую на Has added.
         /// </summary>
         public static string Sex_Added {
             get {
@@ -1442,7 +1447,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на изменил;изменила.
+        ///   Ищет локализованную строку, похожую на Has changed.
         /// </summary>
         public static string Sex_Changed {
             get {
@@ -1451,7 +1456,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на удалил;удалила.
+        ///   Ищет локализованную строку, похожую на Has deleted.
         /// </summary>
         public static string Sex_Deleted {
             get {
@@ -1460,7 +1465,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на освободил;освободила.
+        ///   Ищет локализованную строку, похожую на Has freed.
         /// </summary>
         public static string Sex_Free {
             get {
@@ -1469,7 +1474,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на заменил;заменила.
+        ///   Ищет локализованную строку, похожую на Has replaced.
         /// </summary>
         public static string Sex_Replaced {
             get {
@@ -1478,7 +1483,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на она дала.
+        ///   Ищет локализованную строку, похожую на She gave.
         /// </summary>
         public static string SheGave {
             get {
@@ -1487,7 +1492,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Здравствуйте, здравствуйте, добрый день, это «SIGame»!.
+        ///   Ищет локализованную строку, похожую на Greetings, ladies and gentlement, this is SIGame!.
         /// </summary>
         public static string ShowmanGreeting {
             get {
@@ -1496,7 +1501,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущий перевёл игру в следующий раунд.
+        ///   Ищет локализованную строку, похожую на The showman has switched the game into the next round.
         /// </summary>
         public static string ShowmanSwitchedToNextRound {
             get {
@@ -1505,7 +1510,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущий перевёл игру в другой раунд.
+        ///   Ищет локализованную строку, похожую на The showman has switched the game into other round.
         /// </summary>
         public static string ShowmanSwitchedToOtherRound {
             get {
@@ -1514,7 +1519,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущий перевёл игру в предыдущий раунд.
+        ///   Ищет локализованную строку, похожую на The showman has switched the game into the previous round.
         /// </summary>
         public static string ShowmanSwitchedToPreviousRound {
             get {
@@ -1523,7 +1528,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ожидаем решение ведущего....
+        ///   Ищет локализованную строку, похожую на Waiting for the host&apos;s decision....
         /// </summary>
         public static string ShowmanWaiting {
             get {
@@ -1532,7 +1537,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вам достаётся Вопрос без риска!.
+        ///   Ищет локализованную строку, похожую на You got a Question withour risk!.
         /// </summary>
         public static string SponsoredQuestion {
             get {
@@ -1541,7 +1546,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на вопрос звучит только для вас. В случае верного ответа вы получите {0}, в случае неверного ничего не потеряете.
+        ///   Ищет локализованную строку, похожую на This question is only for you. If you answer correctly, you&apos;ll earn {0} points, otherwise you loose nothing!.
         /// </summary>
         public static string SponsoredQuestionInfo {
             get {
@@ -1550,7 +1555,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра окончена.
+        ///   Ищет локализованную строку, похожую на The game is over.
         /// </summary>
         public static string StageFinished {
             get {
@@ -1559,7 +1564,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ставка.
+        ///   Ищет локализованную строку, похожую на Bet.
         /// </summary>
         public static string Stake {
             get {
@@ -1568,7 +1573,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ставку делает.
+        ///   Ищет локализованную строку, похожую на Is making a bet.
         /// </summary>
         public static string StakeMakes {
             get {
@@ -1577,7 +1582,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на до.
+        ///   Ищет локализованную строку, похожую на to.
         /// </summary>
         public static string StakeTo {
             get {
@@ -1586,7 +1591,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Думайте!.
+        ///   Ищет локализованную строку, похожую на Think!.
         /// </summary>
         public static string StartThink {
             get {
@@ -1595,7 +1600,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Странная ошибка.
+        ///   Ищет локализованную строку, похожую на Strange error.
         /// </summary>
         public static string StrangeError {
             get {
@@ -1604,7 +1609,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка разбора строки.
+        ///   Ищет локализованную строку, похожую на String parse error.
         /// </summary>
         public static string StringParseError {
             get {
@@ -1613,7 +1618,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Считаю, что #;Ответ #!;#, очевидно;Ответ #;#!;#;Это #;Насколько я понимаю, это #;Несомненно, это #;Я уверен{0}, что это #;Ну это понятно, #;#, разумеется;#, насколько я в курсе.
+        ///   Ищет локализованную строку, похожую на I presume, it&apos;s #; The answer is #!;It&apos;s obviously #; The answer is #;It&apos;s # as far as I can guess;It&apos;s # for no doubt; i&apos;m sure it&apos;s #; It&apos;s clearly #;It&apos;s # for sure;It&apos;s # I think.
         /// </summary>
         public static string Sure {
             get {
@@ -1622,7 +1627,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на а.
+        ///   Ищет локализованную строку, похожую на .
         /// </summary>
         public static string SureFemaleEnding {
             get {
@@ -1631,7 +1636,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Благодарю вас! Внимание, вопрос!.
+        ///   Ищет локализованную строку, похожую на Thank you! Pay attention to the board!.
         /// </summary>
         public static string ThankYou {
             get {
@@ -1640,7 +1645,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тема.
+        ///   Ищет локализованную строку, похожую на Theme.
         /// </summary>
         public static string Theme {
             get {
@@ -1649,7 +1654,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тему убирает.
+        ///   Ищет локализованную строку, похожую на Is removing a theme.
         /// </summary>
         public static string ThemeDeletes {
             get {
@@ -1658,7 +1663,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на на.
+        ///   Ищет локализованную строку, похожую на to.
         /// </summary>
         public static string To {
             get {
@@ -1667,7 +1672,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сегодня у нас играют:.
+        ///   Ищет локализованную строку, похожую на Our today&apos;s players are.
         /// </summary>
         public static string TodayPlays {
             get {
@@ -1676,7 +1681,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Себе.
+        ///   Ищет локализованную строку, похожую на To myself.
         /// </summary>
         public static string ToMyself {
             get {
@@ -1685,7 +1690,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Попытка переподключиться….
+        ///   Ищет локализованную строку, похожую на Trying to reconnect....
         /// </summary>
         public static string TryReconnect {
             get {
@@ -1694,7 +1699,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на классическая.
+        ///   Ищет локализованную строку, похожую на classic.
         /// </summary>
         public static string TypeClassic {
             get {
@@ -1703,7 +1708,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на право на ошибку.
+        ///   Ищет локализованную строку, похожую на Right for a mistake.
         /// </summary>
         public static string TypeIgnoreWrong {
             get {
@@ -1712,7 +1717,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на управляемая.
+        ///   Ищет локализованную строку, похожую на managable.
         /// </summary>
         public static string TypeManaged {
             get {
@@ -1721,7 +1726,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на без фальстартов.
+        ///   Ищет локализованную строку, похожую на no false starts.
         /// </summary>
         public static string TypeNoFalseStart {
             get {
@@ -1730,7 +1735,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на устная.
+        ///   Ищет локализованную строку, похожую на oral.
         /// </summary>
         public static string TypeOral {
             get {
@@ -1739,7 +1744,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на упрощённая.
+        ///   Ищет локализованную строку, похожую на simple.
         /// </summary>
         public static string TypeSport {
             get {
@@ -1748,7 +1753,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Личность не установлена.
+        ///   Ищет локализованную строку, похожую на Unknown person.
         /// </summary>
         public static string UnknownPerson {
             get {
@@ -1757,7 +1762,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сообщение от неизвестного отправителя.
+        ///   Ищет локализованную строку, похожую на Message from unknown sender.
         /// </summary>
         public static string UnknownSenderMessage {
             get {
@@ -1766,7 +1771,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обнаружен неподдерживаемый тип вопроса.
+        ///   Ищет локализованную строку, похожую на Unknown question type is detected.
         /// </summary>
         public static string UnknownType {
             get {
@@ -1775,7 +1780,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на до.
+        ///   Ищет локализованную строку, похожую на until.
         /// </summary>
         public static string Until {
             get {
@@ -1784,7 +1789,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ВА-БАНК!!!.
+        ///   Ищет локализованную строку, похожую на ALL-IN!!!.
         /// </summary>
         public static string VaBank {
             get {
@@ -1793,7 +1798,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Итак, мы начинаем;Мы начинаем.
+        ///   Ищет локализованную строку, похожую на Here we go!; We&apos;re starting!.
         /// </summary>
         public static string WeBeginRound {
             get {
@@ -1802,7 +1807,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на за.
+        ///   Ищет локализованную строку, похожую на with.
         /// </summary>
         public static string With {
             get {
@@ -1811,7 +1816,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на с параметрами.
+        ///   Ищет локализованную строку, похожую на with parameters.
         /// </summary>
         public static string WithParams {
             get {
@@ -1820,7 +1825,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на с шагом в.
+        ///   Ищет локализованную строку, похожую на with step.
         /// </summary>
         public static string WithStepOf {
             get {
@@ -1829,7 +1834,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Да что вы!;Неправильно!;Увы, это не так!;Нет, вы не правы;К сожалению, вы ошиблись;Вы дали неверный ответ!;Неверно;Нет;Нет, вы ошиблись;Нет, вы не правы;Да нет!;Ваш ответ неверен.
+        ///   Ищет локализованную строку, похожую на None of a kind!;Incorrect!;I&apos;m sorry, but that&apos;s not correct;Unfortunately that&apos;s not right;You have given an incorrect answer!;That&apos;s not right!;No;No, you&apos;re mistaken!;No, you&apos;re not right! Your answer is not correct.
         /// </summary>
         public static string Wrong {
             get {
@@ -1838,7 +1843,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверный ответ.
+        ///   Ищет локализованную строку, похожую на Wrong answer.
         /// </summary>
         public static string WrongAns {
             get {
@@ -1847,7 +1852,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пушкин;Ой, забыл;Э-э-э....
+        ///   Ищет локализованную строку, похожую на Shakespear;Oh, I have forgotten;Hm....
         /// </summary>
         public static string WrongAnswer {
             get {
@@ -1856,7 +1861,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверные ответы.
+        ///   Ищет локализованную строку, похожую на Wrong answers.
         /// </summary>
         public static string WrongAnswers {
             get {
@@ -1865,7 +1870,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверные параметры подключения!.
+        ///   Ищет локализованную строку, похожую на Wrong connection parameters.
         /// </summary>
         public static string WrongConnectionParameters {
             get {
@@ -1874,7 +1879,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Некорректное состояние игры.
+        ///   Ищет локализованную строку, похожую на Wrong game state.
         /// </summary>
         public static string WrongGameState {
             get {
@@ -1883,7 +1888,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверный пароль!.
+        ///   Ищет локализованную строку, похожую на Wrong password.
         /// </summary>
         public static string WrongPassword {
             get {
@@ -1892,7 +1897,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Этот вопрос можно оставить себе.
+        ///   Ищет локализованную строку, похожую на You can keep this question for yourself.
         /// </summary>
         public static string YouCanKeepCat {
             get {
@@ -1901,7 +1906,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на вы можете сказать только.
+        ///   Ищет локализованную строку, похожую на you can say only.
         /// </summary>
         public static string YouCanSayOnly {
             get {
@@ -1910,7 +1915,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вам достаётся Вопрос со ставкой!.
+        ///   Ищет локализованную строку, похожую на You get Question with a stake.
         /// </summary>
         public static string YouGetAuction {
             get {
@@ -1919,7 +1924,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на , каков же ваш ответ?;, ваш ответ?;?;, отвечайте!;, я вас слушаю;, прошу, отвечайте.
+        ///   Ищет локализованную строку, похожую на , what&apos;s your answer?; your answer is..?;?;, answer, please!;, I&apos;m waiting for your answer;, please, answer the question.
         /// </summary>
         public static string YourAnswer {
             get {
@@ -1928,7 +1933,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на на выбор.
+        ///   Ищет локализованную строку, похожую на on the choice.
         /// </summary>
         public static string YourChoice {
             get {
@@ -1937,7 +1942,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вам достается Вопрос с секретом! Вопрос нужно отдать.
+        ///   Ищет локализованную строку, похожую на You got Question with a secret! You should give the question to another player.
         /// </summary>
         public static string YouReceiveCat {
             get {
@@ -1946,7 +1951,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на ваша ставка?;сделайте ставку.
+        ///   Ищет локализованную строку, похожую на what&apos;s your bet?;make your bet.
         /// </summary>
         public static string YourStake {
             get {
@@ -1955,7 +1960,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на поздравляю вас, вы победили!;примите мои поздравления!;с победой вас!.
+        ///   Ищет локализованную строку, похожую на Congratulations, you&apos;re the winner!; My congratulations!; Congratulations on the victory!.
         /// </summary>
         public static string YouWin {
             get {

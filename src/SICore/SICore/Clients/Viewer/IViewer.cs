@@ -142,5 +142,7 @@ namespace SICore
         void OnPersonApellated(int playerIndex);
         void OnPersonPass(int playerIndex);
         void OnReplic(string personCode, string text);
+
+        void OnRoundContent(string[] mparams) { }
     }
 }

@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Utils;
@@ -439,7 +440,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void GameServerClient_GameChanged(GameInfo gameInfo)
+        private void GameServerClient_GameChanged(SI.GameServer.Contract.GameInfo gameInfo)
         {
             lock (_serverGamesLock)
             {
@@ -447,7 +448,7 @@ namespace SIGame.ViewModel
                 {
                     if (ServerGamesCache[i].GameID == gameInfo.GameID)
                     {
-                        ServerGamesCache[i] = gameInfo;
+                        ServerGamesCache[i] = ToSICoreGame(gameInfo);
                         break;
                     }
                 }
@@ -478,7 +479,7 @@ namespace SIGame.ViewModel
                 !SearchFilter.StartsWith(CommonSettings.OnlineGameUrl) &&
                     CultureInfo.CurrentUICulture.CompareInfo.IndexOf(game.GameName, SearchFilter.Trim(), CompareOptions.IgnoreCase) >= 0 ||
                 SearchFilter.StartsWith(CommonSettings.OnlineGameUrl) &&
-                    int.TryParse(SearchFilter.Substring(CommonSettings.OnlineGameUrl.Length), out int gameId) &&
+                    int.TryParse(SearchFilter.AsSpan(CommonSettings.OnlineGameUrl.Length), out int gameId) &&
                     game.GameID == gameId;
 
         private bool FilterGame(GameInfo gameInfo)
@@ -488,12 +489,12 @@ namespace SIGame.ViewModel
                 return false;
             }
 
-            if ((GamesFilter & GamesFilter.Sport) == 0 && (GamesFilter & GamesFilter.Tv) > 0 && gameInfo.Mode == SIEngine.GameModes.Sport)
+            if ((GamesFilter & GamesFilter.Sport) == 0 && (GamesFilter & GamesFilter.Tv) > 0 && gameInfo.Mode == GameModes.Sport)
             {
                 return false;
             }
 
-            if ((GamesFilter & GamesFilter.Sport) > 0 && (GamesFilter & GamesFilter.Tv) == 0 && gameInfo.Mode == SIEngine.GameModes.Tv)
+            if ((GamesFilter & GamesFilter.Sport) > 0 && (GamesFilter & GamesFilter.Tv) == 0 && gameInfo.Mode == GameModes.Tv)
             {
                 return false;
             }
@@ -511,11 +512,11 @@ namespace SIGame.ViewModel
             return true;
         }
 
-        private void GameServerClient_GameCreated(GameInfo gameInfo)
+        private void GameServerClient_GameCreated(SI.GameServer.Contract.GameInfo gameInfo)
         {
             lock (_serverGamesLock)
             {
-                ServerGamesCache.Add(gameInfo);
+                ServerGamesCache.Add(ToSICoreGame(gameInfo));
                 RecountGames();
             }
         }
@@ -652,7 +653,7 @@ namespace SIGame.ViewModel
                     RecountGames();
                 }
 
-                SI.GameServer.Contract.Slice<GameInfo> gamesSlice = null;
+                SI.GameServer.Contract.Slice<SI.GameServer.Contract.GameInfo> gamesSlice = null;
                 var whileGuard = 100;
                 do
                 {
@@ -661,7 +662,7 @@ namespace SIGame.ViewModel
 
                     lock (_serverGamesLock)
                     {
-                        ServerGamesCache.AddRange(gamesSlice.Data);
+                        ServerGamesCache.AddRange(gamesSlice.Data.Select(ToSICoreGame));
                         RecountGames();
                     }
 
@@ -754,6 +755,11 @@ namespace SIGame.ViewModel
                     if (cancellationTokenSource.IsCancellationRequested)
                     {
                         return null;
+                    }
+
+                    if (data.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
+                    {
+                        throw new Exception(Resources.FileTooLarge + ". " + string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb));
                     }
 
                     GameSettings.Message = Resources.SendingPackageToServer;
@@ -1015,6 +1021,79 @@ namespace SIGame.ViewModel
             }
 
             base.CloseContent_Executed(arg);
+        }
+        private static GameInfo ToSICoreGame(SI.GameServer.Contract.GameInfo gameInfo) =>
+            new GameInfo
+            {
+                GameID = gameInfo.GameID,
+                GameName = gameInfo.GameName,
+                Mode = gameInfo.Mode,
+                Owner = gameInfo.Owner,
+                PackageName = gameInfo.PackageName,
+                PasswordRequired = gameInfo.PasswordRequired,
+                Persons = gameInfo.Persons,
+                RealStartTime = gameInfo.RealStartTime == DateTime.MinValue ? DateTime.MinValue : gameInfo.RealStartTime.ToLocalTime(),
+                Rules = BuildRules(gameInfo),
+                Stage = BuildStage(gameInfo),
+                Started = gameInfo.Started,
+                StartTime = gameInfo.StartTime.ToLocalTime()
+            };
+
+        private static string BuildStage(SI.GameServer.Contract.GameInfo gameInfo) => gameInfo.Stage switch
+        {
+            GameStages.Created => Resources.GameStage_Created,
+            GameStages.Started => Resources.GameStage_Started,
+            GameStages.Round => $"{Resources.GameStage_Round}: {gameInfo.StageName}",
+            GameStages.Final => Resources.GameStage_Final,
+            _ => Resources.GameStage_Finished,
+        };
+
+        private static string BuildRules(SI.GameServer.Contract.GameInfo gameInfo)
+        {
+            var rules = gameInfo.Rules;
+            var sb = new StringBuilder();
+
+            if (gameInfo.Mode == GameModes.Sport)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_Sport);
+            }
+
+            if ((rules & SI.GameServer.Contract.GameRules.FalseStart) == 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_NoFalseStart);
+            }
+
+            if ((rules & SI.GameServer.Contract.GameRules.Oral) > 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_Oral);
+            }
+
+            if ((rules & SI.GameServer.Contract.GameRules.IgnoreWrong) > 0)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(", ");
+                }
+
+                sb.Append(Resources.GameRule_IgnoreWrong);
+            }
+
+            return sb.ToString();
         }
 
         public override ValueTask DisposeAsync()

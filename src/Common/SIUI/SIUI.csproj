@@ -28,6 +28,11 @@
     <Resource Include="Fonts\Clefs.ttf" />
     <Resource Include="Fonts\DINCondensedC.ttf" />
     <None Include="key.snk" />
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Update="RoundThemesView.xaml.cs">
       <DependentUpon>RoundThemesView.xaml</DependentUpon>
     </Compile>
@@ -42,5 +47,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
+      <LastGenOutput>Resources.ru-RU.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

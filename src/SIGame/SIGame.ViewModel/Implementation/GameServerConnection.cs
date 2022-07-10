@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SI.GameServer.Client;
 using SICore.Connections;
+using SIData;
 using System;
 using System.IO;
 using System.Threading.Tasks;

@@ -1,4 +1,6 @@
-﻿using SICore;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SI.GameServer.Client;
+using SICore;
 using SICore.Network.Servers;
 using SIGame.ViewModel.Properties;
 using System;
@@ -109,18 +111,20 @@ namespace SIGame.ViewModel
 
         private readonly CommonSettings _commonSettings;
         private readonly UserSettings _userSettings;
+        private readonly IServiceProvider _serviceProvider;
 
-        public MainViewModel(CommonSettings commonSettings, UserSettings userSettings)
+        public MainViewModel(CommonSettings commonSettings, UserSettings userSettings, IServiceProvider serviceProvider)
         {
             _commonSettings = commonSettings;
             _userSettings = userSettings;
+            _serviceProvider = serviceProvider;
 
             Human = new HumanPlayerViewModel(userSettings.GameSettings, commonSettings);
             Settings = new AppSettingsViewModel(userSettings.GameSettings.AppSettings);
 
             MainMenu = new MainMenuViewModel(userSettings) { IsVisible = false };
 
-            BackLink.Default = new BackLink(Settings, userSettings);
+            BackLink.Default = new BackLink(Settings, userSettings, serviceProvider);
 
             Cancel = new CustomCommand(Cancel_Executed);
 
@@ -282,7 +286,8 @@ namespace SIGame.ViewModel
         {
             await Task.Delay(300);
 
-            var login = new LoginViewModel(_userSettings) { Login = Human.HumanPlayer.Name };
+            var login = new LoginViewModel(_serviceProvider.GetRequiredService<IGameServerClientFactory>()) { Login = Human.HumanPlayer.Name };
+
             login.Entered += async (login, client) =>
             {
                 var humanAccount = new HumanAccount(Human.HumanPlayer)
@@ -312,6 +317,7 @@ namespace SIGame.ViewModel
         private async void NetworkGame_Executed(object arg)
         {
             var networkConnection = new SINetworkViewModel(_userSettings.ConnectionData, _commonSettings, _userSettings) { Human = Human.HumanPlayer, ChangeSettings = ShowSlideMenu, Cancel = Cancel };
+            
             networkConnection.Ready += JoinGame;
             networkConnection.StartGame += StartGame;
 

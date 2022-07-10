@@ -61,7 +61,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Версия.
+        ///   Ищет локализованную строку, похожую на Version.
         /// </summary>
         public static string About_Version {
             get {
@@ -70,7 +70,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Участник с таким именем уже существует!.
+        ///   Ищет локализованную строку, похожую на A player with such name already exists.
         /// </summary>
         public static string AlreadyExists {
             get {
@@ -79,7 +79,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Любой.
+        ///   Ищет локализованную строку, похожую на Any.
         /// </summary>
         public static string Any {
             get {
@@ -97,7 +97,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Данный пакет не может быть использован для игры на сервере!.
+        ///   Ищет локализованную строку, похожую на This pack can&apos;t be used to play on the server.
         /// </summary>
         public static string BadPackage {
             get {
@@ -106,7 +106,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Необходимо задать дату рождения!.
+        ///   Ищет локализованную строку, похожую на You have to set your date of birth.
         /// </summary>
         public static string BirthDateRequired {
             get {
@@ -115,16 +115,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось определить адрес сервера!.
-        /// </summary>
-        public static string CannotGetServerAddress {
-            get {
-                return ResourceManager.GetString("CannotGetServerAddress", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменение аккаунта.
+        ///   Ищет локализованную строку, похожую на Account change.
         /// </summary>
         public static string ChangeAccount {
             get {
@@ -133,7 +124,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при переходе на сайт для комментирования. Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на An error occured while visiting the web-site to comment. Make sure you have a default browser.
         /// </summary>
         public static string CommentSiteError {
             get {
@@ -142,7 +133,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Компьютерный игрок.
+        ///   Ищет локализованную строку, похожую на Computer player.
         /// </summary>
         public static string ComputerPlayer {
             get {
@@ -151,7 +142,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создать.
+        ///   Ищет локализованную строку, похожую на Create.
         /// </summary>
         public static string Create {
             get {
@@ -160,7 +151,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось обнаружить созданную игру!.
+        ///   Ищет локализованную строку, похожую на Can&apos;t fine a created game.
         /// </summary>
         public static string CreatedGameNotFound {
             get {
@@ -169,7 +160,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создание игры….
+        ///   Ищет локализованную строку, похожую на Creating the game....
         /// </summary>
         public static string Creating {
             get {
@@ -178,7 +169,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы действительно хотите удалить участника &apos;{0}&apos;?.
+        ///   Ищет локализованную строку, похожую на Are you sure you want to remore the player &apos;{0}&apos;?.
         /// </summary>
         public static string DeleteConfirm {
             get {
@@ -187,7 +178,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось подключиться к серверу при отправке отчёта об игре. Отчёт будет отправлен позднее..
+        ///   Ищет локализованную строку, похожую на Cannot connect to server while uploading game report. The report will be sent later.
         /// </summary>
         public static string Error_SendingReport {
             get {
@@ -196,7 +187,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось загрузить аватар по адресу.
+        ///   Ищет локализованную строку, похожую на Cannot upload avatar to address.
         /// </summary>
         public static string Error_UploadingAvatar {
             get {
@@ -205,7 +196,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт {0}. Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на An error occured while visiting the site {0}. Make sure you have a system default browser selected..
         /// </summary>
         public static string ErrorMovingToSite {
             get {
@@ -214,7 +205,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Экспорт успешно выполнен!.
+        ///   Ищет локализованную строку, похожую на Export successfully completed.
         /// </summary>
         public static string ExportOk {
             get {
@@ -232,7 +223,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Слишком большой файл!.
+        ///   Ищет локализованную строку, похожую на The file it too large.
         /// </summary>
         public static string FileTooLarge {
             get {
@@ -241,7 +232,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сервер завершил игру из-за отключения участников.
+        ///   Ищет локализованную строку, похожую на Game closed due to the players disconnect.
         /// </summary>
         public static string GameClosedCauseEverybodyLeft {
             get {
@@ -250,7 +241,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Истекло ожидание подключения к серверу.
+        ///   Ищет локализованную строку, похожую на Game connection timeout.
         /// </summary>
         public static string GameConnectionTimeout {
             get {
@@ -259,7 +250,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Плохой пакет вопросов!.
+        ///   Ищет локализованную строку, похожую на Bad pack.
         /// </summary>
         public static string GameCreationError_BadPackage {
             get {
@@ -268,7 +259,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра с таким именем уже существует!.
+        ///   Ищет локализованную строку, похожую на A game with such name already exists.
         /// </summary>
         public static string GameCreationError_DuplicateName {
             get {
@@ -277,7 +268,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка подключения.
+        ///   Ищет локализованную строку, похожую на Game join error.
         /// </summary>
         public static string GameCreationError_JoinError {
             get {
@@ -286,7 +277,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать игру на сервере, так как не был обнаружен игровой пакет!.
+        ///   Ищет локализованную строку, похожую на Can&apos;t create a game on the server due to absence of a pack.
         /// </summary>
         public static string GameCreationError_NoPackage {
             get {
@@ -295,7 +286,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваша версия игры устарела. Обновите игру.
+        ///   Ищет локализованную строку, похожую на Your client is outdated. Please, update the game..
         /// </summary>
         public static string GameCreationError_ObsoleteVersion {
             get {
@@ -304,7 +295,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать игру на сервере из-за ошибки на сервере!.
+        ///   Ищет локализованную строку, похожую на Can&apos;t create a game on the server due to an error.
         /// </summary>
         public static string GameCreationError_ServerError {
             get {
@@ -313,7 +304,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Производится обслуживание сервера! Пожалуйста, подключитесь через некоторое время. Приносим извинения за доставленные неудобства..
+        ///   Ищет локализованную строку, похожую на The server is in the maintenance. Please, try to log in later. We apologize for any inconvenience caused.
         /// </summary>
         public static string GameCreationError_ServerMaintainance {
             get {
@@ -322,7 +313,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сервер не готов начать игру.
+        ///   Ищет локализованную строку, похожую на The server is not ready to start the game.
         /// </summary>
         public static string GameCreationError_ServerNotReady {
             get {
@@ -331,7 +322,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Превышено максимальное количество запущенных игр на сервере! Пожалуйста, подождите..
+        ///   Ищет локализованную строку, похожую на The maximal amount of games in the server is exceeded. Please, wait..
         /// </summary>
         public static string GameCreationError_TooManyGames {
             get {
@@ -340,7 +331,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось создать игру по неизвестной причине!.
+        ///   Ищет локализованную строку, похожую на Can&apos;t creat a game due to an unknown error.
         /// </summary>
         public static string GameCreationError_UnknownReason {
             get {
@@ -349,7 +340,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверные настройки игры.
+        ///   Ищет локализованную строку, похожую на Wrong game settings.
         /// </summary>
         public static string GameCreationError_WrongSettings {
             get {
@@ -358,7 +349,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка игрового движка.
+        ///   Ищет локализованную строку, похожую на Game engine error.
         /// </summary>
         public static string GameEngineError {
             get {
@@ -367,7 +358,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вход в игру….
+        ///   Ищет локализованную строку, похожую на Entering the game....
         /// </summary>
         public static string GameEntering {
             get {
@@ -376,7 +367,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вопросы задаются по очереди.
+        ///   Ищет локализованную строку, похожую на Questions are following one another.
         /// </summary>
         public static string GameModes_Sport_Hint {
             get {
@@ -385,7 +376,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выбор вопросов из таблицы, спецвопросы и финал.
+        ///   Ищет локализованную строку, похожую на Selecting questions from table, special questions and final.
         /// </summary>
         public static string GameModes_Tv_Hint {
             get {
@@ -394,7 +385,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Необходимо задать название игры.
+        ///   Ищет локализованную строку, похожую на Game name is required.
         /// </summary>
         public static string GameNameRequired {
             get {
@@ -403,7 +394,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на право на ошибку.
+        ///   Ищет локализованную строку, похожую на ignore wrong.
         /// </summary>
         public static string GameRule_IgnoreWrong {
             get {
@@ -412,7 +403,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на без фальстартов.
+        ///   Ищет локализованную строку, похожую на no falstarts.
         /// </summary>
         public static string GameRule_NoFalseStart {
             get {
@@ -421,7 +412,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на устная.
+        ///   Ищет локализованную строку, похожую на oral.
         /// </summary>
         public static string GameRule_Oral {
             get {
@@ -430,7 +421,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на спортивная.
+        ///   Ищет локализованную строку, похожую на simplified.
         /// </summary>
         public static string GameRule_Sport {
             get {
@@ -439,7 +430,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Все.
+        ///   Ищет локализованную строку, похожую на All.
         /// </summary>
         public static string GamesFilter_All {
             get {
@@ -448,7 +439,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новые.
+        ///   Ищет локализованную строку, похожую на New.
         /// </summary>
         public static string GamesFilter_New {
             get {
@@ -457,7 +448,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Без пароля.
+        ///   Ищет локализованную строку, похожую на No password.
         /// </summary>
         public static string GamesFilter_NoPassword {
             get {
@@ -466,7 +457,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Упрощённые.
+        ///   Ищет локализованную строку, похожую на Sport.
         /// </summary>
         public static string GamesFilter_Sport {
             get {
@@ -475,7 +466,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Классические.
+        ///   Ищет локализованную строку, похожую на TV.
         /// </summary>
         public static string GamesFilter_Tv {
             get {
@@ -484,7 +475,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создана.
+        ///   Ищет локализованную строку, похожую на Created.
         /// </summary>
         public static string GameStage_Created {
             get {
@@ -493,7 +484,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Финал.
+        ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string GameStage_Final {
             get {
@@ -502,7 +493,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра окончена.
+        ///   Ищет локализованную строку, похожую на Finished.
         /// </summary>
         public static string GameStage_Finished {
             get {
@@ -511,7 +502,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
         public static string GameStage_Round {
             get {
@@ -520,7 +511,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начата.
+        ///   Ищет локализованную строку, похожую на Started.
         /// </summary>
         public static string GameStage_Started {
             get {
@@ -538,7 +529,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Импорт успешно выполнен!.
+        ///   Ищет локализованную строку, похожую на Import successfully completed.
         /// </summary>
         public static string ImportOk {
             get {
@@ -547,7 +538,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} встречается как минимум дважды!.
+        ///   Ищет локализованную строку, похожую на {0} is found at least twice.
         /// </summary>
         public static string IsDouble {
             get {
@@ -556,7 +547,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при переходе по ссылке. Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на An error occured while trying to follow the link. Please, make sure you have a default browser.
         /// </summary>
         public static string LinkError {
             get {
@@ -565,7 +556,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на На сервере запрещено использование такого логина!.
+        ///   Ищет локализованную строку, похожую на This login is forbidden on the server.
         /// </summary>
         public static string LoginForbidden {
             get {
@@ -574,7 +565,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не удалось перенести логи.
+        ///   Ищет локализованную строку, похожую на An error occured while moving logs.
         /// </summary>
         public static string LogsMovingError {
             get {
@@ -583,7 +574,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соединение с сервером разорвано!.
+        ///   Ищет локализованную строку, похожую на The connection is lost.
         /// </summary>
         public static string LostConnection {
             get {
@@ -592,7 +583,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Об игре.
+        ///   Ищет локализованную строку, похожую на About.
         /// </summary>
         public static string MainMenu_About {
             get {
@@ -601,7 +592,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Лучшие игроки.
+        ///   Ищет локализованную строку, похожую на Best players.
         /// </summary>
         public static string MainMenu_BestPlayers {
             get {
@@ -610,7 +601,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выход.
+        ///   Ищет локализованную строку, похожую на Exit.
         /// </summary>
         public static string MainMenu_Exit {
             get {
@@ -619,7 +610,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра по сети.
+        ///   Ищет локализованную строку, похожую на Network game.
         /// </summary>
         public static string MainMenu_NetworkGame {
             get {
@@ -628,7 +619,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра онлайн.
+        ///   Ищет локализованную строку, похожую на Online game.
         /// </summary>
         public static string MainMenu_OnlineGame {
             get {
@@ -637,7 +628,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Одиночная игра.
+        ///   Ищет локализованную строку, похожую на Single game.
         /// </summary>
         public static string MainMenu_SingleGame {
             get {
@@ -646,7 +637,16 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разные.
+        ///   Ищет локализованную строку, похожую на Maximum file size: {0} MB.
+        /// </summary>
+        public static string MaximumFileSize {
+            get {
+                return ResourceManager.GetString("MaximumFileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Mixed.
         /// </summary>
         public static string Mixed {
             get {
@@ -655,7 +655,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Необходимо указать имя участника!.
+        ///   Ищет локализованную строку, похожую на Player&apos;s name is required.
         /// </summary>
         public static string NameRequired {
             get {
@@ -664,7 +664,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый.
+        ///   Ищет локализованную строку, похожую на New.
         /// </summary>
         public static string New {
             get {
@@ -673,7 +673,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый аккаунт.
+        ///   Ищет локализованную строку, похожую на New account.
         /// </summary>
         public static string NewAccount {
             get {
@@ -682,7 +682,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новая игра.
+        ///   Ищет локализованную строку, похожую на New game.
         /// </summary>
         public static string NewGame {
             get {
@@ -691,7 +691,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый компьютерный игрок.
+        ///   Ищет локализованную строку, похожую на New AI player.
         /// </summary>
         public static string NewPlayer {
             get {
@@ -700,7 +700,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новости.
+        ///   Ищет локализованную строку, похожую на News.
         /// </summary>
         public static string News {
             get {
@@ -709,7 +709,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый ведущий.
+        ///   Ищет локализованную строку, похожую на New Showman.
         /// </summary>
         public static string NewShowman {
             get {
@@ -718,7 +718,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Следующий.
+        ///   Ищет локализованную строку, похожую на Next.
         /// </summary>
         public static string Next {
             get {
@@ -727,7 +727,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка лицензий не существует!.
+        ///   Ищет локализованную строку, похожую на Licenses folder not found.
         /// </summary>
         public static string NoLicensesFolder {
             get {
@@ -736,7 +736,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка логов не существует!.
+        ///   Ищет локализованную строку, похожую на Log folder not found.
         /// </summary>
         public static string NoLogsFolder {
             get {
@@ -745,16 +745,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ваша версия игры устарела. Необходимо обновить её.
-        /// </summary>
-        public static string ObsoleClient {
-            get {
-                return ResourceManager.GetString("ObsoleClient", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Попробуйте отключить брандмауэр или файервол. Возможно, дело в VPN или прокси-сервере.
+        ///   Ищет локализованную строку, похожую на Try to disable firewall or antivirus. Maybe the problem is with VPN or proxy server.
         /// </summary>
         public static string Online_Login_Hint {
             get {
@@ -763,7 +754,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Адрес игры.
+        ///   Ищет локализованную строку, похожую на Game address.
         /// </summary>
         public static string OnlineGameAddress {
             get {
@@ -772,7 +763,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пользователь с таким именем уже вошёл на сервер!.
+        ///   Ищет локализованную строку, похожую на A user with such name is already on the server.
         /// </summary>
         public static string OnlineUserConflict {
             get {
@@ -781,7 +772,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при открытии папки лицензий: {0}.
+        ///   Ищет локализованную строку, похожую на Licenses folder opening error.
         /// </summary>
         public static string OpenLicensesError {
             get {
@@ -790,7 +781,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка при открытии папки логов: {0}.
+        ///   Ищет локализованную строку, похожую на Log folder opening error.
         /// </summary>
         public static string OpenLogsError {
             get {
@@ -799,7 +790,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Проверка пакета….
+        ///   Ищет локализованную строку, похожую на Checking the pack....
         /// </summary>
         public static string PackageCheck {
             get {
@@ -808,7 +799,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на пакет не выбран.
+        ///   Ищет локализованную строку, похожую на package not selected.
         /// </summary>
         public static string PackageNotSelected {
             get {
@@ -817,7 +808,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы действительно хотите удалить компьютерного игрока {0}?.
+        ///   Ищет локализованную строку, похожую на Do you really want to remove the AI player {0}?.
         /// </summary>
         public static string PlayerDeleteConfirm {
             get {
@@ -826,7 +817,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Такой игрок уже есть!.
+        ///   Ищет локализованную строку, похожую на The player already exists.
         /// </summary>
         public static string PlayerExists {
             get {
@@ -835,7 +826,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игроку необходимо задать имя!.
+        ///   Ищет локализованную строку, похожую на The player&apos;s name is required.
         /// </summary>
         public static string PlayerNameRequired {
             get {
@@ -844,7 +835,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мультимедиа-порт {0} уже занят (возможно, одна игра уже запущена?). Попробуйте задать другой порт в настройках.
+        ///   Ищет локализованную строку, похожую на Multimedia port {0} is alreay used (another game running?). Try to set another port in settings.
         /// </summary>
         public static string PortIsUsedError {
             get {
@@ -853,7 +844,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Необходимо задать номер порта.
+        ///   Ищет локализованную строку, похожую на The port number is required.
         /// </summary>
         public static string PortNumberRequired {
             get {
@@ -862,7 +853,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Подготовка….
+        ///   Ищет локализованную строку, похожую на Preparing....
         /// </summary>
         public static string Preparing {
             get {
@@ -871,7 +862,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Случайный набор тем сервера.
+        ///   Ищет локализованную строку, похожую на Random server themes.
         /// </summary>
         public static string RandomServerThemes {
             get {
@@ -880,7 +871,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Случайный набор тем.
+        ///   Ищет локализованную строку, похожую на Random themes set.
         /// </summary>
         public static string RandomThemes {
             get {
@@ -889,7 +880,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соединение восстановлено..
+        ///   Ищет локализованную строку, похожую на Connection restored..
         /// </summary>
         public static string ReconnectedMessage {
             get {
@@ -898,7 +889,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Разрыв соединения, переподключаемся....
+        ///   Ищет локализованную строку, похожую на Connection lost, reconnecting....
         /// </summary>
         public static string ReconnectingMessage {
             get {
@@ -907,7 +898,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соединение было установлено, но внезапно разорвалось!.
+        ///   Ищет локализованную строку, похожую на Rejoin error.
         /// </summary>
         public static string RejoinError {
             get {
@@ -916,7 +907,16 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0}-й раунд.
+        ///   Ищет локализованную строку, похожую на The round themes are; Here are the themes of the round.
+        /// </summary>
+        public static string RoundThemes {
+            get {
+                return ResourceManager.GetString("RoundThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Round {0}.
         /// </summary>
         public static string RoundTrailing {
             get {
@@ -925,7 +925,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить.
+        ///   Ищет локализованную строку, похожую на Save.
         /// </summary>
         public static string Save {
             get {
@@ -934,7 +934,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправка пакета на сервер….
+        ///   Ищет локализованную строку, похожую на Sending the pack to the server.
         /// </summary>
         public static string SendingPackageToServer {
             get {
@@ -943,7 +943,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Соединение с сервером потеряно!.
+        ///   Ищет локализованную строку, похожую на Server connection lost!.
         /// </summary>
         public static string ServerConnectionError {
             get {
@@ -952,7 +952,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки возвращены к значениям по умолчанию!.
+        ///   Ищет локализованную строку, похожую на The settings are set to default.
         /// </summary>
         public static string SettingsReset {
             get {
@@ -961,7 +961,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ведущему необходимо задать имя!.
+        ///   Ищет локализованную строку, похожую на Showman&apos;s name is required.
         /// </summary>
         public static string ShomanNameRequired {
             get {
@@ -970,7 +970,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы действительно хотите удалить ведущего {0}?.
+        ///   Ищет локализованную строку, похожую на Do you really want to remove the showman {0}?.
         /// </summary>
         public static string ShowmanDeleteConfirm {
             get {
@@ -979,7 +979,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Библиотека вопросов.
+        ///   Ищет локализованную строку, похожую на Questions storage.
         /// </summary>
         public static string SIStorage {
             get {
@@ -988,7 +988,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка обращения к Библиотеке.
+        ///   Ищет локализованную строку, похожую на An error while accessing the storage.
         /// </summary>
         public static string SIStorageCallError {
             get {
@@ -997,7 +997,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка работы с Библиотекой вопросов.
+        ///   Ищет локализованную строку, похожую на An error while working the storage.
         /// </summary>
         public static string SIStorageError {
             get {
@@ -1006,7 +1006,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт ({0}). Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на An error occured while following the web-site ({0}). Make sure you have a default browser.
         /// </summary>
         public static string SiteNavigationError {
             get {
@@ -1024,7 +1024,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на выбор темы в финальном раунде.
+        ///   Ищет локализованную строку, похожую на Time to choose a final round theme.
         /// </summary>
         public static string TimeSettings_ChoosingFinalTheme {
             get {
@@ -1033,7 +1033,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время для выбора игроком вопроса.
+        ///   Ищет локализованную строку, похожую на Time to choose a question by players.
         /// </summary>
         public static string TimeSettings_ChoosingQuestion {
             get {
@@ -1042,7 +1042,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на обдумывание в финале.
+        ///   Ищет локализованную строку, похожую на Time to think on a final question.
         /// </summary>
         public static string TimeSettings_FinalThinking {
             get {
@@ -1051,7 +1051,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление на отдачу Вопроса с секретом.
+        ///   Ищет локализованную строку, похожую на Time to give the &quot;Secret question&quot; away.
         /// </summary>
         public static string TimeSettings_GivingCat {
             get {
@@ -1060,7 +1060,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление над ставкой на Вопросе со ставкой и финале.
+        ///   Ищет локализованную строку, похожую на Time to make a bet in an &quot;Bet question&quot; and in the final question.
         /// </summary>
         public static string TimeSettings_MakingStake {
             get {
@@ -1069,7 +1069,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на паузу для медиаконтента.
+        ///   Ищет локализованную строку, похожую на Time to pause while showing media.
         /// </summary>
         public static string TimeSettings_MediaDelay {
             get {
@@ -1078,7 +1078,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на ввод ответа после нажатия кнопки.
+        ///   Ищет локализованную строку, похожую на Time to enter the answer after pressing the button.
         /// </summary>
         public static string TimeSettings_PrintingAnswer {
             get {
@@ -1087,7 +1087,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на вывод правильного ответа.
+        ///   Ищет локализованную строку, похожую на Time to show right answer.
         /// </summary>
         public static string TimeSettings_RightAnswer {
             get {
@@ -1096,7 +1096,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время раунда.
+        ///   Ищет локализованную строку, похожую на Round time.
         /// </summary>
         public static string TimeSettings_Round {
             get {
@@ -1105,7 +1105,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на принятие решений ведущим.
+        ///   Ищет локализованную строку, похожую на Time for making decisions by the showman.
         /// </summary>
         public static string TimeSettings_ShowmanDecisions {
             get {
@@ -1114,7 +1114,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время для размышления над вопросом.
+        ///   Ищет локализованную строку, похожую на Time to think on a question.
         /// </summary>
         public static string TimeSettings_ThinkingOnQuestion {
             get {
@@ -1123,7 +1123,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Время на размышление над спецвопросом.
+        ///   Ищет локализованную строку, похожую на Time to think on a special question.
         /// </summary>
         public static string TimeSettings_ThinkingOnSpecial {
             get {
@@ -1132,7 +1132,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы создали слишком много игр!.
+        ///   Ищет локализованную строку, похожую на You have created too many games!.
         /// </summary>
         public static string TooManyGames {
             get {
@@ -1141,7 +1141,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обнаружено обновление программы до версии {0}.
+        ///   Ищет локализованную строку, похожую на Game update to version {0} found.
         /// </summary>
         public static string UpdateVersionMessage {
             get {
@@ -1150,7 +1150,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла..
+        ///   Ищет локализованную строку, похожую на The pack sending time is expired. Please, try again, or reduce the size of the file.
         /// </summary>
         public static string UploadPackageTimeout {
             get {
@@ -1159,7 +1159,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт ({0}). Убедитесь, что у вас настроен браузер по умолчанию..
+        ///   Ищет локализованную строку, похожую на An error occured while following the web-site ({0}). Make sure you have a default browser.
         /// </summary>
         public static string VKThemesError {
             get {
@@ -1168,7 +1168,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Неверный формат адреса.
+        ///   Ищет локализованную строку, похожую на Invalid address format.
         /// </summary>
         public static string WrongAddressFormat {
             get {

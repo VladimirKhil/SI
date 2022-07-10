@@ -4,7 +4,7 @@ namespace AppService.Client
 {
     public interface IAppServiceClient : IDisposable
     {
-        Task<AppInfo> GetProductAsync(string name);
+        Task<AppInfo?> GetProductAsync(string name);
 
         Task<ErrorStatus?> SendErrorReportAsync(
             string application,

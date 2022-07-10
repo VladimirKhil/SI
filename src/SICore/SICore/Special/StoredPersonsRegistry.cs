@@ -1,15 +1,19 @@
 ﻿using Newtonsoft.Json;
 using SICore.BusinessLogic;
 using SICore.Utils;
+using SIData;
 using System.IO;
 using System.Linq;
 
 namespace SICore.Special
 {
+    /// <summary>
+    /// Contains default computer persons.
+    /// </summary>
     public static class StoredPersonsRegistry
     {
         /// <summary>
-        /// Коллекция компьютерных участников по умолчанию
+        /// Contains default computer persons.
         /// </summary>
         private static StoredPersons _storedPersons = null;
 

@@ -1,21 +1,20 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Input;
-using System.IO;
-using Notions;
-using SIData;
+﻿using Notions;
 using SICore;
-using System.IO.Compression;
-using System.Threading.Tasks;
+using SIData;
 using SIGame.ViewModel.Properties;
-using SIEngine;
+using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SIGame.ViewModel
 {
     /// <summary>
     /// Модель отображения редактируемых настроек
     /// </summary>
-    public sealed class AppSettingsViewModel: ViewModel<AppSettings>
+    public sealed class AppSettingsViewModel : ViewModel<AppSettings>
     {
         /// <summary>
         /// Имя файла общих настроек

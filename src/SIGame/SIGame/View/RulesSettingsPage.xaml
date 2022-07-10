@@ -5,20 +5,24 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:SIGame"
       xmlns:localc="clr-namespace:SIGame.Converters"
+      xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
       xmlns:lp="clr-namespace:SIGame.Properties"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
-      xmlns:e="clr-namespace:SIEngine;assembly=SIEngine"
+      xmlns:data="clr-namespace:SIData;assembly=SIData"
       mc:Ignorable="d" 
-      d:DesignHeight="1130.26" d:DesignWidth="1960.521"
-      Title="{x:Static lp:Resources.GameRules}" FontSize="20" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
-
+      d:DesignHeight="1130.26"
+      d:DesignWidth="1960.521"
+      Title="{x:Static lp:Resources.GameRules}"
+      FontSize="20"
+      FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
+      d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <ObjectDataProvider x:Key="GameModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="e:GameModes"/>
+                <x:Type TypeName="data:GameModes"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type e:GameModes}" />
+        <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type data:GameModes}" />
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0,3" />
@@ -89,6 +93,15 @@
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.ManagedGame}" />
         </CheckBox>
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.ManagedGame_Hint}" />
+
+        <CheckBox IsChecked="{Binding Model.UsePingPenalty}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.UsePingPenalty}" />
+        </CheckBox>
+
+        <CheckBox IsChecked="{Binding Model.PreloadRoundContent}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PreloadRoundContent}" />
+        </CheckBox>
+
         <CheckBox IsChecked="{Binding Model.IgnoreWrong}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.NoPenaltyForWrongAnswer}" />
         </CheckBox>

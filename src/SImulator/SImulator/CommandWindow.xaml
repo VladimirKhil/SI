@@ -256,8 +256,12 @@
             <uic:TemplateConverter x:Key="Selector">
                 <uic:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
-                        <TextBlock Text="Для управления ходом игры нажимайте кнопку &quot;Дальше&quot;"
-                                   TextWrapping="Wrap" TextAlignment="Center" VerticalAlignment="Center" Margin="30" />
+                        <TextBlock
+                            Text="Для управления ходом игры нажимайте кнопку &quot;Дальше&quot;"
+                            TextWrapping="Wrap"
+                            TextAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="30" />
                     </DataTemplate>
                 </uic:TemplateConverter.DefaultTemplate>
                 <uic:TemplateConverter.Templates>
@@ -438,11 +442,6 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <!--<ComboBox IsEditable="True" Height="25" Width="Auto" HorizontalAlignment="Stretch" SelectedItem="{Binding PackageSource}" ItemsSource="{Binding Recent}" VerticalContentAlignment="Center" />-->
-                    <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5">
-                        <Button Content="Выбрать…" Height="25" Command="{Binding SelectPackage}" CommandParameter="0" Width="100" />
-                        <Button Content="Хранилище пакетов…" Height="25" Margin="5,0,0,0" Command="{Binding SelectPackage}" CommandParameter="1" Padding="10,1" />
-                    </StackPanel>-->
                     <Menu HorizontalAlignment="Left" Height="25" Width="100" Margin="0,7,0,0">
                         <MenuItem Header="Выбрать" Height="25" Width="100" BorderThickness="1" BorderBrush="Gray">
                             <MenuItem.HeaderTemplate>
@@ -589,7 +588,13 @@
                     <Button DockPanel.Dock="Right" Style="{StaticResource CommandButton}" ToolTip="Дальше" Margin="8,0,0,0" Command="{Binding Next}">
                         <Path Data="M0,0L5,5L0,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
                     </Button>
-                    <ContentControl Height="200" Name="main" Content="{Binding LocalInfo}" ContentTemplate="{Binding LocalInfo.TStage, Converter={StaticResource Selector}}" Margin="0,2,0,2" FontSize="14" />
+                    <ContentControl
+                        Height="200"
+                        Name="main"
+                        Content="{Binding LocalInfo}"
+                        ContentTemplate="{Binding LocalInfo.TStage, Converter={StaticResource Selector}}"
+                        Margin="0,2,0,2"
+                        FontSize="14" />
                 </DockPanel>
                 <Separator DockPanel.Dock="Top" Width="250" />
                 <StackPanel DockPanel.Dock="Top" Margin="1,4,5,1" Orientation="Horizontal">

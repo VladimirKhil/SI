@@ -22,5 +22,8 @@
     <PackageReference Include="System.IO.Pipelines" Version="6.0.2" />
     <PackageReference Include="System.Threading.Channels" Version="6.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SIData\SIData.csproj" />
+  </ItemGroup>
 
 </Project>

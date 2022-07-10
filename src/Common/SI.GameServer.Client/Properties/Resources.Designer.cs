@@ -19,10 +19,10 @@ namespace SI.GameServer.Client.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SI.GameServer.Client.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SI.GameServer.Client.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SI.GameServer.Client.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,117 +61,162 @@ namespace SI.GameServer.Client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Слишком большой файл!.
+        ///   Ищет локализованную строку, похожую на Cannot determine server address!.
         /// </summary>
-        internal static string FileTooLarge {
+        public static string CannotGetServerAddress {
+            get {
+                return ResourceManager.GetString("CannotGetServerAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Server list is empty.
+        /// </summary>
+        public static string EmptyServerList {
+            get {
+                return ResourceManager.GetString("EmptyServerList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Empty server uri.
+        /// </summary>
+        public static string EmptyServerUri {
+            get {
+                return ResourceManager.GetString("EmptyServerUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The file it too large.
+        /// </summary>
+        public static string FileTooLarge {
             get {
                 return ResourceManager.GetString("FileTooLarge", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на право на ошибку.
+        ///   Ищет локализованную строку, похожую на ignore wrong.
         /// </summary>
-        internal static string GameRule_IgnoreWrong {
+        public static string GameRule_IgnoreWrong {
             get {
                 return ResourceManager.GetString("GameRule_IgnoreWrong", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на без фальстартов.
+        ///   Ищет локализованную строку, похожую на no falstarts.
         /// </summary>
-        internal static string GameRule_NoFalseStart {
+        public static string GameRule_NoFalseStart {
             get {
                 return ResourceManager.GetString("GameRule_NoFalseStart", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на устная.
+        ///   Ищет локализованную строку, похожую на oral.
         /// </summary>
-        internal static string GameRule_Oral {
+        public static string GameRule_Oral {
             get {
                 return ResourceManager.GetString("GameRule_Oral", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на спортивная.
+        ///   Ищет локализованную строку, похожую на simplified.
         /// </summary>
-        internal static string GameRule_Sport {
+        public static string GameRule_Sport {
             get {
                 return ResourceManager.GetString("GameRule_Sport", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Создана.
+        ///   Ищет локализованную строку, похожую на Created.
         /// </summary>
-        internal static string GameStage_Created {
+        public static string GameStage_Created {
             get {
                 return ResourceManager.GetString("GameStage_Created", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Финал.
+        ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
-        internal static string GameStage_Final {
+        public static string GameStage_Final {
             get {
                 return ResourceManager.GetString("GameStage_Final", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Игра окончена.
+        ///   Ищет локализованную строку, похожую на Finished.
         /// </summary>
-        internal static string GameStage_Finished {
+        public static string GameStage_Finished {
             get {
                 return ResourceManager.GetString("GameStage_Finished", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Раунд.
+        ///   Ищет локализованную строку, похожую на Round.
         /// </summary>
-        internal static string GameStage_Round {
+        public static string GameStage_Round {
             get {
                 return ResourceManager.GetString("GameStage_Round", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Начата.
+        ///   Ищет локализованную строку, похожую на Started.
         /// </summary>
-        internal static string GameStage_Started {
+        public static string GameStage_Started {
             get {
                 return ResourceManager.GetString("GameStage_Started", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на На сервере запрещено использование такого логина!.
+        ///   Ищет локализованную строку, похожую на This login is forbidden on the server.
         /// </summary>
-        internal static string LoginForbidden {
+        public static string LoginForbidden {
             get {
                 return ResourceManager.GetString("LoginForbidden", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пользователь с таким именем уже вошёл на сервер!.
+        ///   Ищет локализованную строку, похожую на Your game version is obsolete. You need to upgrade it.
         /// </summary>
-        internal static string OnlineUserConflict {
+        public static string ObsoleClient {
+            get {
+                return ResourceManager.GetString("ObsoleClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на A user with such name is already on the server.
+        /// </summary>
+        public static string OnlineUserConflict {
             get {
                 return ResourceManager.GetString("OnlineUserConflict", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла..
+        ///   Ищет локализованную строку, похожую на Package upload failed. Maybe your package is too large. Or try later.
         /// </summary>
-        internal static string UploadPackageTimeout {
+        public static string UploadPackageConnectionError {
+            get {
+                return ResourceManager.GetString("UploadPackageConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на The pack sending time is expired. Please, try again, or reduce the size of the file.
+        /// </summary>
+        public static string UploadPackageTimeout {
             get {
                 return ResourceManager.GetString("UploadPackageTimeout", resourceCulture);
             }

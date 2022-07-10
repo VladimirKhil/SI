@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SICore.PlatformSpecific
 {
-    public abstract class BackLinkCore: IGameManager
+    public abstract class BackLinkCore : IGameManager
     {
         private string _tempFile = null;
 
@@ -32,7 +33,7 @@ namespace SICore.PlatformSpecific
 
         public abstract void SendError(Exception exc, bool isWarning = false);
 
-        public abstract void SaveReport(Results.GameResult result);
+        public abstract Task SaveReportAsync(Results.GameResult result);
 
         public abstract void OnPictureError(string remoteUri);
 
@@ -52,30 +53,6 @@ namespace SICore.PlatformSpecific
             logUri = Path.Combine(userFolder, protoFileName);
 
             return File.Create(logUri);
-        }
-        
-        public string CreateTempFile(string name, byte[] data)
-        {
-            ClearTempFile();
-            _tempFile = Path.Combine(Path.GetTempPath(), name);
-            File.WriteAllBytes(_tempFile, data);
-
-            return _tempFile;
-        }
-
-        public void ClearTempFile()
-        {
-            try
-            {
-                if (_tempFile != null && File.Exists(_tempFile))
-                    File.Delete(_tempFile);
-
-                _tempFile = null;
-            }
-            catch
-            {
-
-            }
         }
 
         public virtual string GetAd(string localization, out int adId)

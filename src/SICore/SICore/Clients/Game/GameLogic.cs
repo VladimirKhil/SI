@@ -58,8 +58,8 @@ namespace SICore
 
         internal void Run(SIDocument document)
         {
-            Engine = _data.Settings.AppSettings.GameMode == SIEngine.GameModes.Tv ?
-                (SIEngine.EngineBase)new SIEngine.TvEngine(document, this) :
+            Engine = _data.Settings.AppSettings.GameMode == GameModes.Tv ?
+                new SIEngine.TvEngine(document, this) :
                 new SIEngine.SportEngine(document, this);
 
             Engine.Package += Engine_Package;
@@ -158,7 +158,7 @@ namespace SICore
 
             _gameActions.SendMessage(msg.ToString());
 
-            ScheduleExecution(Tasks.MoveNext, 11 + 150 * gameThemes.Length / 18);
+            ScheduleExecution(Tasks.MoveNext, Math.Min(40, 11 + 150 * gameThemes.Length / 18));
         }
 
         private void Engine_Round(Round round)
@@ -172,7 +172,7 @@ namespace SICore
 
             ProcessRound(round, 1);
 
-            if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+            if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
             {
                 RunRoundTimer();
             }
@@ -290,7 +290,7 @@ namespace SICore
             _data.QuestionHistory.Clear();
 
             // Если информация о теме ещё не выводилась
-            if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Tv && !_data.ThemeInfo[themeIndex])
+            if (_data.Settings.AppSettings.GameMode == GameModes.Tv && !_data.ThemeInfo[themeIndex])
             {
                 _data.ThemeInfo[themeIndex] = true;
                 ScheduleExecution(Tasks.Theme, 10, 1, true);
@@ -589,7 +589,7 @@ namespace SICore
                 _data.OpenedFiles.Clear();
             }
 
-            if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Tv)
+            if (_data.Settings.AppSettings.GameMode == GameModes.Tv)
             {
                 var activeQuestionsCount = GetRoundActiveQuestionsCount();
 
@@ -741,12 +741,12 @@ namespace SICore
 
         protected override async ValueTask DisposeAsync(bool disposing) =>
             await ClientData.TaskLock.TryLockAsync(
-                () =>
+                async () =>
                 {
                     if (_data.AcceptedReports > 0)
                     {
                         _data.AcceptedReports = 0;
-                        _data.BackLink.SaveReport(_data.GameResultInfo);
+                        await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
                     }
 
                     if (Engine != null)
@@ -2124,20 +2124,27 @@ namespace SICore
             OnDecision();
         }
 
-        private void WaitReport()
+        private async void WaitReport()
         {
-            foreach (var item in _data.Players)
+            try
             {
-                _gameActions.SendMessage(Messages.Cancel, item.Name);
-            }
+                foreach (var item in _data.Players)
+                {
+                    _gameActions.SendMessage(Messages.Cancel, item.Name);
+                }
 
-            if (_data.AcceptedReports > 0)
+                if (_data.AcceptedReports > 0)
+                {
+                    _data.AcceptedReports = 0;
+                    await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
+                }
+
+                StopWaiting();
+            }
+            catch (Exception exc)
             {
-                _data.AcceptedReports = 0;
-                _data.BackLink.SaveReport(_data.GameResultInfo);
+                _data.BackLink.SendError(exc);
             }
-
-            StopWaiting();
         }
 
         private void AnnounceStake()
@@ -2515,7 +2522,7 @@ namespace SICore
                 }
 
                 _data.Type = _data.Question.Type;
-                if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+                if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
                 {
                     var themeChanged = false;
                     string catTheme = null;
@@ -2778,7 +2785,7 @@ namespace SICore
         {
             var sb = new StringBuilder();
 
-            if (settings.GameMode == SIEngine.GameModes.Sport)
+            if (settings.GameMode == GameModes.Sport)
             {
                 if (sb.Length > 0)
                     sb.Append(", ");
@@ -3823,7 +3830,7 @@ namespace SICore
             }
             else if (informed)
             {
-                if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+                if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
                 {
                     ScheduleExecution(Tasks.MoveNext, 20);
                 }
@@ -3838,7 +3845,7 @@ namespace SICore
             }
             else
             {
-                if (_data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport)
+                if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
                 {
                     ScheduleExecution(Tasks.MoveNext, 1, 0);
                 }
@@ -3867,6 +3874,8 @@ namespace SICore
         {
             var informed = false;
             var isRandomPackage = package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
+
+            var baseTime = 0;
 
             if (arg == 1)
             {
@@ -3943,6 +3952,8 @@ namespace SICore
                     var res = new StringBuilder();
                     res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfPackage)], package.Info.Comments.Text);
                     _gameActions.ShowmanReplic(res.ToString());
+
+                    baseTime = GetReadingDurationForTextLength(package.Info.Comments.Text.Length);
                 }
                 else
                 {
@@ -3982,7 +3993,7 @@ namespace SICore
 
             if (arg < 6)
             {
-                ScheduleExecution(Tasks.Package, 15, arg + 1, force: !informed);
+                ScheduleExecution(Tasks.Package, baseTime + 15, arg + 1, force: !informed);
             }
             else if (informed)
             {
@@ -4021,7 +4032,7 @@ namespace SICore
 
                 var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
                 var skipRoundAnnounce = isRandomPackage &&
-                    _data.Settings.AppSettings.GameMode == SIEngine.GameModes.Sport &&
+                    _data.Settings.AppSettings.GameMode == GameModes.Sport &&
                     _data.Package.Rounds.Count == 2; // second round is always the final in random package
 
                 var roundIndex = -1;
@@ -4048,7 +4059,7 @@ namespace SICore
                     baseTime = 1;
                 }
 
-                // Теперь случайные спецвопросы расставляются здесь
+                // Create random special questions
                 if (_data.Settings.RandomSpecials)
                 {
                     RandomizeSpecials(round);
@@ -4092,8 +4103,10 @@ namespace SICore
                 {
                     informed = true;
                     var res = new StringBuilder();
-                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfRound)], _data.Package.Info.Comments.Text);
+                    res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfRound)], round.Info.Comments.Text);
                     _gameActions.ShowmanReplic(res.ToString());
+
+                    baseTime = GetReadingDurationForTextLength(round.Info.Comments.Text.Length);
                 }
                 else
                 {

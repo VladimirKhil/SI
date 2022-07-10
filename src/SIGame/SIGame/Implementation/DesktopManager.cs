@@ -1,10 +1,11 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using SICore.Clients.Viewer;
+using SIGame.Contracts;
 using SIGame.Properties;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PlatformSpecific;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -15,6 +16,8 @@ namespace SIGame.Implementation
 {
     public sealed class DesktopManager : PlatformManager
     {
+        internal IServiceProvider ServiceProvider { get; set; }
+
         private readonly System.Windows.Controls.MediaElement _element = new System.Windows.Controls.MediaElement
         {
             LoadedBehavior = System.Windows.Controls.MediaState.Manual,
@@ -371,21 +374,12 @@ namespace SIGame.Implementation
         {
             try
             {
-                MessageBoxImage image;
-                switch (messageType)
+                var image = messageType switch
                 {
-                    case MessageType.Warning:
-                        image = MessageBoxImage.Warning;
-                        break;
-
-                    case MessageType.Error:
-                        image = MessageBoxImage.Error;
-                        break;
-
-                    default:
-                        image = MessageBoxImage.Information;
-                        break;
-                }
+                    MessageType.Warning => MessageBoxImage.Warning,
+                    MessageType.Error => MessageBoxImage.Error,
+                    _ => MessageBoxImage.Information,
+                };
 
                 if (uiThread)
                 {
@@ -411,7 +405,15 @@ namespace SIGame.Implementation
 
         public override void SendErrorReport(Exception exc, bool isWarning = false)
         {
-            MessageBox.Show(exc.Message);
+            if (isWarning)
+            {
+                MessageBox.Show(exc.Message);
+            }
+            else
+            {
+                var errorManager = ServiceProvider.GetRequiredService<IErrorManager>();
+                errorManager.SendErrorReport(exc);
+            }
         }
 
         public override string GetKeyName(int key) => ((Key)key).ToString();

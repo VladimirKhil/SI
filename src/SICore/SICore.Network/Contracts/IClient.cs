@@ -1,26 +1,26 @@
-﻿using SICore.Connections;
+﻿using SIData;
 using System;
 using System.Threading.Tasks;
 
 namespace SICore.Network.Contracts
 {
     /// <summary>
-    /// Интерфейс клиента
+    /// Represents a node client.
     /// </summary>
     public interface IClient : IDisposable
     {
         /// <summary>
-        /// Имя клиента
+        /// Client name.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Сервер, к которому относится клиент
+        /// Client node.
         /// </summary>
         IServer CurrentServer { get; }
 
         /// <summary>
-        /// Получить входящее сообщение
+        /// Receives incoming message.
         /// </summary>
         void AddIncomingMessage(Message message);
 
@@ -35,9 +35,9 @@ namespace SICore.Network.Contracts
         event Action<IClient, Message> SendingMessage;
 
         /// <summary>
-        /// Подключиться к серверу
+        /// Connects to node.
         /// </summary>
-        /// <param name="s">Сервер, к которому подключается клиент</param>
+        /// <param name="s">Node to connect.</param>
         void ConnectTo(IServer s);
     }
 }
