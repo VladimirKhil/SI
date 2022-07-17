@@ -84,7 +84,9 @@ namespace SIQuester
                 {
                     var rem = (value - Minimum) % Step;
                     if (rem > 0)
+                    {
                         textBox.Text = (value - rem).ToString();
+                    }
                 }
             }
             catch
@@ -104,10 +106,15 @@ namespace SIQuester
 
                 var futureText = new StringBuilder();
                 if (SelectionStart > 0)
-                    futureText.Append(Text.Substring(0, SelectionStart));
+                {
+                    futureText.Append(Text.AsSpan(0, SelectionStart));
+                }
+
                 futureText.Append(e.Text);
                 if (SelectionStart + SelectionLength < Text.Length)
-                    futureText.Append(Text.Substring(SelectionStart + SelectionLength));
+                {
+                    futureText.Append(Text.AsSpan(SelectionStart + SelectionLength));
+                }
 
                 var fText = futureText.ToString();
                 if (!int.TryParse(fText, out int futureValue) || futureValue > Maximum)

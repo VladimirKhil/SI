@@ -43,7 +43,7 @@ namespace SIQuester.ViewModel
                 {
                     if (Model.Logo != null && Model.Logo.Length > 0)
                     {
-                        _logo = Document.Images.Wrap(Model.Logo.Substring(1));
+                        _logo = Document.Images.Wrap(Model.Logo[1..]);
                     }
                 }
 

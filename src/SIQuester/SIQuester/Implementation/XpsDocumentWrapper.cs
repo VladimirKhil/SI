@@ -7,19 +7,10 @@ namespace SIQuester.Implementation
     {
         private readonly XpsDocument _document;
 
-        public XpsDocumentWrapper(XpsDocument document)
-        {
-            _document = document;
-        }
+        public XpsDocumentWrapper(XpsDocument document) => _document = document;
 
-        public object GetDocument()
-        {
-            return _document.GetFixedDocumentSequence();
-        }
+        public object GetDocument() => _document.GetFixedDocumentSequence();
 
-        public void Dispose()
-        {
-            _document.Close();
-        }
+        public void Dispose() => _document.Close();
     }
 }

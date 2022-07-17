@@ -5,16 +5,11 @@ using System.Windows.Controls;
 
 namespace SIQuester.Selectors
 {
-    public sealed class AtomTypeSelector: DataTemplateSelector
+    public sealed class AtomTypeSelector : DataTemplateSelector
     {
         public DataTemplate ImageTemplate { get; set; }
         public DataTemplate AudioTemplate { get; set; }
         public DataTemplate VideoTemplate { get; set; }
-
-        public AtomTypeSelector()
-        {
-
-        }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {

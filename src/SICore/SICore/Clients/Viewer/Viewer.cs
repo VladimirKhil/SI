@@ -1,5 +1,4 @@
 ﻿using SICore.BusinessLogic;
-using SICore.Connections;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
@@ -11,7 +10,6 @@ using SIUI.Model;
 using SIUI.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

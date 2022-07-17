@@ -1,16 +1,17 @@
-﻿#if !DEBUG
-using Microsoft.WindowsAPICodePack.Dialogs;
-#endif
+﻿using AppService.Client;
+using AppService.Client.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Net.Http;
@@ -18,23 +19,31 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
+using System.Xaml;
+#if !DEBUG
+using Microsoft.WindowsAPICodePack.Dialogs;
+#endif
 
 namespace SIQuester
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Provides interaction logic for App.xaml.
     /// </summary>
     public partial class App : Application
     {
         private IHost _host;
+        private IConfiguration _configuration;
+        private bool _useAppService;
 
         /// <summary>
         /// Имя конфигурационного файла пользовательских настроек
         /// </summary>
         private const string ConfigFileName = "user.config";
 
-        private readonly Implementation.DesktopManager _manager = new Implementation.DesktopManager();
+        private readonly Implementation.DesktopManager _manager = new();
 
         /// <summary>
         /// Используется ли версия Windows от Vista и выше
@@ -53,11 +62,6 @@ namespace SIQuester
         /// </summary>
         public static string StartupPath => AppDomain.CurrentDomain.BaseDirectory;
 
-        /// <summary>
-        /// Необходимый заголовок для WebRequest'ов и WebClient'ов
-        /// </summary>
-        public static string UserAgentHeader => $"{ProductName} {Assembly.GetExecutingAssembly().GetName().Version} ({Environment.OSVersion.VersionString})";
-        
         private bool _hasError = false;
 
         private ILogger<App> _logger;
@@ -82,15 +86,22 @@ namespace SIQuester
                 }
             }
 
-#if !DEBUG
-                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-#endif
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             _host = new HostBuilder()
+#if DEBUG
+                .UseEnvironment("Development")
+#endif
                 .ConfigureAppConfiguration((context, configurationBuilder) =>
                 {
-                    configurationBuilder.SetBasePath(context.HostingEnvironment.ContentRootPath);
-                    configurationBuilder.AddJsonFile("appsettings.json", optional: true);
+                    var env = context.HostingEnvironment;
+
+                    configurationBuilder
+                        .SetBasePath(context.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile("appsettings.json", optional: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                    _configuration = configurationBuilder.Build();
                 })
                 .ConfigureServices(ConfigureServices)
                 .ConfigureLogging((hostingContext, logging) =>
@@ -103,6 +114,18 @@ namespace SIQuester
             await _host.StartAsync();
 
             _manager.ServiceProvider = _host.Services;
+
+            var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
+            _useAppService = appServiceClientOptions.ServiceUri != null;
+
+#if !DEBUG
+            if (AppSettings.Default.SearchForUpdates)
+            {
+                SearchForUpdatesAsync();
+            }
+
+            SendDelayedReports();
+#endif
 
             _logger = _host.Services.GetRequiredService<ILogger<App>>();
             _logger.LogInformation("Application started");
@@ -128,6 +151,8 @@ namespace SIQuester
 
         private void ConfigureServices(IServiceCollection services)
         {
+            services.AddAppServiceClient(_configuration);
+
             services.AddTransient(typeof(MainWindow));
         }
 
@@ -171,7 +196,101 @@ namespace SIQuester
             }
         }
 
-        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+#if !DEBUG
+        private async void SendDelayedReports()
+        {
+            if (!_useAppService)
+            {
+                return;
+            }
+
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+            try
+            {
+                while (AppSettings.Default.DelayedErrors.Count > 0)
+                {
+                    var error = AppSettings.Default.DelayedErrors[0];
+                    var errorInfo = (Model.ErrorInfo)XamlServices.Load(error);
+
+                    await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+                    AppSettings.Default.DelayedErrors.RemoveAt(0);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private async void SearchForUpdatesAsync()
+        {
+            var close = await SearchForUpdatesNewAsync();
+            if (close)
+            {
+                Shutdown();
+            }
+        }
+
+        /// <summary>
+        /// Произвести поиск и установку обновлений
+        /// </summary>
+        /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
+        private async Task<bool> SearchForUpdatesNewAsync()
+        {
+            if (!_useAppService)
+            {
+                return false;
+            }
+
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+            try
+            {
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                var product = await appService.GetProductAsync("SIQuester");
+
+                if (product.Version > currentVersion)
+                {
+                    var updateUri = product.Uri;
+
+                    var localFile = Path.Combine(Path.GetTempPath(), "setup.exe");
+
+                    using (var httpClient = new HttpClient())
+                    using (var stream = await httpClient.GetStreamAsync(updateUri))
+                    using (var fs = File.Create(localFile))
+                    {
+                        await stream.CopyToAsync(fs);
+                    }
+
+                    try
+                    {
+                        Process.Start(localFile, "/passive");
+                    }
+                    catch (Win32Exception)
+                    {
+                        Thread.Sleep(10000); // Иногда проверяется антивирусом и не сразу запускается
+                        Process.Start(localFile);
+                    }
+
+                    return true;
+                }
+
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(
+                    string.Format(SIQuester.Properties.Resources.UpdateException, exc.ToStringDemystified()),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+
+            return false;
+        }
+
+#endif
+
+        private async void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             if (_hasError)
             {
@@ -194,7 +313,11 @@ namespace SIQuester
             {
                 if (e.Exception.Message != "Параметр задан неверно")
                 {
-                    MessageBox.Show(string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(
+                        string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message),
+                        ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
             else if (e.Exception is InvalidOperationException
@@ -264,33 +387,84 @@ namespace SIQuester
 
                 while (exception != null)
                 {
+                    if (systemMessage.Length > 0)
+                    {
+                        systemMessage.AppendLine().AppendLine("======").AppendLine();
+                    }
+
                     message.AppendLine(exception.Message).AppendLine();
-                    systemMessage.AppendLine(exception.ToString()).AppendLine();
+                    systemMessage.AppendLine(exception.ToStringDemystified());
                     exception = exception.InnerException;
                 }
 
-                var errorInfo = new ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
+                var errorInfo = new Model.ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
 #if !DEBUG
-            if (App.IsVistaOrLater)
-            {
-                    using (var dialog = new TaskDialog { Caption = App.ProductName, InstructionText = "Серьёзный сбой в приложении. Отправить отчёт автору?", Text = message.ToString().Trim(), Icon = TaskDialogStandardIcon.Warning, StandardButtons = TaskDialogStandardButtons.Ok })
-                    {
-                        dialog.Show();
-                    }
-            }
-            else
-#endif
+                if (IsVistaOrLater)
                 {
-                    MessageBox.Show(
+                    var dialog = new TaskDialog
+                    {
+                        Caption = ProductName,
+                        InstructionText = SIQuester.Properties.Resources.SendErrorHeader,
+                        Text = message.ToString().Trim(),
+                        Icon = TaskDialogStandardIcon.Warning,
+                        StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
+                    };
+
+                    if (dialog.Show() == TaskDialogResult.Yes)
+                    {
+                        await SendMessageAsync(errorInfo);
+                    }
+                }
+                else
+#endif
+                    if (MessageBox.Show(
                         $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
                         ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+                {
+                    await SendMessageAsync(errorInfo);
                 }
             }
 
             e.Handled = true;
             Shutdown();
+        }
+
+        private async Task SendMessageAsync(Model.ErrorInfo errorInfo)
+        {
+            if (!_useAppService)
+            {
+                return;
+            }
+
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+            try
+            {
+                var result = await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+
+                switch (result)
+                {
+                    case ErrorStatus.Fixed:
+                        MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", ProductName);
+                        break;
+
+                    case ErrorStatus.CannotReproduce:
+                        MessageBox.Show(
+                            "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
+                            ProductName);
+                        break;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", ProductName);
+                if (AppSettings.Default.DelayedErrors.Count < 10)
+                {
+                    AppSettings.Default.DelayedErrors.Add(XamlServices.Save(errorInfo));
+                }
+            }
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)
@@ -343,14 +517,17 @@ namespace SIQuester
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"Ошибка при сохранении настроек программы: {exc.Message}", AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(
+                    $"Ошибка при сохранении настроек программы: {exc.Message}",
+                    AppSettings.ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Exclamation);
             }
         }
 
         /// <summary>
         /// Загрузить пользовательские настройки
         /// </summary>
-        /// <returns></returns>
         public static AppSettings LoadSettings()
         {
             try

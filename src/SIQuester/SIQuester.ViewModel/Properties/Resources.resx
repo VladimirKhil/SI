@@ -416,4 +416,13 @@ theme - тема Кота</value>
   <data name="ErrorInsertingBindedQuestion" xml:space="preserve">
     <value>Попытка вставить привязанный вопрос!</value>
   </data>
+  <data name="ExportMedia" xml:space="preserve">
+    <value>Экспорт медиа</value>
+  </data>
+  <data name="ExportMediaError" xml:space="preserve">
+    <value>Ошибка экспорта медиа</value>
+  </data>
+  <data name="InputMediaUri" xml:space="preserve">
+    <value>Введите адрес мультимедиа-объекта</value>
+  </data>
 </root>

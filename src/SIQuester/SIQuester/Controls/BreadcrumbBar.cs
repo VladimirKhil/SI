@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace SIQuester.Controls
 {
-    public sealed class BreadcrumbBar: StackPanel
+    public sealed class BreadcrumbBar : StackPanel
     {
         private double[] _newWidths = null;
 
@@ -31,6 +31,7 @@ namespace SIQuester.Controls
             }
 
             _newWidths = new double[childrenCount];
+
             if (mustWidth > 0 && desiredWidth > mustWidth)
             {
                 // Переполнение, нужно ужаться

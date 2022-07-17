@@ -8,7 +8,7 @@ namespace SIQuester
     /// <summary>
     /// Изменение коллекции
     /// </summary>
-    public sealed class CollectionChange: IChange
+    public sealed class CollectionChange : IChange
     {
         /// <summary>
         /// Коллекция, которая была изменена

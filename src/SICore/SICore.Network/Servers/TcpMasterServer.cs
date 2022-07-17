@@ -30,9 +30,9 @@ namespace SICore.Network.Servers
         /// <summary>
         /// Поток прослушивания
         /// </summary>
-        private readonly object _listenerSync = new object();
+        private readonly object _listenerSync = new();
 
-        private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellation = new();
 
         /// <summary>
         /// Создание основного сервера

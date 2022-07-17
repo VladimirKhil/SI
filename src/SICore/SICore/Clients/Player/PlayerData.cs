@@ -8,7 +8,7 @@ namespace SICore
     /// <summary>
     /// Данные игрока
     /// </summary>
-    public sealed class PlayerData: INotifyPropertyChanged
+    public sealed class PlayerData : INotifyPropertyChanged
     {
         private CustomCommand _pressGameButton;
 

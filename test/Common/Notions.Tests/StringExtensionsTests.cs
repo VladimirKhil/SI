@@ -9,7 +9,6 @@ namespace Notions.Tests
         [TestCase("@test", "@Test")]
         [TestCase("http://ya.ru", "http://ya.ru")]
         [TestCase("https://ya.ru", "https://ya.ru")]
-        [TestCase(null, null)]
         [TestCase("", "")]
         public void GrowFirstLetter_Ok(string input, string expectedOutput)
         {

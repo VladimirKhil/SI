@@ -1,17 +1,17 @@
 ﻿namespace SIQuester
 {
     /// <summary>
-    /// Изменение документа
+    /// Defines a data change that can be undone or redone.
     /// </summary>
     public interface IChange
     {
         /// <summary>
-        /// Отменить
+        /// Undoes the change.
         /// </summary>
         void Undo();
 
         /// <summary>
-        /// Повторить
+        /// Redoes the change.
         /// </summary>
         void Redo();
     }

@@ -3,25 +3,18 @@
 namespace SIQuester
 {
     /// <summary>
-    /// Группа изменений, хранимая как единое изменение
+    /// Defines a change group which acts like a single change.
     /// </summary>
-    internal sealed class ChangeGroup: List<IChange>, IChange
+    internal sealed class ChangeGroup : List<IChange>, IChange
     {
-        #region IChange Members
-
         public void Undo()
         {
-            for (int i = this.Count - 1; i > -1; i--)
+            for (var i = Count - 1; i > -1; i--)
             {
                 this[i].Undo();
             }
         }
 
-        public void Redo()
-        {
-            this.ForEach(item => item.Redo());
-        }
-
-        #endregion
+        public void Redo() => ForEach(item => item.Redo());
     }
 }

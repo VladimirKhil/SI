@@ -402,7 +402,15 @@ namespace SIQuester.ViewModel
 
         private Tuple<bool, int> Analyze()
         {
-            var result = _converter.ReadFile(_parts, _template, ref _existing, false, string.IsNullOrEmpty(_path) ? "Безымянный" : Path.GetFileNameWithoutExtension(_path), Resources.Empty, Resources.ThemesCollection, out int themesNum);
+            var result = _converter.ReadFile(
+                _parts,
+                _template,
+                ref _existing,
+                false,
+                string.IsNullOrEmpty(_path) ? "Безымянный" : Path.GetFileNameWithoutExtension(_path),
+                Resources.Empty,
+                Resources.ThemesCollection,
+                out int themesNum);
 
             return Tuple.Create(result, themesNum);
         }

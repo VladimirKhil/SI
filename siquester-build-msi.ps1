@@ -1,2 +1,5 @@
-& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x86 /p:OutputPath=bin/Release
-& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x64 /p:OutputPath=bin/Release
+param (
+    [string]$platform = "x64"
+)
+
+& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=$platform /p:OutputPath=bin/Release/$platform /p:BuildProjectReferences=false

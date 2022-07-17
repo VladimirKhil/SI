@@ -3,12 +3,17 @@ using SIPackages.Core;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
+    /// <summary>
+    /// Defines a question scenario view model.
+    /// </summary>
     public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
     {
         internal Scenario Model { get; }
@@ -16,7 +21,9 @@ namespace SIQuester.ViewModel
         internal QuestionViewModel Owner { get; private set; }
 
         public ICommand AddText { get; private set; }
+
         public ICommand AddVoice { get; private set; }
+
         public ICommand AddMarker { get; private set; }
 
         public ICommand ChangeType { get; private set; }
@@ -24,37 +31,33 @@ namespace SIQuester.ViewModel
         public SimpleCommand SetTime { get; private set; }
 
         public SimpleCommand CollapseMedia { get; private set; }
+
         public SimpleCommand ExpandMedia { get; private set; }
+
         public SimpleCommand ExportMedia { get; private set; }
 
         public ICommand SelectAtomObject { get; private set; }
 
-        public override QDocument OwnerDocument
-        {
-            get
-            {
-                return Owner?.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
-            }
-        }
+        public override QDocument OwnerDocument => Owner?.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
 
         private bool _isComplex;
 
         /// <summary>
-        /// Содержит ли сложный ответ
+        /// Does this scenario contain a complex answer.
         /// </summary>
         public bool IsComplex
         {
-            get { return _isComplex; }
+            get => _isComplex;
             set
             {
                 if (_isComplex != value)
                 {
                     _isComplex = value;
-                    OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(IsComplex)));
+                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsComplex)));
                 }
             }
         }
-        
+
         public ScenarioViewModel(QuestionViewModel owner, Scenario scenario)
         {
             Model = scenario;
@@ -108,7 +111,7 @@ namespace SIQuester.ViewModel
             UpdateAtomCommands();
         }
 
-        private void CurrentAtom_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void CurrentAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(AtomViewModel.IsExpanded))
             {
@@ -116,7 +119,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Atom.AtomTime))
             {
@@ -127,32 +130,42 @@ namespace SIQuester.ViewModel
         private void UpdateAtomCommands()
         {
             var atom = CurrentItem;
+            var atomType = atom.Model.Type;
+            var isMedia = atomType == AtomTypes.Image || atomType == AtomTypes.Audio || atomType == AtomTypes.Video;
 
             SetTime.CanBeExecuted = atom != null && atom.Model.AtomTime == 0;
-            CollapseMedia.CanBeExecuted = atom != null && (atom.Model.Type == AtomTypes.Image || atom.Model.Type == AtomTypes.Audio || atom.Model.Type == AtomTypes.Video) && atom.IsExpanded;
-            ExpandMedia.CanBeExecuted = atom != null && (atom.Model.Type == AtomTypes.Image || atom.Model.Type == AtomTypes.Audio || atom.Model.Type == AtomTypes.Video) && !atom.IsExpanded;
-            ExportMedia.CanBeExecuted = atom != null && (atom.Model.Type == AtomTypes.Image || atom.Model.Type == AtomTypes.Audio || atom.Model.Type == AtomTypes.Video);
+
+            CollapseMedia.CanBeExecuted = atom != null && isMedia && atom.IsExpanded;
+            ExpandMedia.CanBeExecuted = atom != null && isMedia && !atom.IsExpanded;
+            ExportMedia.CanBeExecuted = atom != null && isMedia;
         }
 
-        void ScenarioViewModel_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void ScenarioViewModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Add:
+
                     for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                     {
                         this[i].OwnerScenario = this;
                         Model.Insert(i, this[i].Model);
                     }
+
                     break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+
+                case NotifyCollectionChangedAction.Replace:
+
                     for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                     {
                         this[i].OwnerScenario = this;
                         Model[i] = this[i].Model;
                     }
+
                     break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+
+                case NotifyCollectionChangedAction.Remove:
+
                     foreach (AtomViewModel atom in e.OldItems)
                     {
                         atom.OwnerScenario = null;
@@ -166,8 +179,11 @@ namespace SIQuester.ViewModel
 
                     IsComplex = Items.Any(atom => atom.Model.Type == AtomTypes.Marker);
                     break;
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+
+                case NotifyCollectionChangedAction.Reset:
+
                     Model.Clear();
+
                     foreach (AtomViewModel atom in this)
                     {
                         atom.OwnerScenario = this;
@@ -189,21 +205,17 @@ namespace SIQuester.ViewModel
             return atom;
         }
 
-        internal void SelectAtomObject_AsAnswer(object arg)
-        {
-            SelectAtomObjectCore(arg, true);
-        }
+        internal void SelectAtomObject_AsAnswer(object arg) => SelectAtomObjectCore(arg, true);
 
-        private void AddText_Executed(object arg)
-        {
-            QDocument.ActivatedObject = Add(AtomTypes.Text, "");
-        }
+        private void AddText_Executed(object arg) => QDocument.ActivatedObject = Add(AtomTypes.Text, "");
 
         private void AddVoice_Executed(object arg)
         {
             var index = CurrentPosition;
             if (index > -1 && index < Count && string.IsNullOrWhiteSpace(this[index].Model.Text))
+            {
                 RemoveAt(index);
+            }
 
             QDocument.ActivatedObject = Add(AtomTypes.Oral, "");
         }
@@ -231,10 +243,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        protected override bool CanRemove()
-        {
-            return Count > 1;
-        }
+        protected override bool CanRemove() => Count > 1;
 
         private void SetTime_Executed(object arg)
         {
@@ -261,33 +270,28 @@ namespace SIQuester.ViewModel
             try
             {
                 var document = Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
-
                 var media = document.Document.GetLink(CurrentItem.Model);
+
                 if (media.GetStream != null && media.Uri != null)
                 {
-                    var filename = media.Uri;
-                    if (PlatformManager.Instance.ShowSaveUI("Экспорт медиа", "", null, ref filename))
+                    var fileName = media.Uri;
+
+                    if (PlatformManager.Instance.ShowSaveUI(Resources.ExportMedia, "", null, ref fileName))
                     {
-                        using (var stream = media.GetStream().Stream)
-                        {
-                            using (var fs = File.Open(filename, FileMode.Create, FileAccess.Write))
-                            {
-                                await stream.CopyToAsync(fs);
-                            }
-                        }
+                        using var stream = media.GetStream().Stream;
+                        using var fileStream = File.Open(fileName, FileMode.Create, FileAccess.Write);
+
+                        await stream.CopyToAsync(fileStream);
                     }
                 }
             }
             catch (Exception exc)
             {
-                PlatformManager.Instance.ShowExclamationMessage(exc.ToString());
+                PlatformManager.Instance.ShowExclamationMessage($"{Resources.ExportMediaError}: {exc}");
             }
         }
 
-        private void SelectAtomObject_Executed(object arg)
-        {
-            SelectAtomObjectCore(arg, false);
-        }
+        private void SelectAtomObject_Executed(object arg) => SelectAtomObjectCore(arg, false);
 
         private void SelectAtomObjectCore(object arg, bool asAnswer)
         {
@@ -301,8 +305,10 @@ namespace SIQuester.ViewModel
                 return;
             }
 
-            if (!(media is string text))
+            if (media is not string text)
+            {
                 return;
+            }
 
             if (text == Resources.File)
             {
@@ -317,17 +323,22 @@ namespace SIQuester.ViewModel
         private void LinkAtomObject(string mediaType, bool asAnswer)
         {
             var index = CurrentPosition;
+
             if (index == -1 || index >= Count)
             {
                 if (Count == 0)
+                {
                     return;
+                }
 
                 index = Count - 1;
             }
 
-            var uri = PlatformManager.Instance.AskText("Введите адрес мультимедиа-объекта");
+            var uri = PlatformManager.Instance.AskText(Resources.InputMediaUri);
             if (string.IsNullOrWhiteSpace(uri))
+            {
                 return;
+            }
 
             OwnerDocument.BeginChange();
 
@@ -342,7 +353,9 @@ namespace SIQuester.ViewModel
                     }
                 }
                 else if (string.IsNullOrWhiteSpace(this[index].Model.Text))
+                {
                     RemoveAt(index--);
+                }
 
                 var atom = new AtomViewModel(new Atom { Type = mediaType, Text = uri });
                 QDocument.ActivatedObject = atom;
@@ -423,7 +436,7 @@ namespace SIQuester.ViewModel
             else if (mediaType == AtomTypes.Video)
                 collection = document.Video;
 
-            var was = collection.Files.Count;
+            var initialItemCount = collection.Files.Count;
 
             document.BeginChange();
 
@@ -432,16 +445,23 @@ namespace SIQuester.ViewModel
                 collection.AddItem.Execute(null);
 
                 if (!collection.HasPendingChanges)
+                {
                     return;
+                }
 
-                if (was == collection.Files.Count)
+                if (initialItemCount == collection.Files.Count)
+                {
                     return;
+                }
 
                 var index = CurrentPosition;
+
                 if (index == -1 || index >= Count)
                 {
                     if (Count == 0)
+                    {
                         return;
+                    }
 
                     index = Count - 1;
                 }
@@ -455,7 +475,9 @@ namespace SIQuester.ViewModel
                     }
                 }
                 else if (string.IsNullOrWhiteSpace(this[index].Model.Text) && this[index].Model.Type != AtomTypes.Marker)
+                {
                     RemoveAt(index--);
+                }
 
                 var atom = new AtomViewModel(new Atom { Type = mediaType, Text = "" });
                 Insert(index + 1, atom);

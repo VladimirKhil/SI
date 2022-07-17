@@ -47,7 +47,7 @@ namespace SIQuester.Converters
             }
 
             var isLocalFile = uri.Scheme == "file";
-            if (isLocalFile && !File.Exists(uri.LocalPath))
+            if (isLocalFile && (!File.Exists(uri.LocalPath) || new FileInfo(uri.LocalPath).Length == 0))
             {
                 return null;
             }

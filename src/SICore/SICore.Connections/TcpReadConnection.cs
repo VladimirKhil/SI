@@ -81,7 +81,7 @@ namespace SICore.Connections
                 while (true)
                 {
                     // TODO: use Memory
-                    var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length);
+                    var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken);
                     if (bytesRead < 1)
                     {
                         // Нормальное закрытие соединения

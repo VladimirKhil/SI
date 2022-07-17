@@ -3,7 +3,7 @@ using System.Windows.Documents;
 
 namespace SIQuester.Behaviors
 {
-    public sealed class RunBehavior: DependencyObject
+    public sealed class RunBehavior : DependencyObject
     {
         public static RunBehavior Instance { get; private set; }
 

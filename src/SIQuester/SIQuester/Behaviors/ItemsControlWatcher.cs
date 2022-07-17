@@ -17,7 +17,11 @@ namespace SIQuester.ViewModel
 
         // Using a DependencyProperty as the backing store for IsWatching.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsWatchingProperty =
-            DependencyProperty.RegisterAttached("IsWatching", typeof(bool), typeof(ItemsControlWatcher), new UIPropertyMetadata(false, IsWatchingChanged));
+            DependencyProperty.RegisterAttached(
+                "IsWatching",
+                typeof(bool),
+                typeof(ItemsControlWatcher),
+                new UIPropertyMetadata(false, IsWatchingChanged));
 
         private static void IsWatchingChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -38,14 +42,14 @@ namespace SIQuester.ViewModel
 
         private static void Element_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (!(sender is FrameworkElement parent) || !(e.OriginalSource is FrameworkElement child))
+            if (sender is not FrameworkElement parent || e.OriginalSource is not FrameworkElement child)
             {
                 return;
             }
 
             var childItem = child.DataContext;
 
-            if (!(parent.DataContext is IItemsViewModel parentList) || childItem == null)
+            if (parent.DataContext is not IItemsViewModel parentList || childItem == null)
             {
                 return;
             }

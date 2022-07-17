@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 namespace SIPackages.PlatformSpecific
 {
     /// <summary>
-    /// Defines a package source.
+    /// Defines a SIGame package source.
     /// </summary>
-    public interface ISIPackage: IDisposable
+    public interface ISIPackage : IDisposable
     {
         /// <summary>
         /// Gets source entries by category.
         /// </summary>
         /// <param name="category">Category name.</param>
-        /// <returns></returns>
         string[] GetEntries(string category);
 
         /// <summary>
         /// Gets object stream.
         /// </summary>
         /// <param name="name">Object name.</param>
-        /// <param name="read">Should a stream be read-only.</param>
+        /// <param name="read">Will the stream be read (or written to otherwise).</param>
         StreamInfo GetStream(string name, bool read = true);
 
         /// <summary>
@@ -30,7 +29,6 @@ namespace SIPackages.PlatformSpecific
         /// <param name="category">Object category.</param>
         /// <param name="name">Object name.</param>
         /// <param name="read">Should a stream be read-only.</param>
-        /// <returns></returns>
         StreamInfo GetStream(string category, string name, bool read = true);
 
         /// <summary>

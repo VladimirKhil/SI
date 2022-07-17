@@ -3,6 +3,7 @@ using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,26 +11,32 @@ using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class MediaStorageViewModel: WorkspaceViewModel
+    /// <summary>
+    /// Defines a media storage view model.
+    /// </summary>
+    public sealed class MediaStorageViewModel : WorkspaceViewModel
     {
         private readonly QDocument _document = null;
 
         /// <summary>
         /// Добавленные файлы
         /// </summary>
-        private readonly List<MediaItemViewModel> _added = new List<MediaItemViewModel>();
+        private readonly List<MediaItemViewModel> _added = new();
+
         /// <summary>
         /// Удалённые файлы
         /// </summary>
-        private readonly List<MediaItemViewModel> _removed = new List<MediaItemViewModel>();
+        private readonly List<MediaItemViewModel> _removed = new();
+
         /// <summary>
         /// Переименованные файлы
         /// </summary>
-        private readonly List<Tuple<string, string>> _renamed = new List<Tuple<string, string>>();
+        private readonly List<Tuple<string, string>> _renamed = new();
+
         /// <summary>
         /// Пути для файлов, ещё не загруженных в коллекцию (не закоммиченных)
         /// </summary>
-        private readonly Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _streams = new Dictionary<MediaItemViewModel, Tuple<string, FileStream>>();
+        private readonly Dictionary<MediaItemViewModel, Tuple<string, FileStream>> _streams = new();
 
         private bool _blockFlag = false;
 
@@ -60,11 +67,14 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Существующие в коллекции файлы
         /// </summary>
-        public ObservableCollection<MediaItemViewModel> Files { get; } = new ObservableCollection<MediaItemViewModel>();
+        public ObservableCollection<MediaItemViewModel> Files { get; } = new();
+
         public ICommand AddItem { get; private set; }
+
         public ICommand DeleteItem { get; private set; }
 
         private readonly string _header;
+
         private readonly string _name;
 
         public override string Header => _header;
@@ -95,12 +105,13 @@ namespace SIQuester.ViewModel
         private MediaItemViewModel CreateItem(string item)
         {
             var named = new MediaItemViewModel(new Named(item), _name, () => Wrap(item));
+
             named.Model.PropertyChanged += Named_PropertyChanged;
 
             return named;
         }
 
-        private void Named_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Named_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (_blockFlag)
             {
@@ -334,21 +345,26 @@ namespace SIQuester.ViewModel
 
             var item = CreateItem(localName);
             PreviewAdd(item, file);
-            OnChanged(new CustomChange(() =>
-            {
-                PreviewRemove(item);
-                HasPendingChanges = IsChanged();
-            }, () =>
-            {
-                PreviewAdd(item, file);
-                HasPendingChanges = IsChanged();
-            }));
+            OnChanged(
+                new CustomChange(
+                    () =>
+                    {
+                        PreviewRemove(item);
+                        HasPendingChanges = IsChanged();
+                    },
+                    () =>
+                    {
+                        PreviewAdd(item, file);
+                        HasPendingChanges = IsChanged();
+                    }));
         }
 
         private void PreviewAdd(MediaItemViewModel item, string path)
         {
             if (_removed.Contains(item))
+            {
                 _removed.Remove(item);
+            }
             else
             {
                 FileStream fileStream;
@@ -384,7 +400,10 @@ namespace SIQuester.ViewModel
             return _document.Lock.WithLock(() =>
             {
                 var collection = _document.GetCollection(_name);
-                return PlatformSpecific.PlatformManager.Instance.PrepareMedia(new Media(() => collection.GetFile(link), link), collection.Name);
+
+                return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
+                    new Media(() => collection.GetFile(link), link),
+                    collection.Name);
             });
         }
     }

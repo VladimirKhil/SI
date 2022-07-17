@@ -6,7 +6,7 @@
 	<?define ProductDescription="SIGame packages editor" ?>
 	<?define ManufacturerEn="Khil-soft" ?>
 	<?define ProductNameEn="SIQuester" ?>
-	<?define ProductVersion="5.7.0" ?>
+	<?define ProductVersion="5.7.4" ?>
 	<?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
 	<?define ProductNameR="SIQuester" ?>
 
@@ -108,6 +108,15 @@
 			<Component Guid="{BE062A3B-5687-4676-9F5B-710AFB837C5F}">
 				<File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
 			</Component>
+			<Component Guid="{9DDD698F-CC42-450B-A706-73F395AF1F74}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
+			</Component>
+			<Component Guid="{45D455A2-7D37-4D27-8973-B26CA236C2EE}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
+			</Component>
+			<Component Guid="{40264622-CFCF-41EB-A76C-31911128E031}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
+			</Component>
 			<Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
 				<File KeyPath="yes" Source="$(var.PublishFolder)Help.xps" />
 			</Component>
@@ -148,6 +157,9 @@
 			</Component>
 			<Component Guid="{61EE4A7F-8729-4ABE-8BF8-4C2293620BE3}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\WindowsAPICodePack.LICENSE.txt" />
+			</Component>
+			<Component Guid="{61DE6CC1-243C-473A-B297-D5B35A113F5D}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Ben.Demystifier.LICENSE.txt" />
 			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
 				<File KeyPath="yes" Source="$(var.SIQuester.ProjectDir)..\..\..\LICENSE" />

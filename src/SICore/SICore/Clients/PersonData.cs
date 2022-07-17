@@ -7,7 +7,7 @@ namespace SICore
     /// <summary>
     /// Общие данные для игрока и ведущего
     /// </summary>
-    public sealed class PersonData: INotifyPropertyChanged
+    public sealed class PersonData : INotifyPropertyChanged
     {
         public CustomCommand SendPass { get; set; }
         public CustomCommand SendStake { get; set; }

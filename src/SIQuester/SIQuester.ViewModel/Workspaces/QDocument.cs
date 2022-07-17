@@ -1803,6 +1803,7 @@ namespace SIQuester.ViewModel
         private void ClearTempFile(string path)
         {
             var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester", PathHelper.EncodePath(path));
+            
             if (File.Exists(tempPath))
             {
                 try
@@ -1859,7 +1860,9 @@ namespace SIQuester.ViewModel
         public void BeginChange()
         {
             if (_changeGroup != null)
+            {
                 OnError(new Exception(Resources.ChangeGroupIsActivated));
+            }
 
             _changeGroup = new ChangeGroup();
         }
@@ -1885,12 +1888,15 @@ namespace SIQuester.ViewModel
         {
             SearchResults = new SearchResults() { Query = query };
             var package = Package;
+
             if (package.Model.Contains(query))
             {
                 lock (_searchSync)
                 {
                     if (token.IsCancellationRequested)
+                    {
                         return;
+                    }
 
                     SearchResults.Results.Add(package);
                 }
@@ -1903,7 +1909,9 @@ namespace SIQuester.ViewModel
                     lock (_searchSync)
                     {
                         if (token.IsCancellationRequested)
+                        {
                             return;
+                        }
 
                         SearchResults.Results.Add(round);
                     }
@@ -1929,7 +1937,9 @@ namespace SIQuester.ViewModel
                             lock (_searchSync)
                             {
                                 if (token.IsCancellationRequested)
+                                {
                                     return;
+                                }
 
                                 SearchResults.Results.Add(quest);
                             }
@@ -1939,10 +1949,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        public void RollbackChange()
-        {
-            _changeGroup = null;
-        }
+        public void RollbackChange() => _changeGroup = null;
 
         protected override async Task Close_Executed(object arg)
         {
@@ -1957,7 +1964,9 @@ namespace SIQuester.ViewModel
                         : PlatformManager.Instance.Confirm(message);
 
                     if (!result.HasValue)
+                    {
                         return;
+                    }
 
                     if (result.Value)
                     {
@@ -2025,20 +2034,15 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void CheckUndoCanBeExecuted()
-        {
-            Undo.CanBeExecuted = _undoList.Any();
-        }
+        private void CheckUndoCanBeExecuted() => Undo.CanBeExecuted = _undoList.Any();
 
-        private void CheckRedoCanBeExecuted()
-        {
-            Redo.CanBeExecuted = _redoList.Any();
-        }
+        private void CheckRedoCanBeExecuted() => Redo.CanBeExecuted = _redoList.Any();
 
         private async void Wikify_Executed(object arg)
         {
             IsProgress = true;
             BeginChange();
+
             try
             {
                 await Task.Run(WikifyAsync);
@@ -2112,6 +2116,7 @@ namespace SIQuester.ViewModel
         private static void WikifyInfoOwner(IItemViewModel owner)
         {
             var info = owner.Info;
+
             for (int i = 0; i < info.Authors.Count; i++)
             {
                 var value = info.Authors[i];
@@ -2155,7 +2160,9 @@ namespace SIQuester.ViewModel
                 }
 
                 while (Package.Rounds.Count > 0)
+                {
                     Package.Rounds.RemoveAt(0);
+                }
 
                 int ind = 0;
 
@@ -2165,7 +2172,7 @@ namespace SIQuester.ViewModel
                     theme.OwnerRound = null;
                 });
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     var round = new Round { Name = (Package.Rounds.Count + 1).ToString() + Resources.EndingRound, Type = RoundTypes.Standart };
                     var roundViewModel = new RoundViewModel(round) { IsExpanded = true };
@@ -2175,12 +2182,17 @@ namespace SIQuester.ViewModel
                     {
                         ThemeViewModel themeViewModel;
                         if (allthemes.Count == ind)
+                        {
                             themeViewModel = new ThemeViewModel(new Theme());
+                        }
                         else
+                        {
                             themeViewModel = allthemes[ind++];
+                        }
 
                         roundViewModel.Themes.Add(themeViewModel);
-                        for (int k = 0; k < 5; k++)
+
+                        for (var k = 0; k < 5; k++)
                         {
                             QuestionViewModel questionViewModel;
                             if (themeViewModel.Questions.Count <= k)
@@ -2199,7 +2211,9 @@ namespace SIQuester.ViewModel
                             foreach (var atom in questionViewModel.Scenario)
                             {
                                 if (atom.Model.Type == AtomTypes.Text)
+                                {
                                     atom.Model.Text = atom.Model.Text.ClearPoints().GrowFirstLetter();
+                                }
                             }
 
                             questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
@@ -2210,9 +2224,10 @@ namespace SIQuester.ViewModel
                 var finalViewModel = new RoundViewModel(new Round { Type = RoundTypes.Final, Name = Resources.Final }) { IsExpanded = true };
                 Package.Rounds.Add(finalViewModel);
 
-                for (int j = 0; j < 7; j++)
+                for (var j = 0; j < 7; j++)
                 {
                     ThemeViewModel themeViewModel;
+
                     if (allthemes.Count == ind)
                         themeViewModel = new ThemeViewModel(new Theme());
                     else
@@ -2221,6 +2236,7 @@ namespace SIQuester.ViewModel
                     finalViewModel.Themes.Add(themeViewModel);
 
                     QuestionViewModel questionViewModel;
+
                     if (themeViewModel.Questions.Count == 0)
                     {
                         var question = CreateQuestion(0);
@@ -2235,7 +2251,9 @@ namespace SIQuester.ViewModel
                     }
 
                     foreach (var atom in questionViewModel.Scenario)
+                    {
                         atom.Model.Text = atom.Model.Text.ClearPoints();
+                    }
 
                     questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
                 }
@@ -2244,8 +2262,11 @@ namespace SIQuester.ViewModel
                 {
                     var otherViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.Rest });
                     Package.Rounds.Add(otherViewModel);
+
                     while (ind < allthemes.Count)
+                    {
                         otherViewModel.Themes.Add(allthemes[ind++]);
+                    }
                 }
             }
             finally
@@ -2514,10 +2535,7 @@ namespace SIQuester.ViewModel
             Package.IsExpanded = expand;
         }
 
-        private void CollapseAllMedia_Executed(object arg)
-        {
-            ToggleMedia(false);
-        }
+        private void CollapseAllMedia_Executed(object arg) => ToggleMedia(false);
 
         private void ToggleMedia(bool expand)
         {
@@ -2595,10 +2613,13 @@ namespace SIQuester.ViewModel
             }
 
             var link = atomViewModel.Model.Text;
-            if (!link.StartsWith("@")) // Внешняя ссылка
-                return new Media(link);
 
-            return collection.Wrap(link.Substring(1));
+            if (!link.StartsWith("@")) // External link
+            {
+                return new Media(link);
+            }
+
+            return collection.Wrap(link[1..]);
         }
     }
 }

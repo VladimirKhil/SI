@@ -347,10 +347,7 @@ namespace SIPackages
             _video = new DataCollection(_source, VideoStorageName, "si/video");
         }
 
-        public void Save()
-        {
-            SaveCore(_source);
-        }
+        public void Save() => SaveCore(_source);
 
         private void SaveCore(ISIPackage package)
         {
@@ -446,9 +443,9 @@ namespace SIPackages
         }
 
         /// <summary>
-        /// Заменить ссылки на их значения
+        /// Replaces item links by linked values.
         /// </summary>
-        /// <param name="item">Объект, для которого проводится замена</param>
+        /// <param name="item">Item which links are replaced.</param>
         private void InsertLinkValue(InfoOwner item)
         {
             for (int i = 0; i < item.Info.Authors.Count; i++)
@@ -765,10 +762,7 @@ namespace SIPackages
             }
         }
 
-        public void FinalizeSave()
-        {
-            _source.Flush();
-        }
+        public void FinalizeSave() => _source.Flush();
 
         public void CopyData(SIDocument doc)
         {

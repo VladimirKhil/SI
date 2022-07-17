@@ -235,7 +235,7 @@ namespace SIQuester.ViewModel
 
         private void Donate_Executed(object arg) => OpenUri(DonateUrl);
 
-        private void OpenUri(string uri)
+        private static void OpenUri(string uri)
         {
             try
             {
@@ -361,7 +361,7 @@ namespace SIQuester.ViewModel
                 FileStream stream = null;
                 try
                 {
-                    stream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+                    stream = File.OpenRead(path);
 
                     // Loads in read only mode to keep file LastUpdate time unmodified
                     var doc = SIDocument.Load(stream);

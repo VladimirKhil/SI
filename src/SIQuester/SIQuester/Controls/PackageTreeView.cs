@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace SIQuester.Controls
 {
-    public sealed class PackageTreeView: TreeView
+    public sealed class PackageTreeView : TreeView
     {
         public PackageTreeView()
         {
@@ -27,7 +27,9 @@ namespace SIQuester.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Multiply || e.Key == Key.Add || e.Key == Key.Subtract)
+            {
                 return;
+            }
 
             base.OnKeyDown(e);
         }

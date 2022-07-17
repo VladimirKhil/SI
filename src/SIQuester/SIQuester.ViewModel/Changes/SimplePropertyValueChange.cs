@@ -1,6 +1,6 @@
 ﻿namespace SIQuester
 {
-    internal sealed class SimplePropertyValueChange: IChange
+    internal sealed class SimplePropertyValueChange : IChange
     {
         public object Element { get; set; }
         public string PropertyName { get; set; }

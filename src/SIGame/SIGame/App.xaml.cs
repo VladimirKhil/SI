@@ -232,7 +232,7 @@ namespace SIGame
             }
             catch (Exception exc)
             {
-                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.ToStringDemystified()), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -244,10 +244,17 @@ namespace SIGame
         {
             using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
 
-            var currentVersion = Assembly.GetAssembly(typeof(MainViewModel)).GetName().Version;
+            var assembly = Assembly.GetAssembly(typeof(MainViewModel));
+
+            if (assembly == null)
+            {
+                throw new Exception("assembly == null");
+            }
+
+            var currentVersion = assembly.GetName().Version;
             var product = await appService.GetProductAsync("SI");
 
-            if (product.Version > currentVersion)
+            if (product?.Version > currentVersion)
             {
                 return product;
             }

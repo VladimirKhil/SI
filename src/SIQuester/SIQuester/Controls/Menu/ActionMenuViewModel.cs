@@ -5,7 +5,7 @@ namespace SIQuester.ViewModel
     /// <summary>
     /// Класс, управляющий меню действий
     /// </summary>
-    public sealed class ActionMenuViewModel: DependencyObject
+    public sealed class ActionMenuViewModel : DependencyObject
     {
         public static ActionMenuViewModel Instance { get; private set; }
 
@@ -25,7 +25,6 @@ namespace SIQuester.ViewModel
             set { SetValue(IsOpenProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for IsOpen.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsOpenProperty =
             DependencyProperty.Register("IsOpen", typeof(bool), typeof(ActionMenuViewModel), new UIPropertyMetadata(false));
 
@@ -35,7 +34,6 @@ namespace SIQuester.ViewModel
             set { SetValue(PlacementTargetProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for PlacementTarget.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PlacementTargetProperty =
             DependencyProperty.Register("PlacementTarget", typeof(UIElement), typeof(ActionMenuViewModel), new UIPropertyMetadata(null));
     }

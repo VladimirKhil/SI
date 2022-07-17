@@ -43,7 +43,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <None Include="Properties\DataSources\System.Uri.datasource" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />

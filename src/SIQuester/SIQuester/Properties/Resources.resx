@@ -144,6 +144,9 @@
   <data name="Empty" xml:space="preserve">
     <value>Без имени</value>
   </data>
+  <data name="ExportMediaCommand" xml:space="preserve">
+    <value>Выгрузить медиа…</value>
+  </data>
   <data name="Final" xml:space="preserve">
     <value>ФИНАЛ</value>
   </data>
@@ -166,6 +169,9 @@
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
   </data>
+  <data name="SelectSearchFolder" xml:space="preserve">
+    <value>Выберите папку для поиска</value>
+  </data>
   <data name="SendErrorHeader" xml:space="preserve">
     <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
   </data>
@@ -178,8 +184,14 @@
   <data name="Tour" xml:space="preserve">
     <value>Тур</value>
   </data>
+  <data name="TxtFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.txt) | *.txt</value>
+  </data>
   <data name="UpdateException" xml:space="preserve">
     <value>При поиске обновления возникла следующая ошибка: {0}</value>
+  </data>
+  <data name="XmlFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.xml) | *.xml</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
     <value>Ваши темы:</value>

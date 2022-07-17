@@ -209,13 +209,13 @@ namespace SIGame.Implementation
 
         public async void SendDelayedReports()
         {
-            if (CommonSettings.Default.DelayedErrorsNew.Count == 0 && CommonSettings.Default.DelayedResultsNew.Count == 0)
-            {
-                return;
-            }
-
             try
             {
+                if (CommonSettings.Default.DelayedErrorsNew.Count == 0 && CommonSettings.Default.DelayedResultsNew.Count == 0)
+                {
+                    return;
+                }
+
                 if (_useAppService)
                 {
                     while (CommonSettings.Default.DelayedErrorsNew.Count > 0)
@@ -236,8 +236,9 @@ namespace SIGame.Implementation
                     }
                 }
             }
-            catch
+            catch (Exception exc)
             {
+                Trace.TraceError("SendDelayedReports error " + exc.ToStringDemystified());
             }
         }
     }

@@ -23,7 +23,7 @@ using System.Windows.Xps.Serialization;
 namespace SIQuester.Implementation
 {
     /// <summary>
-    /// Реализация функций SIQuester'а для десктопа
+    /// Implements SIQuester desktop framework logic.
     /// </summary>
     internal sealed class DesktopManager : PlatformManager, IDisposable
     {
@@ -71,6 +71,7 @@ namespace SIQuester.Implementation
             var comboBoxTitle = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogLabel("Кодировка");
             var comboBox = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogComboBox();
             var encodings = Encoding.GetEncodings();
+            
             foreach (var enc in encodings)
             {
                 comboBox.Items.Add(new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogComboBoxItem(enc.DisplayName));
@@ -109,7 +110,7 @@ namespace SIQuester.Implementation
         {
             if (richUI.Length > 0 && AppSettings.IsVistaOrLater)
             {
-                // Покажем диалог с богатыми возможностями
+                // Show dialog with rich UI
                 var dialog = new CommonSaveFileDialog
                 {
                     OverwritePrompt = true,
@@ -140,6 +141,7 @@ namespace SIQuester.Implementation
 
                 bool result = dialog.ShowDialog() == CommonFileDialogResult.Ok;
                 filterIndex = dialog.SelectedFileTypeIndex;
+
                 if (result)
                 {
                     filename = dialog.FileName;
@@ -151,7 +153,9 @@ namespace SIQuester.Implementation
                         if (File.Exists(filename))
                         {
                             if (MessageBox.Show(string.Format("Файл {0} существует, заменить?", Path.GetFileName(filename)), AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                            {
                                 return false;
+                            }
                         }
                     }
                 }
@@ -161,12 +165,16 @@ namespace SIQuester.Implementation
             else
             {
                 var filterString = new StringBuilder();
+
                 if (filter != null)
                 {
                     foreach (var item in filter)
                     {
                         if (filterString.Length > 0)
+                        {
                             filterString.Append('|');
+                        }
+
                         filterString.Append(item.Key).Append("|*.").Append(item.Value);
                     }
                 }
@@ -197,13 +205,13 @@ namespace SIQuester.Implementation
 
         public override string ShowImportUI()
         {
-            var openDlg = new OpenFileDialog { DefaultExt = "txt", Filter = "Файлы вопросов (*.txt) | *.txt" };
+            var openDlg = new OpenFileDialog { DefaultExt = "txt", Filter = Resources.TxtFilesFilter };
             return openDlg.ShowDialog() == true ? openDlg.FileName : null;
         }
 
         public override string ShowImportXmlUI()
         {
-            var openDlg = new OpenFileDialog { DefaultExt = "xml", Filter = "Файлы вопросов (*.xml) | *.xml" };
+            var openDlg = new OpenFileDialog { DefaultExt = "xml", Filter = Resources.XmlFilesFilter };
             return openDlg.ShowDialog() == true ? openDlg.FileName : null;
         }
 
@@ -211,7 +219,7 @@ namespace SIQuester.Implementation
         {
             using var dialog = new System.Windows.Forms.FolderBrowserDialog 
             {
-                Description = "Выберите папку для поиска"
+                Description = Resources.SelectSearchFolder
             };
 
             return dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK ? dialog.SelectedPath : null;
@@ -219,7 +227,7 @@ namespace SIQuester.Implementation
 
         public override IMedia PrepareMedia(IMedia media, string type)
         {
-            if (media.GetStream == null) // Это ссылка на внешний файл
+            if (media.GetStream == null) // This is an external link
             {
                 return media;
             }
@@ -229,24 +237,27 @@ namespace SIQuester.Implementation
                 return new Media(fileName);
             }
 
-            // Это сам файл
-            fileName = Path.Combine(Path.GetTempPath(), new Random().Next() + media.Uri);
+            // This is file itself
+            var tempDirectory = Path.Combine(Path.GetTempPath(), App.ProductName);
+            Directory.CreateDirectory(tempDirectory);
+
+            fileName = Path.Combine(tempDirectory, new Random().Next() + media.Uri);
 
             if (fileName.Length >= MAX_PATH)
             {
-                fileName = fileName.Substring(0, MAX_PATH - 1);
+                fileName = fileName[..(MAX_PATH - 1)];
             }
 
-            using (var fs = File.Create(fileName))
+            var stream = media.GetStream();
+            if (stream == null)
             {
-                var stream = media.GetStream();
-                if (stream != null)
-                {
-                    using (stream.Stream)
-                    {
-                        stream.Stream.CopyTo(fs);
-                    }
-                }
+                return null;
+            }
+
+            using (stream.Stream)
+            {
+                using var fs = File.Create(fileName);
+                stream.Stream.CopyTo(fs);
             }
 
             _mediaFiles[media.Uri] = fileName;
@@ -308,9 +319,12 @@ namespace SIQuester.Implementation
                             for (int i = 0; i < round.Themes.Count; i++)
                             {
                                 var theme = round.Themes[i];
+                                
                                 paragraph.AppendLine();
                                 paragraph.AppendFormat("Тема {0}. {1}", i + 1, (theme.Name ?? "").ToUpper().EndWithPoint());
+                                
                                 AppendInfo(doc, paragraph, theme);
+                                
                                 paragraph.AppendLine();
                                 paragraph.AppendLine();
 
@@ -333,23 +347,30 @@ namespace SIQuester.Implementation
                     {
                         var paragraph = new Paragraph();
 
-                        doc.Package.Rounds.ForEach(round => round.Themes.ForEach(theme => theme.Questions.ForEach(quest =>
-                        {
-                            paragraph.AppendFormat("\\{0}\\", theme.Name).AppendLine();
-                            paragraph.AppendFormat("\\{0}", quest.Scenario);
-                            if (quest.Info.Comments.Text.Length > 0)
-                                paragraph.AppendFormat(". {0}: {1}", Resources.Comments, quest.Info.Comments.Text);
+                        doc.Package.Rounds.ForEach(
+                            round => round.Themes.ForEach(
+                                theme => theme.Questions.ForEach(
+                                    quest =>
+                                    {
+                                        paragraph.AppendFormat("\\{0}\\", theme.Name).AppendLine();
+                                        paragraph.AppendFormat("\\{0}", quest.Scenario);
 
-                            paragraph.Append('\\').AppendLine().Append('\\');
-                            paragraph.Append(string.Join(", ", quest.Right.ToArray()));
-                            if (quest.Info.Sources.Count > 0)
-                            {
-                                paragraph.Append('\\').AppendLine().Append('\\');
-                                paragraph.Append(string.Join(", ", doc.GetRealSources(quest.Info.Sources)));
-                            }
+                                        if (quest.Info.Comments.Text.Length > 0)
+                                        {
+                                            paragraph.AppendFormat(". {0}: {1}", Resources.Comments, quest.Info.Comments.Text);
+                                        }
 
-                            paragraph.Append('\\').AppendLine().AppendLine();
-                        })));
+                                        paragraph.Append('\\').AppendLine().Append('\\');
+                                        paragraph.Append(string.Join(", ", quest.Right.ToArray()));
+
+                                        if (quest.Info.Sources.Count > 0)
+                                        {
+                                            paragraph.Append('\\').AppendLine().Append('\\');
+                                            paragraph.Append(string.Join(", ", doc.GetRealSources(quest.Info.Sources)));
+                                        }
+
+                                        paragraph.Append('\\').AppendLine().AppendLine();
+                                    })));
 
                         document.Blocks.Add(paragraph);
                     }
@@ -361,27 +382,33 @@ namespace SIQuester.Implementation
 
                         paragraph.AppendLine(doc.Package.Name);
                         int i = 0;
+
                         doc.Package.Rounds.ForEach(round =>
                         {
                             paragraph.AppendLine();
                             paragraph.AppendLine(round.Name);
                             paragraph.AppendLine();
                             paragraph.AppendLine(Resources.YourThemes);
+
                             round.Themes.ForEach(theme =>
                             {
                                 paragraph.AppendFormat(STR_ExtendedDefinition, Resources.Theme, theme.Name.ToUpper(), ++i);
                                 paragraph.AppendLine();
                             });
+
                             round.Themes.ForEach(theme =>
                             {
                                 paragraph.AppendLine();
                                 paragraph.AppendFormat(STR_Definition, Resources.Theme, theme.Name.ToUpper());
                                 paragraph.AppendLine();
+                                
                                 if (theme.Info.Comments.Text.Length > 0)
                                     paragraph.AppendFormat(STR_ExtendedDefinition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)), theme.Info.Comments.Text);
                                 else
                                     paragraph.AppendFormat(STR_Definition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)));
+                                
                                 paragraph.AppendLine();
+                                
                                 theme.Questions.ForEach(quest =>
                                 {
                                     paragraph.AppendLine();
@@ -409,8 +436,10 @@ namespace SIQuester.Implementation
                         text.AppendLine(string.Format("{0}:", Resources.Championship));
                         text.AppendLine(doc.Package.Name.EndWithPoint().GrowFirstLetter().Trim());
                         text.AppendLine();
+
                         var info = new StringBuilder();
                         int authorsCount = doc.Package.Info.Authors.Count;
+
                         if (authorsCount > 0 && !(authorsCount == 1 && doc.Package.Info.Authors[0] == Resources.Empty))
                         {
                             info.AppendLine(string.Join(Environment.NewLine, doc.GetRealAuthors(doc.Package.Info.Authors)).Trim());
@@ -435,11 +464,13 @@ namespace SIQuester.Implementation
                             text.Append(info);
                         }
 
-                        int r = 1;
+                        var r = 1;
+
                         foreach (var round in doc.Package.Rounds)
                         {
                             text.AppendLine(string.Format("{0}:", Resources.Tour));
                             text.Append(round.Name.GrowFirstLetter().Trim());
+
                             if (round.Type == RoundTypes.Final)
                             {
                                 text.Append(string.Format(" ({0})", Resources.Final));
@@ -469,7 +500,7 @@ namespace SIQuester.Implementation
                                 text.AppendLine();
                             }
 
-                            int i = 1;
+                            var i = 1;
                             foreach (var theme in round.Themes)
                             {
                                 text.AppendLine(string.Format("{0} {1}:", Resources.Question, i));
@@ -482,9 +513,9 @@ namespace SIQuester.Implementation
                                     text.AppendLine(")");
                                 }
 
-                                int L = theme.Questions.Count;
+                                var questionsCount = theme.Questions.Count;
 
-                                for (int j = 0; j < L; j++)
+                                for (var j = 0; j < questionsCount; j++)
                                 {
                                     text.Append("   ");
                                     if (j < 5)
@@ -502,9 +533,10 @@ namespace SIQuester.Implementation
                                 text.AppendLine();
                                 text.AppendLine(string.Format("{0}:", Resources.Answer));
 
-                                for (int j = 0; j < L; j++)
+                                for (var j = 0; j < questionsCount; j++)
                                 {
                                     var qLine = new StringBuilder("   ");
+
                                     if (j < 5)
                                     {
                                         qLine.Append(j + 1);
@@ -515,30 +547,40 @@ namespace SIQuester.Implementation
                                     }
 
                                     qLine.Append(string.Format(". {0}", theme.Questions[j].Right[0].ClearPoints().GrowFirstLetter().Trim()));
-                                    int A = theme.Questions[j].Right.Count;
-                                    if (A > 1)
+                                    
+                                    var rightCount = theme.Questions[j].Right.Count;
+
+                                    if (rightCount > 1)
                                     {
                                         qLine.Append(string.Format(" {0}: ", Resources.Accept));
-                                        for (int k = 1; k < A; k++)
+
+                                        for (int k = 1; k < rightCount; k++)
                                         {
                                             qLine.Append(theme.Questions[j].Right[k].ClearPoints().GrowFirstLetter());
-                                            if (k < A - 1)
+
+                                            if (k < rightCount - 1)
+                                            {
                                                 qLine.Append(", ");
+                                            }
                                         }
                                     }
 
                                     if (theme.Questions[j].Info.Comments.Text.Length > 0)
+                                    {
                                         qLine.Append(string.Format(" ({0})", theme.Questions[j].Info.Comments.Text.ClearPoints().GrowFirstLetter().Trim()));
+                                    }
+
                                     text.AppendLine(qLine.ToString().EndWithPoint());
                                 }
 
                                 static bool qHasSource(Question quest) => quest.Info.Sources.Count > 0 && quest.Info.Sources[0].Length > 3;
+                                
                                 if (theme.Questions.Any(qHasSource))
                                 {
                                     text.AppendLine();
                                     text.AppendLine(string.Format("{0}:", Resources.BaseSources));
 
-                                    for (int j = 0; j < L; j++)
+                                    for (int j = 0; j < questionsCount; j++)
                                     {
                                         if (qHasSource(theme.Questions[j]))
                                         {
@@ -592,7 +634,15 @@ namespace SIQuester.Implementation
                         }
 
                         int counter = 0, iold = 0;
-                        string fileStr = text.Replace('«', '\"').Replace('»', '\"').Replace('–', '-').Replace('—', '-').Replace("…", "...").ToString();
+
+                        var fileStr = text
+                            .Replace('«', '\"')
+                            .Replace('»', '\"')
+                            .Replace('–', '-')
+                            .Replace('—', '-')
+                            .Replace("…", "...")
+                            .ToString();
+                        
                         int fl = fileStr.Length;
                         var fileRes = new StringBuilder();
                         for (int i = 0; i < fl; i++)
@@ -685,7 +735,13 @@ namespace SIQuester.Implementation
             var current = (uint)0;
             var total = (uint)doc.Package.Rounds.Sum(round => round.Themes.Count);
 
-            var document = new FlowDocument { PagePadding = new Thickness(0.0), ColumnWidth = double.PositiveInfinity, FontFamily = new FontFamily("Times New Roman") };
+            var document = new FlowDocument
+            {
+                PagePadding = new Thickness(0.0),
+                ColumnWidth = double.PositiveInfinity,
+                FontFamily = new FontFamily("Times New Roman")
+            };
+
             var packageCaption = new Paragraph { KeepWithNext = true, Margin = new Thickness(10.0, 5.0, 0.0, 0.0) };
 
             var textP = new Run { FontSize = 30, FontWeight = FontWeights.Bold, Text = doc.Package.Name };
@@ -697,9 +753,9 @@ namespace SIQuester.Implementation
             {
                 var caption = new Paragraph { KeepWithNext = true, Margin = new Thickness(10.0, 5.0, 0.0, 0.0) };
 
-                var textC = new Run { FontSize = 24, FontWeight = FontWeights.Bold, Text = round.Name };
+                var textCaption = new Run { FontSize = 24, FontWeight = FontWeights.Bold, Text = round.Name };
 
-                caption.Inlines.Add(textC);
+                caption.Inlines.Add(textCaption);
                 document.Blocks.Add(caption);
 
                 var table = new Table { CellSpacing = 0.0, BorderBrush = Brushes.Black, BorderThickness = new Thickness(0.0, 0.5, 0.0, 0.5) };
@@ -722,25 +778,28 @@ namespace SIQuester.Implementation
                         
                         paragraph.Inlines.Add(string.Format(round.Type == RoundTypes.Standart ? "{0}, {1}" : "{0}", theme.Name, quest.Price));
                         paragraph.Inlines.Add(new LineBreak());
+
                         if (quest.Type.Name != QuestionTypes.Simple)
                         {
                             if (quest.Type.Name == QuestionTypes.Sponsored)
-                                paragraph.Inlines.Add("ВОПРОС ОТ СПОНСОРА");
+                                paragraph.Inlines.Add("ВОПРОС БЕЗ РИСКА");
                             else if (quest.Type.Name == QuestionTypes.Auction)
-                                paragraph.Inlines.Add("ВОПРОС-АУКЦИОН");
+                                paragraph.Inlines.Add("ВОПРОС СО СТАВКОЙ");
                             else if (quest.Type.Name == QuestionTypes.Cat)
                             {
-                                paragraph.Inlines.Add("КОТ В МЕШКЕ");
+                                paragraph.Inlines.Add("ВОПРОС С СЕКРЕТОМ");
                                 paragraph.Inlines.Add(new LineBreak());
                                 paragraph.Inlines.Add(string.Format("{0}, {1}", quest.Type[QuestionTypeParams.Cat_Theme], quest.Type[QuestionTypeParams.Cat_Cost]));
                             }
                             else if (quest.Type.Name == QuestionTypes.BagCat)
                             {
-                                paragraph.Inlines.Add("КОТ В МЕШКЕ");
+                                paragraph.Inlines.Add("ВОПРОС С СЕКРЕТОМ");
                                 var knows = quest.Type[QuestionTypeParams.BagCat_Knows];
                                 var cost = quest.Type[QuestionTypeParams.Cat_Cost];
                                 if (cost == "0")
+                                {
                                     cost = "Минимум или максимум в раунде";
+                                }
 
                                 if (knows == QuestionTypeParams.BagCat_Knows_Value_Never)
                                 {
@@ -761,10 +820,10 @@ namespace SIQuester.Implementation
                                 if (quest.Type[QuestionTypeParams.BagCat_Self] == QuestionTypeParams.BagCat_Self_Value_True)
                                 {
                                     paragraph.Inlines.Add(new LineBreak());
-                                    paragraph.Inlines.Add("Кота можно оставить себе");
+                                    paragraph.Inlines.Add("Вопрос можно оставить себе");
                                 }
                             }
-                            else // Неподдерживаемый тип
+                            else // Unsupported type
                             {
                                 paragraph.Inlines.Add(quest.Type.Name);
                                 foreach (var param in quest.Type.Params)
@@ -786,9 +845,8 @@ namespace SIQuester.Implementation
                     rowGroup.Rows.Add(row);
 
                     current++;
-
-                    // прогресс current из total
                 }
+
                 table.RowGroups.Add(rowGroup);
                 document.Blocks.Add(table);
             }
@@ -809,37 +867,28 @@ namespace SIQuester.Implementation
             return new XpsDocumentWrapper(document);
         }
 
-        public override void AddToRecentCategory(string fileName)
-        {
-            JumpList.AddToRecentCategory(fileName);
-        }
+        public override void AddToRecentCategory(string fileName) => JumpList.AddToRecentCategory(fileName);
 
-        public override void ShowErrorMessage(string message)
-        {
+        public override void ShowErrorMessage(string message) =>
             MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
-        }
 
-        public override void ShowExclamationMessage(string message)
-        {
+        public override void ShowExclamationMessage(string message) =>
             MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-        }
 
-        public override void Inform(string message, bool exclamation = false)
-        {
+        public override void Inform(string message, bool exclamation = false) =>
             MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, exclamation ? MessageBoxImage.Exclamation : MessageBoxImage.Information);
-        }
 
-        public override bool Confirm(string message)
-        {
-            return MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
-        }
+        public override bool Confirm(string message) =>
+            MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
 
         public override bool? ConfirmWithCancel(string message)
         {
             var result = MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Cancel)
+            {
                 return null;
+            }
 
             return result == MessageBoxResult.Yes;
         }
@@ -848,15 +897,14 @@ namespace SIQuester.Implementation
         {
             var window = Application.Current.MainWindow;
             if (window != null)
+            {
                 return MessageBox.Show(window, message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
+            }
 
             return MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.Yes;
         }
 
-        public override void Exit()
-        {
-            Application.Current.MainWindow.Close();
-        }
+        public override void Exit() => Application.Current.MainWindow?.Close();
 
         public void Dispose()
         {

@@ -6,8 +6,6 @@ namespace SIQuester.Behaviors
 {
     public static class ToggleBehavior
     {
-
-
         public static ToggleButton GetTarget(DependencyObject obj)
         {
             return (ToggleButton)obj.GetValue(TargetProperty);
@@ -25,6 +23,7 @@ namespace SIQuester.Behaviors
         public static void OnTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var button = (Button)d;
+
             if (e.NewValue != null)
             {
                 button.Click += (s, e1) =>

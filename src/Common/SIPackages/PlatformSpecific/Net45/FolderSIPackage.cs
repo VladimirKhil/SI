@@ -34,6 +34,7 @@ namespace SIPackages.PlatformSpecific.Net45
             Directory.CreateDirectory(Path.Combine(_folder, category));
             
             using var fs = File.Create(Path.Combine(_folder, category, name));
+
             await stream.CopyToAsync(fs);
         }
 

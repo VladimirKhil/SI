@@ -10,6 +10,9 @@ namespace SIPackages
     /// </summary>
     public static class ZipHelper
     {
+        /// <summary>
+        /// Defines a maxumim file length on current platform.
+        /// </summary>
         internal static int MaxFileNameLength = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // / 2 because of 2-byte non-ASCII symbols
 
         /// <summary>
@@ -42,11 +45,13 @@ namespace SIPackages
         {
             var name = unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
             if (name.Length > MaxFileNameLength)
+            {
                 name = CalculateHash(name);
+            }
 
             var index = entry.FullName.IndexOf('/');
-
-            var targetDir = index > -1 ? Path.Combine(destinationDirectoryPath, entry.FullName.Substring(0, index)) : destinationDirectoryPath;
+            var targetDir = index > -1 ? Path.Combine(destinationDirectoryPath, entry.FullName[..index]) : destinationDirectoryPath;
+            
             Directory.CreateDirectory(targetDir);
 
             return Path.Combine(targetDir, name);
@@ -65,19 +70,27 @@ namespace SIPackages
 
             if (Path.GetFileName(targetFile).Length > MaxFileNameLength)
             {
-                throw new ArgumentOutOfRangeException(nameof(targetFile), $"Wrong target file: \"{targetFile}\", entry.Name: \"{entry.Name}\"");
+                throw new InvalidOperationException(
+                    $"Too long target file name: \"{targetFile}\", entry.Name: \"{entry.Name}\". " +
+                    $"Maximum allowed length: {MaxFileNameLength}");
             }
-
-            if (!entry.FullName.EndsWith("/"))
+            
+            if (!entry.FullName.EndsWith('/')) // Not a directory
             {
                 entry.ExtractToFile(targetFile, true);
             }
         }
 
+        /// <summary>
+        /// Creates a unqiue value hash. Used when an original value is too long to be used as a file name.
+        /// </summary>
+        /// <param name="value">Value to hash.</param>
+        /// <returns>Hashed value.</returns>
         internal static string CalculateHash(string value)
         {
-            ulong hashedValue = 3074457345618258791ul;
-            for (int i = 0; i < value.Length; i++)
+            var hashedValue = 3074457345618258791ul;
+
+            for (var i = 0; i < value.Length; i++)
             {
                 hashedValue += value[i];
                 hashedValue *= 3074457345618258799ul;
@@ -87,7 +100,9 @@ namespace SIPackages
 
             var extIndex = value.LastIndexOf('.');
             if (extIndex > -1)
-                result += value.Substring(extIndex);
+            {
+                result += value[extIndex..];
+            }
 
             return result;
         }

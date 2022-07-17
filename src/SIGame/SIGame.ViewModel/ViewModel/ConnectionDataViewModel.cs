@@ -294,7 +294,7 @@ namespace SIGame.ViewModel
 
             var data = new ViewerData(BackLink.Default)
             {
-                ServerPublicUrl = ContentPublicBaseUrls.FirstOrDefault(),
+                ServerPublicUrl = ContentPublicBaseUrls?.FirstOrDefault(),
                 ContentPublicUrls = ContentPublicBaseUrls,
                 ServerAddress = ServerAddress
             };

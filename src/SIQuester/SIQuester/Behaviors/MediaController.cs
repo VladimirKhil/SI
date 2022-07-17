@@ -8,29 +8,16 @@ namespace SIQuester.Behaviors
 {
     public static class MediaController
     {
-        public static IMediaOwner GetSource(DependencyObject obj)
-        {
-            return (IMediaOwner)obj.GetValue(SourceProperty);
-        }
+        public static IMediaOwner GetSource(DependencyObject obj) => (IMediaOwner)obj.GetValue(SourceProperty);
 
-        public static void SetSource(DependencyObject obj, IMediaOwner value)
-        {
-            obj.SetValue(SourceProperty, value);
-        }
+        public static void SetSource(DependencyObject obj, IMediaOwner value) => obj.SetValue(SourceProperty, value);
 
-        // Using a DependencyProperty as the backing store for Source.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.RegisterAttached("Source", typeof(IMediaOwner), typeof(MediaController), new PropertyMetadata(null));
 
-        public static Slider GetProgress(DependencyObject obj)
-        {
-            return (Slider)obj.GetValue(ProgressProperty);
-        }
+        public static Slider GetProgress(DependencyObject obj) => (Slider)obj.GetValue(ProgressProperty);
 
-        public static void SetProgress(DependencyObject obj, Slider value)
-        {
-            obj.SetValue(ProgressProperty, value);
-        }
+        public static void SetProgress(DependencyObject obj, Slider value) => obj.SetValue(ProgressProperty, value);
 
         // Using a DependencyProperty as the backing store for Progress.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ProgressProperty =
@@ -42,20 +29,27 @@ namespace SIQuester.Behaviors
             var slider = (Slider)e.NewValue;
 
             if (media == null || slider == null)
+            {
                 return;
+            }
 
             bool blocked = false;
 
             slider.ValueChanged += (s, e2) =>
                 {
                     if (blocked)
+                    {
                         return;
+                    }
 
                     if (media.NaturalDuration.HasTimeSpan)
+                    {
                         media.Position = TimeSpan.FromSeconds(media.NaturalDuration.TimeSpan.TotalSeconds * slider.Value / 100);
+                    }
                 };
 
             var timer = new System.Timers.Timer(1000);
+
             timer.Elapsed += (sender, e2) =>
             {
                 media.Dispatcher.BeginInvoke((Action)(() =>
@@ -99,18 +93,11 @@ namespace SIQuester.Behaviors
 
             media.Unloaded += ended;
         }
-        
-        public static ToggleButton GetPlayPauseButton(DependencyObject obj)
-        {
-            return (ToggleButton)obj.GetValue(PlayPauseButtonProperty);
-        }
 
-        public static void SetPlayPauseButton(DependencyObject obj, ToggleButton value)
-        {
-            obj.SetValue(PlayPauseButtonProperty, value);
-        }
+        public static ToggleButton GetPlayPauseButton(DependencyObject obj) => (ToggleButton)obj.GetValue(PlayPauseButtonProperty);
 
-        // Using a DependencyProperty as the backing store for PlayPauseButton.  This enables animation, styling, binding, etc...
+        public static void SetPlayPauseButton(DependencyObject obj, ToggleButton value) => obj.SetValue(PlayPauseButtonProperty, value);
+
         public static readonly DependencyProperty PlayPauseButtonProperty =
             DependencyProperty.RegisterAttached("PlayPauseButton", typeof(ToggleButton), typeof(MediaController), new PropertyMetadata(null, OnPlayPauseButtonChanged));
 
@@ -182,32 +169,25 @@ namespace SIQuester.Behaviors
             };
 
             media.Unloaded += (s, e2) =>
+            {
+                try
                 {
-                    try
-                    {
-                        if (GetIsPlaying(media))
-                            media.Stop();
+                    if (GetIsPlaying(media))
+                        media.Stop();
 
-                        media.SetValue(IsPlayingProperty, DependencyProperty.UnsetValue);
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show("Ошибка проигрывания мультимедиа: " + exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                    }
-                };
+                    media.SetValue(IsPlayingProperty, DependencyProperty.UnsetValue);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show("Ошибка проигрывания мультимедиа: " + exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+            };
         }
 
-        public static bool GetIsPlaying(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(IsPlayingProperty);
-        }
+        public static bool GetIsPlaying(DependencyObject obj) => (bool)obj.GetValue(IsPlayingProperty);
 
-        public static void SetIsPlaying(DependencyObject obj, bool value)
-        {
-            obj.SetValue(IsPlayingProperty, value);
-        }
+        public static void SetIsPlaying(DependencyObject obj, bool value) => obj.SetValue(IsPlayingProperty, value);
 
-        // Using a DependencyProperty as the backing store for IsPlaying.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsPlayingProperty =
             DependencyProperty.RegisterAttached("IsPlaying", typeof(bool), typeof(MediaController), new PropertyMetadata(false));
     }

@@ -9,11 +9,25 @@ using System.Xml;
 
 namespace SIPackages.PlatformSpecific.Net45
 {
+    // TODO: Remove legacy [Content_Types].xml (and all content types support) generation
+    // TODO: Keep Uri.EscapeUriString only for backward compatibility; use original names in zip archive
+
+    /// <summary>
+    /// Define a Zip-based package source.
+    /// </summary>
+    /// <remarks>
+    /// Inner file names could be Uri-escaped.
+    /// </remarks>
+    /// <inheritdoc cref="ISIPackage" />
     internal sealed class ZipSIPackage : ISIPackage
     {
         private readonly Stream _stream;
         private readonly ZipArchive _zipArchive;
 
+        /// <summary>
+        /// Content types collection.
+        /// </summary>
+        [Obsolete]
         private Dictionary<string, string> _contentTypes = new();
 
         private ZipSIPackage(Stream stream, ZipArchive zipArchive)
@@ -22,6 +36,12 @@ namespace SIPackages.PlatformSpecific.Net45
             _zipArchive = zipArchive;
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="ZipSIPackage" /> class.
+        /// </summary>
+        /// <param name="stream">Stream that would contain package data.</param>
+        /// <param name="leaveOpen">Should the stream be left open after packages disposal.</param>
+        /// <returns>Created package.</returns>
         public static ZipSIPackage Create(Stream stream, bool leaveOpen = false) =>
             new(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
 
@@ -83,14 +103,15 @@ namespace SIPackages.PlatformSpecific.Net45
         }
 
         public StreamInfo GetStream(string category, string name, bool read = true) =>
-            GetStream($"{category}/{Uri.EscapeDataString(name)}", read);
+            GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
 
         public void CreateStream(string name, string contentType)
         {
-            _zipArchive.CreateEntry(Uri.EscapeDataString(name), CompressionLevel.Optimal);
+            _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
             AddContentTypeInfo(name, contentType);
         }
 
+        [Obsolete]
         private void AddContentTypeInfo(string name, string contentType)
         {
             var extension = Path.GetExtension(name);
@@ -108,13 +129,13 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void CreateStream(string category, string name, string contentType)
         {
-            _zipArchive.CreateEntry(category + "/" + Uri.EscapeDataString(name), CompressionLevel.Optimal);
+            _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.Optimal);
             AddContentTypeInfo(name, contentType);
         }
 
         public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
         {
-            var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeDataString(name)}", CompressionLevel.Optimal);
+            var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.Optimal);
             using (var writeStream = entry.Open())
             {
                 await stream.CopyToAsync(writeStream);
@@ -125,14 +146,22 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void DeleteStream(string category, string name)
         {
-            _zipArchive.GetEntry($"{category}/{Uri.EscapeDataString(name)}").Delete();
+            var entryName = $"{category}/{Uri.EscapeUriString(name)}";
+            var entry = _zipArchive.GetEntry(entryName);
+
+            if (entry == null)
+            {
+                throw new Exception($"Entry \"{entryName}\" not found");
+            }
+
+            entry.Delete();
         }
 
         public ISIPackage CopyTo(Stream stream, bool closeCurrent, out bool isNew)
         {
             if (_stream.Length == 0)
             {
-                // Это новый пакет, копировать нечего
+                // It is a new package. There is nothing to copy
                 isNew = true;
                 var package = Create(stream);
 
@@ -143,11 +172,11 @@ namespace SIPackages.PlatformSpecific.Net45
             
             isNew = false;
 
-            _stream.Position = 0; // обязательно нужно
+            _stream.Position = 0; // strictly required
             _stream.CopyTo(stream);
             stream.Position = 0;
 
-            // Переоткрываем
+            // Reopening current package
             if (closeCurrent)
             {
                 _stream.Dispose(); // what about _zipPackage?
@@ -160,7 +189,7 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void Flush()
         {
-            // Для обратной совместимости
+            // For backward compatibility
             var entry = _zipArchive.GetEntry("[Content_Types].xml");
 
             if (entry != null)

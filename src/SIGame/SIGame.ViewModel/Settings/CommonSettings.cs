@@ -93,6 +93,7 @@ namespace SIGame
             CompShowmans2 = new List<ComputerAccount>();
             BestPlayers = new ObservableCollection<BestPlayer>();
             DelayedErrorsNew = new ErrorInfoList();
+            DelayedResultsNew = new List<SI.GameResultService.Client.GameResult>();
         }
 
         public void Save(Stream stream, XmlSerializer serializer = null)

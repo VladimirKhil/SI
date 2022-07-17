@@ -6,11 +6,14 @@ using System.Windows.Media;
 
 namespace SIQuester.Converters
 {
-    public sealed class QTypeToColorConverter: IValueConverter
+    public sealed class QTypeToColorConverter : IValueConverter
     {
         public Brush CommonBrush { get; set; }
+
         public Brush AuctionBrush { get; set; }
+
         public Brush CatBrush { get; set; }
+
         public Brush SponsoredBrush { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

@@ -19,7 +19,7 @@ namespace SIQuester.ViewModel.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -259,6 +259,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Экспорт медиа.
+        /// </summary>
+        public static string ExportMedia {
+            get {
+                return ResourceManager.GetString("ExportMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка экспорта медиа.
+        /// </summary>
+        public static string ExportMediaError {
+            get {
+                return ResourceManager.GetString("ExportMediaError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Экспорт в формат СНС.
         /// </summary>
         public static string ExportToSns {
@@ -354,6 +372,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string InColumn {
             get {
                 return ResourceManager.GetString("InColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Введите адрес мультимедиа-объекта.
+        /// </summary>
+        public static string InputMediaUri {
+            get {
+                return ResourceManager.GetString("InputMediaUri", resourceCulture);
             }
         }
         

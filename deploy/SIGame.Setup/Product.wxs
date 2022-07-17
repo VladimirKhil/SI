@@ -6,7 +6,7 @@
   <?define ProductNameR="SIGame" ?>
   <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIGame" ?>
-  <?define ProductVersion="7.7.0" ?>
+  <?define ProductVersion="7.7.2" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
 
@@ -108,6 +108,15 @@
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
         <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
+	    <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
+		    <File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
+	    </Component>
+	    <Component Guid="{9E128CD4-80CB-4268-832B-C2D07E36E03D}">
+		    <File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
+	    </Component>
+	    <Component Guid="{84D30ED4-930D-436F-8287-A8FDB01860FA}">
+		    <File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
+	    </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
         <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
       </Component>

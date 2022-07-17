@@ -11,7 +11,7 @@ using System.Windows.Media;
 
 namespace SIQuester
 {
-    public sealed class SimpleSpardEditor: RichTextBox
+    public sealed class SimpleSpardEditor : RichTextBox
     {
         private Sequence _rootExpression = null;
         private readonly Dictionary<Inline, Expression> _indexTable = new();
@@ -30,9 +30,12 @@ namespace SIQuester
             set { SetValue(SpardProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for DTL.  This enables animation, styling, binding, etc...
         public static readonly System.Windows.DependencyProperty SpardProperty =
-            System.Windows.DependencyProperty.Register("Spard", typeof(string), typeof(SimpleSpardEditor), new System.Windows.UIPropertyMetadata(null, OnSpardChanged));
+            System.Windows.DependencyProperty.Register(
+                "Spard",
+                typeof(string),
+                typeof(SimpleSpardEditor),
+                new System.Windows.UIPropertyMetadata(null, OnSpardChanged));
         
         public static void OnSpardChanged(System.Windows.DependencyObject d, System.Windows.DependencyPropertyChangedEventArgs e)
         {
@@ -705,7 +708,7 @@ namespace SIQuester
             root.SetOperands(newOperands.ToArray());
         }
 
-        private void InsertPureExpressionAtTheBeginning(Expression expr, Sequence root)
+        private static void InsertPureExpressionAtTheBeginning(Expression expr, Sequence root)
         {
             var newOperands = new Expression[] { expr }.Concat(root.OperandsArray);
             root.SetOperands(newOperands.ToArray());
@@ -717,7 +720,9 @@ namespace SIQuester
             {
                 var after = Selection.End.GetNextInsertionPosition(LogicalDirection.Forward);
                 if (after == null)
+                {
                     return false;
+                }
 
                 Selection.Select(Selection.Start, after);
             }
@@ -732,7 +737,9 @@ namespace SIQuester
             {
                 var before = Selection.Start.GetNextInsertionPosition(LogicalDirection.Backward);
                 if (before == null)
+                {
                     return false;
+                }
 
                 Selection.Select(before, Selection.End);
             }
@@ -747,16 +754,20 @@ namespace SIQuester
         private bool RemoveSelection()
         {
             if (Selection.IsEmpty) // Удалять нечего
+            {
                 return false;
+            }
 
             // Run'ы удалим первыми, чтобы при удалении контейнеров они не слиплись
             var inlines = GetAllSelectedInlines(out int leftIndex, out int rightIndex);
 
             var exprs = new List<Expression>();
             bool toDelete;
+
             for (int i = 0; i < inlines.Length; i++)
             {
                 toDelete = true;
+
                 if (inlines[i] is Run run)
                 {
                     if (i == 0 && leftIndex > 0)
@@ -765,6 +776,7 @@ namespace SIQuester
                             Cut(run, leftIndex, rightIndex);
                         else
                             Cut(run, leftIndex, 0);
+
                         toDelete = false;
                     }
                     else if (i == inlines.Length - 1 && rightIndex < 0)
@@ -775,23 +787,30 @@ namespace SIQuester
                 }
 
                 if (toDelete)
+                {
                     exprs.Add(DeleteInline(inlines[i]));
+                }
             }
 
             var expr = exprs.FirstOrDefault();
             if (expr == null)
+            {
                 return false;
+            }
 
             var chain = GetExpressionChain(expr);
             var sequence = _rootExpression;
+
             if (chain.Length > 0)
             {
-                expr = chain[chain.Length - 1];
+                expr = chain[^1];
+
                 for (int i = 0; i < chain.Length; i++)
                 {
                     if (chain[i] is Sequence seq)
                     {
                         sequence = seq;
+
                         if (i > 0)
                         {
                             expr = chain[i - 1];
@@ -805,7 +824,8 @@ namespace SIQuester
             // Склеивание двух строк
             var newOps = sequence.OperandsArray.Where(ex => !exprs.Contains(ex));
             var first = inlines[0];
-            var last = inlines[inlines.Length - 1];
+            var last = inlines[^1];
+
             if (first.PreviousInline is Run && last.NextInline is Run run2)
             {
                 var prev = GetExpression(first.PreviousInline);
@@ -828,7 +848,7 @@ namespace SIQuester
             var expr = (StringValue)instruction.Argument;
             var value = expr.Value;
 
-            expr.Value = value.Substring(0, leftIndex) + value.Substring(value.Length + rightIndex, -rightIndex);
+            expr.Value = string.Concat(value.AsSpan(0, leftIndex), value.AsSpan(value.Length + rightIndex, -rightIndex));
         }
 
         private Expression DeleteInline(Inline inline)
@@ -851,10 +871,7 @@ namespace SIQuester
             InitAndSetText();
         }
 
-        private static Instruction CreateInstruction(string text = "")
-        {
-            return new Instruction(new StringValue("ignoresp"), new StringValue(text));
-        }
+        private static Instruction CreateInstruction(string text = "") => new(new StringValue("ignoresp"), new StringValue(text));
 
         private void InitAndSetText()
         {
@@ -900,6 +917,7 @@ namespace SIQuester
                 var run = AppendTextToEnd(isReadOnly ? parent : expression, text, true);
                 if (run != null)
                     run.Background = color;
+
                 return;
             }
 
@@ -922,6 +940,7 @@ namespace SIQuester
                 {
                     Init(item, expression);
                 }
+
                 return;
             }
 
@@ -947,6 +966,7 @@ namespace SIQuester
                 var item = new LineBreak();
                 _paragraph.Inlines.Add(item);
                 _indexTable[item] = expression;
+
                 return null;
             }
 
@@ -963,6 +983,7 @@ namespace SIQuester
                 _paragraph.Inlines.Add(run);
                 _indexTable[run] = expression;
             }
+
             return run;
         }
     }

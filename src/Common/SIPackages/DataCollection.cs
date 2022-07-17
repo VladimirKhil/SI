@@ -2,13 +2,12 @@
 using SIPackages.PlatformSpecific;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SIPackages
 {
     /// <summary>
-    /// Категория в хранилище
+    /// Defines a package files storage. All files belong to a single category.
     /// </summary>
     /// <inheritdoc cref="IEnumerable{T}" />
     public sealed class DataCollection : IEnumerable<string>
@@ -18,19 +17,19 @@ namespace SIPackages
         private ISIPackage _package = null;
 
         /// <summary>
-        /// Существующие в коллекции файлы
+        /// Current items in the collection.
         /// </summary>
         private readonly List<string> _files = null;
 
         /// <summary>
-        /// Название коллекции
+        /// Collection name.
         /// </summary>
         public string Name { get; }
 
         /// <summary>
-        /// Количество элементов в коллекции
+        /// Colletion item count.
         /// </summary>
-        public int Count => _files.Count();
+        public int Count => _files.Count;
 
         /// <summary>
         /// Initilizes a new instance of <see cref="DataCollection" /> class.
@@ -48,10 +47,9 @@ namespace SIPackages
         }
 
         /// <summary>
-        /// Содержит ли категория файл
+        /// Checks if the collection contains a file.
         /// </summary>
-        /// <param name="fileName">Имя файла</param>
-        /// <returns>Содержит ли категория данный файл</returns>
+        /// <param name="fileName">File name.</param>
         internal bool Contains(string fileName) => _files.Contains(fileName);
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace SIPackages
         #endregion
 
         /// <summary>
-        /// Adss file to the collection.
+        /// Adds file to the collection.
         /// </summary>
         /// <param name="fileName">File name.</param>
         /// <param name="stream">File stream.</param>
@@ -104,7 +102,6 @@ namespace SIPackages
         /// </summary>
         /// <param name="oldName">Old file name.</param>
         /// <param name="newName">New file name.</param>
-        /// <returns></returns>
         public async Task RenameFileAsync(string oldName, string newName)
         {
             var streamInfo = _package.GetStream(Name, oldName);

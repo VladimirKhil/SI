@@ -1,0 +1,1 @@
+& "$Env:PROGRAMFILES\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" .\deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj /p:Configuration=Release /p:OutputPath=bin/Release /p:BuildProjectReferences=false

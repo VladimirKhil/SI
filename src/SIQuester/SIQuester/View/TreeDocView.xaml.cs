@@ -27,17 +27,16 @@ namespace SIQuester
         [return: MarshalAs(UnmanagedType.U4)]
         private static extern int GetLongPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszShortPath, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder lpszLongPath, [MarshalAs(UnmanagedType.U4)] int cchBuffer);
         
-        private readonly object _dragLock = new object();
+        private readonly object _dragLock = new();
 
-        public TreeDocView()
-        {
-            InitializeComponent();
-        }
+        public TreeDocView() => InitializeComponent();
 
         private void Main_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.OriginalSource is UIElement element && element.GetType().ToString() == "System.Windows.Controls.TextBoxView")
+            {
                 return;
+            }
 
             _startPoint = e.GetPosition(null);
 
@@ -57,7 +56,9 @@ namespace SIQuester
             lock (_dragLock)
             {
                 if (_isDragging)
+                {
                     return;
+                }
 
                 var position = e.GetPosition(null);
 
@@ -70,7 +71,9 @@ namespace SIQuester
                     : FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
 
                 if (host == null || host.DataContext == null || host.DataContext is PackageViewModel || !(host.DataContext is IItemViewModel))
+                {
                     return;
+                }
 
                 if (AppSettings.Default.View == ViewMode.Flat && (host.DataContext is RoundViewModel || host.DataContext is ThemeViewModel))
                     return;
@@ -287,12 +290,11 @@ namespace SIQuester
                         else
                         {
                             var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                            using (var stringReader = new StringReader(value))
-                            using (var reader = XmlReader.Create(stringReader))
-                            {
-                                round = new Round();
-                                round.ReadXml(reader);
-                            }
+
+                            using var stringReader = new StringReader(value);
+                            using var reader = XmlReader.Create(stringReader);
+                            round = new Round();
+                            round.ReadXml(reader);
                         }
 
                         if (treeViewItem.DataContext is PackageViewModel)
@@ -318,12 +320,10 @@ namespace SIQuester
                         else
                         {
                             var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                            using (var stringReader = new StringReader(value))
-                            using (var reader = XmlReader.Create(stringReader))
-                            {
-                                theme = new Theme();
-                                theme.ReadXml(reader);
-                            }
+                            using var stringReader = new StringReader(value);
+                            using var reader = XmlReader.Create(stringReader);
+                            theme = new Theme();
+                            theme.ReadXml(reader);
                         }
 
                         if (treeViewItem.DataContext is RoundViewModel)
@@ -349,12 +349,10 @@ namespace SIQuester
                         else
                         {
                             var value = e.Data.GetData(DataFormats.Serializable).ToString();
-                            using (var stringReader = new StringReader(value))
-                            using (var reader = XmlReader.Create(stringReader))
-                            {
-                                question = new Question();
-                                question.ReadXml(reader);
-                            }
+                            using var stringReader = new StringReader(value);
+                            using var reader = XmlReader.Create(stringReader);
+                            question = new Question();
+                            question.ReadXml(reader);
                         }
 
                         if (treeViewItem.DataContext is ThemeViewModel)
@@ -386,7 +384,9 @@ namespace SIQuester
                         }
                     }
                     else
+                    {
                         e.Effects = DragDropEffects.None;
+                    }
                 }
                 finally
                 {

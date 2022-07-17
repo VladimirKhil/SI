@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
@@ -7,14 +8,16 @@ namespace SIQuester.Converters
 {
     public sealed class ListJoinConverter : IMultiValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var result = new List<object>();
 
             foreach (var item in values)
             {
                 if (item == DependencyProperty.UnsetValue)
+                {
                     continue;
+                }
 
                 result.AddRange((IEnumerable<object>)item);
             }
@@ -22,9 +25,7 @@ namespace SIQuester.Converters
             return result;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
-        {
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
             throw new NotImplementedException();
-        }
     }
 }

@@ -13,16 +13,6 @@ namespace SIQuester.Model
         public const string ProductName = "SIQuester";
 
         /// <summary>
-        /// Необходимый заголовок для WebRequest'ов и WebClient'ов
-        /// </summary>
-        public static string UserAgentHeader =>
-            string.Format(
-                "{0} {1} ({2})",
-                ProductName,
-                Assembly.GetExecutingAssembly().GetName().Version.ToString(),
-                Environment.OSVersion.VersionString);
-
-        /// <summary>
         /// Используется ли версия Windows от Vista и выше
         /// </summary>
         public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;

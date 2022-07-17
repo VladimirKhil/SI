@@ -60,6 +60,19 @@ namespace SICore.Clients.Viewer
                 using var fileStream = File.Create(localFile);
                 await responseStream.CopyToAsync(fileStream);
             }
+            catch (Exception exc)
+            {
+                Trace.TraceError("AddFile error: " + exc);
+
+                try
+                {
+                    if (File.Exists(localFile))
+                    {
+                        File.Delete(localFile);
+                    }
+                }
+                catch { }
+            }
             finally
             {
                 lock (_globalLock)
