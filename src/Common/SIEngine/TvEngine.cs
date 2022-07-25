@@ -7,16 +7,16 @@ using System.Linq;
 namespace SIEngine
 {
     /// <summary>
-    /// Классическая (телевизионная) SIGame
+    /// Handles classic SIGame rules.
     /// </summary>
     public sealed class TvEngine : EngineBase
     {
-        private readonly Stack<Tuple<int, int>> _history = new Stack<Tuple<int, int>>();
-        private readonly Stack<Tuple<int, int>> _forward = new Stack<Tuple<int, int>>();
+        private readonly Stack<Tuple<int, int>> _history = new();
+        private readonly Stack<Tuple<int, int>> _forward = new();
 
-        private readonly HashSet<Tuple<int, int>> _questionsTable = new HashSet<Tuple<int, int>>();
-        private readonly HashSet<int> _themesTable = new HashSet<int>();
-        private readonly List<int> _finalMap = new List<int>();
+        private readonly HashSet<Tuple<int, int>> _questionsTable = new();
+        private readonly HashSet<int> _themesTable = new();
+        private readonly List<int> _finalMap = new();
 
         private void SetActiveThemeQuestion()
         {
@@ -39,7 +39,7 @@ namespace SIEngine
         }
 
         /// <summary>
-        /// Перейти к следующему шагу игры
+        /// Moves to the next game stage.
         /// </summary>
         public override void MoveNext()
         {
@@ -93,6 +93,7 @@ namespace SIEngine
                     OnSound("cathegories.mp3");
 
                     _questionsTable.Clear();
+
                     for (int i = 0; i < _activeRound.Themes.Count; i++)
                     {
                         for (int j = 0; j < _activeRound.Themes[i].Questions.Count; j++)

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using SIStorageService.Client;
+using SIStorageService.Client.Models;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Services.SI.ViewModel
@@ -19,7 +20,9 @@ namespace Services.SI.ViewModel
             get
             {
                 if (_packages == null && !_isLoading)
+                {
                     LoadPackagesAsync();
+                }
 
                 return _packages;
             }
@@ -66,7 +69,9 @@ namespace Services.SI.ViewModel
 
                 Packages = packages;
                 if (_packages.Length > 0)
+                {
                     CurrentPackage = _packages[0];
+                }
             }
             catch (Exception exc)
             {

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -204,15 +205,17 @@ namespace SIQuester.ViewModel
 
                 PreviewRemove(item);
 
-                OnChanged(new CustomChange(() =>
-                {
-                    PreviewAdd(item, uri.Uri);
-                    HasPendingChanges = IsChanged();
-                }, () =>
-                {
-                    PreviewRemove(item);
-                    HasPendingChanges = IsChanged();
-                }));
+                OnChanged(new CustomChange(
+                    () =>
+                    {
+                        PreviewAdd(item, uri.Uri);
+                        HasPendingChanges = IsChanged();
+                    },
+                    () =>
+                    {
+                        PreviewRemove(item);
+                        HasPendingChanges = IsChanged();
+                    }));
 
                 HasPendingChanges = IsChanged();
             }
@@ -239,7 +242,7 @@ namespace SIQuester.ViewModel
             OnPropertyChanged(nameof(Files));
         }
 
-        public async Task CommitAsync(DataCollection collection)
+        public async Task CommitAsync(DataCollection collection, CancellationToken cancellationToken = default)
         {
             foreach (var item in _removed.ToArray())
             {
@@ -253,7 +256,7 @@ namespace SIQuester.ViewModel
                 try
                 {
                     using var fs = _streams[item].Item2;
-                    await collection.AddFileAsync(item.Model.Name, fs);
+                    await collection.AddFileAsync(item.Model.Name, fs, cancellationToken);
                 }
                 catch (Exception exc)
                 {
@@ -266,7 +269,7 @@ namespace SIQuester.ViewModel
 
             foreach (var item in _renamed.ToArray())
             {
-                await collection.RenameFileAsync(item.Item1, item.Item2);
+                await collection.RenameFileAsync(item.Item1, item.Item2, cancellationToken);
                 _renamed.Remove(item);
             }
 
@@ -402,7 +405,7 @@ namespace SIQuester.ViewModel
                 var collection = _document.GetCollection(_name);
 
                 return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), link),
+                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
                     collection.Name);
             });
         }

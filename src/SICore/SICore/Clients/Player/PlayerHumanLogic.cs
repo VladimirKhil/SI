@@ -112,11 +112,6 @@ namespace SICore
             _data.BackLink.OnFlash();
         }
 
-        public void Connected(string name)
-        {
-
-        }
-
         #endregion
 
         public void Report()

@@ -72,7 +72,7 @@ namespace SICore
         internal int PingPenalty { get; set; }
 
         /// <summary>
-        /// Время последней неудачной попытки нажать кнопку
+        /// Time of the last button misfire for the player.
         /// </summary>
         internal DateTime LastBadTryTime { get; set; }
 

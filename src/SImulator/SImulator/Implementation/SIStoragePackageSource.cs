@@ -1,7 +1,7 @@
-﻿using Services.SI;
-using SImulator.Implementation.WinAPI;
+﻿using SImulator.Implementation.WinAPI;
 using SImulator.ViewModel;
 using SImulator.ViewModel.PlatformSpecific;
+using SIStorageService.Client.Models;
 using System;
 using System.IO;
 using System.Net.Http;

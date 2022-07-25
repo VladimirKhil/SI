@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SICore.PlatformSpecific
 {
     public abstract class BackLinkCore : IGameManager
     {
-        private string _tempFile = null;
-
         public abstract void OnFlash(bool flash = true);
 
         public abstract void OnError(Exception exc);
@@ -33,7 +32,7 @@ namespace SICore.PlatformSpecific
 
         public abstract void SendError(Exception exc, bool isWarning = false);
 
-        public abstract Task SaveReportAsync(Results.GameResult result);
+        public abstract Task SaveReportAsync(Results.GameResult result, CancellationToken cancellationToken = default);
 
         public abstract void OnPictureError(string remoteUri);
 
@@ -66,8 +65,15 @@ namespace SICore.PlatformSpecific
         public abstract void LogWarning(string message);
 
         public abstract bool AreAnswersShown { get; set; }
+
         public abstract bool ShowBorderOnFalseStart { get; }
 
         public abstract bool LoadExternalMedia { get; }
+
+        public abstract int MaxImageSizeKb { get; }
+
+        public abstract int MaxAudioSizeKb { get; }
+
+        public abstract int MaxVideoSizeKb { get; }
     }
 }

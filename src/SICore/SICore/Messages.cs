@@ -43,6 +43,7 @@
         /// <summary>
         /// Время блокировки Игровой кнопки
         /// </summary>
+        [IdempotencyRequired]
         public const string ButtonBlockingTime = "BUTTON_BLOCKING_TIME";
 
         /// <summary>
@@ -78,6 +79,7 @@
         /// <summary>
         /// Default computer players.
         /// </summary>
+        [IdempotencyRequired]
         public const string ComputerAccounts = "COMPUTERACCOUNTS";
 
         /// <summary>
@@ -113,6 +115,7 @@
         /// <summary>
         /// Фальстарты
         /// </summary>
+        [IdempotencyRequired]
         public const string FalseStart = "FALSESTART";
 
         /// <summary>
@@ -168,6 +171,7 @@
         /// <summary>
         /// Имя хоста
         /// </summary>
+        [IdempotencyRequired]
         public const string Hostname = "HOSTNAME";
 
         /// <summary>
@@ -183,6 +187,7 @@
         /// <summary>
         /// Информация об игре и её участниках (расширенная)
         /// </summary>
+        [IdempotencyRequired]
         public const string Info2 = "INFO2";
 
         /// <summary>
@@ -243,11 +248,13 @@
         /// <summary>
         /// Картинка участника
         /// </summary>
+        [IdempotencyRequired]
         public const string Picture = "PICTURE";
 
         /// <summary>
         /// Скорость чтения вопроса
         /// </summary>
+        [IdempotencyRequired]
         public const string ReadingSpeed = "READINGSPEED";
 
         /// <summary>
@@ -299,11 +306,6 @@
         /// Ставка игрока
         /// </summary>
         public const string PersonStake = "PERSONSTAKE";
-
-        /// <summary>
-        /// Печать сообщения
-        /// </summary>
-        public const string Print = "PRINT";
 
         /// <summary>
         /// Тип вопроса
@@ -398,6 +400,7 @@
         /// <summary>
         /// Изменения таймера
         /// </summary>
+        [IdempotencyRequired]
         public const string Timer = "TIMER";
 
         /// <summary>

@@ -1,5 +1,5 @@
-﻿using Services.SI;
-using SIQuester.Properties;
+﻿using SIQuester.Properties;
+using SIStorageService.Client.Models;
 using System;
 using System.Globalization;
 using System.Windows.Data;

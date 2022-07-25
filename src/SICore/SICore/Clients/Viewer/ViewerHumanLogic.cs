@@ -1,6 +1,5 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
-using SICore.Connections;
 using SIData;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -78,8 +77,13 @@ namespace SICore
                 lock (_data.TInfoLock)
                 lock (TInfo.RoundInfoLock)
                 {
-                    if (_data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count && _data.QuestionIndex > -1 && _data.QuestionIndex < _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
-                        TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = -1;
+                    if (_data.ThemeIndex > -1 &&
+                        _data.ThemeIndex < _data.TInfo.RoundInfo.Count &&
+                        _data.QuestionIndex > -1 &&
+                        _data.QuestionIndex < _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
+                    {
+                        TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = SIPackages.Question.InvalidPrice;
+                    }
                 }
             }
             else
@@ -89,7 +93,9 @@ namespace SICore
                 lock (TInfo.RoundInfoLock)
                 {
                     if (_data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count)
+                    {
                         TInfo.RoundInfo[_data.ThemeIndex].Name = null;
+                    }
                 }
             }
         }
@@ -110,6 +116,7 @@ namespace SICore
         public virtual void ReceiveText(Message m)
         {
             _data.AddToChat(m);
+
             if (_data.BackLink.MakeLogs)
             {
                 AddToFileLog(m);
@@ -212,7 +219,9 @@ namespace SICore
                 logString = $"<span class=\"sh\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
                 if (_data.BackLink.TranslateGameToChat)
+                {
                     _data.AddToChat(new Message(text, _data.Speaker.Name));
+                }
             }
             else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
             {
@@ -259,7 +268,9 @@ namespace SICore
         }
 
         internal void AddToFileLog(Message message) =>
-            AddToFileLog($"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> <span style=\"font-weight: bold\">{message.Text}</span><br />");
+            AddToFileLog(
+                $"<span style=\"color: gray; font-weight: bold\">{message.Sender}:</span> " +
+                $"<span style=\"font-weight: bold\">{message.Text}</span><br />");
 
         internal void AddToFileLog(string text)
         {
@@ -307,6 +318,7 @@ namespace SICore
             }
         }
 
+        [Obsolete]
         private void ParseMessageToPrint(
             XmlReader reader,
             StringBuilder chatMessageBuilder,
@@ -992,6 +1004,7 @@ namespace SICore
                 if (!string.IsNullOrWhiteSpace(ClientData.ServerAddress))
                 {
                     var remoteUri = ClientData.ServerAddress;
+
                     if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri hostUri))
                     {
                         account.Picture = path.Replace(Constants.GameHost, hostUri.Host);

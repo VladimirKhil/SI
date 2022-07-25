@@ -1,4 +1,4 @@
-﻿using Services.SI;
+﻿using SIStorageService.Client;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

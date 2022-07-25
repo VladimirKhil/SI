@@ -1,14 +1,14 @@
-﻿namespace Services.SI
+﻿namespace SIStorageService.Client.Models
 {
     /// <summary>
-    /// Именованный объект
+    /// Defines an object with name.
     /// </summary>
     public sealed class NamedObject
     {
         public int ID { get; set; }
 
         /// <summary>
-        /// Имя
+        /// Object name.
         /// </summary>
         public string Name { get; set; }
     }

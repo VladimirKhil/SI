@@ -753,4 +753,13 @@
   <data name="DownloadFileError" xml:space="preserve">
     <value>Downloading file error</value>
   </data>
+  <data name="InvalidAvatarData" xml:space="preserve">
+    <value>Invalid avatar data</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="OversizedFile" xml:space="preserve">
+    <value>{0} {1} exceeds recommended size of {2} KB and could be loaded with delay</value>
+  </data>
 </root>

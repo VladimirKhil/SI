@@ -1,5 +1,4 @@
 ﻿using SICore.Clients.Player;
-using SICore.Connections;
 using SICore.Extensions;
 using SICore.Utils;
 using SIData;
@@ -1624,11 +1623,6 @@ namespace SICore
         public void CatCost() => ScheduleExecution(PlayerTasks.CatCost, 15);
 
         public void IsRight(bool voteForRight) => ScheduleExecution(voteForRight ? PlayerTasks.AnswerRight : PlayerTasks.AnswerWrong, 10 + _data.Rand.Next(10));
-
-        public void Connected(string name)
-        {
-            
-        }
 
         #endregion
 

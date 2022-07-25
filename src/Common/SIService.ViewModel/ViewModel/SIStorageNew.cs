@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SIStorageService.Client;
+using SIStorageService.Client.Models;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;

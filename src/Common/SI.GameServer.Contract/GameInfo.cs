@@ -19,6 +19,11 @@ namespace SI.GameServer.Contract
         public string PackageName { get; set; }
 
         /// <summary>
+        /// Game package restrictions.
+        /// </summary>
+        public string Restriction { get; set; }
+
+        /// <summary>
         /// Game creation (!) time.
         /// </summary>
         public DateTime StartTime { get; set; }
@@ -62,5 +67,10 @@ namespace SI.GameServer.Contract
         /// Game language.
         /// </summary>
         public string Language { get; set; }
+
+        /// <summary>
+        /// Minimum client protocol version required to join this game.
+        /// </summary>
+        public int MinimumClientProtocolVersion { get; set; }
     }
 }

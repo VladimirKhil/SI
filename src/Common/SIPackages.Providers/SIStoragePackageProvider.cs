@@ -1,24 +1,28 @@
-﻿using System;
+﻿using SIPackages.Providers.Properties;
+using SIStorageService.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIPackages.Providers
 {
     public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
-        private readonly Services.SI.ISIStorageServiceClient _siStorageServiceClient;
-        private readonly HashSet<string> _downloadedFiles = new HashSet<string>();
+        private readonly ISIStorageServiceClient _siStorageServiceClient;
+        private readonly HashSet<string> _downloadedFiles = new();
         private readonly string _storageOriginsPath;
         private readonly string _storageUrl;
 
         public SIStoragePackageProvider(string serverAddress, string storageOriginsPath, string storageUrl)
         {
-            _siStorageServiceClient = new Services.SI.SIStorageServiceClient(serverAddress);
+            _siStorageServiceClient = new SIStorageServiceClient(serverAddress);
             _storageOriginsPath = storageOriginsPath;
             _storageUrl = storageUrl;
         }
@@ -44,7 +48,7 @@ namespace SIPackages.Providers
             }
         }
 
-        public async Task<SIDocument> GetPackageAsync(string name)
+        public async Task<SIDocument> GetPackageAsync(string name, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(_storageOriginsPath))
             {
@@ -54,15 +58,15 @@ namespace SIPackages.Providers
                 var escapedName = string.Join("/", packageNameParts.Select(pnp => Uri.EscapeDataString(pnp)));
 
                 var uri = $"{_storageUrl}/{escapedName}";
-                using (var response = await HttpClient.GetAsync(uri))
+                using (var response = await HttpClient.GetAsync(uri, cancellationToken))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new Exception($"Error while accessing \"{uri}\": {await response.Content.ReadAsStringAsync()}!");
+                        throw new Exception($"Error while accessing \"{uri}\": {await response.Content.ReadAsStringAsync(cancellationToken)}!");
                     }
 
                     using var fs = File.Create(fileName);
-                    await response.Content.CopyToAsync(fs);
+                    await response.Content.CopyToAsync(fs, cancellationToken);
                 }
 
                 _downloadedFiles.Add(fileName);
@@ -77,13 +81,14 @@ namespace SIPackages.Providers
 
                 if (!File.Exists(packageOriginPath))
                 {
-                    throw new Exception($"Пакет {name} не существует!");
+                    throw new Exception(string.Format(Resources.PackageDoesNotExist, name));
                 }
 
                 return SIDocument.Load(File.OpenRead(packageOriginPath));
             }
         }
 
-        public async Task<IEnumerable<string>> GetPackagesAsync() => await _siStorageServiceClient.GetPackagesByTagAsync();
+        public async Task<IEnumerable<string>> GetPackagesAsync(CancellationToken cancellationToken = default) =>
+            await _siStorageServiceClient.GetPackagesByTagAsync(cancellationToken: cancellationToken);
     }
 }

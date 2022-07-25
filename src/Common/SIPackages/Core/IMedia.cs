@@ -10,10 +10,15 @@ namespace SIPackages.Core
         /// <summary>
         /// Gets media stream information.
         /// </summary>
-        Func<StreamInfo> GetStream { get; }
+        Func<StreamInfo>? GetStream { get; }
 
         /// <summary>
-        /// Media uri.
+        /// Gets media stream length.
+        /// </summary>
+        long StreamLength { get; }
+
+        /// <summary>
+        /// Gets Media uri.
         /// </summary>
         string Uri { get; }
     }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SIStorageService.Client;
+using SIStorageService.Client.Models;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -19,11 +21,16 @@ namespace Services.SI.ViewModel
             get
             {
                 if (_categories == null)
+                {
                     return null;
+                }
 
                 SICategory category = _currentCategory;
+
                 if (category == null || category.Packages == null)
+                {
                     return null;
+                }
 
                 return category.CurrentPackage;
             }
@@ -52,7 +59,9 @@ namespace Services.SI.ViewModel
             get
             {
                 if (_categories == null && !_isLoading)
+                {
                     LoadCategoriesAsync();
+                }
 
                 return _categories;
             }
@@ -75,7 +84,9 @@ namespace Services.SI.ViewModel
                 if (_restriction != value)
                 {
                     if (value == "(не исключать)")
+                    {
                         value = " ";
+                    }
 
                     _restriction = value;
                     OnPropertyChanged();
@@ -111,7 +122,9 @@ namespace Services.SI.ViewModel
         public async Task<Uri> LoadSelectedPackageUriAsync()
         {
             if (_siService == null || SelectedPackage == null)
+            {
                 return null;
+            }
 
             return await _siService.GetPackageByIDAsync(SelectedPackage.ID);
         }
@@ -125,7 +138,9 @@ namespace Services.SI.ViewModel
                 Categories = categories.Select(pc => new SICategory(pc, _siService, Restriction)).ToArray();
 
                 if (_categories.Length > 0)
+                {
                     CurrentCategory = _categories[0];
+                }
 
                 foreach (var category in _categories)
                 {

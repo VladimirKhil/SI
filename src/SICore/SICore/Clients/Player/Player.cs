@@ -11,21 +11,23 @@ using R = SICore.Properties.Resources;
 namespace SICore
 {
     /// <summary>
-    /// Клиент игрока
+    /// Represents a game player.
     /// </summary>
     public sealed class Player : Viewer<IPlayer>
     {
-        private readonly object _readyLock = new object();
+        private readonly object _readyLock = new();
 
         private bool _buttonDisabledByGame = false;
         private bool _buttonDisabledByTimer = false;
 
         /// <summary>
-        /// Создание клиента
+        /// Initializes a new instance of <see cref="Player" /> class.
         /// </summary>
-        /// <param name="personData">Данные игрока</param>
-        /// <param name="isHost">Является ли владельцем игры</param>
-        /// <param name="form">Имеет ли форму для вывода</param>
+        /// <param name="client">Player game network client.</param>
+        /// <param name="personData">Player account data.</param>
+        /// <param name="isHost">Is the player a game host.</param>
+        /// <param name="localizer">Resource localizer.</param>
+        /// <param name="data">Player game data.</param>
         public Player(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
             : base(client, personData, isHost, localizer, data)
         {
@@ -366,21 +368,15 @@ namespace SICore
                         }
 
                         var isRight = mparams[1] == "+";
-                        if (!int.TryParse(mparams[2], out var playerIndex)
-                            || playerIndex < 0 || playerIndex >= ClientData.Players.Count)
+
+                        if (!int.TryParse(mparams[2], out var playerIndex) ||
+                            playerIndex < 0 ||
+                            playerIndex >= ClientData.Players.Count)
                         {
                             break;
                         }
 
                         _logic.PersonAnswered(playerIndex, isRight);
-                        break;
-
-                    case Messages.Connected:
-                        if (mparams[3] == _client.Name)
-                        {
-                            return;
-                        }
-                        _logic.Connected(mparams[3]);
                         break;
 
                     case Messages.Table:

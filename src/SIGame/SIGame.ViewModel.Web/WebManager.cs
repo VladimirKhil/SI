@@ -93,20 +93,20 @@ namespace SIGame.ViewModel.Web
             return response();
         }
 
-        public override string MakeURI(string file, string category)
+        public override string MakeUri(string file, string category)
         {
             var uri = Uri.EscapeDataString(file);
             return $"http://localhost:{_multimediaPort}/data/{uri}";
         }
 
-        public override void StopURI(IEnumerable<string> toRemove)
+        public override void StopUri(IEnumerable<string> toRemove)
         {
             lock (_filesSync)
             {
                 if (_disposed)
                     return;
 
-                base.StopURI(toRemove);
+                base.StopUri(toRemove);
             }
         }
 
@@ -114,7 +114,7 @@ namespace SIGame.ViewModel.Web
         {
             lock (_filesSync)
             {
-                StopURI(_files.Keys.ToArray());
+                StopUri(_files.Keys.ToArray());
 
                 if (_web != null)
                 {

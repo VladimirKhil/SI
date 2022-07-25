@@ -21,6 +21,7 @@
 	</PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
+    <ProjectReference Include="..\..\Common\SIStorageService.Client\SIStorageService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +43,5 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="..\..\Common\SIService.Client\SIService.Client.projitems" Label="Shared" />
   <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
 </Project>

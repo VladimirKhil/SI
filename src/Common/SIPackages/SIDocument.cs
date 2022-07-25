@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -564,9 +565,12 @@ namespace SIPackages
         {
             var link = atom.Text.ExtractLink();
             if (string.IsNullOrEmpty(link))
+            {
                 return new Media(atom.Text);
+            }
 
             var collection = _images;
+
             switch (atom.Type)
             {
                 case AtomTypes.Audio:
@@ -581,22 +585,30 @@ namespace SIPackages
             // TODO: сделать детерминированный выбор
 
             if (collection.Contains(link))
-                return new Media(() => collection.GetFile(link), link);
+            {
+                return new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link);
+            }
 
             var escapedLink = Uri.EscapeUriString(link);
 
             if (collection.Contains(escapedLink))
-                return new Media(() => collection.GetFile(escapedLink), escapedLink);
+            {
+                return new Media(() => collection.GetFile(escapedLink), () => collection.GetFileLength(escapedLink), escapedLink);
+            }
 
             var hash = ZipHelper.CalculateHash(link);
 
             if (collection.Contains(hash))
-                return new Media(() => collection.GetFile(hash), hash);
+            {
+                return new Media(() => collection.GetFile(hash), () => collection.GetFileLength(hash), hash);
+            }
 
             var escapedHash = ZipHelper.CalculateHash(escapedLink);
 
             if (collection.Contains(escapedHash))
-                return new Media(() => collection.GetFile(escapedHash), escapedHash);
+            {
+                return new Media(() => collection.GetFile(escapedHash), () => collection.GetFileLength(escapedHash), escapedHash);
+            }
 
             // Это ссылка на внешний файл
             return new Media(link);
@@ -638,23 +650,23 @@ namespace SIPackages
 
         #region Collection functions
 
-        public async Task CopyCollections(SIDocument newDocument)
+        public async Task CopyCollectionsAsync(SIDocument newDocument, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, Package);
 
             foreach (var round in Package.Rounds)
             {
-                await CopyCollections(newDocument, round);
+                await CopyCollectionsAsync(newDocument, round, cancellationToken);
             }
         }
 
-        public async Task CopyCollections(SIDocument newDocument, Round round)
+        public async Task CopyCollectionsAsync(SIDocument newDocument, Round round, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, round);
 
             foreach (var theme in round.Themes)
             {
-                await CopyCollections(newDocument, theme);
+                await CopyCollectionsAsync(newDocument, theme, cancellationToken);
             }
         }
 
@@ -663,27 +675,34 @@ namespace SIPackages
         /// </summary>
         /// <param name="newDocument"></param>
         /// <param name="theme"></param>
-        public async Task CopyCollections(SIDocument newDocument, Theme theme)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task CopyCollectionsAsync(SIDocument newDocument, Theme theme, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, theme);
 
             foreach (var question in theme.Questions)
             {
-                await CopyCollections(newDocument, question);
+                await CopyCollectionsAsync(newDocument, question, cancellationToken);
             }
         }
 
-        public async Task CopyCollections(SIDocument newDocument, Question question)
+        /// <summary>
+        /// Copies authors, sources and media files from question to the new document.
+        /// </summary>
+        /// <param name="newDocument">Target document.</param>
+        /// <param name="question">Original question.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task CopyCollectionsAsync(SIDocument newDocument, Question question, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, question);
 
             foreach (var atom in question.Scenario)
             {
-                await CopyMedia(newDocument, atom);
+                await CopyMediaAsync(newDocument, atom, cancellationToken);
             }
         }
 
-        private async Task CopyMedia(SIDocument newDocument, Atom atom)
+        private async Task CopyMediaAsync(SIDocument newDocument, Atom atom, CancellationToken cancellationToken = default)
         {
             var link = atom.Text.ExtractLink();
 
@@ -707,7 +726,7 @@ namespace SIPackages
                 if (collection.Contains(link))
                 {
                     using var stream = collection.GetFile(link).Stream;
-                    await newCollection.AddFileAsync(link, stream);
+                    await newCollection.AddFileAsync(link, stream, cancellationToken);
                 }
             }
         }

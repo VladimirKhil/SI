@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.Model", "src\Common\SI
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIUI.ViewModel", "src\Common\SIUI.ViewModel\SIUI.ViewModel.csproj", "{F25DB44A-CE4D-4E80-8688-55390FFA4C35}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "src\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "desktop", "desktop", "{15089A1F-44DF-4B42-83B3-313E024F07BE}"
@@ -65,7 +63,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "src\Common\Utils\U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppService.Client", "src\Common\AppService.Client\AppService.Client.csproj", "{26C59ADA-8AE7-467B-8D03-404725CCFC53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SI.GameResultService.Client", "src\SIGame\SI.GameResultService.Client\SI.GameResultService.Client.csproj", "{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SI.GameResultService.Client", "src\SIGame\SI.GameResultService.Client\SI.GameResultService.Client.csproj", "{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIStorageService.Client", "src\Common\SIStorageService.Client\SIStorageService.Client.csproj", "{D991588B-3F10-405B-B173-6363ED37BE72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -559,6 +559,26 @@ Global
 		{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC}.Release|x64.Build.0 = Release|Any CPU
 		{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC}.Release|x86.Build.0 = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|x64.Build.0 = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Debug|x86.Build.0 = Debug|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|ARM.Build.0 = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|ARM64.Build.0 = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|x64.ActiveCfg = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|x64.Build.0 = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|x86.ActiveCfg = Release|Any CPU
+		{D991588B-3F10-405B-B173-6363ED37BE72}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -571,7 +591,6 @@ Global
 		{099E79AD-4A07-464E-BC5E-FE2B25B6B398} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{7A59B7D8-AA61-4DE8-BC29-41C16A22F2E9} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{F25DB44A-CE4D-4E80-8688-55390FFA4C35} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
-		{A4CEB981-DED1-4ADB-9058-3869F6A44C8D} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{15089A1F-44DF-4B42-83B3-313E024F07BE} = {F806503B-43D4-473F-AAF7-4297E54EBE66}
 		{78C96549-6EA8-4236-B026-6ECA55D9EC3A} = {15089A1F-44DF-4B42-83B3-313E024F07BE}
@@ -593,13 +612,12 @@ Global
 		{49D06BD3-C088-4E5A-888E-697D78417ABF} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{26C59ADA-8AE7-467B-8D03-404725CCFC53} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 		{1E610AA5-EAF3-4F24-AFFA-8CBCD8E18AEC} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
+		{D991588B-3F10-405B-B173-6363ED37BE72} = {98AD9562-11D8-4547-B71E-56BDAC94A39C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD7AA90B-4EDB-45F7-A42F-7DE847C4386A}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Common\SIService.Client\SIService.Client.projitems*{099e79ad-4a07-464e-bc5e-fe2b25b6b398}*SharedItemsImports = 5
-		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{b992988a-31c6-44fd-8719-47144ae78bb8}*SharedItemsImports = 5
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection

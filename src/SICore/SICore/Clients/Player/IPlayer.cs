@@ -20,11 +20,6 @@
         /// </summary>
         void IsRight(bool voteForRight);
 
-        /// <summary>
-        /// Подключён
-        /// </summary>
-        void Connected(string name);
-
         void Report();
 
         void Clear();

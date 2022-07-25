@@ -5,6 +5,7 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
+using SIStorageService.Client;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -120,7 +121,7 @@ namespace SIQuester.ViewModel
             SetSettings = new SimpleCommand(SetSettings_Executed);
             SearchFolder = new SimpleCommand(SearchFolder_Executed);
 
-            _storageContextViewModel = new StorageContextViewModel(new Services.SI.SIStorageServiceClient());
+            _storageContextViewModel = new StorageContextViewModel(new SIStorageServiceClient());
             _storageContextViewModel.Load();
 
             AddCommandBinding(ApplicationCommands.New, New_Executed);
@@ -543,8 +544,11 @@ namespace SIQuester.ViewModel
         public static void ShowError(Exception exc)
         {
             var message = exc.Message;
+
             if (message.Length > 1000)
-                message = message.Substring(0, 1000) + "…";
+            {
+                message = message[..1000] + "…";
+            }
 
             PlatformManager.Instance.ShowExclamationMessage(message);
         }

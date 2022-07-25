@@ -79,9 +79,12 @@ namespace SImulator.ViewModel
 
         public RemoteGameUI()
         {
-            TInfo = new TableInfoViewModel { Enabled = true };
+            TInfo = new TableInfoViewModel
+            {
+                Enabled = true,
+                TStage = TableStage.Sign
+            };
 
-            TInfo.TStage = TableStage.Sign;
             TInfo.PropertyChanged += TInfo_PropertyChanged;
             TInfo.Ready += TInfo_Ready;
 
@@ -175,8 +178,9 @@ namespace SImulator.ViewModel
 
             _buffer.Position = 0;
 
-            var media = new Media(() => new StreamInfo { Stream = _buffer, Length = _buffer.Length }, uri);
+            var media = new Media(() => new StreamInfo { Stream = _buffer, Length = _buffer.Length }, () => _buffer.Length, uri);
             var mediaPrepared = await PlatformManager.Instance.PrepareMediaAsync(media);
+            
             if (mediaPrepared == null)
             {
                 return;

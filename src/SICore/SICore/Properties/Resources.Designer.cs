@@ -457,6 +457,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на File.
+        /// </summary>
+        public static string File {
+            get {
+                return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string Final {
@@ -786,6 +795,15 @@ namespace SICore.Properties {
         public static string InformChooser {
             get {
                 return ResourceManager.GetString("InformChooser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid avatar data.
+        /// </summary>
+        public static string InvalidAvatarData {
+            get {
+                return ResourceManager.GetString("InvalidAvatarData", resourceCulture);
             }
         }
         
@@ -1164,6 +1182,15 @@ namespace SICore.Properties {
         public static string Or {
             get {
                 return ResourceManager.GetString("Or", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} {1} exceeds recommended size of {2} KB and could be loaded with delay.
+        /// </summary>
+        public static string OversizedFile {
+            get {
+                return ResourceManager.GetString("OversizedFile", resourceCulture);
             }
         }
         

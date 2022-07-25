@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Services.SI
+﻿namespace SIStorageService.Client.Models
 {
     public sealed class PackageInfo
     {

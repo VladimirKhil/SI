@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Utils;
 using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers
@@ -328,7 +329,7 @@ namespace SICore.Network.Servers
                 {
                     // Анонимное сообщение (серверу)
                     var connection = await ConnectionsLock.WithLockAsync(() =>
-                        Connections.FirstOrDefault(conn => conn.Id == m.Receiver.Substring(1)));
+                        Connections.FirstOrDefault(conn => conn.Id == m.Receiver[1..]));
 
                     if (connection != null)
                     {

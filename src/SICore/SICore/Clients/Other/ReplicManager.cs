@@ -3,10 +3,18 @@ using System.Text;
 
 namespace SICore
 {
+    /// <summary>
+    /// Contains methods for generating replic messages.
+    /// </summary>
     internal static class ReplicManager
     {
         private static readonly char[] _escapeChars = new char[] { '<', '>', '\"', '\'', '&' };
         private static readonly string[] _escapeStrings = new string[] { "&lt;", "&gt;", "&quot;", "&apos;", "&amp;" };
+
+        /// <summary>
+        /// Line break.
+        /// </summary>
+        private const string _Line = "<line />";
 
         internal static string Escape(string s)
         {
@@ -32,52 +40,17 @@ namespace SICore
         }
 
         /// <summary>
-        /// Реплика
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string Replic(string s)
-        {
-            return string.Format("<replic>{0}</replic>{1}", Escape(s), Line());
-        }
-
-        /// <summary>
-        /// Реплика
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string OldReplic(string s)
-        {
-            return string.Format("<replic old=\"true\">{0}</replic>{1}", Escape(s), Line());
-        }
-
-        /// <summary>
         /// Системное сообщение
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string System(string s)
-        {
-            return string.Format("<system>{0}</system>{1}", Escape(s), Line());
-        }
+        public static string System(string s) => string.Format("<system>{0}</system>{1}", Escape(s), _Line);
 
         /// <summary>
         /// Специальное сообщение
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static string Special(string s)
-        {
-            return string.Format("<special>{0}</special>{1}", Escape(s), Line());
-        }
-
-        /// <summary>
-        /// Переход на новую строку
-        /// </summary>
-        /// <returns></returns>
-        public static string Line()
-        {
-            return "<line />";
-        }
+        public static string Special(string s) => string.Format("<special>{0}</special>{1}", Escape(s), _Line);
     }
 }

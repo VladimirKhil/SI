@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SIPackages.Core;
+using System;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using SIPackages.Core;
 
 namespace SIPackages.PlatformSpecific.Net45
 {
@@ -29,13 +28,18 @@ namespace SIPackages.PlatformSpecific.Net45
             using (File.Create(Path.Combine(_folder, category, name))) { }
         }
 
-        public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
+        public async Task CreateStreamAsync(
+            string category,
+            string name,
+            string contentType,
+            Stream stream,
+            CancellationToken cancellationToken = default)
         {
             Directory.CreateDirectory(Path.Combine(_folder, category));
             
             using var fs = File.Create(Path.Combine(_folder, category, name));
 
-            await stream.CopyToAsync(fs);
+            await stream.CopyToAsync(fs, cancellationToken);
         }
 
         public void DeleteStream(string category, string name) => throw new NotImplementedException();
@@ -58,6 +62,7 @@ namespace SIPackages.PlatformSpecific.Net45
         public StreamInfo GetStream(string name, bool read = true)
         {
             var file = new FileInfo(Path.Combine(_folder, name));
+
             if (!file.Exists)
             {
                 return null;
@@ -74,6 +79,28 @@ namespace SIPackages.PlatformSpecific.Net45
             }
 
             return GetStream(Path.Combine(category, name), read);
+        }
+
+        public long GetStreamLength(string name)
+        {
+            var file = new FileInfo(Path.Combine(_folder, name));
+
+            if (!file.Exists)
+            {
+                return -1;
+            }
+
+            return file.Length;
+        }
+
+        public long GetStreamLength(string category, string name)
+        {
+            if (name.Length > ZipHelper.MaxFileNameLength)
+            {
+                name = ZipHelper.CalculateHash(name);
+            }
+
+            return GetStreamLength(Path.Combine(category, name));
         }
     }
 }

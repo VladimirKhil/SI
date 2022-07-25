@@ -1,11 +1,10 @@
-﻿using SICore.Connections;
-using SIData;
+﻿using SIData;
 using SIUI.ViewModel;
 
 namespace SICore
 {
     /// <summary>
-    /// Зритель
+    /// Defines a game viewer.
     /// </summary>
     public interface IViewer : ILogic
     {

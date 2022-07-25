@@ -10,7 +10,7 @@ namespace Utils
     /// </summary>
     public sealed class Lock : IDisposable
     {
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
 
         private readonly string _name;
 
@@ -22,6 +22,27 @@ namespace Utils
         public void WithLock(Action action, CancellationToken cancellationToken = default)
         {
             _semaphore.Wait(cancellationToken);
+            try
+            {
+                action();
+            }
+            finally
+            {
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
+            }
+        }
+
+        public void WithLock(Action action, int millisecondsTimeout)
+        {
+            _semaphore.Wait(millisecondsTimeout);
+
             try
             {
                 action();
@@ -45,9 +66,37 @@ namespace Utils
             }
         }
 
+        public async ValueTask WithLockAsync(Action action, int millisecondsTimeout)
+        {
+            await _semaphore.WaitAsync(millisecondsTimeout);
+
+            try
+            {
+                action();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
         public T WithLock<T>(Func<T> func, CancellationToken cancellationToken = default)
         {
             _semaphore.Wait(cancellationToken);
+            try
+            {
+                return func();
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public T WithLock<T>(Func<T> func, int millisecondsTimeout)
+        {
+            _semaphore.Wait(millisecondsTimeout);
+
             try
             {
                 return func();
@@ -191,7 +240,14 @@ namespace Utils
             {
                 if (lockAquired)
                 {
-                    _semaphore.Release();
+                    try
+                    {
+                        _semaphore.Release();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+
+                    }
                 }
             }
 

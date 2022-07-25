@@ -7,8 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D8DC2E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Desktop", "Desktop", "{B812C629-7DBF-4094-AA34-059C9094A226}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.Client", "src\Common\SIService.Client\SIService.Client.shproj", "{A4CEB981-DED1-4ADB-9058-3869F6A44C8D}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SIService.ViewModel", "src\Common\SIService.ViewModel\SIService.ViewModel.shproj", "{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIQuester.ViewModel", "src\SIQuester\SIQuester.ViewModel\SIQuester.ViewModel.csproj", "{8B3640F3-9547-4B76-874D-7FA2E75AD679}"
@@ -37,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "src\Common\Utils\U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppService.Client", "src\Common\AppService.Client\AppService.Client.csproj", "{85ABCE10-858E-44F8-A1C1-5CAA9E84F484}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIPackages.Tests", "test\Common\SIPackages.Tests\SIPackages.Tests.csproj", "{3B650F1B-FA32-4C3C-A79E-6C386DF9977E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIPackages.Tests", "test\Common\SIPackages.Tests\SIPackages.Tests.csproj", "{3B650F1B-FA32-4C3C-A79E-6C386DF9977E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIStorageService.Client", "src\Common\SIStorageService.Client\SIStorageService.Client.csproj", "{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,6 +131,14 @@ Global
 		{3B650F1B-FA32-4C3C-A79E-6C386DF9977E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3B650F1B-FA32-4C3C-A79E-6C386DF9977E}.Release|x86.ActiveCfg = Release|Any CPU
 		{3B650F1B-FA32-4C3C-A79E-6C386DF9977E}.Release|x86.Build.0 = Release|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -138,7 +146,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{D8DC2EF3-36A3-475B-A88F-861AB1E112F6} = {29A5EB8A-6B88-4AE9-A83B-0C9793134565}
 		{B812C629-7DBF-4094-AA34-059C9094A226} = {29A5EB8A-6B88-4AE9-A83B-0C9793134565}
-		{A4CEB981-DED1-4ADB-9058-3869F6A44C8D} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 		{D8A9ACD8-2C11-4CFB-B4E2-0BFA4F6F9500} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 		{8B3640F3-9547-4B76-874D-7FA2E75AD679} = {29A5EB8A-6B88-4AE9-A83B-0C9793134565}
 		{D689345A-26EB-432D-8442-67E1DE287FE9} = {B812C629-7DBF-4094-AA34-059C9094A226}
@@ -151,14 +158,13 @@ Global
 		{DB37734A-E865-4E1E-8CB9-3A9EB3D6BDF4} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 		{85ABCE10-858E-44F8-A1C1-5CAA9E84F484} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 		{3B650F1B-FA32-4C3C-A79E-6C386DF9977E} = {03BB87B1-7EA0-49F8-B8A5-46A64E7A6E0C}
+		{A7A22A0A-6409-490B-86DA-3F3DE2C307B7} = {D8DC2EF3-36A3-475B-A88F-861AB1E112F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {080C13E0-0C5D-41FE-9CBB-EE7ED6CB69F3}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		src\Common\SIService.Client\SIService.Client.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 5
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{8b3640f3-9547-4b76-874d-7fa2e75ad679}*SharedItemsImports = 5
-		src\Common\SIService.Client\SIService.Client.projitems*{a4ceb981-ded1-4adb-9058-3869f6a44c8d}*SharedItemsImports = 13
 		src\Common\SIService.ViewModel\SIService.ViewModel.projitems*{d8a9acd8-2c11-4cfb-b4e2-0bfa4f6f9500}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

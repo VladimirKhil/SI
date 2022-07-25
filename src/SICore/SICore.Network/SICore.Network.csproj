@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
+    <ProjectReference Include="..\..\Common\Utils\Utils.csproj" />
     <ProjectReference Include="..\SICore.Connections\SICore.Connections.csproj" />
   </ItemGroup>
   <ItemGroup>

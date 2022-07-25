@@ -1,10 +1,10 @@
-﻿using SICore.Network;
-using SICore.Utils;
+﻿using SICore.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SICore
 {
@@ -32,7 +32,7 @@ namespace SICore
 
         private Timer _taskTimer = null;
         private int _taskArgument = -1;
-        private readonly Stack<Tuple<int, int, int>> _oldTasks = new Stack<Tuple<int, int, int>>();
+        private readonly Stack<Tuple<int, int, int>> _oldTasks = new();
         
         private readonly Lock _taskTimerLock = new Lock(nameof(_taskTimerLock));
         
@@ -84,30 +84,38 @@ namespace SICore
 
         internal StopReason StopReason => _stopReason;
 
-        internal virtual void Stop(StopReason reason)
+        internal virtual bool Stop(StopReason reason)
         {
             if (_stopReason == StopReason.None)
             {
                 _stopReason = reason;
                 ExecuteImmediate();
+
+                return true;
             }
+
+            return false;
         }
 
         protected void PauseExecution(int task, int taskArgument)
         {
             var now = DateTime.UtcNow;
+
             // Saving running task, its argument and left time
             _oldTasks.Push(Tuple.Create(task, taskArgument, (int)((_finishingTime - now).TotalMilliseconds / 100)));
+
             CurrentTask = -1;
         }
 
         protected internal void ResumeExecution(int resumeTime = 0)
         {
-            if (_oldTasks.Any())
+            if (!_oldTasks.Any())
             {
-                var oldTask = _oldTasks.Pop();
-                ScheduleExecution(oldTask.Item1, oldTask.Item2, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3));
+                throw new Exception("Cannot resume execution: no saved task!");
             }
+
+            var oldTask = _oldTasks.Pop();
+            ScheduleExecution(oldTask.Item1, oldTask.Item2, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3));
         }
 
         protected internal void UpdatePausedTask(int task, int taskArgument, int taskTime)

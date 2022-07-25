@@ -1,13 +1,14 @@
-﻿namespace Services.SI
+﻿namespace SIStorageService.Client.Models
 {
     /// <summary>
-    /// Категория пакета
+    /// Defines a package category.
     /// </summary>
     public sealed class PackageCategory
     {
         public int ID { get; set; }
+
         /// <summary>
-        /// Имя категории
+        /// Category name.
         /// </summary>
         public string Name { get; set; }
     }

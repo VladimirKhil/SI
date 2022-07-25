@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
@@ -49,7 +50,7 @@ namespace SIGame.ViewModel
         /// <summary>
         /// Sends game results info to server.
         /// </summary>
-        public override async Task SaveReportAsync(GameResult gameResult)
+        public override async Task SaveReportAsync(GameResult gameResult, CancellationToken cancellationToken = default)
         {
             SI.GameResultService.Client.AnswerInfo answerConverter(AnswerInfo q) =>
                 new SI.GameResultService.Client.AnswerInfo { Answer = q.Answer, Question = q.Question, Theme = q.Theme, Round = q.Round };
@@ -72,7 +73,7 @@ namespace SIGame.ViewModel
             var gameResultService = _serviceProvider.GetRequiredService<SI.GameResultService.Client.IGameResultServiceClient>();
             try
             {
-                await gameResultService.SendGameReportAsync(result);
+                await gameResultService.SendGameReportAsync(result, cancellationToken);
             }
             catch (Exception)
             {
@@ -146,5 +147,11 @@ namespace SIGame.ViewModel
         public override bool ShowBorderOnFalseStart => _userSettings.GameSettings.AppSettings.ShowBorderOnFalseStart;
 
         public override bool LoadExternalMedia => _userSettings.LoadExternalMedia;
+
+        public override int MaxImageSizeKb => int.MaxValue;
+
+        public override int MaxAudioSizeKb => int.MaxValue;
+
+        public override int MaxVideoSizeKb => int.MaxValue;
     }
 }

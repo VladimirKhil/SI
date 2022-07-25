@@ -1,14 +1,12 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Net.Http;
+using SIStorageService.Client.Models;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Services.SI
+namespace SIStorageService.Client
 {
+    // TODO: Implement retries via Polly
+
     public sealed class SIStorageServiceClient : ISIStorageServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
@@ -59,6 +57,7 @@ namespace Services.SI
             return GetAsync<string[]>($"PackagesByTag{packageFilter}", cancellationToken);
         }
 
+        [Obsolete]
         public Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NewServerInfo[]>("servers", cancellationToken);
 

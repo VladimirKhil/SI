@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -133,12 +134,14 @@ namespace SIPackages.PlatformSpecific.Net45
             AddContentTypeInfo(name, contentType);
         }
 
-        public async Task CreateStreamAsync(string category, string name, string contentType, Stream stream)
+        public async Task CreateStreamAsync(
+            string category,
+            string name, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
             var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.Optimal);
             using (var writeStream = entry.Open())
             {
-                await stream.CopyToAsync(writeStream);
+                await stream.CopyToAsync(writeStream, cancellationToken);
             }
 
             AddContentTypeInfo(name, contentType);
@@ -216,5 +219,14 @@ namespace SIPackages.PlatformSpecific.Net45
 
             _stream.Flush();
         }
+
+        public long GetStreamLength(string name)
+        {
+            var entry = _zipArchive.GetEntry(name);
+            return entry?.Length ?? -1;
+        }
+
+        public long GetStreamLength(string category, string name) =>
+            GetStreamLength($"{category}/{Uri.EscapeUriString(name)}");
     }
 }

@@ -4,10 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIEngine.Tests
 {
+    /// <summary>
+    /// Defines a fake package source.
+    /// </summary>
     internal sealed class PackageMock : ISIPackage
     {
         private readonly Dictionary<string, HashSet<string>> _streams = new();
@@ -26,7 +30,12 @@ namespace SIEngine.Tests
             categoryStreams.Add(name);
         }
 
-        public Task CreateStreamAsync(string category, string name, string contentType, Stream stream) =>
+        public Task CreateStreamAsync(
+            string category,
+            string name,
+            string contentType,
+            Stream stream,
+            CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
         public void DeleteStream(string category, string name) => throw new NotImplementedException();
@@ -48,5 +57,9 @@ namespace SIEngine.Tests
         public StreamInfo GetStream(string name, bool read = true) => throw new NotImplementedException();
 
         public StreamInfo GetStream(string category, string name, bool read = true) => throw new NotImplementedException();
+
+        public long GetStreamLength(string name) => throw new NotImplementedException();
+
+        public long GetStreamLength(string category, string name) => throw new NotImplementedException();
     }
 }

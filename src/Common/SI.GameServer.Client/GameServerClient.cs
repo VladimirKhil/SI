@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Handlers;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +36,7 @@ namespace SI.GameServer.Client
 
         private HubConnection _connection;
 
-        public string ServiceUri => _options.ServiceUri;
+        public string ServiceUri => _options.ServiceUri!;
 
         public event Action<GameInfo> GameCreated;
         public event Action<int> GameDeleted;
@@ -48,8 +47,8 @@ namespace SI.GameServer.Client
         public event Action<int> UploadProgress;
         public event Action<Message> IncomingMessage;
 
-        public event Func<Exception, Task> Closed;
-        public event Func<Exception, Task> Reconnecting;
+        public event Func<Exception?, Task> Closed;
+        public event Func<Exception?, Task> Reconnecting;
         public event Func<string, Task> Reconnected;
 
         private readonly IUIThreadExecutor? _uIThreadExecutor;
@@ -154,6 +153,7 @@ namespace SI.GameServer.Client
                 });
 
             var response = await _client.PostAsync(uri, content, cancellationToken);
+
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync(cancellationToken);
@@ -315,7 +315,7 @@ namespace SI.GameServer.Client
             return $"{response.StatusCode}: {serverError}";
         }
 
-        private Task OnConnectionClosedAsync(Exception exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
+        private Task OnConnectionClosedAsync(Exception? exc) => Closed != null ? Closed(exc) : Task.CompletedTask;
 
         private void OnUI(Action action)
         {

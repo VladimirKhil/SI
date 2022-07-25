@@ -5,50 +5,54 @@ using System.IO;
 
 namespace SICore
 {
-    /// <summary>
-    /// Класс, раздающий мультимедиа по некоторому URI
-    /// </summary>
+    /// <inheritdoc cref="IShare" />
     public abstract class ShareBase : IShare
     {
-        protected Dictionary<string, Func<StreamInfo>> _files = new Dictionary<string, Func<StreamInfo>>();
-        protected object _filesSync = new object();
+        private const int MaxFileSize = 1_000_000;
+
+        protected Dictionary<string, Func<StreamInfo>> _files = new();
+        protected object _filesSync = new();
 
         public event Action<Exception> Error;
 
-        public virtual string CreateURI(string file, byte[] data, string category)
+        public virtual string CreateUri(string file, byte[] data, string category)
         {
             lock (_filesSync)
             {
-                if (ContainsURI(file))
-                    return MakeURI(file, category);
+                if (ContainsUri(file))
+                {
+                    return MakeUri(file, category);
+                }
 
-                if (data.Length > 1000000)
+                if (data.Length > MaxFileSize)
+                {
                     return "";
+                }
 
                 _files[file] = () => new StreamInfo { Stream = new MemoryStream(data), Length = data.Length };
             }
 
-            return MakeURI(file, category);
+            return MakeUri(file, category);
         }
 
-        public virtual string CreateURI(string file, Func<StreamInfo> getStream, string category)
+        public virtual string CreateUri(string file, Func<StreamInfo> getStream, string category)
         {
             lock (_filesSync)
             {
-                if (ContainsURI(file))
+                if (ContainsUri(file))
                 {
-                    return MakeURI(file, category);
+                    return MakeUri(file, category);
                 }
 
                 _files[file] = getStream;
             }
 
-            return MakeURI(file, category);
+            return MakeUri(file, category);
         }
 
-        public abstract string MakeURI(string file, string category);
+        public abstract string MakeUri(string file, string category);
 
-        public bool ContainsURI(string file)
+        public bool ContainsUri(string file)
         {
             lock (_filesSync)
             {
@@ -56,7 +60,7 @@ namespace SICore
             }
         }
 
-        public virtual void StopURI(IEnumerable<string> toRemove)
+        public virtual void StopUri(IEnumerable<string> toRemove)
         {
             lock (_filesSync)
             {

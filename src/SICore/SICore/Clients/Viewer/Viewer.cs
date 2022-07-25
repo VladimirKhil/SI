@@ -214,7 +214,7 @@ namespace SICore
 
         private void Ban_Executed(object arg)
         {
-            if (!(arg is ViewerAccount person))
+            if (arg is not ViewerAccount person)
                 return;
 
             if (person == ClientData.Me)
@@ -284,11 +284,19 @@ namespace SICore
                                 return;
                             }
 
+                            var role = mparams[1];
+
+                            if (role != Constants.Showman && role != Constants.Player && role != Constants.Viewer)
+                            {
+                                return;
+                            }
+
                             if (!_client.Server.IsMain)
                             {
                                 await _client.Server.ConnectionsLock.WithLockAsync(() =>
                                 {
                                     var currentConnection = ((ISlaveServer)_client.Server).HostServer;
+
                                     if (currentConnection != null)
                                     {
                                         lock (currentConnection.ClientsSync)
@@ -300,8 +308,9 @@ namespace SICore
                             }
 
                             var account = new Account(mparams[3], mparams[4] == "m");
-                            int.TryParse(mparams[2], out int index);
-                            InsertPerson(mparams[1], account, index);
+                            _ = int.TryParse(mparams[2], out var index);
+
+                            InsertPerson(role, account, index);
 
                             PersonConnected?.Invoke();
 
@@ -315,9 +324,11 @@ namespace SICore
                         #region Disconnect
                         {
                             _logic.Print(ReplicManager.Special(LO[nameof(R.DisconnectMessage)]));
-                            if (Connector != null && !Connector.IsReconnecting)
-                                _logic.TryConnect(Connector);
 
+                            if (Connector != null && !Connector.IsReconnecting)
+                            {
+                                _logic.TryConnect(Connector);
+                            }
                             break;
                         }
                         #endregion
@@ -344,8 +355,10 @@ namespace SICore
                             #region ReadingSpeed
                             if (mparams.Length > 1)
                             {
-                                 if (int.TryParse(mparams[1], out int readingSpeed) && readingSpeed > 0)
+                                if (int.TryParse(mparams[1], out int readingSpeed) && readingSpeed > 0)
+                                {
                                     _logic.OnTextSpeed(1.0 / readingSpeed);
+                                }
                             }
                             break;
                             #endregion
@@ -366,7 +379,8 @@ namespace SICore
                         {
                             ClientData.HostName = mparams[1];
                             IsHost = _client.Name == ClientData.HostName;
-                            if (mparams.Length > 2) // Хост был кем-то изменён
+
+                            if (mparams.Length > 2) // Host has been changed
                             {
                                 _logic.OnReplic(
                                     ReplicCodes.Special.ToString(),
@@ -404,10 +418,6 @@ namespace SICore
                             }
                             break;
                         }
-
-                    case Messages.Print:
-                        OnPrint(mparams);
-                        break;
 
                     case Messages.Replic:
                         OnReplic(mparams);
@@ -595,23 +605,30 @@ namespace SICore
 
                     case Messages.Table:
                         {
-                            #region Tablo2
+                            #region Table
 
                             lock (ClientData.TInfoLock)
                             {
                                 if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
+                                {
                                     break;
+                                }
 
                                 var index = 1;
+
                                 for (int i = 0; i < ClientData.TInfo.RoundInfo.Count; i++)
                                 {
                                     if (index == mparams.Length)
+                                    {
                                         break;
+                                    }
 
                                     while (index < mparams.Length && mparams[index].Length > 0) // пустой параметр разделяет темы
                                     {
                                         if (!int.TryParse(mparams[index++], out int price))
+                                        {
                                             price = -1;
+                                        }
 
                                         ClientData.TInfo.RoundInfo[i].Questions.Add(new QuestionInfo { Price = price });
                                     }
@@ -902,12 +919,12 @@ namespace SICore
                         {
                             #region Picture
 
-                            if (ClientData.Players.Count == 0)
-                                return;
-
                             var per = ClientData.MainPersons.FirstOrDefault(person => person.Name == mparams[1]);
+
                             if (per != null)
+                            {
                                 _logic.UpdatePicture(per, mparams[2]);
+                            }
 
                             #endregion
                             break;
@@ -1019,9 +1036,11 @@ namespace SICore
             lock (ClientData.TInfoLock)
             {
                 ClientData.TInfo.RoundInfo.Clear();
+
                 for (var i = 2; i < mparams.Length; i++)
                 {
                     ClientData.TInfo.RoundInfo.Add(new ThemeInfo { Name = mparams[i] });
+
                     if (print)
                     {
                         _logic.Print(ReplicManager.System(mparams[i]));
@@ -1080,11 +1099,6 @@ namespace SICore
             ClientData.Players[ClientData.LastStakerIndex].Stake = stake;
 
             OnAd();
-        }
-
-        private void OnPrint(string[] mparams)
-        {
-
         }
 
         private void OnReplic(string[] mparams)
@@ -1681,13 +1695,14 @@ namespace SICore
 
         private async ValueTask ProcessInfoAsync(string[] mparams)
         {
-            int.TryParse(mparams[1], out var numOfPlayers);
+            _ = int.TryParse(mparams[1], out var numOfPlayers);
             var numOfViewers = (mparams.Length - 2) / 5 - 1 - numOfPlayers;
 
             var gameStarted = ClientData.Stage != GameStage.Before;
 
             var mIndex = 2;
             ClientData.BeginUpdatePersons($"ProcessInfo {string.Join(" ", mparams)}");
+
             try
             {
                 ClientData.ShowMan = new PersonAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+", gameStarted)
@@ -1698,6 +1713,7 @@ namespace SICore
                 };
 
                 var newPlayers = new List<PlayerAccount>();
+
                 for (int i = 0; i < numOfPlayers; i++)
                 {
                     var account = new PlayerAccount(mparams[mIndex++], mparams[mIndex++] == "+", mparams[mIndex++] == "+", gameStarted)
@@ -1712,6 +1728,7 @@ namespace SICore
                 ClientData.Players = newPlayers;
 
                 var newViewers = new List<ViewerAccount>();
+
                 for (int i = 0; i < numOfViewers; i++)
                 {
                     var viewerName = mparams[mIndex++];
@@ -1770,7 +1787,10 @@ namespace SICore
                             {
                                 lock (connection.ClientsSync)
                                 {
-                                    connection.Clients.Add(item.Name);
+                                    if (!connection.Clients.Contains(item.Name))
+                                    {
+                                        connection.Clients.Add(item.Name);
+                                    }
                                 }
                             }
                         });
@@ -1858,8 +1878,11 @@ namespace SICore
         private void UpdateShowmanCommands()
         {
             var showman = MyData.ShowMan;
+
             if (showman == null || showman.Free == null)
+            {
                 return;
+            }
 
             showman.Free.CanBeExecuted = showman.IsHuman && showman.IsConnected;
 
@@ -1928,10 +1951,11 @@ namespace SICore
                         player.GameStarted = ClientData.Stage != GameStage.Before;
                         break;
 
-                    default:
+                    case Constants.Viewer:
                         var viewer = new ViewerAccount(account) { IsHuman = true, IsConnected = true };
 
                         var existingViewer = ClientData.Viewers.FirstOrDefault(v => v.Name == viewer.Name);
+
                         if (existingViewer != null)
                         {
                             throw new Exception($"Duplicate viewer name: \"{viewer.Name}\" ({existingViewer.IsConnected})!\n" + ClientData.PersonsUpdateHistory);
@@ -1940,6 +1964,9 @@ namespace SICore
                         ClientData.Viewers.Add(viewer);
                         ClientData.UpdateViewers();
                         break;
+
+                    default:
+                        throw new ArgumentException($"Unsupported role {role}");
                 }
             }
             finally

@@ -1,9 +1,7 @@
-﻿using System;
-using SICore.Connections;
-using SICore.Utils;
-using SIData;
+﻿using SIData;
 using SIPackages;
 using SIUI.ViewModel;
+using System;
 
 namespace SICore
 {
@@ -211,12 +209,14 @@ namespace SICore
             switch (timerCommand)
             {
                 case MessageParams.Timer_Go:
+
                     var maxTime = int.Parse(arg);
                     var now = DateTime.UtcNow;
                     _timersInfo[timerIndex].IsEnabled = true;
                     _timersInfo[timerIndex].StartTime = now;
                     _timersInfo[timerIndex].EndTime = now.AddMilliseconds(maxTime * 100);
                     _timersInfo[timerIndex].MaxTime = maxTime;
+
                     break;
 
                 case MessageParams.Timer_Stop:
@@ -232,17 +232,22 @@ namespace SICore
                     break;
 
                 case "USER_PAUSE":
+
                     var currentTime2 = int.Parse(arg);
 
                     _timersInfo[timerIndex].IsUserEnabled = false;
+
                     if (_timersInfo[timerIndex].IsEnabled)
                     {
                         _timersInfo[timerIndex].PauseTime = currentTime2;
                     }
+
                     break;
 
                 case "RESUME":
+
                     _timersInfo[timerIndex].IsEnabled = true;
+
                     if (!_timersInfo[timerIndex].IsUserEnabled)
                     {
                         return;
@@ -251,10 +256,13 @@ namespace SICore
                     var now2 = DateTime.UtcNow;
                     _timersInfo[timerIndex].EndTime = now2.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
                     _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
+                    
                     break;
 
                 case "USER_RESUME":
+
                     _timersInfo[timerIndex].IsUserEnabled = true;
+
                     if (!_timersInfo[timerIndex].IsEnabled || _timersInfo[timerIndex].PauseTime == -1)
                     {
                         return;
@@ -263,6 +271,7 @@ namespace SICore
                     var now3 = DateTime.UtcNow;
                     _timersInfo[timerIndex].EndTime = now3.AddMilliseconds((_timersInfo[timerIndex].MaxTime - _timersInfo[timerIndex].PauseTime) * 100);
                     _timersInfo[timerIndex].StartTime = _timersInfo[timerIndex].EndTime.AddMilliseconds(-_timersInfo[timerIndex].MaxTime * 100);
+                    
                     break;
 
                 case "MAXTIME":

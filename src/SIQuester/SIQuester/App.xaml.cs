@@ -9,6 +9,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SIQuester.Model;
 using SIQuester.ViewModel;
+using SIStorageService.Client;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -171,7 +172,7 @@ namespace SIQuester
                     directoryInfo.Create();
                 }
 
-                var service = new Services.SI.SIStorageServiceClient();
+                var service = new SIStorageServiceClient();
                 var packages = await service.GetPackagesAsync();
                 using var client = new HttpClient();
                 foreach (var package in packages)

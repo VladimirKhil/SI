@@ -89,7 +89,7 @@ namespace SIQuester.ViewModel
                     mainRound.Themes.Add(newTheme);
 
                     // Выгрузим с собой необходимые коллекции
-                    await _document.Document.CopyCollections(newDocument, allthemes[index - 1]);
+                    await _document.Document.CopyCollectionsAsync(newDocument, allthemes[index - 1]);
                 }
 
                 OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
@@ -116,7 +116,7 @@ namespace SIQuester.ViewModel
                     mainRound.Themes.Add(newTheme);
 
                     // Выгрузим с собой необходимые коллекции
-                    await _document.Document.CopyCollections(newDocument, theme);
+                    await _document.Document.CopyCollectionsAsync(newDocument, theme);
                 }
 
                 OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });

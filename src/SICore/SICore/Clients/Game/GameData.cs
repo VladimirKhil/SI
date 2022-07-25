@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Utils;
 
 namespace SICore
 {
@@ -64,14 +65,26 @@ namespace SICore
             set
             {
                 _answererIndex = value;
+
                 if (value > -1 && value < Players.Count)
+                {
                     Answerer = Players[value];
+                }
                 else if (value == -1)
+                {
                     Answerer = null;
+                }
                 else
+                {
                     throw new ArgumentException($"{nameof(value)} {value} must be greater or equal to -1 and less than {Players.Count}!");
+                }
             }
         }
+
+        /// <summary>
+        /// Index of possible answerer.
+        /// </summary>
+        public int PendingAnswererIndex { get; set; }
 
         /// <summary>
         /// Текущий отвечающий игрок
@@ -139,7 +152,7 @@ namespace SICore
         internal string HostName { get; set; }
 
         /// <summary>
-        /// Время начала раунда
+        /// Timer start time.
         /// </summary>
         internal DateTime[] TimerStartTime { get; set; } = new DateTime[3] { DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow };
 
@@ -181,7 +194,7 @@ namespace SICore
         /// <summary>
         /// Отвеченные неверные версии
         /// </summary>
-        internal List<string> UsedWrongVersions = new List<string>();
+        internal List<string> UsedWrongVersions = new();
 
         /// <summary>
         /// Показывает, были ли уже выведены данные о теме
@@ -296,7 +309,7 @@ namespace SICore
 
         internal int TableInformStage { get; set; }
 
-        internal object TableInformStageLock { get; } = new object();
+        internal Lock TableInformStageLock { get; } = new Lock(nameof(TableInformStageLock));
 
         /// <summary>
         /// Количество ставящих в финале
@@ -342,6 +355,7 @@ namespace SICore
             {
                 _showMan = value;
                 OnPropertyChanged();
+
                 if (_isUpdating)
                 {
                     return;
@@ -483,6 +497,9 @@ namespace SICore
         public int Penalty { get; internal set; }
         public DateTime PenaltyStartTime { get; internal set; }
 
+        /// <summary>
+        /// A flag indicating that the game waits a little before accepting an answerer.
+        /// </summary>
         public bool IsDeferringAnswer { get; internal set; }
 
         public ThemeDeletersEnumerator ThemeDeleters { get; internal set; }
@@ -504,9 +521,6 @@ namespace SICore
 
         public double TimeThinking { get; internal set; }
 
-        [Obsolete]
-        public DateTime StartTryTime { get; internal set; }
-
         public bool MoveNextBlocked { get; set; }
 
         public bool IsPlayingMedia { get; set; }
@@ -522,7 +536,9 @@ namespace SICore
         /// </summary>
         public int TargetRoundIndex { get; internal set; }
 
-        public RoundInfo[] Rounds { get; internal set; } = new RoundInfo[0];
+        public RoundInfo[] Rounds { get; internal set; } = Array.Empty<RoundInfo>();
+
+        internal int OversizedMediaNotificationsCount { get; set; }
 
         public GameData(IGameManager gameManager) : base(gameManager)
         {

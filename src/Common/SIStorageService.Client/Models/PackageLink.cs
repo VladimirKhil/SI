@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Services.SI
+﻿namespace SIStorageService.Client.Models
 {
     /// <summary>
     /// Contains package link.
@@ -13,7 +11,7 @@ namespace Services.SI
         public string Name { get; set; }
 
         /// <summary>
-        /// Package URI.
+        /// Package uri.
         /// </summary>
         public Uri Uri { get; set; }
     }

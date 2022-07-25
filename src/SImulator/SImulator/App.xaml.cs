@@ -7,6 +7,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
+using SIStorageService.Client.Models;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -97,7 +98,7 @@ namespace SImulator
 
 #if DEBUG
             main.PackageSource = new SIStoragePackageSource(
-                new Services.SI.PackageInfo
+                new PackageInfo
                 {
                     Description = SImulator.Properties.Resources.TestPackage
                 },

@@ -346,9 +346,9 @@ namespace SIEngine
         protected virtual void AutoNextCore() { }
 
         /// <summary>
-        /// Перейти к следующему раунду
+        /// Moves to the next round.
         /// </summary>
-        /// <param name="showSign"></param>
+        /// <param name="showSign">Should the logo be shown.</param>
         public virtual bool MoveNextRound(bool showSign = true)
         {
             var moved = true;
@@ -372,6 +372,7 @@ namespace SIEngine
             CanMoveBackRound = _roundIndex > 0;
 
             UpdateCanNext();
+
             if (moved)
             {
                 OnNextRound(showSign);
@@ -549,10 +550,13 @@ namespace SIEngine
                 case AtomTypes.Audio:
                 case AtomTypes.Video:
                     {
-                        // Мультимедийное содержимое
+                        // Multimedia content
                         var media = GetMedia();
+
                         if (media == null)
+                        {
                             break;
+                        }
 
                         var isSound = activeAtom.Type == AtomTypes.Audio;
                         var isImage = activeAtom.Type == AtomTypes.Image;
@@ -569,15 +573,22 @@ namespace SIEngine
                             if (isSound)
                             {
                                 var backItem = GetBackgroundImageOrText();
+
                                 if (backItem != null)
                                 {
                                     if (backItem.Item1 != null)
+                                    {
                                         OnQuestionImage(backItem.Item1, media);
+                                    }
                                     else
+                                    {
                                         OnQuestionText(backItem.Item2, media);
+                                    }
                                 }
                                 else
+                                {
                                     OnQuestionSound(media);
+                                }
                             }
                             else
                             {
@@ -593,6 +604,7 @@ namespace SIEngine
 
                 case AtomTypes.Marker:
                     _atomIndex++;
+
                     if (_atomIndex < _activeQuestion.Scenario.Count)
                     {
                         _useAnswerMarker = true; // Прерываем отыгрыш вопроса: остальное - ответ

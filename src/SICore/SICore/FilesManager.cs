@@ -3,6 +3,7 @@ using System;
 
 namespace SICore
 {
+    /// <inheritdoc cref="ShareBase" />
     public sealed class FilesManager : ShareBase, IFilesManager
     {
         private readonly int _gameID = -1;
@@ -16,13 +17,13 @@ namespace SICore
             _rootPath = rootPath;
         }
 
-        public override string MakeURI(string file, string category)
+        public override string MakeUri(string file, string category)
         {
             var uri = Uri.EscapeDataString(file);
 
             if (category != null && !string.IsNullOrEmpty(_rootPath))
             {
-                return $"{_rootPath}/{category}/{uri}"; // Ресурс будет возвращён внешним сервером
+                return $"{_rootPath}/{category}/{uri}"; // The resource will be provided by the external server
             }
 
             return string.Format("http://localhost:{0}/data/{1}/{2}", _multimediaPort, _gameID, uri);
@@ -31,6 +32,7 @@ namespace SICore
         public StreamInfo GetFile(string file)
         {
             Func<StreamInfo> response = null;
+
             lock (_filesSync)
             {
                 if (!_files.TryGetValue(Uri.UnescapeDataString(file), out response) && !_files.TryGetValue(file, out response))

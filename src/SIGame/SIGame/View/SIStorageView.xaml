@@ -6,7 +6,7 @@
              xmlns:lctrl="clr-namespace:SIGame.Controls"
              xmlns:lc="clr-namespace:SIGame.Converters"
              xmlns:lp="clr-namespace:SIGame.Properties"
-             xmlns:ss="clr-namespace:Services.SI;assembly=SIPackages.Providers"
+             xmlns:ss="clr-namespace:SIStorageService.Client.Models;assembly=SIStorageService.Client"
              mc:Ignorable="d">
     <UserControl.Resources>
         <lc:NotSetConverter x:Key="NotSetConverter" />

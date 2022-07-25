@@ -42,6 +42,11 @@
         public const string Player = "player";
 
         /// <summary>
+        /// Viewer.
+        /// </summary>
+        public const string Viewer = "viewer";
+
+        /// <summary>
         /// Место для подстановки ответа
         /// </summary>
         public const string AnswerPlaceholder = "#";

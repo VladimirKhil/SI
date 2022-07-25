@@ -100,10 +100,8 @@ namespace SICore.Network.Clients
         /// <param name="isSystem">Системное ли</param>
         /// <param name="receiver">Получатель</param>
         /// <param name="isPrivate">Приватное ли</param>
-        public void SendMessage(string text, bool isSystem = true, string receiver = NetworkConstants.Everybody, bool isPrivate = false)
-        {
+        public void SendMessage(string text, bool isSystem = true, string receiver = NetworkConstants.Everybody, bool isPrivate = false) =>
             SendingMessage?.Invoke(this, new Message(text, Name, receiver, isSystem, isPrivate));
-        }
 
         /// <summary>
         /// Получение сообщения. Гарантируется обработка сообщений строго по одному в том порядке, в котором они были получены

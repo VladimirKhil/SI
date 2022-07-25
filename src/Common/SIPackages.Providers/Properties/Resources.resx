@@ -117,28 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Audio" xml:space="preserve">
-    <value>Audio</value>
-  </data>
-  <data name="Image" xml:space="preserve">
-    <value>Image</value>
-  </data>
-  <data name="LinkMissed" xml:space="preserve">
-    <value>Link is missed:</value>
-  </data>
-  <data name="Package" xml:space="preserve">
-    <value>Package</value>
-  </data>
-  <data name="Round" xml:space="preserve">
-    <value>Round</value>
-  </data>
-  <data name="RoundTrailing" xml:space="preserve">
-    <value> round</value>
-  </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Theme</value>
-  </data>
-  <data name="Video" xml:space="preserve">
-    <value>Video</value>
+  <data name="PackageDoesNotExist" xml:space="preserve">
+    <value>Package {0} does not exist</value>
   </data>
 </root>

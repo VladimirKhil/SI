@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIPackages.Providers
@@ -29,10 +30,11 @@ namespace SIPackages.Providers
             int roundsCount = 3,
             int themesCount = 6,
             int baseCost = 100,
-            Stream stream = null)
+            Stream stream = null,
+            CancellationToken cancellationToken = default)
         {
             var doc = SIDocument.Create(name, author, stream);
-            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName);
+            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, cancellationToken);
         }
 
         public static Task<SIDocument> GenerateRandomPackageAsync(
@@ -44,11 +46,12 @@ namespace SIPackages.Providers
             string finalName,
             int roundsCount = 3,
             int themesCount = 6,
-            int baseCost = 100)
+            int baseCost = 100,
+            CancellationToken cancellationToken = default)
         {
             var doc = SIDocument.Create(name, author, folder);
 
-            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName);
+            return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, cancellationToken);
         }
 
         private static async Task<SIDocument> GenerateCoreAsync(
@@ -58,9 +61,10 @@ namespace SIPackages.Providers
             int baseCost,
             SIDocument doc,
             string roundNameFormat,
-            string finalName)
+            string finalName,
+            CancellationToken cancellationToken = default)
         {
-            var files = (await provider.GetPackagesAsync()).ToList();
+            var files = (await provider.GetPackagesAsync(cancellationToken)).ToList();
 
             var packageComments = new StringBuilder(RandomIndicator); // Used in game reports
 
@@ -81,7 +85,8 @@ namespace SIPackages.Providers
                         i,
                         round => round.Type == RoundTypes.Standart && round.Themes.Count > 0,
                         packageComments,
-                        baseCost))
+                        baseCost,
+                        cancellationToken))
                     {
                         j--;
                         continue;
@@ -110,7 +115,8 @@ namespace SIPackages.Providers
                     roundsCount,
                     round => round.Type == RoundTypes.Final && round.Themes.Count > 0,
                     packageComments,
-                    0))
+                    0,
+                    cancellationToken))
                 {
                     j--;
                     continue;
@@ -130,10 +136,11 @@ namespace SIPackages.Providers
             int roundIndex,
             Func<Round, bool> predicate,
             StringBuilder packageComments,
-            int baseCost)
+            int baseCost,
+            CancellationToken cancellationToken = default)
         {
             var fIndex = Rand.Next(files.Count);
-            var doc2 = await provider.GetPackageAsync(files[fIndex]);
+            var doc2 = await provider.GetPackageAsync(files[fIndex], cancellationToken);
             if (doc2 == null)
             {
                 throw new PackageNotFoundException(files[fIndex]);
@@ -171,7 +178,7 @@ namespace SIPackages.Providers
 
                     InheritAuthors(doc2, theme.Questions[i]);
                     InheritSources(doc2, theme.Questions[i]);
-                    await InheritContentAsync(doc, doc2, theme.Questions[i]);
+                    await InheritContentAsync(doc, doc2, theme.Questions[i], cancellationToken);
                 }
 
                 doc.Package.Rounds[roundIndex].Themes.Add(theme);
@@ -212,7 +219,11 @@ namespace SIPackages.Providers
             }
         }
 
-        private static async Task InheritContentAsync(SIDocument doc, SIDocument doc2, Question question)
+        private static async Task InheritContentAsync(
+            SIDocument doc,
+            SIDocument doc2,
+            Question question,
+            CancellationToken cancellationToken = default)
         {
             foreach (var atom in question.Scenario)
             {
@@ -243,7 +254,7 @@ namespace SIPackages.Providers
                     if (collection != null)
                     {
                         using var stream = link.GetStream().Stream;
-                        await collection.AddFileAsync(link.Uri, stream);
+                        await collection.AddFileAsync(link.Uri, stream, cancellationToken);
                     }
                 }
             }

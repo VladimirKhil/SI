@@ -2,6 +2,7 @@
 using SIData;
 using System;
 using System.Collections.Generic;
+using Utils;
 
 namespace SICore.Network.Contracts
 {

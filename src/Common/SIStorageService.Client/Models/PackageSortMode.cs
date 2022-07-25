@@ -1,4 +1,4 @@
-﻿namespace Services.SI
+﻿namespace SIStorageService.Client.Models
 {
     public enum PackageSortMode
     {

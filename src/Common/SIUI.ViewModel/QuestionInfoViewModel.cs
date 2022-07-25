@@ -15,13 +15,13 @@ namespace SIUI.ViewModel
         /// </summary>
         public int Price
         {
-            get { return _model.Price; }
+            get => _model.Price;
             set { _model.Price = value; OnPropertyChanged(); }
         }
 
         public QuestionInfoStages State
         {
-            get { return _state; }
+            get => _state;
             set { _state = value; OnPropertyChanged(); }
         }
 

@@ -1,6 +1,7 @@
 ﻿using SIPackages.Core;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIPackages.PlatformSpecific
@@ -15,6 +16,19 @@ namespace SIPackages.PlatformSpecific
         /// </summary>
         /// <param name="category">Category name.</param>
         string[] GetEntries(string category);
+
+        /// <summary>
+        /// Gets stream length.
+        /// </summary>
+        /// <param name="name">Object name.</param>
+        long GetStreamLength(string name);
+
+        /// <summary>
+        /// Gets stream length.
+        /// </summary>
+        /// <param name="category">Object category.</param>
+        /// <param name="name">Object name.</param>
+        long GetStreamLength(string category, string name);
 
         /// <summary>
         /// Gets object stream.
@@ -53,7 +67,8 @@ namespace SIPackages.PlatformSpecific
         /// <param name="name">Object name.</param>
         /// <param name="contentType">Object content type.</param>
         /// <param name="stream">Object stream.</param>
-        Task CreateStreamAsync(string category, string name, string contentType, Stream stream);
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task CreateStreamAsync(string category, string name, string contentType, Stream stream, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Deletes an object.

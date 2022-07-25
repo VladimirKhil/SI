@@ -1,7 +1,9 @@
 ﻿using SIPackages.Core;
 using SIPackages.PlatformSpecific;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SIPackages
@@ -58,6 +60,8 @@ namespace SIPackages
         /// <param name="fileName">File name.</param>
         public StreamInfo GetFile(string fileName) => _package.GetStream(Name, fileName);
 
+        public long GetFileLength(string fileName) => _package.GetStreamLength(Name, fileName);
+
         #region IEnumerable<string> Members
 
         public IEnumerator<string> GetEnumerator()
@@ -81,9 +85,10 @@ namespace SIPackages
         /// </summary>
         /// <param name="fileName">File name.</param>
         /// <param name="stream">File stream.</param>
-        public async Task AddFileAsync(string fileName, Stream stream)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task AddFileAsync(string fileName, Stream stream, CancellationToken cancellationToken = default)
         {
-            await _package.CreateStreamAsync(Name, fileName, _mediaType, stream);
+            await _package.CreateStreamAsync(Name, fileName, _mediaType, stream, cancellationToken);
             _files.Add(fileName);
         }
 
@@ -102,12 +107,13 @@ namespace SIPackages
         /// </summary>
         /// <param name="oldName">Old file name.</param>
         /// <param name="newName">New file name.</param>
-        public async Task RenameFileAsync(string oldName, string newName)
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public async Task RenameFileAsync(string oldName, string newName, CancellationToken cancellationToken = default)
         {
             var streamInfo = _package.GetStream(Name, oldName);
             using (var stream = streamInfo.Stream)
             {
-                await _package.CreateStreamAsync(Name, newName, _mediaType, stream);
+                await _package.CreateStreamAsync(Name, newName, _mediaType, stream, cancellationToken);
             }
 
             _files.Add(newName);

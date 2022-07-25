@@ -1,4 +1,4 @@
-﻿using Services.SI;
+﻿using SIStorageService.Client.Models;
 using System;
 using System.Globalization;
 using System.Windows.Data;
@@ -13,9 +13,7 @@ namespace SImulator.Converters
             return publisher.ID == -2 ? "(все)" : (publisher.ID == -1 ? "(не задано)" : publisher.Name);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => 
             throw new NotImplementedException();
-        }
     }
 }

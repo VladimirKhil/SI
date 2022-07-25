@@ -1,5 +1,5 @@
-﻿using Services.SI;
-using SIGame.Properties;
+﻿using SIGame.Properties;
+using SIStorageService.Client.Models;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -12,7 +12,9 @@ namespace SIGame.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is PackageSortMode))
+            {
                 return DependencyProperty.UnsetValue;
+            }
 
             return (PackageSortMode)value == PackageSortMode.Name ? Resources.Name : Resources.PublishedDate;
         }

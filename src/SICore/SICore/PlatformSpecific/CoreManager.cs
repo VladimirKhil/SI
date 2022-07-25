@@ -3,7 +3,7 @@
 namespace SICore.PlatformSpecific
 {
     /// <summary>
-    /// Логика, различающаяся на разных платформах
+    /// Provides a system-specific game logic.
     /// </summary>
     public abstract class CoreManager
     {
@@ -17,6 +17,7 @@ namespace SICore.PlatformSpecific
         public abstract byte[] GetData(string filename);
 
         public abstract bool FileExists(string filePath);
+
         public abstract Stream GetFile(string filePath);
     }
 }

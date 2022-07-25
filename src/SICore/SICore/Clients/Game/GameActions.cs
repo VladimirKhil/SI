@@ -13,9 +13,13 @@ using R = SICore.Properties.Resources;
 
 namespace SICore
 {
+    /// <summary>
+    /// Defines game actions.
+    /// </summary>
     public sealed class GameActions
     {
         private readonly GameData _gameData;
+
         private readonly ILocalizer LO;
 
         public Client Client { get; }
@@ -34,12 +38,6 @@ namespace SICore
         public void SendMessageToWithArgs(string receiver, params object[] args) =>
             SendMessage(string.Join(Message.ArgsSeparator, args), receiver);
 
-        /// <summary>
-        /// Вывод в протокол
-        /// </summary>
-        /// <param name="text">Текст</param>
-        public void Print(string text) => SendMessageWithArgs(Messages.Print, text);
-
         internal void SystemReplic(string text) => UserMessage(MessageTypes.System, text);
 
         internal void SpecialReplic(string text) => UserMessage(MessageTypes.Special, text);
@@ -57,72 +55,16 @@ namespace SICore
         /// <param name="personIndex">Индекс источника сообщения (для реплик игроков)</param>
         internal void UserMessage(MessageTypes messageType, string text, GameRole? personRole = null, int? personIndex = null)
         {
-            switch (messageType)
-            {
-                case MessageTypes.System:
-                    Print(ReplicManager.System(text));
-                    break;
-
-                case MessageTypes.Special:
-                    Print(ReplicManager.Special(text));
-                    break;
-
-                case MessageTypes.Replic:
-                    if (!personRole.HasValue)
-                    {
-                        throw new ArgumentNullException(nameof(personRole));
-                    }
-
-                    switch (personRole.Value)
-                    {
-                        case GameRole.Viewer: // Не используется
-                            break;
-
-                        case GameRole.Player:
-                            if (!personIndex.HasValue)
-                            {
-                                throw new ArgumentNullException(nameof(personIndex));
-                            }
-
-                            Print(Player(personIndex.Value) + ReplicManager.Replic(text));
-                            break;
-
-                        case GameRole.Showman:
-                            Print(Showman() + ReplicManager.Replic(text));
-                            break;
-                    }
-
-                    break;
-            }
-
-            var person = messageType == MessageTypes.System ? ReplicCodes.System.ToString()
-                : messageType == MessageTypes.Special ? ReplicCodes.Special.ToString() :
-                (personRole == GameRole.Player
-                ? ReplicCodes.Player + personIndex.Value.ToString()
-                : ReplicCodes.Showman.ToString());
+            var person = messageType == MessageTypes.System
+                ? ReplicCodes.System.ToString()
+                : messageType == MessageTypes.Special
+                    ? ReplicCodes.Special.ToString()
+                    : (personRole == GameRole.Player
+                        ? ReplicCodes.Player + personIndex.Value.ToString()
+                        : ReplicCodes.Showman.ToString());
 
             SendMessageWithArgs(Messages.Replic, person, text);
         }
-
-        /// <summary>
-        /// Зритель
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        public static string Viewer(string s) => $"<viewer>{ReplicManager.Escape(s)}</viewer>";
-
-        /// <summary>
-        /// Игрок
-        /// </summary>
-        /// <param name="n">Номер игрока</param>
-        /// <returns></returns>
-        public static string Player(int n) => $"<player>{n}</player>";
-
-        /// <summary>
-        /// Ведущий
-        /// </summary>
-        /// <returns></returns>
-        public string Showman() => $"<showman>{ReplicManager.Escape(_gameData.ShowMan.Name)}</showman>";
 
         /// <summary>
         /// Выдача информации о счёте
@@ -142,7 +84,6 @@ namespace SICore
         /// <summary>
         /// Sends all rounds names to person. Only rounds with at least one question are taken into account.
         /// </summary>
-        /// <param name="roundNames">Rounds names.</param>
         /// <param name="person">Person name.</param>
         public void InformRoundsNames(string person = NetworkConstants.Everybody)
         {
@@ -161,11 +102,13 @@ namespace SICore
         public void AnnounceSums()
         {
             var s = new StringBuilder(LO[nameof(R.Score)]).Append(": ");
-            var total = _gameData.Players.Count;
-            for (var i = 0; i < total; i++)
+            var playerCount = _gameData.Players.Count;
+
+            for (var i = 0; i < playerCount; i++)
             {
                 s.Append(Notion.FormatNumber(_gameData.Players[i].Sum));
-                if (i < total - 1)
+
+                if (i < playerCount - 1)
                 {
                     s.Append("; ");
                 }
@@ -179,20 +122,20 @@ namespace SICore
         /// </summary>
         public void InformTable(string receiver = NetworkConstants.Everybody)
         {
-            var message2 = new StringBuilder(Messages.Table);
+            var message = new StringBuilder(Messages.Table);
 
             for (var i = 0; i < _gameData.TInfo.RoundInfo.Count; i++)
             {
                 for (var j = 0; j < _gameData.TInfo.RoundInfo[i].Questions.Count; j++)
                 {
-                    message2.Append(Message.ArgsSeparatorChar);
-                    message2.Append(_gameData.TInfo.RoundInfo[i].Questions[j].Price);
+                    message.Append(Message.ArgsSeparatorChar);
+                    message.Append(_gameData.TInfo.RoundInfo[i].Questions[j].Price);
                 }
 
-                message2.Append(Message.ArgsSeparatorChar);
+                message.Append(Message.ArgsSeparatorChar);
             }
 
-            SendMessage(message2.ToString(), receiver);
+            SendMessage(message.ToString(), receiver);
         }
 
         /// <summary>
@@ -233,6 +176,7 @@ namespace SICore
             }
 
             IEnumerable<string> persons;
+
             if (person != NetworkConstants.Everybody)
             {
                 if (Client.CurrentServer.Contains(person))
@@ -264,6 +208,7 @@ namespace SICore
                     foreach (var atom in question.Scenario)
                     {
                         var atomType = atom.Type;
+
                         if (atomType == AtomTypes.Image || atomType == AtomTypes.Audio || atomType == AtomTypes.Video)
                         {
                             var link = _gameData.PackageDoc.GetLink(atom);
@@ -283,7 +228,7 @@ namespace SICore
                                         ? SIDocument.AudioStorageName
                                         : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
 
-                                var uri = _gameData.Share.CreateURI(link.Uri, link.GetStream, mediaCategory);
+                                var uri = _gameData.Share.CreateUri(link.Uri, link.GetStream, mediaCategory);
                                 contentUris.Add(uri.Replace("http://localhost", "http://" + Constants.GameHost));
                             }
                         }

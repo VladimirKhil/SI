@@ -183,12 +183,15 @@ namespace SIUI.ViewModel
 
         public bool Finished
         {
-            get { return _finished; }
+            get => _finished;
             set
             {
                 _finished = value;
+
                 if (value)
+                {
                     OnReady();
+                }
 
                 OnPropertyChanged();
             }
@@ -201,7 +204,9 @@ namespace SIUI.ViewModel
                 lock (TStageLock)
                 {
                     if (_tStage == TableStage.RoundTable)
+                    {
                         TStage = TableStage.Special;
+                    }
                 }
             }
 
@@ -369,6 +374,7 @@ namespace SIUI.ViewModel
         {
             Finished = false;
             _isComplex = true;
+
             for (var k = 0; k < RoundInfo.Count; k++)
             {
                 RoundInfo[k].Active = k == themeIndex && setActive;
