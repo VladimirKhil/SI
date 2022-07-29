@@ -1440,6 +1440,11 @@ namespace SICore
                     return;
                 }
 
+                if (!_logic.Stop(StopReason.Pause))
+                {
+                    return;
+                }
+
                 ClientData.TInfo.Pause = true;
                 ClientData.PauseStartTime = DateTime.UtcNow;
 
@@ -1464,8 +1469,6 @@ namespace SICore
                 {
                     times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
                 }
-
-                _logic.Stop(StopReason.Pause);
 
                 _gameActions.SpecialReplic(LO[nameof(R.PauseInGame)]);
             }
@@ -1514,7 +1517,15 @@ namespace SICore
                 else
                 {
                     _logic.AddHistory($"Pause resumed ({_logic.PrintOldTasks()} {_logic.StopReason})");
-                    _logic.ResumeExecution();
+
+                    try
+                    {
+                        _logic.ResumeExecution();
+                    }
+                    catch (Exception exc)
+                    {
+                        throw new Exception($"Resume execution error: {_logic.PrintHistory()}", exc);
+                    }
 
                     if (_logic.StopReason == StopReason.Decision)
                     {

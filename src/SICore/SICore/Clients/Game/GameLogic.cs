@@ -34,7 +34,7 @@ namespace SICore
         /// <summary>
         /// Maximum number of oversized media notifications.
         /// </summary>
-        public const int MaxMediaNotifications = 5;
+        public const int MaxMediaNotifications = 15;
 
         /// <summary>
         /// Maximum penalty value for a player.
@@ -52,7 +52,7 @@ namespace SICore
 
         private readonly Action _autoGame;
 
-        private readonly HistoryLog _tasksHistory = new HistoryLog();
+        private readonly HistoryLog _tasksHistory = new();
 
         public SIEngine.EngineBase Engine { get; private set; }
 
@@ -155,7 +155,7 @@ namespace SICore
                 .Select(roundTuple => new RoundInfo { Index = roundTuple.index, Name = roundTuple.round.Name })
                 .ToArray();
 
-            if (_data.Package.Info.Comments.Text.StartsWith("{random}"))
+            if (_data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator))
             {
                 _data.GameResultInfo.PackageName += string.Concat(Environment.NewLine, _data.Package.Info.Comments.Text.AsSpan(8));
             }
@@ -416,9 +416,9 @@ namespace SICore
                 {
                     // Notify users that the media file is too large and could be downloaded slowly
 
-                    var contentName = atomType == AtomTypes.Image ? SIPackages.Properties.Resources.Image :
-                        (atomType == AtomTypes.Audio ? SIPackages.Properties.Resources.Audio :
-                        (atomType == AtomTypes.Video ? SIPackages.Properties.Resources.Video : R.File));
+                    var contentName = atomType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
+                        (atomType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
+                        (atomType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
 
                     var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, filename, maxRecommendedFileLength);
 
@@ -432,7 +432,11 @@ namespace SICore
                         _data.OversizedMediaNotificationsCount++;
 
                         // Show message on table
-                        // TODO
+
+                        _gameActions.SendMessageWithArgs(
+                           Messages.Atom,
+                           AtomTypes.Text,
+                           errorMessage);
                     }
                 }
 
@@ -812,6 +816,7 @@ namespace SICore
         {
             if (_stopReason != StopReason.None)
             {
+                _tasksHistory.AddLogEntry($"Stop skipped. Current reason: {_stopReason}, new reason: {reason}");
                 return false;
             }
 
@@ -4481,6 +4486,7 @@ namespace SICore
             {
                 _data.CurPriceRight = -1;
                 _data.CatInfo = BagCatHelper.ParseCatCost(cost);
+
                 if (_data.CatInfo != null)
                 {
                     if (_data.CatInfo.Step == 0)
@@ -4504,11 +4510,13 @@ namespace SICore
 
                     catInfo.Minimum = -1;
                     catInfo.Maximum = 0;
+
                     foreach (var theme in _data.Round.Themes)
                     {
                         foreach (var quest in theme.Questions)
                         {
                             var price = quest.Price;
+
                             if (price < catInfo.Minimum || catInfo.Minimum == -1)
                             {
                                 catInfo.Minimum = price;
@@ -4522,6 +4530,7 @@ namespace SICore
                     }
 
                     catInfo.Step = catInfo.Maximum - catInfo.Minimum;
+
                     if (catInfo.Step == 0)
                     {
                         add = catInfo.Maximum.ToString();
