@@ -20,6 +20,9 @@
         /// </summary>
         public int Port { get; set; }
 
+        [System.Obsolete]
+        public string PackagesPublicBaseUrl { get; set; }
+
         /// <summary>
         /// Base Urls that are considered valid for in-game content files.
         /// </summary>

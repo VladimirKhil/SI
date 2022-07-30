@@ -1186,7 +1186,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на {0} {1} exceeds recommended size of {2} KB and could be loaded with delay.
+        ///   Ищет локализованную строку, похожую на {0} in question {1} exceeds recommended size of {2} KB and could be loaded with delay.
         /// </summary>
         public static string OversizedFile {
             get {

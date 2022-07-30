@@ -174,7 +174,7 @@ namespace SICore
 
             _gameActions.SendMessage(msg.Build());
 
-            ScheduleExecution(Tasks.MoveNext, Math.Min(40, 11 + 150 * gameThemes.Length / 18));
+            ScheduleExecution(Tasks.MoveNext, Math.Max(40, 11 + 150 * gameThemes.Length / 18));
         }
 
         private void Engine_Round(Round round)
@@ -420,12 +420,10 @@ namespace SICore
                         (atomType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
                         (atomType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
 
-                    var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, filename, maxRecommendedFileLength);
+                    var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
+                    var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
 
-                    _gameActions.SendMessageWithArgs(
-                        Messages.Replic,
-                        ReplicCodes.Special.ToString(),
-                        errorMessage);
+                    _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
 
                     if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
                     {
@@ -433,10 +431,8 @@ namespace SICore
 
                         // Show message on table
 
-                        _gameActions.SendMessageWithArgs(
-                           Messages.Atom,
-                           AtomTypes.Text,
-                           errorMessage);
+                        _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, errorMessage); // Will be removed in the future
+                        _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
                     }
                 }
 
@@ -1715,6 +1711,33 @@ namespace SICore
                 case StopReason.Pause:
                     _tasksHistory.AddLogEntry($"Pause PauseExecution {task} {arg} {PrintOldTasks()}");
                     PauseExecution((int)task, arg);
+
+                    ClientData.PauseStartTime = DateTime.UtcNow;
+
+                    if (ClientData.IsPlayingMedia)
+                    {
+                        ClientData.IsPlayingMediaPaused = true;
+                        ClientData.IsPlayingMedia = false;
+                    }
+
+                    if (ClientData.IsThinking)
+                    {
+                        var startTime = ClientData.TimerStartTime[1];
+
+                        ClientData.TimeThinking += ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
+                        ClientData.IsThinkingPaused = true;
+                        ClientData.IsThinking = false;
+                    }
+
+                    var times = new int[Constants.TimersCount];
+
+                    for (var i = 0; i < Constants.TimersCount; i++)
+                    {
+                        times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+                    }
+
+                    _gameActions.SpecialReplic(LO[nameof(R.PauseInGame)]);
+                    _gameActions.SendMessageWithArgs(Messages.Pause, '+', times[0], times[1], times[2]);
                     break;
 
                 case StopReason.Decision:

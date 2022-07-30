@@ -21,7 +21,7 @@ using R = SICore.Properties.Resources;
 namespace SICore
 {
     /// <summary>
-    /// Клиент игры
+    /// Defines a game actor. Responds to all game-related messages.
     /// </summary>
     public sealed class Game : Actor<GameData, GameLogic>
     {
@@ -1063,6 +1063,7 @@ namespace SICore
 
             var index = -1;
             IEnumerable<ViewerAccount> accountsToSearch;
+
             switch (role)
             {
                 case Constants.Showman:
@@ -1071,6 +1072,7 @@ namespace SICore
 
                 case Constants.Player:
                     accountsToSearch = ClientData.Players;
+
                     if (ClientData.HostName == name) // Подключение организатора
                     {
                         var defaultPlayers = ClientData.Settings.Players;
@@ -1430,9 +1432,8 @@ namespace SICore
 
         private void OnPauseCore(bool isPauseEnabled)
         {
-            var times = new int[3];
-
             // Game host or showman requested a game pause
+
             if (isPauseEnabled)
             {
                 if (ClientData.TInfo.Pause)
@@ -1440,108 +1441,77 @@ namespace SICore
                     return;
                 }
 
-                if (!_logic.Stop(StopReason.Pause))
+                if (_logic.Stop(StopReason.Pause))
                 {
-                    return;
+                    ClientData.TInfo.Pause = true;
+                    Logic.AddHistory("Pause activated");
                 }
 
-                ClientData.TInfo.Pause = true;
-                ClientData.PauseStartTime = DateTime.UtcNow;
-
-                Logic.AddHistory("Pause activated");
-
-                if (ClientData.IsThinking)
-                {
-                    var startTime = ClientData.TimerStartTime[1];
-
-                    ClientData.TimeThinking += ClientData.PauseStartTime.Subtract(startTime).TotalMilliseconds / 100;
-                    ClientData.IsThinkingPaused = true;
-                    ClientData.IsThinking = false;
-                }
-
-                if (ClientData.IsPlayingMedia)
-                {
-                    ClientData.IsPlayingMediaPaused = true;
-                    ClientData.IsPlayingMedia = false;
-                }
-
-                for (var i = 0; i < Constants.TimersCount; i++)
-                {
-                    times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-                }
-
-                _gameActions.SpecialReplic(LO[nameof(R.PauseInGame)]);
+                return;
             }
-            else
+
+            if (_logic.StopReason == StopReason.Pause)
             {
-                if (!ClientData.TInfo.Pause)
-                {
-                    if (_logic.StopReason == StopReason.Pause)
-                    {
-                        // We are currently moving into pause mode. Resuming
-                        _logic.AddHistory("Immediate pause resume");
-                        _logic.CancelStop();
-                    }
-
-                    return;
-                }
-
+                // We are currently moving into pause mode. Resuming
                 ClientData.TInfo.Pause = false;
-
-                var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
-
-                for (var i = 0; i < Constants.TimersCount; i++)
-                {
-                    times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
-                    ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
-                }
-
-                if (ClientData.IsPlayingMediaPaused)
-                {
-                    ClientData.IsPlayingMediaPaused = false;
-                    ClientData.IsPlayingMedia = true;
-                }
-
-                if (ClientData.IsThinkingPaused)
-                {
-                    ClientData.IsThinkingPaused = false;
-                    ClientData.IsThinking = true;
-                }
-
-                if (_logic.StopReason == StopReason.Pause)
-                {
-                    // We are currently moving into pause mode. Resuming
-                    _logic.AddHistory("Immediate pause resume");
-                    _logic.CancelStop();
-                }
-                else
-                {
-                    _logic.AddHistory($"Pause resumed ({_logic.PrintOldTasks()} {_logic.StopReason})");
-
-                    try
-                    {
-                        _logic.ResumeExecution();
-                    }
-                    catch (Exception exc)
-                    {
-                        throw new Exception($"Resume execution error: {_logic.PrintHistory()}", exc);
-                    }
-
-                    if (_logic.StopReason == StopReason.Decision)
-                    {
-                        _logic.ExecuteImmediate(); // Вдруг уже готово
-                    }
-                }
-
-                _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
+                _logic.AddHistory("Immediate pause resume");
+                _logic.CancelStop();
+                return;
             }
 
+            if (!ClientData.TInfo.Pause)
+            {
+                return;
+            }
+
+            ClientData.TInfo.Pause = false;
+
+            var pauseDuration = DateTime.UtcNow.Subtract(ClientData.PauseStartTime);
+
+            var times = new int[Constants.TimersCount];
+
+            for (var i = 0; i < Constants.TimersCount; i++)
+            {
+                times[i] = (int)(ClientData.PauseStartTime.Subtract(ClientData.TimerStartTime[i]).TotalMilliseconds / 100);
+                ClientData.TimerStartTime[i] = ClientData.TimerStartTime[i].Add(pauseDuration);
+            }
+
+            if (ClientData.IsPlayingMediaPaused)
+            {
+                ClientData.IsPlayingMediaPaused = false;
+                ClientData.IsPlayingMedia = true;
+            }
+
+            if (ClientData.IsThinkingPaused)
+            {
+                ClientData.IsThinkingPaused = false;
+                ClientData.IsThinking = true;
+            }
+
+            _logic.AddHistory($"Pause resumed ({_logic.PrintOldTasks()} {_logic.StopReason})");
+
+            try
+            {
+                var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+                times[1] = maxPressingTime - _logic.ResumeExecution();
+            }
+            catch (Exception exc)
+            {
+                throw new Exception($"Resume execution error: {_logic.PrintHistory()}", exc);
+            }
+
+            if (_logic.StopReason == StopReason.Decision)
+            {
+                _logic.ExecuteImmediate(); // Decision could be ready
+            }
+
+            _gameActions.SpecialReplic(LO[nameof(R.GameResumed)]);
             _gameActions.SendMessageWithArgs(Messages.Pause, isPauseEnabled ? '+' : '-', times[0], times[1], times[2]);
         }
 
         private void OnAtom()
         {
-            if (!ClientData.IsPlayingMedia)
+            if (!ClientData.IsPlayingMedia || ClientData.TInfo.Pause)
             {
                 return;
             }
@@ -1736,7 +1706,7 @@ namespace SICore
                 }
             }
 
-            if (canPressChanged && ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
+            if (canPressChanged && !ClientData.TInfo.Pause && ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
             {
                 _logic.ScheduleExecution(Tasks.WaitTry, 3, force: true);
             }
@@ -1745,9 +1715,14 @@ namespace SICore
         /// <summary>
         /// Handles player button press.
         /// </summary>
-        /// <param name="playerName">Player name.</param>
+        /// <param name="playerName">Pressed player name.</param>
         private void OnI(string playerName)
         {
+            if (ClientData.TInfo.Pause)
+            {
+                return;
+            }
+
             if (ClientData.Decision != DecisionType.Pressing)
             {
                 // Just show that the player has misfired the button
@@ -1993,6 +1968,7 @@ namespace SICore
             if (ClientData.Stage == GameStage.Before)
             {
                 var readyAll = ClientData.MainPersons.All(p => p.Ready);
+
                 if (readyAll)
                 {
                     StartGame();

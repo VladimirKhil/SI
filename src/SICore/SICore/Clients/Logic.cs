@@ -102,12 +102,13 @@ namespace SICore
             var now = DateTime.UtcNow;
 
             // Saving running task, its argument and left time
-            _oldTasks.Push(Tuple.Create(task, taskArgument, (int)((_finishingTime - now).TotalMilliseconds / 100)));
+            var leftTime = (int)((_finishingTime - now).TotalMilliseconds / 100);
+            _oldTasks.Push(Tuple.Create(task, taskArgument, leftTime));
 
             CurrentTask = -1;
         }
 
-        protected internal void ResumeExecution(int resumeTime = 0)
+        protected internal int ResumeExecution(int resumeTime = 0)
         {
             if (!_oldTasks.Any())
             {
@@ -115,7 +116,11 @@ namespace SICore
             }
 
             var oldTask = _oldTasks.Pop();
-            ScheduleExecution(oldTask.Item1, oldTask.Item2, resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3));
+            var taskTime = resumeTime > 0 ? resumeTime : Math.Max(1, oldTask.Item3);
+
+            ScheduleExecution(oldTask.Item1, oldTask.Item2, taskTime);
+
+            return taskTime;
         }
 
         protected internal void UpdatePausedTask(int task, int taskArgument, int taskTime)

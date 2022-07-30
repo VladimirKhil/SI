@@ -31,6 +31,11 @@
         public const string Atom = "ATOM";
 
         /// <summary>
+        /// Small hint fragment. Displayed separately from the main content.
+        /// </summary>
+        public const string Atom_Hint = "ATOM_HINT";
+
+        /// <summary>
         /// Дополнительная единица сценария вопроса
         /// </summary>
         public const string Atom_Second = "ATOM_SECOND";

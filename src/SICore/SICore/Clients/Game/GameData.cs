@@ -515,10 +515,16 @@ namespace SICore
 
         public int TextLength { get; internal set; }
 
+        /// <summary>
+        /// Marks thinking time when the border around question is shrinking.
+        /// </summary>
         public bool IsThinking { get; internal set; }
 
         public bool IsThinkingPaused { get; internal set; }
 
+        /// <summary>
+        /// Accumulates time passed in thinking on question (border shrinking) mode, 0.1 s units.
+        /// </summary>
         public double TimeThinking { get; internal set; }
 
         public bool MoveNextBlocked { get; set; }
@@ -538,6 +544,10 @@ namespace SICore
 
         public RoundInfo[] Rounds { get; internal set; } = Array.Empty<RoundInfo>();
 
+        /// <summary>
+        /// Counts notifications shown in the game.
+        /// Allow to prevent showing an unlimited number of notifications in the game.
+        /// </summary>
         internal int OversizedMediaNotificationsCount { get; set; }
 
         public GameData(IGameManager gameManager) : base(gameManager)
