@@ -198,9 +198,9 @@ namespace SImulator.Implementation
                     }
                 };
 
-                storage.Error += exc =>
+                storage.Error += (exc, message) =>
                 {
-                    ShowMessage(string.Format(Resources.SIStorageError, exc.ToString()), false);
+                    ShowMessage(string.Format(Resources.SIStorageError, $"{message} {exc}"), false);
                 };
 
                 try
