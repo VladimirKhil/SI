@@ -1,4 +1,5 @@
-﻿using SI.GameServer.Client;
+﻿using Microsoft.Extensions.Logging;
+using SI.GameServer.Client;
 using SICore;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -7,7 +8,6 @@ using SICore.Network.Servers;
 using SIData;
 using SIGame.ViewModel.Implementation;
 using SIGame.ViewModel.Properties;
-using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,6 +28,8 @@ namespace SIGame.ViewModel
     /// </summary>
     public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
+        public const int MaxAvatarSizeMb = 2;
+
         private SI.GameServer.Contract.HostInfo _gamesHostInfo;
 
         public string ServerName => _gamesHostInfo?.Name ?? "SIGame";
@@ -331,13 +333,16 @@ namespace SIGame.ViewModel
 
         public ObservableCollection<string> Users { get; } = new ObservableCollection<string>();
 
-        private readonly object _usersLock = new object();
-        
+        private readonly object _usersLock = new();
+
+        private readonly ILogger<SIOnlineViewModel> _logger;
+
         public SIOnlineViewModel(
             ConnectionData connectionData,
             IGameServerClient gameServerClient,
             CommonSettings commonSettings,
-            UserSettings userSettings)
+            UserSettings userSettings,
+            ILogger<SIOnlineViewModel> logger)
             : base(connectionData, commonSettings, userSettings)
         {
             _gameServerClient = gameServerClient;
@@ -359,6 +364,8 @@ namespace SIGame.ViewModel
             ServerAddress = _gameServerClient.ServiceUri;
 
             AddEmoji = new CustomCommand(AddEmoji_Executed);
+
+            _logger = logger;
         }
 
         private Task GameServerClient_Reconnecting(Exception exc)
@@ -579,6 +586,10 @@ namespace SIGame.ViewModel
             {
 
             }
+            catch (ObjectDisposedException)
+            {
+
+            }
             catch (Exception exc)
             {
                 PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Warning, true);                
@@ -744,6 +755,7 @@ namespace SIGame.ViewModel
             var cancellationTokenSource = GameSettings.CancellationTokenSource = new CancellationTokenSource();
 
             var hash = await packageSource.GetPackageHashAsync(cancellationTokenSource.Token);
+
             var packageKey = new PackageKey
             {
                 Name = packageSource.GetPackageName(),
@@ -755,34 +767,9 @@ namespace SIGame.ViewModel
 
             if (!hasPackage)
             {
-                var data = await packageSource.GetPackageDataAsync(cancellationTokenSource.Token);
-                if (data == null)
+                if (!await UploadPackageAsync(packageSource, packageKey, cancellationTokenSource.Token))
                 {
-                    throw new Exception(Resources.BadPackage);
-                }
-
-                using (data)
-                {
-                    if (cancellationTokenSource.IsCancellationRequested)
-                    {
-                        return null;
-                    }
-
-                    if (data.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
-                    {
-                        throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
-                    }
-
-                    GameSettings.Message = Resources.SendingPackageToServer;
-                    ShowProgress = true;
-                    try
-                    {
-                        await _gameServerClient.UploadPackageAsync(packageKey, data, cancellationTokenSource.Token);
-                    }
-                    finally
-                    {
-                        ShowProgress = false;
-                    }
+                    return null;
                 }
             }
 
@@ -841,6 +828,46 @@ namespace SIGame.ViewModel
             }
 
             return Tuple.Create(_server, _host);
+        }
+
+        private async Task<bool> UploadPackageAsync(
+            PackageSources.PackageSource packageSource,
+            PackageKey packageKey,
+            CancellationToken cancellationToken)
+        {
+            var data = await packageSource.GetPackageDataAsync(cancellationToken);
+
+            if (data == null)
+            {
+                throw new Exception(Resources.BadPackage);
+            }
+
+            using (data)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return false;
+                }
+
+                if (data.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
+                {
+                    throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
+                }
+
+                GameSettings.Message = Resources.SendingPackageToServer;
+                ShowProgress = true;
+
+                try
+                {
+                    await _gameServerClient.UploadPackageAsync(packageKey, data, cancellationToken);
+                }
+                finally
+                {
+                    ShowProgress = false;
+                }
+            }
+
+            return true;
         }
 
         private async Task InitServerAndClientNewAsync(CancellationToken cancellationToken = default)
@@ -903,6 +930,7 @@ namespace SIGame.ViewModel
             CancellationToken cancellationToken = default)
         {
             var avatarUri = account.Picture;
+
             if (!Uri.TryCreate(avatarUri, UriKind.Absolute, out Uri pictureUri))
             {
                 return (null, null);
@@ -913,7 +941,13 @@ namespace SIGame.ViewModel
                 return (null, null);
             }
 
+            if (new FileInfo(avatarUri).Length > MaxAvatarSizeMb * 1024 * 1024)
+            {
+                return (null, null);
+            }
+
             byte[] fileHash = null;
+
             using (var stream = File.OpenRead(avatarUri))
             {
                 using var sha1 = SHA1.Create();
@@ -924,6 +958,7 @@ namespace SIGame.ViewModel
 
             // Если файла на сервере нет, загрузим его
             var avatarPath = await _gameServerClient.HasImageAsync(avatarKey, cancellationToken);
+
             if (avatarPath == null)
             {
                 using var stream = File.OpenRead(avatarUri);
@@ -955,6 +990,7 @@ namespace SIGame.ViewModel
                 lock (_serverGamesLock)
                 {
                     var passwordRequired = gameInfo != null && gameInfo.PasswordRequired;
+
                     if (passwordRequired && string.IsNullOrEmpty(_password))
                     {
                         IsProgress = false;
@@ -965,10 +1001,12 @@ namespace SIGame.ViewModel
 
             try
             {
-                Trace.TraceInformation($"Joining game: UseSignalRConnection = {_userSettings.UseSignalRConnection}");
+                _logger.LogInformation("Joining game: UseSignalRConnection = {useSignalRConnection}", _userSettings.UseSignalRConnection);
+
                 if (_userSettings.UseSignalRConnection)
                 {
                     var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password, cancellationToken);
+                    
                     if (result.ErrorMessage != null)
                     {
                         Error = result.ErrorMessage;
@@ -982,7 +1020,9 @@ namespace SIGame.ViewModel
                 {
                     await InitServerAndClientAsync(_gamesHostInfo.Host ?? new Uri(ServerAddress).Host, _gamesHostInfo.Port);
                     await ConnectCoreAsync(true);
+
                     var result = await _connector.SetGameIdAsync(gameInfo.GameID);
+
                     if (!result)
                     {
                         Error = Resources.CreatedGameNotFound;

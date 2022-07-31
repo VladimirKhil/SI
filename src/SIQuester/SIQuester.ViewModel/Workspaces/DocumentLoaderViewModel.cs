@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class DocumentLoaderViewModel: WorkspaceViewModel
+    public sealed class DocumentLoaderViewModel : WorkspaceViewModel
     {
         public override string Header => Resources.DocumentLoading;
 

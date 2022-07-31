@@ -7,9 +7,12 @@ using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
+    /// <summary>
+    /// Provides a view model for network (direct) connection.
+    /// </summary>
     public sealed class SINetworkViewModel : ConnectionDataViewModel
     {
-        private static readonly Regex AddressRegex = new Regex(@"^(?<host>(\d{1,3}\.){3}\d{1,3})\:(?<port>\d+)$");
+        private static readonly Regex AddressRegex = new(@"^(?<host>(\d{1,3}\.){3}\d{1,3})\:(?<port>\d+)$");
 
         protected override bool IsOnline => false;
 
@@ -33,6 +36,9 @@ namespace SIGame.ViewModel
             }
         }
 
+        /// <summary>
+        /// Host address.
+        /// </summary>
         public string Address
         {
             get => _model.Address;
@@ -43,30 +49,24 @@ namespace SIGame.ViewModel
                 Error = "";
                 if (_model.Address != newValue)
                 {
-                    Connect.CanBeExecuted = false;
+                    _model.Address = newValue;
+                    OnPropertyChanged();
 
-                    try
+                    var match = AddressRegex.Match(newValue);
+                    if (!match.Success || !int.TryParse(match.Groups["port"].Value, out _))
                     {
-                        var match = AddressRegex.Match(newValue);
-                        if (!match.Success || !int.TryParse(match.Groups["port"].Value, out _))
-                        {
-                            Error = Resources.WrongAddressFormat;
-                            return;
-                        }
+                        Error = Resources.WrongAddressFormat;
+                        Connect.CanBeExecuted = false;
+                        return;
+                    }
 
-                        _model.Address = newValue;
-                        OnPropertyChanged();
-                    }
-                    finally
-                    {
-                        Connect.CanBeExecuted = true;
-                    }
+                    Connect.CanBeExecuted = true;
                 }
             }
         }
 
         /// <summary>
-        /// Подключиться к конкретному серверу
+        /// Connect to the host specified by the direct address.
         /// </summary>
         public CustomCommand Connect { get; private set; }
 
@@ -80,7 +80,7 @@ namespace SIGame.ViewModel
 
         public CustomCommand Cancel { get; set; }
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         public SINetworkViewModel(ConnectionData connectionData, CommonSettings commonSettings, UserSettings userSettings)
             : base(connectionData, commonSettings, userSettings)
@@ -155,6 +155,7 @@ namespace SIGame.ViewModel
                     Error = exc.Message;
                     FullError = exc.ToString();
                     await _server.DisposeAsync();
+                    _server = null;
 
                     if (_connector != null)
                     {

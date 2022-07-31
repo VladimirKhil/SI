@@ -1020,4 +1020,13 @@
   <data name="ServerLicense" xml:space="preserve">
     <value>Server license</value>
   </data>
+  <data name="MaximumReplicTextLength" xml:space="preserve">
+    <value>Maximum replic text length</value>
+  </data>
+  <data name="MaximumTableTextLength" xml:space="preserve">
+    <value>Maximum table text length</value>
+  </data>
+  <data name="Sec" xml:space="preserve">
+    <value>sec</value>
+  </data>
 </root>

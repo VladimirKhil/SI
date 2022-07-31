@@ -41,6 +41,10 @@ namespace SIGame.ViewModel
 
         public override string GameButtonKey => PlatformSpecific.PlatformManager.Instance.GetKeyName(_userSettings.GameSettings.AppSettings.GameButtonKey2);
 
+        public override int MaximumTableTextLength => _userSettings.GameSettings.AppSettings.ThemeSettings.MaximumTableTextLength;
+
+        public override int MaximumReplicTextLength => _userSettings.GameSettings.AppSettings.ThemeSettings.MaximumReplicTextLength;
+
         public override void OnError(Exception exc) => PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Error, true);
 
         public override void LogWarning(string message) => Trace.TraceWarning(message);
@@ -53,10 +57,10 @@ namespace SIGame.ViewModel
         public override async Task SaveReportAsync(GameResult gameResult, CancellationToken cancellationToken = default)
         {
             SI.GameResultService.Client.AnswerInfo answerConverter(AnswerInfo q) =>
-                new SI.GameResultService.Client.AnswerInfo { Answer = q.Answer, Question = q.Question, Theme = q.Theme, Round = q.Round };
+                new() { Answer = q.Answer, Question = q.Question, Theme = q.Theme, Round = q.Round };
 
             SI.GameResultService.Client.PersonResult personResultConverter(PersonResult p) =>
-                new SI.GameResultService.Client.PersonResult { Name = p.Name, Sum = p.Sum };
+                new() { Name = p.Name, Sum = p.Sum };
 
             var result = new SI.GameResultService.Client.GameResult
             {

@@ -32,11 +32,11 @@ namespace SIGame.Implementation
 
         private void OnTimeChanged(object sender, EventArgs e) => TimeChanged?.Invoke(this);
 
-        public void Run(int maxTime, bool byUser)
+        public void Run(int maxTime, bool byUser, double? fromValue = null)
         {
             if (Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
-                Dispatcher.Invoke((Action<int, bool>)Run, maxTime, byUser);
+                Dispatcher.Invoke((Action<int, bool, double?>)Run, maxTime, byUser, fromValue);
                 return;
             }
             
@@ -64,7 +64,7 @@ namespace SIGame.Implementation
                 return;
             }
 
-            var animationTime = State == TimerState.Paused ? MaxTime * (1.0 - Time / 100) : MaxTime;
+            var animationTime = State == TimerState.Paused ? MaxTime * (1.0 - (fromValue ?? Time) / 100) : MaxTime;
 
             if (animationTime < double.Epsilon)
             {
@@ -75,7 +75,9 @@ namespace SIGame.Implementation
 
             State = TimerState.Running;
 
-            var animation = new DoubleAnimation(100.0, duration) { FillBehavior = FillBehavior.Stop };
+            var animation = fromValue.HasValue ?
+                new DoubleAnimation(fromValue.Value, 100.0, duration) { FillBehavior = FillBehavior.Stop }
+                : new DoubleAnimation(100.0, duration) { FillBehavior = FillBehavior.Stop };
 
             BeginAnimation(TimeProperty, animation);
         }
@@ -120,7 +122,12 @@ namespace SIGame.Implementation
 
                 if (MaxTime > 0)
                 {
-                    var animation = new DoubleAnimation(Math.Min(100.0, currentTime * 100 / MaxTime), new Duration(TimeSpan.FromMilliseconds(300))) { FillBehavior = FillBehavior.HoldEnd };
+                    var animation = new DoubleAnimation(
+                        Math.Min(100.0, currentTime * 100 / MaxTime),
+                        new Duration(TimeSpan.FromMilliseconds(300)))
+                    {
+                        FillBehavior = FillBehavior.HoldEnd
+                    };
 
                     BeginAnimation(TimeProperty, animation);
                 }

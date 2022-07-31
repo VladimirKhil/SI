@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System;
 
 namespace SIGame
 {
@@ -59,6 +60,7 @@ namespace SIGame
         private void NumericTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             var textBox = (TextBox)sender;
+
             if (!int.TryParse(textBox.Text, out var value))
             {
                 textBox.Text = Minimum.ToString();
@@ -76,6 +78,7 @@ namespace SIGame
             else
             {
                 var rem = (value - Minimum) % Step;
+
                 if (rem > 0)
                 {
                     textBox.Text = (value - rem).ToString();
@@ -99,20 +102,22 @@ namespace SIGame
                 }
 
                 var futureText = new StringBuilder();
+
                 if (SelectionStart > 0)
                 {
-                    futureText.Append(Text.Substring(0, SelectionStart));
+                    futureText.Append(Text.AsSpan(0, SelectionStart));
                 }
 
                 futureText.Append(e.Text);
 
                 if (SelectionStart + SelectionLength < Text.Length)
                 {
-                    futureText.Append(Text.Substring(SelectionStart + SelectionLength));
+                    futureText.Append(Text.AsSpan(SelectionStart + SelectionLength));
                 }
 
                 var fText = futureText.ToString();
                 var futureValue = int.Parse(fText);
+
                 if (futureValue > Maximum)
                 {
                     e.Handled = true;
@@ -133,6 +138,7 @@ namespace SIGame
         private void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
             var clipboard = e.DataObject.GetData(typeof(string)) as string;
+
             if (!int.TryParse(clipboard, out _))
             {
                 e.CancelCommand();

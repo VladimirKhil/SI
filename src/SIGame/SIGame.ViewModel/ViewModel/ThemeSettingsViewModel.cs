@@ -15,6 +15,7 @@ namespace SIGame.ViewModel
         /// Выбрать логотип
         /// </summary>
         public ICommand SelectLogo { get; private set; }
+
         /// <summary>
         /// Очистить логотип
         /// </summary>
@@ -24,6 +25,7 @@ namespace SIGame.ViewModel
         /// Выбрать фон
         /// </summary>
         public ICommand SelectCustomBackground { get; private set; }
+
         /// <summary>
         /// Очистить фон
         /// </summary>
@@ -33,6 +35,7 @@ namespace SIGame.ViewModel
         /// Выбрать фон
         /// </summary>
         public ICommand SelectCustomMainBackground { get; private set; }
+
         /// <summary>
         /// Очистить фон
         /// </summary>
@@ -44,6 +47,7 @@ namespace SIGame.ViewModel
         /// Выбрать мелодию
         /// </summary>
         public ICommand SelectSound { get; private set; }
+
         /// <summary>
         /// Очистить мелодию
         /// </summary>
@@ -73,10 +77,11 @@ namespace SIGame.ViewModel
         private void SelectLogo_Executed(object arg)
         {
             var fileName = PlatformSpecific.PlatformManager.Instance.SelectLogo();
+
             if (fileName != null)
             {
                 var fileLength = new FileInfo(fileName).Length;
-                if (fileLength > 250000)
+                if (fileLength > 250_000)
                     PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.FileTooLarge, PlatformSpecific.MessageType.Warning);
                 else
                     _model.UISettings.LogoUri = fileName;
@@ -91,20 +96,22 @@ namespace SIGame.ViewModel
         private void SelectSound_Executed(object arg)
         {
             var fileName = PlatformSpecific.PlatformManager.Instance.SelectSound();
+
             if (fileName != null)
             {
                 var fileLength = new FileInfo(fileName).Length;
-                if (fileLength > 5000000)
+                if (fileLength > 5_000_000)
+                {
                     PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.FileTooLarge, PlatformSpecific.MessageType.Warning);
+                }
                 else
+                {
                     _model.GetType().GetProperty(arg.ToString()).SetValue(_model, fileName);
+                }
             }
         }
 
-        private void ClearSound_Executed(object arg)
-        {
-            _model.GetType().GetProperty(arg.ToString()).SetValue(_model, null);
-        }
+        private void ClearSound_Executed(object arg) => _model.GetType().GetProperty(arg.ToString()).SetValue(_model, null);
 
         private void SelectColor_Executed(object arg)
         {
@@ -142,7 +149,7 @@ namespace SIGame.ViewModel
             if (fileName != null)
             {
                 var fileLength = new FileInfo(fileName).Length;
-                if (fileLength > 1500000)
+                if (fileLength > 1_500_000)
                     PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.FileTooLarge, PlatformSpecific.MessageType.Warning);
                 else
                     _model.CustomMainBackgroundUri = fileName;
@@ -157,6 +164,9 @@ namespace SIGame.ViewModel
         internal void Reset()
         {
             SIUISettings.Reset();
+
+            _model.MaximumTableTextLength = ThemeSettings.DefaultMaximumTableTextLength;
+            _model.MaximumReplicTextLength = ThemeSettings.DefaultMaximumReplicTextLength;
         }
     }
 }

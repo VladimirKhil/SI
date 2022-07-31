@@ -163,8 +163,12 @@ namespace Notions
             var res = new StringBuilder();
             int length = s.Length;
             for (var i = 0; i < length; i++)
+            {
                 if (char.IsDigit(s[i]))
+                {
                     res.Append(s[i]);
+                }
+            }
 
             return res.ToString();
         }
@@ -173,9 +177,14 @@ namespace Notions
         {
             var res = new StringBuilder();
             int length = s.Length;
+
             for (int i = 0; i < length; i++)
+            {
                 if (!char.IsDigit(s[i]))
+                {
                     res.Append(s[i]);
+                }
+            }
 
             return res.ToString();
         }
@@ -224,15 +233,23 @@ namespace Notions
         public static string EndWithPoint(this string s)
         {
             var res = ClearPoints(s);
+
             if (res.Length == 0)
+            {
                 return "";
+            }
 
             if (Uri.IsWellFormedUriString(s, UriKind.Absolute))
+            {
                 return res;
+            }
 
-            var last = res[res.Length - 1];
+            var last = res[^1];
+
             if (last != '?' && last != '!' && last != '…')
+            {
                 res += ".";
+            }
 
             return res;
         }
@@ -287,14 +304,22 @@ namespace Notions
         public static string FullTrim(this string s)
         {
             s = s.Trim();
+
             if (s.Length == 0)
+            {
                 return s;
+            }
 
             var res = new StringBuilder(s[0].ToString());
             var length = s.Length;
+
             for (var i = 1; i < length; i++)
+            {
                 if (s[i] == '\n' || !char.IsWhiteSpace(s[i]) || !char.IsWhiteSpace(s[i - 1]))
+                {
                     res.Append(s[i]);
+                }
+            }
 
             return res.ToString();
         }
@@ -318,7 +343,7 @@ namespace Notions
             if (s.Length <= 4)
                 return s;
 
-            return FormatNumber(s.Substring(0, s.Length - 3), true) + " " + s.Substring(s.Length - 3);
+            return $"{FormatNumber(s[..^3], true)} {s[^3..]}";
         }
 
         /// <summary>
@@ -345,8 +370,13 @@ namespace Notions
                 else if (s[i] == '"')
                     if (i == 0 || char.IsWhiteSpace(s[i - 1]) || i < length - 1 && (char.IsLetter(s[i + 1]) || char.IsDigit(s[i + 1])))
                         res.Append('«');
-                    else if (i == length - 1 || !char.IsLetter(s[i + 1]) && !char.IsDigit(s[i + 1]) || i > 0 && (char.IsLetter(s[i - 1]) || char.IsDigit(s[i - 1])))
+                    else if (i == length - 1 ||
+                        !char.IsLetter(s[i + 1]) && !char.IsDigit(s[i + 1]) ||
+                        i > 0 && (char.IsLetter(s[i - 1]) ||
+                        char.IsDigit(s[i - 1])))
+                    {
                         res.Append('»');
+                    }
                     else
                         res.Append(s[i]);
                 else
@@ -361,9 +391,10 @@ namespace Notions
         /// </summary>
         /// <param name="s">The string to shorten.</param>
         /// <param name="maxLength">Maximum allowed string length.</param>
+        /// <param name="ellipsis">Shorten line ending.</param>
         /// <returns>If string length is less than or equal to {maxLength}, returns original string.
         /// Otherwise returnes substring of {s} which length is less than {maxLength}</returns>
-        public static string Shorten(this string s, int maxLength)
+        public static string Shorten(this string s, int maxLength, string ellipsis = "")
         {
             if (maxLength == 0 || s.Length == 0)
             {
@@ -376,7 +407,7 @@ namespace Notions
             }
 
             // Surrogates have high component first
-            return s.Substring(0, maxLength - (char.IsHighSurrogate(s[maxLength - 1]) ? 1 : 0));
+            return s[..(maxLength - (char.IsHighSurrogate(s[maxLength - 1]) ? 1 : 0))] + ellipsis;
         }
     }
 }

@@ -1182,7 +1182,12 @@
             <DataTemplate x:Key="Language">
                 <DockPanel>
                     <TextBlock Text="Язык" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                    <ComboBox siq:ActivateManager.IsWatching="True" Style="{StaticResource ComboBoxCommon}" MinWidth="90" ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=TreeView}}" SelectedItem="{Binding Model.Language}">
+                    <ComboBox
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource ComboBoxCommon}"
+                        MinWidth="90"
+                        ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                        SelectedItem="{Binding Model.Language}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />

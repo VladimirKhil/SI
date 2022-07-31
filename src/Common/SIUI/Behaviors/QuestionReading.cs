@@ -28,14 +28,17 @@ namespace SIUI.Behaviors
         {
             var textBlock = (TextBlock)d;
             var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+
             textBlock.Loaded += (sender, e2) =>
-                {
-                    textBlock.TextEffects[0].BeginAnimation(TextEffect.PositionCountProperty, new Int32Animation
+            {
+                textBlock.TextEffects[0].BeginAnimation(
+                    TextEffect.PositionCountProperty,
+                    new Int32Animation
                     { 
                         To = tableInfoViewModel.Text.Length,
                         Duration = new Duration(TimeSpan.FromSeconds(tableInfoViewModel.Text.Length * tableInfoViewModel.TextSpeed))
                     });
-                };
+            };
         }
 
         public static bool GetIsAttachedPartial(DependencyObject obj)
@@ -99,7 +102,7 @@ namespace SIUI.Behaviors
         {
             if (System.Windows.Threading.Dispatcher.CurrentDispatcher != textBlock.Dispatcher)
             {
-                textBlock.Dispatcher.Invoke((Action<TextBlock, TableInfoViewModel>)UpdateAnimation, textBlock, tableInfoViewModel);
+                textBlock.Dispatcher.Invoke(UpdateAnimation, textBlock, tableInfoViewModel);
                 return;
             }
 

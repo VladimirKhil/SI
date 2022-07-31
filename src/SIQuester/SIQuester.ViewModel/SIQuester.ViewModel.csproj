@@ -6,7 +6,7 @@
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
     <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
-    <Version>5.7.0</Version>
+    <Version>5.7.8</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

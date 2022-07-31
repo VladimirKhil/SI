@@ -29,7 +29,7 @@ namespace Services.SI.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public event Action<Exception> Error;
+        public event Action<Exception, string> Error;
 
         private PackageInfo[] _packages;
 
@@ -251,7 +251,7 @@ namespace Services.SI.ViewModel
             }
             catch (Exception exc)
             {
-                Error?.Invoke(exc);
+                OnError(exc);
             }
             finally
             {
@@ -259,7 +259,9 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private static readonly NamedObject All = new NamedObject { ID = -2 };
+        private void OnError(Exception exc, string message = null) => Error?.Invoke(exc, message);
+
+        private static readonly NamedObject All = new() { ID = -2 };
 
         private async void LoadPublishersAsync()
         {
@@ -288,7 +290,7 @@ namespace Services.SI.ViewModel
             }
             catch (Exception exc)
             {
-                Error?.Invoke(exc);
+                OnError(exc);
                 IsLoading = false;
             }
         }
@@ -302,7 +304,6 @@ namespace Services.SI.ViewModel
                 Tags = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(tags).ToArray();
                 if (_tags.Length > 0)
                 {
-                    // Без асинхронной загрузки пакетов
                     if (DefaultTag != null)
                     {
                         _currentTag = _tags.FirstOrDefault(p => p.Name == DefaultTag) ?? _tags[0];
@@ -319,7 +320,7 @@ namespace Services.SI.ViewModel
             }
             catch (Exception exc)
             {
-                Error?.Invoke(exc);
+                OnError(exc);
             }
             
             IsLoading = false;

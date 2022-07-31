@@ -4,7 +4,7 @@ using SIUI.ViewModel;
 
 namespace SIUI.Selectors
 {
-    public sealed class QuestionTemplateSelector: DataTemplateSelector
+    public sealed class QuestionTemplateSelector : DataTemplateSelector
     {
         public DataTemplate Simple { get; set; }
 

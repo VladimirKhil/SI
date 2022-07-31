@@ -27,7 +27,7 @@ namespace SIGame.Tests
 			throw new NotImplementedException();
 		}
 
-		public void Run(int maxTime, bool byUser) { }
+		public void Run(int maxTime, bool byUser, double? fromValue = null) { }
 
 		public void Stop() { }
 	}

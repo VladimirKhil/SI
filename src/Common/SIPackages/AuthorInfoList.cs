@@ -4,13 +4,16 @@ using System.Xml.Serialization;
 
 namespace SIPackages
 {
+    /// <summary>
+    /// Defines a list of package authors.
+    /// </summary>
     [CollectionDataContract(Name = "Authors", Namespace = "")]
     public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
     {
         /// <summary>
         /// Gets XML schema to use.
         /// </summary>
-        public System.Xml.Schema.XmlSchema GetSchema() => null;
+        public System.Xml.Schema.XmlSchema? GetSchema() => null;
 
         /// <summary>
         /// Loads data from XML reader.
@@ -35,7 +38,7 @@ namespace SIPackages
                                     Id = reader["id"]
                                 };
 
-                                this.Add(authorInfo);
+                                Add(authorInfo);
                                 break;
 
                             case "Name":

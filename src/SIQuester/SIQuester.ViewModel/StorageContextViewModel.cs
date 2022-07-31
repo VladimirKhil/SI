@@ -9,7 +9,7 @@ namespace SIQuester.ViewModel
 {
     public sealed class StorageContextViewModel : INotifyPropertyChanged
     {
-        private readonly SIStorageServiceClient _siStorageService;
+        private readonly ISIStorageServiceClient _siStorageService;
 
         private string[] _publishers;
 
@@ -58,7 +58,7 @@ namespace SIQuester.ViewModel
 
         public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
-        public StorageContextViewModel(SIStorageServiceClient siStorageService)
+        public StorageContextViewModel(ISIStorageServiceClient siStorageService)
         {
             _siStorageService = siStorageService;
         }

@@ -53,6 +53,7 @@ namespace SIPackages.PlatformSpecific.Net45
                 new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
 
             var entry = zipPackage._zipArchive.GetEntry("[Content_Types].xml");
+
             if (entry != null)
             {
                 using var readStream = entry.Open();

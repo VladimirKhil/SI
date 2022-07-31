@@ -57,8 +57,8 @@ namespace SIGame.ViewModel
 
         public bool IsPaused
         {
-            get { return _isPaused; }
-            set { _isPaused = value; OnPropertyChanged(); }
+            get => _isPaused;
+            set { if (_isPaused != value) { _isPaused = value; OnPropertyChanged(); } }
         }
 
         public event Action GameEnded;
@@ -118,18 +118,20 @@ namespace SIGame.ViewModel
             Timers[1].TimeChanged += GameViewModel_TimeChanged;
         }
 
-        private void Host_IsPausedChanged(bool isPaused)
-        {
-            IsPaused = isPaused;
-        }
+        private void Host_IsPausedChanged(bool isPaused) => IsPaused = isPaused;
 
-        private void Server_Reconnected() => Host.AddLog(Resources.ReconnectedMessage);
+        private void Server_Reconnected()
+        {
+            Host.AddLog(Resources.ReconnectedMessage);
+            Host.GetInfo(); // Invalidate game state
+        }
 
         private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectingMessage);
 
         private void Host_Ad(string text)
         {
             Ad = text;
+
             if (!string.IsNullOrEmpty(text))
             {
                 TInfo.Text = "";
@@ -174,7 +176,8 @@ namespace SIGame.ViewModel
                     break;
 
                 case "USER_RESUME":
-                    timer.Run(-1, true);
+                    double? fromValue = int.TryParse(arg, out var passedTime) ? 100.0 * passedTime / timer.MaxTime : null;
+                    timer.Run(-1, true, fromValue);
                     break;
 
                 case "MAXTIME":
@@ -295,7 +298,7 @@ namespace SIGame.ViewModel
         {
             await Task.Delay(4000);
 
-            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector.GameId}");
+            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector.GameId}&invite=true");
         }
 
         private async void PrintNetworkInformation(CancellationToken cancellationToken = default)

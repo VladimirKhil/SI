@@ -120,6 +120,9 @@
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
   </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
+  </data>
   <data name="Image" xml:space="preserve">
     <value>Image</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="RoundTrailing" xml:space="preserve">
     <value> round</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Sources</value>
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Theme</value>

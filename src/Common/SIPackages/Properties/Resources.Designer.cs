@@ -70,6 +70,15 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Comments.
+        /// </summary>
+        public static string Comments {
+            get {
+                return ResourceManager.GetString("Comments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Image.
         /// </summary>
         public static string Image {
@@ -111,6 +120,15 @@ namespace SIPackages.Properties {
         public static string RoundTrailing {
             get {
                 return ResourceManager.GetString("RoundTrailing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Sources.
+        /// </summary>
+        public static string Sources {
+            get {
+                return ResourceManager.GetString("Sources", resourceCulture);
             }
         }
         

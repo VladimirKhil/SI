@@ -194,8 +194,10 @@ namespace SICore
 
         private void Kick_Executed(object arg)
         {
-            if (!(arg is ViewerAccount person))
+            if (arg is not ViewerAccount person)
+            {
                 return;
+            }
 
             if (person == ClientData.Me)
             {
@@ -1783,6 +1785,7 @@ namespace SICore
                         await _client.Server.ConnectionsLock.WithLockAsync(() =>
                         {
                             var connection = ((ISlaveServer)_client.Server).HostServer;
+
                             if (connection != null)
                             {
                                 lock (connection.ClientsSync)
@@ -1902,6 +1905,7 @@ namespace SICore
                 switch (role)
                 {
                     case Constants.Showman:
+
                         ClientData.ShowMan = new PersonAccount(account)
                         {
                             IsHuman = true,
@@ -1916,7 +1920,9 @@ namespace SICore
                         break;
 
                     case Constants.Player:
+
                         var playersWereUpdated = false;
+
                         while (index >= ClientData.Players.Count)
                         {
                             var p = new PlayerAccount(
@@ -2029,9 +2035,8 @@ namespace SICore
         public void Pause() => _viewerActions.SendMessage(Messages.Pause, ClientData.TInfo.Pause ? "-" : "+");
 
         /// <summary>
-        /// Выдаёт информацию о расположении своей картинки
+        /// Sends user avatar (file or uri) to server.
         /// </summary>
-        /// <param name="path"></param>
         public void SendPicture()
         {
             if (Avatar != null)
@@ -2052,7 +2057,7 @@ namespace SICore
                     return;
                 }
 
-                if (uri.Scheme == "file" && !_client.Server.Contains(NetworkConstants.GameName)) // Нужно передать локальный файл по сети
+                if (uri.Scheme == "file" && !_client.Server.Contains(NetworkConstants.GameName)) // We should send local file over network
                 {
                     byte[] data = null;
                     try

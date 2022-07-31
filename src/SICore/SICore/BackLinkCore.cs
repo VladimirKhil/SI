@@ -28,6 +28,10 @@ namespace SICore.PlatformSpecific
 
         public abstract string PhotoUri { get; }
 
+        public abstract int MaximumTableTextLength { get; }
+
+        public abstract int MaximumReplicTextLength { get; }
+
         public abstract string GetPhotoUri(string name);
 
         public abstract void SendError(Exception exc, bool isWarning = false);

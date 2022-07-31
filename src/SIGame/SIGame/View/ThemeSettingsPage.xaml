@@ -11,9 +11,13 @@
     xmlns:ui="clr-namespace:SIUI;assembly=SIUI"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:localc="clr-namespace:SIGame.Converters"
+    xmlns:local="clr-namespace:SIGame"
+    xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     Title="{x:Static lp:Resources.AppTheme}"
     FontSize="20"
-    IsEnabled="{Binding Settings.IsEditable}">
+    IsEnabled="{Binding Settings.IsEditable}"
+    d:DataContext="{d:DesignInstance vm:MainViewModel}"
+    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
             <Setter Property="Margin" Value="0,30,0,0" />
@@ -23,7 +27,9 @@
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0,5" />
+            <Setter Property="Padding" Value="4,4" />
         </Style>
+        
         <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="Margin" Value="0,5" />
         </Style>
@@ -38,8 +44,10 @@
         </Style>
 
         <localc:FontFamilyConverter x:Key="FontFamilyConverter1" />
+        
     </Page.Resources>
     <StackPanel DataContext="{Binding Settings.ThemeSettings}" Margin="10,5">
+        
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}" VerticalAlignment="Center" FontSize="20" Margin="5,10" TextWrapping="Wrap" />
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableFont}" />
         <ComboBox Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SIUISettings.TableFontFamily}" Style="{StaticResource ComboBoxStyle}">
@@ -49,6 +57,7 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+        
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableColor}" />
         <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
             <Rectangle>
@@ -57,6 +66,7 @@
                 </Rectangle.Fill>
             </Rectangle>
         </Button>
+        
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableBackground}" />
         <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
             <Rectangle>
@@ -65,8 +75,31 @@
                 </Rectangle.Fill>
             </Rectangle>
         </Button>
+        
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.LineHeight}" />
         <ComboBox Style="{StaticResource ComboBoxStyle}" Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}" SelectedItem="{Binding SIUISettings.QuestionLineSpacing}" />
+
+        <TextBlock
+            Style="{StaticResource Header}"
+            Text="{x:Static lp:Resources.MaximumTableTextLength}" />
+
+        <local:NumericTextBox
+            Style="{StaticResource {x:Type TextBox}}"
+            FontSize="16"
+            FontWeight="Light"
+            VerticalAlignment="Center"
+            Text="{Binding Model.MaximumTableTextLength}"
+            Minimum="1" />
+
+        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.MaximumReplicTextLength}" />
+        
+        <local:NumericTextBox
+            Style="{StaticResource {x:Type TextBox}}"
+            FontSize="16"
+            FontWeight="Light"
+            VerticalAlignment="Center"
+            Text="{Binding Model.MaximumReplicTextLength}"
+            Minimum="1" />
 
         <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.MainBackground}" />
         <TextBox Text="{Binding Model.CustomMainBackgroundUri}" Margin="0,5" Padding="1" />

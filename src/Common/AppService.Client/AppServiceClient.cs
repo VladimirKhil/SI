@@ -5,6 +5,7 @@ using System.Text;
 
 namespace AppService.Client
 {
+    /// <inheritdoc cref="IAppServiceClient" />
     public sealed class AppServiceClient : IAppServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
@@ -16,9 +17,9 @@ namespace AppService.Client
             _client = client;
         }
 
-        public async Task<AppInfo?> GetProductAsync(string name)
+        public async Task<AppInfo?> GetProductAsync(string name, CancellationToken cancellationToken = default)
         {
-            var appInfo = await CallAsync<AppInfo>("Product?name=" + name + "&osVersion=" + Environment.OSVersion.Version);
+            var appInfo = await CallAsync<AppInfo>("Product?name=" + name + "&osVersion=" + Environment.OSVersion.Version, cancellationToken);
             
             if (appInfo == null)
             {
@@ -37,7 +38,8 @@ namespace AppService.Client
             string application,
             string errorMessage,
             Version? appVersion = null,
-            DateTime? time = null)
+            DateTime? time = null,
+            CancellationToken cancellationToken = default)
         {
             var version = appVersion ?? Assembly.GetEntryAssembly()?.GetName().Version;
 
@@ -51,6 +53,7 @@ namespace AppService.Client
             };
 
             var sb = new StringBuilder();
+
             using (var writer = new StringWriter(sb))
             {
                 Serializer.Serialize(writer, errorInfo);
@@ -58,16 +61,16 @@ namespace AppService.Client
 
             var content = new StringContent(sb.ToString(), Encoding.UTF8, "application/json");
 
-            using var response = await _client.PostAsync("SendErrorReport2", content);
-            using var stream = await response.Content.ReadAsStreamAsync();
+            using var response = await _client.PostAsync("SendErrorReport2", content, cancellationToken);
+            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
             using var reader = new StreamReader(stream);
 
             return (ErrorStatus?)Serializer.Deserialize(reader, typeof(ErrorStatus));
         }
 
-        private async Task<T?> CallAsync<T>(string request)
+        private async Task<T?> CallAsync<T>(string request, CancellationToken cancellationToken = default)
         {
-            using var stream = await _client.GetStreamAsync(request);
+            using var stream = await _client.GetStreamAsync(request, cancellationToken);
             using var reader = new StreamReader(stream);
 
             return (T?)Serializer.Deserialize(reader, typeof(T));

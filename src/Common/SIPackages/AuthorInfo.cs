@@ -8,7 +8,7 @@ namespace SIPackages
     /// Автор
     /// </summary>
     [DataContract]
-    public sealed class AuthorInfo: IdOwner
+    public sealed class AuthorInfo : IdOwner
     {
         private string _name;
         private string _surname;

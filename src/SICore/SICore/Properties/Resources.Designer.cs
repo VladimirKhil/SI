@@ -466,6 +466,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на File &quot;{0}&quot; loading error.
+        /// </summary>
+        public static string FileLoadError {
+            get {
+                return ResourceManager.GetString("FileLoadError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Final.
         /// </summary>
         public static string Final {

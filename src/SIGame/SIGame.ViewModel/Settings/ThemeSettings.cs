@@ -1,170 +1,200 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SIUI.ViewModel.Core;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Text;
-using SIUI.ViewModel.Core;
 
 namespace SIGame.ViewModel
 {
     /// <summary>
-    /// Настройки темы
+    /// Provides application theme settings.
     /// </summary>
-    public sealed class ThemeSettings: INotifyPropertyChanged
+    public sealed class ThemeSettings : INotifyPropertyChanged
     {
+        internal const int DefaultMaximumTableTextLength = 1200;
+        internal const int DefaultMaximumReplicTextLength = 400;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private Settings uiSettings = new Settings();
+        private Settings _uiSettings = new();
 
         /// <summary>
         /// Настройки отображения табло
         /// </summary>
         public Settings UISettings
         {
-            get { return uiSettings; }
-            set { uiSettings = value; OnPropertyChanged(); }
+            get => _uiSettings;
+            set { _uiSettings = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string customMainBackgroundUri = null;
+        private int _maximumTableTextLength = DefaultMaximumTableTextLength;
+
+        /// <summary>
+        /// Maximum length for text on game table.
+        /// </summary>
+        [DefaultValue(DefaultMaximumTableTextLength)]
+        public int MaximumTableTextLength
+        {
+            get { return _maximumTableTextLength; }
+            set { if (_maximumTableTextLength != value) { _maximumTableTextLength = value; OnPropertyChanged(); } }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _maximumReplicTextLength = DefaultMaximumReplicTextLength;
+
+        /// <summary>
+        /// Maximum length for replic text.
+        /// </summary>
+        [DefaultValue(DefaultMaximumReplicTextLength)]
+        public int MaximumReplicTextLength
+        {
+            get { return _maximumReplicTextLength; }
+            set { if (_maximumReplicTextLength != value) { _maximumReplicTextLength = value; OnPropertyChanged(); } }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private string _customMainBackgroundUri = null;
 
         /// <summary>
         /// Настроенное главное фоновое изображение
         /// </summary>
         public string CustomMainBackgroundUri
         {
-            get { return customMainBackgroundUri; }
-            set { customMainBackgroundUri = value; OnPropertyChanged(); }
+            get { return _customMainBackgroundUri; }
+            set { _customMainBackgroundUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string customBackgroundUri = null;
+        private string _customBackgroundUri = null;
 
         /// <summary>
         /// Настроенное фоновое изображение
         /// </summary>
         public string CustomBackgroundUri
         {
-            get { return customBackgroundUri; }
-            set { customBackgroundUri = value; OnPropertyChanged(); }
+            get { return _customBackgroundUri; }
+            set { _customBackgroundUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundMainMenuUri = null;
+        private string _soundMainMenuUri = null;
 
         /// <summary>
         /// Мелодия главного меню
         /// </summary>
         public string SoundMainMenuUri
         {
-            get { return soundMainMenuUri; }
-            set { soundMainMenuUri = value; OnPropertyChanged(); }
+            get { return _soundMainMenuUri; }
+            set { _soundMainMenuUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundBeginRoundUri = null;
+        private string _soundBeginRoundUri = null;
 
         /// <summary>
         /// Мелодия начала раунда
         /// </summary>
         public string SoundBeginRoundUri
         {
-            get { return soundBeginRoundUri; }
-            set { soundBeginRoundUri = value; OnPropertyChanged(); }
+            get { return _soundBeginRoundUri; }
+            set { _soundBeginRoundUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundRoundThemesUri = null;
+        private string _soundRoundThemesUri = null;
 
         /// <summary>
         /// Мелодия тем раунда
         /// </summary>
         public string SoundRoundThemesUri
         {
-            get { return soundRoundThemesUri; }
-            set { soundRoundThemesUri = value; OnPropertyChanged(); }
+            get { return _soundRoundThemesUri; }
+            set { _soundRoundThemesUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundNoAnswerUri = null;
+        private string _soundNoAnswerUri = null;
 
         /// <summary>
         /// Мелодия окончания времени на нажатие кнопки
         /// </summary>
         public string SoundNoAnswerUri
         {
-            get { return soundNoAnswerUri; }
-            set { soundNoAnswerUri = value; OnPropertyChanged(); }
+            get { return _soundNoAnswerUri; }
+            set { _soundNoAnswerUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundQuestionStakeUri = null;
+        private string _soundQuestionStakeUri = null;
 
         /// <summary>
         /// Мелодия вопроса со ставкой
         /// </summary>
         public string SoundQuestionStakeUri
         {
-            get { return soundQuestionStakeUri; }
-            set { soundQuestionStakeUri = value; OnPropertyChanged(); }
+            get { return _soundQuestionStakeUri; }
+            set { _soundQuestionStakeUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundQuestionGiveUri = null;
+        private string _soundQuestionGiveUri = null;
 
         /// <summary>
         /// Мелодия вопроса с передачей
         /// </summary>
         public string SoundQuestionGiveUri
         {
-            get { return soundQuestionGiveUri; }
-            set { soundQuestionGiveUri = value; OnPropertyChanged(); }
+            get { return _soundQuestionGiveUri; }
+            set { _soundQuestionGiveUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundQuestionNoRiskUri = null;
+        private string _soundQuestionNoRiskUri = null;
 
         /// <summary>
         /// Мелодия вопроса без риска
         /// </summary>
         public string SoundQuestionNoRiskUri
         {
-            get { return soundQuestionNoRiskUri; }
-            set { soundQuestionNoRiskUri = value; OnPropertyChanged(); }
+            get { return _soundQuestionNoRiskUri; }
+            set { _soundQuestionNoRiskUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundFinalThinkUri = null;
+        private string _soundFinalThinkUri = null;
 
         /// <summary>
         /// Мелодия размышления в финале
         /// </summary>
         public string SoundFinalThinkUri
         {
-            get { return soundFinalThinkUri; }
-            set { soundFinalThinkUri = value; OnPropertyChanged(); }
+            get { return _soundFinalThinkUri; }
+            set { _soundFinalThinkUri = value; OnPropertyChanged(); }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string soundTimeoutUri = null;
+        private string _soundTimeoutUri = null;
 
         /// <summary>
         /// Мелодия окончания времени раунда
         /// </summary>
         public string SoundTimeoutUri
         {
-            get { return soundTimeoutUri; }
-            set { soundTimeoutUri = value; OnPropertyChanged(); }
+            get { return _soundTimeoutUri; }
+            set { _soundTimeoutUri = value; OnPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         internal void Initialize(ThemeSettings themeSettings)
         {
-            uiSettings.Initialize(themeSettings.uiSettings);
+            _uiSettings.Initialize(themeSettings._uiSettings);
+
+            MaximumTableTextLength = themeSettings.MaximumTableTextLength;
+            MaximumReplicTextLength = themeSettings.MaximumReplicTextLength;
 
             CustomMainBackgroundUri = themeSettings.CustomMainBackgroundUri;
             CustomBackgroundUri = themeSettings.CustomBackgroundUri;
+
             SoundMainMenuUri = themeSettings.SoundMainMenuUri;
             SoundBeginRoundUri = themeSettings.SoundBeginRoundUri;
             SoundRoundThemesUri = themeSettings.SoundRoundThemesUri;

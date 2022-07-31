@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SI.GameServer.Client;
 using SICore;
 using SICore.Network.Servers;
@@ -273,6 +274,7 @@ namespace SIGame.ViewModel
             gameSettings.PrepareForGame();
 
             var contentBox = new ContentBox { Data = gameSettings, Title = Resources.NewGame };
+
             var navigator = new NavigatorViewModel
             {
                 Content = contentBox,
@@ -295,18 +297,23 @@ namespace SIGame.ViewModel
                     Name = login.Trim()
                 };
 
-                var onlineConnection = new SIOnlineViewModel(_userSettings.ConnectionData, client, _commonSettings, _userSettings)
+                var onlineViewModel = new SIOnlineViewModel(
+                    _userSettings.ConnectionData,
+                    client,
+                    _commonSettings,
+                    _userSettings,
+                    _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>())
                 {
                     Human = humanAccount,
                     Cancel = Cancel,
                     ChangeSettings = ShowSlideMenu
                 };
 
-                onlineConnection.Ready += JoinGame;
-                onlineConnection.StartGame += StartGame;
+                onlineViewModel.Ready += JoinGame;
+                onlineViewModel.StartGame += StartGame;
 
-                ActiveView = onlineConnection;
-                await onlineConnection.InitAsync();
+                ActiveView = onlineViewModel;
+                await onlineViewModel.InitAsync();
             };
 
             ActiveView = new ContentBox { Data = login, Cancel = Cancel };
@@ -316,7 +323,15 @@ namespace SIGame.ViewModel
 
         private async void NetworkGame_Executed(object arg)
         {
-            var networkConnection = new SINetworkViewModel(_userSettings.ConnectionData, _commonSettings, _userSettings) { Human = Human.HumanPlayer, ChangeSettings = ShowSlideMenu, Cancel = Cancel };
+            var networkConnection = new SINetworkViewModel(
+                _userSettings.ConnectionData,
+                _commonSettings,
+                _userSettings)
+            {
+                Human = Human.HumanPlayer, 
+                ChangeSettings = ShowSlideMenu,
+                Cancel = Cancel
+            };
             
             networkConnection.Ready += JoinGame;
             networkConnection.StartGame += StartGame;

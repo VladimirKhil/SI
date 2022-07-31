@@ -1,10 +1,11 @@
 ﻿using SIPackages.Core;
+using SIPackages.Properties;
 using System.Diagnostics;
 
 namespace SIPackages
 {
     /// <summary>
-    /// Комментарии к объекту пакета
+    /// Defines a package item comments.
     /// </summary>
     public sealed class Comments : PropertyChangedNotifier
     {
@@ -12,11 +13,11 @@ namespace SIPackages
         private string _text = "";
 
         /// <summary>
-        /// Текст комментария
+        /// Comments text.
         /// </summary>
         public string Text
         {
-            get { return _text; }
+            get => _text;
             set
             {
                 var oldValue = _text;
@@ -28,6 +29,7 @@ namespace SIPackages
             }
         }
 
-        public override string ToString() => $"Комментарии: {_text}";
+        /// <inheritdoc />
+        public override string ToString() => $"{Resources.Comments}: {_text}";
     }
 }

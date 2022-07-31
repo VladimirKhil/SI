@@ -1285,6 +1285,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Maximum replic text length.
+        /// </summary>
+        public static string MaximumReplicTextLength {
+            get {
+                return ResourceManager.GetString("MaximumReplicTextLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Maximum table text length.
+        /// </summary>
+        public static string MaximumTableTextLength {
+            get {
+                return ResourceManager.GetString("MaximumTableTextLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Multimedia port.
         /// </summary>
         public static string MediaPort {
@@ -1884,6 +1902,15 @@ namespace SIGame.Properties {
         public static string Search {
             get {
                 return ResourceManager.GetString("Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на sec.
+        /// </summary>
+        public static string Sec {
+            get {
+                return ResourceManager.GetString("Sec", resourceCulture);
             }
         }
         

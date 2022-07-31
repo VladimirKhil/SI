@@ -1,29 +1,30 @@
-﻿using System;
+﻿using SIPackages.Core;
+using SIPackages.Properties;
 using System.Collections.Generic;
-using SIPackages.Core;
 
 namespace SIPackages
 {
     /// <summary>
-    /// Источники объекта в пакете
+    /// Defines a package item sources.
     /// </summary>
     public sealed class Sources : List<string>
     {
         /// <summary>
-        /// Создание списка источников
+        /// Initializes a new instance of <see cref="Sources" /> class.
         /// </summary>
         public Sources() { }
 
-        public Sources(IList<string> collection)
+        /// <summary>
+        /// Initializes a new instance of <see cref="Sources" /> class.
+        /// </summary>
+        /// <param name="collection">Sources collection.</param>
+        public Sources(IEnumerable<string> collection)
             : base(collection)
         {
 
         }
 
-        /// <summary>
-        /// Строковое представление истчоников
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString() => $"Источники: {this.ToCommonString()}";
+        /// <inheritdoc />
+        public override string ToString() => $"{Resources.Sources}: {this.ToCommonString()}";
     }
 }

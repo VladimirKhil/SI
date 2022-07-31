@@ -6,7 +6,6 @@
 	<?define ProductDescription="SIGame packages editor" ?>
 	<?define ManufacturerEn="Khil-soft" ?>
 	<?define ProductNameEn="SIQuester" ?>
-	<?define ProductVersion="5.7.4" ?>
 	<?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
 	<?define ProductNameR="SIQuester" ?>
 

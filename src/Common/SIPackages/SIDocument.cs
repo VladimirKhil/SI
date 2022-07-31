@@ -1,4 +1,5 @@
-﻿using SIPackages.Core;
+﻿using EnsureThat;
+using SIPackages.Core;
 using SIPackages.PlatformSpecific;
 using SIPackages.Properties;
 using System;
@@ -13,11 +14,35 @@ using System.Xml;
 namespace SIPackages
 {
     /// <summary>
-    /// Документ SIGame
+    /// Defines a SIGame document.
     /// </summary>
     public sealed class SIDocument : IDisposable
     {
-        #region Fields
+        private const string ContentFileName = "content.xml";
+        private const string AuthorsFileName = "authors.xml";
+        private const string SourcesFileName = "sources.xml";
+
+        /// <summary>
+        /// Хранилище текстов
+        /// </summary>
+        private const string TextsStorageName = "Texts";
+
+        /// <summary>
+        /// Хранилище изображений
+        /// </summary>
+        public const string ImagesStorageName = "Images";
+
+        /// <summary>
+        /// Хранилище звуков
+        /// </summary>
+        public const string AudioStorageName = "Audio";
+
+        /// <summary>
+        /// Хранилище видео
+        /// </summary>
+        public const string VideoStorageName = "Video";
+
+        private bool _disposed;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ISIPackage _source;
@@ -46,49 +71,20 @@ namespace SIPackages
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private DataCollection _video;
 
-        #endregion
-
-        #region Static
-
-        private const string ContentFileName = "content.xml";
-        private const string AuthorsFileName = "authors.xml";
-        private const string SourcesFileName = "sources.xml";
-
-        /// <summary>
-        /// Хранилище текстов
-        /// </summary>
-        private const string TextsStorageName = "Texts";
-        /// <summary>
-        /// Хранилище изображений
-        /// </summary>
-        public const string ImagesStorageName = "Images";
-        /// <summary>
-        /// Хранилище звуков
-        /// </summary>
-        public const string AudioStorageName = "Audio";
-        /// <summary>
-        /// Хранилище видео
-        /// </summary>
-        public const string VideoStorageName = "Video";
-
-        #endregion
-
-        #region Properties
-
         /// <summary>
         /// Игровой пакет
         /// </summary>
-        public Package Package { get { return _package; } }
+        public Package Package => _package;
 
         /// <summary>
         /// Коллекция авторов
         /// </summary>
-        public List<AuthorInfo> Authors { get { return _authors; } }
+        public List<AuthorInfo> Authors => _authors;
 
         /// <summary>
         /// Коллекция источников
         /// </summary>
-        public List<SourceInfo> Sources { get { return _sources; } }
+        public List<SourceInfo> Sources => _sources;
 
         /// <summary>
         /// Document images collection.
@@ -105,13 +101,17 @@ namespace SIPackages
         /// </summary>
         public DataCollection Video => _video;
 
-        #endregion
-
         #region Document Functions
 
-        private SIDocument()
+        private SIDocument(ISIPackage source)
         {
-            
+            Ensure.That(source).IsNotNull();
+
+            _source = source;
+
+            _images = new DataCollection(_source, ImagesStorageName, "si/image");
+            _audio = new DataCollection(_source, AudioStorageName, "si/audio");
+            _video = new DataCollection(_source, VideoStorageName, "si/video");
         }
 
         /// <summary>
@@ -119,17 +119,8 @@ namespace SIPackages
         /// </summary>
         /// <param name="name">Document name.</param>
         /// <param name="author">Document author.</param>
-        public static SIDocument Create(string name, string author)
-        {
-            var document = new SIDocument();
-
-            var ms = new MemoryStream();
-            document.CreateInternal(ms, name, author, false);
-
-            Init(document);
-
-            return document;
-        }
+        public static SIDocument Create(string name, string author) =>
+            CreateInternal(new MemoryStream(), name, author, false);
 
         /// <summary>
         /// Creates a document and associates it with the stream.
@@ -143,17 +134,8 @@ namespace SIPackages
             string name,
             string author,
             Stream stream,
-            bool leaveStreamOpen = false)
-        {
-            var document = new SIDocument();
-
-            var ms = stream ?? new MemoryStream();
-            document.CreateInternal(ms, name, author, leaveStreamOpen);
-
-            Init(document);
-
-            return document;
-        }
+            bool leaveStreamOpen = false) =>
+            CreateInternal(stream, name, author, leaveStreamOpen);
 
         /// <summary>
         /// Creates a document and associates it with the folder.
@@ -161,16 +143,8 @@ namespace SIPackages
         /// <param name="name">Document name.</param>
         /// <param name="author">Document author.</param>
         /// <param name="folder">Folder to write data.</param>
-        public static SIDocument Create(string name, string author, string folder)
-        {
-            var document = new SIDocument();
-
-            document.CreateInternal(folder, name, author);
-
-            Init(document);
-
-            return document;
-        }
+        public static SIDocument Create(string name, string author, string folder) =>
+            CreateInternal(folder, name, author);
 
         /// <summary>
         /// Creates a document and associates it with the specified source.
@@ -178,42 +152,28 @@ namespace SIPackages
         /// <param name="name">Document name.</param>
         /// <param name="author">Document author.</param>
         /// <param name="source">Source to write data.</param>
-        public static SIDocument Create(string name, string author, ISIPackage source)
+        public static SIDocument Create(string name, string author, ISIPackage source) =>
+            CreateInternal(source, name, author);
+
+        private void Init()
         {
-            var document = new SIDocument();
+            _package.ID = Guid.NewGuid().ToString();
+            _package.Date = DateTime.UtcNow.ToString("dd.MM.yyyy");
+        }
 
-            document.CreateInternal(source, name, author);
+        private static SIDocument CreateInternal(Stream stream, string name, string author, bool leaveStreamOpen) =>
+            CreateInternal(SIPackageFactory.Instance.CreatePackage(stream, leaveStreamOpen), name, author);
 
-            Init(document);
+        private static SIDocument CreateInternal(string folder, string name, string author) =>
+            CreateInternal(SIPackageFactory.Instance.CreatePackage(folder), name, author);
+
+        private static SIDocument CreateInternal(ISIPackage source, string name, string author)
+        {
+            var document = new SIDocument(source);
+            document.CreateCore(name, author);
+            document.Init();
 
             return document;
-        }
-
-        private static void Init(SIDocument document)
-        {
-            document._package.ID = Guid.NewGuid().ToString();
-            document._package.Date = DateTime.UtcNow.ToString("dd.MM.yyyy");
-        }
-
-        private void CreateInternal(Stream stream, string name, string author, bool leaveStreamOpen)
-        {
-            _source = SIPackageFactory.Instance.CreatePackage(stream, leaveStreamOpen);
-
-            CreateCore(name, author);
-        }
-
-        private void CreateInternal(string folder, string name, string author)
-        {
-            _source = SIPackageFactory.Instance.CreatePackage(folder);
-
-            CreateCore(name, author);
-        }
-
-        private void CreateInternal(ISIPackage source, string name, string author)
-        {
-            _source = source;
-
-            CreateCore(name, author);
         }
 
         private void CreateCore(string name, string author)
@@ -221,8 +181,6 @@ namespace SIPackages
             _source.CreateStream(ContentFileName, "si/xml");
             _source.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
             _source.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
-
-            InitializeStorages();
 
             _package = new Package { Name = name };
             _package.Info.Authors.Add(author);
@@ -236,24 +194,16 @@ namespace SIPackages
         /// </summary>
         /// <param name="stream">Source stream.</param>
         /// <param name="read">Should the document be read-only.</param>
-        public static SIDocument Load(Stream stream, bool read = true)
-        {
-            var document = new SIDocument();
-            document.LoadInternal(stream, read);
-            return document;
-        }
+        public static SIDocument Load(Stream stream, bool read = true) =>
+            LoadInternal(SIPackageFactory.Instance.GetPackage(stream, read));
 
         /// <summary>
-        /// Загрузка пакета из папки
+        /// loads document from folder.
         /// </summary>
-        /// <param name="folder">Папка с содержимым пакета</param>
-        /// <returns>Загруженный пакет</returns>
-        public static SIDocument Load(string folder)
-        {
-            var document = new SIDocument();
-            document.LoadInternal(folder, true);
-            return document;
-        }
+        /// <param name="folder">Source folder.</param>
+        /// <param name="read">Should the document be read-only.</param>
+        public static SIDocument Load(string folder, bool read = true) =>
+            LoadInternal(SIPackageFactory.Instance.GetPackage(folder, read));
 
         /// <summary>
         /// Loads document from stream as XML.
@@ -261,10 +211,8 @@ namespace SIPackages
         /// <param name="stream">Source stream.</param>
         public static SIDocument LoadXml(Stream stream)
         {
-            var document = new SIDocument();
-
             var ms = new MemoryStream();
-            document.CreateInternal(ms, "", "", false);
+            var document = CreateInternal(ms, "", "", false);
 
             using (var reader = XmlReader.Create(stream))
             {
@@ -282,30 +230,25 @@ namespace SIPackages
             return document;
         }
 
-        private void LoadInternal(Stream stream, bool read)
+        private static SIDocument LoadInternal(ISIPackage source)
         {
-            _source = SIPackageFactory.Instance.GetPackage(stream, read);
+            var document = new SIDocument(source);
 
-            LoadData();
-            InitializeStorages();
-        }
+            document.LoadData();
 
-        private void LoadInternal(string folder, bool read)
-        {
-            _source = SIPackageFactory.Instance.GetPackage(folder, read);
-
-            LoadData();
-            InitializeStorages();
+            return document;
         }
 
         private void LoadData()
         {
             var streamInfo = _source.GetStream(ContentFileName);
+
             if (streamInfo != null)
             {
                 using (streamInfo.Stream)
                 {
                     using var reader = XmlReader.Create(streamInfo.Stream);
+
                     while (reader.Read())
                     {
                         if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
@@ -319,6 +262,7 @@ namespace SIPackages
             }
 
             streamInfo = _source.GetStream(TextsStorageName, AuthorsFileName);
+
             if (streamInfo != null)
             {
                 using (streamInfo.Stream)
@@ -330,6 +274,7 @@ namespace SIPackages
             }
 
             streamInfo = _source.GetStream(TextsStorageName, SourcesFileName);
+
             if (streamInfo != null)
             {
                 using (streamInfo.Stream)
@@ -341,13 +286,9 @@ namespace SIPackages
             }
         }
 
-        private void InitializeStorages()
-        {
-            _images = new DataCollection(_source, ImagesStorageName, "si/image");
-            _audio = new DataCollection(_source, AudioStorageName, "si/audio");
-            _video = new DataCollection(_source, VideoStorageName, "si/video");
-        }
-
+        /// <summary>
+        /// Saves current document accepting all made changed.
+        /// </summary>
         public void Save() => SaveCore(_source);
 
         private void SaveCore(ISIPackage package)
@@ -381,7 +322,15 @@ namespace SIPackages
         /// <returns>Document based on new stream.</returns>
         public SIDocument SaveAs(Stream stream, bool switchTo)
         {
+            Ensure.That(stream).IsNotNull();
+            Ensure.That(_source).IsNotNull();
+            Ensure.That(_images).IsNotNull();
+            Ensure.That(_audio).IsNotNull();
+            Ensure.That(_video).IsNotNull();
+
             var newSource = _source.CopyTo(stream, switchTo, out bool isNew);
+
+            Ensure.That(newSource).IsNotNull();
 
             if (isNew)
             {
@@ -392,12 +341,7 @@ namespace SIPackages
             
             if (switchTo)
             {
-                _source.Dispose();
-                _source = newSource;
-
-                _images.UpdateSource(_source);
-                _audio.UpdateSource(_source);
-                _video.UpdateSource(_source);
+                ResetTo(newSource);
             }
 
             SaveCore(newSource);
@@ -407,10 +351,7 @@ namespace SIPackages
                 return this;
             }
 
-            var doc = new SIDocument { _source = newSource };
-            doc.InitializeStorages();
-
-            return doc;
+            return new SIDocument(newSource);
         }
 
         /// <summary>
@@ -421,19 +362,25 @@ namespace SIPackages
         {
             var package = _package.Clone();
             InsertLinkValue(package);
+
             foreach (var round in package.Rounds)
             {
                 InsertLinkValue(round);
+
                 foreach (var theme in round.Themes)
                 {
                     InsertLinkValue(theme);
+
                     foreach (var quest in theme.Questions)
                     {
                         InsertLinkValue(quest);
+
                         foreach (var atom in quest.Scenario)
                         {
                             if (atom.Text.ExtractLink().Length > 0)
+                            {
                                 atom.Text = string.Format("{0} {1}", Resources.LinkMissed, atom.Text);
+                            }
                         }
                     }
                 }
@@ -452,6 +399,7 @@ namespace SIPackages
             for (int i = 0; i < item.Info.Authors.Count; i++)
             {
                 var author = GetLink(item.Info.Authors, i);
+
                 if (author != null)
                 {
                     item.Info.Authors[i].ExtractLink(out string tail);
@@ -462,6 +410,7 @@ namespace SIPackages
             for (int i = 0; i < item.Info.Sources.Count; i++)
             {
                 var source = GetLink(item.Info.Sources, i);
+
                 if (source != null)
                 {
                     item.Info.Sources[i].ExtractLink(out string tail);
@@ -514,7 +463,7 @@ namespace SIPackages
         /// <param name="authors">Список авторов</param>
         /// <param name="index">Индекс в списке авторов</param>
         /// <returns>Автор из хранилища</returns>
-        public AuthorInfo GetLink(Authors authors, int index)
+        public AuthorInfo? GetLink(Authors authors, int index)
         {
             var link = authors[index].ExtractLink();
             return _authors.FirstOrDefault(author => author.Id == link);
@@ -525,8 +474,9 @@ namespace SIPackages
         /// </summary>
         /// <param name="authors">Список авторов</param>
         /// <param name="index">Индекс в списке авторов</param>
+        /// <param name="tail">Author specification.</param>
         /// <returns>Автор из хранилища</returns>
-        public AuthorInfo GetLink(Authors authors, int index, out string tail)
+        public AuthorInfo? GetLink(Authors authors, int index, out string tail)
         {
             var link = authors[index].ExtractLink(out tail);
             return _authors.FirstOrDefault(author => author.Id == link);
@@ -582,7 +532,7 @@ namespace SIPackages
                     break;
             }
 
-            // TODO: сделать детерминированный выбор
+            // TODO: make deterministic choice
 
             if (collection.Contains(link))
             {
@@ -650,6 +600,11 @@ namespace SIPackages
 
         #region Collection functions
 
+        /// <summary>
+        /// Copies all neccessary collections to the target document.
+        /// </summary>
+        /// <param name="newDocument">Target document.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public async Task CopyCollectionsAsync(SIDocument newDocument, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, Package);
@@ -660,6 +615,12 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Copies all neccessary round collections to the target document.
+        /// </summary>
+        /// <param name="newDocument">Target document.</param>
+        /// <param name="round">Source round.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public async Task CopyCollectionsAsync(SIDocument newDocument, Round round, CancellationToken cancellationToken = default)
         {
             CopyAuthorsAndSources(newDocument, round);
@@ -731,12 +692,19 @@ namespace SIPackages
             }
         }
 
+        /// <summary>
+        /// Copies object authors and sources to the new document.
+        /// </summary>
+        /// <param name="newDocument">Target document.</param>
+        /// <param name="infoOwner">Sorce object.</param>
         public void CopyAuthorsAndSources(SIDocument newDocument, InfoOwner infoOwner)
         {
             var length = infoOwner.Info.Authors.Count;
-            for (int i = 0; i < length; i++)
+
+            for (var i = 0; i < length; i++)
             {
                 var authorID = infoOwner.Info.Authors[i].ExtractLink();
+
                 if (authorID.Length > 0)
                 {
                     if (newDocument.Authors.All(author => author.Id != authorID))
@@ -752,9 +720,11 @@ namespace SIPackages
             }
 
             length = infoOwner.Info.Sources.Count;
+
             for (int i = 0; i < length; i++)
             {
                 var sourceID = infoOwner.Info.Sources[i].ExtractLink(true);
+
                 if (sourceID.Length > 0)
                 {
                     if (newDocument.Sources.All(source => source.Id != sourceID))
@@ -772,17 +742,28 @@ namespace SIPackages
 
         #endregion
 
+        /// <inheritdoc />
         public void Dispose()
         {
-            if (_source != null)
+            if (_disposed)
             {
-                _source.Dispose();
-                _source = null;
+                return;
             }
+
+            _source.Dispose();
+
+            _disposed = true;
         }
 
+        /// <summary>
+        /// Flushes internal document source.
+        /// </summary>
         public void FinalizeSave() => _source.Flush();
 
+        /// <summary>
+        /// Copies current document data to another document.
+        /// </summary>
+        /// <param name="doc">Target document.</param>
         public void CopyData(SIDocument doc)
         {
             doc._package = _package;
@@ -790,9 +771,22 @@ namespace SIPackages
             doc._sources = _sources;
         }
 
-        public void ResetTo(Stream stream, bool read = true)
+        /// <summary>
+        /// Switches document to the new source stream.
+        /// </summary>
+        /// <param name="stream">Source stream.</param>
+        public void ResetTo(Stream stream) => ResetTo(SIPackageFactory.Instance.GetPackage(stream));
+
+        /// <summary>
+        /// Switches document to the new source.
+        /// </summary>
+        /// <param name="source">New source.</param>
+        public void ResetTo(ISIPackage source)
         {
-            _source = SIPackageFactory.Instance.GetPackage(stream, read);
+            Ensure.That(source).IsNotNull();
+
+            _source.Dispose();
+            _source = source;
 
             _images.UpdateSource(_source);
             _audio.UpdateSource(_source);

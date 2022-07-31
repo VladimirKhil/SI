@@ -767,4 +767,7 @@
   <data name="OversizedFile" xml:space="preserve">
     <value>{0} в вопросе {1} превышает рекомендуемый размер {2} КБ и может загружаться с задержкой</value>
   </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>Ошибка загрузки файла "{0}"</value>
+  </data>
 </root>

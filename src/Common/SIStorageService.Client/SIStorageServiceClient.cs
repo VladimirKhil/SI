@@ -7,6 +7,7 @@ namespace SIStorageService.Client
 {
     // TODO: Implement retries via Polly
 
+    /// <inheritdoc cref="ISIStorageServiceClient" />
     public sealed class SIStorageServiceClient : ISIStorageServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
@@ -76,9 +77,10 @@ namespace SIStorageService.Client
             int difficulty = 1,
             int? publisherId = null,
             int? authorId = null,
-            string restriction = null,
+            string? restriction = null,
             PackageSortMode sortMode = PackageSortMode.Name,
-            bool sortAscending = true)
+            bool sortAscending = true,
+            CancellationToken cancellationToken = default)
         {
             var queryString = new StringBuilder();
 
@@ -146,7 +148,7 @@ namespace SIStorageService.Client
                 queryString.Append("sortAscending=false");
             }
 
-            return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}");
+            return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}", cancellationToken);
         }
 
         private async Task<T> GetAsync<T>(string request, CancellationToken cancellationToken = default)

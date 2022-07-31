@@ -24,14 +24,8 @@
             return X.GetHashCode() + 31 * Y.GetHashCode();
         }
 
-        public static bool operator ==(Point left, Point right)
-        {
-            return left.Equals(right);
-        }
+        public static bool operator ==(Point left, Point right) => left.Equals(right);
 
-        public static bool operator !=(Point left, Point right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Point left, Point right) => !(left == right);
     }
 }

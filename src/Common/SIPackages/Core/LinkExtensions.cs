@@ -8,22 +8,29 @@
         /// <summary>
         /// Выделить текст ссылки из строки
         /// </summary>
-        /// <param name="s">Строка текста в формате @link#tail</param>
+        /// <param name="value">Строка текста в формате @link#tail</param>
         /// <param name="useTail">Should link tail (part after #) be used.</param>
         /// <returns>Ссылка link</returns>
-        internal static string ExtractLink(this string s, bool useTail = false)
+        internal static string ExtractLink(this string value, bool useTail = false)
         {
-            if (s.Length < 2 || s[0] != '@')
+            if (value.Length < 2 || value[0] != '@')
+            {
                 return "";
+            }
 
             if (!useTail)
-                return s.Substring(1);
+            {
+                return value[1..];
+            }
 
-            int ind = s.IndexOf('#');
+            var ind = value.IndexOf('#');
+
             if (ind == 1)
+            {
                 return "";
+            }
 
-            return ind == -1 ? s.Substring(1) : s.Substring(1, ind - 1);
+            return ind == -1 ? value[1..] : value[1..ind];
         }
 
         /// <summary>
@@ -43,9 +50,9 @@
                 return "";
 
             if (ind > -1)
-                tail = s.Substring(ind + 1);
+                tail = s[(ind + 1)..];
 
-            return ind == -1 ? s.Substring(1) : s.Substring(1, ind - 1);
+            return ind == -1 ? s[1..] : s[1..ind];
         }
     }
 }

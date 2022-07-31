@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
+using System.Net;
 #if !DEBUG
 using Microsoft.WindowsAPICodePack.Dialogs;
 #endif
@@ -155,6 +156,8 @@ namespace SIQuester
             services.AddAppServiceClient(_configuration);
 
             services.AddTransient(typeof(MainWindow));
+
+            services.AddSingleton(AppSettings.Default);
         }
 
         /// <summary>
@@ -164,31 +167,34 @@ namespace SIQuester
         private static async void Backup(string folder)
         {
             int code = 0;
+
             try
             {
                 var directoryInfo = new DirectoryInfo(folder);
+
                 if (!directoryInfo.Exists)
                 {
                     directoryInfo.Create();
                 }
 
-                var service = new SIStorageServiceClient();
+                ISIStorageServiceClient service = new SIStorageServiceClient();
                 var packages = await service.GetPackagesAsync();
-                using var client = new HttpClient();
+                using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
+
                 foreach (var package in packages)
                 {
-                    var uri = await service.GetPackageByIDAsync(package.ID);
-                    var fileName = Path.GetFileName(Uri.UnescapeDataString(uri.ToString()));
+                    var link = await service.GetPackageByGuid2Async(package.Guid);
+                    var fileName = Path.GetFileName(link.Name);
 
                     var targetFile = Path.Combine(folder, fileName);
-                    using var stream = await client.GetStreamAsync(uri);
+                    using var stream = await client.GetStreamAsync(link.Uri);
                     using var fileStream = File.Create(targetFile);
                     await stream.CopyToAsync(fileStream);
                 }
             }
             catch (Exception exc)
             {
-                Console.Write(exc.ToString());
+                Console.Write($"Backup error: {exc}");
                 code = 1;
             }
             finally
@@ -236,7 +242,7 @@ namespace SIQuester
         /// Произвести поиск и установку обновлений
         /// </summary>
         /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
-        private async Task<bool> SearchForUpdatesNewAsync()
+        private async Task<bool> SearchForUpdatesNewAsync(CancellationToken cancellationToken = default)
         {
             if (!_useAppService)
             {
@@ -248,19 +254,25 @@ namespace SIQuester
             try
             {
                 var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                var product = await appService.GetProductAsync("SIQuester");
+                var product = await appService.GetProductAsync("SIQuester", cancellationToken);
 
                 if (product.Version > currentVersion)
                 {
+                    _logger.LogInformation(
+                        "Update detected. Current version: {currentVersion}. Product version: {productVersion}. Product uri: {productUri}",
+                        currentVersion,
+                        product.Version,
+                        product.Uri);
+
                     var updateUri = product.Uri;
 
                     var localFile = Path.Combine(Path.GetTempPath(), "setup.exe");
 
-                    using (var httpClient = new HttpClient())
-                    using (var stream = await httpClient.GetStreamAsync(updateUri))
+                    using (var httpClient = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 })
+                    using (var stream = await httpClient.GetStreamAsync(updateUri, cancellationToken))
                     using (var fs = File.Create(localFile))
                     {
-                        await stream.CopyToAsync(fs);
+                        await stream.CopyToAsync(fs, cancellationToken);
                     }
 
                     try
@@ -280,7 +292,7 @@ namespace SIQuester
             catch (Exception exc)
             {
                 MessageBox.Show(
-                    string.Format(SIQuester.Properties.Resources.UpdateException, exc.ToStringDemystified()),
+                    string.Format(SIQuester.Properties.Resources.UpdateException, exc.Message),
                     ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

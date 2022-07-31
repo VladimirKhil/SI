@@ -43,11 +43,13 @@ namespace SImulator.Implementation.ButtonManagers.Web
 
         public override void Stop()
         {
-            var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHub, IButtonClient>>();
-            context.Clients.All.StateChanged(0); // No await
+            try
+            {
+                var context = _webApplication.Services.GetRequiredService<IHubContext<ButtonHub, IButtonClient>>();
+                context.Clients.All.StateChanged(0); // No await
+            }
+            catch (ObjectDisposedException) { }
         }
-
-        public override ValueTask DisposeAsync() => _webApplication.DisposeAsync();
 
         public string Press(string connectionId)
         {
@@ -63,5 +65,7 @@ namespace SImulator.Implementation.ButtonManagers.Web
 
             return player?.Name ?? "";
         }
+
+        public override ValueTask DisposeAsync() => _webApplication.DisposeAsync();
     }
 }

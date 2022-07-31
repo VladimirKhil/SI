@@ -21,20 +21,6 @@ namespace SImulator.Implementation.ButtonManagers
             _comPort.DataReceived += ComPort_DataReceived;
         }
 
-        private void ComPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            int bytes = _comPort.BytesToRead;
-            if (bytes <= 0)
-            {
-                return;
-            }
-
-            var buffer = new byte[bytes];
-            _comPort.Read(buffer, 0, bytes);
-
-            OnKeyPressed((GameKey)buffer[0]);
-        }
-
         public override bool Run()
         {
             try
@@ -50,12 +36,6 @@ namespace SImulator.Implementation.ButtonManagers
             }
         }
 
-        private static void ShowError(string error) => System.Windows.MessageBox.Show(
-            error,
-            MainViewModel.ProductName,
-            System.Windows.MessageBoxButton.OK,
-            System.Windows.MessageBoxImage.Error);
-
         public override void Stop()
         {
             _comPort.Close();
@@ -67,5 +47,25 @@ namespace SImulator.Implementation.ButtonManagers
 
             return new ValueTask();
         }
+
+        private void ComPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            int bytes = _comPort.BytesToRead;
+            if (bytes <= 0)
+            {
+                return;
+            }
+
+            var buffer = new byte[bytes];
+            _comPort.Read(buffer, 0, bytes);
+
+            OnKeyPressed((GameKey)buffer[0]);
+        }
+
+        private static void ShowError(string error) => System.Windows.MessageBox.Show(
+            error,
+            MainViewModel.ProductName,
+            System.Windows.MessageBoxButton.OK,
+            System.Windows.MessageBoxImage.Error);
     }
 }

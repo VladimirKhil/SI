@@ -117,34 +117,67 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Audio" xml:space="preserve">
-    <value>Аудио</value>
+  <data name="CommonAppError" xml:space="preserve">
+    <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
   </data>
-  <data name="Comments" xml:space="preserve">
-    <value>Комментарии</value>
+  <data name="DiskFullError" xml:space="preserve">
+    <value>Закончилось место на диске!</value>
   </data>
-  <data name="Image" xml:space="preserve">
-    <value>Изображение</value>
+  <data name="FileDeletionError" xml:space="preserve">
+    <value>Ошибка удаления файла: {0}</value>
   </data>
-  <data name="LinkMissed" xml:space="preserve">
-    <value>Ссылка утеряна:</value>
+  <data name="FinishGameQuestion" xml:space="preserve">
+    <value>Завершить игру?</value>
   </data>
-  <data name="Package" xml:space="preserve">
-    <value>Пакет</value>
+  <data name="GameModes_Sport" xml:space="preserve">
+    <value>Упрощённая</value>
   </data>
-  <data name="Round" xml:space="preserve">
-    <value>Раунд</value>
+  <data name="GameModes_Tv" xml:space="preserve">
+    <value>Классическая</value>
   </data>
-  <data name="RoundTrailing" xml:space="preserve">
-    <value>-й раунд</value>
+  <data name="KeyboardDetachError" xml:space="preserve">
+    <value>Ошибка завершения прослушивания клавиатуры</value>
   </data>
-  <data name="Sources" xml:space="preserve">
-    <value>Источники</value>
+  <data name="KeyboardListeningError" xml:space="preserve">
+    <value>Ошибка прослушивания клавиатуры</value>
   </data>
-  <data name="Theme" xml:space="preserve">
-    <value>Тема</value>
+  <data name="LogsFolderNotFound" xml:space="preserve">
+    <value>Папка для записи логов "{0}" не найдена</value>
   </data>
-  <data name="Video" xml:space="preserve">
-    <value>Видео</value>
+  <data name="MainScreen" xml:space="preserve">
+    <value>Основной</value>
+  </data>
+  <data name="NavigateToSiteError" xml:space="preserve">
+    <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
+  </data>
+  <data name="OutOfMemoryError" xml:space="preserve">
+    <value>Недостаточно памяти для выполнения программы!</value>
+  </data>
+  <data name="RuntimeBrokenError" xml:space="preserve">
+    <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
+  </data>
+  <data name="SavingSettingsError" xml:space="preserve">
+    <value>Ошибка при сохранении настроек программы</value>
+  </data>
+  <data name="SecondaryScreen" xml:space="preserve">
+    <value>Дополнительный</value>
+  </data>
+  <data name="SelectLogsFolder" xml:space="preserve">
+    <value>Выберите папку для записи логов</value>
+  </data>
+  <data name="SelectQuestionPackage" xml:space="preserve">
+    <value>Выберите пакет вопросов</value>
+  </data>
+  <data name="SIQuestions" xml:space="preserve">
+    <value>Вопросы СИ</value>
+  </data>
+  <data name="SIStorageError" xml:space="preserve">
+    <value>Ошибка работы с библиотекой вопросов: {0}</value>
+  </data>
+  <data name="TestPackage" xml:space="preserve">
+    <value>Пакет тест</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>Окно</value>
   </data>
 </root>

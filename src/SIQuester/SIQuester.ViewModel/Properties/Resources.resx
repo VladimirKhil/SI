@@ -425,4 +425,13 @@ theme - тема Кота</value>
   <data name="InputMediaUri" xml:space="preserve">
     <value>Введите адрес мультимедиа-объекта</value>
   </data>
+  <data name="RestoreConfirmation" xml:space="preserve">
+    <value>Обнаружены файлы, которые не были корректно сохранены при последней работе с программой. Восстановить их?</value>
+  </data>
+  <data name="DocumentSavingError" xml:space="preserve">
+    <value>Ошибка сохранения документа</value>
+  </data>
+  <data name="SIQuestions" xml:space="preserve">
+    <value>Вопросы СИ</value>
+  </data>
 </root>

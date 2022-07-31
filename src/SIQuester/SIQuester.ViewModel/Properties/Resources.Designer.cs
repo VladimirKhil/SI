@@ -187,6 +187,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка сохранения документа.
+        /// </summary>
+        public static string DocumentSavingError {
+            get {
+                return ResourceManager.GetString("DocumentSavingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пакет {0} был изменён. Вы хотите сохранить его?.
         /// </summary>
         public static string DoYouWantToSave {
@@ -637,6 +646,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Обнаружены файлы, которые не были корректно сохранены при последней работе с программой. Восстановить их?.
+        /// </summary>
+        public static string RestoreConfirmation {
+            get {
+                return ResourceManager.GetString("RestoreConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Правильный ответ.
         /// </summary>
         public static string RightAnswer {
@@ -687,6 +705,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string SimpleQuestion {
             get {
                 return ResourceManager.GetString("SimpleQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопросы СИ.
+        /// </summary>
+        public static string SIQuestions {
+            get {
+                return ResourceManager.GetString("SIQuestions", resourceCulture);
             }
         }
         

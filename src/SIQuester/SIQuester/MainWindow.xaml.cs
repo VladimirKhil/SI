@@ -298,11 +298,12 @@ namespace SIQuester
             }
         }
 
-        private void Main_Loaded(object sender, RoutedEventArgs e)
+        private async void Main_Loaded(object sender, RoutedEventArgs e)
         {
             var mainViewModel = DataContext as MainViewModel;
             mainViewModel.DocList.CollectionChanged += DocList_CollectionChanged;
-            mainViewModel.Initialize();
+
+            await mainViewModel.InitializeAsync();
         }
 
         private void Main_Closed(object sender, EventArgs e)

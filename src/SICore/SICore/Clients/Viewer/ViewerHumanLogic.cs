@@ -1,4 +1,5 @@
-﻿using SICore.BusinessLogic;
+﻿using Notions;
+using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
 using SIData;
 using SIPackages.Core;
@@ -24,9 +25,12 @@ namespace SICore
     {
         private bool _disposed = false;
 
+        private readonly CancellationTokenSource _cancellation = new();
+
         private readonly LocalFileManager _localFileManager = new();
 
         protected readonly ViewerActions _viewerActions;
+
         protected readonly ILocalizer _localizer;
 
         public TableInfoViewModel TInfo { get; }
@@ -214,7 +218,7 @@ namespace SICore
 
                 // add new replic to the current speaker
                 _data.Speaker = _data.ShowMan;
-                _data.Speaker.Replic = text;
+                _data.Speaker.Replic = TrimReplic(text);
 
                 logString = $"<span class=\"sh\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
@@ -226,6 +230,7 @@ namespace SICore
             else if (replicCode.StartsWith(ReplicCodes.Player.ToString()) && replicCode.Length > 1)
             {
                 var indexString = replicCode[1..];
+
                 if (int.TryParse(indexString, out var index) && index >= 0 && index < _data.Players.Count)
                 {
                     if (_data.Speaker != null)
@@ -234,7 +239,7 @@ namespace SICore
                     }
 
                     _data.Speaker = _data.Players[index];
-                    _data.Speaker.Replic = text;
+                    _data.Speaker.Replic = TrimReplic(text);
 
                     logString = $"<span class=\"sr n{index}\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
@@ -266,6 +271,8 @@ namespace SICore
                 AddToFileLog(logString);
             }
         }
+
+        private string TrimReplic(string text) => text.Shorten(_data.BackLink.MaximumReplicTextLength, "…");
 
         internal void AddToFileLog(Message message) =>
             AddToFileLog(
@@ -574,13 +581,21 @@ namespace SICore
         public void TextShape(string[] mparams)
         {
             var text = new StringBuilder();
+
             for (var i = 1; i < mparams.Length; i++)
             {
                 text.Append(mparams[i]);
+
                 if (i < mparams.Length - 1)
                 {
                     text.Append('\n');
                 }
+            }
+
+            if (!TInfo.PartialText && TInfo.TStage == TableStage.Question)
+            {
+                // Toggle TStage change to reapply QuestionTemplateSelector template
+                TInfo.TStage = TableStage.Void;
             }
 
             TInfo.TextLength = 0;
@@ -624,9 +639,11 @@ namespace SICore
                 case AtomTypes.Text:
                 case Constants.PartialText:
                     var text = new StringBuilder();
+
                     for (var i = 2; i < mparams.Length; i++)
                     {
                         text.Append(mparams[i]);
+
                         if (i < mparams.Length - 1)
                         {
                             text.Append('\n');
@@ -648,7 +665,7 @@ namespace SICore
                     }
                     else
                     {
-                        TInfo.Text = text.ToString();
+                        TInfo.Text = text.ToString().Shorten(_data.BackLink.MaximumTableTextLength, "…");
                     }
 
                     TInfo.QuestionContentType = QuestionContentType.Text;
@@ -659,13 +676,16 @@ namespace SICore
                 case AtomTypes.Audio:
                 case AtomTypes.Image:
                     string uri = null;
+
                     switch (mparams[2])
                     {
                         case MessageParams.Atom_Uri:
                             uri = mparams[3];
+
                             if (uri.Contains(Constants.GameHost))
                             {
                                 var address = ClientData.ServerAddress;
+
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
                                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
@@ -690,6 +710,7 @@ namespace SICore
                     }
 
                     Uri mediaUri;
+
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
                     {
                         return;
@@ -734,17 +755,22 @@ namespace SICore
             {
                 case AtomTypes.Audio:
                     string uri = null;
+
                     switch (mparams[2])
                     {
                         case MessageParams.Atom_Uri:
                             uri = mparams[3];
+
                             if (uri.Contains(Constants.GameHost))
                             {
                                 var address = ClientData.ServerAddress;
+
                                 if (!string.IsNullOrWhiteSpace(address))
                                 {
                                     if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                                    {
                                         uri = uri.Replace(Constants.GameHost, hostUri.Host);
+                                    }
                                 }
                             }
                             else if (uri.Contains(Constants.ServerHost))
@@ -762,6 +788,7 @@ namespace SICore
                     }
 
                     Uri mediaUri;
+
                     if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
                     {
                         return;
@@ -988,6 +1015,9 @@ namespace SICore
             }
 
             _localFileManager.Dispose();
+
+            _cancellation.Cancel();
+            _cancellation.Dispose();
 
             return base.DisposeAsync(disposing);
         }
@@ -1255,6 +1285,7 @@ namespace SICore
                 if (uri.Contains(Constants.GameHost))
                 {
                     var address = ClientData.ServerAddress;
+
                     if (!string.IsNullOrWhiteSpace(address))
                     {
                         if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
@@ -1277,7 +1308,13 @@ namespace SICore
                     continue;
                 }
 
-                _localFileManager.AddFile(mediaUri, e => _data.OnAddString($"File {mediaUri} loading error", e.Message, LogMode.Protocol));
+                _localFileManager.AddFile(
+                    mediaUri,
+                    e => _data.OnAddString(
+                        null,
+                        $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
+                        LogMode.Log),
+                    _cancellation.Token);
             }
         }
     }

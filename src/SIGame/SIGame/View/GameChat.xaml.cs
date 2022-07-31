@@ -10,7 +10,7 @@ using System.Windows.Media;
 namespace SIGame
 {
     /// <summary>
-    /// Interaction logic for GameChat.xaml
+    /// Provides interaction logic for GameChat.xaml.
     /// </summary>
     public partial class GameChat : UserControl
     {
@@ -32,10 +32,7 @@ namespace SIGame
             [LogMode.Chat + 11] = Brushes.ForestGreen
         };
 
-        public GameChat()
-        {
-            InitializeComponent();
-        }
+        public GameChat() => InitializeComponent();
 
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -59,7 +56,9 @@ namespace SIGame
             }
 
             if (!ModeColors.TryGetValue(mode, out Brush c))
+            {
                 c = ModeColors[LogMode.Chat];
+            }
 
             var pos = text.VerticalOffset;
 
@@ -74,7 +73,7 @@ namespace SIGame
 
                 tr = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd)
                 {
-                    Text = ": " + message + "\r"
+                    Text = $": {message}\r"
                 };
 
                 tr.ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Black);
@@ -83,14 +82,16 @@ namespace SIGame
             {
                 var tr = new TextRange(text.Document.ContentEnd, text.Document.ContentEnd)
                 {
-                    Text = message + "\r"
+                    Text = $"{message}\r"
                 };
 
                 tr.ApplyPropertyValue(TextElement.ForegroundProperty, c);
             }
 
             if (pos + text.ViewportHeight >= text.ExtentHeight - 5.0)
+            {
                 text.ScrollToEnd();
+            }
         }
 
         private void CollectionViewSource_Filter(object sender, FilterEventArgs e) =>

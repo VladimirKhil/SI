@@ -2,6 +2,7 @@
 using Notions;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Providers;
 using SIQuester.Model;
 using SIQuester.ViewModel.Commands;
 using SIQuester.ViewModel.Helpers;
@@ -49,11 +50,11 @@ namespace SIQuester.ViewModel
         private const int MaxUndoListCount = 100;
 
         private const string ClipboardKey = "siqdata";
-
+        private const string SIExtension = "siq";
         private bool _changed = false;
         private readonly Stack<IChange> _undoList = new();
         private readonly Stack<IChange> _redoList = new();
-        private bool _isMakingUndo = false; // Блокирует добавление UnDo-операций для самого UnDo
+        private bool _isMakingUndo = false; // Blocks UnDo-operations for UnDo itself
         private ChangeGroup _changeGroup = null;
 
         private IItemViewModel _activeNode = null;
@@ -464,7 +465,7 @@ namespace SIQuester.ViewModel
 
         private bool NeedSave() => Changed || string.IsNullOrEmpty(_path);
 
-        protected internal override async Task SaveIfNeeded(bool temp, bool full)
+        protected internal override async Task SaveIfNeededAsync(bool temp, bool full)
         {
             if (temp)
             {
@@ -472,13 +473,18 @@ namespace SIQuester.ViewModel
                 {
                     await Lock.WithLockAsync(async () =>
                     {
-                        // Автосохранение документа по временном пути
-                        var path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), full ? "SIQuester" : "SIQuesterData");
+                        // Autosave document to temp path
+                        var path = System.IO.Path.Combine(
+                            System.IO.Path.GetTempPath(),
+                            AppSettings.ProductName,
+                            full ? AppSettings.AutoSaveFolderName : AppSettings.AutoSaveSimpleFolderName);
+
                         Directory.CreateDirectory(path);
 
                         if (full)
                         {
                             var tempName = System.IO.Path.Combine(path, PathHelper.EncodePath(_path));
+
                             using (var stream = File.Open(tempName, FileMode.Create, FileAccess.ReadWrite))
                             {
                                 using var tempDoc = Document.SaveAs(stream, false);
@@ -1035,7 +1041,7 @@ namespace SIQuester.ViewModel
         {
             try
             {
-                await SaveIfNeeded(false, true);
+                await SaveIfNeededAsync(false, true);
 
                 var checkResult = Validate();
                 if (!string.IsNullOrWhiteSpace(checkResult))
@@ -1285,6 +1291,7 @@ namespace SIQuester.ViewModel
         private async void ImportSiq_Executed(object arg)
         {
             var files = PlatformManager.Instance.ShowOpenUI();
+
             if (files != null)
             {
                 BeginChange();
@@ -1295,6 +1302,7 @@ namespace SIQuester.ViewModel
                     {
                         using var stream = File.OpenRead(file);
                         using var doc = SIDocument.Load(stream);
+
                         foreach (var round in doc.Package.Rounds)
                         {
                             Package.Rounds.Add(new RoundViewModel(round.Clone()));
@@ -1305,12 +1313,15 @@ namespace SIQuester.ViewModel
                         foreach (var round in doc.Package.Rounds)
                         {
                             CopyAuthorsAndSources(doc, round);
+
                             foreach (var theme in round.Themes)
                             {
                                 CopyAuthorsAndSources(doc, theme);
+
                                 foreach (var question in theme.Questions)
                                 {
                                     CopyAuthorsAndSources(doc, question);
+
                                     foreach (var atom in question.Scenario)
                                     {
                                         if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.Video)
@@ -1337,8 +1348,14 @@ namespace SIQuester.ViewModel
 
                                         if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
                                         {
-                                            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), Guid.NewGuid().ToString());
+                                            var tempPath = System.IO.Path.Combine(
+                                                System.IO.Path.GetTempPath(),
+                                                AppSettings.ProductName,
+                                                AppSettings.TempMediaFolderName,
+                                                Guid.NewGuid().ToString());
+
                                             Directory.CreateDirectory(tempPath);
+
                                             var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
                                             using (var fileStream = File.Create(tempFile))
                                             {
@@ -1413,14 +1430,14 @@ namespace SIQuester.ViewModel
                 }
                 else
                 {
-                    await SaveAs();
+                    await SaveAsAsync();
                 }
             }
             catch (Exception exc)
             {
                 _logger.LogError(exc, "Saving error: {error}", exc.Message);
 
-                OnError(exc);
+                OnError(exc, Resources.DocumentSavingError);
             }
         }
 
@@ -1688,6 +1705,7 @@ namespace SIQuester.ViewModel
 
             var infoOwner = (IItemViewModel)arg;
             var parent = infoOwner.Owner;
+
             while (parent != null) // Раскрываем донизу
             {
                 parent.IsExpanded = true;
@@ -1706,24 +1724,23 @@ namespace SIQuester.ViewModel
                  var tempPath = System.IO.Path.GetTempFileName();
                  var tempStream = File.Open(tempPath, FileMode.Open, FileAccess.ReadWrite);
 
-                 Document.SaveAs(tempStream, true);
-
-                 if (Images.HasPendingChanges)
+                 using (var tempDoc = Document.SaveAs(tempStream, false))
                  {
-                     await Images.CommitAsync(Document.Images);
-                 }
+                     if (Images.HasPendingChanges)
+                     {
+                         await Images.CommitAsync(tempDoc.Images);
+                     }
 
-                 if (Audio.HasPendingChanges)
-                 {
-                     await Audio.CommitAsync(Document.Audio);
-                 }
+                     if (Audio.HasPendingChanges)
+                     {
+                         await Audio.CommitAsync(tempDoc.Audio);
+                     }
 
-                 if (Video.HasPendingChanges)
-                 {
-                     await Video.CommitAsync(Document.Video);
+                     if (Video.HasPendingChanges)
+                     {
+                         await Video.CommitAsync(tempDoc.Video);
+                     }
                  }
-
-                 Document.Dispose(); // tempStream is disposed here
 
                  _logger.LogInformation("SaveInternalAsync: document has been saved to temp path: {path}", tempPath);
 
@@ -1731,25 +1748,30 @@ namespace SIQuester.ViewModel
                  {
                      // Checking saved document
                      var testStream = File.Open(tempPath, FileMode.Open, FileAccess.Read);
-
                      using (SIDocument.Load(testStream)) { }
 
-                     File.Copy(tempPath, _path, true);
+                     // Test ok, overwriting current file and switching to it
+                     Document.ResetTo(EmptySIPackage.Instance); // reset source temporarily
 
-                     _logger.LogInformation("SaveInternalAsync: document has been validated and saved to final path: {path}", _path);
+                     try
+                     {
+                         File.Copy(tempPath, _path, true);
+
+                         _logger.LogInformation("SaveInternalAsync: document has been validated and saved to final path: {path}", _path);
+
+                         Changed = false;
+                         ClearTempFile();
+                     }
+                     finally
+                     {
+                         var stream = File.OpenRead(_path);
+                         Document.ResetTo(stream);
+                     }
                  }
                  finally
                  {
                      File.Delete(tempPath);
                  }
-
-                 Changed = false;
-
-                 ClearTempFile(_path);
-
-                 var stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
-
-                 Document.ResetTo(stream);
              });
 
         internal ValueTask SaveAsInternalAsync(string path) =>
@@ -1759,56 +1781,66 @@ namespace SIQuester.ViewModel
                 try
                 {
                     stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
-                    Document.SaveAs(stream, true);
 
-                    if (Images.HasPendingChanges)
+                    using (var tempDoc = Document.SaveAs(stream, false))
                     {
-                        await Images.CommitAsync(Document.Images);
+                        if (Images.HasPendingChanges)
+                        {
+                            await Images.CommitAsync(tempDoc.Images);
+                        }
+
+                        if (Audio.HasPendingChanges)
+                        {
+                            await Audio.CommitAsync(tempDoc.Audio);
+                        }
+
+                        if (Video.HasPendingChanges)
+                        {
+                            await Video.CommitAsync(tempDoc.Video);
+                        }
                     }
 
-                    if (Audio.HasPendingChanges)
-                    {
-                        await Audio.CommitAsync(Document.Audio);
-                    }
-
-                    if (Video.HasPendingChanges)
-                    {
-                        await Video.CommitAsync(Document.Video);
-                    }
-
-                    Document.Dispose(); // stream is disposed here
                     _logger.LogInformation("SaveAsInternalAsync: document has been saved as {path}", path);
 
-                    ClearTempFile(_path);
+                    ClearTempFile();
 
                     Path = path;
                     Changed = false;
 
                     FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
 
-                    stream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
-                    Document.ResetTo(stream);
-                }
-                catch
-                {
-                    if (stream != null)
+                    var newStream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
+                    try
                     {
-                        stream.Dispose();
+                        Document.ResetTo(newStream);
                     }
-
+                    catch (Exception)
+                    {
+                        newStream.Dispose();
+                        throw;
+                    }
+                }
+                catch (Exception)
+                {
+                    stream?.Dispose();
                     throw;
                 }
             });
 
-        private void ClearTempFile(string path)
+        private void ClearTempFile()
         {
-            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SIQuester", PathHelper.EncodePath(path));
+            var tempPath = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(),
+                AppSettings.ProductName,
+                AppSettings.AutoSaveFolderName,
+                PathHelper.EncodePath(_path));
             
             if (File.Exists(tempPath))
             {
                 try
                 {
                     File.Delete(tempPath);
+
                     _logger.LogInformation("Temporary file deleted. File path: {path}", tempPath);
                 }
                 catch (Exception exc)
@@ -1822,7 +1854,7 @@ namespace SIQuester.ViewModel
         {
             try
             {
-                await SaveAs();
+                await SaveAsAsync();
             }
             catch (Exception exc)
             {
@@ -1830,17 +1862,18 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private async Task SaveAs()
+        private async Task SaveAsAsync()
         {
             try
             {
                 string filename = Document.Package.Name;
+
                 var filter = new Dictionary<string, string>
                 {
-                    ["Вопросы СИ"] = "siq"
+                    [Resources.SIQuestions] = SIExtension
                 };
 
-                if (PlatformManager.Instance.ShowSaveUI(null, "siq", filter, ref filename))
+                if (PlatformManager.Instance.ShowSaveUI(null, SIExtension, filter, ref filename))
                 {
                     await SaveAsInternalAsync(filename);
                     AppSettings.Default.History.Add(filename);
@@ -2568,14 +2601,7 @@ namespace SIQuester.ViewModel
         {
             if (Document != null)
             {
-                try
-                {
-                    Document.Dispose();
-                }
-                catch (ObjectDisposedException)
-                {
-
-                }
+                Document.Dispose();
 
                 PlatformManager.Instance.ClearMedia(Document.Images);
                 PlatformManager.Instance.ClearMedia(Document.Audio);
@@ -2584,7 +2610,7 @@ namespace SIQuester.ViewModel
                 Document = null;
             }
 
-            ClearTempFile(_path);
+            ClearTempFile();
 
             if (OriginalPath != null)
             {

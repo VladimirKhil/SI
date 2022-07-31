@@ -762,4 +762,7 @@
   <data name="OversizedFile" xml:space="preserve">
     <value>{0} in question {1} exceeds recommended size of {2} KB and could be loaded with delay</value>
   </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>File "{0}" loading error</value>
+  </data>
 </root>

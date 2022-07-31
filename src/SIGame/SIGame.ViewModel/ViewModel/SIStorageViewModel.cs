@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class SIStorageViewModel: ViewModel<SIStorageNew>, INavigationNode
+    public sealed class SIStorageViewModel : ViewModel<SIStorageNew>, INavigationNode
     {
         public AsyncCommand LoadStorePackage { get; internal set; }
 
@@ -60,9 +60,11 @@ namespace SIGame.ViewModel
                 }
             };
 
-            Model.Error += exc =>
+            Model.Error += (exc, message) =>
             {
-                PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.SIStorageError + ": " + exc.Message, PlatformSpecific.MessageType.Warning);
+                PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                    $"{message ?? Resources.SIStorageError}: {exc.Message}",
+                    PlatformSpecific.MessageType.Warning);
             };
 
             LoadStorePackage = new AsyncCommand(LoadStorePackage_Executed) { CanBeExecuted = false };

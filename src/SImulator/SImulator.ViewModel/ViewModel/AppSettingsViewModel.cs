@@ -1,5 +1,4 @@
-﻿using SIEngine;
-using SImulator.ViewModel.Model;
+﻿using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
@@ -11,6 +10,7 @@ namespace SImulator.ViewModel
     public sealed class AppSettingsViewModel
     {
         public AppSettings Model { get; private set; }
+
         public SettingsViewModel SIUISettings { get; private set; }
 
         public GameModes[] Modes { get; } = new GameModes[] { GameModes.Tv, GameModes.Sport };

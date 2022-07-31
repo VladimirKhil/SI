@@ -127,8 +127,15 @@ namespace SIQuester.ViewModel
 
                 var path = Path.GetTempFileName();
                 template.Save(path);
-                _document.TransformPackage(path);
-                File.Delete(path);
+
+                try
+                {
+                    _document.TransformPackage(path);
+                }
+                finally
+                {
+                    File.Delete(path);
+                }
             }
             catch (Exception exc)
             {

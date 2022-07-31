@@ -2,18 +2,50 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace SIQuester.Model
 {
-    public sealed class AppSettings: INotifyPropertyChanged
+    /// <summary>
+    /// Defines application settings.
+    /// </summary>
+    public sealed class AppSettings : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Application name.
+        /// </summary>
         public const string ProductName = "SIQuester";
 
         /// <summary>
-        /// Используется ли версия Windows от Vista и выше
+        /// Name of the folder used to store auto saves.
+        /// </summary>
+        public const string AutoSaveFolderName = "AutoSave";
+
+        /// <summary>
+        /// Name of the folder used to store simplified auto saves (packages without media).
+        /// </summary>
+        public const string AutoSaveSimpleFolderName = "AutoSaveSimple";
+
+        /// <summary>
+        /// Name of the folder used to store restored auto saves.
+        /// </summary>
+        public const string AutoSaveRestoreFolderName = "AutoSaveRestore";
+
+        /// <summary>
+        /// Name of the folder used to store unpacked media.
+        /// </summary>
+        public const string MediaFolderName = "Media";
+
+        /// <summary>
+        /// Name of the folder used to store temporary media files.
+        /// </summary>
+        public const string TempMediaFolderName = "TempMedia";
+
+        private const string DefaultFontFamily = "Calibri";
+
+        /// <summary>
+        /// Is current Windows version a Windows Vista or a later version.
         /// </summary>
         public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
 
@@ -151,7 +183,7 @@ namespace SIQuester.Model
 
         public StringCollection DelayedErrors
         {
-            get { return _delayedErrors; }
+            get => _delayedErrors;
             set
             {
                 if (_delayedErrors != value)
@@ -164,9 +196,12 @@ namespace SIQuester.Model
 
         private FileHistory _history = new();
 
+        /// <summary>
+        /// Defines a list of files that have been opened before.
+        /// </summary>
         public FileHistory History
         {
-            get { return _history; }
+            get => _history;
             set
             {
                 if (_history != value)
@@ -182,7 +217,7 @@ namespace SIQuester.Model
         [DefaultValue("")]
         public string SearchPath
         {
-            get { return _searchPath; }
+            get => _searchPath;
             set
             {
                 if (_searchPath != value)
@@ -213,7 +248,7 @@ namespace SIQuester.Model
         [DefaultValue(ViewMode.TreeFull)]
         public ViewMode View
         {
-            get { return _view; }
+            get => _view;
             set
             {
                 if (_view != value)
@@ -229,7 +264,7 @@ namespace SIQuester.Model
         [DefaultValue(FlatScale.Theme)]
         public FlatScale FlatScale
         {
-            get { return _flatScale; }
+            get => _flatScale;
             set
             {
                 if (_flatScale != value)
@@ -245,7 +280,7 @@ namespace SIQuester.Model
         [DefaultValue(false)]
         public bool ShowEditPanel
         {
-            get { return _showEditPanel; }
+            get => _showEditPanel;
             set
             {
                 if (_showEditPanel != value)
@@ -261,7 +296,7 @@ namespace SIQuester.Model
         [DefaultValue(EditMode.None)]
         public EditMode Edit
         {
-            get { return _edit; }
+            get => _edit;
             set
             {
                 if (_edit != value)
@@ -293,7 +328,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool SpellChecking
         {
-            get { return _spellChecking; }
+            get => _spellChecking;
             set
             {
                 if (_spellChecking != value)
@@ -320,15 +355,15 @@ namespace SIQuester.Model
             }
         }
 
-        private string _fontFamily = "Calibri";
+        private string _fontFamily = DefaultFontFamily;
 
-        [DefaultValue("Calibri")]
+        [DefaultValue(DefaultFontFamily)]
         public string FontFamily
         {
             get => _fontFamily;
             set
             {
-                if (_fontFamily != value && value != null)
+                if (_fontFamily != value && value != null) // null could be provided by the WPF binding
                 {
                     _fontFamily = value;
                     OnPropertyChanged();

@@ -17,7 +17,8 @@ namespace SIPackages.Core
         {
             var text = new StringBuilder();
             text.Append('(');
-            for (int i = 0; i < list.Count; i++)
+
+            for (var i = 0; i < list.Count; i++)
             {
                 if (i > 0)
                 {
@@ -28,9 +29,15 @@ namespace SIPackages.Core
             }
 
             text.Append(')');
+
             return text.ToString();
         }
 
+        /// <summary>
+        /// Checks if any of list items contains the provided pattern.
+        /// </summary>
+        /// <param name="list">List to check.</param>
+        /// <param name="pattern">Pattern to find.</param>
         public static bool ContainsQuery(this List<string> list, string pattern) =>
             list.Any(item => item.IndexOf(pattern, StringComparison.CurrentCultureIgnoreCase) > -1);
 

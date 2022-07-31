@@ -7,13 +7,13 @@
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <Version>2.9.1</Version>
+    <Version>2.9.2</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup>
-    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <SatelliteResourceLanguages>ru-RU</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>SImulator.App</StartupObject>
@@ -35,8 +35,17 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+    <ItemGroup>
+	    <Content Update="ru-RU\SIUI.resources.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    </Content>
+    </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\logo.png" />
+	  <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
+		  <Generator>ResXFileCodeGenerator</Generator>
+	  </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -1,7 +1,7 @@
 ﻿namespace SIPackages.Core
 {
     /// <summary>
-    /// Где нашлось
+    /// Defines search result source kinds.
     /// </summary>
     public enum ResultKind
     {
@@ -47,18 +47,23 @@
         TypeParamValue
     }
 
+    /// <summary>
+    /// Defines well-known media types.
+    /// </summary>
     public enum MediaTypes
     {
         /// <summary>
-        /// Изображения
+        /// Images.
         /// </summary>
         Images,
+
         /// <summary>
-        /// Звуки
+        /// Sounds.
         /// </summary>
         Audio,
+
         /// <summary>
-        /// Видео
+        /// Video.
         /// </summary>
         Video
     }

@@ -1,7 +1,7 @@
 ﻿using SIEngine;
-using SImulator.ViewModel.Model;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -505,7 +504,9 @@ namespace SImulator.ViewModel
             for (themeIndex = 0; themeIndex < LocalInfo.RoundInfo.Count; themeIndex++)
             {
                 if (LocalInfo.RoundInfo[themeIndex] == theme)
+                {
                     break;
+                }
             }
 
             _gameHost.OnThemeSelected(themeIndex);
@@ -575,7 +576,9 @@ namespace SImulator.ViewModel
         private void RunRoundTimer_Executed(object arg)
         {
             if (arg != null)
+            {
                 RoundTime = 0;
+            }
 
             _roundTimer.Change(1000, 1000);
 
@@ -585,7 +588,9 @@ namespace SImulator.ViewModel
         private void StopRoundTimer_Executed(object arg)
         {
             if (arg != null)
+            {
                 RoundTime = 0;
+            }
 
             _roundTimer.Change(Timeout.Infinite, Timeout.Infinite);
             
@@ -1242,6 +1247,12 @@ namespace SImulator.ViewModel
         {
             try
             {
+                StopRoundTimer_Executed(null);
+                _roundTimer.Dispose();
+
+                StopQuestionTimer_Executed(0);
+                _thinkingTimer.Dispose();
+
                 Settings.Model.SIUISettings.PropertyChanged -= Default_PropertyChanged;
                 Settings.SIUISettings.PropertyChanged -= Default_PropertyChanged;
 
@@ -1271,12 +1282,6 @@ namespace SImulator.ViewModel
                     catch (ObjectDisposedException) { }
 
                     PlatformManager.Instance.ClearMedia();
-
-                    StopRoundTimer_Executed(null);
-                    _roundTimer.Dispose();
-
-                    StopQuestionTimer_Executed(0);
-                    _thinkingTimer.Dispose();
                 }
             }
             catch (Exception exc)

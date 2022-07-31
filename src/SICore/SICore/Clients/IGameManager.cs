@@ -48,6 +48,10 @@ namespace SICore
         /// </summary>
         int MaxVideoSizeKb { get; }
 
+        int MaximumTableTextLength { get; }
+
+        int MaximumReplicTextLength { get; }
+
         string GetPhotoUri(string name);
 
         void SendError(Exception exc, bool isWarning = false);

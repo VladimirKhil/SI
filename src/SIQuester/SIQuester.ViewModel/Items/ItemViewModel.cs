@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 
 namespace SIQuester.ViewModel
@@ -31,7 +32,9 @@ namespace SIQuester.ViewModel
         public InfoViewModel Info { get; private set; }
 
         public SimpleCommand AddAuthors { get; private set; }
+
         public SimpleCommand AddSources { get; private set; }
+
         public SimpleCommand AddComments { get; private set; }
 
         public ICommand SetCosts { get; private set; }
@@ -89,7 +92,7 @@ namespace SIQuester.ViewModel
         private void AddComments_Executed(object arg)
         {
             QDocument.ActivatedObject = Info.Comments;
-            Info.Comments.Text = "Комментарий";
+            Info.Comments.Text = Resources.Comment;
         }
 
         private void SetCosts_Executed(object arg)

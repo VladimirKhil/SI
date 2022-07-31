@@ -6,7 +6,7 @@ namespace SIPackages.Core
     /// <summary>
     /// Defines a secret question info.
     /// </summary>
-    public class BagCatInfo: INotifyPropertyChanged
+    public class BagCatInfo : INotifyPropertyChanged
     {
         private int _minimum = 0;
 
@@ -15,8 +15,8 @@ namespace SIPackages.Core
         /// </summary>
         public int Minimum
         {
-            get { return _minimum; }
-            set { _minimum = value; OnPropertyChanged(); }
+            get => _minimum;
+            set { if (_minimum != value) { _minimum = value; OnPropertyChanged(); } }
         }
 
         private int _maximum = 0;
@@ -26,8 +26,8 @@ namespace SIPackages.Core
         /// </summary>
         public int Maximum
         {
-            get { return _maximum; }
-            set { _maximum = value; OnPropertyChanged(); }
+            get => _maximum;
+            set { if (_maximum != value) { _maximum = value; OnPropertyChanged(); } }
         }
 
         private int _step = 0;
@@ -37,19 +37,18 @@ namespace SIPackages.Core
         /// </summary>
         public int Step
         {
-            get { return _step; }
-            set { _step = value; OnPropertyChanged(); }
+            get => _step;
+            set { if (_step != value) { _step = value; OnPropertyChanged(); } }
         }
 
         /// <summary>
-        /// Property change notifier.
+        /// Raises object property change event.
         /// </summary>
-        /// <param name="name">Name of the property that has changed.</param>
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
+        /// <param name="name">Name of the property wchich value has been changed.</param>
+        protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        /// <inheritdoc />
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

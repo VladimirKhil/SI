@@ -238,10 +238,10 @@ namespace SIQuester.Implementation
             }
 
             // This is file itself
-            var tempDirectory = Path.Combine(Path.GetTempPath(), App.ProductName);
-            Directory.CreateDirectory(tempDirectory);
+            var tempMediaDirectory = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
+            Directory.CreateDirectory(tempMediaDirectory);
 
-            fileName = Path.Combine(tempDirectory, new Random().Next() + media.Uri);
+            fileName = Path.Combine(tempMediaDirectory, new Random().Next() + media.Uri);
 
             if (fileName.Length >= MAX_PATH)
             {

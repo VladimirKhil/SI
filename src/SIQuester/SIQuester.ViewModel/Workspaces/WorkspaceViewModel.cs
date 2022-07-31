@@ -5,28 +5,32 @@ using System.Threading.Tasks;
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Рабочая область приложения
+    /// Defines an application workspace view model.
     /// </summary>
-    public abstract class WorkspaceViewModel: ModelViewBase
+    public abstract class WorkspaceViewModel : ModelViewBase
     {
         /// <summary>
-        /// Закрыть рабочую область
+        /// Close workspace.
         /// </summary>
         public IAsyncCommand Close { get; private set; }
+
         /// <summary>
-        /// Название рабочей области
+        /// Workspace name.
         /// </summary>
         public abstract string Header { get; }
+
         /// <summary>
-        /// Подсказка рабочей области
+        /// Workspace tooltip.
         /// </summary>
         public virtual string ToolTip { get; } = null;
 
         /// <summary>
-        /// Ошибка, возникшая в момент выполнения какой-либо операции
+        /// Workspace operation error event.
         /// </summary>
-        public event Action<Exception> Error;
+        public event Action<Exception, string> Error;
+
         public event Action<WorkspaceViewModel> Closed;
+
         public event Action<WorkspaceViewModel> NewItem;
 
         protected WorkspaceViewModel()
@@ -41,12 +45,12 @@ namespace SIQuester.ViewModel
             return Task.CompletedTask;
         }
 
-        protected internal void OnError(Exception exc) => Error?.Invoke(exc);
+        protected internal void OnError(Exception exc, string message = null) => Error?.Invoke(exc, message);
 
         protected void OnClosed() => Closed?.Invoke(this);
 
         protected void OnNewItem(WorkspaceViewModel viewModel) => NewItem?.Invoke(viewModel);
 
-        protected internal virtual Task SaveIfNeeded(bool temp, bool full) => Task.CompletedTask;
+        protected internal virtual Task SaveIfNeededAsync(bool temp, bool full) => Task.CompletedTask;
     }
 }

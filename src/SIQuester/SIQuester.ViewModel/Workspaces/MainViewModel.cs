@@ -8,6 +8,7 @@ using SIQuester.ViewModel.Properties;
 using SIStorageService.Client;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace SIQuester.ViewModel
     public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     {
         private const string DonateUrl = "https://yoomoney.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
-
+        private const int MaxMessageLength = 1000;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger<MainViewModel> _logger;
 
@@ -148,7 +149,7 @@ namespace SIQuester.ViewModel
             {
                 try
                 {
-                    await item.SaveIfNeeded(true, autoSaveCounter % 10 == 0); // Every 10th autosave is full
+                    await item.SaveIfNeededAsync(true, autoSaveCounter % 10 == 0); // Every 10th autosave is full
                 }
                 catch (Exception exc)
                 {
@@ -157,7 +158,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
             if (_args.Length > 0)
             {
@@ -166,30 +167,40 @@ namespace SIQuester.ViewModel
 
             if (AppSettings.Default.AutoSave)
             {
-                var tempDir = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "SIQuester"));
-                if (!tempDir.Exists)
+                var autoSaveFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.AutoSaveFolderName));
+                if (!autoSaveFolder.Exists)
                 {
                     return;
                 }
 
-                var files = tempDir.EnumerateFiles().ToArray();
-                
+                var files = autoSaveFolder.EnumerateFiles();
+
                 if (files.Any())
                 {
                     try
                     {
-                        if (PlatformManager.Instance.Confirm("Обнаружены файлы, которые не были корректно сохранены при последней работе с программой. Восстановить их?"))
+                        if (PlatformManager.Instance.Confirm(Resources.RestoreConfirmation))
                         {
+                            var restoreFolder = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.AutoSaveRestoreFolderName);
+                            
+                            Directory.CreateDirectory(restoreFolder);
+
                             foreach (var file in files)
                             {
-                                var tmpName = Path.Combine(Path.GetTempPath(), "SIQuester", Guid.NewGuid().ToString());
-                                File.Copy(file.FullName, tmpName);
+                                var tmpName = Path.Combine(restoreFolder, Guid.NewGuid().ToString());
+
+                                using (var sourceStream = File.OpenRead(file.FullName))
+                                using (var destStream = File.Create(tmpName))
+                                {
+                                    await sourceStream.CopyToAsync(destStream);
+                                }
 
                                 OpenFile(tmpName, overridePath: PathHelper.DecodePath(file.Name));
                             }
                         }
                         else
                         {
+                            // TODO: Synchronous IO operations could affect UI performance
                             foreach (var file in files)
                             {
                                 file.Delete();
@@ -255,31 +266,33 @@ namespace SIQuester.ViewModel
             ActiveDocument = CollectionViewSource.GetDefaultView(DocList).CurrentItem as QDocument;
         }
 
-        private void DocList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void DocList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Add:
                     foreach (WorkspaceViewModel item in e.NewItems)
                     {
                         item.Error += ShowError;
                         item.NewItem += Item_NewDoc;
                         item.Closed += Item_Closed;
                     }
+
                     CollectionViewSource.GetDefaultView(DocList).MoveCurrentToLast();
                     CheckSaveAllCanBeExecuted(this, EventArgs.Empty);
                     break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Move:
                     break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Remove:
                     foreach (WorkspaceViewModel item in e.OldItems)
                     {
                         item.Error -= ShowError;
                         item.NewItem -= Item_NewDoc;
                         item.Closed -= Item_Closed;
                     }
+
                     CheckSaveAllCanBeExecuted(this, EventArgs.Empty);
                     break;
 
@@ -532,7 +545,7 @@ namespace SIQuester.ViewModel
             {
                 try
                 {
-                    await item.SaveIfNeeded(false, true);
+                    await item.SaveIfNeededAsync(false, true);
                 }
                 catch (Exception exc)
                 {
@@ -541,16 +554,16 @@ namespace SIQuester.ViewModel
             }
         }        
 
-        public static void ShowError(Exception exc)
+        public static void ShowError(Exception exc, string message = null)
         {
-            var message = exc.Message;
+            var fullMessage = message != null ? $"{message}: {exc.Message}" : exc.Message;
 
-            if (message.Length > 1000)
+            if (fullMessage.Length > MaxMessageLength)
             {
-                message = message[..1000] + "…";
+                fullMessage = string.Concat(fullMessage.AsSpan(0, MaxMessageLength), "…");
             }
 
-            PlatformManager.Instance.ShowExclamationMessage(message);
+            PlatformManager.Instance.ShowExclamationMessage(fullMessage);
         }
 
         protected override void Dispose(bool disposing)

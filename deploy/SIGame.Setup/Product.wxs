@@ -6,7 +6,6 @@
   <?define ProductNameR="SIGame" ?>
   <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIGame" ?>
-  <?define ProductVersion="7.7.2" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
 

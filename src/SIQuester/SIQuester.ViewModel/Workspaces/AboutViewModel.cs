@@ -9,7 +9,7 @@ using Utils;
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Информация о программе
+    /// Defines application info view model.
     /// </summary>
     public sealed class AboutViewModel : WorkspaceViewModel
     {
@@ -18,7 +18,7 @@ namespace SIQuester.ViewModel
         public override string Header => Resources.About;
 
         /// <summary>
-        /// Версия программы
+        /// Application version.
         /// </summary>
         public string Version
         {
@@ -59,9 +59,10 @@ namespace SIQuester.ViewModel
             {
                 var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _LicensesFolder);
                 var licenseText = new StringBuilder();
+
                 foreach (var file in new DirectoryInfo(licensesFolder).EnumerateFiles())
                 {
-                    licenseText.AppendLine(File.ReadAllText(file.FullName)).AppendLine();
+                    licenseText.Append(file.Name).AppendLine(":").AppendLine().AppendLine(File.ReadAllText(file.FullName)).AppendLine();
                 }
 
                 Licenses = licenseText.ToString();

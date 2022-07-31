@@ -84,7 +84,7 @@ namespace SIUI.ViewModel.Core
         public double QuestionLineSpacing
         {
             get => _questionLineSpacing;
-            set { if (Math.Abs(_questionLineSpacing - value) < double.Epsilon) { _questionLineSpacing = value; OnPropertyChanged(); } }
+            set { if (Math.Abs(_questionLineSpacing - value) > double.Epsilon) { _questionLineSpacing = value; OnPropertyChanged(); } }
         }
 
         private bool _showScore = false;

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 
 namespace SICore.Clients.Viewer
 {
@@ -25,7 +26,7 @@ namespace SICore.Clients.Viewer
             _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
         }
 
-        public async void AddFile(Uri uri, Action<Exception> onError)
+        public async void AddFile(Uri uri, Action<Exception> onError, CancellationToken cancellationToken = default)
         {
             var fileName = Path.GetFileName(uri.ToString());
             var localFile = Path.Combine(_rootFolder, fileName);
@@ -49,20 +50,23 @@ namespace SICore.Clients.Viewer
             {
                 Directory.CreateDirectory(_rootFolder);
 
-                var response = await _client.GetAsync(uri);
+                var response = await _client.GetAsync(uri, cancellationToken);
+                
                 if (!response.IsSuccessStatusCode)
                 {
-                    onError(new Exception($"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync()}"));
+                    onError(new Exception(
+                        $"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
+                    
                     return;
                 }
 
-                using var responseStream = await response.Content.ReadAsStreamAsync();
+                using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
                 using var fileStream = File.Create(localFile);
-                await responseStream.CopyToAsync(fileStream);
+                await responseStream.CopyToAsync(fileStream, cancellationToken);
             }
             catch (Exception exc)
             {
-                Trace.TraceError("AddFile error: " + exc);
+                onError(exc);
 
                 try
                 {

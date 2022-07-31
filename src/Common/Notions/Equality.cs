@@ -9,9 +9,9 @@ namespace Notions
     /// </summary>
     internal sealed class Equality
     {
-        private readonly List<Point[]> _equalsMy = new List<Point[]>();
-        private readonly List<Point[]> _equalsInheriredLeft = new List<Point[]>();
-        private readonly List<Point[]> _equalsInheriredTop = new List<Point[]>();
+        private readonly List<Point[]> _equalsMy = new();
+        private readonly List<Point[]> _equalsInheriredLeft = new();
+        private readonly List<Point[]> _equalsInheriredTop = new();
 
         internal void Append(Equality other, int i, int j)
         {

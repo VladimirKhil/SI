@@ -2,8 +2,19 @@
 
 namespace SIQuester.ViewModel.Helpers
 {
+    /// <summary>
+    /// Defines methods for deconding and encoding paths as valid file names.
+    /// </summary>
+    /// <remarks>
+    /// Equation X == DecodePath(EncodePath(X)) should be always true.
+    /// </remarks>
     internal static class PathHelper
     {
+        /// <summary>
+        /// Encodes path a valid file name.
+        /// </summary>
+        /// <param name="path">Path to encode.</param>
+        /// <returns>Encoded file name.</returns>
         internal static string EncodePath(string path)
         {
             var result = new StringBuilder();
@@ -26,16 +37,21 @@ namespace SIQuester.ViewModel.Helpers
             return result.ToString();
         }
 
-        internal static string DecodePath(string path)
+        /// <summary>
+        /// Decodes file name as a path.
+        /// </summary>
+        /// <param name="fileName">File name to decode.</param>
+        /// <returns>Decoded path.</returns>
+        internal static string DecodePath(string fileName)
         {
             var result = new StringBuilder();
 
-            for (int i = 0; i < path.Length; i++)
+            for (int i = 0; i < fileName.Length; i++)
             {
-                var c = path[i];
-                if (c == '%' && i + 1 < path.Length)
+                var c = fileName[i];
+                if (c == '%' && i + 1 < fileName.Length)
                 {
-                    var c1 = path[++i];
+                    var c1 = fileName[++i];
                     if (c1 == '%')
                         result.Append('%');
                     else if (c1 == ')')

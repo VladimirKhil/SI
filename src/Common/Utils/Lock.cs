@@ -22,6 +22,7 @@ namespace Utils
         public void WithLock(Action action, CancellationToken cancellationToken = default)
         {
             _semaphore.Wait(cancellationToken);
+
             try
             {
                 action();
@@ -49,7 +50,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -62,7 +70,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -76,7 +91,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -103,7 +125,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -116,7 +145,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -129,7 +165,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -142,7 +185,14 @@ namespace Utils
             }
             finally
             {
-                _semaphore.Release();
+                try
+                {
+                    _semaphore.Release();
+                }
+                catch (ObjectDisposedException)
+                {
+
+                }
             }
         }
 
@@ -170,7 +220,14 @@ namespace Utils
             {
                 if (lockAquired)
                 {
-                    _semaphore.Release();
+                    try
+                    {
+                        _semaphore.Release();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+
+                    }
                 }
             }
 
@@ -201,7 +258,14 @@ namespace Utils
             {
                 if (lockAquired)
                 {
-                    _semaphore.Release();
+                    try
+                    {
+                        _semaphore.Release();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+
+                    }
                 }
             }
 

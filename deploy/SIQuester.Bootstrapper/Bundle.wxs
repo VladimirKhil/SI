@@ -6,7 +6,7 @@
     <Bundle AboutUrl="https://vladimirkhil.com/si/siquester"
             Name="SIQuester"
             Condition="(VersionNT = v6.0 AND ServicePackLevel >= 2) OR (VersionNT = v6.1 AND ServicePackLevel >= 1) OR (VersionNT >= v6.2)"
-            Version="5.7.4"
+            Version="$(var.ProductVersion)"
             Manufacturer="Khil-soft"
             UpgradeCode="31CC22C7-17EC-4D88-88F5-2E3EB1A1FA7C"
             IconSourceFile="Resources\logo.ico">

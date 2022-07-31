@@ -7,19 +7,21 @@ using System.Linq;
 namespace SIPackages
 {
     /// <summary>
-    /// Раунд
+    /// Defines a game round.
     /// </summary>
+    /// <inheritdoc cref="InfoOwner" />
     public sealed class Round : InfoOwner
     {
+        /// <summary>
+        /// Round themes.
+        /// </summary>
         public List<Theme> Themes { get; } = new List<Theme>();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _type = RoundTypes.Standart;
 
         /// <summary>
-        /// Тип раунда
-        /// standart: обычный
-        /// final: финальный
+        /// Round type.
         /// </summary>
         public string Type
         {
@@ -27,6 +29,7 @@ namespace SIPackages
             set { var oldValue = _type; if (oldValue != value) { _type = value; OnPropertyChanged(oldValue); } }
         }
 
+        /// <inheritdoc/>
         public override string ToString() => $"{Resources.Round}: {Resources.Round}";
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace SIPackages
             return theme;
         }
 
+        /// <inheritdoc/>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             Name = reader.GetAttribute("name");
@@ -87,6 +91,7 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc/>
         public override void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("round");
@@ -113,9 +118,12 @@ namespace SIPackages
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Creates a copy of round.
+        /// </summary>
         public Round Clone()
         {
-            var round = new Round()
+            var round = new Round
             {
                 _name = _name,
                 _type = _type

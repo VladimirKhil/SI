@@ -10,7 +10,7 @@
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
-    <Version>5.7.0</Version>
+    <Version>5.7.8</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -202,6 +202,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Update="licenses\Ben.Demystifier.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="licenses\WindowsAPICodePack.LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

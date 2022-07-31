@@ -1020,4 +1020,13 @@
   <data name="ServerLicense" xml:space="preserve">
     <value>Лицензия сервера</value>
   </data>
+  <data name="MaximumReplicTextLength" xml:space="preserve">
+    <value>Максимальная длина реплики</value>
+  </data>
+  <data name="MaximumTableTextLength" xml:space="preserve">
+    <value>Максимальная длина текста на табло</value>
+  </data>
+  <data name="Sec" xml:space="preserve">
+    <value>с</value>
+  </data>
 </root>

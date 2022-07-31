@@ -9,13 +9,17 @@ namespace SImulator.Implementation.ButtonManagers.Web
     {
         private readonly IButtonProcessor _buttonProcessor;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ButtonHub" /> class.
+        /// </summary>
+        /// <param name="buttonProcessor">Button processor.</param>
         public ButtonHub(IButtonProcessor buttonProcessor)
         {
             _buttonProcessor = buttonProcessor;
         }
 
         /// <summary>
-        /// Press the button.
+        /// Presses the button.
         /// </summary>
         /// <returns>Pressed player name.</returns>
         public string Press() => _buttonProcessor.Press(Context.ConnectionId);

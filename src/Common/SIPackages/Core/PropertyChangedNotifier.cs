@@ -8,15 +8,15 @@ namespace SIPackages.Core
     /// </summary>
     public abstract class PropertyChangedNotifier : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        /// <inheritdoc />
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        /// Informs about object property value change.
+        /// Raises object property change event.
         /// </summary>
-        /// <param name="propertyName">Name of changed property.</param>
-        protected void OnPropertyChanged<T>(T oldValue, [CallerMemberName] string propertyName = null)
-        {
+        /// <param name="oldValue">Old property value.</param>
+        /// <param name="propertyName">Changed property name.</param>
+        protected void OnPropertyChanged<T>(T? oldValue, [CallerMemberName] string? propertyName = null) =>
             PropertyChanged?.Invoke(this, new ExtendedPropertyChangedEventArgs<T>(propertyName, oldValue));
-        }
     }
 }

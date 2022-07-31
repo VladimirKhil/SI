@@ -172,6 +172,7 @@ namespace SICore
             if (person != NetworkConstants.Everybody)
             {
                 InformPicture(ClientData.ShowMan, person);
+
                 foreach (var item in ClientData.Players)
                 {
                     InformPicture(item, person);
@@ -180,6 +181,7 @@ namespace SICore
             else
             {
                 InformPicture(ClientData.ShowMan);
+
                 foreach (var item in ClientData.Players)
                 {
                     InformPicture(item);

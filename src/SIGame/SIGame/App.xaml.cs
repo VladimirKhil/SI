@@ -1,4 +1,13 @@
-﻿using SICore.PlatformSpecific;
+﻿using AppService.Client;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NLog.Extensions.Logging;
+using NLog.Web;
+using SI.GameResultService.Client;
+using SI.GameServer.Client;
+using SICore.PlatformSpecific;
+using SIGame.Contracts;
 using SIGame.Implementation;
 using SIGame.ViewModel;
 using System;
@@ -12,15 +21,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
 using Utils;
-using AppService.Client;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using NLog.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using NLog.Web;
-using SI.GameServer.Client;
-using SI.GameResultService.Client;
-using SIGame.Contracts;
 #if !DEBUG
 using AppService.Client.Models;
 using SICore;
@@ -232,7 +232,7 @@ namespace SIGame
             }
             catch (Exception exc)
             {
-                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.ToStringDemystified()), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -43,6 +43,11 @@ namespace SICore.Network.Servers
                 throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
             }
 
+            if (result.IsFaulted)
+            {
+                throw result.Exception;
+            }
+
             var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
 
             if (upgrade)

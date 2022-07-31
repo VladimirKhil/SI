@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace SIGame
 {
     /// <summary>
-    /// Настройки, которые пользователь может редактировать с помощью диалога настроек и возвращать в первоначальное состояние
+    /// Extends <see cref="AppSettingsCore" /> with app settings which do not affect game server but could be reset to defaults.
     /// </summary>
     public sealed class AppSettings : AppSettingsCore
     {
@@ -42,7 +42,7 @@ namespace SIGame
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ThemeSettings _themeSettings = new ThemeSettings();
+        private ThemeSettings _themeSettings = new();
 
         /// <summary>
         /// Настройки темы
@@ -146,7 +146,7 @@ namespace SIGame
             ThemeSettings = settings.ThemeSettings;
             TranslateGameToChat = settings._translateGameToChat;
             ShowBorderOnFalseStart = settings.ShowBorderOnFalseStart;
-            // logsFolder не меняется
+            // logsFolder is not changed
         }
 
         public AppSettingsCore ToAppSettingsCore()
