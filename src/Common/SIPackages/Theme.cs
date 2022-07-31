@@ -74,7 +74,7 @@ namespace SIPackages
         /// <param name="reader">XML Reader.</param>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
-            _name = reader.GetAttribute("name");
+            _name = reader.GetAttribute("name") ?? "";
 
             if (reader.IsEmptyElement)
             {
@@ -130,10 +130,12 @@ namespace SIPackages
             if (Questions.Any())
             {
                 writer.WriteStartElement("questions");
+
                 foreach (var item in Questions)
                 {
                     item.WriteXml(writer);
                 }
+
                 writer.WriteEndElement();
             }
 

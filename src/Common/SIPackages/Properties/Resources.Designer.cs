@@ -79,6 +79,15 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Authors.
+        /// </summary>
+        public static string Authors {
+            get {
+                return ResourceManager.GetString("Authors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Image.
         /// </summary>
         public static string Image {

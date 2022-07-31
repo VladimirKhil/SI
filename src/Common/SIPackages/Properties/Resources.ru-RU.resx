@@ -123,6 +123,9 @@
   <data name="Comments" xml:space="preserve">
     <value>Комментарии</value>
   </data>
+  <data name="Authors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
   <data name="Image" xml:space="preserve">
     <value>Изображение</value>
   </data>

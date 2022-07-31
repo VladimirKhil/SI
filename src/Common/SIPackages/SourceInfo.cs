@@ -5,7 +5,7 @@ using System.Text;
 namespace SIPackages
 {
     /// <summary>
-    /// Источник
+    /// Defines an source info.
     /// </summary>
     [DataContract]
     public sealed class SourceInfo : IdOwner
@@ -66,10 +66,7 @@ namespace SIPackages
             set { var oldValue = _city; if (oldValue != value) { _city = value; OnPropertyChanged(oldValue); } }
         }
 
-        /// <summary>
-        /// Строковое представление источника
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             var result = new StringBuilder();
@@ -103,6 +100,6 @@ namespace SIPackages
             return result.ToString();
         }
 
-        public SourceInfo Clone() => new SourceInfo { _author = _author, _city = _city, _publish = _publish, _title = _title, _year = _year, Id = Id };
+        public SourceInfo Clone() => new() { _author = _author, _city = _city, _publish = _publish, _title = _title, _year = _year, Id = Id };
     }
 }

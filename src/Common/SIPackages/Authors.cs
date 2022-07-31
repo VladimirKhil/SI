@@ -1,33 +1,26 @@
-﻿using System;
+﻿using SIPackages.Core;
+using SIPackages.Properties;
 using System.Collections.Generic;
-using SIPackages.Core;
 
 namespace SIPackages
 {
     /// <summary>
-    /// Авторы объекта в пакете
+    /// Defines a list of package object authors names.
     /// </summary>
     public sealed class Authors : List<string>
     {
         /// <summary>
-        /// Создание списка авторов
+        /// Initializes a new instance of <see cref="Authors" /> class.
         /// </summary>
         public Authors() { }
 
         /// <summary>
-        /// Создание списка авторов
+        /// Initializes a new instance of <see cref="Authors" /> class.
         /// </summary>
-        /// <param name="collection"></param>
-        public Authors(IList<string> collection)
-            : base(collection)
-        {
+        /// <param name="collection">Initial authors names collection.</param>
+        public Authors(IList<string> collection) : base(collection) { }
 
-        }
-
-        /// <summary>
-        /// Строковое представление авторов
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString() => $"Авторы: {this.ToCommonString()}";
+        /// <inheritdoc />
+        public override string ToString() => $"{Resources.Authors}: {this.ToCommonString()}";
     }
 }

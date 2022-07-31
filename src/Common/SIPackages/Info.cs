@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-
-namespace SIPackages
+﻿namespace SIPackages
 {
     /// <summary>
     /// Информация об объекте в пакете
@@ -26,8 +23,9 @@ namespace SIPackages
         /// <summary>
         /// Расширение данных
         /// </summary>
-        public string Extension { get; set; }
+        public string? Extension { get; set; }
 
-        public override string ToString() => string.Format("[{0}, {1}, {2}]", this.Authors, this.Sources, this.Comments);
+        /// <inheritdoc />
+        public override string ToString() => string.Format("[{0}, {1}, {2}]", Authors, Sources, Comments);
     }
 }

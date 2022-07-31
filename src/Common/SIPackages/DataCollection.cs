@@ -1,6 +1,5 @@
 ﻿using SIPackages.Core;
 using SIPackages.PlatformSpecific;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -16,12 +15,12 @@ namespace SIPackages
     {
         private readonly string _mediaType;
 
-        private ISIPackage _package = null;
+        private ISIPackage _package;
 
         /// <summary>
         /// Current items in the collection.
         /// </summary>
-        private readonly List<string> _files = null;
+        private readonly List<string> _files;
 
         /// <summary>
         /// Collection name.
@@ -29,7 +28,7 @@ namespace SIPackages
         public string Name { get; }
 
         /// <summary>
-        /// Colletion item count.
+        /// Collection item count.
         /// </summary>
         public int Count => _files.Count;
 
@@ -60,6 +59,10 @@ namespace SIPackages
         /// <param name="fileName">File name.</param>
         public StreamInfo GetFile(string fileName) => _package.GetStream(Name, fileName);
 
+        /// <summary>
+        /// Gets collection file length.
+        /// </summary>
+        /// <param name="fileName">File name.</param>
         public long GetFileLength(string fileName) => _package.GetStreamLength(Name, fileName);
 
         #region IEnumerable<string> Members
@@ -111,6 +114,7 @@ namespace SIPackages
         public async Task RenameFileAsync(string oldName, string newName, CancellationToken cancellationToken = default)
         {
             var streamInfo = _package.GetStream(Name, oldName);
+
             using (var stream = streamInfo.Stream)
             {
                 await _package.CreateStreamAsync(Name, newName, _mediaType, stream, cancellationToken);

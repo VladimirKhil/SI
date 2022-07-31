@@ -46,9 +46,12 @@ namespace SIPackages
         /// <inheritdoc/>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
-            Name = reader.GetAttribute("name");
+            Name = reader.GetAttribute("name") ?? "";
+
             if (reader.MoveToAttribute("type"))
+            {
                 _type = reader.Value;
+            }
 
             if (reader.IsEmptyElement)
             {
@@ -60,6 +63,7 @@ namespace SIPackages
             while (!read || reader.Read())
             {
                 read = true;
+
                 switch (reader.NodeType)
                 {
                     case System.Xml.XmlNodeType.Element:
@@ -96,6 +100,7 @@ namespace SIPackages
         {
             writer.WriteStartElement("round");
             writer.WriteAttributeString("name", _name);
+
             if (_type != RoundTypes.Standart)
             {
                 writer.WriteAttributeString("type", _type);

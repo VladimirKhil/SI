@@ -20,6 +20,7 @@ namespace SIPackages
             set
             {
                 var oldValue = _value;
+
                 if (oldValue != value)
                 {
                     _value = value;
@@ -28,6 +29,7 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc />
         public override string ToString() => $"{Name}: {Value}";
     }
 }

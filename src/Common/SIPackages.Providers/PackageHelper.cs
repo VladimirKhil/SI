@@ -141,6 +141,7 @@ namespace SIPackages.Providers
         {
             var fIndex = Rand.Next(files.Count);
             var doc2 = await provider.GetPackageAsync(files[fIndex], cancellationToken);
+
             if (doc2 == null)
             {
                 throw new PackageNotFoundException(files[fIndex]);
@@ -150,6 +151,7 @@ namespace SIPackages.Providers
             {
                 var normal = doc2.Package.Rounds.Where(predicate).ToList();
                 var count = normal.Count;
+
                 if (count == 0)
                 {
                     files.RemoveAt(fIndex);
@@ -190,11 +192,13 @@ namespace SIPackages.Providers
         private static void InheritAuthors(SIDocument doc2, Question question)
         {
             var authors = question.Info.Authors;
+
             if (authors.Count > 0)
             {
                 for (int i = 0; i < authors.Count; i++)
                 {
                     var link = doc2.GetLink(question.Info.Authors, i, out string tail);
+
                     if (link != null)
                     {
                         question.Info.Authors[i] = link + tail;
@@ -206,11 +210,13 @@ namespace SIPackages.Providers
         private static void InheritSources(SIDocument doc2, Question question)
         {
             var sources = question.Info.Sources;
+
             if (sources.Count > 0)
             {
                 for (int i = 0; i < sources.Count; i++)
                 {
                     var link = doc2.GetLink(question.Info.Sources, i, out string tail);
+
                     if (link != null)
                     {
                         question.Info.Sources[i] = link + tail;
@@ -233,9 +239,11 @@ namespace SIPackages.Providers
                 }
 
                 var link = doc2.GetLink(atom);
+
                 if (link.GetStream != null)
                 {
                     DataCollection collection = null;
+
                     switch (atom.Type)
                     {
                         case AtomTypes.Video:
@@ -263,9 +271,11 @@ namespace SIPackages.Providers
         private static void InheritAuthors(SIDocument doc2, Round round, Theme theme)
         {
             var authors = theme.Info.Authors;
+
             if (authors.Count == 0)
             {
                 authors = round.Info.Authors;
+
                 if (authors.Count == 0)
                 {
                     authors = doc2.Package.Info.Authors;
@@ -287,6 +297,7 @@ namespace SIPackages.Providers
                 for (int i = 0; i < authors.Count; i++)
                 {
                     var link = doc2.GetLink(theme.Info.Authors, i, out string tail);
+
                     if (link != null)
                     {
                         theme.Info.Authors[i] = link + tail;
@@ -298,9 +309,11 @@ namespace SIPackages.Providers
         private static void InheritSources(SIDocument doc2, Round round, Theme theme)
         {
             var sources = theme.Info.Sources;
+
             if (sources.Count == 0)
             {
                 sources = round.Info.Sources;
+
                 if (sources.Count == 0)
                 {
                     sources = doc2.Package.Info.Sources;
@@ -322,6 +335,7 @@ namespace SIPackages.Providers
                 for (int i = 0; i < sources.Count; i++)
                 {
                     var link = doc2.GetLink(theme.Info.Sources, i, out string tail);
+
                     if (link != null)
                     {
                         theme.Info.Sources[i] = link + tail;

@@ -58,7 +58,7 @@ namespace SIPackages
         /// <summary>
         /// Имя вопроса (фиктивное свойство)
         /// </summary>
-        public override string Name => null;
+        public override string Name => "";
 
         public override bool Contains(string value) =>
             base.Contains(value) ||
