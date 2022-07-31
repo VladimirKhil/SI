@@ -653,16 +653,50 @@
                             </DataTemplate>
                             <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
                                 <Grid>
-                                    <!--Основной контент вопроса (текст, изображение, видео, скрипичный ключ)-->
+                                    <!-- Main question content (text, image, video, treble clef) -->
                                     <ContentControl
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionContentType, Converter={StaticResource QuestionContentSelector}}"
                                         Margin="10" />
-                                    <!--Рамка для нажатия / имя нажавшего-->
+                                    
+                                    <!-- Border for pressing mode / Answerer name -->
                                     <ContentControl
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionStyle, Converter={StaticResource DecoratorSelector}}" />
-                                    <!--Фоновый звук-->
+
+                                    <!-- Hint -->
+                                    <ContentControl Content="{Binding}">
+                                        <ContentControl.Style>
+                                            <Style TargetType="ContentControl">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate>
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="3*" />
+                                                                    <RowDefinition Height="*" />
+                                                                </Grid.RowDefinitions>
+                                                                <Border Grid.Row="1" Background="#88000000">
+                                                                    <TextBlock Text="{Binding Hint}" Style="{StaticResource QuestionText}" Opacity="0.4" />
+                                                                </Border>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Hint}" Value="">
+                                                        <Setter Property="ContentTemplate">
+                                                            <Setter.Value>
+                                                                <DataTemplate />
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ContentControl.Style>
+                                    </ContentControl>
+                                    
+                                    <!-- Background sound -->
                                     <ContentControl Content="{Binding}">
                                         <ContentControl.Style>
                                             <Style TargetType="ContentControl">
