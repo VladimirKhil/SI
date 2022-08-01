@@ -23,6 +23,8 @@ namespace SICore
     /// </summary>
     public class ViewerHumanLogic : Logic<ViewerData>, IViewer
     {
+        private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
+
         private bool _disposed = false;
 
         private readonly CancellationTokenSource _cancellation = new();
@@ -801,6 +803,24 @@ namespace SICore
 
                     break;
             }
+        }
+
+        virtual public void OnAtomHint(string hint)
+        {
+            TInfo.Hint = hint;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(HintLifetime);
+                    TInfo.Hint = "";
+                }
+                catch (Exception exc)
+                {
+                    _data.BackLink.SendError(exc);
+                }
+            });
         }
 
         public void SetRight(string answer)

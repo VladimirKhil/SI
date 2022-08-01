@@ -85,7 +85,7 @@ namespace SIUI.ViewModel
         private int _textLength;
 
         /// <summary>
-        /// Длина текста (при использовании частичного текста свойство Text содержит не только частичный текст, но и форму остального текста вопроса.
+        /// Длина текста. При использовании частичного текста свойство Text содержит не только частичный текст, но и форму остального текста вопроса.
         /// Её отображать не надо
         /// </summary>
         public int TextLength
@@ -93,7 +93,18 @@ namespace SIUI.ViewModel
             get { return _textLength; }
             set { if (_textLength != value) { _textLength = value; OnPropertyChanged(); } }
         }
-        
+
+        private string _hint = "";
+
+        /// <summary>
+        /// Additional hint shown over other content with transparency for a limited time.
+        /// </summary>
+        public string Hint
+        {
+            get { return _hint; }
+            set { if (_hint != value) { _hint = value; OnPropertyChanged(); } }
+        }
+
         private int _playerIndex = -1;
 
         /// <summary>
@@ -108,7 +119,7 @@ namespace SIUI.ViewModel
         public string ActivePlayer => _playerIndex < 0 || _playerIndex >= Players.Count ? "" : Players[_playerIndex].Name;
 
         /// <summary>
-        /// Игроки, проигравшие кнопку
+        /// Players lost the button chase.
         /// </summary>
         public ObservableCollection<string> LostButtonPlayers { get; } = new ObservableCollection<string>();
 

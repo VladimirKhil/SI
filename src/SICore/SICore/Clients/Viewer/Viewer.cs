@@ -119,9 +119,11 @@ namespace SICore
             var player = person as PlayerAccount;
 
             string index;
+
             if (player != null)
             {
                 var playerIndex = ClientData.Players.IndexOf(player);
+
                 if (playerIndex == -1)
                 {
                     return;
@@ -152,6 +154,7 @@ namespace SICore
             if (player != null)
             {
                 var index = ClientData.Players.IndexOf(player);
+
                 if (index < 0 || index >= ClientData.Players.Count)
                 {
                     AddLog($"Wrong index: {index}" + Environment.NewLine);
@@ -161,7 +164,11 @@ namespace SICore
                 indexString = index.ToString();
             }
 
-            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_Free, player != null ? Constants.Player : Constants.Showman, indexString);
+            _viewerActions.SendMessage(
+                Messages.Config,
+                MessageParams.Config_Free,
+                player != null ? Constants.Player : Constants.Showman,
+                indexString);
         }
 
         private void Delete_Executed(object arg)
@@ -217,7 +224,9 @@ namespace SICore
         private void Ban_Executed(object arg)
         {
             if (arg is not ViewerAccount person)
+            {
                 return;
+            }
 
             if (person == ClientData.Me)
             {
@@ -245,6 +254,7 @@ namespace SICore
                 var player = ClientData.Players[i];
                 player.CanBeSelected = ClientData.Stage == GameStage.Before || !player.IsConnected || !player.IsHuman;
                 int num = i;
+
                 player.SelectionCallback = p =>
                 {
                     _viewerActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_DeleteTable, num);
@@ -714,6 +724,13 @@ namespace SICore
 
                     case Messages.Atom:
                         _logic.SetAtom(mparams);
+                        break;
+
+                    case Messages.Atom_Hint:
+                        if (mparams.Length > 1)
+                        {
+                            _logic.OnAtomHint(mparams[1]);
+                        }
                         break;
 
                     case Messages.Atom_Second:

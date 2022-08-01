@@ -143,5 +143,7 @@ namespace SICore
         void OnReplic(string personCode, string text);
 
         void OnRoundContent(string[] mparams) { }
+
+        void OnAtomHint(string hint) { }
     }
 }
