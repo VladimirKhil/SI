@@ -59,9 +59,11 @@ namespace SICore
         public bool IsRunning { get; set; }
 
         public event Action<GameStages, string> StageChanged;
+
         public event Action<string, int, int> AdShown;
 
         internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(stage, stageName);
+
         internal void OnAdShown(int adId) =>
             AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
 
@@ -2433,8 +2435,9 @@ namespace SICore
             }
             else if (arg == 2)
             {
-                // Покажем рекламу
+                // Showing advertisement
                 var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
+
                 if (!string.IsNullOrEmpty(ad))
                 {
                     var res = new StringBuilder(LO[nameof(R.Ads)] + ": ").Append(ad);
@@ -2444,7 +2447,7 @@ namespace SICore
 
                     _gameActions.SendMessageWithArgs(Messages.Ads, ad);
 #if !DEBUG
-                    ClientData.MoveNextBlocked = true;
+                    ClientData.MoveNextBlocked = !ClientData.Settings.AppSettings.Managed;
 #endif
                     OnAdShown(adId);
                     adShown = true;
@@ -2460,6 +2463,7 @@ namespace SICore
             else
             {
                 ClientData.MoveNextBlocked = false;
+
                 _gameActions.ShowmanReplic(_data.Chooser.Name + ", " + string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight)));
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
@@ -4308,6 +4312,7 @@ namespace SICore
                 try
                 {
                     var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
+
                     if (!string.IsNullOrEmpty(ad))
                     {
                         informed = true;
@@ -4320,7 +4325,7 @@ namespace SICore
 
 #if !DEBUG
                         // Advertisement could not be skipped
-                        ClientData.MoveNextBlocked = true;
+                        ClientData.MoveNextBlocked = !ClientData.Settings.AppSettings.Managed;
 #endif
                         adShown = true;
 
