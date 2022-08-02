@@ -28,7 +28,7 @@
 				Compressed="no"
                 DisplayName="SIQuester"
                 SourceFile="..\SIQuester.Setup\bin\Release\x86\ru-ru\SIQuester.x86.msi"
-				DownloadUrl="https://vladimirkhil.com/si/siquester/SIQuester.x86.msi"
+				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/siquester-v$(var.ProductVersion)/SIQuester.x86.msi"
 	            InstallCondition="NOT VersionNT64" />
 			
 		    <MsiPackage
@@ -36,7 +36,7 @@
 				Compressed="no"
 			    DisplayName="SIQuester"
 			    SourceFile="..\SIQuester.Setup\bin\Release\x64\ru-ru\SIQuester.x64.msi"
-				DownloadUrl="https://vladimirkhil.com/si/siquester/SIQuester.x64.msi"
+				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/siquester-v$(var.ProductVersion)/SIQuester.x64.msi"
 			    InstallCondition="VersionNT64" />
         </Chain>
     </Bundle>

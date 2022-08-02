@@ -85,7 +85,7 @@ namespace SIGame.ViewModel
         public bool IsProgress
         {
             get => _isProgress;
-            set { _isProgress = value; OnPropertyChanged(); }
+            set { if (_isProgress != value) { _isProgress = value; OnPropertyChanged(); } }
         }
 
         private string _error = "";
@@ -231,6 +231,7 @@ namespace SIGame.ViewModel
                 {
                     Error = exc.Message;
                     FullError = exc.ToString();
+
                     if (_host != null)
                     {
                         await _host.DisposeAsync();
@@ -261,7 +262,7 @@ namespace SIGame.ViewModel
 
         protected virtual string GetExtraCredentials() => "";
 
-        protected string _avatar;
+        protected Task<(string AvatarUrl, FileKey FileKey)> _avatarLoadingTask;
 
         protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
         {
@@ -269,6 +270,7 @@ namespace SIGame.ViewModel
                 async () =>
                 {
                     var externalServer = _server.HostServer;
+
                     if (externalServer != null)
                     {
                         lock (externalServer.ClientsSync)
@@ -279,6 +281,7 @@ namespace SIGame.ViewModel
                     else
                     {
                         Error = Resources.RejoinError;
+
                         if (_host != null)
                         {
                             await _host.DisposeAsync();
@@ -308,7 +311,8 @@ namespace SIGame.ViewModel
                 _ => new SimpleViewer(_client, humanPlayer, isHost, localizer, data),
             };
 
-            _host.Avatar = _avatar;
+            _host.Avatar = _avatarLoadingTask != null ? (await _avatarLoadingTask).AvatarUrl : null;
+
             _host.Connector = new ReconnectManager(_server, _client, _host, humanPlayer, role, GetExtraCredentials(), IsOnline)
             {
                 ServerAddress = ServerAddress
@@ -317,6 +321,7 @@ namespace SIGame.ViewModel
             _host.Client.ConnectTo(_server);
 
             _releaseServer = false;
+
             if (!isHost && Ready != null)
             {
                 Ready(_server, _host, IsOnline); // Здесь происходит переход к игре

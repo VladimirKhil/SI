@@ -35,7 +35,7 @@ namespace SIPackages.PlatformSpecific
         /// </summary>
         /// <param name="name">Object name.</param>
         /// <param name="read">Will the stream be read (or written to otherwise).</param>
-        StreamInfo GetStream(string name, bool read = true);
+        StreamInfo? GetStream(string name, bool read = true);
 
         /// <summary>
         /// Gets object stream.
@@ -43,7 +43,7 @@ namespace SIPackages.PlatformSpecific
         /// <param name="category">Object category.</param>
         /// <param name="name">Object name.</param>
         /// <param name="read">Should a stream be read-only.</param>
-        StreamInfo GetStream(string category, string name, bool read = true);
+        StreamInfo? GetStream(string category, string name, bool read = true);
 
         /// <summary>
         /// Creates an object.

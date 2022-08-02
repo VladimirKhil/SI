@@ -117,10 +117,10 @@
 		    <File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
 	    </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_ru.xps" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)Help_ru.xps" />
       </Component>
       <Component Guid="{ADDF321D-6B06-412B-8096-3911FF966799}">
-        <File KeyPath="yes" Source="$(var.SIGame.TargetDir)Help_en.xps" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)Help_en.xps" />
       </Component>
       <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
         <RegistryValue
