@@ -58,6 +58,7 @@ namespace SIPackages.Providers
                 var escapedName = string.Join("/", packageNameParts.Select(pnp => Uri.EscapeDataString(pnp)));
 
                 var uri = $"{_storageUrl}/{escapedName}";
+
                 using (var response = await HttpClient.GetAsync(uri, cancellationToken))
                 {
                     if (!response.IsSuccessStatusCode)

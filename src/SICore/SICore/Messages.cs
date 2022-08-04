@@ -251,6 +251,36 @@
         public const string Pass = "PASS";
 
         /// <summary>
+        /// Пауза в игре
+        /// </summary>
+        public const string Pause = "PAUSE";
+
+        /// <summary>
+        /// Информация об ответе игрока
+        /// </summary>
+        public const string Person = "PERSON";
+
+        /// <summary>
+        /// Игрок принял решение по апелляции
+        /// </summary>
+        public const string PersonApellated = "PERSONAPELLATED";
+
+        /// <summary>
+        /// Игрок ответил в финале
+        /// </summary>
+        public const string PersonFinalAnswer = "PERSONFINALANSWER";
+
+        /// <summary>
+        /// Игрок сделал ставку в финале
+        /// </summary>
+        public const string PersonFinalStake = "PERSONFINALSTAKE";
+
+        /// <summary>
+        /// Ставка игрока
+        /// </summary>
+        public const string PersonStake = "PERSONSTAKE";
+
+        /// <summary>
         /// Картинка участника
         /// </summary>
         [IdempotencyRequired]
@@ -281,36 +311,6 @@
         /// Правильный ответ (простой)
         /// </summary>
         public const string RightAnswer = "RIGHTANSWER";
-
-        /// <summary>
-        /// Пауза в игре
-        /// </summary>
-        public const string Pause = "PAUSE";
-
-        /// <summary>
-        /// Информация об ответе игрока
-        /// </summary>
-        public const string Person = "PERSON";
-
-        /// <summary>
-        /// Игрок принял решение по апелляции
-        /// </summary>
-        public const string PersonApellated = "PERSONAPELLATED";
-
-        /// <summary>
-        /// Игрок ответил в финале
-        /// </summary>
-        public const string PersonFinalAnswer = "PERSONFINALANSWER";
-
-        /// <summary>
-        /// Игрок сделал ставку в финале
-        /// </summary>
-        public const string PersonFinalStake = "PERSONFINALSTAKE";
-
-        /// <summary>
-        /// Ставка игрока
-        /// </summary>
-        public const string PersonStake = "PERSONSTAKE";
 
         /// <summary>
         /// Тип вопроса

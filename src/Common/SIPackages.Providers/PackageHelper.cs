@@ -71,6 +71,7 @@ namespace SIPackages.Providers
             for (var i = 0; i < roundsCount; i++)
             {
                 doc.Package.Rounds.Add(new Round { Type = RoundTypes.Standart, Name = string.Format(roundNameFormat, i + 1) });
+
                 for (int j = 0; j < themesCount; j++)
                 {
                     if (files.Count == 0)

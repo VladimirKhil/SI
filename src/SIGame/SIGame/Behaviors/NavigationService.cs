@@ -7,27 +7,25 @@ using Utils;
 
 namespace SIGame.Behaviors
 {
+    // TODO: Replace with SIUI.Behaviors.HyperlinkBehavior
     public static class NavigationService
     {
         // Copied from http://geekswithblogs.net/casualjim/archive/2005/12/01/61722.aspx
-        private static readonly Regex RE_URL = new Regex(@"(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?");
+        private static readonly Regex RE_URL = new(@"(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~/|/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?");
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached(
             "Text",
             typeof(string),
             typeof(NavigationService),
-            new PropertyMetadata(null, OnTextChanged)
-        );
+            new PropertyMetadata(null, OnTextChanged));
 
-        public static string GetText(DependencyObject d)
-        { return d.GetValue(TextProperty) as string; }
+        public static string GetText(DependencyObject d) => d.GetValue(TextProperty) as string;
 
-        public static void SetText(DependencyObject d, string value)
-        { d.SetValue(TextProperty, value); }
+        public static void SetText(DependencyObject d, string value) => d.SetValue(TextProperty, value);
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is TextBlock text_block))
+            if (d is not TextBlock text_block)
                 return;
 
             text_block.Inlines.Clear();
@@ -69,7 +67,14 @@ namespace SIGame.Behaviors
         private static void OnUrlClick(object sender, RoutedEventArgs e)
         {
             var link = (Hyperlink)sender;
-            Browser.Open(link.NavigateUri.ToString());
+            try
+            {
+                Browser.Open(link.NavigateUri.ToString());
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
     }
 }

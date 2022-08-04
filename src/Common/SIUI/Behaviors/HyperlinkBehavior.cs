@@ -32,12 +32,14 @@ namespace SIUI.Behaviors
             textBlock.Inlines.Clear();
 
             var newValue = (string)e.NewValue;
+
             if (string.IsNullOrEmpty(newValue))
             {
                 return;
             }
 
             var previousPosition = 0;
+
             foreach (var match in UrlMatcher.MatchText(newValue))
             {
                 if (match.Index != previousPosition)
@@ -67,7 +69,15 @@ namespace SIUI.Behaviors
         private static void OnLinkClick(object sender, RoutedEventArgs e)
         {
             var link = (Hyperlink)sender;
-            Browser.Open(link.NavigateUri.ToString());
+
+            try
+            {
+                Browser.Open(link.NavigateUri.ToString());
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
     }
 }
