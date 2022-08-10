@@ -1,12 +1,20 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace SIGame
 {
+    /// <summary>
+    /// Represents a button that shows drop-down menu on click.
+    /// </summary>
     public sealed class DropDownButton : Button
     {
-        public static readonly DependencyProperty DropDownProperty = DependencyProperty.Register("DropDown", typeof(ContextMenu), typeof(DropDownButton), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty DropDownProperty =
+            DependencyProperty.Register("DropDown", typeof(ContextMenu), typeof(DropDownButton), new UIPropertyMetadata(null));
 
+        /// <summary>
+        /// Button drop-down menu.
+        /// </summary>
         public ContextMenu DropDown
         {
             get => (ContextMenu)GetValue(DropDownProperty);
@@ -15,10 +23,20 @@ namespace SIGame
 
         protected override void OnClick()
         {
-            if (DropDown != null)
+            if (DropDown == null)
             {
-                DropDown.PlacementTarget = this;
+                return;
+            }
+
+            DropDown.PlacementTarget = this;
+
+            try
+            {
                 DropDown.IsOpen = true;
+            }
+            catch (DivideByZeroException) // at void System.Windows.Vector.Normalize()
+            {
+                MessageBox.Show("DropDownButton Error", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
     }

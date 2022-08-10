@@ -52,6 +52,7 @@ namespace SIPackages.PlatformSpecific.Net45
         public string[] GetEntries(string category)
         {
             var directoryInfo = new DirectoryInfo(Path.Combine(_folder, category));
+
             if (!directoryInfo.Exists)
             {
                 return Array.Empty<string>();
@@ -60,7 +61,7 @@ namespace SIPackages.PlatformSpecific.Net45
             return directoryInfo.GetFiles().Select(file => file.Name).ToArray();
         }
 
-        public StreamInfo GetStream(string name, bool read = true)
+        public StreamInfo? GetStream(string name, bool read = true)
         {
             var file = new FileInfo(Path.Combine(_folder, name));
 
@@ -72,7 +73,7 @@ namespace SIPackages.PlatformSpecific.Net45
             return new StreamInfo { Length = file.Length, Stream = read ? file.OpenRead() : file.Open(FileMode.Open) };
         }
 
-        public StreamInfo GetStream(string category, string name, bool read = true)
+        public StreamInfo? GetStream(string category, string name, bool read = true)
         {
             if (name.Length > ZipHelper.MaxFileNameLength)
             {

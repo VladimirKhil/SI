@@ -20,6 +20,7 @@ namespace SIGame.ViewModel
                 if (_canBeExecuted != value)
                 {
                     _canBeExecuted = value;
+
                     if (CanExecuteChanged != null)
                     {
                         if (SynchronizationContext.Current == null)
@@ -39,10 +40,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        public AsyncCommand(Func<object, Task> execute)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-        }
+        public AsyncCommand(Func<object, Task> execute) => _execute = execute ?? throw new ArgumentNullException(nameof(execute));
 
         public bool CanExecute(object parameter) => _canBeExecuted;
 

@@ -183,7 +183,7 @@ namespace SI.GameServer.Client
                     $"{ServiceUri}sionline?token={token}",
                     options =>
                     {
-                        options.AccessTokenProvider = () => Task.FromResult(Convert.ToBase64String(Encoding.UTF8.GetBytes(_login)));
+                        options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(_login)));
                     })
                 .WithAutomaticReconnect()
                 .AddMessagePackProtocol()

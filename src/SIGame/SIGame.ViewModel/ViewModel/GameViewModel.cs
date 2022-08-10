@@ -41,7 +41,7 @@ namespace SIGame.ViewModel
 
         public bool NetworkGame
         {
-            get { return _networkGame; }
+            get => _networkGame;
             set { _networkGame = value; OnPropertyChanged(); }
         }
 
@@ -49,7 +49,7 @@ namespace SIGame.ViewModel
 
         public int NetworkGamePort
         {
-            get { return _networkGamePort; }
+            get => _networkGamePort;
             set { _networkGamePort = value; OnPropertyChanged(); }
         }
 
@@ -75,7 +75,7 @@ namespace SIGame.ViewModel
 
         public string Ad
         {
-            get { return _ad; }
+            get => _ad;
             set { _ad = value; OnPropertyChanged(); }
         }
 
@@ -83,7 +83,7 @@ namespace SIGame.ViewModel
 
         public double Volume
         {
-            get { return TInfo.Volume * 100; }
+            get => TInfo.Volume * 100;
             set { TInfo.Volume = Math.Max(1, value) / 100; }
         }
 
@@ -141,10 +141,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void GameViewModel_TimeChanged(IAnimatableTimer timer)
-        {
-            Host.MyLogic.TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
-        }
+        private void GameViewModel_TimeChanged(IAnimatableTimer timer) => Host.MyLogic.TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
         private void Host_Timer(int timerIndex, string timerCommand, string arg)
         {
@@ -196,6 +193,7 @@ namespace SIGame.ViewModel
         private void Host_Switch(IViewerClient newHost)
         {
             newHost.Connector = Host.Connector;
+
             if (newHost.Connector != null)
             {
                 newHost.Connector.SetHost(newHost);
@@ -223,10 +221,7 @@ namespace SIGame.ViewModel
             OnPropertyChanged(nameof(TInfo));
         }
 
-        private void Move_Executed(object arg)
-        {
-            Host.Move(arg);
-        }
+        private void Move_Executed(object arg) => Host.Move(arg);
 
         private void Cancel_Executed(object arg)
         {
@@ -237,15 +232,9 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void ChangePauseInGame_Executed(object arg)
-        {
-            Host.Pause();
-        }
+        private void ChangePauseInGame_Executed(object arg) => Host.Pause();
 
-        private void EndGame_Executed(object arg)
-        {
-            GameEnded?.Invoke();
-        }
+        private void EndGame_Executed(object arg) => GameEnded?.Invoke();
 
         public async ValueTask DisposeAsync()
         {
@@ -275,10 +264,7 @@ namespace SIGame.ViewModel
         /// Изменилось значение свойства
         /// </summary>
         /// <param name="name">Имя свойства</param>
-        private void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
+        private void OnPropertyChanged([CallerMemberName] string name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public event PropertyChangedEventHandler PropertyChanged;
 

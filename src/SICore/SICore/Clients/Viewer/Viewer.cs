@@ -110,7 +110,11 @@ namespace SICore
             var account = (PersonAccount)arg;
             var player = account as PlayerAccount;
 
-            _viewerActions.SendMessage(Messages.Config, MessageParams.Config_ChangeType, player != null ? Constants.Player : Constants.Showman, player != null ? ClientData.Players.IndexOf(player).ToString() : "");
+            _viewerActions.SendMessage(
+                Messages.Config,
+                MessageParams.Config_ChangeType,
+                player != null ? Constants.Player : Constants.Showman,
+                player != null ? ClientData.Players.IndexOf(player).ToString() : "");
         }
 
         private void Replace_Executed(PersonAccount person, object arg)
@@ -999,6 +1003,7 @@ namespace SICore
                     person.Picture = "";
 
                     var personAccount = person as PersonAccount;
+
                     if (ClientData.Stage == GameStage.Before && personAccount != null)
                     {
                         personAccount.Ready = false;
@@ -1028,6 +1033,7 @@ namespace SICore
                 await _client.Server.ConnectionsLock.WithLockAsync(() =>
                 {
                     var currentConnection = ((ISlaveServer)_client.Server).HostServer;
+
                     if (currentConnection != null)
                     {
                         lock (currentConnection.ClientsSync)
@@ -1092,7 +1098,8 @@ namespace SICore
         private void OnPersonStake(string[] mparams)
         {
             if (!int.TryParse(mparams[1], out var lastStakerIndex) ||
-                lastStakerIndex < 0 || lastStakerIndex >= ClientData.Players.Count)
+                lastStakerIndex < 0 ||
+                lastStakerIndex >= ClientData.Players.Count)
             {
                 return;
             }
@@ -1100,6 +1107,7 @@ namespace SICore
             ClientData.LastStakerIndex = lastStakerIndex;
 
             int stake;
+
             if (mparams[2] == "0")
                 stake = -1;
             else if (mparams[2] == "2")
@@ -1175,6 +1183,7 @@ namespace SICore
         private void OnConfigAddTable(string[] mparams)
         {
             ClientData.BeginUpdatePersons($"Config_AddTable {string.Join(" ", mparams)}");
+
             try
             {
                 var account = new PlayerAccount(mparams[2], mparams[3] == "+", mparams[4] == "+", ClientData.Stage != GameStage.Before)
@@ -2077,6 +2086,7 @@ namespace SICore
                 if (uri.Scheme == "file" && !_client.Server.Contains(NetworkConstants.GameName)) // We should send local file over network
                 {
                     byte[] data = null;
+
                     try
                     {
                         data = CoreManager.Instance.GetData(ClientData.Picture);
@@ -2087,7 +2097,9 @@ namespace SICore
                     }
 
                     if (data == null)
+                    {
                         return;
+                    }
 
                     _viewerActions.SendMessage(Messages.Picture, ClientData.Picture, Convert.ToBase64String(data));
                 }
@@ -2103,9 +2115,6 @@ namespace SICore
         /// </summary>
         public void GetInfo() => _viewerActions.SendMessage(Messages.Info);
 
-        public virtual void Init()
-        {
-            ClientData.IsPlayer = false;
-        }
+        public virtual void Init() => ClientData.IsPlayer = false;
     }
 }

@@ -463,10 +463,7 @@ namespace SICore
 
         }
 
-        virtual public void GameThemes()
-        {
-            TInfo.TStage = TableStage.GameThemes;
-        }
+        virtual public void GameThemes() => TInfo.TStage = TableStage.GameThemes;
 
         virtual public void RoundThemes(bool print)
         {
@@ -506,7 +503,7 @@ namespace SICore
             }
         }
 
-        private Task ExecuteInUIThread(Action action)
+        private Task ExecuteInUIThread(Action action) // TODO: Replace with UI.Execute
         {
             if (UI.Scheduler == null)
             {
@@ -557,8 +554,10 @@ namespace SICore
             {
                 lock (TInfo.RoundInfoLock)
                 {
-                    if (_data.ThemeIndex > -1 && _data.ThemeIndex < TInfo.RoundInfo.Count &&
-                        _data.QuestionIndex > -1 && _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
+                    if (_data.ThemeIndex > -1 &&
+                        _data.ThemeIndex < TInfo.RoundInfo.Count &&
+                        _data.QuestionIndex > -1 &&
+                        _data.QuestionIndex < TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
                     {
                         select = true;
                     }
@@ -830,16 +829,14 @@ namespace SICore
                 TInfo.TStage = TableStage.Answer;
                 TInfo.Text = answer;
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException exc)
             {
                 // Странная ошибка в привязках WPF иногда возникает
+                _data.BackLink.SendError(exc);
             }
         }
 
-        public void Try()
-        {
-            TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
-        }
+        public void Try() => TInfo.QuestionStyle = QuestionStyle.WaitingForPress;
 
         /// <summary>
         /// Нельзя жать на кнопку
@@ -848,6 +845,7 @@ namespace SICore
         virtual public void EndTry(string text)
         {
             TInfo.QuestionStyle = QuestionStyle.Normal;
+
             if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.Video)
             {
                 TInfo.IsMediaStopped = true;
@@ -860,7 +858,9 @@ namespace SICore
             }
 
             if (number < 0 || number >= _data.Players.Count)
+            {
                 return;
+            }
 
             _data.Players[number].State = PlayerState.Press;
         }
@@ -943,6 +943,7 @@ namespace SICore
             else if (_data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat)
             {
                 TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
+
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -957,6 +958,7 @@ namespace SICore
             else if (_data.QuestionType == QuestionTypes.Sponsored)
             {
                 TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
+
                 lock (TInfo.RoundInfoLock)
                 {
                     foreach (var item in TInfo.RoundInfo)
@@ -981,10 +983,7 @@ namespace SICore
             }
         }
 
-        public void StopRound()
-        {
-            TInfo.TStage = TableStage.Sign;
-        }
+        public void StopRound() => TInfo.TStage = TableStage.Sign;
 
         virtual public void Out(int themeIndex)
         {
@@ -1014,10 +1013,7 @@ namespace SICore
             _data.BackLink.SaveBestPlayers(_data.Players);
         }
 
-        public void TimeOut()
-        {
-            _data.Sound = Sounds.RoundTimeout;
-        }
+        public void TimeOut() => _data.Sound = Sounds.RoundTimeout;
 
         protected override ValueTask DisposeAsync(bool disposing)
         {
@@ -1042,10 +1038,7 @@ namespace SICore
             return base.DisposeAsync(disposing);
         }
 
-        public void FinalThink()
-        {
-            _data.BackLink.PlaySound(Sounds.FinalThink);
-        }
+        public void FinalThink() => _data.BackLink.PlaySound(Sounds.FinalThink);
 
         public void UpdatePicture(Account account, string path)
         {
@@ -1089,6 +1082,7 @@ namespace SICore
                 OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.TryReconnect)]);
 
                 var result = await connector.ReconnectToServer();
+
                 if (!result)
                 {
                     AnotherTry(connector);
@@ -1101,12 +1095,18 @@ namespace SICore
                 if (!string.IsNullOrEmpty(connector.Error))
                 {
                     if (connector.CanRetry)
+                    {
                         AnotherTry(connector);
+                    }
                     else
+                    {
                         OnReplic(ReplicCodes.Special.ToString(), connector.Error);
+                    }
                 }
                 else
+                {
                     OnReplic(ReplicCodes.Special.ToString(), _localizer[nameof(R.ReconnectEntered)]);
+                }
             }
             catch (Exception exc)
             {
@@ -1120,6 +1120,7 @@ namespace SICore
             try
             {
                 OnReplic(ReplicCodes.Special.ToString(), connector.Error);
+
                 if (!_disposed)
                 {
                     await Task.Delay(10000);

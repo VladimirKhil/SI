@@ -103,7 +103,7 @@ namespace SIGame.Implementation
         {
             if (Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
-                Dispatcher.Invoke((Action<int, bool>)Pause, currentTime, byUser);
+                Dispatcher.Invoke(Pause, currentTime, byUser);
                 return;
             }
 

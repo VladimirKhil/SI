@@ -11,7 +11,6 @@ using SIGame.ViewModel.Properties;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -384,8 +383,17 @@ namespace SIGame.ViewModel
             UI.Execute(
                 async () =>
                 {
-                    await ReloadGamesAsync(cancellationToken);
-                    await ReloadUsersAsync(cancellationToken);
+                    IsProgress = true;
+
+                    try
+                    {
+                        await ReloadGamesAsync(cancellationToken);
+                        await ReloadUsersAsync(cancellationToken);
+                    }
+                    finally
+                    {
+                        IsProgress = false;
+                    }
                 },
                 exc =>
                 {
@@ -563,10 +571,10 @@ namespace SIGame.ViewModel
 
         public async Task InitAsync()
         {
+            IsProgress = true;
+
             try
             {
-                IsProgress = true;
-
                 _gamesHostInfo = await _gameServerClient.GetGamesHostInfoAsync(_cancellationTokenSource.Token);
 
                 if (_gamesHostInfo.MaxPackageSizeMb == 0)
@@ -580,7 +588,7 @@ namespace SIGame.ViewModel
                 await ReloadGamesAsync(_cancellationTokenSource.Token);
                 await ReloadUsersAsync(_cancellationTokenSource.Token);
 
-                _avatar = (await UploadAvatarAsync(Human, _cancellationTokenSource.Token)).AvatarUrl;
+                _avatarLoadingTask = UploadAvatarAsync(Human, _cancellationTokenSource.Token);
             }
             catch (TaskCanceledException)
             {
@@ -594,6 +602,10 @@ namespace SIGame.ViewModel
             {
                 PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Warning, true);                
                 Cancel.Execute(null);
+            }
+            finally
+            {
+                IsProgress = false;
             }
         }
 
@@ -621,9 +633,11 @@ namespace SIGame.ViewModel
             {
                 var users = await _gameServerClient.GetUsersAsync(cancellationToken);
                 Array.Sort(users);
+
                 lock (_usersLock)
                 {
                     Users.Clear();
+
                     foreach (var user in users)
                     {
                         Users.Add(user);
@@ -665,8 +679,8 @@ namespace SIGame.ViewModel
 
         private async Task ReloadGamesAsync(CancellationToken cancellationToken = default)
         {
-            IsProgress = true;
             Error = "";
+
             try
             {
                 lock (_serverGamesLock)
@@ -677,6 +691,7 @@ namespace SIGame.ViewModel
 
                 SI.GameServer.Contract.Slice<SI.GameServer.Contract.GameInfo> gamesSlice = null;
                 var whileGuard = 100;
+
                 do
                 {
                     var fromId = gamesSlice != null && gamesSlice.Data.Length > 0 ? gamesSlice.Data.Last().GameID + 1 : 0;
@@ -695,10 +710,6 @@ namespace SIGame.ViewModel
             {
                 Error = exc.Message;
                 FullError = exc.ToString();
-            }
-            finally
-            {
-                IsProgress = false;
             }
         }
 

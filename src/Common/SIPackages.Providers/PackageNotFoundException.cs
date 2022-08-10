@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SIPackages.Providers
 {
-    public sealed class PackageNotFoundException: Exception
+    public sealed class PackageNotFoundException : Exception
     {
-
         public PackageNotFoundException()
         {
         }
