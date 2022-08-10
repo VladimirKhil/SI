@@ -4,21 +4,17 @@ using System.Diagnostics;
 
 namespace SIPackages.Core
 {
-    /// <summary>
-    /// Именованный объект пакета
-    /// </summary>
+    /// <inheritdoc cref="INamed" />
     public class Named : PropertyChangedNotifier, INamed
     {
         // TODO: private
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         protected string _name = "";
 
-        /// <summary>
-        /// Имя
-        /// </summary>
+        /// <inheritdoc />
         public virtual string Name
         {
-            get { return _name; }
+            get => _name;
             set
             {
                 if (_name != value)
@@ -31,23 +27,29 @@ namespace SIPackages.Core
         }
 
         /// <summary>
-        /// Создание именованного объекта
+        /// Iitializes a new instance of <see cref="Named" /> class with an empty name.
         /// </summary>
         public Named() { }
 
         /// <summary>
-        /// Создание именованного объекта
+        /// Iitializes a new instance of <see cref="Named" /> class.
         /// </summary>
+        /// <param name="name">Object name.</param>
         public Named(string name) { _name = name; }
 
-        public virtual bool Contains(string value)
-        {
-            return _name != null && _name.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
-        }
+        /// <summary>
+        /// Does the object contain specified value.
+        /// </summary>
+        /// <param name="value">Text value.</param>
+        public virtual bool Contains(string value) =>
+            _name.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
-        public virtual IEnumerable<SearchData> Search(string value)
-        {
-            return SearchExtensions.Search(ResultKind.Name, _name, value);
-        }
+        /// <summary>
+        /// Searches a value inside the object.
+        /// </summary>
+        /// <param name="value">Value to search.</param>
+        /// <returns>Search results.</returns>
+        public virtual IEnumerable<SearchData> Search(string value) =>
+            SearchExtensions.Search(ResultKind.Name, _name, value);
     }
 }

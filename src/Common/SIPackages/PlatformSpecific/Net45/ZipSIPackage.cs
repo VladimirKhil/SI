@@ -1,12 +1,10 @@
 ﻿using SIPackages.Core;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace SIPackages.PlatformSpecific.Net45
 {
@@ -25,12 +23,6 @@ namespace SIPackages.PlatformSpecific.Net45
         private readonly Stream _stream;
         private readonly ZipArchive _zipArchive;
 
-        /// <summary>
-        /// Content types collection.
-        /// </summary>
-        [Obsolete]
-        private Dictionary<string, string> _contentTypes = new();
-
         private ZipSIPackage(Stream stream, ZipArchive zipArchive)
         {
             _stream = stream;
@@ -46,33 +38,8 @@ namespace SIPackages.PlatformSpecific.Net45
         public static ZipSIPackage Create(Stream stream, bool leaveOpen = false) =>
             new(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
 
-        public static ZipSIPackage Open(Stream stream, bool read = true)
-        {
-            var zipPackage = new ZipSIPackage(
-                stream,
-                new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
-
-            var entry = zipPackage._zipArchive.GetEntry("[Content_Types].xml");
-
-            if (entry != null)
-            {
-                using var readStream = entry.Open();
-                using var reader = XmlReader.Create(readStream);
-
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "Default")
-                    {
-                        var ext = reader["Extension"];
-                        var type = reader["ContentType"];
-
-                        zipPackage._contentTypes[ext.ToLower()] = type;
-                    }
-                }
-            }
-
-            return zipPackage;
-        }
+        public static ZipSIPackage Open(Stream stream, bool read = true) =>
+            new(stream, new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
 
         public string[] GetEntries(string category)
         {
@@ -87,15 +54,17 @@ namespace SIPackages.PlatformSpecific.Net45
                 .ToArray();
         }
 
-        public StreamInfo GetStream(string name, bool read = true)
+        public StreamInfo? GetStream(string name, bool read = true)
         {
             var entry = _zipArchive.GetEntry(name);
+
             if (entry == null)
             {
                 return null;
             }
             
             var stream = entry.Open();
+
             if (!read)
             {
                 stream.SetLength(0);
@@ -104,48 +73,24 @@ namespace SIPackages.PlatformSpecific.Net45
             return new StreamInfo { Stream = stream, Length = _zipArchive.Mode == ZipArchiveMode.Read ? entry.Length : 0 };
         }
 
-        public StreamInfo GetStream(string category, string name, bool read = true) =>
-            GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
+        public StreamInfo? GetStream(string category, string name, bool read = true) => GetStream($"{category}/{Uri.EscapeUriString(name)}", read);
 
-        public void CreateStream(string name, string contentType)
-        {
-            _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
-            AddContentTypeInfo(name, contentType);
-        }
+        public void CreateStream(string name, string contentType) => _zipArchive.CreateEntry(Uri.EscapeUriString(name), CompressionLevel.Optimal);
 
-        [Obsolete]
-        private void AddContentTypeInfo(string name, string contentType)
-        {
-            var extension = Path.GetExtension(name);
-            if (extension.StartsWith("."))
-            {
-                extension = extension[1..];
-            }
-
-            var ext = extension.ToLower();
-            if (!_contentTypes.ContainsKey(ext))
-            {
-                _contentTypes[ext] = contentType;
-            }
-        }
-
-        public void CreateStream(string category, string name, string contentType)
-        {
-            _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.Optimal);
-            AddContentTypeInfo(name, contentType);
-        }
+        public void CreateStream(string category, string name, string contentType) =>
+            _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.NoCompression);
 
         public async Task CreateStreamAsync(
             string category,
-            string name, string contentType, Stream stream, CancellationToken cancellationToken = default)
+            string name,
+            string contentType,
+            Stream stream,
+            CancellationToken cancellationToken = default)
         {
-            var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.Optimal);
-            using (var writeStream = entry.Open())
-            {
-                await stream.CopyToAsync(writeStream, cancellationToken);
-            }
+            var entry = _zipArchive.CreateEntry($"{category}/{Uri.EscapeUriString(name)}", CompressionLevel.NoCompression);
 
-            AddContentTypeInfo(name, contentType);
+            using var writeStream = entry.Open();
+            await stream.CopyToAsync(writeStream, cancellationToken);
         }
 
         public void DeleteStream(string category, string name)
@@ -167,11 +112,7 @@ namespace SIPackages.PlatformSpecific.Net45
             {
                 // It is a new package. There is nothing to copy
                 isNew = true;
-                var package = Create(stream);
-
-                package._contentTypes = _contentTypes;
-
-                return package;
+                return Create(stream);
             }
             
             isNew = false;
@@ -191,35 +132,7 @@ namespace SIPackages.PlatformSpecific.Net45
 
         public void Dispose() => _zipArchive.Dispose();
 
-        public void Flush()
-        {
-            // For backward compatibility
-            var entry = _zipArchive.GetEntry("[Content_Types].xml");
-
-            if (entry != null)
-            {
-                entry.Delete();
-            }
-
-            entry = _zipArchive.CreateEntry("[Content_Types].xml", CompressionLevel.Optimal);
-
-            using (var writeStream = entry.Open())
-            {
-                var ns = "http://schemas.openxmlformats.org/package/2006/content-types";
-                using var writer = XmlWriter.Create(writeStream);
-
-                writer.WriteStartElement("Types", ns);
-                foreach (var item in _contentTypes)
-                {
-                    writer.WriteStartElement("Default", ns);
-                    writer.WriteAttributeString("Extension", item.Key);
-                    writer.WriteAttributeString("ContentType", item.Value);
-                    writer.WriteEndElement();
-                }
-            }
-
-            _stream.Flush();
-        }
+        public void Flush() => _stream.Flush();
 
         public long GetStreamLength(string name)
         {
@@ -227,7 +140,6 @@ namespace SIPackages.PlatformSpecific.Net45
             return entry?.Length ?? -1;
         }
 
-        public long GetStreamLength(string category, string name) =>
-            GetStreamLength($"{category}/{Uri.EscapeUriString(name)}");
+        public long GetStreamLength(string category, string name) => GetStreamLength($"{category}/{Uri.EscapeUriString(name)}");
     }
 }

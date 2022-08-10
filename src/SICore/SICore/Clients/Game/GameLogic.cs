@@ -748,6 +748,11 @@ namespace SICore
                 throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
             }
 
+            if (_data.ThemeDeleters.IsEmpty())
+            {
+                throw new InvalidOperationException("_data.ThemeDeleters.IsEmpty()");
+            }
+
             _gameActions.SendMessageWithArgs(Messages.Out, themeIndex);
 
             var playerIndex = _data.ThemeDeleters.Current.PlayerIndex;
@@ -1564,7 +1569,7 @@ namespace SICore
                             break;
 
                         case Tasks.PrintSponsored:
-                            PrintSponsored(arg);
+                            PrintNoRiskQuestion(arg);
                             break;
 
                         case Tasks.PrintQue:
@@ -2422,10 +2427,8 @@ namespace SICore
             ScheduleExecution(Tasks.GoodLuck, 20 + ClientData.Rand.Next(10));
         }
 
-        private void PrintSponsored(int arg)
+        private void PrintNoRiskQuestion(int arg)
         {
-            var adShown = false;
-
             if (arg == 1)
             {
                 _data.CurPriceRight *= 2;
@@ -2433,40 +2436,16 @@ namespace SICore
                 _data.AnswererIndex = _data.ChooserIndex;
                 _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
             }
-            else if (arg == 2)
+
+            if (arg < 2)
             {
-                // Showing advertisement
-                var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
-
-                if (!string.IsNullOrEmpty(ad))
-                {
-                    var res = new StringBuilder(LO[nameof(R.Ads)] + ": ").Append(ad);
-
-                    _gameActions.ShowmanReplic(res.ToString());
-                    _gameActions.SpecialReplic(res.ToString());
-
-                    _gameActions.SendMessageWithArgs(Messages.Ads, ad);
-#if !DEBUG
-                    ClientData.MoveNextBlocked = !ClientData.Settings.AppSettings.Managed;
-#endif
-                    OnAdShown(adId);
-                    adShown = true;
-                }
-                else
-                    arg++;
-            }
-
-            if (arg < 3)
-            {
-                ScheduleExecution(Tasks.PrintSponsored, adShown ? 60 : 10, arg + 1);
+                ScheduleExecution(Tasks.PrintSponsored, 10, arg + 1);
             }
             else
             {
-                ClientData.MoveNextBlocked = false;
-
-                _gameActions.ShowmanReplic(_data.Chooser.Name + ", " + string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight)));
+                _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
-                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, '+');
                 ScheduleExecution(Tasks.PrintQue, 10);
             }
         }
@@ -4069,13 +4048,13 @@ namespace SICore
                     _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
                     informed = true;
 
-                    var packageLogo = _data.Package.Logo;
+                    var logoLink = _data.PackageDoc.GetLogoLink();
 
-                    if (!string.IsNullOrWhiteSpace(packageLogo))
+                    if (logoLink.GetStream != null)
                     {
                         var uri = _data.Share.CreateUri(
-                            packageLogo[1..],
-                            () => _data.PackageDoc.Images.GetFile(packageLogo[1..]),
+                            logoLink.Uri,
+                            logoLink.GetStream,
                             SIDocument.ImagesStorageName);
 
                         foreach (var person in _data.AllPersons.Keys)

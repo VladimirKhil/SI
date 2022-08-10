@@ -11,6 +11,7 @@ using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Web;
 using SIPackages;
+using SIPackages.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -623,14 +624,14 @@ namespace SIGame.ViewModel
             }
         }
 
-        private async Task<(SIDocument, string)> BeginNewGameAsync()
+        private async Task<(SIDocument, string)> BeginNewGameAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var (packageFile, isTemp) = await Package.GetPackageFileAsync();
+                var (packageFile, isTemp) = await Package.GetPackageFileAsync(cancellationToken);
 
                 var tempDir = Path.Combine(Path.GetTempPath(), CommonSettings.AppNameEn, Guid.NewGuid().ToString());
-                ZipHelper.ExtractToDirectory(packageFile, tempDir);
+                await ZipHelper.ExtractToDirectoryAsync(packageFile, tempDir, cancellationToken: cancellationToken);
 
                 if (isTemp)
                 {

@@ -7,45 +7,43 @@ using System.Xml.Serialization;
 namespace SIPackages
 {
     /// <summary>
-    /// Владелец информации
+    /// Represents an object having common information attached to it.
     /// </summary>
     public abstract class InfoOwner : Named, IXmlSerializable
     {
         /// <summary>
-        /// Информация об объекте
+        /// Object information.
         /// </summary>
         public Info Info { get; } = new Info();
 
         /// <summary>
-        /// Установка информации, такой же, как и у источника
+        /// Copies info from source object.
         /// </summary>
-        /// <param name="infoOwner">Источник информации</param>
+        /// <param name="infoOwner">Source object.</param>
         public void SetInfoFromOwner(InfoOwner infoOwner)
         {
             foreach (string s in infoOwner.Info.Authors)
+            {
                 Info.Authors.Add(s);
+            }
 
             foreach (string s in infoOwner.Info.Sources)
+            {
                 Info.Sources.Add(s);
+            }
 
             Info.Comments.Text = infoOwner.Info.Comments.Text;
+            Info.Extension = infoOwner.Info.Extension;
         }
 
-        /// <summary>
-        /// Does the object contain specified value.
-        /// </summary>
-        /// <param name="value">Text value.</param>
+        /// <inheritdoc />
         public override bool Contains(string value) => 
-            base.Contains(value)
-            || Info.Authors.ContainsQuery(value)
-            || Info.Sources.ContainsQuery(value)
-            || Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
+            base.Contains(value) ||
+            Info.Authors.ContainsQuery(value) ||
+            Info.Sources.ContainsQuery(value) ||
+            Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
-        /// <summary>
-        /// Searches a value inside object.
-        /// </summary>
-        /// <param name="value">Value to search.</param>
-        /// <returns>Search results.</returns>
+        /// <inheritdoc />
         public override IEnumerable<SearchData> Search(string value)
         {
             foreach (var item in base.Search(value))
@@ -71,8 +69,10 @@ namespace SIPackages
             }
         }
 
-        public System.Xml.Schema.XmlSchema GetSchema() => null;
+        /// <inheritdoc />
+        public System.Xml.Schema.XmlSchema? GetSchema() => null;
 
+        /// <inheritdoc />
         public virtual void ReadXml(System.Xml.XmlReader reader)
         {
             var read = true;
@@ -113,6 +113,7 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc />
         public virtual void WriteXml(System.Xml.XmlWriter writer)
         {
             var anyAuthors = Info.Authors.Any();
@@ -154,22 +155,6 @@ namespace SIPackages
 
                 writer.WriteEndElement();
             }
-        }
-
-        protected void FillInfo(InfoOwner owner)
-        {
-            foreach (var item in Info.Authors)
-            {
-                owner.Info.Authors.Add(item);
-            }
-
-            foreach (var item in Info.Sources)
-            {
-                owner.Info.Sources.Add(item);
-            }
-
-            owner.Info.Comments.Text = Info.Comments.Text;
-            owner.Info.Extension = Info.Extension;
         }
     }
 }

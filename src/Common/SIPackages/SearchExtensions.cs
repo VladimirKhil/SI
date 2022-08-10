@@ -19,6 +19,7 @@ namespace SIPackages
         public static SearchMatch? SearchFragment(this InfoOwner item, string value)
         {
             var result = item.Search(value).FirstOrDefault();
+
             if (result == null)
             {
                 return null;

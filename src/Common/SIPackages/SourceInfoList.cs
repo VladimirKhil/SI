@@ -4,22 +4,26 @@ using System.Xml.Serialization;
 
 namespace SIPackages
 {
+    /// <summary>
+    /// Defines a collection of sources.
+    /// </summary>
     [CollectionDataContract(Name = "Sources", Namespace = "")]
     public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
     {
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
+        /// <inheritdoc />
+        public System.Xml.Schema.XmlSchema? GetSchema() => null;
 
+        /// <inheritdoc />
         public void ReadXml(System.Xml.XmlReader reader)
         {
-            SourceInfo sourceInfo = null;
+            SourceInfo? sourceInfo = null;
 
             var read = true;
+
             while (!read || reader.Read())
             {
                 read = true;
+
                 switch (reader.NodeType)
                 {
                     case System.Xml.XmlNodeType.Element:
@@ -35,7 +39,13 @@ namespace SIPackages
                                 break;
 
                             case "Author":
-                                sourceInfo.Author = reader.ReadElementContentAsString();
+                                var author = reader.ReadElementContentAsString();
+
+                                if (sourceInfo != null)
+                                {
+                                    sourceInfo.Author = author;
+                                }
+
                                 read = false;
                                 break;
 
@@ -65,6 +75,7 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc />
         public void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("Sources");

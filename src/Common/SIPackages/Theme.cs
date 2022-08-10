@@ -152,7 +152,7 @@ namespace SIPackages
                 _name = _name
             };
 
-            FillInfo(theme);
+            theme.SetInfoFromOwner(this);
 
             foreach (var quest in Questions)
             {

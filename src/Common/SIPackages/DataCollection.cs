@@ -1,5 +1,6 @@
 ﻿using SIPackages.Core;
 using SIPackages.PlatformSpecific;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace SIPackages
     {
         private readonly string _mediaType;
 
-        private ISIPackage _package;
+        private ISIPackage _packageContainer;
 
         /// <summary>
         /// Current items in the collection.
@@ -42,9 +43,9 @@ namespace SIPackages
         {
             Name = name;
             _mediaType = mediaType;
-            _package = package;
+            _packageContainer = package;
 
-            _files = new List<string>(_package.GetEntries(Name));
+            _files = new List<string>(_packageContainer.GetEntries(Name));
         }
 
         /// <summary>
@@ -57,13 +58,13 @@ namespace SIPackages
         /// Gets collection file.
         /// </summary>
         /// <param name="fileName">File name.</param>
-        public StreamInfo GetFile(string fileName) => _package.GetStream(Name, fileName);
+        public StreamInfo? GetFile(string fileName) => _packageContainer.GetStream(Name, fileName);
 
         /// <summary>
         /// Gets collection file length.
         /// </summary>
         /// <param name="fileName">File name.</param>
-        public long GetFileLength(string fileName) => _package.GetStreamLength(Name, fileName);
+        public long GetFileLength(string fileName) => _packageContainer.GetStreamLength(Name, fileName);
 
         #region IEnumerable<string> Members
 
@@ -91,7 +92,7 @@ namespace SIPackages
         /// <param name="cancellationToken">Cancellation token.</param>
         public async Task AddFileAsync(string fileName, Stream stream, CancellationToken cancellationToken = default)
         {
-            await _package.CreateStreamAsync(Name, fileName, _mediaType, stream, cancellationToken);
+            await _packageContainer.CreateStreamAsync(Name, fileName, _mediaType, stream, cancellationToken);
             _files.Add(fileName);
         }
 
@@ -101,7 +102,7 @@ namespace SIPackages
         /// <param name="fileName">File name.</param>
         public void RemoveFile(string fileName)
         {
-            _package.DeleteStream(Name, fileName);
+            _packageContainer.DeleteStream(Name, fileName);
             _files.Remove(fileName);
         }
 
@@ -113,19 +114,23 @@ namespace SIPackages
         /// <param name="cancellationToken">Cancellation token.</param>
         public async Task RenameFileAsync(string oldName, string newName, CancellationToken cancellationToken = default)
         {
-            var streamInfo = _package.GetStream(Name, oldName);
+            var streamInfo = _packageContainer.GetStream(Name, oldName);
+
+            if (streamInfo == null)
+            {
+                throw new InvalidOperationException($"Cannot rename file {oldName}: file does not exist");
+            }
 
             using (var stream = streamInfo.Stream)
             {
-                await _package.CreateStreamAsync(Name, newName, _mediaType, stream, cancellationToken);
+                await _packageContainer.CreateStreamAsync(Name, newName, _mediaType, stream, cancellationToken);
             }
 
             _files.Add(newName);
-
-            _package.DeleteStream(Name, oldName);
+            _packageContainer.DeleteStream(Name, oldName);
             _files.Remove(oldName);
         }
 
-        internal void UpdateSource(ISIPackage package) => _package = package;
+        internal void UpdateSource(ISIPackage package) => _packageContainer = package;
     }
 }

@@ -79,22 +79,22 @@ namespace Notions
         }
 
         /// <summary>
-        /// Возвращает случайную строку из списка строк
+        /// Returns random value from values collection.
         /// </summary>
-        /// <param name="lstr"></param>
-        /// <returns></returns>
-        public static string RandomString(params string[] lstr)
+        /// <param name="values">Values collection.</param>
+        public static string RandomString(params string[] values)
         {
-            int c = lstr.Length;
+            var c = values.Length;
+
             if (c == 0)
+            {
                 return string.Empty;
+            }
+
             var random = new Random(DateTime.UtcNow.Millisecond);
-            return lstr[random.Next(c)];
+            return values[random.Next(c)];
         }
 
-        public static string FormatNumber(int num)
-        {
-            return StringExtensions.FormatNumber(num.ToString());
-        }
+        public static string FormatNumber(int num) => StringExtensions.FormatNumber(num.ToString());
     }
 }

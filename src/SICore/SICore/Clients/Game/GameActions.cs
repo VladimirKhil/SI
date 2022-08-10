@@ -73,6 +73,7 @@ namespace SICore
         public void InformSums(string person = NetworkConstants.Everybody)
         {
             var message = new StringBuilder(Messages.Sums);
+
             for (var i = 0; i < _gameData.Players.Count; i++)
             {
                 message.Append(Message.ArgsSeparatorChar).Append(_gameData.Players[i].Sum);

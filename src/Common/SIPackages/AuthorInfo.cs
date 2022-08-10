@@ -5,76 +5,74 @@ using System.Text;
 namespace SIPackages
 {
     /// <summary>
-    /// Автор
+    /// Defines a package object author info.
     /// </summary>
     [DataContract]
     public sealed class AuthorInfo : IdOwner
     {
-        private string _name;
-        private string _surname;
-        private string _secondName;
-        private string _country;
-        private string _city;
+        private string? _name;
+        private string? _surname;
+        private string? _secondName;
+        private string? _country;
+        private string? _city;
 
         /// <summary>
-        /// Имя
+        /// Author's name.
         /// </summary>
         [DataMember]
-        public string Name
+        public string? Name
         {
-            get { return _name; }
+            get => _name;
             set { var oldValue = _name; if (oldValue != value) { _name = value; OnPropertyChanged(oldValue); } }
         }
 
         /// <summary>
-        /// Фамилия
+        /// Author's surname.
         /// </summary>
         [DataMember]
-        public string Surname
+        public string? Surname
         {
-            get { return _surname; }
+            get => _surname;
             set { var oldValue = _surname; if (oldValue != value) { _surname = value; OnPropertyChanged(oldValue); } }
         }
 
         /// <summary>
-        /// Отчество
+        /// Author's second name.
         /// </summary>
         [DataMember]
-        public string SecondName
+        public string? SecondName
         {
-            get { return _secondName; }
+            get => _secondName;
             set { var oldValue = _secondName; if (oldValue != value) { _secondName = value; OnPropertyChanged(oldValue); } }
         }
 
         /// <summary>
-        /// Страна
+        /// Author's country.
         /// </summary>
         [DataMember]
-        public string Country
+        public string? Country
         {
-            get { return _country; }
+            get => _country;
             set { var oldValue = _country; if (oldValue != value) { _country = value; OnPropertyChanged(oldValue); } }
         }
 
         /// <summary>
-        /// Город
+        /// Author's city.
         /// </summary>
         [DataMember]
-        public string City
+        public string? City
         {
-            get { return _city; }
+            get => _city;
             set { var oldValue = _city; if (oldValue != value) { _city = value; OnPropertyChanged(oldValue); } }
         }
 
-        /// <summary>
-        /// Строковое представление автора
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             var result = new StringBuilder();
 
             result.Append(_name);
+
             if (!string.IsNullOrEmpty(_secondName))
             {
                 result.Append(' ');
@@ -90,18 +88,23 @@ namespace SIPackages
             if (!string.IsNullOrEmpty(_city) || !string.IsNullOrEmpty(_country))
             {
                 result.Append(" (");
+
                 if (!string.IsNullOrEmpty(_city))
                 {
                     result.Append(_city);
+
                     if (!string.IsNullOrEmpty(_country))
                     {
                         result.Append(", ");
                         result.Append(_country);
                     }
                     else
+                    {
                         result.Append(_country);
+                    }
                 }
-                result.Append(")");
+
+                result.Append(')');
             }
 
             return result.ToString();

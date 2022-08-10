@@ -6,11 +6,11 @@
     internal static class LinkExtensions
     {
         /// <summary>
-        /// Выделить текст ссылки из строки
+        /// Extracts link from value.
         /// </summary>
-        /// <param name="value">Строка текста в формате @link#tail</param>
-        /// <param name="useTail">Should link tail (part after #) be used.</param>
-        /// <returns>Ссылка link</returns>
+        /// <param name="value">Text with format of "@link#tail".</param>
+        /// <param name="useTail">Should the link tail (part after #) be used.</param>
+        /// <returns>Extracted link.</returns>
         internal static string ExtractLink(this string value, bool useTail = false)
         {
             if (value.Length < 2 || value[0] != '@')
@@ -42,15 +42,23 @@
         internal static string ExtractLink(this string s, out string tail)
         {
             tail = "";
-            if (s.Length == 0 || s[0] != '@' || s.Length < 2)
-                return "";
 
-            int ind = s.IndexOf('#');
-            if (ind == 1)
+            if (s.Length == 0 || s[0] != '@' || s.Length < 2)
+            {
                 return "";
+            }
+
+            var ind = s.IndexOf('#');
+
+            if (ind == 1)
+            {
+                return "";
+            }
 
             if (ind > -1)
+            {
                 tail = s[(ind + 1)..];
+            }
 
             return ind == -1 ? s[1..] : s[1..ind];
         }

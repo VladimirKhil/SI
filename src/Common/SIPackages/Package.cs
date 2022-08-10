@@ -6,7 +6,7 @@ using System.Linq;
 namespace SIPackages
 {
     /// <summary>
-    /// Пакет
+    /// Represents a SIGame package object.
     /// </summary>
     public sealed class Package : InfoOwner
     {
@@ -14,9 +14,9 @@ namespace SIPackages
         private double _version = 4.0;
 
         /// <summary>
-        /// Версия пакета
+        /// Package version.
         /// </summary>
-        public double Version { get { return _version; } }
+        public double Version => _version;
 
         private string _id = "";
 
@@ -97,16 +97,16 @@ namespace SIPackages
         private string _logo = "";
 
         /// <summary>
-        /// Адрес логотипа пакета
+        /// Package logo link.
         /// </summary>
         public string Logo
         {
-            get { return _logo; }
+            get => _logo;
             set
             {
-                var oldValue = _logo;
                 if (_logo != value)
                 {
+                    var oldValue = _logo;
                     _logo = value;
                     OnPropertyChanged(oldValue);
                 }
@@ -190,31 +190,49 @@ namespace SIPackages
         /// <param name="reader">XML reader.</param>
         public override void ReadXml(System.Xml.XmlReader reader)
         {
-            _name = reader.GetAttribute("name");
+            Name = reader.GetAttribute("name") ?? "";
 
             var versionString = reader.GetAttribute("version");
-            double.TryParse(versionString, out _version);
+
+            if (double.TryParse(versionString, out var version))
+            {
+                _version = version;
+            }
 
             if (reader.MoveToAttribute("id"))
+            {
                 _id = reader.Value;
+            }
 
             if (reader.MoveToAttribute("restriction"))
+            {
                 _restriction = reader.Value;
+            }
 
             if (reader.MoveToAttribute("date"))
+            {
                 _date = reader.Value;
+            }
 
             if (reader.MoveToAttribute("publisher"))
+            {
                 _publisher = reader.Value;
+            }
 
             if (reader.MoveToAttribute("difficulty"))
-                int.TryParse(reader.Value, out _difficulty);
+            {
+                _ = int.TryParse(reader.Value, out _difficulty);
+            }
 
             if (reader.MoveToAttribute("logo"))
+            {
                 _logo = reader.Value;
+            }
 
             if (reader.MoveToAttribute("language"))
+            {
                 _language = reader.Value;
+            }
 
             if (reader.IsEmptyElement)
             {
@@ -223,9 +241,11 @@ namespace SIPackages
             }
 
             var read = true;
+
             while (!read || reader.Read())
             {
                 read = true;
+
                 switch (reader.NodeType)
                 {
                     case System.Xml.XmlNodeType.Element:
@@ -302,10 +322,12 @@ namespace SIPackages
             if (Rounds.Any())
             {
                 writer.WriteStartElement("rounds");
+
                 foreach (var item in Rounds)
                 {
                     item.WriteXml(writer);
                 }
+
                 writer.WriteEndElement();
             }
 
@@ -319,7 +341,7 @@ namespace SIPackages
         {
             var package = new Package
             {
-                _name = _name,
+                Name = Name,
                 _date = _date,
                 _restriction = _restriction,
                 _publisher = _publisher,
@@ -329,7 +351,7 @@ namespace SIPackages
 
             package.Tags.AddRange(Tags);
 
-            FillInfo(package);
+            package.SetInfoFromOwner(this);
 
             foreach (var round in Rounds)
             {

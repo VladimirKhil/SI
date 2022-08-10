@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace SIPackages.PlatformSpecific
 {
     /// <summary>
-    /// Defines a SIGame package source.
+    /// Defines a SIGame package container.
     /// </summary>
     public interface ISIPackage : IDisposable
     {
         /// <summary>
-        /// Gets source entries by category.
+        /// Gets container entries by category.
         /// </summary>
         /// <param name="category">Category name.</param>
         string[] GetEntries(string category);
@@ -35,7 +35,7 @@ namespace SIPackages.PlatformSpecific
         /// </summary>
         /// <param name="name">Object name.</param>
         /// <param name="read">Will the stream be read (or written to otherwise).</param>
-        StreamInfo GetStream(string name, bool read = true);
+        StreamInfo? GetStream(string name, bool read = true);
 
         /// <summary>
         /// Gets object stream.
@@ -43,7 +43,7 @@ namespace SIPackages.PlatformSpecific
         /// <param name="category">Object category.</param>
         /// <param name="name">Object name.</param>
         /// <param name="read">Should a stream be read-only.</param>
-        StreamInfo GetStream(string category, string name, bool read = true);
+        StreamInfo? GetStream(string category, string name, bool read = true);
 
         /// <summary>
         /// Creates an object.
@@ -87,7 +87,7 @@ namespace SIPackages.PlatformSpecific
         ISIPackage CopyTo(Stream stream, bool close, out bool isNew);
 
         /// <summary>
-        /// Flushes source changes.
+        /// Flushes container changes.
         /// </summary>
         void Flush();
     }

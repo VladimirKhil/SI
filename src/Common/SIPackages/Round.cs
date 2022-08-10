@@ -134,7 +134,7 @@ namespace SIPackages
                 _type = _type
             };
 
-            FillInfo(round);
+            round.SetInfoFromOwner(this);
 
             foreach (var theme in Themes)
             {

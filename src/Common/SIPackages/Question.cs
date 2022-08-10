@@ -1,4 +1,5 @@
 ﻿using SIPackages.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -56,10 +57,11 @@ namespace SIPackages
         public override string ToString() => $"{_price}: {Scenario} ({(Right.Count > 0 ? Right[0] : "")})";
 
         /// <summary>
-        /// Имя вопроса (фиктивное свойство)
+        /// Question name (not used).
         /// </summary>
         public override string Name => "";
 
+        /// <inheritdoc />
         public override bool Contains(string value) =>
             base.Contains(value) ||
             Type.Contains(value) ||
@@ -67,6 +69,7 @@ namespace SIPackages
             Right.ContainsQuery(value) ||
             Wrong.ContainsQuery(value);
 
+        /// <inheritdoc />
         public override IEnumerable<SearchData> Search(string value)
         {
             foreach (var item in base.Search(value))
@@ -97,10 +100,11 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc />
         public override void ReadXml(System.Xml.XmlReader reader)
         {
             var priceStr = reader.GetAttribute("price");
-            int.TryParse(priceStr, out _price);
+            _ = int.TryParse(priceStr, out _price);
 
             var right = true;
 
@@ -182,6 +186,7 @@ namespace SIPackages
             }
         }
 
+        /// <inheritdoc />
         public override void WriteXml(System.Xml.XmlWriter writer)
         {
             writer.WriteStartElement("question");
@@ -192,6 +197,7 @@ namespace SIPackages
             {
                 writer.WriteStartElement("type");
                 writer.WriteAttributeString("name", Type.Name);
+
                 foreach (var item in Type.Params)
                 {
                     writer.WriteStartElement("param");
@@ -199,50 +205,65 @@ namespace SIPackages
                     writer.WriteValue(item.Value);
                     writer.WriteEndElement();
                 }
+
                 writer.WriteEndElement();
             }
 
             writer.WriteStartElement("scenario");
+
             foreach (var atom in Scenario)
             {
                 writer.WriteStartElement("atom");
+
                 if (atom.AtomTime != 0)
+                {
                     writer.WriteAttributeString("time", atom.AtomTime.ToString());
+                }
 
                 if (atom.Type != AtomTypes.Text)
+                {
                     writer.WriteAttributeString("type", atom.Type);
+                }
 
                 writer.WriteValue(atom.Text);
                 writer.WriteEndElement();
             }
+
             writer.WriteEndElement();
 
             writer.WriteStartElement("right");
+
             foreach (var item in Right)
             {
                 writer.WriteElementString("answer", item);
             }
+
             writer.WriteEndElement();
 
             if (Wrong.Any())
             {
                 writer.WriteStartElement("wrong");
+
                 foreach (var item in Wrong)
                 {
                     writer.WriteElementString("answer", item);
                 }
+
                 writer.WriteEndElement();
             }
 
             writer.WriteEndElement();
         }
 
+        /// <summary>
+        /// Creates a copy of this question.
+        /// </summary>
         public Question Clone()
         {
             var question = new Question { _price = _price };
             question.Type.Name = Type.Name;
 
-            FillInfo(question);
+            question.SetInfoFromOwner(this);
 
             foreach (var atom in Scenario)
             {
@@ -262,6 +283,10 @@ namespace SIPackages
             return question;
         }
 
+        /// <summary>
+        /// Gets question right answers.
+        /// </summary>
+        [Obsolete("Use Right property")]
         public IList<string> GetRightAnswers() => Right;
     }
 }

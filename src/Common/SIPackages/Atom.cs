@@ -8,14 +8,16 @@ using System.Text;
 namespace SIPackages
 {
     /// <summary>
-    /// Элементарная единица сценария
+    /// Defines a question scenario minimal item.
     /// </summary>
     public sealed class Atom : PropertyChangedNotifier, ITyped
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _type = AtomTypes.Text;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private int _atomTime;
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string _text = "";
 
@@ -25,7 +27,7 @@ namespace SIPackages
         public bool IsLink => _text.Length > 0 && _text[0] == '@';
 
         /// <summary>
-        /// Тип единицы
+        /// Atom type.
         /// </summary>
         public string Type
         {
@@ -42,7 +44,7 @@ namespace SIPackages
         }
 
         /// <summary>
-        /// Строковое представление некоторых типов
+        /// Localized string representation for a atom.
         /// </summary>
         public string TypeString => _type switch
         {
@@ -53,7 +55,7 @@ namespace SIPackages
         };
 
         /// <summary>
-        /// Время действия атома
+        /// Atom duration in seconds.
         /// </summary>
         [DefaultValue(0)]
         public int AtomTime
@@ -93,10 +95,7 @@ namespace SIPackages
         /// <param name="value">Text value.</param>
         public bool Contains(string value) => _text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
-        /// <summary>
-        /// Строковое представление единицы
-        /// </summary>
-        /// <returns>Тип единицы и её содержимое</returns>
+        /// <inheritdoc />
         public override string ToString()
         {
             if (_type == AtomTypes.Text)

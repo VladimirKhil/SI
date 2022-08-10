@@ -5,16 +5,16 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SIPackages.Providers
+namespace SIPackages.Containers
 {
     /// <summary>
-    /// Defines an empty SI package source.
+    /// Defines an empty SI package container.
     /// </summary>
     /// <inheritdoc cref="ISIPackage" />
     public sealed class EmptySIPackage : ISIPackage
     {
         /// <summary>
-        /// Singleton empty SI package source.
+        /// Singleton empty SI package container.
         /// </summary>
         public static readonly EmptySIPackage Instance = new();
 

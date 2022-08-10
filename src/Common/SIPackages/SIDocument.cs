@@ -1,5 +1,6 @@
 ﻿using EnsureThat;
 using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.PlatformSpecific;
 using SIPackages.Properties;
 using System;
@@ -18,14 +19,14 @@ namespace SIPackages
     /// </summary>
     public sealed class SIDocument : IDisposable
     {
-        private const string ContentFileName = "content.xml";
-        private const string AuthorsFileName = "authors.xml";
-        private const string SourcesFileName = "sources.xml";
+        internal const string ContentFileName = "content.xml";
+        internal const string AuthorsFileName = "authors.xml";
+        internal const string SourcesFileName = "sources.xml";
 
         /// <summary>
         /// Хранилище текстов
         /// </summary>
-        private const string TextsStorageName = "Texts";
+        internal const string TextsStorageName = "Texts";
 
         /// <summary>
         /// Хранилище изображений
@@ -497,10 +498,10 @@ namespace SIPackages
         }
 
         /// <summary>
-        /// Получить ссылку на ресурс единицы сценария
+        /// Gets link from atom text.
         /// </summary>
-        /// <param name="atom">Единица сценария</param>
-        /// <returns>Ресурс, на который ссылкается данная единица</returns>
+        /// <param name="atom">Atom containing the link.</param>
+        /// <returns>Linked resource.</returns>
         public IMedia GetLink(Atom atom)
         {
             var link = atom.Text.ExtractLink();
@@ -510,19 +511,34 @@ namespace SIPackages
                 return new Media(atom.Text);
             }
 
-            var collection = _images;
-
-            switch (atom.Type)
+            var collection = atom.Type switch
             {
-                case AtomTypes.Audio:
-                    collection = _audio;
-                    break;
+                AtomTypes.Audio => _audio,
+                AtomTypes.Video => _video,
+                AtomTypes.Image => _images,
+                _ => throw new InvalidOperationException($"Unsupported atom type {atom.Type}"),
+            };
 
-                case AtomTypes.Video:
-                    collection = _video;
-                    break;
+            return GetLinkFromCollection(link, collection);
+        }
+
+        /// <summary>
+        /// Gets document package logo link.
+        /// </summary>
+        public IMedia GetLogoLink()
+        {
+            var link = _package.Logo.ExtractLink();
+
+            if (string.IsNullOrEmpty(link))
+            {
+                return new Media(_package.Logo);
             }
 
+            return GetLinkFromCollection(link, _images);
+        }
+
+        private static IMedia GetLinkFromCollection(string link, DataCollection collection)
+        {
             // TODO: make deterministic choice
 
             if (collection.Contains(link))
@@ -551,7 +567,7 @@ namespace SIPackages
                 return new Media(() => collection.GetFile(escapedHash), () => collection.GetFileLength(escapedHash), escapedHash);
             }
 
-            // Это ссылка на внешний файл
+            // This is a link to an external resource
             return new Media(link);
         }
 

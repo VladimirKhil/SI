@@ -2175,6 +2175,8 @@ namespace SICore
 
                 if (noPlayersLeft)
                 {
+                    ClientData.Decision = DecisionType.None;
+                    
                     // All players that could play are removed
                     if (Logic.Engine.CanMoveNextRound)
                     {
