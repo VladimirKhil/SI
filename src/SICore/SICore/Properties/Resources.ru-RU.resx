@@ -770,4 +770,7 @@
   <data name="FileLoadError" xml:space="preserve">
     <value>Ошибка загрузки файла "{0}"</value>
   </data>
+  <data name="PersonAlreadyExists" xml:space="preserve">
+    <value>Участник {0} уже есть в игре!</value>
+  </data>
 </root>

@@ -635,20 +635,7 @@ namespace SICore
                             break;
 
                         case Messages.NextDelete:
-                            if (ClientData.IsWaiting &&
-                                ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting &&
-                                message.Sender == ClientData.ShowMan.Name)
-                            {
-                                #region NextDelete
-
-                                if (int.TryParse(args[1], out int n) && n > -1 && n < ClientData.Players.Count && ClientData.Players[n].Flag)
-                                {
-                                    ClientData.ThemeDeleters.Current.SetIndex(n);
-                                    _logic.Stop(StopReason.Decision);
-                                }
-
-                                #endregion
-                            }
+                            OnNextDelete(message, args);
                             break;
 
                         case Messages.Delete:
@@ -776,6 +763,22 @@ namespace SICore
                     Share_Error(new Exception(message.Text, exc));
                 }
             }, 5000);
+
+        private void OnNextDelete(Message message, string[] args)
+        {
+            if (ClientData.IsWaiting &&
+                ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting &&
+                message.Sender == ClientData.ShowMan.Name &&
+                args.Length > 1 &&
+                int.TryParse(args[1], out int playerIndex) &&
+                playerIndex > -1 &&
+                playerIndex < ClientData.Players.Count &&
+                ClientData.Players[playerIndex].Flag)
+            {
+                ClientData.ThemeDeleters.Current.SetIndex(playerIndex);
+                _logic.Stop(StopReason.Decision);
+            }
+        }
 
         private void OnPicture(Message message, string[] args)
         {
@@ -988,30 +991,38 @@ namespace SICore
                 .Append(account.Name);
 
             _gameActions.SpecialReplic(res.ToString());
-
             _gameActions.SendMessageWithArgs(Messages.Disconnected, account.Name);
 
-            account.IsConnected = false;
+            ClientData.BeginUpdatePersons($"Disconnected {account.Name}");
 
-            if (ClientData.Viewers.Contains(account))
+            try
             {
-                ClientData.Viewers.Remove(account);
-            }
-            else
-            {
-                var isBefore = ClientData.Stage == GameStage.Before;
-                if (account is GamePersonAccount person)
+                account.IsConnected = false;
+
+                if (ClientData.Viewers.Contains(account))
                 {
-                    person.Name = Constants.FreePlace;
-                    person.Picture = "";
-                    if (isBefore)
+                    ClientData.Viewers.Remove(account);
+                }
+                else
+                {
+                    var isBefore = ClientData.Stage == GameStage.Before;
+
+                    if (account is GamePersonAccount person)
                     {
-                        person.Ready = false;
+                        person.Name = Constants.FreePlace;
+                        person.Picture = "";
+
+                        if (isBefore)
+                        {
+                            person.Ready = false;
+                        }
                     }
                 }
             }
-
-            ClientData.OnAllPersonsChanged();
+            finally
+            {
+                ClientData.EndUpdatePersons();
+            }
 
             if (args[1] == ClientData.HostName)
             {
@@ -1314,15 +1325,6 @@ namespace SICore
                 return;
             }
 
-            // Is paused or is pause pending
-            if ((ClientData.TInfo.Pause || _logic.StopReason == StopReason.Pause) && moveDirection == MoveDirections.Next)
-            {
-                OnPauseCore(false);
-                return;
-            }
-
-            ClientData.MoveDirection = moveDirection;
-
             switch (moveDirection)
             {
                 case MoveDirections.RoundBack:
@@ -1363,7 +1365,8 @@ namespace SICore
                         args.Length <= 2 ||
                         !int.TryParse(args[2], out int roundIndex) ||
                         roundIndex < 0 ||
-                        roundIndex >= ClientData.Rounds.Length)
+                        roundIndex >= ClientData.Rounds.Length ||
+                        ClientData.Rounds[roundIndex].Index == _logic.Engine.RoundIndex)
                     {
                         return;
                     }
@@ -1372,7 +1375,16 @@ namespace SICore
                     break;
             }
 
+            // Resume paused game
+            if (ClientData.TInfo.Pause)
+            {
+                OnPauseCore(false);
+                return;
+            }
+
             _logic.AddHistory($"Move started: {ClientData.MoveDirection}");
+
+            ClientData.MoveDirection = moveDirection;
             _logic.Stop(StopReason.Move);
         }
 
@@ -2018,7 +2030,8 @@ namespace SICore
 
                 var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
 
-                Logic.AddHistory($"AnswererIndex dropped; nextTask = {nextTask};" +
+                Logic.AddHistory(
+                    $"AnswererIndex dropped; nextTask = {nextTask};" +
                     $" ClientData.Decision = {ClientData.Decision}; Logic.IsFinalRound() = {Logic.IsFinalRound()}");
 
                 if ((ClientData.Decision == DecisionType.Answering ||
@@ -2067,6 +2080,7 @@ namespace SICore
             else if (ClientData.StakerIndex == playerIndex)
             {
                 var stakersCount = ClientData.Players.Count(p => p.StakeMaking);
+
                 if (stakersCount == 1)
                 {
                     for (int i = 0; i < ClientData.Players.Count; i++)
@@ -2112,6 +2126,7 @@ namespace SICore
                     else
                     {
                         newOrder[j++] = currentOrder[i] - (currentOrder[i] > playerIndex ? 1 : 0);
+
                         if (j == newOrder.Length)
                         {
                             break;
@@ -2186,6 +2201,15 @@ namespace SICore
                     {
                         // TODO: it is better to provide a correct command to the game engine
                         PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
+                    }
+                }
+                else if (ClientData.Decision == DecisionType.NextPersonFinalThemeDeleting)
+                {
+                    var indicies = ClientData.ThemeDeleters.Current.PossibleIndicies;
+
+                    for (var i = 0; i < ClientData.Players.Count; i++)
+                    {
+                        ClientData.Players[i].Flag = indicies.Contains(i);
                     }
                 }
             }
@@ -2369,6 +2393,7 @@ namespace SICore
             {
                 if (ClientData.AllPersons.ContainsKey(replacer))
                 {
+                    _gameActions.SpecialReplic(string.Format(LO[nameof(R.PersonAlreadyExists)], replacer));
                     return;
                 }
 
@@ -2616,6 +2641,7 @@ namespace SICore
                     }
 
                     var rand = ClientData.Rand.Next(_defaultPlayers.Length - visited.Count - 1);
+
                     while (visited.Contains(rand))
                     {
                         rand++;
@@ -2628,7 +2654,18 @@ namespace SICore
                 }
                 else
                 {
-                    newAcc = CreateNewComputerShowman(_defaultShowmans[0]);
+                    var showman = new ComputerAccount(_defaultShowmans[0]);
+                    var name = showman.Name;
+                    var nameIndex = 0;
+
+                    while (nameIndex < Constants.MaxPlayers && ClientData.AllPersons.ContainsKey(name))
+                    {
+                        name = $"{showman.Name} {nameIndex++}";
+                    }
+
+                    showman.Name = name;
+
+                    newAcc = CreateNewComputerShowman(showman);
                     newName = newAcc.Name;
                     newIsMale = newAcc.IsMale;
                 }

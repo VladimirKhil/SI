@@ -98,10 +98,11 @@ namespace SICore
         /// </summary>
         internal int ChooserIndex
         {
-            get { return _chooserIndex; }
+            get => _chooserIndex;
             set
             {
                 _chooserIndex = value;
+
                 if (value > -1 && value < Players.Count)
                     Chooser = Players[value];
                 else if (value == -1)
@@ -355,16 +356,6 @@ namespace SICore
             {
                 _showMan = value;
                 OnPropertyChanged();
-
-                if (_isUpdating)
-                {
-                    return;
-                }
-
-                BackLink?.LogWarning("Unreachable code? " + Environment.StackTrace);
-
-                OnMainPersonsChanged();
-                OnAllPersonsChanged();
             }
         }
 
@@ -392,10 +383,7 @@ namespace SICore
             PersonsUpdateHistory.Append($"Update: ").Append(PrintPersons());
         }
 
-        public void OnMainPersonsChanged()
-        {
-            MainPersons = new GamePersonAccount[] { _showMan }.Concat(Players).ToArray();
-        }
+        public void OnMainPersonsChanged() => MainPersons = new GamePersonAccount[] { _showMan }.Concat(Players).ToArray();
 
         /// <summary>
         /// Зрители
@@ -409,10 +397,7 @@ namespace SICore
         /// </summary>
         internal GamePersonAccount[] MainPersons
         {
-            get
-            {
-                return _mainPersons;
-            }
+            get => _mainPersons;
             private set
             {
                 _mainPersons = value;
@@ -435,18 +420,11 @@ namespace SICore
             }
         }
 
-        private bool _isUpdating = false;
-
-        internal void BeginUpdatePersons(string reason)
-        {
-            _isUpdating = true;
-
-            PersonsUpdateHistory.Append($"Before ({reason}): ").Append(PrintPersons());
-        }
+        internal void BeginUpdatePersons(string reason) =>
+            PersonsUpdateHistory.AppendLine("===").Append($"Before ({reason}): ").Append(PrintPersons());
 
         internal void EndUpdatePersons()
         {
-            _isUpdating = false;
             OnMainPersonsChanged();
             OnAllPersonsChanged();
         }

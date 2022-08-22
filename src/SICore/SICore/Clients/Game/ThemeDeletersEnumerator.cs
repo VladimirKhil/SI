@@ -6,7 +6,7 @@ using System.Text;
 namespace SICore.Clients.Game
 {
     /// <summary>
-    /// Перечислитель игроков, убирающих финальные темы
+    /// Enumerates players that delete final themes.
     /// </summary>
     public sealed class ThemeDeletersEnumerator
     {
@@ -17,14 +17,22 @@ namespace SICore.Clients.Game
         /// </summary>
         public sealed class IndexInfo
         {
+            /// <summary>
+            /// Current player index.
+            /// </summary>
             public int PlayerIndex { get; set; }
+
+            /// <summary>
+            /// Contains possible values for <see cref="PlayerIndex" /> when it is not selected yet.
+            /// Only one value should be selected after all.
+            /// </summary>
             public HashSet<int> PossibleIndicies { get; private set; }
 
             public IndexInfo(int index)
             {
                 if (index < 0)
                 {
-                    throw new ArgumentException($"Недопустимый индекс {index}", nameof(index));
+                    throw new ArgumentException($"Invalid value: {index}", nameof(index));
                 }
 
                 PlayerIndex = index;
@@ -61,12 +69,12 @@ namespace SICore.Clients.Game
         }
 
         /// <summary>
-        /// Порядок объявления ставок
+        /// Making stakes/theme deleting order.
         /// </summary>
         private IndexInfo[] _order;
 
         /// <summary>
-        /// Индекс в order
+        /// Current enumerator position in <see cref="_order" />.
         /// </summary>
         private int _orderIndex;
 
@@ -76,7 +84,7 @@ namespace SICore.Clients.Game
         private bool _cycle;
 
         /// <summary>
-        /// Текущий элемент
+        /// Current enumerator item.
         /// </summary>
         public IndexInfo Current => _order[_orderIndex];
 
@@ -115,6 +123,7 @@ namespace SICore.Clients.Game
             for (var levelIndex = 0; levelIndex < levels.Length; levelIndex++)
             {
                 var level = levels[levelIndex];
+
                 if (level.Count() == 1)
                 {
                     _order[k--] = new IndexInfo(players.IndexOf(level.First()));
@@ -127,6 +136,7 @@ namespace SICore.Clients.Game
                 else
                 {
                     var indicies = new HashSet<int>();
+
                     foreach (var item in level)
                     {
                         indicies.Add(players.IndexOf(item));
@@ -161,6 +171,7 @@ namespace SICore.Clients.Game
             void updatePossibleIndices(IndexInfo indexInfo)
             {
                 var possibleIndices = indexInfo.PossibleIndicies;
+
                 if (processedPossibleIndicies.Contains(possibleIndices))
                 {
                     return;
@@ -168,6 +179,7 @@ namespace SICore.Clients.Game
 
                 var allIndices = possibleIndices.ToArray();
                 possibleIndices.Clear();
+
                 foreach (var ind in allIndices)
                 {
                     if (ind == index)
@@ -186,6 +198,7 @@ namespace SICore.Clients.Game
                 for (var i = 0; i < _order.Length; i++)
                 {
                     var playerIndex = _order[i].PlayerIndex;
+
                     if (playerIndex > index)
                     {
                         _order[i].PlayerIndex--;
@@ -210,8 +223,10 @@ namespace SICore.Clients.Game
 
                 for (int i = 0, j = 0; i < _order.Length; i++)
                 {
-                    if (_order[i].PlayerIndex == index
-                        || _order[i].PlayerIndex == -1 && _order[i].PossibleIndicies.Count == 1 && _order[i].PossibleIndicies.Contains(index))
+                    if (_order[i].PlayerIndex == index ||
+                            _order[i].PlayerIndex == -1 &&
+                            _order[i].PossibleIndicies.Count == 1 &&
+                            _order[i].PossibleIndicies.Contains(index))
                     {
                         continue;
                     }
@@ -234,7 +249,8 @@ namespace SICore.Clients.Game
                         if (_order[i].PossibleIndicies == variantWithIndex)
                         {
                             possibleVariantsCount--;
-                            if (possibleVariantsCount == 0) // Один вариант нужно удалить
+
+                            if (possibleVariantsCount == 0) // One variant should be deleted
                             {
                                 continue;
                             }
@@ -244,6 +260,7 @@ namespace SICore.Clients.Game
                     }
 
                     j++;
+
                     if (j == newOrder.Length)
                     {
                         break;
@@ -274,6 +291,7 @@ namespace SICore.Clients.Game
         public bool MoveNext()
         {
             _orderIndex++;
+
             if (_orderIndex == _order.Length)
             {
                 if (!_cycle || _order.Length == 0)
@@ -291,7 +309,12 @@ namespace SICore.Clients.Game
 
         public bool IsEmpty() => _order.Length == 0;
 
-        public override string ToString() => new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
-                .Append(' ').Append(_orderIndex).Append(' ').Append(_cycle).ToString();
+        public override string ToString() => 
+            new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
+            .Append(' ')
+            .Append(_orderIndex)
+            .Append(' ')
+            .Append(_cycle)
+            .ToString();
     }
 }

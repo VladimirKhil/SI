@@ -765,4 +765,7 @@
   <data name="FileLoadError" xml:space="preserve">
     <value>File "{0}" loading error</value>
   </data>
+  <data name="PersonAlreadyExists" xml:space="preserve">
+    <value>Person {0} already exists in the game!</value>
+  </data>
 </root>

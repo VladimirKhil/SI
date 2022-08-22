@@ -1249,6 +1249,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Person {0} already exists in the game!.
+        /// </summary>
+        public static string PersonAlreadyExists {
+            get {
+                return ResourceManager.GetString("PersonAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на player&apos;s type.
         /// </summary>
         public static string PersonType {
