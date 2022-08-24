@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace SIPackages.Core
@@ -6,9 +7,11 @@ namespace SIPackages.Core
     /// <summary>
     /// Defines an object that informs about its property value changes.
     /// </summary>
+    [Serializable]
     public abstract class PropertyChangedNotifier : INotifyPropertyChanged
     {
         /// <inheritdoc />
+        [field: NonSerialized]
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>

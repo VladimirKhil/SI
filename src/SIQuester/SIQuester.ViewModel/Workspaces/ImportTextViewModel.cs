@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using QTxtConverter;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System;

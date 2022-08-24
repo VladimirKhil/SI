@@ -22,7 +22,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Image Source="/SIQuester;component/Resources/logo.png" Width="64" Margin="5,5,0,5" Grid.RowSpan="3" />
+                <Image Source="/SIQuester;component/Resources/logo.jpg" Width="64" Margin="5,5,0,5" Grid.RowSpan="3" />
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" FontWeight="Bold">SIQuester</TextBlock>
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">2005 - 2022 гг.</TextBlock>
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="2" Text="{Binding Version, StringFormat=Версия \{0\}}" />

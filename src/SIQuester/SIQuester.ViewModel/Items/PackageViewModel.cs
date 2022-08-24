@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using System;
 using System.Collections.ObjectModel;
@@ -9,21 +10,31 @@ using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class PackageViewModel: ItemViewModel<Package>
+    /// <summary>
+    /// Defines a package view model.
+    /// </summary>
+    public sealed class PackageViewModel : ItemViewModel<Package>
     {
         public override IItemViewModel Owner => null;
 
         public QDocument Document { get; private set; }
 
-        public ObservableCollection<RoundViewModel> Rounds { get; } = new ObservableCollection<RoundViewModel>();
+        public ObservableCollection<RoundViewModel> Rounds { get; } = new();
+
         public ICommand AddRound { get; private set; }
+
         public SimpleCommand AddRestrictions { get; private set; }
+
         public SimpleCommand AddTags { get; private set; }
+
         public SimpleCommand ChangeLanguage { get; private set; }
 
         public TagsViewModel Tags { get; private set; }
 
         public override ICommand Add { get; protected set; }
+
+        public override string AddHeader => Resources.AddRound;
+
         public override ICommand Remove
         {
             get => null;
@@ -31,6 +42,7 @@ namespace SIQuester.ViewModel
         }
 
         public ICommand SelectLogo { get; private set; }
+
         public ICommand RemoveLogo { get; private set; }
 
         private IMedia _logo = null;
@@ -211,6 +223,7 @@ namespace SIQuester.ViewModel
         protected override void UpdateCosts(CostSetter costSetter)
         {
             Document.BeginChange();
+
             try
             {
                 base.UpdateCosts(costSetter);
@@ -225,7 +238,7 @@ namespace SIQuester.ViewModel
             }
             finally
             {
-                Document.CommitChange();
+                Document.CommitChange(); // Always
             }
         }
     }

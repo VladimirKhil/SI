@@ -668,26 +668,22 @@
                                     <ContentControl Content="{Binding}">
                                         <ContentControl.Style>
                                             <Style TargetType="ContentControl">
-                                                <Setter Property="ContentTemplate">
-                                                    <Setter.Value>
-                                                        <DataTemplate>
-                                                            <Grid>
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="3*" />
-                                                                    <RowDefinition Height="*" />
-                                                                </Grid.RowDefinitions>
-                                                                <Border Grid.Row="1" Background="#88000000">
-                                                                    <TextBlock Text="{Binding Hint}" Style="{StaticResource QuestionText}" Opacity="0.4" />
-                                                                </Border>
-                                                            </Grid>
-                                                        </DataTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
+                                                <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Hint}" Value="">
+                                                    <DataTrigger Binding="{Binding Hint, Converter={StaticResource NotNullOrEmptyConverter}}" Value="true">
                                                         <Setter Property="ContentTemplate">
                                                             <Setter.Value>
-                                                                <DataTemplate />
+                                                                <DataTemplate>
+                                                                    <Grid>
+                                                                        <Grid.RowDefinitions>
+                                                                            <RowDefinition Height="3*" />
+                                                                            <RowDefinition Height="*" />
+                                                                        </Grid.RowDefinitions>
+                                                                        <Border Grid.Row="1" Background="#88000000">
+                                                                            <TextBlock Text="{Binding Hint}" Style="{StaticResource QuestionText}" Opacity="0.4" />
+                                                                        </Border>
+                                                                    </Grid>
+                                                                </DataTemplate>
                                                             </Setter.Value>
                                                         </Setter>
                                                     </DataTrigger>

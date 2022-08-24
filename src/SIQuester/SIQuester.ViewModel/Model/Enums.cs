@@ -3,7 +3,7 @@
 namespace SIQuester.Model
 {
     /// <summary>
-    /// Тип пакета
+    /// Defines well-known package templates.
     /// </summary>
     public enum PackageType
     {
@@ -26,7 +26,7 @@ namespace SIQuester.Model
     }
 
     /// <summary>
-    /// Формат экспорта
+    /// Defines well-known packge export formats.
     /// </summary>
     public enum ExportFormats
     {
@@ -48,12 +48,38 @@ namespace SIQuester.Model
         Horizontal
     }
 
+    /// <summary>
+    /// Defines document view modes.
+    /// </summary>
     public enum ViewMode
     {
+        /// <summary>
+        /// Tree view mode.
+        /// </summary>
         [Description("Дерево")]
         TreeFull,
+        /// <summary>
+        /// Flat view mode.
+        /// </summary>
         [Description("Плитки")]
         Flat
+    }
+
+    /// <summary>
+    /// Defines document layout modes in the flat view.
+    /// </summary>
+    public enum FlatLayoutMode
+    {
+        /// <summary>
+        /// Table layout.
+        /// </summary>
+        [Description("Таблица")]
+        Table,
+        /// <summary>
+        /// List layout.
+        /// </summary>
+        [Description("Список")]
+        List
     }
 
     /// <summary>

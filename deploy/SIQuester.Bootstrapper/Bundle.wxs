@@ -16,7 +16,7 @@
             <bal:WixStandardBootstrapperApplication
 				LicenseUrl=""
                 LocalizationFile="HyperlinkTheme_ru-ru.wxl" 
-                LogoFile="Resources\logo.png"
+                LogoFile="Resources\logo.jpg"
                 ThemeFile="HyperlinkTheme.xml"
                 SuppressOptionsUI="yes" />
 			
@@ -27,7 +27,7 @@
 	            Id="SIQuester.Setup.x86"
 				Compressed="no"
                 DisplayName="SIQuester"
-                SourceFile="..\SIQuester.Setup\bin\Release\x86\ru-ru\SIQuester.x86.msi"
+                SourceFile="..\..\bin\.Release\SIQuester.Setup\x86\ru-ru\SIQuester.x86.msi"
 				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/siquester-v$(var.ProductVersion)/SIQuester.x86.msi"
 	            InstallCondition="NOT VersionNT64" />
 			
@@ -35,7 +35,7 @@
 			    Id="SIQuester.Setup.x64"
 				Compressed="no"
 			    DisplayName="SIQuester"
-			    SourceFile="..\SIQuester.Setup\bin\Release\x64\ru-ru\SIQuester.x64.msi"
+			    SourceFile="..\..\bin\.Release\SIQuester.Setup\x64\ru-ru\SIQuester.x64.msi"
 				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/siquester-v$(var.ProductVersion)/SIQuester.x64.msi"
 			    InstallCondition="VersionNT64" />
         </Chain>

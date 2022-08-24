@@ -4,6 +4,7 @@ using SI.GameServer.Client;
 using SICore;
 using SICore.Network.Servers;
 using SIGame.ViewModel.Properties;
+using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -267,7 +268,13 @@ namespace SIGame.ViewModel
         {
             await Task.Delay(500);
 
-            var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings) { Human = Human.HumanPlayer, ChangeSettings = ShowSlideMenu };
+            var siStorage = _serviceProvider.GetRequiredService<SIStorage>();
+
+            var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage)
+            {
+                Human = Human.HumanPlayer,
+                ChangeSettings = ShowSlideMenu
+            };
 
             gameSettings.StartGame += StartGame;
 

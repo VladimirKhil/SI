@@ -18,6 +18,7 @@ namespace SIQuester.Controls
 
             var widths = new Tuple<int, double>[childrenCount];
             var size = new System.Windows.Size(double.PositiveInfinity, constraint.Height);
+
             for (int i = 0; i < childrenCount; i++)
             {
                 var child = Children[i];
@@ -38,6 +39,7 @@ namespace SIQuester.Controls
                 desiredWidth = mustWidth;
 
                 var left = childrenCount;
+
                 foreach (var item in widths.OrderBy(t => t.Item2))
                 {
                     var newWidth = Math.Min(item.Item2, mustWidth / left);
@@ -61,6 +63,7 @@ namespace SIQuester.Controls
         protected override System.Windows.Size ArrangeOverride(System.Windows.Size arrangeBounds)
         {
             var rect = new System.Windows.Rect(0.0, 0.0, 0.0, arrangeBounds.Height);
+
             for (int i = 0; i < _newWidths.Length; i++)
             {
                 rect.Width = _newWidths[i];

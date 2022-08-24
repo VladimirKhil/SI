@@ -6,7 +6,9 @@ namespace SIQuester.Model
     public sealed class SearchResults
     {
         public string Query { get; set; }
+
         public Collection<IItemViewModel> Results { get; set; }
+
         public int Index { get; set; }
 
         public SearchResults()

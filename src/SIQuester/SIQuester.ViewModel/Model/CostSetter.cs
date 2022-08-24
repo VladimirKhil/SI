@@ -9,6 +9,7 @@ namespace SIQuester.Model
     {
         [XmlAttribute]
         public int BaseValue { get; set; }
+
         [XmlAttribute]
         public int Increment { get; set; }
 

@@ -10,7 +10,7 @@
     <OutputType>Bundle</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
-	<DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
+    <DefineConstants>ProductVersion=$(MsiProductVersion)</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -52,7 +52,7 @@
     <Content Include="HyperlinkTheme.xml" />
     <Content Include="License.rtf" />
     <Content Include="Resources\logo.ico" />
-    <Content Include="Resources\logo.png" />
+    <Content Include="Resources\logo.jpg" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HyperlinkTheme_ru-ru.wxl" />

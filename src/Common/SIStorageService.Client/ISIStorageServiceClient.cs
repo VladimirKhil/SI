@@ -57,5 +57,12 @@ namespace SIStorageService.Client
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Found package.</returns>
         Task<PackageLink> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets package uri by identifier.
+        /// </summary>
+        /// <param name="packageID">Package identifier.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task<Uri> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default);
     }
 }

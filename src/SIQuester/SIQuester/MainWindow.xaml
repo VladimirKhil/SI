@@ -8,6 +8,7 @@
     xmlns:vm1="clr-namespace:SIQuester.ViewModel"
     xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d" 
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
     Title="SIQuester"
@@ -17,7 +18,7 @@
     TitleBarHeight="25"
     Name="main"
     WindowState="Maximized"
-    Icon="Resources/logo.png"
+    Icon="Resources/logo.jpg"
     Closed="Main_Closed"
     Closing="Main_Closing"
     Loaded="Main_Loaded"
@@ -29,12 +30,40 @@
         <siqcv:UnionConverter x:Key="UnionConverter" />
         <siqcv:DirectoryConverter x:Key="DirectoryConverter" />
         <siqcv:FileNameConverter x:Key="FileNameConverter" />
-        
+        <siqcv:NotNullConverter x:Key="NotNullConverter" />
+
         <DataTemplate x:Key="TabItemHeaderTemplate">
             <DockPanel AllowDrop="True" Height="25" Background="Transparent">
-                <Button Name="cb" Visibility="Hidden" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="5,0,2,0" Padding="0" Width="20" Height="20" Command="{Binding Close}" ToolTip="Закрыть" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                <Button
+                    Name="cb"
+                    Visibility="Hidden"
+                    DockPanel.Dock="Right"
+                    VerticalAlignment="Center"
+                    Margin="5,0,2,0"
+                    Padding="0"
+                    Width="20"
+                    Height="20"
+                    Command="{Binding Close}"
+                    ToolTip="Закрыть"
+                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                     <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L12,12M0,12L12,0" />
                 </Button>
+
+                <ContentControl>
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" Value="True">
+                                    <Setter Property="Content">
+                                        <Setter.Value>
+                                            <TextBlock ToolTip="{Binding ErrorMessage}" Text="⚠️" VerticalAlignment="Center" Margin="5,0,5,0" Foreground="OrangeRed" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
                 <TextBlock MinWidth="80" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Header}" ToolTip="{Binding ToolTip}" Margin="2,0,0,0" />
             </DockPanel>
             <DataTemplate.Triggers>
@@ -68,9 +97,37 @@
                                 <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
                                 <RowDefinition x:Name="RowDefinition1" Height="*"/>
                             </Grid.RowDefinitions>
-                            <TabPanel x:Name="HeaderPanel" Background="Transparent" Grid.Column="0" IsItemsHost="True" Margin="0" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"/>
-                            <Border x:Name="ContentPanel" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.Column="0" KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1" KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
-                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentTemplate="{TemplateBinding SelectedContentTemplate}" Content="{TemplateBinding SelectedContent}" ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+
+                            <TabPanel
+                                x:Name="HeaderPanel"
+                                Background="Transparent"
+                                Grid.Column="0"
+                                IsItemsHost="True"
+                                Margin="0"
+                                Grid.Row="0"
+                                KeyboardNavigation.TabIndex="1"
+                                Panel.ZIndex="1" />
+
+                            <Border
+                                x:Name="ContentPanel"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                KeyboardNavigation.DirectionalNavigation="Contained"
+                                KeyboardNavigation.TabIndex="2"
+                                KeyboardNavigation.TabNavigation="Local">
+
+                                <ContentPresenter
+                                    x:Name="PART_SelectedContentHost"
+                                    ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                    Content="{TemplateBinding SelectedContent}"
+                                    ContentStringFormat="{TemplateBinding SelectedContentStringFormat}"
+                                    ContentSource="SelectedContent"
+                                    Margin="{TemplateBinding Padding}"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
@@ -104,7 +161,10 @@
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="0,2,2,2"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                <Setter
+                                    Property="TextElement.Foreground"
+                                    TargetName="templateRoot"
+                                    Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -117,24 +177,55 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="TabControl">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <Grid x:Name="grid" DataContext="{Binding Settings.History.Files}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid
+                                        x:Name="grid"
+                                        DataContext="{Binding Settings.History.Files}"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        <TextBlock FontSize="24" HorizontalAlignment="Center">Последние файлы</TextBlock>
+                                        <TextBlock FontSize="24" HorizontalAlignment="Center" Text="{x:Static lp:Resources.RecentFiles}" />
                                         <ItemsControl Grid.Row="1" ItemsSource="{Binding}" Margin="0,20,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Button Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
-                                                            CommandParameter="{Binding}" ToolTip="{Binding}"
-                                                            Padding="30,7" MaxWidth="600" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
-                                                        <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
-                                                            <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" /><LineBreak />
-                                                            <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
-                                                        </TextBlock>
+                                                    <Button
+                                                        x:Name="open"
+                                                        Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
+                                                        CommandParameter="{Binding}"
+                                                        ToolTip="{Binding}"
+                                                        Padding="30,7,10,7"
+                                                        HorizontalAlignment="Stretch"
+                                                        HorizontalContentAlignment="Left"
+                                                        Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                        Cursor="Hand">
+                                                        <DockPanel Width="600">
+                                                            <Button
+                                                                x:Name="remove"
+                                                                Visibility="Hidden"
+                                                                DockPanel.Dock="Right"
+                                                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                                Margin="4,0,0,0" 
+                                                                Command="{Binding ElementName=main, Path=DataContext.RemoveRecent}"
+                                                                CommandParameter="{Binding}"
+                                                                ToolTip="{x:Static lp:Resources.RemoveLink}"
+                                                                Width="20"
+                                                                Height="20">
+                                                                <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
+                                                            </Button>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
+                                                                <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" />
+                                                                <LineBreak />
+                                                                <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
+                                                            </TextBlock>
+                                                        </DockPanel>
                                                     </Button>
+                                                    <DataTemplate.Triggers>
+                                                        <Trigger SourceName="open" Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="remove" Property="Visibility" Value="Visible" />
+                                                        </Trigger>
+                                                    </DataTemplate.Triggers>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -174,17 +265,18 @@
         <KeyBinding Key="Delete" Command="{Binding ActiveDocument.Delete}" />
     </Window.InputBindings>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="Редактор вопросов СИ" />
+        <TaskbarItemInfo Description="Редактор вопросов SIGame" />
     </Window.TaskbarItemInfo>
     <metro:MetroWindow.IconTemplate>
         <DataTemplate>
-            <Grid Width="{TemplateBinding Width}"
-                 Height="{TemplateBinding Height}"
-                 Margin="4"
-                 Background="Transparent"
-                 RenderOptions.EdgeMode="Aliased"
-                 RenderOptions.BitmapScalingMode="HighQuality">
-                <Image Source="Resources/logo.png" />
+            <Grid
+                Width="{TemplateBinding Width}"
+                Height="{TemplateBinding Height}"
+                Margin="4"
+                Background="Transparent"
+                RenderOptions.EdgeMode="Aliased"
+                RenderOptions.BitmapScalingMode="HighQuality">
+                <Image Source="Resources/logo.jpg" />
             </Grid>
         </DataTemplate>
     </metro:MetroWindow.IconTemplate>
@@ -199,16 +291,21 @@
             <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Новый… (Ctrl+N)" Command="ApplicationCommands.New">
                 <Path Stretch="Uniform" Fill="White" Margin="4,2" Data="{Binding Source={StaticResource app_new},Path=Data}" />
             </Button>
-            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Открыть… (Ctrl+O)"
-                    Command="ApplicationCommands.Open">
+            <Button
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="Открыть… (Ctrl+O)"
+                Command="ApplicationCommands.Open">
                 <Path Stretch="Uniform" Fill="#FFCD58" Margin="2" Data="{Binding Source={StaticResource app_open},Path=Data}" />
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="0.75" />
                 </Button.LayoutTransform>
             </Button>
-            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Открыть недавние"
-                                DataContext="{Binding}"
-                                IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <siq:DropDownButton
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="Открыть недавние"
+                DataContext="{Binding}"
+                IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}"
+                VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Path Data="M0,0L8,0L4,4z" Fill="White" />
                 <siq:DropDownButton.DropDown>
                     <ContextMenu ItemsSource="{Binding Settings.History.Files}">

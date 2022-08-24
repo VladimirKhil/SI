@@ -212,6 +212,7 @@ namespace SIQuester.ViewModel
         private void AddVoice_Executed(object arg)
         {
             var index = CurrentPosition;
+
             if (index > -1 && index < Count && string.IsNullOrWhiteSpace(this[index].Model.Text))
             {
                 RemoveAt(index);
@@ -229,9 +230,11 @@ namespace SIQuester.ViewModel
         private void ChangeType_Executed(object arg)
         {
             var index = CurrentPosition;
+
             if (index > -1 && index < Count)
             {
                 var atom = this[index];
+
                 if (atom.Model.Type == AtomTypes.Text)
                 {
                     atom.Model.Type = AtomTypes.Oral;
@@ -335,6 +338,7 @@ namespace SIQuester.ViewModel
             }
 
             var uri = PlatformManager.Instance.AskText(Resources.InputMediaUri);
+
             if (string.IsNullOrWhiteSpace(uri))
             {
                 return;
@@ -432,9 +436,13 @@ namespace SIQuester.ViewModel
 
             var collection = document.Images;
             if (mediaType == AtomTypes.Audio)
+            {
                 collection = document.Audio;
+            }
             else if (mediaType == AtomTypes.Video)
+            {
                 collection = document.Video;
+            }
 
             var initialItemCount = collection.Files.Count;
 
@@ -483,6 +491,7 @@ namespace SIQuester.ViewModel
                 Insert(index + 1, atom);
 
                 var last = collection.Files.LastOrDefault();
+
                 if (last != null)
                 {
                     SIDocument.SetLink(atom.Model, last.Model.Name);

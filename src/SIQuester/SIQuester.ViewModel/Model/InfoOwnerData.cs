@@ -1,40 +1,56 @@
 ﻿using SIPackages;
+using SIPackages.Core;
+using SIQuester.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace SIQuester.Model
 {
+    /// <summary>
+    /// Contains package object data used in copy-paste and drag-and-drop operations.
+    /// </summary>
     [Serializable]
-    public sealed class InfoOwnerData : IDisposable
+    public sealed class InfoOwnerData
     {
         public enum Level { Package, Round, Theme, Question };
 
         public Level ItemLevel { get; set; }
-        public string ItemData { get; set; }
-        public List<AuthorInfo> Authors { get; set; }
-        public List<SourceInfo> Sources { get; set; }
-        public Dictionary<string, StreamProxy> Images { get; set; }
-        public Dictionary<string, StreamProxy> Audio { get; set; }
-        public Dictionary<string, StreamProxy> Video { get; set; }
 
-        public InfoOwnerData(InfoOwner item)
+        public string ItemData { get; set; }
+
+        public AuthorInfo[] Authors { get; set; }
+
+        public SourceInfo[] Sources { get; set; }
+
+        public Dictionary<string, string> Images { get; set; } = new();
+
+        public Dictionary<string, string> Audio { get; set; } = new();
+
+        public Dictionary<string, string> Video { get; set; } = new();
+
+        public InfoOwnerData(QDocument document, IItemViewModel item)
         {
+            var model = item.GetModel();
+
             var sb = new StringBuilder();
+
             using (var writer = XmlWriter.Create(sb, new XmlWriterSettings { OmitXmlDeclaration = true }))
             {
-                item.WriteXml(writer);
+                model.WriteXml(writer);
             }
 
             ItemData = sb.ToString();
+
             ItemLevel =
-                item is Package ? Level.Package :
-                item is Round ? Level.Round :
-                item is Theme ? Level.Theme : Level.Question;
+                model is Package ? Level.Package :
+                model is Round ? Level.Round :
+                model is Theme ? Level.Theme : Level.Question;
+
+            GetFullData(document, item);
         }
 
         public InfoOwner GetItem()
@@ -57,121 +73,84 @@ namespace SIQuester.Model
             return item;
         }
 
-        public void Dispose()
-        {
-            if (Images != null)
-            {
-                foreach (var item in Images.Values)
-                {
-                    item.Dispose();
-                }
-            }
-
-            if (Audio != null)
-            {
-                foreach (var item in Audio.Values)
-                {
-                    item.Dispose();
-                }
-            }
-
-            if (Video != null)
-            {
-                foreach (var item in Video.Values)
-                {
-                    item.Dispose();
-                }
-            }
-        }
-
         /// <summary>
-        /// Получить полные данные для объекта, включая присоединённые элементы коллекций
+        /// Gets full object data including attached objects.
         /// </summary>
-        /// <returns></returns>
-        public void GetFullData(SIDocument document, InfoOwner owner)
+        /// <param name="document">Document which contains the object.</param>
+        /// <param name="owner">Object having necessary data.</param>
+        private void GetFullData(QDocument documentViewModel, IItemViewModel item)
         {
-            var length = owner.Info.Authors.Count;
+            var model = item.GetModel();
+            var document = documentViewModel.Document;
+
+            var length = model.Info.Authors.Count;
+
+            var authors = new HashSet<AuthorInfo>();
+
             for (int i = 0; i < length; i++)
             {
-                var docAuthor = document.GetLink(owner.Info.Authors, i);
+                var docAuthor = document.GetLink(model.Info.Authors, i);
+
                 if (docAuthor != null)
                 {
-                    if (Authors == null)
-                        Authors = new List<AuthorInfo>();
-
-                    if (!Authors.Contains(docAuthor))
-                        Authors.Add(docAuthor);
+                    authors.Add(docAuthor);
                 }
             }
 
-            length = owner.Info.Sources.Count;
+            Authors = authors.ToArray();
+
+            length = model.Info.Sources.Count;
+
+            var sources = new HashSet<SourceInfo>();
+
             for (int i = 0; i < length; i++)
             {
-                var docSource = document.GetLink(owner.Info.Sources, i);
+                var docSource = document.GetLink(model.Info.Sources, i);
+
                 if (docSource != null)
                 {
-                    if (Sources == null)
-                        Sources = new List<SourceInfo>();
-
-                    if (!Sources.Contains(docSource))
-                        Sources.Add(docSource);
+                    sources.Add(docSource);
                 }
             }
-        }
 
-        public async Task ApplyDataAsync(SIDocument document)
-        {
-            if (Authors != null)
+            Sources = sources.ToArray();
+
+            if (model is Question question)
             {
-                foreach (var author in Authors)
+                foreach (var atom in question.Scenario)
                 {
-                    if (!document.Authors.Any(x => x.Id == author.Id))
+                    if (!atom.IsLink)
                     {
-                        document.Authors.Add(author);
+                        continue;
                     }
-                }
-            }
 
-            if (Sources != null)
-            {
-                foreach (var source in Sources)
-                {
-                    if (!document.Sources.Any(x => x.Id == source.Id))
+                    var collection = atom.Type switch
                     {
-                        document.Sources.Add(source);
+                        AtomTypes.Image => documentViewModel.Images,
+                        AtomTypes.Audio => documentViewModel.Audio,
+                        AtomTypes.Video => documentViewModel.Video,
+                        _ => null,
+                    };
+
+                    if (collection == null)
+                    {
+                        continue;
                     }
-                }
-            }
 
-            if (Images != null)
-            {
-                foreach (var item in Images)
-                {
-                    if (!document.Images.Contains(item.Key))
+                    var targetCollection = atom.Type switch
                     {
-                        await document.Images.AddFileAsync(item.Key, item.Value.Stream);
-                    }
-                }
-            }
+                        AtomTypes.Image => Images,
+                        AtomTypes.Audio => Audio,
+                        AtomTypes.Video => Video,
+                        _ => null,
+                    };
 
-            if (Audio != null)
-            {
-                foreach (var item in Audio)
-                {
-                    if (!document.Audio.Contains(item.Key))
-                    {
-                        await document.Audio.AddFileAsync(item.Key, item.Value.Stream);
-                    }
-                }
-            }
+                    var link = atom.Text[1..];
 
-            if (Video != null)
-            {
-                foreach (var item in Video)
-                {
-                    if (!document.Video.Contains(item.Key))
+                    if (!targetCollection.ContainsKey(link))
                     {
-                        await document.Video.AddFileAsync(item.Key, item.Value.Stream);
+                        var preparedMedia = collection.Wrap(link);
+                        targetCollection.Add(link, preparedMedia.Uri);
                     }
                 }
             }

@@ -5,6 +5,9 @@
     /// </summary>
     public sealed class NamedObject
     {
+        /// <summary>
+        /// Object unique identifier.
+        /// </summary>
         public int ID { get; set; }
 
         /// <summary>

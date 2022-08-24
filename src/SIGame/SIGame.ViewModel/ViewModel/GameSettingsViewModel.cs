@@ -12,6 +12,7 @@ using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Web;
 using SIPackages;
 using SIPackages.Helpers;
+using SIStorageService.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,7 +31,7 @@ namespace SIGame.ViewModel
 {
     public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings>, INavigatable, IDisposable
     {
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
 
         private string _duplicatingName = null;
 
@@ -46,7 +47,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public GameRole Role
         {
-            get { return _model.Role; }
+            get => _model.Role;
             set
             {
                 if (_model.Role != value)
@@ -64,7 +65,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public bool NetworkGame
         {
-            get { return _model.NetworkGame; }
+            get => _model.NetworkGame;
             set
             {
                 _model.NetworkGame = value;
@@ -80,7 +81,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public NetworkGameType NetworkGameType
         {
-            get { return _model.NetworkGameType; }
+            get => _model.NetworkGameType;
             set
             {
                 _model.NetworkGameType = value;
@@ -94,7 +95,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public string NetworkGameName
         {
-            get { return _model.NetworkGameName; }
+            get => _model.NetworkGameName;
             set
             {
                 _model.NetworkGameName = value;
@@ -108,7 +109,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public string NetworkGamePassword
         {
-            get { return _model.NetworkGamePassword; }
+            get => _model.NetworkGamePassword;
             set
             {
                 _model.NetworkGamePassword = value;
@@ -118,14 +119,16 @@ namespace SIGame.ViewModel
 
         public int PlayersCount
         {
-            get { return _model.PlayersCount; }
-            set 
+            get => _model.PlayersCount;
+            set
             {
                 var oldValue = _model.PlayersCount;
+
                 if (oldValue != value)
                 {
                     _model.PlayersCount = value;
                     OnPropertyChanged();
+
                     if (oldValue < value)
                     {
                         do
@@ -151,7 +154,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public bool AllowViewers
         {
-            get { return _model.AllowViewers; }
+            get => _model.AllowViewers;
             set { _model.AllowViewers = value; OnPropertyChanged(); }
         }
 
@@ -160,7 +163,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public int NetworkPort
         {
-            get { return _model.NetworkPort; }
+            get => _model.NetworkPort;
             set { _model.NetworkPort = value; OnPropertyChanged(); SetErrorMessage(); }
         }
 
@@ -168,10 +171,7 @@ namespace SIGame.ViewModel
 
         public GameAccount Showman
         {
-            get
-            {
-                return _showman;
-            }
+            get => _showman;
             set
             {
                 if (_showman != value)
@@ -237,6 +237,7 @@ namespace SIGame.ViewModel
         /// Игроки
         /// </summary>
         public ObservableCollection<GameAccount> Players { get; } = new ObservableCollection<GameAccount>();
+
         /// <summary>
         /// Зрители
         /// </summary>
@@ -247,7 +248,7 @@ namespace SIGame.ViewModel
 
         public string ErrorMessage
         {
-            get { return _errorMessage; }
+            get => _errorMessage;
             set { _errorMessage = value; OnPropertyChanged(); }
         }
 
@@ -258,7 +259,7 @@ namespace SIGame.ViewModel
         /// </summary>
         public PackageSource Package
         {
-            get { return _package; }
+            get => _package;
             set
             {
                 _package = value;
@@ -274,6 +275,7 @@ namespace SIGame.ViewModel
         public IAsyncCommand BeginGame { get; private set; }
 
         public ICommand RemoveComputerAccount { get; private set; }
+
         public ICommand EditComputerAccount { get; private set; }
 
         public ICommand RemoveShowmanAccount { get; private set; }
@@ -284,6 +286,7 @@ namespace SIGame.ViewModel
             UpdateComputerPlayers();
 
             var gamePlayers = Players;
+
             foreach (var player in gamePlayers)
             {
                 if (player.SelectedAccount == _computerPlayers.Last())
@@ -296,6 +299,7 @@ namespace SIGame.ViewModel
         private void NewComputerAccount_Edit(ComputerAccount origin, ComputerAccount account)
         {
             var players = _commonSettings.CompPlayers2;
+
             for (int i = 0; i < players.Count; i++)
             {
                 if (players[i] == origin)
@@ -304,6 +308,7 @@ namespace SIGame.ViewModel
                     GameAccount playerAcc = null;
 
                     var gamePlayers = Players;
+
                     foreach (var player in gamePlayers)
                     {
                         if (player.SelectedAccount == oldAccount)
@@ -315,8 +320,11 @@ namespace SIGame.ViewModel
 
                     players[i] = account;
                     UpdateComputerPlayers();
+
                     if (playerAcc != null)
+                    {
                         playerAcc.SelectedAccount = account;
+                    }
                 }
             }
         }
@@ -336,18 +344,20 @@ namespace SIGame.ViewModel
         public ICommand SelectPackage => _selectPackage;
 
         private ICommand _closeNewShowman;
+
         private ICommand _closeNewPlayer;
 
         private readonly CommonSettings _commonSettings;
 
         internal event Func<GameSettings, PackageSource, Task<Tuple<SlaveServer, IViewerClient>>> CreateGame;
+
         public event Action<ContentBox> Navigate;
 
         private bool _isProgress;
 
         public bool IsProgress
         {
-            get { return _isProgress; }
+            get => _isProgress;
             set { _isProgress = value; OnPropertyChanged(); }
         }
 
@@ -355,7 +365,7 @@ namespace SIGame.ViewModel
 
         public string Message
         {
-            get { return _message; }
+            get => _message;
             set { _message = value; OnPropertyChanged(); }
         }
 
@@ -363,6 +373,7 @@ namespace SIGame.ViewModel
             GameSettings gameSettings,
             CommonSettings commonSettings,
             UserSettings userSettings,
+            SIStorage siStorage,
             bool isNetworkGame = false)
             : base(gameSettings)
         {
@@ -372,7 +383,7 @@ namespace SIGame.ViewModel
             UpdateComputerPlayers();
             UpdateComputerShowmans();
 
-            StorageInfo = new SIStorageViewModel(userSettings);
+            StorageInfo = new SIStorageViewModel(siStorage, userSettings);
             StorageInfo.AddPackage += StorageInfo_AddPackage;
 
             gameSettings.Updated += GameSettings_Updated;
@@ -894,9 +905,11 @@ namespace SIGame.ViewModel
             }
 
             int player = -1;
+
             if (Role == GameRole.Player)
             {
                 player = PlayerNumber;
+
                 if (PlayerNumber > -1 && PlayerNumber < Players.Count)
                 {
                     Players[PlayerNumber].AccountType = AccountTypes.Human;
@@ -928,7 +941,9 @@ namespace SIGame.ViewModel
         private void UpdateShowman()
         {
             if (_showman == null)
+            {
                 return;
+            }
 
             if (_showman.AccountType == AccountTypes.Human)
             {
@@ -986,6 +1001,7 @@ namespace SIGame.ViewModel
                 }
 
                 var index = _random.Next(_computerPlayers.Length - visited.Count - 1);
+
                 while (visited.Contains(index))
                 {
                     index++;
@@ -1046,8 +1062,11 @@ namespace SIGame.ViewModel
         internal void PrepareForGame()
         {
             Viewers.Clear();
+
             if (Role == GameRole.Viewer)
+            {
                 Viewers.Add(new SimpleAccount<HumanAccount> { SelectedAccount = Human });
+            }
 
             Players.Clear();
 
@@ -1056,14 +1075,17 @@ namespace SIGame.ViewModel
             var anyAccount = new HumanAccount { Name = Constants.FreePlace, CanBeDeleted = false };
 
             var playerTypes = Model.PlayersTypes;
-            for (int i = 0; i < playersCount; i++) // Рандомные игроки
+
+            for (int i = 0; i < playersCount; i++) // Random players
             {
                 if (Role == GameRole.Player && i == PlayerNumber)
                 {
                     Players.Add(new GameAccount(this) { AccountType = AccountTypes.Human, SelectedAccount = Human });
                 }
-                else if (!NetworkGame || playerTypes == null
-                    || i >= playerTypes.Length || playerTypes[i] == AccountTypes.Computer)
+                else if (!NetworkGame ||
+                    playerTypes == null ||
+                    i >= playerTypes.Length ||
+                    playerTypes[i] == AccountTypes.Computer)
                 {
                     Players.Add(new GameAccount(this) { AccountType = AccountTypes.Computer });
                 }
@@ -1076,11 +1098,17 @@ namespace SIGame.ViewModel
             if (Showman == null)
             {
                 if (Role == GameRole.Showman)
+                {
                     Showman = new GameAccount(this) { AccountType = AccountTypes.Human, SelectedAccount = Human };
+                }
                 else if (!NetworkGame || _model.ShowmanType == AccountTypes.Computer)
+                {
                     Showman = new GameAccount(this) { AccountType = AccountTypes.Computer, SelectedAccount = _computerShowmans[0] };
+                }
                 else
+                {
                     Showman = new GameAccount(this) { AccountType = AccountTypes.Human, SelectedAccount = anyAccount };
+                }
             }
         }
 

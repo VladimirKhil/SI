@@ -1,21 +1,32 @@
 ﻿using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.Properties;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class RoundViewModel: ItemViewModel<Round>
+    /// <summary>
+    /// Defines a round view model.
+    /// </summary>
+    public sealed class RoundViewModel : ItemViewModel<Round>
     {
         public PackageViewModel OwnerPackage { get; set; }
 
         public override IItemViewModel Owner => OwnerPackage;
 
-        public ObservableCollection<ThemeViewModel> Themes { get; } = new ObservableCollection<ThemeViewModel>();
+        public ObservableCollection<ThemeViewModel> Themes { get; } = new();
+
         public override ICommand Add { get; protected set; }
+
+        public override string AddHeader => Resources.AddTheme;
+
         public override ICommand Remove { get; protected set; }
+
         public ICommand Clone { get; private set; }
+
         public ICommand AddTheme { get; private set; }
 
         public RoundViewModel(Round round)
@@ -90,10 +101,10 @@ namespace SIQuester.ViewModel
 
         private void AddTheme_Executed(object arg)
         {
+            var document = OwnerPackage.Document;
+
             try
             {
-                var document = OwnerPackage.Document;
-
                 var theme = new Theme { Name = "" };
                 var themeViewModel = new ThemeViewModel(theme);
 
@@ -102,11 +113,12 @@ namespace SIQuester.ViewModel
                 try
                 {
                     Themes.Add(themeViewModel);
+
                     if (AppSettings.Default.CreateQuestionsWithTheme)
                     {
                         for (int i = 0; i < 5; i++)
                         {
-                            var question = QDocument.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase);
+                            var question = PackageItemsHelper.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase);
                             themeViewModel.Questions.Add(new QuestionViewModel(question));
                         }
                     }
@@ -130,6 +142,7 @@ namespace SIQuester.ViewModel
             var document = OwnerPackage.Document;
 
             document.BeginChange();
+
             try
             {
                 base.UpdateCosts(costSetter);
@@ -141,7 +154,7 @@ namespace SIQuester.ViewModel
             }
             finally
             {
-                document.CommitChange();
+                document.CommitChange(); // Always
             }
         }
     }

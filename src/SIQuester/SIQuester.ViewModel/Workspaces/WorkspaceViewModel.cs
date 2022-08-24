@@ -19,6 +19,24 @@ namespace SIQuester.ViewModel
         /// </summary>
         public abstract string Header { get; }
 
+        private string _errorMessage = null;
+
+        /// <summary>
+        /// Workspace error message.
+        /// </summary>
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set
+            {
+                if (_errorMessage != value)
+                {
+                    _errorMessage = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         /// <summary>
         /// Workspace tooltip.
         /// </summary>

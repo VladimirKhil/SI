@@ -1,16 +1,16 @@
 ﻿using SIStorageService.Client;
 using SIStorageService.Client.Models;
-using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
-namespace Services.SI.ViewModel
+namespace SIStorageService.ViewModel
 {
-    public sealed class SIStorageNew : INotifyPropertyChanged
+    /// <summary>
+    /// Defines a SI Storage view model.
+    /// </summary>
+    public sealed class SIStorage : INotifyPropertyChanged
     {
-        private SIStorageServiceClient _siService;
+        private readonly ISIStorageServiceClient _siStorageServiceClient;
 
         private bool _isLoading;
 
@@ -28,17 +28,15 @@ namespace Services.SI.ViewModel
             set { _isLoadingPackages = value; OnPropertyChanged(); }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event Action<Exception, string> Error;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        private PackageInfo[] _packages;
+        public event Action<Exception, string>? Error;
 
-        public PackageInfo[] Packages
+        private PackageInfo[]? _packages;
+
+        public PackageInfo[]? Packages
         {
-            get
-            {
-                return _packages;
-            }
+            get => _packages;
             set
             {
                 _packages = value;
@@ -46,14 +44,11 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private PackageInfo[] _filteredPackages;
+        private PackageInfo[]? _filteredPackages;
 
-        public PackageInfo[] FilteredPackages
+        public PackageInfo[]? FilteredPackages
         {
-            get
-            {
-                return _filteredPackages;
-            }
+            get => _filteredPackages;
             set
             {
                 _filteredPackages = value;
@@ -61,19 +56,19 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private PackageInfo _currentPackage;
+        private PackageInfo? _currentPackage;
 
-        public PackageInfo CurrentPackage
+        public PackageInfo? CurrentPackage
         {
-            get { return _currentPackage; }
+            get => _currentPackage;
             set { if (_currentPackage != value) { _currentPackage = value; OnPropertyChanged(); } }
         }
 
-        private NamedObject _currentPublisher;
+        private NamedObject? _currentPublisher;
 
-        public NamedObject CurrentPublisher
+        public NamedObject? CurrentPublisher
         {
-            get { return _currentPublisher; }
+            get => _currentPublisher;
             set
             {
                 if (_currentPublisher != value)
@@ -85,24 +80,21 @@ namespace Services.SI.ViewModel
             }
         }
 
-        public Task<Uri> LoadSelectedPackageUriAsync()
+        public Task<PackageLink> LoadSelectedPackageUriAsync(CancellationToken cancellationToken = default)
         {
-            if (_siService == null || CurrentPackage == null)
+            if (CurrentPackage == null)
             {
-                return Task.FromResult<Uri>(null);
+                throw new InvalidOperationException("CurrentPackage is undefined");
             }
 
-            return _siService.GetPackageByIDAsync(CurrentPackage.ID);
+            return _siStorageServiceClient.GetPackageByGuid2Async(CurrentPackage.Guid, cancellationToken);
         }
 
-        private NamedObject[] _publishers;
+        private NamedObject[]? _publishers;
 
-        public NamedObject[] Publishers
+        public NamedObject[]? Publishers
         {
-            get
-            {
-                return _publishers;
-            }
+            get => _publishers;
             set
             {
                 _publishers = value;
@@ -110,11 +102,11 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private string _currentRestriction;
+        private string? _currentRestriction;
 
-        public string CurrentRestriction
+        public string? CurrentRestriction
         {
-            get { return _currentRestriction; }
+            get => _currentRestriction;
             set
             {
                 if (_currentRestriction != value)
@@ -132,11 +124,11 @@ namespace Services.SI.ViewModel
 
         public bool[] SortDirections { get; } = new bool[] { true, false };
 
-        private NamedObject _currentTag;
+        private NamedObject? _currentTag;
 
-        public NamedObject CurrentTag
+        public NamedObject? CurrentTag
         {
-            get { return _currentTag; }
+            get => _currentTag;
             set
             {
                 if (_currentTag != value)
@@ -148,9 +140,9 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private NamedObject[] _tags;
+        private NamedObject[]? _tags;
 
-        public NamedObject[] Tags
+        public NamedObject[]? Tags
         {
             get => _tags;
             set
@@ -160,9 +152,9 @@ namespace Services.SI.ViewModel
             }
         }
 
-        private string _filter;
+        private string? _filter;
 
-        public string Filter
+        public string? Filter
         {
             get => _filter;
             set
@@ -180,7 +172,7 @@ namespace Services.SI.ViewModel
 
         public PackageSortMode CurrentSortMode
         {
-            get { return _currentSortMode; }
+            get => _currentSortMode;
             set
             {
                 if (_currentSortMode != value)
@@ -208,30 +200,27 @@ namespace Services.SI.ViewModel
             }
         }
 
-        public string DefaultPublisher { get; internal set; }
+        public string? DefaultPublisher { get; set; }
 
-        public string DefaultTag { get; internal set; }
+        public string? DefaultTag { get; set; }
 
-        public SIStorageNew()
+        public SIStorage() => throw new NotImplementedException();
+
+        public SIStorage(ISIStorageServiceClient sIStorageServiceClient)
         {
-            
+            _siStorageServiceClient = sIStorageServiceClient;
         }
 
         public void Open()
         {
-            _siService = new SIStorageServiceClient();
             IsLoading = true;
             LoadPublishersAsync();
         }
 
         private async void LoadPackagesAsync()
         {
-            if (_siService == null)
-            {
-                return;
-            }
-
             IsLoadingPackages = true;
+
             try
             {
                 Packages = null;
@@ -240,7 +229,7 @@ namespace Services.SI.ViewModel
                 var tagID = _currentTag == All ? null : _currentTag?.ID;
                 var publisherId = _currentPublisher == All ? null : _currentPublisher?.ID;
 
-                var packages = await _siService.GetPackagesAsync(tagId: tagID,
+                var packages = await _siStorageServiceClient.GetPackagesAsync(tagId: tagID,
                     publisherId: publisherId,
                     restriction: _currentRestriction,
                     sortMode: _currentSortMode,
@@ -267,20 +256,21 @@ namespace Services.SI.ViewModel
         {
             try
             {
-                var publishers = await _siService.GetPublishersAsync();
+                var publishers = await _siStorageServiceClient.GetPublishersAsync();
 
                 Publishers = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(publishers).ToArray();
-                if (_publishers.Length > 0)
+                
+                if (Publishers.Length > 0)
                 {
                     // Без асинхронной загрузки пакетов
 
                     if (DefaultPublisher != null)
                     {
-                        _currentPublisher = _publishers.FirstOrDefault(p => p.Name == DefaultPublisher) ?? _publishers[0];
+                        _currentPublisher = Publishers.FirstOrDefault(p => p.Name == DefaultPublisher) ?? Publishers[0];
                     }
                     else
                     {
-                        _currentPublisher = _publishers[0];
+                        _currentPublisher = Publishers[0];
                     }
 
                     OnPropertyChanged(nameof(CurrentPublisher));
@@ -299,18 +289,19 @@ namespace Services.SI.ViewModel
         {
             try
             {
-                var tags = await _siService.GetTagsAsync();
+                var tags = await _siStorageServiceClient.GetTagsAsync();
 
                 Tags = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(tags).ToArray();
-                if (_tags.Length > 0)
+
+                if (Tags.Length > 0)
                 {
                     if (DefaultTag != null)
                     {
-                        _currentTag = _tags.FirstOrDefault(p => p.Name == DefaultTag) ?? _tags[0];
+                        _currentTag = Tags.FirstOrDefault(p => p.Name == DefaultTag) ?? Tags[0];
                     }
                     else
                     {
-                        _currentTag = _tags[0];
+                        _currentTag = Tags[0];
                     }
 
                     OnPropertyChanged(nameof(CurrentTag));
@@ -337,9 +328,7 @@ namespace Services.SI.ViewModel
             CurrentPackage = _filteredPackages?.FirstOrDefault();
         }
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

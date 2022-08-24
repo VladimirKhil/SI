@@ -1,5 +1,5 @@
-﻿using Microsoft.Win32;
-using Services.SI.ViewModel;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Win32;
 using SImulator.Implementation.ButtonManagers;
 using SImulator.Properties;
 using SImulator.ViewModel;
@@ -7,6 +7,7 @@ using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIPackages.Core;
+using SIStorageService.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
@@ -32,6 +33,8 @@ namespace SImulator.Implementation
     {
         private const int StreamCopyBufferSize = 81920;
         private const string GameSiteUri = "https://vladimirkhil.com";
+
+        public IServiceProvider ServiceProvider { get; set; }
 
         private Window _window = null;
         private PlayersWindow _playersWindow = null;
@@ -155,6 +158,7 @@ namespace SImulator.Implementation
         {
             var key2 = (Key)key;
             int code = -1;
+
             if (key2 >= Key.D1 && key2 <= Key.D9)
             {
                 code = key2 - Key.D1;
@@ -185,14 +189,12 @@ namespace SImulator.Implementation
             }
             else if (arg.ToString() == "1")
             {
-                var storage = new SIStorageNew
-                {
-                    CurrentRestriction = ((App)Application.Current).Settings.Restriction
-                };
+                var storage = ServiceProvider.GetRequiredService<SIStorage>();
+                storage.CurrentRestriction = ((App)Application.Current).Settings.Restriction;
 
                 storage.PropertyChanged += (s, e) =>
                 {
-                    if (e.PropertyName == nameof(SIStorageNew.CurrentRestriction))
+                    if (e.PropertyName == nameof(SIStorage.CurrentRestriction))
                     {
                         ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction;
                     }
@@ -211,10 +213,12 @@ namespace SImulator.Implementation
                     var package = packageStoreWindow.ShowDialog().Value ? storage.CurrentPackage : null;
 
                     if (package == null)
+                    {
                         return null;
+                    }
 
-                    var uri = await storage.LoadSelectedPackageUriAsync();
-                    return new SIStoragePackageSource(package, uri);
+                    var link = await storage.LoadSelectedPackageUriAsync();
+                    return new SIStoragePackageSource(package, link.Uri);
                 }
                 catch (Exception exc)
                 {
@@ -373,10 +377,8 @@ namespace SImulator.Implementation
                 // So we need to copy this file to disk
                 using (streamInfo.Stream)
                 {
-                    using (var fs = File.Create(fileName))
-                    {
-                        await streamInfo.Stream.CopyToAsync(fs, StreamCopyBufferSize, cancellationToken);
-                    }
+                    using var fs = File.Create(fileName);
+                    await streamInfo.Stream.CopyToAsync(fs, StreamCopyBufferSize, cancellationToken);
                 }
             }
             catch (IOException exc)

@@ -434,4 +434,19 @@ theme - тема Кота</value>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>
   </data>
+  <data name="FileSizeLimitExceed" xml:space="preserve">
+    <value>Размер файла превышает допустимое значение для игры через Игровой сервер ({0} байт)!</value>
+  </data>
+  <data name="HowToUseApp" xml:space="preserve">
+    <value>Как использовать программу</value>
+  </data>
+  <data name="AddQuestion" xml:space="preserve">
+    <value>Добавить вопрос</value>
+  </data>
+  <data name="AddRound" xml:space="preserve">
+    <value>Добавить раунд</value>
+  </data>
+  <data name="AddTheme" xml:space="preserve">
+    <value>Добавить тему</value>
+  </data>
 </root>

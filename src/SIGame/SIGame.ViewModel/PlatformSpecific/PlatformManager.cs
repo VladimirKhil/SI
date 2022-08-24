@@ -4,9 +4,11 @@ using System.Windows.Input;
 
 namespace SIGame.ViewModel.PlatformSpecific
 {
-    public abstract class PlatformManager: IUIThreadExecutor
+    public abstract class PlatformManager : IUIThreadExecutor
     {
         public static PlatformManager Instance;
+
+        public IServiceProvider ServiceProvider { get; set; }
 
         protected PlatformManager()
         {

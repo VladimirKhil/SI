@@ -101,7 +101,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public string Hint
         {
-            get { return _hint; }
+            get => _hint;
             set { if (_hint != value) { _hint = value; OnPropertyChanged(); } }
         }
 

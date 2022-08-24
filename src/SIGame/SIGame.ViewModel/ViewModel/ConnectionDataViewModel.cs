@@ -13,6 +13,8 @@ using SICore.Network;
 using SICore.Network.Configuration;
 using System.Diagnostics;
 using SIData;
+using SIStorageService.ViewModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SIGame.ViewModel
 {
@@ -56,12 +58,14 @@ namespace SIGame.ViewModel
 
             // Можно под кем-то подключиться
             var showman = persons.FirstOrDefault(p => p.Role == GameRole.Showman);
+
             if (showman != null && !showman.IsOnline)
             {
                 _join.ExecutionArea.Add(GameRole.Showman);
             }
 
             var players = persons.Where(p => p.Role == GameRole.Player);
+
             if (players.Any(p => !p.IsOnline))
             {
                 _join.ExecutionArea.Add(GameRole.Player);
@@ -144,7 +148,9 @@ namespace SIGame.ViewModel
         {
             _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
-            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, true)
+            var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>();
+
+            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage, true)
             {
                 Human = Human,
                 ChangeSettings = ChangeSettings

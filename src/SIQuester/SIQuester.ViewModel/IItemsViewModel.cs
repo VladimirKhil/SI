@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace SIQuester.ViewModel
 {
-    public interface IItemsViewModel: IList, INotifyPropertyChanged
+    public interface IItemsViewModel : IList, INotifyPropertyChanged
     {
         int CurrentPosition { get; }
 

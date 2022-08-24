@@ -7,13 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class ImportDBStorageViewModel: WorkspaceViewModel
+    public sealed class ImportDBStorageViewModel : WorkspaceViewModel
     {
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+
         public override string Header => Resources.DBStorage;
 
         private DBNode[] _tours = null;
@@ -52,7 +55,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                _tours = await LoadNodesAsync("SVOYAK");
+                _tours = await LoadNodesAsync("SVOYAK", _cancellationTokenSource.Token);
                 OnPropertyChanged(nameof(Tours));
             }
             catch (Exception exc)
@@ -77,32 +80,47 @@ namespace SIQuester.ViewModel
 
         public void Select(DBNode item)
         {
-            async Task<QDocument> loader()
+            async Task<QDocument> loader(CancellationToken cancellationToken)
             {
-                var siDoc = await SelectAsync(item);
+                var siDoc = await SelectAsync(item, cancellationToken);
                 return new QDocument(siDoc, _storageContextViewModel, _loggerFactory) { FileName = siDoc.Package.Name, Changed = true };
             };
 
             OnNewItem(new DocumentLoaderViewModel(item.Name, loader));
         }
 
-        internal async Task<SIDocument> SelectAsync(DBNode item)
+        protected override void Dispose(bool disposing)
         {
-            var doc = await Utils.GetXmlAsync(item.Key);
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+
+            base.Dispose(disposing);
+        }
+
+        internal static async Task<SIDocument> SelectAsync(DBNode item, CancellationToken cancellationToken)
+        {
+            var doc = await Utils.GetXmlAsync(item.Key, cancellationToken);
             var manager = new XmlNamespaceManager(doc.NameTable);
 
             var siDoc = SIDocument.Create(doc.SelectNodes(@"/tournament/Title", manager)[0].InnerText.GrowFirstLetter().ClearPoints(), Resources.EmptyValue);
             siDoc.Package.Info.Comments.Text += string.Format(Resources.DBStorageComment, doc["tournament"]["FileName"].InnerText);
             string s = doc["tournament"]["Info"].InnerText;
+            
             if (s.Length > 0)
                 siDoc.Package.Info.Comments.Text += string.Format("\r\nИнфо: {0}", s);
+
             s = doc["tournament"]["URL"].InnerText;
+
             if (s.Length > 0)
                 siDoc.Package.Info.Comments.Text += string.Format("\r\nURL: {0}", s);
+
             s = doc["tournament"]["PlayedAt"].InnerText;
+
             if (s.Length > 0)
                 siDoc.Package.Info.Comments.Text += string.Format("\r\nИграно: {0}", s);
+
             s = doc["tournament"]["Editors"].InnerText;
+
             if (s.Length > 0)
                 siDoc.Package.Info.Authors[0] = $"{Resources.Editors}: {s}";
 
@@ -117,6 +135,7 @@ namespace SIQuester.ViewModel
                 var sour = node2["Sources"].InnerText.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 int i = 0, j = 0;
                 var themeName = new StringBuilder();
+
                 while (i < text.Length && !(text[i].Length > 3 && text[i].Substring(0, 3) == "   "))
                 {
                     if (themeName.Length > 0)
@@ -316,7 +335,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                node.Children = await LoadNodesAsync(node.Key);
+                node.Children = await LoadNodesAsync(node.Key, _cancellationTokenSource.Token);
             }
             catch (Exception exc)
             {
@@ -333,9 +352,9 @@ namespace SIQuester.ViewModel
             }
         }
 
-        internal static async Task<DBNode[]> LoadNodesAsync(string filename)
+        internal static async Task<DBNode[]> LoadNodesAsync(string filename, CancellationToken cancellationToken)
         {
-            var xmlDocument = await Utils.GetXmlAsync(filename);
+            var xmlDocument = await Utils.GetXmlAsync(filename, cancellationToken);
 
             var manager = new XmlNamespaceManager(xmlDocument.NameTable);
             var nodeList = xmlDocument.SelectNodes(@"/tournament/tour", manager);

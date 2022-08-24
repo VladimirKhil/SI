@@ -11,13 +11,13 @@ namespace SIStorageService.Client
     public sealed class SIStorageServiceClient : ISIStorageServiceClient
     {
         private static readonly JsonSerializer Serializer = new();
-        private static readonly HttpClient Client = new();
+        private readonly HttpClient _client;
 
         private readonly string _serverUri;
 
-        public SIStorageServiceClient(string serverUri = "https://vladimirkhil.com/api/si")
+        public SIStorageServiceClient(HttpClient client)
         {
-            _serverUri = serverUri;
+            _client = client;
         }
 
         public Task<Package[]> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
@@ -151,11 +151,11 @@ namespace SIStorageService.Client
             return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}", cancellationToken);
         }
 
-        private async Task<T> GetAsync<T>(string request, CancellationToken cancellationToken = default)
+        private async Task<T?> GetAsync<T>(string request, CancellationToken cancellationToken = default)
         {
             try
             {
-                using var responseMessage = await Client.GetAsync($"{_serverUri}/{request}", cancellationToken);
+                using var responseMessage = await _client.GetAsync(request, cancellationToken);
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
@@ -167,7 +167,7 @@ namespace SIStorageService.Client
                 using var responseStream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
                 using var reader = new StreamReader(responseStream);
 
-                return (T)Serializer.Deserialize(reader, typeof(T));
+                return (T?)Serializer.Deserialize(reader, typeof(T));
             }
             catch (SocketException exc)
             {

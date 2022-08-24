@@ -60,14 +60,19 @@ namespace SIQuester
         private void NumericTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             var textBox = (TextBox)sender;
+
             try
             {
                 if (!int.TryParse(textBox.Text, out int value))
                 {
                     if (0 >= Minimum && 0 <= Maximum)
+                    {
                         textBox.Text = "0";
+                    }
                     else
+                    {
                         textBox.Text = Minimum.ToString();
+                    }
 
                     return;
                 }
@@ -83,6 +88,7 @@ namespace SIQuester
                 else
                 {
                     var rem = (value - Minimum) % Step;
+
                     if (rem > 0)
                     {
                         textBox.Text = (value - rem).ToString();
@@ -105,18 +111,21 @@ namespace SIQuester
                 }
 
                 var futureText = new StringBuilder();
+
                 if (SelectionStart > 0)
                 {
                     futureText.Append(Text.AsSpan(0, SelectionStart));
                 }
 
                 futureText.Append(e.Text);
+
                 if (SelectionStart + SelectionLength < Text.Length)
                 {
                     futureText.Append(Text.AsSpan(SelectionStart + SelectionLength));
                 }
 
                 var fText = futureText.ToString();
+
                 if (!int.TryParse(fText, out int futureValue) || futureValue > Maximum)
                 {
                     e.Handled = true;
@@ -137,6 +146,7 @@ namespace SIQuester
         private void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
             var clipboard = (string)e.DataObject.GetData(typeof(string));
+
             try
             {
                 if (!int.TryParse(clipboard, out int res))

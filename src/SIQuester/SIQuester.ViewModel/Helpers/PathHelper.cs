@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 
 namespace SIQuester.ViewModel.Helpers
 {
@@ -11,7 +12,7 @@ namespace SIQuester.ViewModel.Helpers
     internal static class PathHelper
     {
         /// <summary>
-        /// Encodes path a valid file name.
+        /// Encodes path as a valid file name.
         /// </summary>
         /// <param name="path">Path to encode.</param>
         /// <returns>Encoded file name.</returns>
@@ -69,5 +70,11 @@ namespace SIQuester.ViewModel.Helpers
 
             return result.ToString();
         }
+
+        /// <summary>
+        /// Removes invalid file name characters from file name.
+        /// </summary>
+        /// <param name="filename">File name to process.</param>
+        internal static string RemoveInvalidFileNameChars(string filename) => string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
     }
 }

@@ -10,13 +10,15 @@ namespace SIPackages.PlatformSpecific.Net45
 {
     internal sealed class FolderSIPackage : ISIPackage
     {
-        private string _folder;
+        private readonly string _folder;
+
+        public FolderSIPackage(string folder) => _folder = folder;
 
         public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-        internal static ISIPackage Create(string folder) => new FolderSIPackage { _folder = folder };
+        internal static ISIPackage Create(string folder) => new FolderSIPackage(folder);
 
-        internal static ISIPackage Open(string folder) => new FolderSIPackage { _folder = folder };
+        internal static ISIPackage Open(string folder) => new FolderSIPackage(folder);
 
         public void CreateStream(string name, string contentType)
         {

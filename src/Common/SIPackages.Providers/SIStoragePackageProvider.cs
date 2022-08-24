@@ -20,9 +20,9 @@ namespace SIPackages.Providers
         private readonly string _storageOriginsPath;
         private readonly string _storageUrl;
 
-        public SIStoragePackageProvider(string serverAddress, string storageOriginsPath, string storageUrl)
+        public SIStoragePackageProvider(ISIStorageServiceClient siStorageServiceClient, string storageOriginsPath, string storageUrl)
         {
-            _siStorageServiceClient = new SIStorageServiceClient(serverAddress);
+            _siStorageServiceClient = siStorageServiceClient;
             _storageOriginsPath = storageOriginsPath;
             _storageUrl = storageUrl;
         }
@@ -30,6 +30,7 @@ namespace SIPackages.Providers
         public void Dispose()
         {
             var exceptionsList = new List<Exception>();
+
             foreach (var file in _downloadedFiles)
             {
                 try

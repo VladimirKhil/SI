@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SI.GameResultService.Client;
@@ -10,6 +11,8 @@ using SICore.PlatformSpecific;
 using SIGame.Contracts;
 using SIGame.Implementation;
 using SIGame.ViewModel;
+using SIStorageService.Client;
+using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -38,11 +41,13 @@ namespace SIGame
     {
         private IHost _host;
         private IConfiguration _configuration;
+        private ILogger<App> _logger;
 
 #pragma warning disable IDE0052
-        private readonly DesktopCoreManager _coreManager = new DesktopCoreManager();
+        private readonly DesktopCoreManager _coreManager = new();
 #pragma warning restore IDE0052
-        private readonly DesktopManager _manager = new DesktopManager();
+
+        private readonly DesktopManager _manager = new();
 
         private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
 
@@ -79,6 +84,7 @@ namespace SIGame
             await _host.StartAsync();
 
             _manager.ServiceProvider = _host.Services;
+            _logger = _host.Services.GetRequiredService<ILogger<App>>();
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -86,6 +92,9 @@ namespace SIGame
             services.AddAppServiceClient(_configuration);
             services.AddSIGameServerClient(_configuration);
             services.AddGameResultServiceClient(_configuration);
+            services.AddSIStorageServiceClient(_configuration);
+
+            services.AddTransient(typeof(SIStorage));
 
             services.AddSingleton<IUIThreadExecutor>(_manager);
             services.AddTransient<IErrorManager, ErrorManager>();
@@ -139,6 +148,7 @@ namespace SIGame
                 if (Environment.OSVersion.Version < new Version(10, 0))
                 {
                     ServicePointManager.Expect100Continue = true;
+
                     try
                     {
                         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
@@ -206,7 +216,7 @@ namespace SIGame
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
-            Trace.TraceError($"Common game error: {e.ExceptionObject}");
+            _logger.LogError("Common game error: {error}", e.ExceptionObject);
 
         private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -225,6 +235,7 @@ namespace SIGame
             try
             {
                 var updateInfo = await SearchForUpdatesAsync();
+
                 if (updateInfo != null)
                 {
                     SearchForUpdatesFinished(updateInfo);
@@ -232,7 +243,13 @@ namespace SIGame
             }
             catch (Exception exc)
             {
-                MessageBox.Show(string.Format(SIGame.Properties.Resources.UpdateException, exc.Message), ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+                _logger.LogError(exc, "Update error: {error}", exc.Message);
+
+                MessageBox.Show(
+                    string.Format(SIGame.Properties.Resources.UpdateException, exc.Message),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 
@@ -326,6 +343,7 @@ namespace SIGame
         private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             var inner = e.Exception;
+
             while (inner.InnerException != null)
             {
                 inner = inner.InnerException;
@@ -460,6 +478,7 @@ namespace SIGame
             try
             {
                 var commonSettingsFile = Path.Combine(SettingsFolder, CommonConfigFileName);
+
                 if (File.Exists(commonSettingsFile) && Monitor.TryEnter(CommonConfigFileName, 2000))
                 {
                     try
@@ -482,6 +501,7 @@ namespace SIGame
                 }
 
                 using var file = IsolatedStorageFile.GetMachineStoreForAssembly();
+
                 if (file.FileExists(CommonConfigFileName) && Monitor.TryEnter(CommonConfigFileName, 2000))
                 {
                     try
@@ -505,6 +525,7 @@ namespace SIGame
                 else
                 {
                     var oldSettings = CommonSettings.LoadOld(CommonConfigFileName);
+
                     if (oldSettings != null)
                     {
                         return oldSettings;
@@ -558,6 +579,7 @@ namespace SIGame
             try
             {
                 var userSettingsFile = Path.Combine(SettingsFolder, UserConfigFileName);
+
                 if (File.Exists(userSettingsFile) && Monitor.TryEnter(UserConfigFileName, 2000))
                 {
                     try
@@ -580,6 +602,7 @@ namespace SIGame
                 }
 
                 using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+
                 if (file.FileExists(UserConfigFileName) && Monitor.TryEnter(UserConfigFileName, 2000))
                 {
                     try
@@ -604,6 +627,7 @@ namespace SIGame
                 else
                 {
                     var oldSettings = UserSettings.LoadOld(UserConfigFileName);
+
                     if (oldSettings != null)
                     {
                         return oldSettings;

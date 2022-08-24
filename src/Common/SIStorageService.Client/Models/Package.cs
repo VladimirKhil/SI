@@ -1,7 +1,7 @@
 ﻿namespace SIStorageService.Client.Models
 {
     /// <summary>
-    /// Пакет СИ
+    /// Defines package info.
     /// </summary>
     public sealed class Package
     {

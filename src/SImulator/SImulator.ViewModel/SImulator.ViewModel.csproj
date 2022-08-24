@@ -43,5 +43,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="..\..\Common\SIService.ViewModel\SIService.ViewModel.projitems" Label="Shared" />
 </Project>

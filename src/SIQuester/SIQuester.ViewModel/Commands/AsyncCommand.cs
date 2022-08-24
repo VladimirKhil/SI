@@ -14,12 +14,13 @@ namespace SIQuester.ViewModel.Commands
 
         public bool CanBeExecuted
         {
-            get { return _canBeExecuted; }
+            get => _canBeExecuted;
             set
             {
                 if (_canBeExecuted != value)
                 {
                     _canBeExecuted = value;
+
                     if (CanExecuteChanged != null)
                     {
                         if (SynchronizationContext.Current == null)
@@ -46,6 +47,7 @@ namespace SIQuester.ViewModel.Commands
 
         public bool CanExecute(object parameter) => _canBeExecuted;
 
+        [Obsolete("Use ExecuteAsync instead")]
         public async void Execute(object parameter) => await _execute(parameter); // TODO: throw NotSupported because `async void` is a bad practice
 
         public Task ExecuteAsync(object parameter) => _execute(parameter);

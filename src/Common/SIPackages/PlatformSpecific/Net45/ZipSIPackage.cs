@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace SIPackages.PlatformSpecific.Net45
 {
-    // TODO: Remove legacy [Content_Types].xml (and all content types support) generation
     // TODO: Keep Uri.EscapeUriString only for backward compatibility; use original names in zip archive
 
     /// <summary>

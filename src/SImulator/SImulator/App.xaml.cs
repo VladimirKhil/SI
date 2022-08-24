@@ -7,7 +7,9 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
+using SIStorageService.Client;
 using SIStorageService.Client.Models;
+using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -70,6 +72,8 @@ namespace SImulator
 
             await _host.StartAsync();
 
+            _manager.ServiceProvider = _host.Services;
+
             var options = _configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
             var appServiceClientOptions = options.Get<AppServiceClientOptions>();
 
@@ -79,6 +83,9 @@ namespace SImulator
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddAppServiceClient(_configuration);
+            services.AddSIStorageServiceClient(_configuration);
+
+            services.AddTransient(typeof(SIStorage));
 
             services.AddTransient<CommandWindow>();
         }

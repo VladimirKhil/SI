@@ -10,11 +10,13 @@ using NLog.Web;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIStorageService.Client;
+using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -24,7 +26,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
-using System.Net;
 #if !DEBUG
 using Microsoft.WindowsAPICodePack.Dialogs;
 #endif
@@ -77,17 +78,6 @@ namespace SIQuester
                 AppSettings.Default.SpellChecking = false;
             }
 
-            if (e.Args.Length > 0)
-            {
-                if (e.Args[0] == "backup")
-                {
-                    // Бэкап хранилища вопросов
-                    var folder = e.Args[1];
-                    Backup(folder);
-                    return;
-                }
-            }
-
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             _host = new HostBuilder()
@@ -120,6 +110,17 @@ namespace SIQuester
             var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
             _useAppService = appServiceClientOptions.ServiceUri != null;
 
+            if (e.Args.Length > 0)
+            {
+                if (e.Args[0] == "backup")
+                {
+                    // Бэкап хранилища вопросов
+                    var folder = e.Args[1];
+                    Backup(folder);
+                    return;
+                }
+            }
+
 #if !DEBUG
             if (AppSettings.Default.SearchForUpdates)
             {
@@ -139,9 +140,10 @@ namespace SIQuester
 
             try
             {
+                var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
                 var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-                MainWindow = new MainWindow { DataContext = new MainViewModel(e.Args, loggerFactory) };
+                MainWindow = new MainWindow { DataContext = new MainViewModel(e.Args, siStorageClient, loggerFactory) };
                 MainWindow.Show();
             }
             catch (Exception exc)
@@ -154,6 +156,9 @@ namespace SIQuester
         private void ConfigureServices(IServiceCollection services)
         {
             services.AddAppServiceClient(_configuration);
+            services.AddSIStorageServiceClient(_configuration);
+
+            services.AddTransient(typeof(SIStorage));
 
             services.AddTransient(typeof(MainWindow));
 
@@ -164,7 +169,7 @@ namespace SIQuester
         /// Backups SIStorage to folder. This method is called from the console.
         /// </summary>
         /// <param name="folder">Folder to backup.</param>
-        private static async void Backup(string folder)
+        private async void Backup(string folder)
         {
             int code = 0;
 
@@ -177,13 +182,13 @@ namespace SIQuester
                     directoryInfo.Create();
                 }
 
-                ISIStorageServiceClient service = new SIStorageServiceClient();
-                var packages = await service.GetPackagesAsync();
+                var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
+                var packages = await siStorageClient.GetPackagesAsync();
                 using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
 
                 foreach (var package in packages)
                 {
-                    var link = await service.GetPackageByGuid2Async(package.Guid);
+                    var link = await siStorageClient.GetPackageByGuid2Async(package.Guid);
                     var fileName = Path.GetFileName(link.Name);
 
                     var targetFile = Path.Combine(folder, fileName);
@@ -312,7 +317,7 @@ namespace SIQuester
 
             _hasError = true;
 
-            _logger.LogError(e.Exception, "Application error: {message}", e.Exception.Message);
+            _logger?.LogError(e.Exception, "Application error: {message}", e.Exception.Message);
 
             if (e.Exception is OutOfMemoryException)
             {

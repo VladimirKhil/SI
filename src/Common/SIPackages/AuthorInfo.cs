@@ -1,4 +1,5 @@
 ﻿using SIPackages.Core;
+using System;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace SIPackages
     /// Defines a package object author info.
     /// </summary>
     [DataContract]
+    [Serializable]
     public sealed class AuthorInfo : IdOwner
     {
         private string? _name;

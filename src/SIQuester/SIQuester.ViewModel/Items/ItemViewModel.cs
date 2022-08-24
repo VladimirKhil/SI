@@ -6,29 +6,46 @@ using System.Windows.Input;
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Элемент пакета
+    /// Defines a package item view model.
     /// </summary>
     public abstract class ItemViewModel<T> : ModelViewBase, IItemViewModel
         where T: InfoOwner
     {
         private bool _isExpanded;
 
+        /// <summary>
+        /// If item tree node is expanded.
+        /// </summary>
         public bool IsExpanded
         {
-            get { return _isExpanded; }
+            get => _isExpanded;
             set { if (_isExpanded != value) { _isExpanded = value; OnPropertyChanged(); } }
         }
 
         private bool _isSelected;
 
+        /// <summary>
+        /// If item is selected.
+        /// </summary>
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
         }
 
+        /// <summary>
+        /// Add command caption.
+        /// </summary>
+        public virtual string AddHeader { get; } = "";
+
+        /// <summary>
+        /// Item model.
+        /// </summary>
         public T Model { get; }
 
+        /// <summary>
+        /// Item common info view model.
+        /// </summary>
         public InfoViewModel Info { get; private set; }
 
         public SimpleCommand AddAuthors { get; private set; }
@@ -40,6 +57,12 @@ namespace SIQuester.ViewModel
         public ICommand SetCosts { get; private set; }
 
         public InfoOwner GetModel() => Model;
+
+        public abstract IItemViewModel Owner { get; }
+
+        public abstract ICommand Add { get; protected set; }
+
+        public abstract ICommand Remove { get; protected set; }
 
         protected ItemViewModel(T model)
         {
@@ -72,11 +95,6 @@ namespace SIQuester.ViewModel
             AddAuthors.CanBeExecuted = Info.Authors.Count == 0;
         }
 
-        public abstract IItemViewModel Owner { get; }
-
-        public abstract ICommand Add { get; protected set; }
-        public abstract ICommand Remove { get; protected set; }
-
         private void AddAuthors_Executed(object arg)
         {
             QDocument.ActivatedObject = Info.Authors;
@@ -95,10 +113,7 @@ namespace SIQuester.ViewModel
             Info.Comments.Text = Resources.Comment;
         }
 
-        private void SetCosts_Executed(object arg)
-        {
-            UpdateCosts((CostSetter)arg);
-        }
+        private void SetCosts_Executed(object arg) => UpdateCosts((CostSetter)arg);
 
         protected virtual void UpdateCosts(CostSetter costSetter)
         {

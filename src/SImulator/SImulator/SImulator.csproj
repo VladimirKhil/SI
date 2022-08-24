@@ -60,6 +60,7 @@
     <ProjectReference Include="..\..\Common\AppService.Client\AppService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
+    <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
     <ProjectReference Include="..\SImulator.ViewModel\SImulator.ViewModel.csproj" />

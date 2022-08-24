@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel.Helpers
 {
     internal static class BindHelper
     {
@@ -11,33 +12,33 @@ namespace SIQuester.ViewModel
                 {
                     switch (e.Action)
                     {
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                        case NotifyCollectionChangedAction.Add:
                             for (int i = 0; i < e.NewItems.Count; i++)
                             {
                                 target.Insert(e.NewStartingIndex + i, (T)e.NewItems[i]);
                             }
                             break;
 
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                        case NotifyCollectionChangedAction.Move:
                             target[e.NewStartingIndex] = collection[e.NewStartingIndex];
                             target[e.OldStartingIndex] = collection[e.OldStartingIndex];
                             break;
 
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                        case NotifyCollectionChangedAction.Remove:
                             for (int i = 0; i < e.OldItems.Count; i++)
                             {
                                 target.RemoveAt(e.OldStartingIndex);
                             }
                             break;
 
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                        case NotifyCollectionChangedAction.Replace:
                             for (int i = 0; i < e.NewItems.Count; i++)
                             {
                                 target[e.NewStartingIndex + i] = (T)e.NewItems[i];
                             }
                             break;
 
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                        case NotifyCollectionChangedAction.Reset:
                             target.Clear();
                             foreach (var item in collection)
                             {

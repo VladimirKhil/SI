@@ -8,9 +8,13 @@ namespace SIQuester.Selectors
     public sealed class QuestionTypeParamTemplateSelector : DataTemplateSelector
     {
         public DataTemplate BaseTemplate { get; set; }
+
         public DataTemplate CatThemeTemplate { get; set; }
+
         public DataTemplate CatCostTemplate { get; set; }
+
         public DataTemplate BagCatSelfTemplate { get; set; }
+
         public DataTemplate BagCatKnowsTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)

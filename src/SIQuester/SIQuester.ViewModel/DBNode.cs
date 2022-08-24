@@ -3,23 +3,39 @@ using System.Runtime.CompilerServices;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class DBNode: INotifyPropertyChanged
+    /// <summary>
+    /// Represents a questions database node.
+    /// </summary>
+    public sealed class DBNode : INotifyPropertyChanged
     {
         public string Name { get; set; }
+
         public string Key { get; set; }
 
         private DBNode[] _children;
 
         public DBNode[] Children
         {
-            get
-            {
-                return _children;
-            }
+            get => _children;
             set
             {
                 _children = value;
                 OnPropertyChanged();
+            }
+        }
+
+        private bool _isExpanded = false;
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -29,20 +45,5 @@ namespace SIQuester.ViewModel
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private bool isExpanded = false;
-
-        public bool IsExpanded
-        {
-            get { return isExpanded; }
-            set
-            {
-                if (isExpanded != value)
-                {
-                    isExpanded = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
     }
 }

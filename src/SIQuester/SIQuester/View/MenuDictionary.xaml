@@ -166,7 +166,17 @@
                     </DockPanel>
                 </Button>                
             </DockPanel>
-            <Popup x:Name="PART_Popup" AllowsTransparency="true" HorizontalOffset="-17" VerticalOffset="23" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" Focusable="false">
+            
+            <Popup
+                x:Name="PART_Popup"
+                AllowsTransparency="true"
+                HorizontalOffset="-17"
+                VerticalOffset="23"
+                IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                Placement="Right"
+                PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
+                Focusable="false">
+                
                 <Microsoft_Windows_Themes:SystemDropShadowChrome x:Name="Shdw" Color="Transparent">
                     <ContentControl x:Name="SubMenuBorder" IsTabStop="false" Template="{DynamicResource {ComponentResourceKey ResourceId=SubmenuContent, TypeInTargetAssembly={x:Type FrameworkElement}}}">
                         <ScrollViewer Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}" CanContentScroll="true">

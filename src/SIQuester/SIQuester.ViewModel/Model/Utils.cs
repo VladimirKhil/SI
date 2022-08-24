@@ -1,7 +1,7 @@
-﻿using SIQuester.Model;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -12,24 +12,25 @@ namespace SIQuester
     /// </summary>
     internal static class Utils
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
         /// <summary>
         /// Получить XML из Базы
         /// </summary>
         /// <param name="name">Имя турнира в Базе</param>
         /// <returns>Скачанный XML</returns>
-        internal static async Task<XmlDocument> GetXmlAsync(string name)
+        internal static async Task<XmlDocument> GetXmlAsync(string name, CancellationToken cancellationToken)
         {
-            using var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml");
+            using var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml", cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception(await response.Content.ReadAsStringAsync());
+                throw new Exception(await response.Content.ReadAsStringAsync(cancellationToken));
             }
 
             var xmlDocument = new XmlDocument();
-            using (var stream = await response.Content.ReadAsStreamAsync())
+
+            using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
             {
                 xmlDocument.Load(stream);
             }

@@ -7,13 +7,7 @@ namespace SIQuester.ViewModel
     {
         internal PackageViewModel Owner { get; private set; }
 
-        public override QDocument OwnerDocument
-        {
-            get
-            {
-                return Owner.Document;
-            }
-        }
+        public override QDocument OwnerDocument => Owner.Document;
 
         public ICommand AddTag { get; private set; }
 
@@ -30,10 +24,15 @@ namespace SIQuester.ViewModel
         private void AddTag_Executed(object arg)
         {
             var index = CurrentPosition;
+
             if (string.IsNullOrWhiteSpace(this[index]))
+            {
                 this[index] = arg.ToString();
+            }
             else
+            {
                 Add(arg.ToString());
+            }
         }
     }
 }

@@ -3,16 +3,17 @@
 namespace SIQuester.Model
 {
     /// <summary>
-    /// Результат поиска
+    /// Represents a search match inside a file.
     /// </summary>
     public sealed class SearchResult
     {
         /// <summary>
-        /// Имя файла
+        /// File name.
         /// </summary>
         public string FileName { get; set; }
+
         /// <summary>
-        /// Найденный фрагмент из трёх частей (до совпадения, совпадение, после совпадения)
+        /// Found fragment with highlighted area.
         /// </summary>
         public SearchMatch Fragment { get; set; }
     }

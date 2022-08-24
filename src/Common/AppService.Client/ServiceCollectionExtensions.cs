@@ -23,6 +23,7 @@ namespace AppService.Client
             services.Configure<AppServiceClientOptions>(optionsSection);
 
             var options = optionsSection.Get<AppServiceClientOptions>();
+
             if (options?.ServiceUri != null)
             {
                 services.AddHttpClient<IAppServiceClient, AppServiceClient>(

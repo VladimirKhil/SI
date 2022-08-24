@@ -56,7 +56,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool SearchForUpdates
         {
-            get { return _searchForUpdates; }
+            get => _searchForUpdates;
             set
             {
                 if (_searchForUpdates != value)
@@ -72,7 +72,7 @@ namespace SIQuester.Model
         [DefaultValue(false)]
         public bool AutomaticTextImport
         {
-            get { return _automaticTextImport; }
+            get => _automaticTextImport;
             set
             {
                 if (_automaticTextImport != value)
@@ -88,7 +88,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool ChangePriceOnMove
         {
-            get { return _changePriceOnMove; }
+            get => _changePriceOnMove;
             set
             {
                 if (_changePriceOnMove != value)
@@ -104,7 +104,7 @@ namespace SIQuester.Model
         [DefaultValue(false)]
         public bool CreateQuestionsWithTheme
         {
-            get { return _createQuestionsWithTheme; }
+            get => _createQuestionsWithTheme;
             set
             {
                 if (_createQuestionsWithTheme != value)
@@ -120,7 +120,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool IsFirstRun
         {
-            get { return _isFirstRun; }
+            get => _isFirstRun;
             set
             {
                 if (_isFirstRun != value)
@@ -136,7 +136,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool ShowToolTips
         {
-            get { return _showToolTips; }
+            get => _showToolTips;
             set
             {
                 if (_showToolTips != value)
@@ -149,10 +149,13 @@ namespace SIQuester.Model
 
         private int _questionBase = 100;
 
+        /// <summary>
+        /// Basic question price.
+        /// </summary>
         [DefaultValue(100)]
         public int QuestionBase
         {
-            get { return _questionBase; }
+            get => _questionBase;
             set
             {
                 if (_questionBase != value)
@@ -168,7 +171,7 @@ namespace SIQuester.Model
         [DefaultValue(true)]
         public bool AutoSave
         {
-            get { return _autoSave; }
+            get => _autoSave;
             set
             {
                 if (_autoSave != value)
@@ -232,7 +235,7 @@ namespace SIQuester.Model
 
         public CostSetterList CostSetters
         {
-            get { return _costSetters; }
+            get => _costSetters;
             set
             {
                 if (_costSetters != value)
@@ -245,6 +248,9 @@ namespace SIQuester.Model
 
         private ViewMode _view = ViewMode.TreeFull;
 
+        /// <summary>
+        /// Document view mode.
+        /// </summary>
         [DefaultValue(ViewMode.TreeFull)]
         public ViewMode View
         {
@@ -254,6 +260,25 @@ namespace SIQuester.Model
                 if (_view != value)
                 {
                     _view = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private FlatLayoutMode _flatLayoutMode = FlatLayoutMode.Table;
+
+        /// <summary>
+        /// Layout mode in flat view.
+        /// </summary>
+        [DefaultValue(FlatLayoutMode.Table)]
+        public FlatLayoutMode FlatLayoutMode
+        {
+            get => _flatLayoutMode;
+            set
+            {
+                if (_flatLayoutMode != value)
+                {
+                    _flatLayoutMode = value;
                     OnPropertyChanged();
                 }
             }
@@ -312,7 +337,7 @@ namespace SIQuester.Model
         [DefaultValue(false)]
         public bool AlightAnswersRight
         {
-            get { return _alightAnswersRight; }
+            get => _alightAnswersRight;
             set
             {
                 if (_alightAnswersRight != value)
@@ -344,7 +369,7 @@ namespace SIQuester.Model
         [DefaultValue(15)]
         public int FontSize
         {
-            get { return _fontSize; }
+            get => _fontSize;
             set
             {
                 if (_fontSize != value)
@@ -374,17 +399,36 @@ namespace SIQuester.Model
         private bool _removeLinks = true;
 
         /// <summary>
-        /// Удалять медиа после удаления последней ссылки
+        /// Remove media file after the removal of last link to it.
         /// </summary>
         [DefaultValue(true)]
         public bool RemoveLinks
         {
-            get { return _removeLinks; }
+            get => _removeLinks;
             set
             {
                 if (_removeLinks != value)
                 {
                     _removeLinks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _checkFileSize = true;
+
+        /// <summary>
+        /// Enables check that file size is greater than the default game server limit (100 MB).
+        /// </summary>
+        [DefaultValue(true)]
+        public bool CheckFileSize
+        {
+            get => _checkFileSize;
+            set
+            {
+                if (_checkFileSize != value)
+                {
+                    _checkFileSize = value;
                     OnPropertyChanged();
                 }
             }
@@ -429,10 +473,8 @@ namespace SIQuester.Model
             serializer.Serialize(stream, this);
         }
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -447,6 +489,7 @@ namespace SIQuester.Model
             ChangePriceOnMove = defaultSettings.ChangePriceOnMove;
 
             _costSetters.Clear();
+
             foreach (var item in defaultSettings.CostSetters)
             {
                 _costSetters.Add(item);
@@ -458,7 +501,9 @@ namespace SIQuester.Model
             QuestionBase = defaultSettings.QuestionBase;
             SearchForUpdates = defaultSettings.SearchForUpdates;
             RemoveLinks = defaultSettings.RemoveLinks;
+            CheckFileSize = defaultSettings.CheckFileSize;
             _flatScale = defaultSettings._flatScale;
+            FlatLayoutMode = defaultSettings.FlatLayoutMode;
         }
     }
 }

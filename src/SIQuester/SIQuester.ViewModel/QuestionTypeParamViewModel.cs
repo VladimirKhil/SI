@@ -10,6 +10,7 @@ namespace SIQuester.ViewModel
         public QuestionTypeViewModel Owner { get; internal set; }
 
         public ICommand AddQuestionTypeParam => Owner?.AddQuestionTypeParam;
+
         public SimpleCommand RemoveQuestionTypeParam { get; private set; }
 
         public QuestionTypeParamViewModel(QuestionTypeParam item)

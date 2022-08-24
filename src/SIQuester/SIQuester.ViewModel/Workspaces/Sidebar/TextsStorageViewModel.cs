@@ -1,9 +1,11 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
 
@@ -34,7 +36,7 @@ namespace SIQuester.ViewModel
 
         public int CurrentIndex
         {
-            get { return _currentIndex; }
+            get => _currentIndex;
             set
             {
                 if (!Equals(_currentIndex, value))
@@ -44,10 +46,13 @@ namespace SIQuester.ViewModel
                 }
             }
         }
-        
+
         public SimpleCommand MoveUp { get; private set; }
+
         public SimpleCommand MoveDown { get; private set; }
+
         public ICommand Add { get; private set; }
+
         public SimpleCommand Remove { get; private set; }       
 
         protected TextsStorageViewModel(string title, IList<T> sourceList)
@@ -73,7 +78,7 @@ namespace SIQuester.ViewModel
             CheckCommands();
         }
 
-        private void Collection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) =>
+        private void Collection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
             OnChanged(new CollectionChange { Collection = (IList)sender, Args = e });
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)

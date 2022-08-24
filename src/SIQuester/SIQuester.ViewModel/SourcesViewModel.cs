@@ -2,7 +2,7 @@
 
 namespace SIQuester.ViewModel
 {
-    public sealed class SourcesViewModel: LinksViewModel
+    public sealed class SourcesViewModel : LinksViewModel
     {
         public Sources Model { get; private set; }
 

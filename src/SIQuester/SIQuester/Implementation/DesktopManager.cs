@@ -39,7 +39,14 @@ namespace SIQuester.Implementation
 
         public override string[] ShowOpenUI()
         {
-            var openDialog = new OpenFileDialog { Title = "Открыть пакет", FileName = "", DefaultExt = "siq", Filter = "Вопросы СИ|*.siq", Multiselect = true };
+            var openDialog = new OpenFileDialog
+            {
+                Title = "Открыть пакет",
+                FileName = "",
+                DefaultExt = "siq",
+                Filter = "Вопросы СИ|*.siq",
+                Multiselect = true
+            };
 
             bool result = openDialog.ShowDialog().Value;
             return result ? openDialog.FileNames : null;
@@ -64,7 +71,13 @@ namespace SIQuester.Implementation
             return ShowSaveUICore(title, defaultExtension, filter, ref filename, ref filterIndex, null);
         }
 
-        public override bool ShowExportUI(string title, Dictionary<string, string> filter, ref string filename, ref int filterIndex, out Encoding encoding, out bool start)
+        public override bool ShowExportUI(
+            string title,
+            Dictionary<string, string> filter,
+            ref string filename,
+            ref int filterIndex,
+            out Encoding encoding,
+            out bool start)
         {
             var checkBox = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogCheckBox("Открыть файл после сохранения", false);
 
@@ -75,6 +88,7 @@ namespace SIQuester.Implementation
             foreach (var enc in encodings)
             {
                 comboBox.Items.Add(new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogComboBoxItem(enc.DisplayName));
+                
                 if (enc.Name == "utf-8")
                 {
                     comboBox.SelectedIndex = comboBox.Items.Count - 1;
@@ -89,6 +103,7 @@ namespace SIQuester.Implementation
             var result = ShowSaveUICore(title, null, filter, ref filename, ref filterIndex, handler, checkBox, comboBoxTitle, comboBox);
 
             encoding = Encoding.UTF8;
+
             if (result)
             {
                 if (comboBox.SelectedIndex > -1 && comboBox.SelectedIndex < comboBox.Items.Count)
@@ -193,6 +208,7 @@ namespace SIQuester.Implementation
                 }
 
                 bool result = saveDialog.ShowDialog().Value;
+
                 if (result)
                 {
                     filename = saveDialog.FileName;
@@ -249,6 +265,7 @@ namespace SIQuester.Implementation
             }
 
             var stream = media.GetStream();
+
             if (stream == null)
             {
                 return null;

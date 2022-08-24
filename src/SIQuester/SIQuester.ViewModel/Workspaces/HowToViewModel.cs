@@ -1,15 +1,16 @@
 ﻿using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class HowToViewModel: WorkspaceViewModel
+    public sealed class HowToViewModel : WorkspaceViewModel
     {
-        public override string Header => "Как использовать программу";
+        public override string Header => Resources.HowToUseApp;
 
         private readonly IXpsDocumentWrapper _documentWrapper;
 
-        public object Document { get { return _documentWrapper.GetDocument(); } }
+        public object Document => _documentWrapper.GetDocument();
 
         public HowToViewModel()
         {
@@ -19,6 +20,7 @@ namespace SIQuester.ViewModel
         protected override async Task Close_Executed(object arg)
         {
             _documentWrapper.Dispose();
+
             await base.Close_Executed(arg);
         }
     }

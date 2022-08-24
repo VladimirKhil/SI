@@ -33,6 +33,22 @@ namespace SIQuester.ViewModel
     /// </summary>
     public sealed class QDocument : WorkspaceViewModel
     {
+        private const int MaxUndoListCount = 100;
+
+        private const string ClipboardKey = "siqdata";
+
+        private const string SIExtension = "siq";
+
+        /// <summary>
+        /// Maximum file size allowed by game server.
+        /// </summary>
+        private const int GameServerFileSizeLimit = 100 * 1024 * 1024;
+
+        /// <summary>
+        /// Созданный объект
+        /// </summary>
+        public static object ActivatedObject { get; set; }
+
         /// <summary>
         /// Overriden file path which will be used for file saving.
         /// </summary>
@@ -42,26 +58,24 @@ namespace SIQuester.ViewModel
 
         internal Lock Lock { get; }
 
-        /// <summary>
-        /// Созданный объект
-        /// </summary>
-        public static object ActivatedObject { get; set; }
-
-        private const int MaxUndoListCount = 100;
-
-        private const string ClipboardKey = "siqdata";
-        private const string SIExtension = "siq";
         private bool _changed = false;
+
         private readonly Stack<IChange> _undoList = new();
+
         private readonly Stack<IChange> _redoList = new();
+
         private bool _isMakingUndo = false; // Blocks UnDo-operations for UnDo itself
+
         private ChangeGroup _changeGroup = null;
 
         private IItemViewModel _activeNode = null;
+
         private IItemViewModel[] _activeChain = null;
 
         public MediaStorageViewModel Images { get; private set; }
+
         public MediaStorageViewModel Audio { get; private set; }
+
         public MediaStorageViewModel Video { get; private set; }
 
         private readonly ILogger<QDocument> _logger;
@@ -95,16 +109,13 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void Workspace_Closed(WorkspaceViewModel obj)
-        {
-            Dialog = null;
-        }
+        private void Workspace_Closed(WorkspaceViewModel obj) => Dialog = null;
 
         private string _searchText;
 
         public string SearchText
         {
-            get { return _searchText; }
+            get => _searchText;
             set
             {
                 if (_searchText != value)
@@ -117,6 +128,7 @@ namespace SIQuester.ViewModel
         }
 
         private CancellationTokenSource _cancellation = null;
+
         private readonly object _searchSync = new();
 
         private async void MakeSearch()
@@ -144,6 +156,7 @@ namespace SIQuester.ViewModel
             ClearSearchText.CanBeExecuted = true;
 
             var task = Task.Run(() => Search(_searchText, _cancellation.Token), _cancellation.Token);
+
             try
             {
                 await task;
@@ -155,9 +168,12 @@ namespace SIQuester.ViewModel
             }
 
             if (task.IsCanceled)
+            {
                 return;
+            }
 
             SearchFailed = SearchResults == null || SearchResults.Results.Count == 0;
+
             if (!_searchFailed)
             {
                 NextSearchResult.CanBeExecuted = true;
@@ -239,14 +255,17 @@ namespace SIQuester.ViewModel
             }
 
             var link = atom.Model.Text;
+
             if (!link.StartsWith("@")) // Внешняя ссылка
+            {
                 return;
+            }
 
             if (!HasLinksTo(link)) // Вызывается уже после удаления объектов из дерева, так что работает корректно
             {
                 for (int i = 0; i < collection.Files.Count; i++)
                 {
-                    if (collection.Files[i].Model.Name == link.Substring(1))
+                    if (collection.Files[i].Model.Name == link[1..])
                     {
                         collection.DeleteItem.Execute(collection.Files[i]);
                         break;
@@ -258,7 +277,6 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Имеются ли какие-то ссылки в документе на мультимедиа
         /// </summary>
-        /// <param name="link"></param>
         private bool HasLinksTo(string link)
         {
             foreach (var round in Document.Package.Rounds)
@@ -285,7 +303,7 @@ namespace SIQuester.ViewModel
 
         public bool SearchFailed
         {
-            get { return _searchFailed; }
+            get => _searchFailed;
             set { if (_searchFailed != value) { _searchFailed = value; OnPropertyChanged(); } }
         }
 
@@ -344,8 +362,11 @@ namespace SIQuester.ViewModel
         public ICommand Wikify { get; private set; }
 
         public ICommand ConvertToCompTvSI { get; private set; }
+
         public ICommand ConvertToCompTvSISimple { get; private set; }
+
         public ICommand ConvertToSportSI { get; private set; }
+
         public ICommand ConvertToMillionaire { get; private set; }
 
         public ICommand Navigate { get; private set; }
@@ -355,6 +376,7 @@ namespace SIQuester.ViewModel
         public ICommand ExpandAll { get; private set; }
 
         public ICommand CollapseAllMedia { get; private set; }
+
         public ICommand ExpandAllMedia { get; private set; }
 
         public SimpleCommand SendToGame { get; private set; }
@@ -362,10 +384,13 @@ namespace SIQuester.ViewModel
         public ICommand Delete { get; private set; }
 
         public SimpleCommand Undo { get; private set; }
+
         public SimpleCommand Redo { get; private set; }
 
         public SimpleCommand NextSearchResult { get; private set; }
+
         public SimpleCommand PreviousSearchResult { get; private set; }
+
         public SimpleCommand ClearSearchText { get; private set; }
 
         #endregion
@@ -416,6 +441,7 @@ namespace SIQuester.ViewModel
         private void SetActiveChain()
         {
             var chain = new List<IItemViewModel>();
+
             for (var current = _activeNode; current != null; current = current.Owner)
             {
                 chain.Insert(0, current);
@@ -513,7 +539,10 @@ namespace SIQuester.ViewModel
                         }
                         else
                         {
-                            var tempName = System.IO.Path.Combine(path, Uri.EscapeDataString(Package.Model.Name) + ".xml");
+                            var tempName = System.IO.Path.Combine(
+                                path,
+                                System.IO.Path.ChangeExtension(PathHelper.RemoveInvalidFileNameChars(Package.Model.Name), "xml"));
+                            
                             using var stream = File.Create(tempName);
                             using var writer = XmlWriter.Create(stream);
                             Document.Package.WriteXml(writer);
@@ -566,6 +595,7 @@ namespace SIQuester.ViewModel
         }
 
         private DateTime _lastChangedTime = DateTime.MinValue;
+
         private DateTime _lastSavedTime = DateTime.MinValue;
 
         public override string Header => $"{FileName}{(NeedSave() ? "*" : "")}";
@@ -704,6 +734,7 @@ namespace SIQuester.ViewModel
                         }
 
                         var typeName = questionType.Model.Name;
+
                         if (typeName == QuestionTypes.Cat ||
                             typeName == QuestionTypes.BagCat ||
                             typeName == QuestionTypes.Auction ||
@@ -743,7 +774,7 @@ namespace SIQuester.ViewModel
                 }
                 else
                 {
-                    AddChange(new SimplePropertyValueChange() { Element = sender, PropertyName = e.PropertyName, Value = ext.OldValue });
+                    AddChange(new SimplePropertyValueChange { Element = sender, PropertyName = e.PropertyName, Value = ext.OldValue });
                 }
             }
         }
@@ -821,6 +852,7 @@ namespace SIQuester.ViewModel
                         {
                             Listen(itemViewModel);
                             itemViewModel.GetModel().PropertyChanged += Object_PropertyValueChanged;
+
                             if (itemViewModel is PackageViewModel package)
                             {
                                 package.Rounds.CollectionChanged += Object_CollectionChanged;
@@ -880,28 +912,37 @@ namespace SIQuester.ViewModel
                         {
                             StopListen(itemViewModel);
                             itemViewModel.GetModel().PropertyChanged -= Object_PropertyValueChanged;
+
                             if (itemViewModel is PackageViewModel package)
+                            {
                                 package.Rounds.CollectionChanged -= Object_CollectionChanged;
+                            }
                             else
                             {
                                 if (itemViewModel is RoundViewModel round)
+                                {
                                     round.Themes.CollectionChanged -= Object_CollectionChanged;
+                                }
                                 else
                                 {
                                     if (itemViewModel is ThemeViewModel theme)
+                                    {
                                         theme.Questions.CollectionChanged -= Object_CollectionChanged;
+                                    }
                                     else
                                     {
                                         var questionViewModel = (QuestionViewModel)itemViewModel;
 
                                         questionViewModel.Type.PropertyChanged -= Object_PropertyValueChanged;
                                         questionViewModel.Type.Params.CollectionChanged -= Object_CollectionChanged;
+
                                         foreach (var param in questionViewModel.Type.Params)
                                         {
                                             param.PropertyChanged -= Object_PropertyValueChanged;
                                         }
 
                                         questionViewModel.Scenario.CollectionChanged -= Object_CollectionChanged;
+
                                         foreach (var atom in questionViewModel.Scenario)
                                         {
                                             atom.PropertyChanged -= Object_PropertyValueChanged;
@@ -1044,6 +1085,7 @@ namespace SIQuester.ViewModel
                 await SaveIfNeededAsync(false, true);
 
                 var checkResult = Validate();
+
                 if (!string.IsNullOrWhiteSpace(checkResult))
                 {
                     PlatformManager.Instance.Inform(checkResult, true);
@@ -1073,6 +1115,7 @@ namespace SIQuester.ViewModel
             foreach (var item in mediaStorage.Files)
             {
                 var name = item.Model.Name;
+
                 if (files.Contains(name))
                 {
                     errors.Add($"Файл \"{name}\" содержится в пакете дважды!");
@@ -1099,6 +1142,7 @@ namespace SIQuester.ViewModel
             FillFiles(video, Video, errors);
 
             var crossList = images.Intersect(audio).Union(images.Intersect(video)).Union(audio.Intersect(video)).ToArray();
+
             if (crossList.Length > 0)
             {
                 foreach (var item in crossList)
@@ -1108,12 +1152,17 @@ namespace SIQuester.ViewModel
             }
 
             var logo = Package.Logo;
+
             if (logo != null)
             {
                 if (images.Contains(logo.Uri))
+                {
                     usedFiles.Add(logo.Uri);
+                }
                 else
+                {
                     errors.Add($"Логотип пакета: отсутствует файл \"{logo.Uri}\"!");
+                }
             }
 
             foreach (var round in Package.Rounds)
@@ -1125,6 +1174,7 @@ namespace SIQuester.ViewModel
                         foreach (var atom in question.Scenario)
                         {
                             List<string> collection = null;
+
                             switch (atom.Model.Type)
                             {
                                 case AtomTypes.Image:
@@ -1143,12 +1193,19 @@ namespace SIQuester.ViewModel
                             if (collection != null)
                             {
                                 var media = Document.GetLink(atom.Model);
+
                                 if (collection.Contains(media.Uri))
+                                {
                                     usedFiles.Add(media.Uri);
+                                }
                                 else if (allowExternal && !atom.Model.Text.StartsWith("@"))
+                                {
                                     continue;
+                                }
                                 else
+                                {
                                     errors.Add($"{round.Model.Name}/{theme.Model.Name}/{question.Model.Price}: отсутствует файл \"{media.Uri}\"! {(allowExternal ? "" : "Внешние ссылки не допускаются")}");
+                                }
                             }
                         }
                     }
@@ -1156,6 +1213,7 @@ namespace SIQuester.ViewModel
             }
 
             var extraFiles = images.Union(audio).Union(video).Except(usedFiles).ToArray();
+
             if (extraFiles.Length > 0)
             {
                 foreach (var item in extraFiles)
@@ -1169,19 +1227,19 @@ namespace SIQuester.ViewModel
 
         internal void Cut_Executed()
         {
-            // Пока не поддерживается
+            // Not supported yet
         }
 
         internal void Copy_Executed()
         {
             if (_activeNode == null)
+            {
                 return;
+            }
 
             try
             {
-                var itemData = new InfoOwnerData(_activeNode.GetModel());
-                itemData.GetFullData(Document, _activeNode.GetModel());
-
+                var itemData = new InfoOwnerData(this, _activeNode);
                 Clipboard.SetData(ClipboardKey, itemData);
             }
             catch (Exception exc)
@@ -1190,13 +1248,19 @@ namespace SIQuester.ViewModel
             }
         }
 
-        internal async void Paste_Executed()
+        internal void Paste_Executed()
         {
             if (_activeNode == null)
+            {
                 return;
+            }
 
             if (!Clipboard.ContainsData(ClipboardKey))
+            {
                 return;
+            }
+
+            BeginChange();
 
             try
             {
@@ -1206,6 +1270,7 @@ namespace SIQuester.ViewModel
                 if (level == InfoOwnerData.Level.Round)
                 {
                     var round = (Round)itemData.GetItem();
+
                     if (_activeNode is PackageViewModel myPackage)
                     {
                         myPackage.Rounds.Add(new RoundViewModel(round));
@@ -1217,12 +1282,15 @@ namespace SIQuester.ViewModel
                             myRound.OwnerPackage.Rounds.Insert(myRound.OwnerPackage.Rounds.IndexOf(myRound), new RoundViewModel(round));
                         }
                         else
+                        {
                             return;
+                        }
                     }
                 }
                 else if (level == InfoOwnerData.Level.Theme)
                 {
                     var theme = (Theme)itemData.GetItem();
+
                     if (_activeNode is RoundViewModel myRound)
                     {
                         myRound.Themes.Add(new ThemeViewModel(theme));
@@ -1231,15 +1299,20 @@ namespace SIQuester.ViewModel
                     {
                         if (_activeNode is ThemeViewModel myTheme)
                         {
-                            myTheme.OwnerRound.Themes.Insert(myTheme.OwnerRound.Themes.IndexOf(myTheme), new ThemeViewModel(theme));
+                            myTheme.OwnerRound.Themes.Insert(
+                                myTheme.OwnerRound.Themes.IndexOf(myTheme),
+                                new ThemeViewModel(theme));
                         }
                         else
+                        {
                             return;
+                        }
                     }
                 }
                 else if (level == InfoOwnerData.Level.Question)
                 {
                     var question = (Question)itemData.GetItem();
+
                     if (_activeNode is ThemeViewModel myTheme)
                     {
                         myTheme.Questions.Add(new QuestionViewModel(question));
@@ -1248,28 +1321,96 @@ namespace SIQuester.ViewModel
                     {
                         if (_activeNode is QuestionViewModel myQuestion)
                         {
-                            myQuestion.OwnerTheme.Questions.Insert(myQuestion.OwnerTheme.Questions.IndexOf(myQuestion), new QuestionViewModel(question));
+                            myQuestion.OwnerTheme.Questions.Insert(
+                                myQuestion.OwnerTheme.Questions.IndexOf(myQuestion),
+                                new QuestionViewModel(question));
                         }
                         else
+                        {
                             return;
+                        }
                     }
                 }
                 else
+                {
                     return;
+                }
 
-                await itemData.ApplyDataAsync(Document);
+                ApplyData(itemData);
+                CommitChange();
             }
             catch (Exception exc)
             {
+                RollbackChange();
                 OnError(exc);
+            }
+        }
+
+        public void ApplyData(InfoOwnerData data)
+        {
+            foreach (var author in data.Authors)
+            {
+                if (!Authors.Collection.Any(x => x.Id == author.Id))
+                {
+                    Authors.Collection.Add(author);
+                }
+            }
+
+            foreach (var source in data.Sources)
+            {
+                if (!Sources.Collection.Any(x => x.Id == source.Id))
+                {
+                    Sources.Collection.Add(source);
+                }
+            }
+
+            var tempMediaDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName);
+            Directory.CreateDirectory(tempMediaDirectory);
+
+            // TODO: correctly handle situations with media names collision in source and target packages
+
+            foreach (var item in data.Images)
+            {
+                if (!Images.Files.Any(file => file.Model.Name == item.Key))
+                {
+                    var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                    File.Copy(item.Value, tmp);
+
+                    Images.AddFile(tmp, item.Key);
+                }
+            }
+
+            foreach (var item in data.Audio)
+            {
+                if (!Audio.Files.Any(file => file.Model.Name == item.Key))
+                {
+                    var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                    File.Copy(item.Value, tmp);
+
+                    Audio.AddFile(tmp, item.Key);
+                }
+            }
+
+            foreach (var item in data.Video)
+            {
+                if (!Video.Files.Any(file => file.Model.Name == item.Key))
+                {
+                    var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                    File.Copy(item.Value, tmp);
+
+                    Video.AddFile(tmp, item.Key);
+                }
             }
         }
 
         private void NextSearchResult_Executed(object arg)
         {
             SearchResults.Index++;
+
             if (SearchResults.Index == SearchResults.Results.Count)
+            {
                 SearchResults.Index = 0;
+            }
 
             Navigate.Execute(SearchResults.Results[SearchResults.Index]);
         }
@@ -1277,16 +1418,16 @@ namespace SIQuester.ViewModel
         private void PreviousSearchResult_Executed(object arg)
         {
             SearchResults.Index--;
+
             if (SearchResults.Index == -1)
+            {
                 SearchResults.Index = SearchResults.Results.Count - 1;
+            }
 
             Navigate.Execute(SearchResults.Results[SearchResults.Index]);
         }
 
-        private void ClearSearchText_Executed(object arg)
-        {
-            SearchText = "";
-        }
+        private void ClearSearchText_Executed(object arg) => SearchText = "";
 
         private async void ImportSiq_Executed(object arg)
         {
@@ -1331,6 +1472,7 @@ namespace SIQuester.ViewModel
 
                                         var collection = doc.Images;
                                         var newCollection = Images;
+
                                         switch (atom.Type)
                                         {
                                             case AtomTypes.Audio:
@@ -1357,6 +1499,7 @@ namespace SIQuester.ViewModel
                                             Directory.CreateDirectory(tempPath);
 
                                             var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
+
                                             using (var fileStream = File.Create(tempFile))
                                             {
                                                 await link.GetStream().Stream.CopyToAsync(fileStream);
@@ -1383,9 +1526,11 @@ namespace SIQuester.ViewModel
         private void CopyAuthorsAndSources(SIDocument document, InfoOwner infoOwner)
         {
             var length = infoOwner.Info.Authors.Count;
+
             for (int i = 0; i < length; i++)
             {
                 var otherAuthor = document.GetLink(infoOwner.Info.Authors, i);
+
                 if (otherAuthor != null)
                 {
                     if (Authors.Collection.All(author => author.Id != otherAuthor.Id))
@@ -1396,9 +1541,11 @@ namespace SIQuester.ViewModel
             }
 
             length = infoOwner.Info.Sources.Count;
+
             for (int i = 0; i < length; i++)
             {
                 var otherSource = document.GetLink(infoOwner.Info.Sources, i);
+
                 if (otherSource != null)
                 {
                     if (Sources.Collection.All(source => source.Id != otherSource.Id))
@@ -1483,39 +1630,32 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void ExportHtml_Executed(object arg)
-        {
+        private void ExportHtml_Executed(object arg) =>
             TransformPackage(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ygpackagekey3.0.xslt"));
-        }
 
-        private void ExportPrintHtml_Executed(object arg)
-        {
+        private void ExportPrintHtml_Executed(object arg) =>
             TransformPackage(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ygpackagesimple3.0.xslt"));
-        }
 
-        private void ExportFormattedHtml_Executed(object arg)
-        { 
-            Dialog = new ExportHtmlViewModel(this);
-        }
+        private void ExportFormattedHtml_Executed(object arg) => Dialog = new ExportHtmlViewModel(this);
 
-        private void ExportBase_Executed(object arg)
-        {
-            Dialog = new ExportViewModel(this, ExportFormats.Db);
-        }
+        private void ExportBase_Executed(object arg) => Dialog = new ExportViewModel(this, ExportFormats.Db);
 
         private void ExportMirc_Executed(object arg)
         {
             try
             {
                 string filename = string.Format("{0}IRCScriptFile", FileName.Replace(".", "-"));
+
                 var filter = new Dictionary<string, string>
                 {
                     ["Текстовые файлы"] = "txt"
                 };
+
                 if (PlatformManager.Instance.ShowSaveUI(Resources.ToIRC, "txt", filter, ref filename))
                 {
                     var file = new StringBuilder();
                     file.AppendLine(Document.Package.Rounds.Count.ToString());
+
                     Document.Package.Rounds.ForEach(round =>
                     {
                         file.AppendLine(round.Themes.Count.ToString());
@@ -1663,6 +1803,7 @@ namespace SIQuester.ViewModel
         private async void ExportTable_Executed(object arg)
         {
             string filename = FileName.Replace(".", "-");
+
             var filter = new Dictionary<string, string>
             {
                 ["Документы (*.xps)"] = "xps"
@@ -1671,6 +1812,7 @@ namespace SIQuester.ViewModel
             if (PlatformManager.Instance.ShowSaveUI("Экспорт в формат таблицы", "xps", filter, ref filename))
             {
                 IsProgress = true;
+
                 try
                 {
                     await Task.Run(() => PlatformManager.Instance.ExportTable(Document, filename));
@@ -1751,7 +1893,7 @@ namespace SIQuester.ViewModel
                      using (SIDocument.Load(testStream)) { }
 
                      // Test ok, overwriting current file and switching to it
-                     Document.ResetTo(EmptySIPackage.Instance); // reset source temporarily
+                     Document.ResetTo(EmptySIPackageContainer.Instance); // reset source temporarily
 
                      try
                      {
@@ -1761,6 +1903,8 @@ namespace SIQuester.ViewModel
 
                          Changed = false;
                          ClearTempFile();
+
+                         CheckFileSize();
                      }
                      finally
                      {
@@ -1809,10 +1953,11 @@ namespace SIQuester.ViewModel
 
                     FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
 
-                    var newStream = File.Open(_path, FileMode.Open, FileAccess.ReadWrite);
+                    var newStream = File.OpenRead(_path);
                     try
                     {
                         Document.ResetTo(newStream);
+                        CheckFileSize();
                     }
                     catch (Exception)
                     {
@@ -1826,6 +1971,23 @@ namespace SIQuester.ViewModel
                     throw;
                 }
             });
+
+        public void CheckFileSize() => ErrorMessage = GetFileSizeErrorMessage();
+
+        private string GetFileSizeErrorMessage()
+        {
+            if (!AppSettings.Default.CheckFileSize)
+            {
+                return null;
+            }
+
+            if (!string.IsNullOrEmpty(_path) && new FileInfo(_path).Length > GameServerFileSizeLimit)
+            {
+                return string.Format(Resources.FileSizeLimitExceed, GameServerFileSizeLimit);
+            }
+
+            return null;
+        }
 
         private void ClearTempFile()
         {
@@ -1882,7 +2044,6 @@ namespace SIQuester.ViewModel
             catch (Exception exc)
             {
                 _logger.LogError(exc, "SavingAs error: {error}", exc.Message);
-
                 OnError(exc);
             }
         }
@@ -1957,7 +2118,9 @@ namespace SIQuester.ViewModel
                         lock (_searchSync)
                         {
                             if (token.IsCancellationRequested)
+                            {
                                 return;
+                            }
 
                             SearchResults.Results.Add(theme);
                         }
@@ -2006,8 +2169,11 @@ namespace SIQuester.ViewModel
                         try
                         {
                             await Save_Executed(null);
+
                             if (NeedSave())
+                            {
                                 return;
+                            }
                         }
                         catch (Exception exc)
                         {
@@ -2120,11 +2286,12 @@ namespace SIQuester.ViewModel
                         {
                             var value = quest.Right[i];
                             var newValue = value.Wikify();
+
                             if (newValue != value)
                             {
                                 var index = i;
                                 // ObservableCollection should be modified in the UI thread
-                                Task.Factory.StartNew(() => { quest.Right[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                                UI.Execute(() => { quest.Right[index] = newValue; }, exc => OnError(exc));
                             }
                         }
 
@@ -2132,11 +2299,12 @@ namespace SIQuester.ViewModel
                         {
                             var value = quest.Wrong[i];
                             var newValue = value.Wikify();
+
                             if (newValue != value)
                             {
                                 var index = i;
                                 // ObservableCollection should be modified in the UI thread
-                                Task.Factory.StartNew(() => { quest.Wrong[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                                UI.Execute(() => { quest.Wrong[index] = newValue; }, exc => OnError(exc));
                             }
                         }
 
@@ -2146,7 +2314,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private static void WikifyInfoOwner(IItemViewModel owner)
+        private void WikifyInfoOwner(IItemViewModel owner)
         {
             var info = owner.Info;
 
@@ -2154,10 +2322,11 @@ namespace SIQuester.ViewModel
             {
                 var value = info.Authors[i];
                 var newValue = value.Wikify().GrowFirstLetter();
+
                 if (newValue != value)
                 {
                     var index = i;
-                    Task.Factory.StartNew(() => { info.Authors[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                    UI.Execute(() => { info.Authors[index] = newValue; }, exc => OnError(exc));
                 }
             }
 
@@ -2165,10 +2334,11 @@ namespace SIQuester.ViewModel
             {
                 var value = info.Sources[i];
                 var newValue = value.Wikify().GrowFirstLetter();
+
                 if (newValue != value)
                 {
                     var index = i;
-                    Task.Factory.StartNew(() => { info.Sources[index] = newValue; }, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+                    UI.Execute(() => { info.Sources[index] = newValue; }, exc => OnError(exc));
                 }
             }
 
@@ -2214,6 +2384,7 @@ namespace SIQuester.ViewModel
                     for (int j = 0; j < 6; j++)
                     {
                         ThemeViewModel themeViewModel;
+
                         if (allthemes.Count == ind)
                         {
                             themeViewModel = new ThemeViewModel(new Theme());
@@ -2228,9 +2399,10 @@ namespace SIQuester.ViewModel
                         for (var k = 0; k < 5; k++)
                         {
                             QuestionViewModel questionViewModel;
+
                             if (themeViewModel.Questions.Count <= k)
                             {
-                                var question = CreateQuestion(100 * (i + 1) * (k + 1));
+                                var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1));
 
                                 questionViewModel = new QuestionViewModel(question);
                                 themeViewModel.Questions.Add(questionViewModel);
@@ -2262,9 +2434,13 @@ namespace SIQuester.ViewModel
                     ThemeViewModel themeViewModel;
 
                     if (allthemes.Count == ind)
+                    {
                         themeViewModel = new ThemeViewModel(new Theme());
+                    }
                     else
+                    {
                         themeViewModel = allthemes[ind++];
+                    }
 
                     finalViewModel.Themes.Add(themeViewModel);
 
@@ -2272,7 +2448,7 @@ namespace SIQuester.ViewModel
 
                     if (themeViewModel.Questions.Count == 0)
                     {
-                        var question = CreateQuestion(0);
+                        var question = PackageItemsHelper.CreateQuestion(0);
 
                         questionViewModel = new QuestionViewModel(question);
                         themeViewModel.Questions.Add(questionViewModel);
@@ -2315,23 +2491,31 @@ namespace SIQuester.ViewModel
             try
             {
                 WikifyInfoOwner(Package);
+
                 foreach (var round in Package.Rounds)
                 {
                     WikifyInfoOwner(round);
+
                     foreach (var theme in round.Themes)
                     {
                         var name = theme.Model.Name;
+
                         if (name != null)
-                            theme.Model.Name = name.Wikify().ClearPoints(); // решил больше не менять регистр
+                        {
+                            theme.Model.Name = name.Wikify().ClearPoints();
+                        }
 
                         // Возможно, стоит заменить авторов вопроса единым автором у темы
                         var singleAuthor = theme.Questions.Count > 0 && theme.Questions[0].Info.Authors.Count == 1 ? theme.Questions[0].Info.Authors[0] : null;
+                        
                         if (singleAuthor != null)
                         {
                             var allAuthorsTheSame = true;
+
                             for (int i = 1; i < theme.Questions.Count; i++)
                             {
                                 var authors = theme.Questions[i].Info.Authors;
+
                                 if (authors.Count != 1 || authors[0] != singleAuthor)
                                 {
                                     allAuthorsTheSame = false;
@@ -2351,12 +2535,15 @@ namespace SIQuester.ViewModel
                         }
 
                         var singleAtom = theme.Questions.Count > 1 && theme.Questions[0].Scenario.Count > 1 ? theme.Questions[0].Scenario[0].Model.Text : null;
+                        
                         if (singleAtom != null)
                         {
                             var allAtomsTheSame = true;
+
                             for (int i = 1; i < theme.Questions.Count; i++)
                             {
                                 var scenario = theme.Questions[i].Scenario;
+
                                 if (scenario.Count < 2 || scenario[0].Model.Text != singleAtom)
                                 {
                                     allAtomsTheSame = false;
@@ -2389,23 +2576,30 @@ namespace SIQuester.ViewModel
                                 if (index > 0 && index < right.Length - 1)
                                 {
                                     // Расщепим ответ на два
-                                    quest.Right[i] = right.Substring(0, index).TrimEnd();
-                                    quest.Right.Add(right.Substring(index + 1).TrimStart());
+                                    quest.Right[i] = right[..index].TrimEnd();
+                                    quest.Right.Add(right[(index + 1)..].TrimStart());
                                 }
                                 else
+                                {
                                     quest.Right[i] = right;
+                                }
                             }
 
                             for (int i = 0; i < quest.Wrong.Count; i++)
+                            {
                                 quest.Wrong[i] = quest.Wrong[i].Wikify().ClearPoints().GrowFirstLetter();
+                            }
 
                             foreach (var atom in quest.Scenario)
                             {
                                 if (atom.Model.Type == AtomTypes.Text)
                                 {
                                     var text = atom.Model.Text;
+
                                     if (text != null)
+                                    {
                                         atom.Model.Text = text.Wikify().ClearPoints().GrowFirstLetter();
+                                    }
                                 }
                             }
 
@@ -2416,8 +2610,11 @@ namespace SIQuester.ViewModel
                                     if (param.Model.Name == QuestionTypeParams.Cat_Theme)
                                     {
                                         var val = param.Model.Value;
+
                                         if (val != null)
+                                        {
                                             param.Model.Value = val.Wikify().ToUpper().ClearPoints();
+                                        }
                                     }
                                 }
                             }
@@ -2431,20 +2628,10 @@ namespace SIQuester.ViewModel
             }
         }
 
-        internal static Question CreateQuestion(int price)
-        {
-            var question = new Question { Price = price };
-
-            var atom = new Atom();
-            question.Scenario.Add(atom);            
-            question.Right.Add("");
-
-            return question;
-        }
-
         private void ConvertToSportSI_Executed(object arg)
         {
             BeginChange();
+
             try
             {
                 foreach (var round in Document.Package.Rounds)
@@ -2452,7 +2639,9 @@ namespace SIQuester.ViewModel
                     foreach (var theme in round.Themes)
                     {
                         for (int i = 0; i < theme.Questions.Count; i++)
+                        {
                             theme.Questions[i].Price = 10 * (i + 1);
+                        }
                     }
                 }
             }
@@ -2480,21 +2669,31 @@ namespace SIQuester.ViewModel
                         allq.AddRange(theme.Questions);
 
                         while (theme.Questions.Any())
+                        {
                             theme.Questions.RemoveAt(0);
+                        }
                     }
 
                     while (round.Themes.Count > 0)
+                    {
                         round.Themes.RemoveAt(0);
+                    }
                 }
 
                 while (Package.Rounds.Count > 0)
+                {
                     Package.Rounds.RemoveAt(0);
+                }
 
                 var ind = 0;
 
                 var gamesCount = (int)Math.Floor((double)allq.Count / 15);
 
-                var roundViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.ThemesCollection }) { IsExpanded = true };
+                var roundViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.ThemesCollection })
+                {
+                    IsExpanded = true
+                };
+
                 Package.Rounds.Add(roundViewModel);
 
                 for (int i = 0; i < gamesCount; i++)
@@ -2532,8 +2731,11 @@ namespace SIQuester.ViewModel
                 {
                     var themeViewModel = new ThemeViewModel(new Theme { Name = Resources.Left });
                     roundViewModel.Themes.Add(themeViewModel);
+
                     while (ind < allq.Count)
+                    {
                         themeViewModel.Questions.Add(allq[ind++]);
+                    }
                 }
             }
             finally
@@ -2587,15 +2789,9 @@ namespace SIQuester.ViewModel
             }
         }
 
-        private void ExpandAllMedia_Executed(object arg)
-        {
-            ToggleMedia(true);
-        }
+        private void ExpandAllMedia_Executed(object arg) => ToggleMedia(true);
 
-        private void Delete_Executed(object arg)
-        {
-            ActiveNode?.Remove?.Execute(null);
-        }
+        private void Delete_Executed(object arg) => ActiveNode?.Remove?.Execute(null);
 
         protected override void Dispose(bool disposing)
         {
@@ -2627,6 +2823,7 @@ namespace SIQuester.ViewModel
         internal IMedia Wrap(AtomViewModel atomViewModel)
         {
             var collection = Images;
+
             switch (atomViewModel.Model.Type)
             {
                 case AtomTypes.Audio:
@@ -2640,7 +2837,7 @@ namespace SIQuester.ViewModel
 
             var link = atomViewModel.Model.Text;
 
-            if (!link.StartsWith("@")) // External link
+            if (!atomViewModel.Model.IsLink) // External link
             {
                 return new Media(link);
             }

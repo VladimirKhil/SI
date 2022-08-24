@@ -12,14 +12,9 @@ namespace SIQuester.ViewModel
             Model = model;
         }
 
-        protected override void LinkTo(int index, object arg)
-        {
+        protected override void LinkTo(int index, object arg) =>
             OwnerDocument.Document.SetAuthorLink(this, index, OwnerDocument.Document.Authors.IndexOf((AuthorInfo)arg));
-        }
 
-        protected override bool CanRemove()
-        {
-            return !(this == OwnerDocument?.Package?.Info?.Authors && Count == 1);
-        }
+        protected override bool CanRemove() => !(this == OwnerDocument?.Package?.Info?.Authors && Count == 1);
     }
 }

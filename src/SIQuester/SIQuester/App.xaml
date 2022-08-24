@@ -7,6 +7,7 @@
     xmlns:ls="clr-namespace:SIQuester.Selectors"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
     xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:util="clr-namespace:SIQuester.Utilities"
     xmlns:vm1="clr-namespace:SIQuester.ViewModel"
@@ -24,6 +25,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="/Icons.xaml" />
+                <ResourceDictionary Source="View/Dictionaries/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate x:Key="EmptyDataTemplate" />
@@ -34,6 +36,8 @@
 
             <siqcv:TextCollectionConverter2 x:Key="TextCollectionConverter2" />
             <siqcv:ListJoinConverter x:Key="ListJoinConverter" />
+            <siqcv:FlatLayoutModeConverter x:Key="FlatLayoutModeConverter" />
+            <siqcv:PriceConverter x:Key="PriceConverter" />
 
             <util:StringList x:Key="Base">
                 <sys:String>(файл…)</sys:String>
@@ -92,8 +96,6 @@
                 </Setter>
             </Style>
 
-            <SolidColorBrush x:Key="ActiveBrush" Color="#FFC5EFF3" />
-
             <Style x:Key="LightTextBox" BasedOn="{StaticResource CommonTextBox}" TargetType="{x:Type TextBox}">
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
@@ -117,23 +119,30 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type MenuItem}">
+                            
                             <Grid SnapsToDevicePixels="true">
                                 <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="2" RadiusY="2"/>
                                 <Rectangle x:Name="InnerBorder" Stroke="Transparent" StrokeThickness="1" RadiusX="2" RadiusY="2" Margin="1"/>
                                 <ContentPresenter Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Grid.Column="2" ContentSource="Header" RecognizesAccessKey="True"/>
                             </Grid>
+                            
                             <ControlTemplate.Triggers>
+                                
                                 <Trigger Property="IsHighlighted" Value="true">
                                     <Setter Property="Stroke" TargetName="InnerBorder" Value="#D1DBF4FF"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsHighlighted" Value="true">
                                     <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemSelectionFill}"/>
                                     <Setter Property="Stroke" TargetName="Bg" Value="#8571CBF1"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter Property="Foreground" Value="#FF9A9A9A"/>
                                 </Trigger>
+                                
                             </ControlTemplate.Triggers>
+                            
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -143,11 +152,14 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type MenuItem}">
+                            
                             <Grid SnapsToDevicePixels="true">
+                                
                                 <Rectangle x:Name="OuterBorder" RadiusX="2" RadiusY="2"/>
                                 <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="1" RadiusY="1" Margin="1"/>
                                 <Rectangle x:Name="InnerBorder" Margin="2"/>
                                 <ContentPresenter Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentSource="Header" RecognizesAccessKey="True"/>
+                                
                                 <Popup x:Name="PART_Popup" AllowsTransparency="true" HorizontalOffset="1" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" VerticalOffset="-1" Focusable="false">
                                     <Border Background="#F5F5F5" BorderBrush="#FF959595" BorderThickness="1">
                                         <ScrollViewer Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}" CanContentScroll="true">
@@ -155,29 +167,37 @@
                                         </ScrollViewer>
                                     </Border>
                                 </Popup>
+                                
                             </Grid>
+                            
                             <ControlTemplate.Triggers>
+                                
                                 <Trigger Property="IsSuspendingPopupAnimation" Value="true">
                                     <Setter Property="PopupAnimation" TargetName="PART_Popup" Value="None"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsHighlighted" Value="true">
                                     <Setter Property="Stroke" TargetName="Bg" Value="#90717070"/>
                                     <Setter Property="Stroke" TargetName="OuterBorder" Value="#50FFFFFF"/>
                                     <Setter Property="Stroke" TargetName="InnerBorder" Value="#50FFFFFF"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsKeyboardFocused" Value="true">
                                     <Setter Property="Stroke" TargetName="Bg" Value="#E0717070"/>
                                     <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemPressedFill}"/>
                                     <Setter Property="Stroke" TargetName="InnerBorder" Value="#50747272"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsSubmenuOpen" Value="true">
                                     <Setter Property="Stroke" TargetName="Bg" Value="#E0717070"/>
                                     <Setter Property="Fill" TargetName="Bg" Value="{StaticResource MenuItemPressedFill}"/>
                                     <Setter Property="Stroke" TargetName="InnerBorder" Value="#50747272"/>
                                 </Trigger>
+                                
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter Property="Foreground" Value="#FF9A9A9A"/>
                                 </Trigger>
+                                
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -199,8 +219,15 @@
             <util:QuestionTypeFilter x:Key="QTFilter" />
             <util:QuestionTypeNameFilter x:Key="QTNameFilter" />
 
-            <CollectionViewSource x:Key="QuestionTypes" Source="{StaticResource QTypes}" util:CollectionViewSourceManager.Filter="{StaticResource QTFilter}" />
-            <CollectionViewSource x:Key="QuestionTypesNames" Source="{Binding Source={StaticResource QTypes},Path=Values}" util:CollectionViewSourceManager.Filter="{StaticResource QTNameFilter}" />
+            <CollectionViewSource
+                x:Key="QuestionTypes"
+                Source="{StaticResource QTypes}"
+                util:CollectionViewSourceManager.Filter="{StaticResource QTFilter}" />
+            
+            <CollectionViewSource
+                x:Key="QuestionTypesNames"
+                Source="{Binding Source={StaticResource QTypes},Path=Values}"
+                util:CollectionViewSourceManager.Filter="{StaticResource QTNameFilter}" />
 
             <siqcv:MappedConverter x:Key="QuestionTypeConverter" Map="{StaticResource QuestionTypes}" />
 
@@ -232,20 +259,28 @@
                 <TextBox Text="{Binding Model.Value}" Padding="0,1" />
             </DataTemplate>
 
-            <ls:QuestionTypeParamTemplateSelector x:Key="TypeParamSelector"
-                                              BaseTemplate="{StaticResource TypeParamBaseTemplate}"
-                                              CatThemeTemplate="{StaticResource TypeParamBaseTemplate}"
-                                              CatCostTemplate="{StaticResource TypeParamBaseTemplate}">
+            <ls:QuestionTypeParamTemplateSelector
+                x:Key="TypeParamSelector"
+                BaseTemplate="{StaticResource TypeParamBaseTemplate}"
+                CatThemeTemplate="{StaticResource TypeParamBaseTemplate}"
+                CatCostTemplate="{StaticResource TypeParamBaseTemplate}">
+                
                 <ls:QuestionTypeParamTemplateSelector.BagCatKnowsTemplate>
                     <DataTemplate>
-                        <ComboBox SelectedItem="{Binding Model.Value, Converter={StaticResource BagCatKnowsConverter}}" ItemsSource="{Binding Source={StaticResource BCKnows},Path=Values,Mode=OneTime}" />
+                        <ComboBox
+                            SelectedItem="{Binding Model.Value, Converter={StaticResource BagCatKnowsConverter}}"
+                            ItemsSource="{Binding Source={StaticResource BCKnows},Path=Values,Mode=OneTime}" />
                     </DataTemplate>
                 </ls:QuestionTypeParamTemplateSelector.BagCatKnowsTemplate>
+                
                 <ls:QuestionTypeParamTemplateSelector.BagCatSelfTemplate>
                     <DataTemplate>
-                        <ComboBox SelectedItem="{Binding Model.Value, Converter={StaticResource BagCatSelfConverter}}" ItemsSource="{Binding Source={StaticResource BCSelf},Path=Values,Mode=OneTime}" />
+                        <ComboBox
+                            SelectedItem="{Binding Model.Value, Converter={StaticResource BagCatSelfConverter}}"
+                            ItemsSource="{Binding Source={StaticResource BCSelf},Path=Values,Mode=OneTime}" />
                     </DataTemplate>
                 </ls:QuestionTypeParamTemplateSelector.BagCatSelfTemplate>
+                
             </ls:QuestionTypeParamTemplateSelector>
 
             <SolidColorBrush x:Key="ItemOverBrush" Color="#FFDEDEFF" />
@@ -256,18 +291,24 @@
                 <Setter Property="IsSelected" Value="{Binding IsSelected}" />
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
                 <Setter Property="siq:SmartMenuManager.SmartMenu" Value="True" />
+                
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TreeViewItem">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" MinWidth="19" />
+                                    <ColumnDefinition Width="Auto" MinWidth="19" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
+
+                                <Border x:Name="HeaderArea" Grid.ColumnSpan="3" Background="Transparent" />
+
                                 <ToggleButton IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press" Name="Expander">
                                     <ToggleButton.Style>
                                         <Style TargetType="ToggleButton">
@@ -308,37 +349,78 @@
                                         </Style>
                                     </ToggleButton.Style>
                                 </ToggleButton>
-                                <Border x:Name="Bd"
-                                        HorizontalAlignment="Stretch"
-                                        BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                        BorderBrush="{TemplateBinding Border.BorderBrush}"
-                                        Padding="{TemplateBinding Control.Padding}"
-                                        Background="{TemplateBinding Panel.Background}"
-                                        SnapsToDevicePixels="True"
-                                        Grid.Column="1">
-                                    <ContentPresenter x:Name="PART_Header"
-                                                Content="{TemplateBinding HeaderedContentControl.Header}"
-                                                ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
-                                                ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
-                                                ContentSource="Header"
-                                                HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
-                                                SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+
+                                <Button
+                                    x:Name="Add"
+                                    Grid.Column="1"
+                                    Command="{Binding Add}"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    HorizontalAlignment="Left"
+                                    ToolTip="{Binding AddHeader}"
+                                    Visibility="Hidden"
+                                    Width="19">
+                                    
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="#FFAAAAAA"
+                                        Margin="1"
+                                        Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                                
+                                </Button>
+
+                                <Border
+                                    x:Name="Bd"
+                                    HorizontalAlignment="Stretch"
+                                    BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                    BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                    Padding="{TemplateBinding Control.Padding}"
+                                    Background="{TemplateBinding Panel.Background}"
+                                    SnapsToDevicePixels="True"
+                                    Grid.Column="2">
+
+                                    <ContentPresenter
+                                        x:Name="PART_Header"
+                                        Content="{TemplateBinding HeaderedContentControl.Header}"
+                                        ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
+                                        ContentSource="Header"
+                                        HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                        SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+
                                 </Border>
-                                <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.Row="1" />
+
+                                <ItemsPresenter x:Name="ItemsHost" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" />
                             </Grid>
+                            
                             <ControlTemplate.Triggers>
                                 <Trigger Property="TreeViewItem.IsExpanded" Value="False">
                                     <Setter TargetName="ItemsHost" Property="UIElement.Visibility" Value="Collapsed" />
                                 </Trigger>
+                                
                                 <Trigger Property="ItemsControl.HasItems" Value="False">
                                     <Setter TargetName="Expander" Property="UIElement.Visibility" Value="Hidden" />
                                 </Trigger>
+
                                 <Trigger SourceName="Bd" Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemOverBrush}" />                                    
+                                    <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemOverBrush}" />
                                 </Trigger>
+
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True" />
+                                        <Condition SourceName="ItemsHost" Property="IsMouseOver" Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="Add" Property="UIElement.Visibility" Value="Visible" />
+                                </MultiTrigger>
+
+                                <DataTrigger Binding="{Binding Add}" Value="{x:Null}">
+                                    <Setter TargetName="Add" Property="UIElement.Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                
                                 <Trigger Property="TreeViewItem.IsSelected" Value="True">
                                     <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemSelectedBrush}" />
                                 </Trigger>
+                                
                                 <Trigger Property="UIElement.IsEnabled" Value="False">
                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                 </Trigger>
@@ -346,6 +428,7 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+                
                 <Setter Property="ItemsPanel">
                     <Setter.Value>
                         <ItemsPanelTemplate>
@@ -360,17 +443,6 @@
                 <Setter Property="Margin" Value="0,0,3,0" />
             </Style>
 
-            <Style x:Key="ComboBoxCommon" TargetType="{x:Type ComboBox}">
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="{StaticResource ActiveBrush}" />
-                    </Trigger>
-                </Style.Triggers>
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Padding" Value="1" />
-            </Style>
-
             <SolidColorBrush x:Key="SecondHighlightColor" Color="#FFFFFF84" />
 
             <!--Default theme-->
@@ -379,6 +451,73 @@
             <SolidColorBrush x:Key="ToolBarButtonHover" Color="#330000FF"/>
             <SolidColorBrush x:Key="ToolBarButtonPressedBorder" Color="#FF0000FF"/>
             <SolidColorBrush x:Key="ToolBarButtonPressed" Color="#770000FF"/>
+            <SolidColorBrush x:Key="ToolBarButtonChecked" Color="#E6F0FA"/>
+
+            <Style x:Key="{x:Static ToolBar.ToggleButtonStyleKey}" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                <Setter Property="Padding" Value="2"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="true">
+                                <ContentPresenter
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="true">
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonHoverBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonChecked}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonHoverBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonHover}"/>
+                                </Trigger>
+                                <Trigger Property="IsKeyboardFocused" Value="true">
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonHoverBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonHover}"/>
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="true"/>
+                                        <Condition Property="IsChecked" Value="true"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonPressedBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonPressed}"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsKeyboardFocused" Value="true"/>
+                                        <Condition Property="IsChecked" Value="true"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonPressedBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonPressed}"/>
+                                </MultiTrigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="BorderBrush" Value="{StaticResource ToolBarButtonPressedBorder}"/>
+                                    <Setter Property="Background" Value="{StaticResource ToolBarButtonPressed}"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
 
             <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="{x:Type Button}">
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
@@ -521,20 +660,25 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            
             <LinearGradientBrush x:Key="TabItem.Static.Background" EndPoint="0,1" StartPoint="0,0">
                 <GradientStop Color="#F0F0F0" Offset="0.0"/>
                 <GradientStop Color="#E5E5E5" Offset="1.0"/>
             </LinearGradientBrush>
+            
             <SolidColorBrush x:Key="TabItem.Static.Border" Color="#ACACAC"/>
+            
             <LinearGradientBrush x:Key="TabItem.MouseOver.Background" EndPoint="0,1" StartPoint="0,0">
                 <GradientStop Color="#ECF4FC" Offset="0.0"/>
                 <GradientStop Color="#DCECFC" Offset="1.0"/>
             </LinearGradientBrush>
+            
             <SolidColorBrush x:Key="TabItem.MouseOver.Border" Color="#7EB4EA"/>
             <SolidColorBrush x:Key="TabItem.Disabled.Background" Color="#F0F0F0"/>
             <SolidColorBrush x:Key="TabItem.Disabled.Border" Color="#D9D9D9"/>
             <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
             <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
+            
             <Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
                 <Setter Property="Foreground" Value="Black"/>
@@ -628,7 +772,9 @@
                 <Setter Property="IsEnabled" Value="{Binding ElementName=main,Path=IsEnabled}" />
                 <Setter Property="lb:PlacementManager.PlacementTarget" Value="{Binding PlacementTarget,Source={x:Static vm1:ActionMenuViewModel.Instance}}" />
                 <Setter Property="Opacity" Value="0.3" />
+                
                 <Style.Triggers>
+                    
                     <EventTrigger RoutedEvent="MouseEnter">
                         <BeginStoryboard>
                             <Storyboard>
@@ -636,6 +782,7 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
+                    
                     <EventTrigger RoutedEvent="MouseLeave">
                         <BeginStoryboard>
                             <Storyboard>
@@ -643,9 +790,11 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
+                    
                     <Trigger Property="DataContext" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </Trigger>
+                    
                 </Style.Triggers>
             </Style>
 
@@ -653,24 +802,55 @@
 
             <ControlTemplate x:Key="QTreeViewScrollViewerTemplate" TargetType="{x:Type ScrollViewer}">
                 <DockPanel Background="{TemplateBinding Background}">
-                    <ScrollBar DockPanel.Dock="Right" x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
-                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+                    
+                    <ScrollBar
+                        DockPanel.Dock="Right"
+                        x:Name="PART_VerticalScrollBar"
+                        AutomationProperties.AutomationId="VerticalScrollBar"
+                        Cursor="Arrow"
+                        Maximum="{TemplateBinding ScrollableHeight}"
+                        Minimum="0"
+                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                        Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                        ViewportSize="{TemplateBinding ViewportHeight}"/>
+                    
+                    <ScrollContentPresenter
+                        x:Name="PART_ScrollContentPresenter"
+                        CanContentScroll="{TemplateBinding CanContentScroll}"
+                        CanHorizontallyScroll="False"
+                        CanVerticallyScroll="False"
+                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                        Content="{TemplateBinding Content}"
+                        Margin="{TemplateBinding Padding}" />
+                    
                 </DockPanel>
             </ControlTemplate>
 
             <ControlTemplate x:Key="QTreeViewTemplate" TargetType="{x:Type TreeView}">
-                <ScrollViewer Template="{StaticResource QTreeViewScrollViewerTemplate}" Background="{TemplateBinding Background}" CanContentScroll="False" Focusable="False" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                <ScrollViewer
+                    Template="{StaticResource QTreeViewScrollViewerTemplate}"
+                    Background="{TemplateBinding Background}"
+                    CanContentScroll="False"
+                    Focusable="False"
+                    HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                    Padding="{TemplateBinding Padding}"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                    VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                    
                     <Grid>
                         <ItemsPresenter />
+                        
                         <Grid Style="{StaticResource ContextMenu2}" HorizontalAlignment="Left" VerticalAlignment="Top">
                             <Border BorderThickness="1" BorderBrush="Gray">
                                 <Border.Effect>
                                     <DropShadowEffect ShadowDepth="1" />
                                 </Border.Effect>
                             </Border>
+                            
                             <Border Name="Bd1" BorderThickness="1" BorderBrush="Gray" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                                 <StackPanel Orientation="Vertical">
                                     <StackPanel.Resources>
+                                        
                                         <Style x:Key="MenuButton" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                                             <Setter Property="ContentTemplate">
                                                 <Setter.Value>
@@ -679,6 +859,7 @@
                                                     </DataTemplate>
                                                 </Setter.Value>
                                             </Setter>
+                                            
                                             <Setter Property="Margin" Value="2" />
                                             <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource VisibilityConverter}}" />
                                         </Style>
@@ -703,7 +884,9 @@
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
+                                        
                                     </StackPanel.Resources>
+                                    
                                     <ContentControl DataContext="{Binding ActiveNode}" Content="{Binding}">
                                         <ContentControl.Resources>
                                             <siqcv:MultiCostSetterConverter x:Key="MultiCostSetterConverter" />
@@ -731,6 +914,7 @@
                                                 <StackPanel Orientation="Horizontal">
                                                     <Button ToolTip="Добавить раунд (Insert)" Content="{StaticResource AddImage}" Command="{Binding AddRound}" Style="{StaticResource MenuButton}" />
                                                     <Separator Style="{StaticResource MenuSeparator}" />
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
@@ -739,6 +923,7 @@
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
+                                                    
                                                     <Button ToolTip="Задать тематику" Command="{Binding AddTags}" Style="{StaticResource MenuButton}">
                                                         <Button.ContentTemplate>
                                                             <DataTemplate>
@@ -746,6 +931,7 @@
                                                             </DataTemplate>
                                                         </Button.ContentTemplate>
                                                     </Button>
+                                                    
                                                     <Button ToolTip="Поменять язык" Command="{Binding ChangeLanguage}" Style="{StaticResource MenuButton}">
                                                         <Button.ContentTemplate>
                                                             <DataTemplate>
@@ -753,14 +939,17 @@
                                                             </DataTemplate>
                                                         </Button.ContentTemplate>
                                                     </Button>
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem ToolTip="Добавить логотип" Header="{StaticResource AddImageImage}" Style="{StaticResource MenuMenuHeader}">
+                                                            
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Base}" />
                                                                     <Binding Path="Document.Images.Files" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
+                                                            
                                                             <MenuItem.ItemContainerStyle>
                                                                 <Style TargetType="MenuItem">
                                                                     <Setter Property="Command" Value="{Binding DataContext.SelectLogo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -775,8 +964,10 @@
                                                                     </Setter>
                                                                 </Style>
                                                             </MenuItem.ItemContainerStyle>
+                                                            
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
                                                     <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Источники" Content="{StaticResource SourcesImageKey}" Command="{Binding AddSources}" Style="{StaticResource MenuButton}" />
@@ -789,7 +980,9 @@
                                                     <Button ToolTip="Добавить тему (Insert)" Content="{StaticResource AddImage}"  Command="{Binding AddTheme}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Клонировать раунд" Content="{StaticResource CloneImage}" Command="{Binding Clone}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Удалить раунд" Content="{StaticResource RemoveImage}" Command="{Binding Remove}" Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
@@ -798,7 +991,9 @@
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
+                                                    
                                                     <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Источники" Content="{StaticResource SourcesImageKey}" Command="{Binding AddSources}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Комментарии" Content="{StaticResource TextImage}" Command="{Binding AddComments}" Style="{StaticResource MenuButton}" />
@@ -807,43 +1002,144 @@
 
                                             <DataTemplate DataType="{x:Type vm:ThemeViewModel}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button ToolTip="Добавить вопрос (Insert)" Content="{StaticResource AddImage}" Command="{Binding AddQuestion}" Style="{StaticResource MenuButton}"/>
-                                                    <Button ToolTip="Клонировать тему" Content="{StaticResource CloneImage}" Command="{Binding Clone}" Style="{StaticResource MenuButton}"/>
-                                                    <Button ToolTip="Удалить тему" Content="{StaticResource RemoveImage}" Command="{Binding Remove}" Style="{StaticResource MenuButton}"/>
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddQuestion}"
+                                                        Content="{StaticResource AddImage}"
+                                                        Command="{Binding AddQuestion}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddEmptyQuestion}"
+                                                        Content="{StaticResource AddEmptyImage}"
+                                                        Command="{Binding AddEmptyQuestion}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.CloneTheme}"
+                                                        Content="{StaticResource CloneImage}"
+                                                        Command="{Binding Clone}"
+                                                        Style="{StaticResource MenuButton}"/>
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.RemoveTheme}"
+                                                        Content="{StaticResource RemoveImage}"
+                                                        Command="{Binding Remove}"
+                                                        Style="{StaticResource MenuButton}"/>
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
-                                                    <Button ToolTip="Отсортировать вопросы по стоимости" Content="{StaticResource SortImage}" Command="{Binding SortQuestions}" Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.SortQuestionsByPrice}"
+                                                        Content="{StaticResource SortImage}"
+                                                        Command="{Binding SortQuestions}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
-                                                            ToolTip="Задать стоимости"
+                                                            ToolTip="{x:Static lp:Resources.FillPrices}"
                                                             ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
                                                     </Menu>
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
-                                                    <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Источники" Content="{StaticResource SourcesImageKey}" Command="{Binding AddSources}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Комментарии" Content="{StaticResource TextImage}" Command="{Binding AddComments}" Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.Authors}"
+                                                        Content="{StaticResource AuthorsImageKey}"
+                                                        Command="{Binding AddAuthors}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.Sources}"
+                                                        Content="{StaticResource SourcesImageKey}"
+                                                        Command="{Binding AddSources}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.Comments}"
+                                                        Content="{StaticResource TextImage}"
+                                                        Command="{Binding AddComments}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
                                                 </StackPanel>
                                             </DataTemplate>
 
                                             <DataTemplate DataType="{x:Type vm:QuestionViewModel}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button ToolTip="Клонировать вопрос" Content="{StaticResource CloneImage}" Command="{Binding Clone}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Удалить вопрос" Content="{StaticResource RemoveImage}" Command="{Binding Remove}" Style="{StaticResource MenuButton}" />
-                                                    <Separator Style="{StaticResource MenuSeparator}" />
-                                                    <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Header="{StaticResource QuestionTypeImage}" ToolTip="Тип вопроса" ItemsSource="{StaticResource QTypes}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemQuestionType}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="Клонировать вопрос"
+                                                        Content="{StaticResource CloneImage}"
+                                                        Command="{Binding Clone}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="Удалить вопрос"
+                                                        Content="{StaticResource RemoveImage}"
+                                                        Command="{Binding Remove}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Separator x:Name="separator1" Style="{StaticResource MenuSeparator}" />
+                                                    
+                                                    <Menu x:Name="type" Style="{StaticResource MenuMenu}">
+                                                        <MenuItem
+                                                            Header="{StaticResource QuestionTypeImage}"
+                                                            ToolTip="Тип вопроса"
+                                                            ItemsSource="{StaticResource QTypes}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItemQuestionType}" />
                                                     </Menu>
-                                                    <Button ToolTip="Неправильные ответы" Content="{StaticResource WrongAnswersImage}" Command="{Binding AddWrongAnswers}" Style="{StaticResource MenuButton}" />
-                                                    <Separator Style="{StaticResource MenuSeparator}" />
-                                                    <Button ToolTip="Авторы" Content="{StaticResource AuthorsImageKey}" Command="{Binding AddAuthors}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Источники" Content="{StaticResource SourcesImageKey}" Command="{Binding AddSources}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Комментарии" Content="{StaticResource TextImage}" Command="{Binding AddComments}" Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        x:Name="wrong"
+                                                        ToolTip="Неправильные ответы"
+                                                        Content="{StaticResource WrongAnswersImage}"
+                                                        Command="{Binding AddWrongAnswers}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Separator x:Name="separator2" Style="{StaticResource MenuSeparator}" />
+
+                                                    <Button
+                                                        x:Name="authors"
+                                                        ToolTip="{x:Static lp:Resources.Authors}"
+                                                        Content="{StaticResource AuthorsImageKey}"
+                                                        Command="{Binding AddAuthors}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        x:Name="sources"
+                                                        ToolTip="{x:Static lp:Resources.Sources}"
+                                                        Content="{StaticResource SourcesImageKey}"
+                                                        Command="{Binding AddSources}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        x:Name="comments"
+                                                        ToolTip="{x:Static lp:Resources.Comments}"
+                                                        Content="{StaticResource TextImage}"
+                                                        Command="{Binding AddComments}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
                                                 </StackPanel>
+                                                
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
+                                                        <Setter TargetName="separator1" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="wrong" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="separator2" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="authors" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="sources" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="comments" Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                                
                                             </DataTemplate>
                                         </ContentControl.Resources>
                                     </ContentControl>
+                                    
                                     <ContentControl DataContext="{Binding ActiveItem}" Content="{Binding}">
                                         <ContentControl.Resources>
 
@@ -851,6 +1147,7 @@
 
                                             <Style x:Key="SubMenuItem" TargetType="MenuItem">
                                                 <Setter Property="Command" Value="{Binding DataContext.SelectAtomObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
+                                                
                                                 <Setter Property="Header">
                                                     <Setter.Value>
                                                         <PriorityBinding>
@@ -883,6 +1180,7 @@
                                                 <StackPanel Orientation="Horizontal">
                                                     <Button ToolTip="Переместить левее" Content="{StaticResource LeftImageKey}" Command="{Binding MoveLeft}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить" Content="{StaticResource AddImage}" Command="{Binding AddItem}" Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Menu Name="menu" Style="{StaticResource MenuMenu}">
                                                         <MenuItem Name="menuItem" Header="…" ToolTip="Стандартное значение" ItemsSource="{Binding OwnerDocument.StorageContext.Tags}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemTag}">
                                                             <MenuItem.HeaderTemplate>
@@ -894,6 +1192,7 @@
                                                             </MenuItem.HeaderTemplate>
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Button ToolTip="Удалить" Content="{StaticResource RemoveImage}" Command="{Binding RemoveItem}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Переместить правее" Content="{StaticResource RightImageKey}" Command="{Binding MoveRight}" Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
@@ -904,6 +1203,7 @@
                                                     <Button ToolTip="Переместить выше" Content="{StaticResource UpImage}" Command="{Binding MoveLeft}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить текст" Content="{StaticResource AddImage}" Command="{Binding AddText}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить устный текст" Content="{StaticResource AddVoiceImage}" Command="{Binding AddVoice}" Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             ToolTip="Добавить изображение"
@@ -924,6 +1224,7 @@
                                                             </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             ToolTip="Добавить аудио"
@@ -944,27 +1245,34 @@
                                                             </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             ToolTip="Добавить видео"
                                                             Header="{StaticResource AddVideoImage}"
                                                             Style="{StaticResource MenuMenuHeader}">
+                                                            
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
                                                                     <Binding Path="OwnerDocument.Video.Files" />
                                                                 </MultiBinding>
                                                             </MenuItem.ItemsSource>
+                                                            
                                                             <MenuItem.ItemContainerStyle>
                                                                 <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
                                                                     <Setter Property="CommandParameter"
                                                                             Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
                                                                 </Style>
                                                             </MenuItem.ItemContainerStyle>
+                                                            
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Button ToolTip="Добавить маркер ответа" Content="{StaticResource AddMarkerImage}" Command="{Binding AddMarker}" Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Separator Style="{StaticResource MenuSeparator}" />
+                                                    
                                                     <Button ToolTip="Поменять тип (на устный или обратно)" Content="{StaticResource ChangeTypeImage}" Command="{Binding ChangeType}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Удалить" Content="{StaticResource RemoveImage}" Command="{Binding RemoveItem}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Указать временной интервал" Content="{StaticResource AddTimeImage}" Command="{Binding SetTime}" Style="{StaticResource MenuButton}" />
@@ -983,6 +1291,7 @@
                                                     <Button ToolTip="Переместить левее" Content="{StaticResource LeftImageKey}" Command="{Binding MoveLeft}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Добавить ответ" Content="{StaticResource AddImage}" Command="{Binding AddItem}" Style="{StaticResource MenuButton}" />
                                                     <StackPanel Orientation="Horizontal" Visibility="{Binding Owner.Scenario.IsComplex, Converter={StaticResource FalseToVisiblityConverter}}">
+                                                        
                                                         <Menu
                                                             Style="{StaticResource MenuMenu}"
                                                             Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
@@ -1005,6 +1314,7 @@
                                                                 </MenuItem.ItemContainerStyle>
                                                             </MenuItem>
                                                         </Menu>
+                                                        
                                                         <Menu
                                                             Style="{StaticResource MenuMenu}"
                                                             Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
@@ -1012,12 +1322,14 @@
                                                                 ToolTip="Добавить аудио"
                                                                 Header="{StaticResource AddAudioImage}"
                                                                 Style="{StaticResource MenuMenuHeader}">
+                                                                
                                                                 <MenuItem.ItemsSource>
                                                                     <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                         <Binding Source="{StaticResource Additional}" />
                                                                         <Binding Path="OwnerDocument.Audio.Files" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
+                                                                
                                                                 <MenuItem.ItemContainerStyle>
                                                                     <Style TargetType="MenuItem">
                                                                         <Setter Property="Command" Value="{Binding DataContext.SelectAtomObject, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
@@ -1032,8 +1344,10 @@
                                                                         </Setter>
                                                                     </Style>
                                                                 </MenuItem.ItemContainerStyle>
+                                                                
                                                             </MenuItem>
                                                         </Menu>
+                                                        
                                                         <Menu
                                                             Style="{StaticResource MenuMenu}"
                                                             Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
@@ -1041,12 +1355,14 @@
                                                                 ToolTip="Добавить видео"
                                                                 Header="{StaticResource AddVideoImage}"
                                                                 Style="{StaticResource MenuMenuHeader}">
+                                                                
                                                                 <MenuItem.ItemsSource>
                                                                     <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                         <Binding Source="{StaticResource Additional}" />
                                                                         <Binding Path="OwnerDocument.Video.Files" />
                                                                     </MultiBinding>
                                                                 </MenuItem.ItemsSource>
+                                                                
                                                                 <MenuItem.ItemContainerStyle>
                                                                     <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
                                                                         <Setter
@@ -1054,10 +1370,17 @@
                                                                             Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
                                                                     </Style>
                                                                 </MenuItem.ItemContainerStyle>
+                                                                
                                                             </MenuItem>
                                                         </Menu>
-                                                    </StackPanel>                                                    
-                                                    <Button ToolTip="Удалить ответ" Content="{StaticResource RemoveImage}" Command="{Binding RemoveItem}" Style="{StaticResource MenuButton}" />
+                                                    </StackPanel>
+                                                    
+                                                    <Button
+                                                        ToolTip="Удалить ответ"
+                                                        Content="{StaticResource RemoveImage}"
+                                                        Command="{Binding RemoveItem}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem Header="{StaticResource Selection}" ToolTip="Дополнительно" Style="{StaticResource MenuMenuHeader}">
                                                             <MenuItem Header="Выделенное -> Новый ответ" Command="{Binding ToNewAnswer}" CommandParameter="{Binding}" />
@@ -1068,16 +1391,35 @@
                                                             <MenuItem Header="A и B => A и B + B и A" Command="{Binding AnswerSpecial3}" />
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Button ToolTip="Переместить правее" Content="{StaticResource RightImageKey}" Command="{Binding MoveRight}" Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
                                             </DataTemplate>
 
                                             <DataTemplate DataType="{x:Type vm:LinksViewModel}">
+                                                
                                                 <StackPanel Orientation="Horizontal">
-                                                    <Button ToolTip="Переместить левее" Content="{StaticResource LeftImageKey}" Command="{Binding MoveLeft}" Style="{StaticResource MenuButton}" />
-                                                    <Button ToolTip="Добавить" Content="{StaticResource AddImage}" Command="{Binding AddItem}" Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="Переместить левее"
+                                                        Content="{StaticResource LeftImageKey}"
+                                                        Command="{Binding MoveLeft}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
+                                                    <Button
+                                                        ToolTip="Добавить"
+                                                        Content="{StaticResource AddImage}"
+                                                        Command="{Binding AddItem}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                    
                                                     <Menu Name="menu" Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Name="menuItem" Header="…" ToolTip="Ссылка" ItemsSource="{Binding Converter={StaticResource TextCollectionConverter2}}" Style="{StaticResource MenuMenuHeader}" ItemContainerStyle="{StaticResource SubMenuItemLink}">
+                                                        <MenuItem
+                                                            Name="menuItem"
+                                                            Header="…"
+                                                            ToolTip="Ссылка"
+                                                            ItemsSource="{Binding Converter={StaticResource TextCollectionConverter2}}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItemLink}">
                                                             <MenuItem.HeaderTemplate>
                                                                 <DataTemplate>
                                                                     <ContentControl Name="root" Height="25" Width="25">
@@ -1087,9 +1429,11 @@
                                                             </MenuItem.HeaderTemplate>
                                                         </MenuItem>
                                                     </Menu>
+                                                    
                                                     <Button ToolTip="Удалить" Content="{StaticResource RemoveImage}" Command="{Binding RemoveItem}" Style="{StaticResource MenuButton}" />
                                                     <Button ToolTip="Переместить правее" Content="{StaticResource RightImageKey}" Command="{Binding MoveRight}" Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
+                                                
                                                 <DataTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding Items.Count,ElementName=menuItem}" Value="0">
                                                         <Setter TargetName="menu" Property="Visibility" Value="Collapsed" />
@@ -1150,19 +1494,24 @@
 
             <DataTemplate x:Key="Tags">
                 <DockPanel>
+                    
                     <TextBlock Text="Тематика" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                    <siq:TextList Style="{StaticResource LightTextBox}"
-                                  DataContext="{Binding Tags}"
-                                  ItemsSource="{Binding}"
-                                  CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
-                                  siq:SmartMenuManager.SecondMenu="True"
-                                  IsSynchronizedWithCurrentItem="True"
-                                  siq:ActivateManager.IsWatching="True" />
+                    
+                    <siq:TextList
+                        Style="{StaticResource LightTextBox}"
+                        DataContext="{Binding Tags}"
+                        ItemsSource="{Binding}"
+                        CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
+                        siq:SmartMenuManager.SecondMenu="True"
+                        IsSynchronizedWithCurrentItem="True"
+                        siq:ActivateManager.IsWatching="True" />
+                    
                 </DockPanel>
             </DataTemplate>
 
             <Style x:Key="TagsStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Tags.Count, Converter={StaticResource GreaterZero}}" Value="true">
                         <Setter Property="ContentTemplate" Value="{StaticResource Tags}" />
@@ -1173,7 +1522,14 @@
             <DataTemplate x:Key="Publisher">
                 <DockPanel>
                     <TextBlock Text="Издатель" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                    <ComboBox siq:ActivateManager.IsWatching="True" Style="{StaticResource ComboBoxCommon}" MinWidth="90" ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=TreeView}}" Text="{Binding Model.Publisher}" IsEditable="True" />
+                    
+                    <ComboBox
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource ComboBoxCommon}"
+                        MinWidth="90"
+                        ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                        Text="{Binding Model.Publisher}"
+                        IsEditable="True" />
                 </DockPanel>
             </DataTemplate>
 
@@ -1182,23 +1538,27 @@
             <DataTemplate x:Key="Language">
                 <DockPanel>
                     <TextBlock Text="Язык" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
+                    
                     <ComboBox
                         siq:ActivateManager.IsWatching="True"
                         Style="{StaticResource ComboBoxCommon}"
                         MinWidth="90"
                         ItemsSource="{Binding DataContext.StorageContext.Languages, RelativeSource={RelativeSource AncestorType=TreeView}}"
                         SelectedItem="{Binding Model.Language}">
+                        
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
+                        
                     </ComboBox>
                 </DockPanel>
             </DataTemplate>
 
             <Style x:Key="LanguageStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="ContentTemplate" Value="{StaticResource Language}" />
+                
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Model.Language}" Value="">
                         <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
@@ -1209,23 +1569,38 @@
             <DataTemplate x:Key="Difficulty">
                 <DockPanel>
                     <TextBlock Text="Сложность" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                    <metro:NumericUpDown Speedup="False" Minimum="1" Maximum="10" Value="{Binding Model.Difficulty}" HorizontalContentAlignment="Left" BorderThickness="0" Background="Transparent" FontSize="15">
+                    
+                    <metro:NumericUpDown
+                        Speedup="False"
+                        Minimum="1"
+                        Maximum="10"
+                        Value="{Binding Model.Difficulty}"
+                        HorizontalContentAlignment="Left"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        FontSize="15">
+                        
                         <metro:NumericUpDown.Resources>
                             <Style TargetType="RepeatButton">
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Background" Value="Transparent" />
                             </Style>
                         </metro:NumericUpDown.Resources>
+                        
                         <metro:NumericUpDown.Style>
+                            
                             <Style TargetType="metro:NumericUpDown">
                                 <Setter Property="HideUpDownButtons" Value="True" />
+                                
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="HideUpDownButtons" Value="False" />
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
+                            
                         </metro:NumericUpDown.Style>
+                        
                     </metro:NumericUpDown>
                 </DockPanel>
             </DataTemplate>
@@ -1240,6 +1615,7 @@
                 <Setter Property="Margin" Value="5" />
                 <Setter Property="Width" Value="400" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
+                
                 <Style.Triggers>
                     <Trigger Property="IsFocused" Value="True">
                         <Setter Property="BorderBrush" Value="Blue" />
@@ -1250,13 +1626,21 @@
             <siqcv:ImageConverter x:Key="ImageConverter" />
 
             <DataTemplate x:Key="Logo">
-                <Border Style="{StaticResource mediaBorder}" ToolTip="Логотип пакета" Width="Auto" Margin="0,5,10,5" Padding="3" siq:SmartMenuManager.SecondMenu="True">
+                <Border
+                    Style="{StaticResource mediaBorder}"
+                    ToolTip="Логотип пакета"
+                    Width="Auto"
+                    Margin="0,5,10,5"
+                    Padding="3"
+                    siq:SmartMenuManager.SecondMenu="True">
+                    
                     <Image MaxHeight="100" Source="{Binding Logo.Uri, Converter={StaticResource ImageConverter}}" HorizontalAlignment="Center" />
                 </Border>
             </DataTemplate>
 
             <Style x:Key="LogoStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="ContentTemplate" Value="{StaticResource Logo}" />
+                
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Logo}" Value="{x:Null}">
                         <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
@@ -1264,7 +1648,10 @@
                 </Style.Triggers>
             </Style>
 
-            <HierarchicalDataTemplate DataType="{x:Type vm:PackageViewModel}" ItemsSource="{Binding Rounds}" ItemContainerStyle="{StaticResource RoundStyle}">
+            <HierarchicalDataTemplate
+                DataType="{x:Type vm:PackageViewModel}"
+                ItemsSource="{Binding Rounds}"
+                ItemContainerStyle="{StaticResource RoundStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition MaxWidth="110" />
@@ -1272,25 +1659,42 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
+                    
                     <ContentControl Grid.RowSpan="2" Style="{StaticResource LogoStyle}" Content="{Binding}" />
-                    <TextBox Grid.Column="1" Grid.ColumnSpan="2" FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.4}" Style="{StaticResource LightTextBox}" Text="{Binding Model.Name}" />
+                    
+                    <TextBox
+                        Grid.Column="1"
+                        Grid.ColumnSpan="2"
+                        FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.4}"
+                        Style="{StaticResource LightTextBox}"
+                        Text="{Binding Model.Name}" />
+                    
                     <StackPanel Grid.Column="1" Grid.Row="2">
                         <DockPanel>
                             <TextBlock Text="Дата создания" Style="{StaticResource BlockStyleKey}" VerticalAlignment="Center" />
-                            <TextBox siq:ActivateManager.IsWatching="True" Style="{StaticResource LightTextBox}" MinWidth="90" Text="{Binding Model.Date}" />
+                            
+                            <TextBox
+                                siq:ActivateManager.IsWatching="True"
+                                Style="{StaticResource LightTextBox}"
+                                MinWidth="90"
+                                Text="{Binding Model.Date}" />
                         </DockPanel>
+                        
                         <ContentControl ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
                         <ContentControl Content="{Binding Info}" />
                     </StackPanel>
+                    
                     <StackPanel Grid.Column="2" Grid.Row="2" Margin="5,0,0,0">
                         <ContentControl ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
                         <ContentControl Style="{StaticResource TagsStyle}" Content="{Binding}" />
                         <ContentControl ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
                     </StackPanel>
+                    
                     <StackPanel Grid.Column="3" Grid.Row="2" Margin="5,0,0,0">
                         <ContentControl Style="{StaticResource LanguageStyle}" Content="{Binding}" />
                     </StackPanel>
@@ -1301,7 +1705,10 @@
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue" />
             </Style>
 
-            <HierarchicalDataTemplate DataType="{x:Type vm:RoundViewModel}" ItemsSource="{Binding Themes}" ItemContainerStyle="{StaticResource ThemeStyle}">
+            <HierarchicalDataTemplate
+                DataType="{x:Type vm:RoundViewModel}"
+                ItemsSource="{Binding Themes}"
+                ItemContainerStyle="{StaticResource ThemeStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -1310,13 +1717,31 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
+                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <TextBox FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.333}" siq:ActivateManager.IsWatching="True" Style="{StaticResource LightTextBox}" Name="default" Grid.ColumnSpan="2" Text="{Binding Model.Name}" />
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="(" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}"/>
-                    <ComboBox Style="{StaticResource ComboBoxCommon}" Grid.Row="0" Grid.Column="3" IsEditable="True" ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}" Text="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}" VerticalAlignment="Center" />
+
+                    <TextBox
+                        Name="default"
+                        FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.333}"
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource LightTextBox}"
+                        Grid.ColumnSpan="2"
+                        Text="{Binding Model.Name}" />
+                    
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="(" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}" />
+                    
+                    <ComboBox
+                        Style="{StaticResource ComboBoxCommon}"
+                        Grid.Row="0"
+                        Grid.Column="3"
+                        IsEditable="True"
+                        ItemsSource="{Binding Source={StaticResource RTypes}, Path=Values, Mode=OneTime}"
+                        Text="{Binding Path=Model.Type, Converter={StaticResource RoundTypeConverter}}"
+                        VerticalAlignment="Center" />
+                    
                     <TextBlock Grid.Row="0" Grid.Column="4" Text=")" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}" />
                     <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
                 </Grid>
@@ -1324,42 +1749,55 @@
 
             <Style x:Key="QuestionStyle" BasedOn="{StaticResource QTreeViewItem}" TargetType="{x:Type TreeViewItem}">
                 <Setter Property="Margin" Value="0,1" />
+                
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TreeViewItem">
-                            <Border x:Name="Bd"
-                                        HorizontalAlignment="Stretch"
-                                        BorderThickness="{TemplateBinding Border.BorderThickness}"
-                                        BorderBrush="{TemplateBinding Border.BorderBrush}"
-                                        Padding="{TemplateBinding Control.Padding}"
-                                        Background="{TemplateBinding Panel.Background}"
-                                        SnapsToDevicePixels="True">
-                                <ContentPresenter x:Name="PART_Header"
-                                                Content="{TemplateBinding HeaderedContentControl.Header}"
-                                                ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
-                                                ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
-                                                ContentSource="Header"
-                                                HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
-                                                SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                            
+                            <Border
+                                x:Name="Bd"
+                                HorizontalAlignment="Stretch"
+                                BorderThickness="{TemplateBinding Border.BorderThickness}"
+                                BorderBrush="{TemplateBinding Border.BorderBrush}"
+                                Padding="{TemplateBinding Control.Padding}"
+                                Background="{TemplateBinding Panel.Background}"
+                                SnapsToDevicePixels="True">
+                                
+                                <ContentPresenter
+                                    x:Name="PART_Header"
+                                    Content="{TemplateBinding HeaderedContentControl.Header}"
+                                    ContentTemplate="{TemplateBinding HeaderedContentControl.HeaderTemplate}"
+                                    ContentTemplateSelector="{TemplateBinding HeaderedItemsControl.HeaderTemplateSelector}"
+                                    ContentSource="Header"
+                                    HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                    SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                             </Border>
+                            
                             <ControlTemplate.Triggers>
+                                
                                 <Trigger SourceName="Bd" Property="IsMouseOver" Value="True">
                                     <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemOverBrush}" />
                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                                 </Trigger>
+                                
                                 <Trigger Property="TreeViewItem.IsSelected" Value="True">
                                     <Setter TargetName="Bd" Property="Panel.Background" Value="{StaticResource ItemSelectedBrush}">
                                     </Setter>
                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
                                 </Trigger>
+                                
                                 <Trigger Property="UIElement.IsEnabled" Value="False">
                                     <Setter Property="TextElement.Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                 </Trigger>
+                                
                             </ControlTemplate.Triggers>
+                            
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+                
                 <Setter Property="KeyboardNavigation.TabNavigation" Value="Local" />
+                
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default}, Path=AlightAnswersRight}" Value="True">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -1367,11 +1805,25 @@
                 </Style.Triggers>
             </Style>
 
-            <HierarchicalDataTemplate DataType="{x:Type vm:ThemeViewModel}" ItemsSource="{Binding Questions}" ItemContainerStyle="{StaticResource QuestionStyle}">
+            <HierarchicalDataTemplate
+                DataType="{x:Type vm:ThemeViewModel}"
+                ItemsSource="{Binding Questions}"
+                ItemContainerStyle="{StaticResource QuestionStyle}">
+                
                 <StackPanel>
-                    <TextBox FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.267}" siq:ActivateManager.IsWatching="True" Style="{StaticResource LightTextBox}" Name="default" MinWidth="90" Text="{Binding Model.Name}" />
+                    
+                    <TextBox
+                        Name="default"
+                        FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.267}"
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource LightTextBox}"
+                        MinWidth="90"
+                        Text="{Binding Model.Name}" />
+                    
                     <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
+                    
                 </StackPanel>
+                
             </HierarchicalDataTemplate>
 
             <Style x:Key="QuestionMark" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource BlockStyleKey}">
@@ -1429,7 +1881,13 @@
             <DataTemplate x:Key="QuestionTypeParamBagCatKnowsTemplate" DataType="{x:Type pc:QuestionTypeParams}">
                 <DockPanel>
                     <TextBox Style="{StaticResource QParamReadOnlyTextBox}" />
-                    <ComboBox Style="{StaticResource ComboBoxCommon}" Padding="2" MinWidth="100" Height="Auto" SelectedItem="{Binding Path=Model.Value, Converter={StaticResource BagCatKnowsConverter}}" ItemsSource="{Binding Source={StaticResource BCKnows},Path=Values,Mode=OneTime}" />
+                    <ComboBox
+                        Style="{StaticResource ComboBoxCommon}"
+                        Padding="2"
+                        MinWidth="100"
+                        Height="Auto"
+                        SelectedItem="{Binding Path=Model.Value, Converter={StaticResource BagCatKnowsConverter}}"
+                        ItemsSource="{Binding Source={StaticResource BCKnows},Path=Values,Mode=OneTime}" />
                 </DockPanel>
             </DataTemplate>
 
@@ -1442,8 +1900,22 @@
 
             <DataTemplate x:Key="QuestionTypeTemplate">
                 <StackPanel Orientation="Vertical">
-                    <ComboBox Style="{StaticResource ComboBoxCommon}" IsSynchronizedWithCurrentItem="False" siq:SmartMenuManager.SecondMenu="True" HorizontalAlignment="Left" MinWidth="50" MaxWidth="250" IsEditable="True" ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}" Text="{Binding Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" FontWeight="Bold" />
-                    <ItemsControl ItemsSource="{Binding Params}" ItemTemplateSelector="{StaticResource QuestionTypeParamTemplateSelector}" FontWeight="Bold">
+                    <ComboBox
+                        Style="{StaticResource ComboBoxCommon}"
+                        IsSynchronizedWithCurrentItem="False"
+                        siq:SmartMenuManager.SecondMenu="True"
+                        HorizontalAlignment="Left"
+                        MinWidth="50"
+                        MaxWidth="250"
+                        IsEditable="True"
+                        ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
+                        Text="{Binding Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}"
+                        FontWeight="Bold" />
+                    
+                    <ItemsControl
+                        ItemsSource="{Binding Params}"
+                        ItemTemplateSelector="{StaticResource QuestionTypeParamTemplateSelector}"
+                        FontWeight="Bold">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical" />
@@ -1539,11 +2011,14 @@
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
                                     <ToggleButton Style="{StaticResource playButton}" Name="play" />
                                     <Slider Style="{StaticResource playSlider}" Name="progress" />
-                                    <MediaElement Name="mediaElement1" lb:MediaController.Source="{Binding}" LoadedBehavior="Manual"
-                                UnloadedBehavior="Manual"
-                                ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
-                                lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
-                                lb:MediaController.Progress="{Binding ElementName=progress}" />
+                                    <MediaElement
+                                        Name="mediaElement1"
+                                        lb:MediaController.Source="{Binding}"
+                                        LoadedBehavior="Manual"
+                                        UnloadedBehavior="Manual"
+                                        ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                                        lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                                        lb:MediaController.Progress="{Binding ElementName=progress}" />
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -1556,7 +2031,14 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{StaticResource AddAudioImage}" Height="25" />
-                                        <TextBox IsReadOnly="True" Style="{StaticResource CommonTextBox}" Foreground="DarkBlue" TextWrapping="Wrap" Height="Auto" MinWidth="50" Text="{Binding Model.Text}" />
+                                        <TextBox
+                                            IsReadOnly="True"
+                                            Style="{StaticResource CommonTextBox}"
+                                            Foreground="DarkBlue"
+                                            TextWrapping="Wrap"
+                                            Height="Auto"
+                                            MinWidth="50"
+                                            Text="{Binding Model.Text}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </Setter.Value>
@@ -1576,11 +2058,18 @@
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <MediaElement Name="mediaElement1" lb:MediaController.Source="{Binding}" LoadedBehavior="Manual"
-                                        UnloadedBehavior="Manual" Width="400" Height="200"
+                                    
+                                    <MediaElement
+                                        Name="mediaElement1"
+                                        lb:MediaController.Source="{Binding}"
+                                        LoadedBehavior="Manual"
+                                        UnloadedBehavior="Manual"
+                                        Width="400"
+                                        Height="200"
                                         ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
                                         lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
                                         lb:MediaController.Progress="{Binding ElementName=progress}" />
+                                    
                                     <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
                                         <ToggleButton Style="{StaticResource playButton}" Name="play" />
                                         <Slider Style="{StaticResource playSlider}" Name="progress" />
@@ -1597,7 +2086,14 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Image Source="{StaticResource AddVideoImage}" Height="25" />
-                                        <TextBox IsReadOnly="True" Style="{StaticResource CommonTextBox}" Foreground="DarkGreen" TextWrapping="Wrap" Height="Auto" MinWidth="50" Text="{Binding Model.Text}" />
+                                        <TextBox
+                                            IsReadOnly="True"
+                                            Style="{StaticResource CommonTextBox}"
+                                            Foreground="DarkGreen"
+                                            TextWrapping="Wrap"
+                                            Height="Auto"
+                                            MinWidth="50"
+                                            Text="{Binding Model.Text}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </Setter.Value>
@@ -1620,7 +2116,17 @@
                         <DockPanel>
                             <ContentControl Style="{StaticResource AtomStyle}" />
                             <Image Source="{StaticResource AddVoiceImage}" Height="25" />
-                            <TextBox siq:ActivateManager.IsWatching="True" TextWrapping="Wrap" AcceptsReturn="True" Height="Auto" MinWidth="50" Text="{Binding Model.Text, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" FontStyle="Italic" />
+                            
+                            <TextBox
+                                siq:ActivateManager.IsWatching="True"
+                                TextWrapping="Wrap"
+                                AcceptsReturn="True"
+                                Height="Auto"
+                                MinWidth="50"
+                                Text="{Binding Model.Text, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource CommonTextBox}"
+                                FontStyle="Italic" />
+                            
                         </DockPanel>
                     </DataTemplate>
 
@@ -1685,34 +2191,96 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    
                     <TextBlock Style="{StaticResource QuestionMark}" />
-                    <siq:NumericTextBox Style="{StaticResource LightTextBox}" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Text="{Binding Model.Price}" MinWidth="30" TabIndex="1" />
-                    <ContentControl Grid.Row="0" Grid.Column="2" Content="{Binding Type}" Style="{StaticResource QuestionTypeStyle}" KeyboardNavigation.IsTabStop="False" />
-                    <ItemsControl Grid.Row="1" Grid.Column="2" Name="scenario" Style="{StaticResource ScenarioStyle}" KeyboardNavigation.IsTabStop="False" />
-                    <ContentControl Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="5" Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />
-                    <TextBlock Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" Text="(" Style="{StaticResource BlockStyleKey}"/>
-                    <StackPanel MaxWidth="400" Grid.Row="1" Grid.Column="4" Orientation="Vertical" VerticalAlignment="Center" TextBlock.FontStyle="Italic">
+                    
+                    <siq:NumericTextBox
+                        x:Name="price"
+                        Style="{StaticResource LightTextBox}"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Grid.RowSpan="2"
+                        Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
+                        MinWidth="30"
+                        TabIndex="1" />
+                    
+                    <ContentControl
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Content="{Binding Type}"
+                        Style="{StaticResource QuestionTypeStyle}"
+                        KeyboardNavigation.IsTabStop="False" />
+
+                    <ItemsControl
+                        Name="scenario"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Style="{StaticResource ScenarioStyle}"
+                        KeyboardNavigation.IsTabStop="False" />
+                    
+                    <ContentControl
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Grid.ColumnSpan="5"
+                        Content="{Binding Info}"
+                        KeyboardNavigation.IsTabStop="False" />
+                    
+                    <TextBlock
+                        x:Name="open"
+                        Grid.Row="1"
+                        Grid.Column="3"
+                        VerticalAlignment="Center"
+                        Text="(" Style="{StaticResource BlockStyleKey}"/>
+                    
+                    <StackPanel
+                        MaxWidth="400"
+                        Grid.Row="1"
+                        Grid.Column="4"
+                        Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        TextBlock.FontStyle="Italic">
+
                         <siq:TextList
+                            x:Name="right"
                             Style="{StaticResource LightTextBox}"
                             siq:SmartMenuManager.SecondMenu="True"
                             CurrentPosition="{Binding CurrentPosition, Mode=OneWayToSource}"
                             DataContext="{Binding Right}"
                             ItemsSource="{Binding}"
-                            x:Name="right"
                             MinWidth="50"
                             TabIndex="3" />
-                        <ContentControl Style="{StaticResource WrongAnswersStyle}" Content="{Binding Wrong}" KeyboardNavigation.IsTabStop="False" />
+                        
+                        <ContentControl
+                            Style="{StaticResource WrongAnswersStyle}"
+                            Content="{Binding Wrong}"
+                            KeyboardNavigation.IsTabStop="False" />
+                        
                     </StackPanel>
-                    <TextBlock Grid.Row="1" Grid.Column="5" VerticalAlignment="Center" Text=")" Style="{StaticResource BlockStyleKey}"/>
+
+                    <TextBlock
+                        x:Name="close"
+                        Grid.Row="1"
+                        Grid.Column="5"
+                        VerticalAlignment="Center"
+                        Text=")"
+                        Style="{StaticResource BlockStyleKey}"/>
+                    
                 </Grid>
                 <HierarchicalDataTemplate.Triggers>
                     <Trigger SourceName="scenario" Property="IsMouseOver" Value="True">
                         <Setter TargetName="scenario" Property="Control.Background" Value="{StaticResource ActiveBrush}" />
                         <Setter TargetName="right" Property="Control.Background" Value="{StaticResource SecondHighlightColor}" />
                     </Trigger>
+                    <DataTrigger Binding="{Binding Model.Price}" Value="{x:Static p:Question.InvalidPrice}">
+                        <Setter TargetName="price" Property="IsEnabled" Value="False" />
+                        <Setter TargetName="scenario" Property="IsEnabled" Value="False" />
+                        <Setter TargetName="open" Property="Visibility" Value="Collapsed" />
+                        <Setter TargetName="right" Property="IsEnabled" Value="False" />
+                        <Setter TargetName="close" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
                 </HierarchicalDataTemplate.Triggers>
             </HierarchicalDataTemplate>
-
+            
             <util:LinkManager x:Key="LinkManager" />
 
             <DataTemplate x:Key="Authors">

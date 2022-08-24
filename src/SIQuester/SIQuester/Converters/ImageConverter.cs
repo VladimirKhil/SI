@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -11,13 +12,13 @@ namespace SIQuester.Converters
     {
         private BitmapImage _defaultImage;
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null)
             {
                 if (_defaultImage == null)
                 {
-                    var logo = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Resources/logo.png")).Stream;
+                    var logo = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Resources/logo.jpg")).Stream;
 
                     _defaultImage = new BitmapImage();
                     _defaultImage.BeginInit();
@@ -47,6 +48,7 @@ namespace SIQuester.Converters
             }
 
             var isLocalFile = uri.Scheme == "file";
+            
             if (isLocalFile && (!File.Exists(uri.LocalPath) || new FileInfo(uri.LocalPath).Length == 0))
             {
                 return null;
@@ -54,24 +56,29 @@ namespace SIQuester.Converters
 
             try
             {
-                var decoder = BitmapDecoder.Create(uri, BitmapCreateOptions.IgnoreColorProfile, isLocalFile ? BitmapCacheOption.OnLoad : BitmapCacheOption.Default); // Лучше эти два параметра не трогать, так как в противном случае в некоторых ситуациях изображения могут перестать отображаться
+                // Do not touch these params otherwise images may suddenly disappear
+
+                var decoder = BitmapDecoder.Create(
+                    uri,
+                    BitmapCreateOptions.IgnoreColorProfile,
+                    isLocalFile ? BitmapCacheOption.OnLoad : BitmapCacheOption.Default);
+                
                 if (decoder.Frames.Count == 0)
                 {
                     return null;
                 }
 
                 var frame = decoder.Frames[0];
+
                 return frame.CanFreeze ? frame.GetAsFrozen() : frame;
             }
             catch (Exception)
             {
+                // TODO: log
                 return null;
             }
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
     }
 }

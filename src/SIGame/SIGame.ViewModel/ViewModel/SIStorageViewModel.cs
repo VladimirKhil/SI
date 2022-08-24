@@ -1,12 +1,12 @@
-﻿using Services.SI.ViewModel;
-using SIGame.ViewModel.PackageSources;
+﻿using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
+using SIStorageService.ViewModel;
 using System;
 using System.Threading.Tasks;
 
 namespace SIGame.ViewModel
 {
-    public sealed class SIStorageViewModel : ViewModel<SIStorageNew>, INavigationNode
+    public sealed class SIStorageViewModel : ViewModel<SIStorage>, INavigationNode
     {
         public AsyncCommand LoadStorePackage { get; internal set; }
 
@@ -18,12 +18,12 @@ namespace SIGame.ViewModel
 
         public bool IsLoading
         {
-            get { return _isLoading; }
+            get => _isLoading;
             set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsProgress)); } }
         }
 
-        public SIStorageViewModel(UserSettings userSettings)
-            : base(new SIStorageNew())
+        public SIStorageViewModel(SIStorage siStorage, UserSettings userSettings)
+            : base(siStorage)
         {
             _model.CurrentRestriction = userSettings.Restriction;
 
@@ -34,27 +34,27 @@ namespace SIGame.ViewModel
             {
                 switch (e.PropertyName)
                 {
-                    case nameof(SIStorageNew.CurrentRestriction):
+                    case nameof(SIStorage.CurrentRestriction):
                         userSettings.Restriction = Model.CurrentRestriction;
                         break;
 
-                    case nameof(SIStorageNew.CurrentPublisher):
+                    case nameof(SIStorage.CurrentPublisher):
                         userSettings.Publisher = Model.CurrentPublisher.Name;
                         break;
 
-                    case nameof(SIStorageNew.CurrentTag):
+                    case nameof(SIStorage.CurrentTag):
                         userSettings.Tag = Model.CurrentTag.Name;
                         break;
 
-                    case nameof(SIStorageNew.CurrentPackage):
+                    case nameof(SIStorage.CurrentPackage):
                         LoadStorePackage.CanBeExecuted = Model.CurrentPackage != null;
                         break;
 
-                    case nameof(SIStorageNew.IsLoading):
+                    case nameof(SIStorage.IsLoading):
                         OnPropertyChanged(nameof(IsProgress));
                         break;
 
-                    case nameof(SIStorageNew.IsLoadingPackages):
+                    case nameof(SIStorage.IsLoadingPackages):
                         OnPropertyChanged(nameof(IsProgress));
                         break;
                 }
@@ -77,9 +77,9 @@ namespace SIGame.ViewModel
                 IsLoading = true;
 
                 var packageInfo = Model.CurrentPackage;
-                var uri = await Model.LoadSelectedPackageUriAsync();
+                var link = await Model.LoadSelectedPackageUriAsync();
 
-                var packageSource = new SIStoragePackageSource(uri, packageInfo.ID, packageInfo.Description, packageInfo.Guid);
+                var packageSource = new SIStoragePackageSource(link.Uri, packageInfo.ID, packageInfo.Description, packageInfo.Guid);
 
                 AddPackage?.Invoke(packageSource);
                 
@@ -88,7 +88,7 @@ namespace SIGame.ViewModel
             catch (Exception exc)
             {
                 IsLoading = false;
-                PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.SIStorageCallError + ": " + exc.Message, PlatformSpecific.MessageType.Warning);
+                PlatformSpecific.PlatformManager.Instance.ShowMessage($"{Resources.SIStorageCallError}: {exc.Message}", PlatformSpecific.MessageType.Warning);
             }
             finally
             {

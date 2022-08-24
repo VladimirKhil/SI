@@ -6,14 +6,14 @@ using System.Windows.Input;
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Базовый класс для моделей отображения с поддержкой команд и извещений об изменениях
+    /// Represents a base view model class supporting commands and property chnage notifications.
     /// </summary>
-    public abstract class ModelViewBase: INotifyPropertyChanged, IDisposable
+    public abstract class ModelViewBase : INotifyPropertyChanged, IDisposable
     {
         /// <summary>
-        /// Коллекция, позволяющая осуществить привязку к стандартным командам
+        /// Allows to keep bindings to common application commands.
         /// </summary>
-        public CommandBindingCollection CommandBindings { get; } = new CommandBindingCollection();
+        public CommandBindingCollection CommandBindings { get; } = new();
 
         protected void AddCommandBinding(ICommand command, ExecutedRoutedEventHandler executed, CanExecuteRoutedEventHandler canExecute = null)
         {
@@ -25,19 +25,12 @@ namespace SIQuester.ViewModel
             CommandBindings.Add(commandBinding);
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        protected void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChanged?.Invoke(this, e);
-        }
+        protected void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #region Члены IDisposable
 
         public void Dispose()
         {
@@ -49,7 +42,5 @@ namespace SIQuester.ViewModel
         {
             
         }
-
-        #endregion
     }
 }

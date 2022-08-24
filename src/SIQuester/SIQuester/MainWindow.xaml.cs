@@ -57,7 +57,7 @@ namespace SIQuester
                         ContentTemplateSelector = (DataTemplateSelector)Application.Current.Resources["ContentSelector"]
                     };
 
-                    var tabItem = new TabItem()
+                    var tabItem = new TabItem
                     {
                         Header = new ContentControl { Content = e.NewItems[0], ContentTemplate = (DataTemplate)Resources["TabItemHeaderTemplate"] },
                         Content = tabContent,
@@ -143,8 +143,11 @@ namespace SIQuester
                 var point = tabItem.TranslatePoint(new System.Windows.Point(), this);
 
                 var preview = new TabbedThumbnail(this, tabItem, new Vector(0, point.Y)) { Title = data.Header };
+
                 if (data is QDocument doc && doc.Document != null)
+                {
                     preview.Tooltip = doc.Document.Package.Name;
+                }
 
                 preview.TabbedThumbnailMinimized += Preview_TabbedThumbnailMinimized;
                 preview.TabbedThumbnailMaximized += Preview_TabbedThumbnailMaximized;
@@ -218,6 +221,7 @@ namespace SIQuester
         private void TabControl1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             CollectionViewSource.GetDefaultView((DataContext as MainViewModel).DocList).MoveCurrentToPosition(tabControl1.SelectedIndex);
+
             if (TaskbarManager.IsPlatformSupported)
             {
                 if (tabControl1.SelectedItem is TabItem tabItem && TaskbarManager.Instance.TabbedThumbnail.IsThumbnailPreviewAdded(tabItem))
@@ -263,6 +267,7 @@ namespace SIQuester
                     }
 
                     image.Render(dv);
+
                     try
                     {
                         preview.SetImage(image);
@@ -325,14 +330,16 @@ namespace SIQuester
             try
             {
                 FocusManager.SetFocusedElement(this, this);
+
                 if (DataContext is MainViewModel mainViewModel && mainViewModel.DocList.Any())
                 {
                     e.Cancel = true;
 
                     var result = await mainViewModel.DisposeRequestAsync();
+
                     if (result)
                     {
-                        await Dispatcher.BeginInvoke((Action)Close);
+                        await Dispatcher.BeginInvoke(Close);
                     }
                 }
             }
@@ -358,6 +365,7 @@ namespace SIQuester
             }
         }
 
+        // Prevents some weird WPF automation issues (totally disables automation)
         protected override AutomationPeer OnCreateAutomationPeer() => new CustomWindowAutomationPeer(this);
 
         private sealed class CustomWindowAutomationPeer : FrameworkElementAutomationPeer
@@ -368,7 +376,7 @@ namespace SIQuester
 
             protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Window;
 
-            protected override List<AutomationPeer> GetChildrenCore() => new List<AutomationPeer>();
+            protected override List<AutomationPeer> GetChildrenCore() => new();
         }
     }
 }

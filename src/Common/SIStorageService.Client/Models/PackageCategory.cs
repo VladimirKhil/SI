@@ -5,6 +5,9 @@
     /// </summary>
     public sealed class PackageCategory
     {
+        /// <summary>
+        /// Unique package category identifier.
+        /// </summary>
         public int ID { get; set; }
 
         /// <summary>

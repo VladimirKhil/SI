@@ -47,17 +47,19 @@ namespace SIPackages
                 return price;
             }
 
-            var questionCount = Questions.Count;
+            var validQuestions = Questions.Where(q => q.Price != Question.InvalidPrice).ToList();
+
+            var questionCount = validQuestions.Count;
 
             if (questionCount > 1)
             {
-                var stepValue = Questions[1].Price - Questions[0].Price;
-                return Math.Max(0, Questions[questionCount - 1].Price + stepValue);
+                var stepValue = validQuestions[1].Price - validQuestions[0].Price;
+                return Math.Max(0, validQuestions[questionCount - 1].Price + stepValue);
             }
 
             if (questionCount > 0)
             {
-                return Questions[0].Price * 2;
+                return validQuestions[0].Price * 2;
             }
 
             if (isFinal)

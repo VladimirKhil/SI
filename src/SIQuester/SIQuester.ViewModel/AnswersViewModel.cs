@@ -8,16 +8,20 @@ using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class AnswersViewModel: ItemsViewModel<string>
+    public sealed class AnswersViewModel : ItemsViewModel<string>
     {
         public QuestionViewModel Owner { get; private set; }
 
         public SimpleCommand AnswerSpecial1 { get; private set; }
+
         public SimpleCommand AnswerSpecial2 { get; private set; }
+
         public SimpleCommand AnswerSpecial3 { get; private set; }
 
         public ICommand ToNewAnswer { get; private set; }
+
         public ICommand ToNewSource { get; private set; }
+
         public ICommand ToNewComment { get; private set; }
 
         public ICommand SelectAtomObject { get; private set; }
@@ -75,11 +79,13 @@ namespace SIQuester.ViewModel
             var document = Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
 
             document.BeginChange();
+
             try
             {
                 var index = CurrentPosition;
                 var text = this[index];
                 var s = text.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
+
                 if (s.Length > 1)
                 {
                     var comments = Owner.Info.Comments;
@@ -91,6 +97,7 @@ namespace SIQuester.ViewModel
                     comments.Text += s[1].GrowFirstLetter();
                     var str = new StringBuilder(s[0].Trim());
                     var i = 2;
+
                     while (i < s.Length)
                     {
                         str.Append(' ');
@@ -113,6 +120,7 @@ namespace SIQuester.ViewModel
         {
             var text = CurrentItem;
             int i = text.IndexOf(" и ");
+
             if (i > -1)
             {
                 Add(string.Format("{0} и {1}", text.Substring(i + 3).GrowFirstLetter(), text.Substring(0, i)));
@@ -172,6 +180,7 @@ namespace SIQuester.ViewModel
             try
             {
                 var text = ProcessSelection();
+
                 if (text == null)
                 {
                     return;
@@ -189,12 +198,14 @@ namespace SIQuester.ViewModel
         private void ToNewComment_Executed(object arg)
         {
             var text = ProcessSelection();
+
             if (text == null)
             {
                 return;
             }
 
             var comments = Owner.Info.Comments;
+
             if (comments.Text.Length > 0)
             {
                 comments.Text += Environment.NewLine;

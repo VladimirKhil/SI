@@ -120,10 +120,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                var tmp = this[index];
-                this[index] = this[index - 1];
-                this[index - 1] = tmp;
-
+                (this[index - 1], this[index]) = (this[index], this[index - 1]);
                 CurrentItem = this[_currentPosition];
                 UpdateCommands();
             }
@@ -148,10 +145,7 @@ namespace SIQuester.ViewModel
 
             try
             {
-                var tmp = this[index];
-                this[index] = this[index + 1];
-                this[index + 1] = tmp;
-
+                (this[index + 1], this[index]) = (this[index], this[index + 1]);
                 CurrentItem = this[_currentPosition];
                 UpdateCommands();
 

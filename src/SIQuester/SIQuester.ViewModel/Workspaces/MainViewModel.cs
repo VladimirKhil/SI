@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
@@ -6,12 +7,14 @@ using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIStorageService.Client;
+using SIStorageService.ViewModel;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -30,7 +33,16 @@ namespace SIQuester.ViewModel
         #region Commands
 
         public ICommand Open { get; private set; }
+
+        /// <summary>
+        /// Open one of the recently opened files.
+        /// </summary>
         public ICommand OpenRecent { get; private set; }
+
+        /// <summary>
+        /// Remove one of the recentlty opened files.
+        /// </summary>
+        public ICommand RemoveRecent { get; private set; }
 
         /// <summary>
         /// Импортировать текстовый файл
@@ -78,7 +90,7 @@ namespace SIQuester.ViewModel
         /// </summary>
         public QDocument ActiveDocument
         {
-            get { return _activeDocument; }
+            get => _activeDocument;
             set
             {
                 if (_activeDocument != value)
@@ -95,7 +107,7 @@ namespace SIQuester.ViewModel
 
         private readonly StorageContextViewModel _storageContextViewModel;
         
-        public MainViewModel(string[] args, ILoggerFactory loggerFactory)
+        public MainViewModel(string[] args, ISIStorageServiceClient siStorageServiceClient, ILoggerFactory loggerFactory)
         {
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<MainViewModel>();
@@ -106,6 +118,7 @@ namespace SIQuester.ViewModel
 
             Open = new SimpleCommand(Open_Executed);
             OpenRecent = new SimpleCommand(OpenRecent_Executed);
+            RemoveRecent = new SimpleCommand(RemoveRecent_Executed);
 
             ImportTxt = new SimpleCommand(ImportTxt_Executed);
             ImportClipboardTxt = new SimpleCommand(ImportClipboardTxt_Executed);
@@ -122,7 +135,7 @@ namespace SIQuester.ViewModel
             SetSettings = new SimpleCommand(SetSettings_Executed);
             SearchFolder = new SimpleCommand(SearchFolder_Executed);
 
-            _storageContextViewModel = new StorageContextViewModel(new SIStorageServiceClient());
+            _storageContextViewModel = new StorageContextViewModel(siStorageServiceClient);
             _storageContextViewModel.Load();
 
             AddCommandBinding(ApplicationCommands.New, New_Executed);
@@ -149,7 +162,7 @@ namespace SIQuester.ViewModel
             {
                 try
                 {
-                    await item.SaveIfNeededAsync(true, autoSaveCounter % 10 == 0); // Every 10th autosave is full
+                    await item.SaveIfNeededAsync(true, autoSaveCounter % 3 == 0); // Every n-th autosave is full
                 }
                 catch (Exception exc)
                 {
@@ -168,6 +181,7 @@ namespace SIQuester.ViewModel
             if (AppSettings.Default.AutoSave)
             {
                 var autoSaveFolder = new DirectoryInfo(Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.AutoSaveFolderName));
+                
                 if (!autoSaveFolder.Exists)
                 {
                     return;
@@ -179,6 +193,8 @@ namespace SIQuester.ViewModel
                 {
                     try
                     {
+                        _logger.LogInformation("Unsaved files found");
+
                         if (PlatformManager.Instance.Confirm(Resources.RestoreConfirmation))
                         {
                             var restoreFolder = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.AutoSaveRestoreFolderName);
@@ -189,18 +205,15 @@ namespace SIQuester.ViewModel
                             {
                                 var tmpName = Path.Combine(restoreFolder, Guid.NewGuid().ToString());
 
-                                using (var sourceStream = File.OpenRead(file.FullName))
-                                using (var destStream = File.Create(tmpName))
-                                {
-                                    await sourceStream.CopyToAsync(destStream);
-                                }
+                                File.Copy(file.FullName, tmpName, true);
+
+                                _logger.LogInformation("Restoring file {file}...", file.FullName);
 
                                 OpenFile(tmpName, overridePath: PathHelper.DecodePath(file.Name));
                             }
                         }
                         else
                         {
-                            // TODO: Synchronous IO operations could affect UI performance
                             foreach (var file in files)
                             {
                                 file.Delete();
@@ -234,6 +247,7 @@ namespace SIQuester.ViewModel
             foreach (var doc in DocList.ToArray())
             {
                 await doc.Close.ExecuteAsync(null);
+
                 if (DocList.Contains(doc)) // Закрытие отменено
                 {
                     return false;
@@ -320,8 +334,6 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Новый
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void New_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             DocList.Add(new NewViewModel(_storageContextViewModel, _loggerFactory));
@@ -330,8 +342,6 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Открыть существующий пакет
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Open_Executed(object arg)
         {
             if (arg is string filename)
@@ -341,6 +351,7 @@ namespace SIQuester.ViewModel
             }
 
             var files = PlatformManager.Instance.ShowOpenUI();
+
             if (files != null)
             {
                 foreach (var file in files)
@@ -354,10 +365,13 @@ namespace SIQuester.ViewModel
         /// Открыть недавний файл
         /// </summary>
         /// <param name="arg">Путь к файлу</param>
-        private void OpenRecent_Executed(object arg)
-        {
-            OpenFile(arg.ToString());
-        }
+        private void OpenRecent_Executed(object arg) => OpenFile(arg.ToString());
+
+        /// <summary>
+        /// Removes recent file.
+        /// </summary>
+        /// <param name="arg">Recent file path.</param>
+        private void RemoveRecent_Executed(object arg) => AppSettings.Default.History.Remove(arg.ToString());
 
         /// <summary>
         /// Opens the existing file.
@@ -370,7 +384,7 @@ namespace SIQuester.ViewModel
         {
             var savingPath = overridePath ?? path;
 
-            Task<QDocument> loader() => Task.Run(() =>
+            Task<QDocument> loader(CancellationToken cancellationToken) => Task.Run(() =>
             {
                 FileStream stream = null;
                 try
@@ -400,6 +414,8 @@ namespace SIQuester.ViewModel
                         docViewModel.Changed = true;
                     }
 
+                    docViewModel.CheckFileSize();
+
                     return docViewModel;
                 }
                 catch (Exception exc)
@@ -421,27 +437,32 @@ namespace SIQuester.ViewModel
                 {
                     if (task.IsFaulted)
                     {
-                        if (task.Exception.InnerException is FileNotFoundException)
+                        var exc = task.Exception.InnerException;
+
+                        if (exc is FileNotFoundException)
                         {
                             AppSettings.Default.History.Remove(path);
                         }
 
-                        throw task.Exception.InnerException;
+                        _logger.LogError(exc, "File open error: {error}", exc.Message);
+
+                        throw exc;
                     }
 
                     return task.Result;
                 },
                 TaskScheduler.FromCurrentSynchronizationContext());
 
-            DocList.Add(new DocumentLoaderViewModel(
-                path,
-                loader,
-                () =>
-                {
-                    AppSettings.Default.History.Add(savingPath);
+            DocList.Add(
+                new DocumentLoaderViewModel(
+                    path,
+                    loader,
+                    () =>
+                    {
+                        AppSettings.Default.History.Add(savingPath);
 
-                    onSuccess?.Invoke();
-                }));
+                        onSuccess?.Invoke();
+                    }));
         }
 
         private void ImportTxt_Executed(object arg)
@@ -465,6 +486,7 @@ namespace SIQuester.ViewModel
         private void ImportXml_Executed(object arg)
         {
             var file = PlatformManager.Instance.ShowImportXmlUI();
+
             if (file == null)
             {
                 return;
@@ -475,7 +497,12 @@ namespace SIQuester.ViewModel
                 using var stream = File.OpenRead(file);
                 var doc = SIDocument.LoadXml(stream);
 
-                var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory) { Path = "", Changed = true, FileName = Path.GetFileNameWithoutExtension(file) };
+                var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
+                {
+                    Path = "",
+                    Changed = true,
+                    FileName = Path.GetFileNameWithoutExtension(file)
+                };
 
                 LoadMediaFromFolder(docViewModel, Path.GetDirectoryName(file));
 
@@ -503,6 +530,7 @@ namespace SIQuester.ViewModel
                                 var link = document.Document.GetLink(atom.Model);
 
                                 var collection = document.Images;
+
                                 switch (atom.Model.Type)
                                 {
                                     case AtomTypes.Audio:
@@ -515,9 +543,12 @@ namespace SIQuester.ViewModel
                                 }
 
                                 if (collection.Files.Any(f => f.Model.Name == link.Uri))
+                                {
                                     continue;
+                                }
 
                                 var resFileName = Path.Combine(folder, link.Uri);
+
                                 if (!File.Exists(resFileName))
                                 {
                                     continue;
@@ -532,12 +563,18 @@ namespace SIQuester.ViewModel
         }
 
         /// <summary>
-        /// Импортировать пакет из Базы вопросов
+        /// Imports package from Packages Database.
         /// </summary>
-        /// <param name="arg"></param>
         private void ImportBase_Executed(object arg) => DocList.Add(new ImportDBStorageViewModel(_storageContextViewModel, _loggerFactory));
 
-        private void ImportFromSIStore_Executed(object arg) => DocList.Add(new ImportSIStorageViewModel(_storageContextViewModel, _loggerFactory));
+        /// <summary>
+        /// Imports package from SI Storage.
+        /// </summary>
+        private void ImportFromSIStore_Executed(object arg) => DocList.Add(
+            new ImportSIStorageViewModel(
+                _storageContextViewModel,
+                PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>(),
+                _loggerFactory));
 
         private async void SaveAll_Executed(object arg)
         {

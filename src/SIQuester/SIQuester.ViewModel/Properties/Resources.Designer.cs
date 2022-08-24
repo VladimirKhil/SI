@@ -79,6 +79,33 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Добавить вопрос.
+        /// </summary>
+        public static string AddQuestion {
+            get {
+                return ResourceManager.GetString("AddQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Добавить раунд.
+        /// </summary>
+        public static string AddRound {
+            get {
+                return ResourceManager.GetString("AddRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Добавить тему.
+        /// </summary>
+        public static string AddTheme {
+            get {
+                return ResourceManager.GetString("AddTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ответ.
         /// </summary>
         public static string Answer {
@@ -322,6 +349,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Размер файла превышает допустимое значение для игры через Игровой сервер ({0} байт)!.
+        /// </summary>
+        public static string FileSizeLimitExceed {
+            get {
+                return ResourceManager.GetString("FileSizeLimitExceed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на ФИНАЛ.
         /// </summary>
         public static string Final {
@@ -372,6 +408,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string HasUpdates {
             get {
                 return ResourceManager.GetString("HasUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Как использовать программу.
+        /// </summary>
+        public static string HowToUseApp {
+            get {
+                return ResourceManager.GetString("HowToUseApp", resourceCulture);
             }
         }
         

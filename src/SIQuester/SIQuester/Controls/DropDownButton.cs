@@ -8,25 +8,15 @@ namespace SIQuester
     /// Кнопка с выпадающим списком
     /// </summary>
     /// <see cref="http://andyonwpf.blogspot.com/2006/10/dropdownbuttons-in-wpf.html"/>
-    public class DropDownButton: Button
+    public class DropDownButton : Button
     {
-        public static readonly DependencyProperty DropDownProperty = DependencyProperty.Register("DropDown", typeof(ContextMenu), typeof(DropDownButton), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty DropDownProperty =
+            DependencyProperty.Register("DropDown", typeof(ContextMenu), typeof(DropDownButton), new UIPropertyMetadata(null));
 
         public ContextMenu DropDown
         {
-            get
-            {
-                return (ContextMenu)GetValue(DropDownProperty);
-            }
-            set
-            {
-                SetValue(DropDownProperty, value);
-            }
-        }
-
-        public DropDownButton()
-        {
-            
+            get => (ContextMenu)GetValue(DropDownProperty);
+            set => SetValue(DropDownProperty, value);
         }
 
         protected override void OnClick()

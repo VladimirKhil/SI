@@ -9,16 +9,13 @@ namespace SIQuester.ViewModel
 {
     public sealed class StorageContextViewModel : INotifyPropertyChanged
     {
-        private readonly ISIStorageServiceClient _siStorageService;
+        private readonly ISIStorageServiceClient _siStorageServiceClient;
 
         private string[] _publishers;
 
         public string[] Publishers
         {
-            get
-            {
-                return _publishers;
-            }
+            get => _publishers;
             set
             {
                 _publishers = value;
@@ -30,10 +27,7 @@ namespace SIQuester.ViewModel
 
         public string[] Authors
         {
-            get
-            {
-                return _authors;
-            }
+            get => _authors;
             set
             {
                 _authors = value;
@@ -45,10 +39,7 @@ namespace SIQuester.ViewModel
 
         public string[] Tags
         {
-            get
-            {
-                return _tags;
-            }
+            get => _tags;
             set
             {
                 _tags = value;
@@ -60,15 +51,15 @@ namespace SIQuester.ViewModel
 
         public StorageContextViewModel(ISIStorageServiceClient siStorageService)
         {
-            _siStorageService = siStorageService;
+            _siStorageServiceClient = siStorageService;
         }
 
         public async void Load()
         {
             try
             {
-                Publishers = (await _siStorageService.GetPublishersAsync()).Select(named => named.Name).ToArray();
-                Tags = (await _siStorageService.GetTagsAsync()).Select(named => named.Name).ToArray();
+                Publishers = (await _siStorageServiceClient.GetPublishersAsync()).Select(named => named.Name).ToArray();
+                Tags = (await _siStorageServiceClient.GetTagsAsync()).Select(named => named.Name).ToArray();
             }
             catch (Exception exc)
             {

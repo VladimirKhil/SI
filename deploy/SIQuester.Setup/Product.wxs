@@ -9,11 +9,8 @@
 	<?define UpgradeCode="C2EAE409-B7B9-49C4-AE2C-B2AD43FDD0FE" ?>
 	<?define ProductNameR="SIQuester" ?>
 
-	<?if $(var.Platform) = x64 ?>
-	  <?define PublishFolder = "$(var.SIQuester.ProjectDir)bin\Release\net6.0-windows\win-x64\publish\" ?>
-	<?else ?>
-	  <?define PublishFolder = "$(var.SIQuester.ProjectDir)bin\Release\net6.0-windows\win-x86\publish\" ?>
-	<?endif ?>
+    <?define SolutionDir = "$(var.SIQuester.ProjectDir)..\..\..\" ?>
+	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
 
 	<Product
 	  Id="*"
@@ -161,7 +158,7 @@
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Ben.Demystifier.LICENSE.txt" />
 			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
-				<File KeyPath="yes" Source="$(var.SIQuester.ProjectDir)..\..\..\LICENSE" />
+				<File KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
 			</Component>
 			<Component Id="LicensesReg" Guid="{E903B74E-2536-49A6-B842-4D8A3BAA342A}">
 				<RegistryValue

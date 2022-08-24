@@ -9,15 +9,9 @@ namespace SIQuester
     /// </summary>
     public static class ActivateManager
     {
-        public static bool GetIsWatching(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(IsWatchingProperty);
-        }
+        public static bool GetIsWatching(DependencyObject obj) => (bool)obj.GetValue(IsWatchingProperty);
 
-        public static void SetIsWatching(DependencyObject obj, bool value)
-        {
-            obj.SetValue(IsWatchingProperty, value);
-        }
+        public static void SetIsWatching(DependencyObject obj, bool value) => obj.SetValue(IsWatchingProperty, value);
 
         // Using a DependencyProperty as the backing store for IsWatching.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsWatchingProperty =
@@ -26,6 +20,7 @@ namespace SIQuester
         private static void PropertyChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var control = (FrameworkElement)sender;
+
             if ((bool)e.NewValue)
             {
                 control.Loaded += Control_Loaded;
@@ -40,11 +35,14 @@ namespace SIQuester
         {
             var control = (FrameworkElement)sender;
             control.Loaded -= Control_Loaded;
+
             if (control.DataContext == QDocument.ActivatedObject)
             {
                 // Финт для того, чтобы появился TextBox для комментария и ограничения. Пустой - сразу исчезает по триггеру
                 if (control is TextBox textBox && (textBox.Text == "Ограничение" || textBox.Text == ViewModel.Properties.Resources.Comment))
+                {
                     textBox.Clear();
+                }
 
                 QDocument.ActivatedObject = null;
 

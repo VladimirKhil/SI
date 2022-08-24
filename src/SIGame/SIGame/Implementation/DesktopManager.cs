@@ -16,7 +16,6 @@ namespace SIGame.Implementation
 {
     public sealed class DesktopManager : PlatformManager
     {
-        internal IServiceProvider ServiceProvider { get; set; }
 
         private readonly System.Windows.Controls.MediaElement _element = new System.Windows.Controls.MediaElement
         {

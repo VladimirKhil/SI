@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 
 namespace SIQuester.ViewModel
 {
+    /// <summary>
+    /// Represents an question scenario atom view model.
+    /// </summary>
     public sealed class AtomViewModel : ModelViewBase, IMediaOwner
     {
-
         public Atom Model { get; }
 
         public ScenarioViewModel OwnerScenario { get; set; }

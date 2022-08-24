@@ -15,15 +15,9 @@ namespace SIQuester.Implementation
     {
         internal FlowDocument _document;
 
-        public FlowDocumentWrapper(FlowDocument document)
-        {
-            _document = document;
-        }
+        public FlowDocumentWrapper(FlowDocument document) => _document = document;
 
-        public object GetDocument()
-        {
-            return _document;
-        }
+        public object GetDocument() => _document;
 
         public void ExportXps(string filename)
         {
@@ -79,6 +73,7 @@ namespace SIQuester.Implementation
                             var text = ((Run)inline).Text;
 
                             writer.WriteStartElement("t", wNamespace);
+
                             if (text.Length > 0 && (char.IsWhiteSpace(text[0]) || char.IsWhiteSpace(text[text.Length - 1])))
                             {
                                 writer.WriteAttributeString("xml", "space", null, "preserve");
@@ -110,14 +105,19 @@ namespace SIQuester.Implementation
             using var sr = new StreamWriter(filename, false, encoding);
             
             onHeader?.Invoke(sr);
+
             foreach (var paragraph in _document.Blocks.OfType<Paragraph>())
             {
                 foreach (var inline in paragraph.Inlines)
                 {
                     if (inline is LineBreak)
+                    {
                         onLineBreak(sr);
+                    }
                     else
+                    {
                         onText(sr, (inline as Run).Text);
+                    }
                 }
             }
 
@@ -127,6 +127,7 @@ namespace SIQuester.Implementation
         public bool Print()
         {
             var printDialog = new PrintDialog();
+
             if (printDialog.ShowDialog() == true)
             {
                 printDialog.PrintDocument(((IDocumentPaginatorSource)_document).DocumentPaginator, "Идёт печать");

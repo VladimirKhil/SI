@@ -47,9 +47,13 @@ namespace SIQuester
         }
 
         private bool _blockChanges = false;
+        
         private int _blockSelection = 0;
+
         private bool _blockNotificationsFlag = false;
+
         private readonly List<ItemInfo> _infos = new();
+
         private int _oldSelectionStart = -1, _oldSelectionLength = -1, _oldOffsetStart = -1;
 
         /// <summary>
@@ -68,8 +72,8 @@ namespace SIQuester
         /// </summary>
         public IList ItemsSource
         {
-            get { return (IList)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
+            get => (IList)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for ItemsSource.  This enables animation, styling, binding, etc...
@@ -91,6 +95,7 @@ namespace SIQuester
                 control.Items = CollectionViewSource.GetDefaultView(control.ItemsSource);
                 control.CurrentItem = control.ItemsSource.Cast<object>().FirstOrDefault();
                 control.CurrentPosition = control.CurrentItem != null ? 0 : -1;
+
                 if (control.IsSynchronizedWithCurrentItem == true)
                 {
                     control.Items.MoveCurrentToPosition(0);
@@ -110,6 +115,7 @@ namespace SIQuester
             }
 
             notifier = newValue as INotifyCollectionChanged;
+
             if (notifier != null)
             {
                 notifier.CollectionChanged += Notifier_CollectionChanged;
@@ -154,8 +160,8 @@ namespace SIQuester
 
         public object CurrentItem
         {
-            get { return GetValue(CurrentItemProperty); }
-            set { SetValue(CurrentItemProperty, value); }
+            get => GetValue(CurrentItemProperty);
+            set => SetValue(CurrentItemProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for CurrentItem.  This enables animation, styling, binding, etc...
@@ -164,8 +170,8 @@ namespace SIQuester
 
         public int CurrentPosition
         {
-            get { return (int)GetValue(CurrentPositionProperty); }
-            set { SetValue(CurrentPositionProperty, value); }
+            get => (int)GetValue(CurrentPositionProperty);
+            set => SetValue(CurrentPositionProperty, value);
         }
 
         // Using a DependencyProperty as the backing store for CurrentPosition.  This enables animation, styling, binding, etc...
@@ -175,6 +181,7 @@ namespace SIQuester
         private void OnItemsReplaced(NotifyCollectionChangedEventArgs e)
         {
             _blockSelection++;
+
             try
             {
                 OnItemsRemoved(e);
@@ -190,13 +197,16 @@ namespace SIQuester
         private void OnItemsRemoved(NotifyCollectionChangedEventArgs e)
         {
             _blockChanges = true;
+
             try
             {
                 _blockSelection++;
+
                 try
                 {
                     var start = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex);
                     var end = ConvertLocalOffsetToGlobalOffset(e.OldStartingIndex + e.OldItems.Count);
+
                     if (e.OldStartingIndex == 0)
                     {
                         end += ItemsSeparator.Length;
@@ -254,6 +264,7 @@ namespace SIQuester
                 Select(ConvertLocalOffsetToGlobalOffset(e.NewStartingIndex), 0);
                 var text = new StringBuilder();
                 var index = e.NewStartingIndex;
+
                 foreach (var item in e.NewItems)
                 {
                     if (index > 0)
@@ -293,9 +304,11 @@ namespace SIQuester
         private string CheckIsLink(int index, object item, out bool isLink, out bool canBeSpecified, out string tail)
         {
             var toAdd = item.ToString();
+
             if (LinkManager != null)
             {
                 var link = LinkManager.GetLinkText(ItemsSource, index, out canBeSpecified, out tail);
+
                 if (link != null)
                 {
                     toAdd = "(" + link + ")";
@@ -349,10 +362,10 @@ namespace SIQuester
         private void OnPaste(object sender, DataObjectPastingEventArgs e)
         {
             var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
-            if (ItemsSource.Count == 0
-                || _infos[index]._readOnlyLength > -1
-                    && (!_infos[index]._canBeSpecified
-                        || offset < _infos[index]._readOnlyLength))
+
+            if (ItemsSource.Count == 0 || 
+                _infos[index]._readOnlyLength > -1 &&
+                (!_infos[index]._canBeSpecified || offset < _infos[index]._readOnlyLength))
             {
                 e.CancelCommand();
             }
@@ -361,10 +374,10 @@ namespace SIQuester
         private void OnCopy(object sender, DataObjectCopyingEventArgs e)
         {
             var offset = ConvertGlobalOffsetToLocalOffset(SelectionStart, out int index);
-            if (ItemsSource.Count == 0
-                || _infos[index]._readOnlyLength > -1
-                    && (!_infos[index]._canBeSpecified
-                        || offset < _infos[index]._readOnlyLength))
+
+            if (ItemsSource.Count == 0 ||
+                    _infos[index]._readOnlyLength > -1 &&
+                    (!_infos[index]._canBeSpecified || offset < _infos[index]._readOnlyLength))
             {
                 e.CancelCommand();
             }
@@ -399,6 +412,7 @@ namespace SIQuester
             }
 
             int index = 0;
+
             foreach (var change in e.Changes)
             {
                 var offset = ConvertGlobalOffsetToLocalOffset(change.Offset, out index);
@@ -421,6 +435,7 @@ namespace SIQuester
                         var hashIndex = origin.IndexOf('#');
 
                         string newText = Text.Substring(change.Offset, change.AddedLength);
+
                         if (hashIndex > -1)
                         {
                             offset = hashIndex + delta + 1;
@@ -431,12 +446,12 @@ namespace SIQuester
                             offset = origin.Length;
                         }
 
-                        ItemsSource[index] = origin.Substring(0, offset) + newText + origin.Substring(offset + change.RemovedLength);
+                        ItemsSource[index] = string.Concat(origin.AsSpan(0, offset), newText, origin.AsSpan(offset + change.RemovedLength));
                         _infos[index] = new ItemInfo(ItemsSource[index].ToString().Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
                     }
                     else
                     {
-                        ItemsSource[index] = origin.Substring(0, offset) + Text.Substring(change.Offset, change.AddedLength) + origin.Substring(offset + change.RemovedLength);
+                        ItemsSource[index] = string.Concat(origin.AsSpan(0, offset), Text.AsSpan(change.Offset, change.AddedLength), origin.AsSpan(offset + change.RemovedLength));
                         _infos[index] = new ItemInfo(ItemsSource[index].ToString().Length, _infos[index]._readOnlyLength, _infos[index]._canBeSpecified);
                     }
                 }
@@ -476,9 +491,11 @@ namespace SIQuester
 
             index = 0;
             var length = 0;
+
             while (index < _infos.Count)
             {
                 var add = _infos[index]._length + ItemsSeparator.Length;
+
                 if (length + add <= offset)
                 {
                     length += add;
@@ -516,9 +533,11 @@ namespace SIQuester
         private int ConvertLocalOffsetToGlobalOffset(int index)
         {
             var result = 0;
+
             for (var i = 0; i < index; i++)
             {
                 result += _infos[i]._length;
+
                 if (i + 1 < index)
                 {
                     result += ItemsSeparator.Length;
@@ -531,6 +550,7 @@ namespace SIQuester
         protected override void OnSelectionChanged(RoutedEventArgs e)
         {
             base.OnSelectionChanged(e);
+
             // В данной версии просто запретим выделять более 1 элемента
             if (_blockSelection > 0 || ItemsSource == null || _infos.Count == 0)
             {
@@ -548,6 +568,7 @@ namespace SIQuester
             if (indexStart != indexEnd || ItemsSource != null && ItemsSource.Count > 0 && offsetEnd > _infos[indexStart]._length)
             {
                 _blockSelection++;
+
                 try
                 {
                     if (SelectionLength == 0)
@@ -624,6 +645,7 @@ namespace SIQuester
         private void SetText()
         {
             _blockChanges = true;
+
             try
             {
                 if (Items == null)
@@ -636,6 +658,7 @@ namespace SIQuester
                 _infos.Clear();
                 int index = 0;
                 var isFirst = true;
+
                 foreach (var item in Items.Cast<string>())
                 {
                     if (!isFirst)
@@ -672,6 +695,7 @@ namespace SIQuester
         {
             var start = SelectionStart;
             var index = 0;
+
             while (index < _infos.Count && start > _infos[index]._length)
             {
                 start -= _infos[index]._length + 2;

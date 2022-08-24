@@ -5,6 +5,7 @@ using System.Windows.Data;
 
 namespace SIQuester.Converters
 {
+    [ValueConversion(typeof(object), typeof(Visibility))]
     public sealed class NotNullToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>

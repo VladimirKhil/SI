@@ -59,6 +59,7 @@ namespace SIQuester
             var expr = ExpressionBuilder.Parse(value, false);
 
             _rootExpression = expr as Sequence;
+
             if (_rootExpression == null)
             {
                 if (expr != null)
@@ -103,13 +104,16 @@ namespace SIQuester
             if (_spardViewModel == null && DataContext != null)
             {
                 System.Windows.FrameworkElement parent = this;
+
                 do
                 {
                     parent = VisualTreeHelper.GetParent(parent) as System.Windows.FrameworkElement;
+
                     if (parent == null)
                         return;
 
                     _spardViewModel = parent.DataContext as SpardTemplateViewModel;
+
                     if (_spardViewModel != null)
                         break;
 
@@ -123,22 +127,23 @@ namespace SIQuester
             }
         }
 
-        private void SpardViewModel_OptionalInserted()
-        {
-            InsertOptional(new Optional(new Sequence(Array.Empty<Expression>())));
-        }
+        private void SpardViewModel_OptionalInserted() => InsertOptional(new Optional(new Sequence(Array.Empty<Expression>())));
 
         private Expression[] GetTopExpressions(Inline[] inlines)
         {
             var result = new List<Expression>();
             var depth = 0;
+
             for (int i = 0; i < inlines.Length; i++)
             {
                 var expr = GetExpression(inlines[i]);
+
                 if (depth == 0)
                 {
                     if (expr is Optional)
+                    {
                         depth++;
+                    }
 
                     result.Add(expr);
                 }
@@ -210,10 +215,7 @@ namespace SIQuester
             InsertExpression(expr);
         }
 
-        private void InsertExpression(Expression expression)
-        {
-            InsertExpression(Selection.Start, expression);
-        }
+        private void InsertExpression(Expression expression) => InsertExpression(Selection.Start, expression);
 
         private void InsertExpression(TextPointer pointer, Expression expression)
         {
@@ -319,6 +321,7 @@ namespace SIQuester
                     }
 
                     _selFlag = true;
+
                     try
                     {
                         Selection.Select(start, end);
@@ -348,6 +351,7 @@ namespace SIQuester
         {
             RemoveSelection();
             var active = GetSelectedInline(out int leftIndex);
+
             if (active != null && active.NextInline is Run && leftIndex == 1)
             {
                 active = active.NextInline;
@@ -357,6 +361,7 @@ namespace SIQuester
             var expr = GetExpression(active);
 
             bool result;
+
             if (active is InlineUIContainer || active is LineBreak)
             {
                 var instruction = CreateInstruction(text);
@@ -370,7 +375,7 @@ namespace SIQuester
                     var stringValue = stringValueInner;
                     var value = stringValue.Value;
 
-                    stringValue.Value = value.Substring(0, leftIndex) + text + value.Substring(leftIndex);
+                    stringValue.Value = string.Concat(value.AsSpan(0, leftIndex), text, value.AsSpan(leftIndex));
 
                     if (CaretPosition.LogicalDirection == LogicalDirection.Forward)
                         CaretPosition.InsertTextInRun(text);
@@ -396,15 +401,10 @@ namespace SIQuester
             return result;
         }
 
-        private Run GetRunInContainer(InlineUIContainer container)
-        {
-            return (Run)((TextBlock)container.Child).Inlines.FirstInline;
-        }
+        private static Run GetRunInContainer(InlineUIContainer container) => (Run)((TextBlock)container.Child).Inlines.FirstInline;
 
-        private void InsertNewExpression(Inline inline, int leftIndex, Expression previous, Expression expression)
-        {
+        private void InsertNewExpression(Inline inline, int leftIndex, Expression previous, Expression expression) =>
             InsertNewExpression(Selection.Start, inline, leftIndex, previous, expression);
-        }
 
         private void InsertNewExpression(TextPointer pointer, Inline inline, int leftIndex, Expression current, Expression expression)
         {
@@ -426,14 +426,17 @@ namespace SIQuester
             {
                 var chain = GetExpressionChain(previous);
                 var sequence = _rootExpression;
+
                 if (chain.Length > 0)
                 {
-                    previous = chain[chain.Length - 1];
+                    previous = chain[^1];
+
                     for (int i = 0; i < chain.Length; i++)
                     {
                         if (chain[i] is Sequence seq)
                         {
                             sequence = seq;
+
                             if (i > 0)
                             {
                                 previous = chain[i - 1];
@@ -451,16 +454,15 @@ namespace SIQuester
         private Expression GetExpression(Inline inline)
         {
             if (inline == null)
+            {
                 return null;
+            }
 
             _indexTable.TryGetValue(inline, out Expression result);
             return result;
         }
 
-        private Inline GetSelectedInline(out int leftIndex)
-        {
-            return GetSelectedInline(Selection.Start, out leftIndex);
-        }
+        private Inline GetSelectedInline(out int leftIndex) => GetSelectedInline(Selection.Start, out leftIndex);
 
         /// <summary>
         /// Получить выделенный элемент
@@ -480,9 +482,11 @@ namespace SIQuester
             {
                 leftIndex = 1;
                 System.Windows.DependencyObject element;
+
                 if (Selection.IsEmpty || pointer == Selection.End)
                 {
                     element = pointer.GetAdjacentElement(LogicalDirection.Backward);
+
                     if (element is Paragraph)
                     {
                         element = pointer.GetAdjacentElement(LogicalDirection.Forward);
@@ -500,6 +504,7 @@ namespace SIQuester
             else
             {
                 leftIndex = active.ContentStart.GetOffsetToPosition(pointer);
+
                 if (Selection.IsEmpty && leftIndex == 0 && active.PreviousInline != null)
                 {
                     leftIndex = 1;
@@ -522,17 +527,22 @@ namespace SIQuester
 
             leftIndex = 0;
             var inline = GetSelectedInline(out int leftIndexLocal);
+
             if (inline != null)
             {
                 while (pointer.CompareTo(Selection.End) < 0)
                 {
                     if (result.Count == 0)
+                    {
                         leftIndex = leftIndexLocal;
+                    }
 
                     result.Add(inline);
 
                     if (inline.NextInline == null)
+                    {
                         break;
+                    }
 
                     inline = inline.NextInline;
 
@@ -590,7 +600,9 @@ namespace SIQuester
             var split = before != null && pointer.CompareTo(inline.ContentStart) > 0 && pointer.CompareTo(inline.ContentEnd) < 0;
 
             if (!InsertExpressionAtPoint(pointer, expr, out Inline toInsert))
+            {
                 return;
+            }
 
             if (split)
             {

@@ -24,6 +24,7 @@ namespace SIQuester.ViewModel.PlatformSpecific
         public abstract Tuple<int, int, int> GetCurrentItemSelectionArea();
 
         public abstract string[] ShowOpenUI();
+
         public abstract string[] ShowMediaOpenUI();
 
         public abstract bool ShowSaveUI(string title, string defaultExtension, Dictionary<string, string> filter, ref string filename);
@@ -31,16 +32,19 @@ namespace SIQuester.ViewModel.PlatformSpecific
         public abstract bool ShowExportUI(string title, Dictionary<string, string> filter, ref string filename, ref int filterIndex, out Encoding encoding, out bool start);
 
         public abstract string ShowImportUI();
+
         public abstract string ShowImportXmlUI();
 
         public abstract string SelectSearchFolder();
 
         public abstract IMedia PrepareMedia(IMedia media, string type);
+
         public abstract void ClearMedia(IEnumerable<string> media);
 
         public abstract string AskText(string title, bool multiline = false);
 
         public abstract IFlowDocumentWrapper BuildDocument(SIDocument doc, ExportFormats format);
+
         public abstract void ExportTable(SIDocument doc, string filename);
 
         public abstract IXpsDocumentWrapper GetHelp();
@@ -48,10 +52,13 @@ namespace SIQuester.ViewModel.PlatformSpecific
         public abstract void AddToRecentCategory(string fileName);
 
         public abstract void ShowErrorMessage(string message);
+
         public abstract void ShowExclamationMessage(string message);
 
         public abstract void Inform(string message, bool exclamation = false);
+
         public abstract bool Confirm(string message);
+
         public abstract bool? ConfirmWithCancel(string message);
 
         public abstract bool ConfirmExclWithWindow(string message);

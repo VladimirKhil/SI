@@ -14,14 +14,6 @@ namespace SIQuester.ViewModel.Workspaces.Dialogs
 
         public override string Header => "Отправка пакета в компьютерную игру";
 
-        private string _error;
-
-        public string ErrorMessage
-        {
-            get { return _error; }
-            set { _error = value; OnPropertyChanged(); }
-        }
-
         private string _comment = "";
 
         public string Comment

@@ -11,7 +11,6 @@
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
     <Version>5.7.8</Version>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,6 +32,11 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="appsettings.Production.json" />
+    <None Remove="Resources\logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="Resources\Icons.xaml" />
+    <Page Remove="Resources\IconsNonShared.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
@@ -62,6 +66,8 @@
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\Icons.xaml" />
+    <None Include="Resources\IconsNonShared.xaml" />
     <Resource Include="Resources\Entypo.ttf" />
     <Content Include="appsettings.Production.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -86,6 +92,7 @@
     <None Include="Resources\bullet_error.png" />
     <None Include="Resources\script_go.png" />
     <Resource Include="Resources\cut.png" />
+    <Resource Include="Resources\logo.jpg" />
     <Resource Include="Resources\page_copy.png" />
     <Resource Include="Resources\paste_plain.png" />
     <None Include="Resources\marker.png" />
@@ -95,7 +102,6 @@
     <Resource Include="Resources\page_edit.png" />
     <None Include="Resources\pencil.png" />
     <None Include="Resources\logo.ico" />
-    <Resource Include="Resources\logo.png" />
     <None Include="Resources\map_add.png" />
     <None Include="Resources\map_delete.png" />
     <None Include="Resources\map_go.png" />

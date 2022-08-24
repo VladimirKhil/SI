@@ -1,25 +1,51 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Properties;
 using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class ThemeViewModel: ItemViewModel<Theme>
+    /// <summary>
+    /// Defines a package theme view model.
+    /// </summary>
+    public sealed class ThemeViewModel : ItemViewModel<Theme>
     {
+        /// <summary>
+        /// Owner round view model.
+        /// </summary>
         public RoundViewModel OwnerRound { get; set; }
 
         public override IItemViewModel Owner => OwnerRound;
 
-        public ObservableCollection<QuestionViewModel> Questions { get; } = new ObservableCollection<QuestionViewModel>();
+        /// <summary>
+        /// Theme questions.
+        /// </summary>
+        public ObservableCollection<QuestionViewModel> Questions { get; } = new();
+
         public override ICommand Add { get; protected set; }
+
+        public override string AddHeader => Resources.AddQuestion;
+
         public override ICommand Remove { get; protected set; }
-        public ICommand Clone{ get; private set; }
+
+        public ICommand Clone { get; private set; }
+
+        /// <summary>
+        /// Adds new question.
+        /// </summary>
         public ICommand AddQuestion { get; private set; }
+
+        /// <summary>
+        /// Adds new question having no data.
+        /// </summary>
+        public ICommand AddEmptyQuestion { get; private set; }
+
         public ICommand SortQuestions { get; private set; }
 
         public ThemeViewModel(Theme theme)
@@ -35,15 +61,16 @@ namespace SIQuester.ViewModel
             Clone = new SimpleCommand(CloneTheme_Executed);
             Remove = new SimpleCommand(RemoveTheme_Executed);
             Add = AddQuestion = new SimpleCommand(AddQuestion_Executed);
+            AddEmptyQuestion = new SimpleCommand(AddEmptyQuestion_Executed);
             SortQuestions = new SimpleCommand(SortQuestions_Executed);
         }
 
-        private void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Questions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Replace:
                     for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                     {
                         if (Questions[i].OwnerTheme != null)
@@ -56,13 +83,13 @@ namespace SIQuester.ViewModel
                     }
                     break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Move:
                     var temp = Model.Questions[e.OldStartingIndex];
                     Model.Questions.Insert(e.NewStartingIndex, temp);
                     Model.Questions.RemoveAt(e.OldStartingIndex + (e.NewStartingIndex < e.OldStartingIndex ? 1 : 0));
                     break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Remove:
                     foreach (QuestionViewModel question in e.OldItems)
                     {
                         question.OwnerTheme = null;
@@ -72,7 +99,7 @@ namespace SIQuester.ViewModel
                     }
                     break;
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                case NotifyCollectionChangedAction.Reset:
                     Model.Questions.Clear();
                     foreach (QuestionViewModel question in Questions)
                     {
@@ -106,31 +133,9 @@ namespace SIQuester.ViewModel
             try
             {
                 var document = OwnerRound.OwnerPackage.Document;
-                var price = Questions.Count == 0 ? AppSettings.Default.QuestionBase : -1;
+                var price = DetectNextQuestionPrice();
 
-                if (price == -1)
-                {
-                    var n = Questions.Count;
-                    if (n > 1)
-                    {
-                        var add = Questions[1].Model.Price - Questions[0].Model.Price;
-                        price = Math.Max(0, Questions[n - 1].Model.Price + add);
-                    }
-                    else if (n > 0)
-                    {
-                        price = Questions[0].Model.Price * 2;
-                    }
-                    else if (OwnerRound.Model.Type == RoundTypes.Final)
-                    {
-                        price = 0;
-                    }
-                    else
-                    {
-                        price = 100;
-                    }
-                }
-
-                var question = QDocument.CreateQuestion(price);
+                var question = PackageItemsHelper.CreateQuestion(price);
 
                 var questionViewModel = new QuestionViewModel(question);
                 Questions.Add(questionViewModel);
@@ -144,12 +149,40 @@ namespace SIQuester.ViewModel
             }
         }
 
+        private int DetectNextQuestionPrice()
+        {
+            var validQuestions = Questions.Where(q => q.Model.Price != Question.InvalidPrice).ToList();
+
+            var questionCount = validQuestions.Count;
+
+            if (questionCount > 1)
+            {
+                var add = validQuestions[1].Model.Price - validQuestions[0].Model.Price;
+                return Math.Max(0, validQuestions[questionCount - 1].Model.Price + add);
+            }
+
+            if (questionCount > 0)
+            {
+                return validQuestions[0].Model.Price * 2;
+            }
+
+            return OwnerRound.Model.Type == RoundTypes.Final ? 0 : AppSettings.Default.QuestionBase;
+        }
+
+        private void AddEmptyQuestion_Executed(object arg)
+        {
+            var question = new Question { Price = -1 };
+            var questionViewModel = new QuestionViewModel(question);
+            Questions.Add(questionViewModel);
+        }
+
         private void SortQuestions_Executed(object arg)
         {
             try
             {
                 var document = OwnerRound.OwnerPackage.Document;
                 document.BeginChange();
+
                 try
                 {
                     for (int i = 1; i < Questions.Count; i++)
@@ -179,6 +212,7 @@ namespace SIQuester.ViewModel
         {
             var document = OwnerRound.OwnerPackage.Document;
             document.BeginChange();
+
             try
             {
                 UpdateCostsCore(costSetter);

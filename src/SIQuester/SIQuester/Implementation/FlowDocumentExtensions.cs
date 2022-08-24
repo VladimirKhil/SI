@@ -7,9 +7,13 @@ namespace SIQuester.Implementation
         internal static Paragraph Append(this Paragraph paragraph, object value)
         {
             if (paragraph.Inlines.LastInline as Run != null)
+            {
                 (paragraph.Inlines.LastInline as Run).Text += value.ToString();
+            }
             else
+            {
                 paragraph.Inlines.Add(value.ToString());
+            }
 
             return paragraph;
         }
@@ -17,9 +21,13 @@ namespace SIQuester.Implementation
         internal static Paragraph AppendText(this Paragraph paragraph, string text)
         {
             if (paragraph.Inlines.LastInline is Run run)
+            {
                 run.Text += text;
+            }
             else
+            {
                 paragraph.Inlines.Add(text);
+            }
 
             return paragraph;
         }
@@ -33,9 +41,13 @@ namespace SIQuester.Implementation
         internal static Paragraph AppendLine(this Paragraph paragraph, string text)
         {
             if (paragraph.Inlines.LastInline is Run run)
+            {
                 run.Text += text;
+            }
             else
+            {
                 paragraph.Inlines.Add(text);
+            }
 
             paragraph.Inlines.Add(new LineBreak());
             return paragraph;
@@ -44,9 +56,13 @@ namespace SIQuester.Implementation
         internal static Paragraph AppendFormat(this Paragraph paragraph, string format, params object[] args)
         {
             if (paragraph.Inlines.LastInline is Run run)
+            {
                 run.Text += string.Format(format, args);
+            }
             else
+            {
                 paragraph.Inlines.Add(string.Format(format, args));
+            }
 
             return paragraph;
         }

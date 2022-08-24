@@ -66,7 +66,7 @@ namespace SIQuester.ViewModel
         internal void OnChanged(IChange change) => Changed?.Invoke(change);
 
         /// <summary>
-        /// Существующие в коллекции файлы
+        /// Collection files.
         /// </summary>
         public ObservableCollection<MediaItemViewModel> Files { get; } = new();
 
@@ -121,6 +121,7 @@ namespace SIQuester.ViewModel
 
             var ext = (ExtendedPropertyChangedEventArgs<string>)e;
             var item = (Named)sender;
+
             if (Files.Count(obj => obj.Model.Name == item.Name) > 1)
             {
                 SafeRename(item, ext.OldValue);
@@ -130,51 +131,60 @@ namespace SIQuester.ViewModel
             var newValue = item.Name;
             var renamedExisting = !_added.Any(mi => mi.Model == item);
             Tuple<string, string> tuple = null;
+
             if (renamedExisting)
             {
                 tuple = Tuple.Create(ext.OldValue, item.Name.Replace("%", ""));
                 _renamed.Add(tuple);
             }
 
-            OnChanged(new CustomChange(() =>
-            {
-                if (renamedExisting)
+            OnChanged(new CustomChange(
+                () =>
                 {
-                    var found = false;
-                    for (int i = _renamed.Count - 1; i >= 0; i--)
+                    if (renamedExisting)
                     {
-                        if (_renamed[i] == tuple)
+                        var found = false;
+
+                        for (int i = _renamed.Count - 1; i >= 0; i--)
                         {
-                            _renamed.RemoveAt(i);
-                            found = true;
-                            break;
+                            if (_renamed[i] == tuple)
+                            {
+                                _renamed.RemoveAt(i);
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            _renamed.Add(Tuple.Create(item.Name, ext.OldValue));
+                            HasPendingChanges = IsChanged();
                         }
                     }
 
-                    if (!found)
+                    SafeRename(item, ext.OldValue);
+
+                },
+                () =>
+                {
+                    SafeRename(item, newValue);
+
+                    if (renamedExisting)
                     {
-                        _renamed.Add(Tuple.Create(item.Name, ext.OldValue));
+                        var last = _renamed.LastOrDefault();
+
+                        if (last != null && last.Item1 == tuple.Item2 && last.Item2 == tuple.Item1)
+                        {
+                            _renamed.RemoveAt(_renamed.Count - 1);
+                        }
+                        else
+                        {
+                            _renamed.Add(tuple);
+                        }
+
                         HasPendingChanges = IsChanged();
                     }
-                }
-
-                SafeRename(item, ext.OldValue);
-
-            }, () =>
-            {
-                SafeRename(item, newValue);
-
-                if (renamedExisting)
-                {
-                    var last = _renamed.LastOrDefault();
-                    if (last != null && last.Item1 == tuple.Item2 && last.Item2 == tuple.Item1)
-                        _renamed.RemoveAt(_renamed.Count - 1);
-                    else
-                        _renamed.Add(tuple);
-
-                    HasPendingChanges = IsChanged();
-                }
-            }));
+                }));
             
             HasPendingChanges = IsChanged();
         }
@@ -182,6 +192,7 @@ namespace SIQuester.ViewModel
         private void SafeRename(Named item, string name)
         {
             _blockFlag = true;
+
             try
             {
                 item.Name = name;
@@ -286,6 +297,7 @@ namespace SIQuester.ViewModel
             foreach (var item in _added.ToArray())
             {
                 var fs = _streams[item].Item2;
+
                 if (final)
                 {
                     using (fs)
@@ -316,6 +328,7 @@ namespace SIQuester.ViewModel
         private void AddItem_Executed(object arg)
         {
             var files = PlatformSpecific.PlatformManager.Instance.ShowMediaOpenUI();
+
             if (files == null)
             {
                 return;
@@ -329,37 +342,39 @@ namespace SIQuester.ViewModel
             HasPendingChanges = IsChanged();
         }
 
-        internal void AddFile(string file)
+        internal void AddFile(string file, string name = null)
         {
-            var localName = Path.GetFileName(file).Replace("%", "");
+            var localName = name ?? Path.GetFileName(file).Replace("%", "");
+
             if (Files.Any(named => named.Model.Name == localName))
             {
                 var ind = 1;
                 var ext = Path.GetExtension(localName);
-                localName = Path.GetFileNameWithoutExtension(localName);
-                string name = null;
+                var baseName = Path.GetFileNameWithoutExtension(localName);
+                string newName = null;
+
                 do
                 {
-                    name = string.Format("{0}_{1}{2}", localName, ind++, ext);
-                } while (Files.Any(named => named.Model.Name == name));
+                    newName = string.Format("{0}_{1}{2}", baseName, ind++, ext);
+                } while (Files.Any(named => named.Model.Name == newName));
 
-                localName = name;
+                localName = newName;
             }
 
             var item = CreateItem(localName);
             PreviewAdd(item, file);
-            OnChanged(
-                new CustomChange(
-                    () =>
-                    {
-                        PreviewRemove(item);
-                        HasPendingChanges = IsChanged();
-                    },
-                    () =>
-                    {
-                        PreviewAdd(item, file);
-                        HasPendingChanges = IsChanged();
-                    }));
+
+            OnChanged(new CustomChange(
+                () =>
+                {
+                    PreviewRemove(item);
+                    HasPendingChanges = IsChanged();
+                },
+                () =>
+                {
+                    PreviewAdd(item, file);
+                    HasPendingChanges = IsChanged();
+                }));
         }
 
         private void PreviewAdd(MediaItemViewModel item, string path)
@@ -395,19 +410,21 @@ namespace SIQuester.ViewModel
         internal IMedia Wrap(string link)
         {
             var p = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
+
             if (p.Key != null)
             {
                 return new Media(p.Value.Item1);
             }
 
-            return _document.Lock.WithLock(() =>
-            {
-                var collection = _document.GetCollection(_name);
+            return _document.Lock.WithLock(
+                () =>
+                {
+                    var collection = _document.GetCollection(_name);
 
-                return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
-                    collection.Name);
-            });
+                    return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
+                        new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
+                        collection.Name);
+                });
         }
     }
 }

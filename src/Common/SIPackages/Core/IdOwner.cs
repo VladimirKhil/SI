@@ -7,6 +7,7 @@ namespace SIPackages.Core
     /// Defines an object having an id.
     /// </summary>
     [DataContract]
+    [Serializable]
     public abstract class IdOwner : PropertyChangedNotifier
     {
         private string _id = Guid.NewGuid().ToString();
@@ -21,6 +22,7 @@ namespace SIPackages.Core
             set
             {
                 var oldValue = _id;
+
                 if (oldValue != value)
                 {
                     _id = value;

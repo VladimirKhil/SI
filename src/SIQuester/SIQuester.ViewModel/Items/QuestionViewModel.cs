@@ -1,16 +1,25 @@
 ﻿using SIPackages;
+using SIQuester.Model;
+using SIQuester.ViewModel.Helpers;
+using System;
+using System.Collections.Specialized;
 using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class QuestionViewModel: ItemViewModel<Question>
+    /// <summary>
+    /// Defines a package question view model.
+    /// </summary>
+    public sealed class QuestionViewModel : ItemViewModel<Question>
     {
         public ThemeViewModel OwnerTheme { get; set; }
 
         public override IItemViewModel Owner => OwnerTheme;
 
         public AnswersViewModel Right { get; private set; }
+
         public AnswersViewModel Wrong { get; private set; }
+
         public ScenarioViewModel Scenario { get; private set; }
 
         public QuestionTypeViewModel Type { get; private set; }
@@ -24,9 +33,12 @@ namespace SIQuester.ViewModel
         }
 
         public override ICommand Remove { get; protected set; }
+
         public ICommand Clone { get; private set; }
 
         public ICommand SetQuestionType { get; private set; }
+
+        public ICommand SwitchEmpty { get; private set; }
 
         public QuestionViewModel(Question question)
             : base(question)
@@ -46,14 +58,13 @@ namespace SIQuester.ViewModel
             Remove = new SimpleCommand(RemoveQuestion_Executed);
 
             SetQuestionType = new SimpleCommand(SetQuestionType_Executed);
+            SwitchEmpty = new SimpleCommand(SwitchEmpty_Executed);
 
             Wrong.CollectionChanged += Wrong_CollectionChanged;
         }
 
-        private void Wrong_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
+        private void Wrong_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
             AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
-        }
 
         private void AddWrongAnswers_Executed(object arg)
         {
@@ -74,9 +85,43 @@ namespace SIQuester.ViewModel
 
         private void RemoveQuestion_Executed(object arg) => OwnerTheme?.Questions.Remove(this);
 
-        private void SetQuestionType_Executed(object arg)
+        private void SetQuestionType_Executed(object arg) => Type.Model.Name = (string)arg;
+
+        private void SwitchEmpty_Executed(object arg)
         {
-            Type.Model.Name = (string)arg;
+            var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
+            document.BeginChange();
+
+            try
+            {
+                if (Model.Price == Question.InvalidPrice)
+                {
+                    Model.Price = AppSettings.Default.QuestionBase * ((OwnerTheme?.Questions.IndexOf(this) ?? 0) + 1);
+                    Model.Scenario.Clear();
+                    Model.Scenario.Add(new Atom());
+                    Model.Type.Params.Clear();
+                    Model.Right.Clear();
+                    Model.Right.Add("");
+                    Model.Wrong.Clear();
+
+                    document.CommitChange();
+                    return;
+                }
+
+                Model.Price = Question.InvalidPrice;
+                Model.Scenario.Clear();
+                Model.Type.Params.Clear();
+                Model.Right.Clear();
+                Model.Wrong.Clear();
+
+                document.CommitChange();
+            }
+            catch (Exception exc)
+            {
+                document.RollbackChange();
+
+                PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+            }
         }
     }
 }

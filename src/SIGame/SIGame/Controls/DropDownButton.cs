@@ -36,7 +36,7 @@ namespace SIGame
             }
             catch (DivideByZeroException) // at void System.Windows.Vector.Normalize()
             {
-                MessageBox.Show("DropDownButton Error", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("DropDownButton Error. Contact game author", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
     }

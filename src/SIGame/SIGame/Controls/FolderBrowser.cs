@@ -372,10 +372,13 @@ namespace SIGame
 
         [DllImport("shell32.dll")]
         private static extern IntPtr SHBrowseForFolderW([MarshalAs(UnmanagedType.LPStruct), In, Out] BROWSEINFOW bi);
+
         [DllImport("shell32.dll")]
         private static extern bool SHGetPathFromIDList(IntPtr pidl, StringBuilder path);
+
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessageW(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessageW(IntPtr hWnd, MessageToBrowser msg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)] string str);
 

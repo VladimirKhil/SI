@@ -9,7 +9,7 @@ namespace SIQuester.ViewModel
     /// <summary>
     /// Упрощённая реализация команды
     /// </summary>
-    public sealed class SimpleCommand: ICommand
+    public sealed class SimpleCommand : ICommand
     {
         private bool _canBeExecuted = true;
 
