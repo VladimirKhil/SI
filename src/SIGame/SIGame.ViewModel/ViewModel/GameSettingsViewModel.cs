@@ -482,9 +482,10 @@ namespace SIGame.ViewModel
             _closeContent.Execute(arg);
         }
 
-        private void SelectPackage_Executed(object arg)
+        private async void SelectPackage_Executed(object arg)
         {
             var code = (PackageSourceTypes)arg;
+
             switch (code)
             {
                 case PackageSourceTypes.Next:
@@ -509,7 +510,7 @@ namespace SIGame.ViewModel
 
                 case PackageSourceTypes.SIStorage:
                     var contentBox = new ContentBox { Data = StorageInfo, Title = Resources.SIStorage };
-                    StorageInfo.Init();
+                    await StorageInfo.InitAsync();
                     Navigate?.Invoke(contentBox);
                     break;
 

@@ -207,7 +207,7 @@ namespace SImulator.Implementation
 
                 try
                 {
-                    storage.Open();
+                    await storage.OpenAsync();
 
                     var packageStoreWindow = new PackageStoreWindow { DataContext = storage };
                     var package = packageStoreWindow.ShowDialog().Value ? storage.CurrentPackage : null;

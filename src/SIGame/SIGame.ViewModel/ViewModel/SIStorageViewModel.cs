@@ -105,14 +105,14 @@ namespace SIGame.ViewModel
 
         private bool _isInitialized = false;
 
-        internal void Init()
+        internal async Task InitAsync()
         {
             if (_isInitialized)
             {
                 return;
             }
 
-            Model.Open();
+            await Model.OpenAsync();
             _isInitialized = true;
         }
     }
