@@ -1,7 +1,9 @@
-﻿<UserControl x:Class="SIQuester.TextsStorageView"
+﻿<UserControl
+    x:Class="SIQuester.TextsStorageView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages" FontSize="14">
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
+    FontSize="14">
     <UserControl.Resources>
         <Style x:Key="LightTextBox" TargetType="{x:Type TextBox}">
             <Setter Property="BorderThickness" Value="0" />
@@ -22,6 +24,7 @@
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition MinWidth="100" />
                 </Grid.ColumnDefinitions>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition />
@@ -29,6 +32,7 @@
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
+                
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Фамилия" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Surname}" Style="{StaticResource LightTextBox}" />
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Имя" Style="{StaticResource BlockStyleKey}" />
@@ -48,6 +52,7 @@
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition MinWidth="100"/>
                 </Grid.ColumnDefinitions>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -55,6 +60,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Автор" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Author}" Style="{StaticResource LightTextBox}" />
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Название" Style="{StaticResource BlockStyleKey}" />
@@ -68,11 +74,13 @@
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
+    
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        
         <StackPanel Orientation="Horizontal" Background="Lavender">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -83,22 +91,37 @@
                     </Style.Triggers>
                 </Style>
             </StackPanel.Resources>
+            
             <Button Name="bAdd" Command="{Binding Add}" ToolTip="Добавить" Width="25" Height="25">
                 <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
             </Button>
+            
             <Button Command="{Binding MoveUp}" Margin="5,0,0,0" Name="bUp" ToolTip="Вверх" Width="25" Height="25">
                 <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_up},Path=Data}" />
             </Button>
+            
             <Button Command="{Binding MoveDown}" Margin="5,0,0,0" Name="bDown" ToolTip="Вниз" Width="25" Height="25">
                 <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_down},Path=Data}" />
             </Button>
         </StackPanel>
-        <ListBox Margin="-2,5,0,0" Grid.Row="1" BorderThickness="0" Padding="-5,-5,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Name="listBox1" ItemsSource="{Binding Collection}" SelectedIndex="{Binding CurrentIndex}" Grid.ColumnSpan="2" IsSynchronizedWithCurrentItem="True">
+        
+        <ListBox
+            Margin="-2,5,0,0"
+            Grid.Row="1"
+            BorderThickness="0"
+            Padding="-5,-5,0,0"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            Name="listBox1"
+            ItemsSource="{Binding Collection}"
+            SelectedIndex="{Binding CurrentIndex}"
+            Grid.ColumnSpan="2"
+            IsSynchronizedWithCurrentItem="True">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
+            
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Template">
@@ -106,17 +129,35 @@
                             <ControlTemplate TargetType="ListBoxItem">
                                 <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#FFD2DCFF">
                                     <DockPanel>
-                                        <Button Name="bDelete" Visibility="Hidden" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Удалить" DockPanel.Dock="Right" VerticalAlignment="Top" Margin="5,0,0,0" Command="{Binding DataContext.Remove, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}">
-                                            <Path Stretch="Uniform" Stroke="#FF555555" Fill="Black" Margin="3" Data="{Binding Source={StaticResource app_delete},Path=Data}" />
+                                        <Button
+                                            Name="bDelete"
+                                            Visibility="Hidden"
+                                            Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                            ToolTip="Удалить"
+                                            DockPanel.Dock="Right"
+                                            VerticalAlignment="Top"
+                                            Margin="5,0,0,0"
+                                            Command="{Binding DataContext.Remove, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding}">
+                                            
+                                            <Path
+                                                Stretch="Uniform"
+                                                Stroke="#FF555555"
+                                                Fill="Black"
+                                                Margin="3"
+                                                Data="{Binding Source={StaticResource app_delete},Path=Data}" />
                                         </Button>
+                                        
                                         <ContentPresenter Content="{Binding}" />
                                     </DockPanel>
                                 </Border>
+                                
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter TargetName="bd" Property="Background" Value="#FFADBCFF" />
                                         <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
                                     </Trigger>
+                                    
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="bd" Property="Background" Value="#FF8AA0FF" />
                                         <Setter TargetName="bDelete" Property="Visibility" Value="Visible" />
@@ -125,6 +166,7 @@
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
+                    
                     <Style.Triggers>
                         <EventTrigger RoutedEvent="GotFocus">
                             <BeginStoryboard>

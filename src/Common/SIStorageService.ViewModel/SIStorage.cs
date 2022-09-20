@@ -30,7 +30,7 @@ namespace SIStorageService.ViewModel
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public event Action<Exception, string>? Error;
+        public event Action<Exception, string?>? Error;
 
         private PackageInfo[]? _packages;
 
@@ -80,11 +80,16 @@ namespace SIStorageService.ViewModel
             }
         }
 
-        public Task<PackageLink> LoadSelectedPackageUriAsync(CancellationToken cancellationToken = default)
+        public Task<PackageLink?> LoadSelectedPackageUriAsync(CancellationToken cancellationToken = default)
         {
             if (CurrentPackage == null)
             {
                 throw new InvalidOperationException("CurrentPackage is undefined");
+            }
+
+            if (CurrentPackage.Guid == null)
+            {
+                throw new InvalidOperationException("CurrentPackage Guid is undefined");
             }
 
             return _siStorageServiceClient.GetPackageByGuid2Async(CurrentPackage.Guid, cancellationToken);
@@ -211,13 +216,29 @@ namespace SIStorageService.ViewModel
             _siStorageServiceClient = sIStorageServiceClient;
         }
 
-        public void Open()
+        public async Task OpenAsync(CancellationToken cancellationToken = default)
         {
             IsLoading = true;
-            LoadPublishersAsync();
+
+            try
+            {
+                await Task.WhenAll(
+                    LoadPublishersAsync(cancellationToken),
+                    LoadTagsAsync(cancellationToken));
+            }
+            catch (Exception exc)
+            {
+                OnError(exc);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            LoadPackagesAsync(cancellationToken);
         }
 
-        private async void LoadPackagesAsync()
+        private async void LoadPackagesAsync(CancellationToken cancellationToken = default)
         {
             IsLoadingPackages = true;
 
@@ -229,11 +250,13 @@ namespace SIStorageService.ViewModel
                 var tagID = _currentTag == All ? null : _currentTag?.ID;
                 var publisherId = _currentPublisher == All ? null : _currentPublisher?.ID;
 
-                var packages = await _siStorageServiceClient.GetPackagesAsync(tagId: tagID,
+                var packages = await _siStorageServiceClient.GetPackagesAsync(
+                    tagId: tagID,
                     publisherId: publisherId,
                     restriction: _currentRestriction,
                     sortMode: _currentSortMode,
-                    sortAscending: _currentSortDirection);
+                    sortAscending: _currentSortDirection,
+                    cancellationToken: cancellationToken);
 
                 Packages = packages;
                 FilterPackages();
@@ -248,81 +271,44 @@ namespace SIStorageService.ViewModel
             }
         }
 
-        private void OnError(Exception exc, string message = null) => Error?.Invoke(exc, message);
+        private void OnError(Exception exc, string? message = null) => Error?.Invoke(exc, message);
 
         private static readonly NamedObject All = new() { ID = -2 };
 
-        private async void LoadPublishersAsync()
+        private async Task LoadPublishersAsync(CancellationToken cancellationToken = default)
         {
-            try
+            var publishers = await _siStorageServiceClient.GetPublishersAsync(cancellationToken) ?? Array.Empty<NamedObject>();
+
+            Publishers = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(publishers).ToArray();
+
+            if (Publishers.Length > 0)
             {
-                var publishers = await _siStorageServiceClient.GetPublishersAsync();
+                _currentPublisher = DefaultPublisher != null
+                    ? Publishers.FirstOrDefault(p => p.Name == DefaultPublisher) ?? Publishers[0]
+                    : Publishers[0];
 
-                Publishers = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(publishers).ToArray();
-                
-                if (Publishers.Length > 0)
-                {
-                    // Без асинхронной загрузки пакетов
-
-                    if (DefaultPublisher != null)
-                    {
-                        _currentPublisher = Publishers.FirstOrDefault(p => p.Name == DefaultPublisher) ?? Publishers[0];
-                    }
-                    else
-                    {
-                        _currentPublisher = Publishers[0];
-                    }
-
-                    OnPropertyChanged(nameof(CurrentPublisher));
-                }
-
-                LoadTagsAsync();
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-                IsLoading = false;
+                OnPropertyChanged(nameof(CurrentPublisher));
             }
         }
 
-        private async void LoadTagsAsync()
+        private async Task LoadTagsAsync(CancellationToken cancellationToken = default)
         {
-            try
+            var tags = await _siStorageServiceClient.GetTagsAsync(cancellationToken) ?? Array.Empty<NamedObject>();
+
+            Tags = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(tags).ToArray();
+
+            if (Tags.Length > 0)
             {
-                var tags = await _siStorageServiceClient.GetTagsAsync();
-
-                Tags = new[] { All, new NamedObject { ID = -1, Name = null } }.Concat(tags).ToArray();
-
-                if (Tags.Length > 0)
-                {
-                    if (DefaultTag != null)
-                    {
-                        _currentTag = Tags.FirstOrDefault(p => p.Name == DefaultTag) ?? Tags[0];
-                    }
-                    else
-                    {
-                        _currentTag = Tags[0];
-                    }
-
-                    OnPropertyChanged(nameof(CurrentTag));
-                }
-
-                LoadPackagesAsync();
+                _currentTag = DefaultTag != null ? Tags.FirstOrDefault(p => p.Name == DefaultTag) ?? Tags[0] : Tags[0];
+                OnPropertyChanged(nameof(CurrentTag));
             }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
-            
-            IsLoading = false;
         }
 
         private void FilterPackages()
         {
             FilteredPackages = _filter == null ? _packages
                 : _packages?
-                    .Where(package => package.Description.ToLower()
-                    .Contains(_filter.ToLower()))
+                    .Where(package => package.Description != null && package.Description.ToLower().Contains(_filter.ToLower()))
                     .ToArray();
 
             CurrentPackage = _filteredPackages?.FirstOrDefault();

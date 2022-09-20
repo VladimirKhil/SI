@@ -407,6 +407,14 @@ namespace SIQuester.ViewModel
             HasPendingChanges = IsChanged();
         }
 
+        internal long GetLength(string link) =>
+            _document.Lock.WithLock(
+                () =>
+                {
+                    var collection = _document.GetCollection(_name);
+                    return collection.GetFileLength(link);
+                });
+
         internal IMedia Wrap(string link)
         {
             var p = _streams.FirstOrDefault(n => n.Key.Model.Name == link);

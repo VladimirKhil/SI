@@ -21,7 +21,9 @@ namespace SIQuester.ViewModel
             get
             {
                 if (_media == null && !_isMediaLoading)
+                {
                     LoadMedia();
+                }
 
                 return _media;
             }
@@ -52,6 +54,7 @@ namespace SIQuester.ViewModel
             }
 
             _isMediaLoading = true;
+
             try
             {
                 return await Task.Run(() =>

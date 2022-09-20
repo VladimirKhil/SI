@@ -10,7 +10,7 @@ namespace SIUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (!(value is string path))
+            if (value is not string path)
                 return DependencyProperty.UnsetValue;
 
             if (!Uri.TryCreate(path, UriKind.Absolute, out Uri uri))

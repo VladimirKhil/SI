@@ -10,9 +10,9 @@ using System.Windows.Input;
 namespace SIQuester.ViewModel
 {
     /// <summary>
-    /// Выбор тем для выгрузки
+    /// Allows to select themes to form a new package.
     /// </summary>
-    public sealed class SelectThemesViewModel: WorkspaceViewModel
+    public sealed class SelectThemesViewModel : WorkspaceViewModel
     {
         private readonly QDocument _document = null;
 

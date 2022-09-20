@@ -21,16 +21,16 @@ namespace SIPackages
         private string _id = "";
 
         /// <summary>
-        /// Уникальный идентификатор пакета
+        /// Unique package identifier.
         /// </summary>
         public string ID
         {
-            get { return _id; }
+            get => _id;
             set
             {
-                var oldValue = _id;
                 if (_id != value)
                 {
+                    var oldValue = _id;
                     _id = value;
                     OnPropertyChanged(oldValue);
                 }
@@ -44,7 +44,7 @@ namespace SIPackages
         /// </summary>
         public string Restriction
         {
-            get { return _restriction; }
+            get => _restriction;
             set
             {
                 var oldValue = _restriction;
@@ -63,7 +63,7 @@ namespace SIPackages
         /// </summary>
         public string Publisher
         {
-            get { return _publisher; }
+            get => _publisher;
             set
             {
                 var oldValue = _publisher;
@@ -82,7 +82,7 @@ namespace SIPackages
         /// </summary>
         public int Difficulty
         {
-            get { return _difficulty; }
+            get => _difficulty;
             set
             {
                 var oldValue = _difficulty;
@@ -120,7 +120,7 @@ namespace SIPackages
         /// </summary>
         public string Date
         {
-            get { return _date; }
+            get => _date;
             set
             {
                 var oldValue = _date;
@@ -139,12 +139,12 @@ namespace SIPackages
         /// </summary>
         public string Language
         {
-            get { return _language; }
+            get => _language;
             set
             {
-                var oldValue = _language;
                 if (_language != value)
                 {
+                    var oldValue = _language;
                     _language = value;
                     OnPropertyChanged(oldValue);
                 }
@@ -157,15 +157,12 @@ namespace SIPackages
         public List<string> Tags { get; } = new List<string>();
 
         /// <summary>
-        /// Раунды пакета
+        /// Package rounds.
         /// </summary>
         public List<Round> Rounds { get; } = new List<Round>();
 
-        /// <summary>
-        /// Строковое представление пакета
-        /// </summary>
-        /// <returns>Описание пакета</returns>
-        public override string ToString() => $"{Resources.Package}: {Resources.Package}";
+        /// <inheritdoc />
+        public override string ToString() => $"{Resources.Package}: {Name}";
 
         /// <summary>
         /// Создание раунда
@@ -176,7 +173,7 @@ namespace SIPackages
         {
             var round = new Round
             {
-                Name = name ?? ((int)(Rounds.Count + 1)).ToString() + Resources.RoundTrailing,
+                Name = name ?? $"{Rounds.Count + 1}{Resources.RoundTrailing}",
                 Type = type
             };
 

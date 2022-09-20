@@ -63,16 +63,19 @@
             <siqcv:EnumToDoubleConverter x:Key="EnumToDoubleConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300" MinWidth="1" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="50" />
         </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+        
         <DockPanel Grid.ColumnSpan="3" Height="30" Name="statusBar1" HorizontalAlignment="Stretch" Background="#FFD7EAFF">
             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel.Resources>
@@ -163,6 +166,7 @@
                 </Button>
                 
                 <Separator />
+                
                 <siq:DropDownButton
                     ToolTip="Действия"
                     VerticalAlignment="Stretch"
@@ -205,6 +209,7 @@
                         </ContextMenu>
                     </siq:DropDownButton.DropDown>
                 </siq:DropDownButton>
+                
                 <Separator />
                 
                 <ComboBox
@@ -245,8 +250,8 @@
                         <Style TargetType="Slider">
                             <Style.Triggers>
                                 <DataTrigger
-                                Binding="{Binding Source={x:Static m:AppSettings.Default},Path=View}"
-                                Value="{x:Static m:ViewMode.TreeFull}">
+                                    Binding="{Binding Source={x:Static m:AppSettings.Default},Path=View}"
+                                    Value="{x:Static m:ViewMode.TreeFull}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -254,6 +259,7 @@
                     </Slider.Style>
                 </Slider>
             </StackPanel>
+            
             <Menu DockPanel.Dock="Right" Margin="2" Width="32">
                 <Menu.Style>
                     <Style TargetType="Menu">
@@ -264,12 +270,14 @@
                         </Style.Triggers>
                     </Style>
                 </Menu.Style>
+                
                 <MenuItem ToolTip="Способ редактирования">
                     <MenuItem.HeaderTemplate>
                         <DataTemplate>
                             <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
                         </DataTemplate>
                     </MenuItem.HeaderTemplate>
+                    
                     <MenuItem.Resources>
                         <Style x:Key="MenuSelect" TargetType="{x:Type MenuItem}">
                             <Setter Property="IsCheckable" Value="True" />
@@ -280,11 +288,13 @@
                             </Style.Triggers>
                         </Style>
                     </MenuItem.Resources>
+                    
                     <MenuItem Style="{StaticResource MenuSelect}" Header="Только чтение" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.None}}" />
                     <MenuItem Style="{StaticResource MenuSelect}" Header="Фиксированная панель" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}" />
                     <MenuItem Style="{StaticResource MenuSelect}" Header="Плавающая панель" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FloatPanel}}" />
                 </MenuItem>
             </Menu>
+            
             <StackPanel Margin="2,0" DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <StackPanel.Resources>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
@@ -295,6 +305,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Resources>
+                
                 <TextBox
                     Name="searchText"
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -313,16 +324,20 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
+                
                 <Button ToolTip="Отменить поиск" Command="{Binding ClearSearchText}" Height="22" Width="22" Margin="0,-1,0,0" VerticalAlignment="Center">
                     <Path Data="M0,0L10,10M0,10L10,0" Stroke="Black" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
+                
                 <Button ToolTip="Предыдущий результат" Command="{Binding PreviousSearchResult}" Padding="5" Margin="0,-1,0,0" VerticalAlignment="Center">
                     <Path Data="M0,5L10,0L10,10" Fill="Black" />
                 </Button>
+                
                 <Button ToolTip="Следующий результат" Command="{Binding NextSearchResult}" Padding="5" Margin="0,-1,0,0" VerticalAlignment="Center">
                     <Path Data="M10,5L0,0L0,10" Fill="Black" />
                 </Button>
             </StackPanel>
+            
             <ContentControl>
                 <Menu
                     FontSize="14"
@@ -333,11 +348,13 @@
                     Padding="0"
                     Background="Transparent"
                     ItemsSource="{Binding ActiveChain}">
+                    
                     <Menu.ItemsPanel>
                         <ItemsPanelTemplate>
                             <lc:BreadcrumbBar />
                         </ItemsPanelTemplate>
                     </Menu.ItemsPanel>
+                    
                     <Menu.Resources>
                         <DataTemplate x:Key="CommonTemplate">
                             <TextBlock Text="{Binding Model.Name}" />
@@ -352,9 +369,11 @@
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:PackageViewModel}" ItemsSource="{Binding Rounds}" ItemTemplate="{StaticResource CommonTemplate}">
                                     <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
                                 </HierarchicalDataTemplate>
+                                
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:RoundViewModel}" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CommonTemplate}">
                                     <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
                                 </HierarchicalDataTemplate>
+                                
                                 <HierarchicalDataTemplate x:Key="{x:Type vm:ThemeViewModel}" ItemsSource="{Binding Questions}" ItemTemplate="{StaticResource QuestionTemplate}">
                                     <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
                                 </HierarchicalDataTemplate>
@@ -370,6 +389,7 @@
                             </siqsel:DictionaryTemplateSelector.Templates>
                         </siqsel:DictionaryTemplateSelector>
                     </Menu.Resources>
+                    
                     <Menu.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItemStyle1}">
                             <Setter Property="MenuItem.Command" Value="{Binding ElementName=main,Path=DataContext.ActiveDocument.Navigate}" />
@@ -391,6 +411,7 @@
                 </Menu>
             </ContentControl>
         </DockPanel>
+        
         <ContentControl Grid.Row="1" Content="{Binding}">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
@@ -487,7 +508,9 @@
                 </Style>
             </ContentControl.Style>
         </ContentControl>
+        
         <GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3" Visibility="{Binding IsChecked, ElementName=bSidebar,Converter={StaticResource VisibilityConverter}}" />
+        
         <ContentControl
             Grid.Row="1"
             Content="{Binding}"
@@ -506,36 +529,59 @@
         </ContentControl>
         
         <Line Grid.ColumnSpan="3" Grid.Row="1" X1="0" X2="1" Y1="0" Y2="0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Stretch="Fill" Stroke="#FFAEAEAE" StrokeThickness="1" />
+        
         <ProgressBar Grid.ColumnSpan="3" Grid.Row="2" VerticalAlignment="Top" Height="3" IsIndeterminate="True" Visibility="{Binding IsProgress, Converter={StaticResource VisibilityConverter}}" />
-        <Grid Grid.ColumnSpan="3" Grid.RowSpan="2" Background="{StaticResource MainBack}" DataContext="{Binding Dialog}"
-              Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter}}">
+        
+        <Grid
+            Grid.ColumnSpan="3"
+            Grid.RowSpan="2"
+            Background="{StaticResource MainBack}"
+            DataContext="{Binding Dialog}"
+            Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter}}">
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
+            
             <StackPanel Orientation="Horizontal" Margin="10,5,5,5">
-                <Button Width="30" Height="30" Background="Transparent" BorderThickness="0" Padding="5" Command="{Binding Close}"
-                        Visibility="{Binding Close, Converter={StaticResource NotNullToVisibilityConverter}}">
+                <Button
+                    Width="30"
+                    Height="30"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="5"
+                    Command="{Binding Close}"
+                    Visibility="{Binding Close, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <Path Data="M0,1L1,0M0,1L1,2M-0.1,1L2,1" Stretch="Uniform" Stroke="Black" StrokeThickness="2" />
                 </Button>
                 <TextBlock FontSize="16" FontWeight="Bold" Margin="3,3,0,0" Text="{Binding Header}"></TextBlock>
             </StackPanel>
+            
             <ContentControl Grid.Row="1" Content="{Binding}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type vmd:WaitDialogViewModel}">
                         <siq:WaitDialog />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type vm:SelectThemesViewModel}">
                         <siq:SelectThemesView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type vm:ExportHtmlViewModel}">
                         <siq:ExportHtmlView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type vm:ExportViewModel}">
                         <siq:ExportView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type vmd:SendToGameDialogViewModel}">
                         <siq:SendToGameDialog />
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type vmd:QuestionPlayViewModel}">
+                        <siq:QuestionPlayView />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>

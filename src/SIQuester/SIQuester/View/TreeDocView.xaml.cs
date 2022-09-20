@@ -1,13 +1,13 @@
 ﻿using SIPackages;
+using SIQuester.Contracts;
+using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,16 +16,13 @@ using System.Xml;
 namespace SIQuester
 {
     /// <summary>
-    /// Interaction logic for TreeDocView.xaml
+    /// Provides interaction logic for TreeDocView.xaml.
     /// </summary>
     public partial class TreeDocView : UserControl
     {
         private bool _isDragging = false;
-        private Point _startPoint;
 
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.U4)]
-        private static extern int GetLongPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszShortPath, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder lpszLongPath, [MarshalAs(UnmanagedType.U4)] int cchBuffer);
+        private Point _startPoint;
         
         private readonly object _dragLock = new();
 
@@ -63,8 +60,8 @@ namespace SIQuester
 
                 var position = e.GetPosition(null);
 
-                if (Math.Abs(position.X - _startPoint.X) <= SystemParameters.MinimumHorizontalDragDistance * 5 &&
-                    Math.Abs(position.Y - _startPoint.Y) <= SystemParameters.MinimumVerticalDragDistance * 5)
+                if (Math.Abs(position.X - _startPoint.X) <= SystemParameters.MinimumHorizontalDragDistance &&
+                    Math.Abs(position.Y - _startPoint.Y) <= SystemParameters.MinimumVerticalDragDistance)
                 {
                     return;
                 }
@@ -100,7 +97,7 @@ namespace SIQuester
             try
             {
                 itemData = new InfoOwnerData(active, (IItemViewModel)host.DataContext);
-                FlatDocView.DoDrag(host, active, item, itemData);
+                DragManager.DoDrag(host, active, item, itemData);
             }
             catch (OutOfMemoryException)
             {
@@ -138,8 +135,8 @@ namespace SIQuester
 
         private void Main_DragEnter(object sender, DragEventArgs e)
         {
-            e.Effects = (e.Data.GetDataPresent("FileName")
-                || e.Data.GetDataPresent("FileContents")
+            e.Effects = (e.Data.GetDataPresent(WellKnownDragFormats.FileName)
+                || e.Data.GetDataPresent(WellKnownDragFormats.FileContents)
                 || e.Data.GetDataPresent(typeof(InfoOwnerData))) ? e.AllowedEffects : DragDropEffects.None;
 
             e.Handled = true;
@@ -149,7 +146,7 @@ namespace SIQuester
         {
             if (e.Data.GetDataPresent(typeof(InfoOwnerData)))
             {
-                ScrollView(e);
+                ScrollHelper.ScrollView(e);
                 SetEffect(e);
             }
             else
@@ -159,70 +156,48 @@ namespace SIQuester
             }
         }
 
-        internal static void SetEffect(DragEventArgs e)
+        internal void SetEffect(DragEventArgs e)
         {
             var treeViewItem = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
 
             if (treeViewItem == null)
             {
                 e.Effects = DragDropEffects.None;
+                _insertionMark.Visibility = Visibility.Hidden;
             }
             else
             {
-                var format = FlatDocView.GetDragFormat(e);
+                var format = WellKnownDragFormats.GetDragFormat(e);
 
                 e.Effects =
-                    (treeViewItem.DataContext is PackageViewModel || treeViewItem.DataContext is RoundViewModel) && format == "siqround" ||
-                    (treeViewItem.DataContext is RoundViewModel || treeViewItem.DataContext is ThemeViewModel) && format == "siqtheme" ||
-                    (treeViewItem.DataContext is ThemeViewModel || treeViewItem.DataContext is QuestionViewModel) && format == "siqquestion"
+                    (treeViewItem.DataContext is PackageViewModel || treeViewItem.DataContext is RoundViewModel) &&
+                        format == WellKnownDragFormats.Round ||
+                    (treeViewItem.DataContext is RoundViewModel || treeViewItem.DataContext is ThemeViewModel) &&
+                        format == WellKnownDragFormats.Theme ||
+                    (treeViewItem.DataContext is ThemeViewModel || treeViewItem.DataContext is QuestionViewModel) &&
+                        format == WellKnownDragFormats.Question
                     ? DragDropEffects.Move
                     : DragDropEffects.None;
+
+                if (e.Effects == DragDropEffects.Move)
+                {
+                    var isDroppingToParent = 
+                        treeViewItem.DataContext is PackageViewModel && format == WellKnownDragFormats.Round ||
+                        treeViewItem.DataContext is RoundViewModel && format == WellKnownDragFormats.Theme ||
+                        treeViewItem.DataContext is ThemeViewModel && format == WellKnownDragFormats.Question;
+
+                    var treeViewItemPosition = treeViewItem.TranslatePoint(new Point(), _grid);
+
+                    _insertionMark.Visibility = Visibility.Visible;
+                    _insertionMark.Margin = new Thickness(0, treeViewItemPosition.Y + (isDroppingToParent ? treeViewItem.ActualHeight : 0), 0, 0);
+                }
+                else
+                {
+                    _insertionMark.Visibility = Visibility.Hidden;
+                }
             }
 
             e.Handled = true;
-        }
-
-        private static ScrollViewer ScrollView(DragEventArgs e, DependencyObject source = null)
-        {
-            var scroller = FlatDocView.FindAncestor<ScrollViewer>(source ?? (DependencyObject)e.OriginalSource);
-
-            if (scroller == null)
-            {
-                return null;
-            }
-
-            var pos = e.GetPosition(scroller);
-
-            double scrollOffset = 0.0;
-
-            // See if we need to scroll down 
-            if (scroller.ViewportHeight - pos.Y < 40.0)
-            {
-                scrollOffset = 6.0;
-            }
-            else if (pos.Y < 40.0)
-            {
-                scrollOffset = -6.0;
-            }
-
-            // Scroll the tree down or up 
-            if (scrollOffset != 0.0)
-            {
-                scrollOffset += scroller.VerticalOffset;
-
-                if (scrollOffset < 0.0)
-                {
-                    scrollOffset = 0.0;
-                }
-                else if (scrollOffset > scroller.ScrollableHeight)
-                {
-                    scrollOffset = scroller.ScrollableHeight;
-                }
-
-                scroller.ScrollToVerticalOffset(scrollOffset);
-            }
-
-            return scroller;
         }
 
         private void Main_Drop(object sender, DragEventArgs e)
@@ -231,16 +206,15 @@ namespace SIQuester
 
             try
             {
-                if (e.Data.GetDataPresent("FileName"))
+                _insertionMark.Visibility = Visibility.Hidden;
+
+                if (e.Data.GetDataPresent(WellKnownDragFormats.FileName))
                 {
-                    var files = e.Data.GetData("FileName") as string[];
+                    var files = e.Data.GetData(WellKnownDragFormats.FileName) as string[];
 
                     foreach (var file in files)
                     {
-                        var longPath = new StringBuilder(255);
-                        GetLongPathName(file, longPath, longPath.Capacity);
-
-                        var longPathString = longPath.ToString();
+                        var longPathString = FileHelper.GetLongPathName(file);
 
                         if (Path.GetExtension(longPathString) == ".txt")
                         {
@@ -256,9 +230,9 @@ namespace SIQuester
                     return;
                 }
 
-                if (e.Data.GetDataPresent("FileContents"))
+                if (e.Data.GetDataPresent(WellKnownDragFormats.FileContents))
                 {
-                    using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
+                    using (var contentStream = e.Data.GetData(WellKnownDragFormats.FileContents) as MemoryStream)
                     {
                         ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
                     }
@@ -275,7 +249,7 @@ namespace SIQuester
                     return;
                 }
 
-                var format = FlatDocView.GetDragFormat(e);
+                var format = WellKnownDragFormats.GetDragFormat(e);
 
                 InfoOwnerData dragData = null;
 
@@ -285,6 +259,7 @@ namespace SIQuester
                 }
                 catch (SerializationException)
                 {
+                    // TODO: log
                     return;
                 }
 
@@ -300,7 +275,7 @@ namespace SIQuester
 
                 e.Effects = DragDropEffects.Move;
 
-                if (format == "siqround")
+                if (format == WellKnownDragFormats.Round)
                 {
                     Round round = null;
 
@@ -321,17 +296,23 @@ namespace SIQuester
                     if (treeViewItem.DataContext is PackageViewModel)
                     {
                         var package = treeViewItem.DataContext as PackageViewModel;
-                        package.Rounds.Add(new RoundViewModel(round));
+                        package.Rounds.Add(new RoundViewModel(round) { IsSelected = true });
                         document.ApplyData(dragData);
+
+                        package.IsExpanded = true;
                     }
                     else if (treeViewItem.DataContext is RoundViewModel)
                     {
                         var docRound = treeViewItem.DataContext as RoundViewModel;
-                        docRound.OwnerPackage.Rounds.Insert(docRound.OwnerPackage.Rounds.IndexOf(docRound), new RoundViewModel(round));
+
+                        docRound.OwnerPackage.Rounds.Insert(
+                            docRound.OwnerPackage.Rounds.IndexOf(docRound),
+                            new RoundViewModel(round) { IsSelected = true });
+
                         document.ApplyData(dragData);
                     }
                 }
-                else if (format == "siqtheme")
+                else if (format == WellKnownDragFormats.Theme)
                 {
                     Theme theme = null;
 
@@ -351,17 +332,23 @@ namespace SIQuester
                     if (treeViewItem.DataContext is RoundViewModel)
                     {
                         var docRound = treeViewItem.DataContext as RoundViewModel;
-                        docRound.Themes.Add(new ThemeViewModel(theme));
+                        docRound.Themes.Add(new ThemeViewModel(theme) { IsSelected = true });
                         document.ApplyData(dragData);
+
+                        docRound.IsExpanded = true;
                     }
                     else if (treeViewItem.DataContext is ThemeViewModel)
                     {
                         var docTheme = treeViewItem.DataContext as ThemeViewModel;
-                        docTheme.OwnerRound.Themes.Insert(docTheme.OwnerRound.Themes.IndexOf(docTheme), new ThemeViewModel(theme));
+
+                        docTheme.OwnerRound.Themes.Insert(
+                            docTheme.OwnerRound.Themes.IndexOf(docTheme),
+                            new ThemeViewModel(theme) { IsSelected = true });
+
                         document.ApplyData(dragData);
                     }
                 }
-                else if (format == "siqquestion")
+                else if (format == WellKnownDragFormats.Question)
                 {
                     Question question = null;
 
@@ -387,12 +374,14 @@ namespace SIQuester
                             question = question.Clone();
                         }
 
-                        docTheme.Questions.Add(new QuestionViewModel(question));
+                        docTheme.Questions.Add(new QuestionViewModel(question) { IsSelected = true });
 
                         if (AppSettings.Default.ChangePriceOnMove)
                         {
-                            FlatDocView.RecountPrices(docTheme);
+                            DragManager.RecountPrices(docTheme);
                         }
+
+                        docTheme.IsExpanded = true;
 
                         document.ApplyData(dragData);
                     }
@@ -412,11 +401,11 @@ namespace SIQuester
                         }
 
                         int pos = docQuestion.OwnerTheme.Questions.IndexOf(docQuestion);
-                        docQuestion.OwnerTheme.Questions.Insert(pos, new QuestionViewModel(question));
+                        docQuestion.OwnerTheme.Questions.Insert(pos, new QuestionViewModel(question) { IsSelected = true });
 
                         if (AppSettings.Default.ChangePriceOnMove)
                         {
-                            FlatDocView.RecountPrices(docQuestion.OwnerTheme);
+                            DragManager.RecountPrices(docQuestion.OwnerTheme);
                         }
 
                         document.ApplyData(dragData);

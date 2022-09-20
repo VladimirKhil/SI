@@ -34,5 +34,10 @@
         /// Question and answer separator.
         /// </summary>
         public const string Marker = "marker";
+
+        /// <summary>
+        /// HTML atom type.
+        /// </summary>
+        public const string Html = "html";
     }
 }

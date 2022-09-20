@@ -70,6 +70,15 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Authors.
+        /// </summary>
+        public static string Authors {
+            get {
+                return ResourceManager.GetString("Authors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Comments.
         /// </summary>
         public static string Comments {
@@ -79,11 +88,11 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Authors.
+        ///   Ищет локализованную строку, похожую на HTML.
         /// </summary>
-        public static string Authors {
+        public static string Html {
             get {
-                return ResourceManager.GetString("Authors", resourceCulture);
+                return ResourceManager.GetString("Html", resourceCulture);
             }
         }
         

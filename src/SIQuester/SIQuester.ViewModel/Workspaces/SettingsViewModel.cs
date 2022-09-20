@@ -5,7 +5,10 @@ using System.Windows.Input;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class SettingsViewModel: WorkspaceViewModel
+    /// <summary>
+    /// Defines application settings view model.
+    /// </summary>
+    public sealed class SettingsViewModel : WorkspaceViewModel
     {
         public ICommand Reset { get; private set; }
 

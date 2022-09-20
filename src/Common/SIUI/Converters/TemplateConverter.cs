@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace SIUI.Converters
 {
-    public sealed class TemplateConverter: IValueConverter
+    public sealed class TemplateConverter : IValueConverter
     {
         public DataTemplate DefaultTemplate { get; set; }
         public Dictionary<object, DataTemplate> Templates { get; set; }

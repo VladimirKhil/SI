@@ -44,29 +44,29 @@ namespace SIQuester.ViewModel
             }
 
             IItemViewModel root = OwnerScenario.Owner;
-            while (root.Owner != null)
-                root = root.Owner;
 
-            if (!(root is PackageViewModel packageViewModel))
+            while (root.Owner != null)
+            {
+                root = root.Owner;
+            }
+
+            if (root is not PackageViewModel packageViewModel)
             {
                 return null;
             }
 
-            _mediaSource = packageViewModel.Document.Wrap(this);
+            _mediaSource = packageViewModel.Document.Wrap(Model);
 
             return _mediaSource;
         }
 
-        public Task<IMedia> LoadMediaAsync()
-        {
-            return Task.FromResult(LoadMedia());
-        }
+        public Task<IMedia> LoadMediaAsync() => Task.FromResult(LoadMedia());
 
         private bool _isExpanded = true;
 
         public bool IsExpanded
         {
-            get { return _isExpanded; }
+            get => _isExpanded;
             set
             {
                 if (_isExpanded != value)
@@ -77,9 +77,6 @@ namespace SIQuester.ViewModel
             }
         }
 
-        public AtomViewModel(Atom model)
-        {
-            Model = model;
-        }
+        public AtomViewModel(Atom model) => Model = model;
     }
 }

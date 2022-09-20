@@ -44,8 +44,6 @@ namespace SIQuester
         /// <summary>
         /// Поскольку TabControl при привязке к коллекции элементов ведёт себя достаточно странно, обеспечим создание и уничтожение вкладок самостоятельно
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void DocList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -303,12 +301,12 @@ namespace SIQuester
             }
         }
 
-        private async void Main_Loaded(object sender, RoutedEventArgs e)
+        private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             var mainViewModel = DataContext as MainViewModel;
             mainViewModel.DocList.CollectionChanged += DocList_CollectionChanged;
 
-            await mainViewModel.InitializeAsync();
+            mainViewModel.Initialize();
         }
 
         private void Main_Closed(object sender, EventArgs e)

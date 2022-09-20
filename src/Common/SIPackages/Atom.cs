@@ -51,6 +51,7 @@ namespace SIPackages
             AtomTypes.Image => Resources.Image,
             AtomTypes.Video => Resources.Video,
             AtomTypes.Audio => Resources.Audio,
+            AtomTypes.Html => Resources.Html,
             _ => _type,
         };
 

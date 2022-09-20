@@ -1,13 +1,15 @@
-﻿<UserControl x:Class="SIQuester.ImportTextView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:lvm="clr-namespace:SIQuester.ViewModel"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" 
-             d:DesignHeight="428" d:DesignWidth="569" xmlns:my="clr-namespace:SIQuester"
-             xmlns:lb="clr-namespace:SIQuester.Behaviors">
+﻿<UserControl
+    x:Class="SIQuester.ImportTextView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    mc:Ignorable="d" 
+    d:DesignHeight="428"
+    d:DesignWidth="569"
+    xmlns:my="clr-namespace:SIQuester"
+    xmlns:lb="clr-namespace:SIQuester.Behaviors">
     <UserControl.Resources>
         <Style x:Key="Editor" TargetType="RichTextBox">
             <Style.Triggers>
@@ -16,6 +18,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        
         <Style x:Key="TemplateSelector" TargetType="MenuItem" BasedOn="{StaticResource SimpleMenuItem}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Variants}" Value="{x:Null}">
@@ -26,25 +29,39 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        
         <Style x:Key="TemplateContainer" TargetType="MenuItem" BasedOn="{StaticResource ChildMenuItem}">
             <Setter Property="Header" Value="{Binding}" />
-            <Setter Property="Command" Value="{Binding Path=DataContext.ChangeTemplate, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu, AncestorLevel=1}}" />
+            
+            <Setter
+                Property="Command"
+                Value="{Binding Path=DataContext.ChangeTemplate, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu, AncestorLevel=1}}" />
+            
             <Setter Property="CommandParameter" Value="{Binding}" />
+            
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
                     <DataTemplate DataType="sys:String">
-                        <my:SimpleSpardEditor Width="350" Background="Transparent" Spard="{Binding Mode=OneTime}" IsReadOnly="True" Focusable="False" BorderThickness="0" />
+                        <my:SimpleSpardEditor
+                            Width="350"
+                            Background="Transparent"
+                            Spard="{Binding Mode=OneTime}"
+                            IsReadOnly="True"
+                            Focusable="False"
+                            BorderThickness="0" />
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </UserControl.Resources>
+    
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="4" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
+        
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -53,18 +70,28 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            
             <TextBlock Text="Исходный файл" TextAlignment="Center" />
-            <RichTextBox Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto" IsReadOnly="True" lb:TextImportManager.TextSource="{Binding}">
+            <RichTextBox
+                Grid.Row="1"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                IsReadOnly="True"
+                lb:TextImportManager.TextSource="{Binding}" />
 
-            </RichTextBox>
             <GridSplitter Background="Transparent" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-            <RichTextBox Grid.Row="3" Style="{StaticResource Editor}" ScrollViewer.VerticalScrollBarVisibility="Auto" lb:EnterHandler.IsAttached="True">
+            
+            <RichTextBox
+                Grid.Row="3"
+                Style="{StaticResource Editor}"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                lb:EnterHandler.IsAttached="True">
                 <FlowDocument>
                     <Paragraph>
                         <Run Text="{Binding BadText}" />
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
+            
             <ProgressBar Grid.Row="4" Height="20" Margin="0,4,0,0" Value="{Binding Progress}" />
         </Grid>
         <GridSplitter Background="Transparent" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
@@ -83,32 +110,57 @@
             </Grid.RowDefinitions>
             <TextBlock Grid.ColumnSpan="2" Text="{Binding Info}" TextWrapping="Wrap" />
             <Label Grid.ColumnSpan="2" Grid.Row="1" BorderThickness="1" BorderBrush="Black" Margin="0,4,0,0" Content="{Binding Problem}" />
-            <CheckBox Grid.Row="2" Margin="0,4,0,0" Grid.ColumnSpan="2" IsChecked="{Binding StandartLogic}" IsEnabled="{Binding CanChangeStandart}"  Content="Ответ следует сразу после вопроса" ToolTip="Ожидать, что за каждым вопросом немедленно идёт ответ, а не считывать сначала группу вопросов, а затем группу ответов" />
+            
+            <CheckBox
+                Grid.Row="2"
+                Margin="0,4,0,0"
+                Grid.ColumnSpan="2"
+                IsChecked="{Binding StandartLogic}"
+                IsEnabled="{Binding CanChangeStandart}"
+                Content="Ответ следует сразу после вопроса"
+                ToolTip="Ожидать, что за каждым вопросом немедленно идёт ответ, а не считывать сначала группу вопросов, а затем группу ответов" />
+            
             <StackPanel Grid.ColumnSpan="2" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
                 <Button Command="{Binding Auto}" Width="166" ToolTip="Определить шаблоны входного файла автоматически" Padding="0,4">
                     <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform" Fill="#FF555555" Margin="2" Width="17" Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Margin="2"
+                            Width="17"
+                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+                        
                         <TextBlock Margin="4,0,0,0" Text="Автоопределение" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                
                 <Button Command="{Binding Sns}" Width="166" Margin="4,0,0,0" ToolTip="Использовать шаблоны проекта СНС" Padding="0,4">
                     <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform" Fill="#FF555555" Margin="2" Width="17" Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Margin="2"
+                            Width="17"
+                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+                        
                         <TextBlock Margin="4,0,0,0" Text="СНС" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>
+            
             <DockPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,4,0,0">
                 <DockPanel DockPanel.Dock="Top">
                     <Label Width="100" Content="Объект" HorizontalContentAlignment="Center" FontWeight="Bold" DockPanel.Dock="Left" />
-                    <Label  Content="Шаблон" HorizontalAlignment="Center" FontWeight="Bold" />
+                    <Label Content="Шаблон" HorizontalAlignment="Center" FontWeight="Bold" />
                 </DockPanel>
+                
                 <ItemsControl ItemsSource="{Binding Templates}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="1" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
+                    
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <DockPanel IsEnabled="{Binding Enabled}">
@@ -118,7 +170,12 @@
                                             <Grid />
                                         </ItemsPanelTemplate>
                                     </Menu.ItemsPanel>
-                                    <MenuItem Style="{StaticResource TemplateSelector}" ItemContainerStyle="{StaticResource TemplateContainer}" Header="{Binding Name}" ItemsSource="{Binding Variants}">
+                                    
+                                    <MenuItem
+                                        Style="{StaticResource TemplateSelector}"
+                                        ItemContainerStyle="{StaticResource TemplateContainer}"
+                                        Header="{Binding Name}"
+                                        ItemsSource="{Binding Variants}">
                                         <MenuItem.HeaderTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
@@ -132,16 +189,30 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </DockPanel>
+            
             <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
                 <Button Command="{Binding Go}" Width="166" Padding="0,4">
                     <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform" Fill="#FF555555" Margin="2" Width="14" Data="{Binding Source={StaticResource app_next},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Margin="2"
+                            Width="14"
+                            Data="{Binding Source={StaticResource app_next},Path=Data}" />
+                        
                         <TextBlock Margin="4,0,0,0" Text="{Binding GoText}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
+                
                 <Button Command="{Binding Skip}" Width="166" Margin="4,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
                     <StackPanel Orientation="Horizontal">
-                        <Path Stretch="Uniform" Fill="#FF555555" Margin="2" Width="14" Data="{Binding Source={StaticResource app_warning},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Margin="2"
+                            Width="14"
+                            Data="{Binding Source={StaticResource app_warning},Path=Data}" />
+                        
                         <TextBlock Margin="4,0,0,0" Text="Пропустить фрагмент" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>

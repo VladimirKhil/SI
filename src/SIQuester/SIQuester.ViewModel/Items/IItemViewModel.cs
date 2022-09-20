@@ -12,6 +12,8 @@ namespace SIQuester.ViewModel
 
         bool IsExpanded { get; set; }
 
+        bool IsDragged { get; set; }
+
         InfoOwner GetModel();
 
         /// <summary>

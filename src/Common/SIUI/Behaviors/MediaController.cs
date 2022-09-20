@@ -22,7 +22,11 @@ namespace SIUI.Behaviors
 
         // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsAttachedProperty =
-            DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(MediaController), new PropertyMetadata(false, OnIsAttachedChanged));
+            DependencyProperty.RegisterAttached(
+                "IsAttached",
+                typeof(bool),
+                typeof(MediaController),
+                new PropertyMetadata(false, OnIsAttachedChanged));
 
         [DllImport("winmm.dll")]
         private static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
@@ -58,7 +62,7 @@ namespace SIUI.Behaviors
                 }
                 catch (Exception exc)
                 {
-                    MessageBox.Show(exc.Message);
+                    MessageBox.Show($"Media play error: {exc.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
             }
 
@@ -67,24 +71,26 @@ namespace SIUI.Behaviors
             SourceDescriptor.AddValueChanged(mediaElement, loaded);
 
             mediaElement.MediaFailed += (sender, e2) =>
-                {
-                    tableInfo.OnMediaLoadError(e2.ErrorException);
-                    Trace.TraceError("MediaFailed error: " + e2.ErrorException);
-                };
+            {
+                tableInfo.OnMediaLoadError(e2.ErrorException);
+                Trace.TraceError("MediaFailed error: " + e2.ErrorException);
+            };
 
             System.Timers.Timer timer = null;
+
             if (tableInfo.HasMediaProgress())
             {
                 timer = new System.Timers.Timer(1000);
+
                 timer.Elapsed += (sender, e2) =>
                 {
-                    mediaElement.Dispatcher.BeginInvoke((Action)(() =>
+                    mediaElement.Dispatcher.BeginInvoke(() =>
                     {
                         if (mediaElement.NaturalDuration.HasTimeSpan)
                         {
                             tableInfo.OnMediaProgress(mediaElement.Position.TotalSeconds / mediaElement.NaturalDuration.TimeSpan.TotalSeconds);
                         }
-                    }));
+                    });
                 };
             }
 
@@ -109,12 +115,12 @@ namespace SIUI.Behaviors
 
             void pauseHandler()
             {
-                mediaElement.Dispatcher.BeginInvoke((Action)mediaElement.Pause);
+                mediaElement.Dispatcher.BeginInvoke(mediaElement.Pause);
             }
 
             void resumeHandler()
             {
-                mediaElement.Dispatcher.BeginInvoke((Action)mediaElement.Play);
+                mediaElement.Dispatcher.BeginInvoke(mediaElement.Play);
             }
 
             void volumeChangedHandler(double volume)
@@ -150,6 +156,7 @@ namespace SIUI.Behaviors
             }
 
             mediaElement.Unloaded += ended;
+
             mediaElement.MediaEnded += (sender, e2) =>
                 {
                     tableInfo.OnMediaEnd();

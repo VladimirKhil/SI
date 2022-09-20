@@ -1,14 +1,13 @@
 ﻿using SIPackages;
-using SIPackages.Core;
+using SIQuester.Contracts;
+using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,11 +24,6 @@ namespace SIQuester
     {
         private bool _isDragging = false;
         private Point _startPoint;
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.U4)]
-        private static extern int GetLongPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszShortPath, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder lpszLongPath, [MarshalAs(UnmanagedType.U4)] int cchBuffer);
-
         private Tuple<ThemeViewModel, int> _insertionPosition;
 
         private readonly object _dragLock = new();
@@ -38,7 +32,7 @@ namespace SIQuester
         {
             InitializeComponent();
 
-            AppSettings.Default.PropertyChanged += Default_PropertyChanged;
+            AppSettings.Default.PropertyChanged += Default_PropertyChanged; // TODO: fix memory leak
         }
 
         private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -138,8 +132,8 @@ namespace SIQuester
 
                 var position = e.GetPosition(null);
 
-                if (Math.Abs(position.X - _startPoint.X) <= 5 * SystemParameters.MinimumHorizontalDragDistance &&
-                    Math.Abs(position.Y - _startPoint.Y) <= 5 * SystemParameters.MinimumVerticalDragDistance)
+                if (Math.Abs(position.X - _startPoint.X) <= SystemParameters.MinimumHorizontalDragDistance &&
+                    Math.Abs(position.Y - _startPoint.Y) <= SystemParameters.MinimumVerticalDragDistance)
                 {
                     return;
                 }
@@ -179,7 +173,7 @@ namespace SIQuester
             {
                 itemData = new InfoOwnerData(active, (IItemViewModel)host.DataContext);
 
-                DoDrag(
+                DragManager.DoDrag(
                     host,
                     active,
                     item,
@@ -219,192 +213,12 @@ namespace SIQuester
 
                 PreviewMouseMove -= MainWindow_PreviewMouseMove;
             }
-        }
-
-        internal static void DoDrag(
-            FrameworkElement host,
-            QDocument active,
-            InfoOwner item,
-            InfoOwnerData itemData,
-            Action beforeDrag = null,
-            Action afterDrag = null)
-        {
-            ArgumentNullException.ThrowIfNull(host, nameof(host));
-            ArgumentNullException.ThrowIfNull(active, nameof(active));
-            ArgumentNullException.ThrowIfNull(item, nameof(item));
-            ArgumentNullException.ThrowIfNull(itemData, nameof(itemData));
-
-            var dataObject = new DataObject(itemData);
-
-            if (host.DataContext is RoundViewModel roundViewModel)
-            {
-                var packageViewModel = roundViewModel.OwnerPackage;
-
-                if (packageViewModel == null)
-                {
-                    throw new ArgumentException(nameof(packageViewModel));
-                }
-
-                int index = packageViewModel.Rounds.IndexOf(roundViewModel);
-
-                active.BeginChange();
-
-                try
-                {
-                    var sb = new StringBuilder();
-
-                    using (var writer = XmlWriter.Create(sb))
-                    {
-                        roundViewModel.Model.WriteXml(writer);
-                    }
-
-                    dataObject.SetData("siqround", "1");
-                    dataObject.SetData(DataFormats.Serializable, sb);
-
-                    var result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
-
-                    if (result == DragDropEffects.Move)
-                    {
-                        if (packageViewModel.Rounds[index] != roundViewModel)
-                        {
-                            index++;
-                        }
-
-                        packageViewModel.Rounds.RemoveAt(index);
-                        active.CommitChange();
-                    }
-                    else
-                    {
-                        active.RollbackChange();
-                    }
-                }
-                catch
-                {
-                    active.RollbackChange();
-                    throw;
-                }
-            }
-            else
-            {
-                if (host.DataContext is ThemeViewModel themeViewModel)
-                {
-                    roundViewModel = themeViewModel.OwnerRound;
-
-                    if (roundViewModel == null)
-                    {
-                        throw new ArgumentException(nameof(roundViewModel));
-                    }
-
-                    int index = roundViewModel.Themes.IndexOf(themeViewModel);
-
-                    active.BeginChange();
-
-                    try
-                    {
-                        var sb = new StringBuilder();
-
-                        using (var writer = XmlWriter.Create(sb))
-                        {
-                            themeViewModel.Model.WriteXml(writer);
-                        }
-
-                        dataObject.SetData("siqtheme", "1");
-                        dataObject.SetData(DataFormats.Serializable, sb);
-
-                        var result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
-
-                        if (result == DragDropEffects.Move)
-                        {
-                            if (roundViewModel.Themes[index] != themeViewModel)
-                            {
-                                index++;
-                            }
-
-                            roundViewModel.Themes.RemoveAt(index);
-                        }
-
-                        active.CommitChange();
-                    }
-                    catch
-                    {
-                        active.RollbackChange();
-                        throw;
-                    }
-                }
-                else
-                {
-                    var questionViewModel = host.DataContext as QuestionViewModel;
-                    themeViewModel = questionViewModel.OwnerTheme;
-
-                    if (themeViewModel == null)
-                    {
-                        throw new ArgumentException(nameof(themeViewModel));
-                    }
-
-                    var index = themeViewModel.Questions.IndexOf(questionViewModel);
-                    active.BeginChange();
-
-                    try
-                    {
-                        var sb = new StringBuilder();
-
-                        using (var writer = XmlWriter.Create(sb))
-                        {
-                            questionViewModel.Model.WriteXml(writer);
-                        }
-
-                        dataObject.SetData("siqquestion", "1");
-                        dataObject.SetData(DataFormats.Serializable, sb);
-
-                        beforeDrag?.Invoke();
-
-                        DragDropEffects result;
-
-                        try
-                        {
-                            result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            result = DragDropEffects.None;
-                        }
-                        finally
-                        {
-                            host.Opacity = 1.0;
-
-                            afterDrag?.Invoke();
-                        }
-
-                        if (result == DragDropEffects.Move)
-                        {
-                            if (themeViewModel.Questions[index] != questionViewModel)
-                            {
-                                index++;
-                            }
-
-                            themeViewModel.Questions.RemoveAt(index);
-
-                            if (AppSettings.Default.ChangePriceOnMove)
-                            {
-                                RecountPrices(themeViewModel);
-                            }
-                        }
-
-                        active.CommitChange();
-                    }
-                    catch
-                    {
-                        active.RollbackChange();
-                        throw;
-                    }
-                }
-            }
-        }
+        }        
 
         private void Main_DragEnter(object sender, DragEventArgs e)
         {
-            e.Effects = (e.Data.GetDataPresent("FileName")
-                || e.Data.GetDataPresent("FileContents")
+            e.Effects = (e.Data.GetDataPresent(WellKnownDragFormats.FileName)
+                || e.Data.GetDataPresent(WellKnownDragFormats.FileContents)
                 || e.Data.GetDataPresent(typeof(InfoOwnerData))) ? e.AllowedEffects : DragDropEffects.None;
 
             e.Handled = true;
@@ -424,6 +238,12 @@ namespace SIQuester
                 }
 
                 var panel = FindAncestor<StackPanel>((DependencyObject)e.OriginalSource);
+
+                if (panel != null && AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table)
+                {
+                    panel = FindAncestor<StackPanel>(VisualTreeHelper.GetParent(panel));
+                }
+
                 if (panel == null)
                 {
                     line.Visibility = Visibility.Hidden;
@@ -432,9 +252,9 @@ namespace SIQuester
                     return;
                 }
 
-                ScrollView(e, scroller);
+                ScrollHelper.ScrollView(e, scroller);
 
-                // Покажем предполагаемое место для вставки
+                // Show possible insertion point
                 if (panel.DataContext is not ThemeViewModel themeViewModel)
                 {
                     line.Visibility = Visibility.Hidden;
@@ -444,7 +264,10 @@ namespace SIQuester
                 }
 
                 var questionsCount = themeViewModel.Questions.Count;
-                var rowsCount = (int)Math.Ceiling((double)questionsCount / 5);
+                var rowsCount = AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table
+                    ? 1
+                    : (int)Math.Ceiling((double)questionsCount / 5);
+
                 var lastRowCount = questionsCount - (rowsCount - 1) * 5;
 
                 var borders = new int[Math.Min(5, questionsCount)];
@@ -486,21 +309,29 @@ namespace SIQuester
                 }
 
                 var pos = e.GetPosition(panel);
-                double x = 0;
 
-                // поля
-                if (pos.Y >= 23 && pos.Y < 26)
+                int rowIndex;
+
+                if (AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table)
                 {
-                    pos.Y = 26;
+                    rowIndex = (int)Math.Floor(((double)pos.Y - 1) / 30);
                 }
-                else if (pos.Y >= 26 + rowsCount * 30 && pos.Y < panel.ActualHeight - 6)
+                else
                 {
-                    pos.Y = 25 + rowsCount * 30 + (rowsCount > 0 ? 0 : 1);
+                    // margins
+                    if (pos.Y >= 23 && pos.Y < 26)
+                    {
+                        pos.Y = 26;
+                    }
+                    else if (pos.Y >= 26 + rowsCount * 30 && pos.Y < panel.ActualHeight - 6)
+                    {
+                        pos.Y = 25 + rowsCount * 30 + (rowsCount > 0 ? 0 : 1);
+                    }
+
+                    rowIndex = (int)Math.Floor(((double)pos.Y - 26) / 30);
                 }
 
-                var row = (int)Math.Floor(((double)pos.Y - 26) / 30);
-
-                if (row < 0 || rowsCount > 0 && row >= rowsCount || rowsCount == 0 && row > 0)
+                if (rowIndex < 0 || rowsCount > 0 && rowIndex >= rowsCount || rowsCount == 0 && rowIndex > 0)
                 {
                     line.Visibility = Visibility.Hidden;
                     _insertionPosition = null;
@@ -508,36 +339,48 @@ namespace SIQuester
                     return;
                 }
 
-                double y = 29 + row * 30;
+                double x = 0;
+                double y = AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table ? 2 : 29 + rowIndex * 30;
 
                 int index = 0;
-                var max = rowsCount > 0 ? (row < rowsCount - 1 ? borders.Length : lastRowCount) : 0;
 
-                for (; index < max; index++)
+                if (AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table)
                 {
-                    if (pos.X < borders[index])
+                    index = (int)Math.Floor((pos.X - 272) / 43);
+                    x = 272 + index * 43;
+                }
+                else
+                {
+                    var max = rowsCount > 0 ? (rowIndex < rowsCount - 1 ? borders.Length : lastRowCount) : 0;
+
+                    for (; index < max; index++)
                     {
-                        x = borders[index] - 23;
-                        break;
+                        if (pos.X < borders[index])
+                        {
+                            x = borders[index] - 23;
+                            break;
+                        }
+                    }
+
+                    if (index == max)
+                    {
+                        x = rowsCount > 0 ? borders[max - 1] + 23 : 120;
                     }
                 }
 
-                if (index == max)
-                {
-                    x = rowsCount > 0 ? borders[max - 1] + 23 : 120;
-                }
+                _insertionPosition = Tuple.Create(themeViewModel, rowIndex * 5 + index);
 
-                _insertionPosition = Tuple.Create(themeViewModel, row * 5 + index);
+                var delta = panel.TranslatePoint(new Point(x, y), grid);
 
                 line.Visibility = Visibility.Visible;
-                var delta = panel.TranslatePoint(new Point(x, y), grid);
                 line.Margin = new Thickness(delta.X, delta.Y, 0, 0);
             }
             else
             {
                 e.Effects = e.AllowedEffects;
-                e.Handled = true;
             }
+
+            e.Handled = true;
         }
 
         private void Main_Drop(object sender, DragEventArgs e)
@@ -548,16 +391,13 @@ namespace SIQuester
             {
                 line.Visibility = Visibility.Hidden;
 
-                if (e.Data.GetDataPresent("FileName"))
+                if (e.Data.GetDataPresent(WellKnownDragFormats.FileName))
                 {
-                    var files = e.Data.GetData("FileName") as string[];
+                    var files = e.Data.GetData(WellKnownDragFormats.FileName) as string[];
 
                     foreach (var file in files)
                     {
-                        var longPath = new StringBuilder(255);
-                        GetLongPathName(file, longPath, longPath.Capacity);
-
-                        var longPathString = longPath.ToString();
+                        var longPathString = FileHelper.GetLongPathName(file);
 
                         if (Path.GetExtension(longPathString) == ".txt")
                         {
@@ -573,9 +413,9 @@ namespace SIQuester
                     return;
                 }
 
-                if (e.Data.GetDataPresent("FileContents"))
+                if (e.Data.GetDataPresent(WellKnownDragFormats.FileContents))
                 {
-                    using (var contentStream = e.Data.GetData("FileContents") as MemoryStream)
+                    using (var contentStream = e.Data.GetData(WellKnownDragFormats.FileContents) as MemoryStream)
                     {
                         ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(contentStream);
                     }
@@ -584,7 +424,7 @@ namespace SIQuester
                     return;
                 }
 
-                var format = GetDragFormat(e);
+                var format = WellKnownDragFormats.GetDragFormat(e);
 
                 InfoOwnerData dragData = null;
 
@@ -594,12 +434,13 @@ namespace SIQuester
                 }
                 catch (SerializationException)
                 {
+                    // TODO: log
                     return;
                 }
 
                 e.Effects = DragDropEffects.Move;
 
-                if (format == "siqquestion" && _insertionPosition != null)
+                if (format == WellKnownDragFormats.Question && _insertionPosition != null)
                 {
                     Question question = null;
 
@@ -630,7 +471,7 @@ namespace SIQuester
 
                     if (AppSettings.Default.ChangePriceOnMove)
                     {
-                        RecountPrices(themeViewModel);
+                        DragManager.RecountPrices(themeViewModel);
                     }
 
                     var document = (QDocument)DataContext;
@@ -647,43 +488,6 @@ namespace SIQuester
                 Trace.TraceError($"Main_Drop error: {ex}");
             }
         }
-
-        internal static void ScrollView(DragEventArgs e, ScrollViewer scroller)
-        {
-            var pos = e.GetPosition(scroller);
-
-            double scrollOffset = 0.0;
-
-            // See if we need to scroll down 
-            if (scroller.ViewportHeight - pos.Y < 40.0)
-            {
-                scrollOffset = 6.0;
-            }
-            else if (pos.Y < 40.0)
-            {
-                scrollOffset = -6.0;
-            }
-
-            // Scroll the tree down or up 
-            if (scrollOffset != 0.0)
-            {
-                scrollOffset += scroller.VerticalOffset;
-
-                if (scrollOffset < 0.0)
-                {
-                    scrollOffset = 0.0;
-                }
-                else if (scrollOffset > scroller.ScrollableHeight)
-                {
-                    scrollOffset = scroller.ScrollableHeight;
-                }
-
-                scroller.ScrollToVerticalOffset(scrollOffset);
-            }
-        }
-
-        internal static string GetDragFormat(DragEventArgs e) =>
-            e.Data.GetFormats(false).FirstOrDefault(f => f.StartsWith("siq"));
 
         internal static T FindAncestor<T>(DependencyObject descendant)
             where T : class
@@ -728,30 +532,6 @@ namespace SIQuester
                 {
                     theme.Questions[i].Price = theme.Questions[i - 1].Price;
                 }
-            }
-        }
-
-        internal static void RecountPrices(ThemeViewModel theme)
-        {
-            var round = theme.OwnerRound;
-
-            if (round == null || round.Model == null || round.OwnerPackage?.Rounds == null)
-            {
-                return;
-            }
-
-            var coef = round.Model.Type == RoundTypes.Final ? 0 : round.OwnerPackage.Rounds.IndexOf(round) + 1;
-            var counter = 0;
-
-            for (int i = 0; i < theme.Questions.Count; i++)
-            {
-                if (theme.Questions[i].Model.Price == Question.InvalidPrice) // Price is not recounted
-                {
-                    continue;
-                }
-
-                theme.Questions[i].Model.Price = coef * AppSettings.Default.QuestionBase * (counter + 1);
-                counter++;
             }
         }
     }

@@ -435,10 +435,23 @@ namespace SIQuester.Model
         }
 
         /// <summary>
-        /// Загрузить пользовательские настройки
+        /// Maximum recommended image size.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
+        public int MaxImageSizeKb { get; } = 1 * 1024;
+
+        /// <summary>
+        /// Maximum recommended audio size.
+        /// </summary>
+        public int MaxAudioSizeKb { get; } = 5 * 1024;
+
+        /// <summary>
+        /// Maximum recommended video size.
+        /// </summary>
+        public int MaxVideoSizeKb { get; } = 10 * 1024;
+
+        /// <summary>
+        /// Loads settings from stream.
+        /// </summary>
         public static AppSettings Load(Stream stream)
         {
             try

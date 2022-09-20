@@ -22,6 +22,7 @@ namespace SIQuester.ViewModel
         public ICommand Print { get; private set; }
 
         private IFlowDocumentWrapper _documentWrapper = null;
+
         private object _document = null;
 
         public object Document

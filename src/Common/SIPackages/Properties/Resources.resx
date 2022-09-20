@@ -150,4 +150,7 @@
   <data name="Video" xml:space="preserve">
     <value>Video</value>
   </data>
+  <data name="Html" xml:space="preserve">
+    <value>HTML</value>
+  </data>
 </root>

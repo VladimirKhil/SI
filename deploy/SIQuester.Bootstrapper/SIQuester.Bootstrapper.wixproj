@@ -52,7 +52,7 @@
     <Content Include="HyperlinkTheme.xml" />
     <Content Include="License.rtf" />
     <Content Include="Resources\logo.ico" />
-    <Content Include="Resources\logo.jpg" />
+    <Content Include="Resources\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HyperlinkTheme_ru-ru.wxl" />

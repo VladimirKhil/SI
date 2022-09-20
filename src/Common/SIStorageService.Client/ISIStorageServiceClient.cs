@@ -11,13 +11,13 @@ namespace SIStorageService.Client
         /// Gets well-known package publishers.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task<NamedObject[]> GetPublishersAsync(CancellationToken cancellationToken = default);
+        Task<NamedObject[]?> GetPublishersAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets well-known package tags.
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task<NamedObject[]> GetTagsAsync(CancellationToken cancellationToken = default);
+        Task<NamedObject[]?> GetTagsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets packages by filter.
@@ -31,7 +31,7 @@ namespace SIStorageService.Client
         /// <param name="sortMode">Packages sort mode.</param>
         /// <param name="sortAscending">Packages sort direction.</param>
         /// <returns>Found packages.</returns>
-        Task<PackageInfo[]> GetPackagesAsync(
+        Task<PackageInfo[]?> GetPackagesAsync(
             int? tagId = null,
             int difficultyRelation = 0,
             int difficulty = 1,
@@ -48,7 +48,7 @@ namespace SIStorageService.Client
         /// <param name="tagId">Tag identifier to search. If omitted, all packages are returned.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Found package names.</returns>
-        Task<string[]> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default);
+        Task<string[]?> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets package by its unique identifier.
@@ -56,13 +56,13 @@ namespace SIStorageService.Client
         /// <param name="packageGuid">Package unique identifier.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Found package.</returns>
-        Task<PackageLink> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default);
+        Task<PackageLink?> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets package uri by identifier.
         /// </summary>
         /// <param name="packageID">Package identifier.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task<Uri> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default);
+        Task<Uri?> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default);
     }
 }

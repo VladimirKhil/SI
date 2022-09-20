@@ -14,5 +14,8 @@
     DragOver="Main_DragOver"
     Drop="Main_Drop"
     d:DataContext="{d:DesignInstance vm:QDocument}">
-    <lc:PackageTreeView Style="{StaticResource QTreeView}" KeyboardNavigation.TabNavigation="Contained" />
+    <Grid Name="_grid">
+        <lc:PackageTreeView Style="{StaticResource QTreeView}" KeyboardNavigation.TabNavigation="Contained" />
+        <Separator Name="_insertionMark" Height="3" Background="Black" Visibility="Hidden" VerticalAlignment="Top" />
+    </Grid>
 </UserControl>

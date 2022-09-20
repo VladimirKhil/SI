@@ -44,7 +44,7 @@
                     Width="20"
                     Height="20"
                     Command="{Binding Close}"
-                    ToolTip="Закрыть"
+                    ToolTip="{x:Static lp:Resources.Close}"
                     Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
                     <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L12,12M0,12L12,0" />
                 </Button>
@@ -56,7 +56,12 @@
                                 <DataTrigger Binding="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" Value="True">
                                     <Setter Property="Content">
                                         <Setter.Value>
-                                            <TextBlock ToolTip="{Binding ErrorMessage}" Text="⚠️" VerticalAlignment="Center" Margin="5,0,5,0" Foreground="OrangeRed" />
+                                            <TextBlock
+                                                ToolTip="{Binding ErrorMessage}"
+                                                Text="⚠️"
+                                                VerticalAlignment="Center"
+                                                Margin="5,0,5,0"
+                                                Foreground="OrangeRed" />
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
@@ -64,15 +69,26 @@
                         </Style>
                     </ContentControl.Style>
                 </ContentControl>
-                <TextBlock MinWidth="80" TextAlignment="Center" VerticalAlignment="Center" Text="{Binding Header}" ToolTip="{Binding ToolTip}" Margin="2,0,0,0" />
+                
+                <TextBlock
+                    MinWidth="80"
+                    TextAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="{Binding Header}"
+                    ToolTip="{Binding ToolTip}"
+                    Margin="2,0,0,0" />
             </DockPanel>
+            
             <DataTemplate.Triggers>
+                
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter TargetName="cb" Property="Visibility" Value="Visible" />
                 </Trigger>
+                
                 <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TabItem}}" Value="True">
                     <Setter TargetName="cb" Property="Visibility" Value="Visible" />
                 </DataTrigger>
+                
             </DataTemplate.Triggers>
         </DataTemplate>
         
@@ -89,10 +105,12 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabControl}">
                         <Grid x:Name="templateRoot" ClipToBounds="True" SnapsToDevicePixels="True" KeyboardNavigation.TabNavigation="Local">
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="ColumnDefinition0"/>
                                 <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
                             </Grid.ColumnDefinitions>
+                            
                             <Grid.RowDefinitions>
                                 <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
                                 <RowDefinition x:Name="RowDefinition1" Height="*"/>
@@ -130,6 +148,7 @@
 
                             </Border>
                         </Grid>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="TabStripPlacement" Value="Bottom">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="1"/>
@@ -138,6 +157,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="2,0,2,2"/>
                             </Trigger>
+                            
                             <Trigger Property="TabStripPlacement" Value="Left">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
                                 <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
@@ -149,6 +169,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="2,2,0,2"/>
                             </Trigger>
+                            
                             <Trigger Property="TabStripPlacement" Value="Right">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
                                 <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
@@ -160,6 +181,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="0,2,2,2"/>
                             </Trigger>
+                            
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter
                                     Property="TextElement.Foreground"
@@ -170,6 +192,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self},Path=Items.Count}" Value="0">
                     <Setter Property="BorderThickness" Value="0" />
@@ -182,14 +205,18 @@
                                         DataContext="{Binding Settings.History.Files}"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
+                                        
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
+                                        
                                         <TextBlock FontSize="24" HorizontalAlignment="Center" Text="{x:Static lp:Resources.RecentFiles}" />
+                                        
                                         <ItemsControl Grid.Row="1" ItemsSource="{Binding}" Margin="0,20,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
+                                                    
                                                     <Button
                                                         x:Name="open"
                                                         Command="{Binding ElementName=main, Path=DataContext.OpenRecent}"
@@ -200,6 +227,7 @@
                                                         HorizontalContentAlignment="Left"
                                                         Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                                         Cursor="Hand">
+                                                        
                                                         <DockPanel Width="600">
                                                             <Button
                                                                 x:Name="remove"
@@ -214,13 +242,16 @@
                                                                 Height="20">
                                                                 <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
                                                             </Button>
+                                                            
                                                             <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
                                                                 <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" />
                                                                 <LineBreak />
                                                                 <Run Text="{Binding Mode=OneWay, Converter={StaticResource DirectoryConverter}}" FontSize="11" />
                                                             </TextBlock>
                                                         </DockPanel>
+                                                        
                                                     </Button>
+                                                    
                                                     <DataTemplate.Triggers>
                                                         <Trigger SourceName="open" Property="IsMouseOver" Value="True">
                                                             <Setter TargetName="remove" Property="Visibility" Value="Visible" />
@@ -231,11 +262,13 @@
                                         </ItemsControl>
                                     </Grid>
                                 </ScrollViewer>
+                                
                                 <ControlTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Settings.History.Files.Count}" Value="0">
                                         <Setter TargetName="grid" Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </ControlTemplate.Triggers>
+                                
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
@@ -247,12 +280,14 @@
             <Setter Property="Margin" Value="0" />
         </Style>
     </Window.Resources>
+    
     <vm1:CommandBindingsManager.RegisterCommandBindings>
         <MultiBinding Converter="{StaticResource UnionConverter}">
             <Binding Path="CommandBindings" />
             <Binding Path="ActiveDocument.CommandBindings" />
         </MultiBinding>
     </vm1:CommandBindingsManager.RegisterCommandBindings>
+    
     <Window.InputBindings>
         <KeyBinding Gesture="CTRL+N" Command="ApplicationCommands.New" />
         <KeyBinding Gesture="CTRL+S" Command="{Binding ActiveDocument.Save}" />
@@ -264,9 +299,11 @@
         <KeyBinding Gesture="CTRL+V" Command="ApplicationCommands.Paste" />
         <KeyBinding Key="Delete" Command="{Binding ActiveDocument.Delete}" />
     </Window.InputBindings>
+    
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="Редактор вопросов SIGame" />
     </Window.TaskbarItemInfo>
+    
     <metro:MetroWindow.IconTemplate>
         <DataTemplate>
             <Grid
@@ -280,33 +317,47 @@
             </Grid>
         </DataTemplate>
     </metro:MetroWindow.IconTemplate>
+    
     <metro:MetroWindow.WindowButtonCommands>
         <metro:WindowButtonCommands
             LightMaxButtonStyle="{StaticResource TitleButton}"
             LightMinButtonStyle="{StaticResource TitleButton}"
             LightCloseButtonStyle="{StaticResource TitleButton}" />
     </metro:MetroWindow.WindowButtonCommands>
+    
     <metro:MetroWindow.LeftWindowCommands>
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
-            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Новый… (Ctrl+N)" Command="ApplicationCommands.New">
+            <Button
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="{x:Static lp:Resources.ToolTipNew}"
+                Command="ApplicationCommands.New">
+                
                 <Path Stretch="Uniform" Fill="White" Margin="4,2" Data="{Binding Source={StaticResource app_new},Path=Data}" />
+                
             </Button>
+            
             <Button
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 ToolTip="Открыть… (Ctrl+O)"
                 Command="ApplicationCommands.Open">
+                
                 <Path Stretch="Uniform" Fill="#FFCD58" Margin="2" Data="{Binding Source={StaticResource app_open},Path=Data}" />
+               
                 <Button.LayoutTransform>
                     <ScaleTransform ScaleX="0.75" />
                 </Button.LayoutTransform>
             </Button>
+            
             <siq:DropDownButton
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 ToolTip="Открыть недавние"
                 DataContext="{Binding}"
                 IsEnabled="{Binding Settings.History.Files.Count,Converter={StaticResource GreaterZero}}"
-                VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch">
+                
                 <Path Data="M0,0L8,0L4,4z" Fill="White" />
+                
                 <siq:DropDownButton.DropDown>
                     <ContextMenu ItemsSource="{Binding Settings.History.Files}">
                         <ContextMenu.ItemContainerStyle>
@@ -318,9 +369,12 @@
                         </ContextMenu.ItemContainerStyle>
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
+                
             </siq:DropDownButton>
+            
             <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Импорт">
                 <Path Stretch="Uniform" Fill="White" Margin="3,2,4,2" Data="{Binding Source={StaticResource app_import},Path=Data}" />
+                
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
                         <MenuItem Header="Текст…" ToolTip="Преобразование текстового файла в SIQ формат" Command="{Binding ImportTxt}">
@@ -328,6 +382,7 @@
                                 <Path Stretch="Uniform" Fill="Gray" Margin="3,0,0,0" Data="{Binding Source={StaticResource app_text},Path=Data}" />
                             </MenuItem.Icon>
                         </MenuItem>
+                        
                         <MenuItem Header="Текст из буфера обмена…" Command="{Binding ImportClipboardTxt}" />
                         <MenuItem Header="XML-файл…" Command="{Binding ImportXml}" />
                         <MenuItem Header="База вопросов…" ToolTip="http://db.chgk.info" Command="{Binding ImportBase}" />
@@ -335,21 +390,38 @@
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
+            
             <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Сохранить всё (Shift+Ctrl+S)" Command="{Binding SaveAll}">
                 <Button.ContentTemplate>
                     <DataTemplate>
                         <Grid Width="20" Height="20">
-                            <Path Name="p1" Stretch="Uniform" Fill="#FF5000C3" Margin="5" Data="{Binding Source={StaticResource app_save},Path=Data}">
+                            
+                            <Path
+                                Name="p1"
+                                Stretch="Uniform"
+                                Fill="#FF5000C3"
+                                Margin="5"
+                                Data="{Binding Source={StaticResource app_save},Path=Data}">
+                                
                                 <Path.RenderTransform>
                                     <TranslateTransform X="-4" Y="4" />
                                 </Path.RenderTransform>
                             </Path>
-                            <Path Name="p2" Stretch="Uniform" Fill="#FF5000C3" Margin="5" Data="{Binding Source={StaticResource app_save},Path=Data}">
+                            
+                            <Path
+                                Name="p2"
+                                Stretch="Uniform"
+                                Fill="#FF5000C3"
+                                Margin="5"
+                                Data="{Binding Source={StaticResource app_save},Path=Data}">
+                                
                                 <Path.RenderTransform>
                                     <TranslateTransform X="4" Y="-4" />
                                 </Path.RenderTransform>
                             </Path>
+                            
                         </Grid>
+                        
                         <DataTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="p1" Property="Fill" Value="LightGray" />
@@ -359,29 +431,54 @@
                     </DataTemplate>
                 </Button.ContentTemplate>
             </Button>
-            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Поиск файлов" Command="{Binding SearchFolder}">
+
+            <Button
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="{x:Static lp:Resources.ToolTipFileSearch}"
+                Command="{Binding SearchFolder}">
+                
                 <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_search},Path=Data}" />
+            
             </Button>
         </metro:WindowCommands>
     </metro:MetroWindow.LeftWindowCommands>
+    
     <metro:MetroWindow.RightWindowCommands>
         <metro:WindowCommands ShowSeparators="False" ShowLastSeparator="False">
-            <Button VerticalAlignment="Stretch" Width="25" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Настройки" Command="{Binding SetSettings}">
+            <Button
+                VerticalAlignment="Stretch"
+                Width="25"
+                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                ToolTip="{x:Static lp:Resources.Settings}"
+                Command="{Binding SetSettings}">
+                
                 <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+                
             </Button>
-            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Помощь">
+            
+            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.Help}">
                 <TextBlock Text="?" FontSize="14" FontWeight="Bold" Foreground="White" Width="20" TextAlignment="Center" />
+                
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
-                        <MenuItem Header="Написать замечания автору…" ToolTip="Сообщить автору о багах или что-нибудь предложить" Command="{Binding Feedback}"/>
-                        <MenuItem Header="Поблагодарить автора…" Command="{Binding Donate}" />
-                        <MenuItem Header="Как использовать программу…" Command="ApplicationCommands.Help" />
-                        <MenuItem Header="О программе…" Command="{Binding About}" />
+                        <MenuItem
+                            Header="{x:Static lp:Resources.ContactAuthor}"
+                            ToolTip="{x:Static lp:Resources.ContactAuthorToolTip}"
+                            Command="{Binding Feedback}" />
+
+                        <MenuItem Header="{x:Static lp:Resources.Donate}" Command="{Binding Donate}" />
+                        <MenuItem Header="{x:Static lp:Resources.HowToUse}" Command="ApplicationCommands.Help" />
+                        <MenuItem Header="{x:Static lp:Resources.About}" Command="{Binding About}" />
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
         </metro:WindowCommands>
     </metro:MetroWindow.RightWindowCommands>
-    <TabControl Name="tabControl1" SelectionChanged="TabControl1_SelectionChanged" Style="{StaticResource TabControlStyle1}"
-                ItemContainerStyle="{StaticResource TabItemStyle1}" />
+    
+    <TabControl
+        Name="tabControl1" 
+        SelectionChanged="TabControl1_SelectionChanged"
+        Style="{StaticResource TabControlStyle1}"
+        ItemContainerStyle="{StaticResource TabItemStyle1}" />
+    
 </metro:MetroWindow>

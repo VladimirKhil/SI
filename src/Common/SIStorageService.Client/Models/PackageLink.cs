@@ -8,11 +8,11 @@
         /// <summary>
         /// Package name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Package uri.
         /// </summary>
-        public Uri Uri { get; set; }
+        public Uri? Uri { get; set; }
     }
 }

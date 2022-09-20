@@ -6,7 +6,7 @@ using System.Xml;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class ExportHtmlViewModel: WorkspaceViewModel
+    public sealed class ExportHtmlViewModel : WorkspaceViewModel
     {
         private readonly QDocument _document = null;
 

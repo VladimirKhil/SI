@@ -29,7 +29,7 @@ namespace Utils
 
             if (TaskScheduler.Current != Scheduler && Scheduler != null)
             {
-                Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.None, Scheduler);
+                Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.DenyChildAttach, Scheduler);
                 return;
             }
 

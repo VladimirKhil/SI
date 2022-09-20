@@ -1,10 +1,12 @@
-﻿<UserControl x:Class="SIQuester.ExportView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:local="clr-namespace:SIQuester"
-             xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
-        Name="root" xmlns:my="clr-namespace:SIQuester.Converters">
+﻿<UserControl
+    x:Class="SIQuester.ExportView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:SIQuester"
+    xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
+    Name="root"
+    xmlns:my="clr-namespace:SIQuester.Converters">
     <UserControl.Resources>
         <ObjectDataProvider x:Key="Formats" ObjectType="sys:Enum" MethodName="GetValues">
             <ObjectDataProvider.MethodParameters>
@@ -22,9 +24,11 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+    
     <DockPanel Margin="5,2">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
             <TextBlock Name="textBlock1" Text="Формат:" VerticalAlignment="Center" Margin="5,2" />
+            
             <ComboBox Name="comboBox1" Width="150" Margin="5,2" ItemsSource="{Binding Source={StaticResource Formats}}" SelectedItem="{Binding Format}" IsSynchronizedWithCurrentItem="True">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -32,9 +36,11 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+            
             <Button Margin="0,2,5,2" Width="100" Height="25" Command="{Binding Save}" CommandParameter="{Binding ElementName=root}">Сохранить...</Button>
             <Button Margin="0,2,5,2" Width="100" Command="{Binding Print}" CommandParameter="{Binding ElementName=root}">Печать...</Button>
         </StackPanel>
+        
         <FlowDocumentReader Name="viewer" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3,0,0" Document="{Binding Document}" BorderBrush="Gray" BorderThickness="1" ViewingMode="Scroll" />
     </DockPanel>
 </UserControl>

@@ -33,6 +33,17 @@ namespace SIQuester.ViewModel
             set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
         }
 
+        private bool _isDragged;
+
+        /// <summary>
+        /// Is item is being dragged.
+        /// </summary>
+        public bool IsDragged
+        {
+            get => _isDragged;
+            set { if (_isDragged != value) { _isDragged = value; OnPropertyChanged(); } }
+        }
+
         /// <summary>
         /// Add command caption.
         /// </summary>

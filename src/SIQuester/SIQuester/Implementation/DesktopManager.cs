@@ -250,7 +250,7 @@ namespace SIQuester.Implementation
 
             if (_mediaFiles.TryGetValue(media.Uri, out string fileName))
             {
-                return new Media(fileName);
+                return new Media(fileName, media.StreamLength);
             }
 
             // This is file itself
@@ -279,7 +279,7 @@ namespace SIQuester.Implementation
 
             _mediaFiles[media.Uri] = fileName;
 
-            return new Media(fileName);
+            return new Media(fileName, media.StreamLength);
         }
 
         public override void ClearMedia(IEnumerable<string> media)

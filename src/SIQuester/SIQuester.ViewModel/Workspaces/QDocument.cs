@@ -373,6 +373,8 @@ namespace SIQuester.ViewModel
 
         public ICommand SelectThemes { get; private set; }
 
+        public ICommand PlayQuestion { get; private set; }
+
         public ICommand ExpandAll { get; private set; }
 
         public ICommand CollapseAllMedia { get; private set; }
@@ -1030,6 +1032,7 @@ namespace SIQuester.ViewModel
             Navigate = new SimpleCommand(Navigate_Executed);
 
             SelectThemes = new SimpleCommand(SelectThemes_Executed);
+            PlayQuestion = new SimpleCommand(PlayQuestion_Executed);
 
             ExpandAll = new SimpleCommand(ExpandAll_Executed);
 
@@ -1110,7 +1113,7 @@ namespace SIQuester.ViewModel
             return CheckLinks();
         }
 
-        private static void FillFiles(List<string> files, MediaStorageViewModel mediaStorage, List<string> errors)
+        private static void FillFiles(List<string> files, MediaStorageViewModel mediaStorage, int maxFileSize, List<string> errors)
         {
             foreach (var item in mediaStorage.Files)
             {
@@ -1119,6 +1122,11 @@ namespace SIQuester.ViewModel
                 if (files.Contains(name))
                 {
                     errors.Add($"Файл \"{name}\" содержится в пакете дважды!");
+                }
+                
+                if (AppSettings.Default.CheckFileSize && mediaStorage.GetLength(item.Model.Name) > maxFileSize * 1024)
+                {
+                    errors.Add(string.Format(Resources.MediaFileTooLarge, name, maxFileSize));
                 }
 
                 files.Add(name);
@@ -1137,9 +1145,9 @@ namespace SIQuester.ViewModel
             var errors = new List<string>();
             var usedFiles = new HashSet<string>();
 
-            FillFiles(images, Images, errors);
-            FillFiles(audio, Audio, errors);
-            FillFiles(video, Video, errors);
+            FillFiles(images, Images, AppSettings.Default.MaxImageSizeKb, errors);
+            FillFiles(audio, Audio, AppSettings.Default.MaxAudioSizeKb, errors);
+            FillFiles(video, Video, AppSettings.Default.MaxVideoSizeKb, errors);
 
             var crossList = images.Intersect(audio).Union(images.Intersect(video)).Union(audio.Intersect(video)).ToArray();
 
@@ -1223,11 +1231,6 @@ namespace SIQuester.ViewModel
             }
 
             return errors.Count == 0 ? null : string.Join(Environment.NewLine, errors);
-        }
-
-        internal void Cut_Executed()
-        {
-            // Not supported yet
         }
 
         internal void Copy_Executed()
@@ -1665,7 +1668,9 @@ namespace SIQuester.ViewModel
                     file.AppendLine();
                     file.AppendLine(Resources.ToIRCtext);
                     file.AppendLine();
+
                     int pind = 1, rind = 1, tind = 1, qind = 1;
+
                     file.AppendLine(string.Format("[p{0}name]", pind));
                     file.AppendLine(Document.Package.Name);
 
@@ -1683,16 +1688,19 @@ namespace SIQuester.ViewModel
                         file.AppendLine(string.Format("[r{0}name]", rind));
                         file.AppendLine(round.Name);
                         file.AppendLine(string.Format("[r{0}type]", rind));
+
                         if (round.Type == RoundTypes.Standart)
                             file.AppendLine(Resources.Simple);
                         else
                             file.AppendLine(Resources.Final);
+
                         file.AppendLine(string.Format("[r{0}auth]", rind));
                         file.AppendLine(string.Join(Environment.NewLine, Document.GetRealAuthors(round.Info.Authors)));
                         file.AppendLine(string.Format("[r{0}sour]", rind));
                         file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(round.Info.Sources)));
                         file.AppendLine(string.Format("[r{0}comm]", rind));
                         file.AppendLine(round.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
+
                         round.Themes.ForEach(theme =>
                         {
                             file.AppendLine(string.Format("[t{0}name]", tind));
@@ -1703,17 +1711,20 @@ namespace SIQuester.ViewModel
                             file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(theme.Info.Sources)));
                             file.AppendLine(string.Format("[t{0}comm]", tind));
                             file.AppendLine(theme.Info.Comments.Text.GrowFirstLetter().EndWithPoint());
+
                             theme.Questions.ForEach(quest =>
                             {
                                 file.AppendLine(string.Format("[q{0}price]", qind));
                                 file.AppendLine(quest.Price.ToString());
                                 file.AppendLine(string.Format("[q{0}type]", qind));
                                 file.AppendLine(quest.Type.Name);
+
                                 foreach (QuestionTypeParam p in quest.Type.Params)
                                 {
                                     file.AppendLine(string.Format("[q{0}{1}]", qind, p.Name));
                                     file.AppendLine(p.Value.Replace('[', '<').Replace(']', '>'));
                                 }
+
                                 var qText = new StringBuilder();
                                 var showmanComments = new StringBuilder();
 
@@ -1723,6 +1734,7 @@ namespace SIQuester.ViewModel
                                     {
                                         if (showmanComments.Length > 0)
                                             showmanComments.AppendLine();
+
                                         showmanComments.Append("* изображение: ");
                                         showmanComments.Append(item.Text);
                                     }
@@ -1730,6 +1742,7 @@ namespace SIQuester.ViewModel
                                     {
                                         if (showmanComments.Length > 0)
                                             showmanComments.AppendLine();
+
                                         showmanComments.Append("* звук: ");
                                         showmanComments.Append(item.Text);
                                     }
@@ -1737,6 +1750,7 @@ namespace SIQuester.ViewModel
                                     {
                                         if (showmanComments.Length > 0)
                                             showmanComments.AppendLine();
+
                                         showmanComments.Append("* видео: ");
                                         showmanComments.Append(item.Text);
                                     }
@@ -1744,15 +1758,18 @@ namespace SIQuester.ViewModel
                                     {
                                         if (qText.Length > 0)
                                             qText.AppendLine();
+
                                         qText.Append(item.Text);
                                     }
                                 }
 
                                 var comments = quest.Info.Comments.Text.GrowFirstLetter().EndWithPoint();
+
                                 if (showmanComments.Length == 0 || comments.Length > 0)
                                 {
                                     if (showmanComments.Length > 0)
                                         showmanComments.AppendLine();
+
                                     showmanComments.Append(comments);
                                 }
 
@@ -1768,10 +1785,13 @@ namespace SIQuester.ViewModel
                                 file.AppendLine(string.Join(Environment.NewLine, Document.GetRealSources(quest.Info.Sources)));
                                 file.AppendLine(string.Format("[q{0}comm]", qind));
                                 file.AppendLine(showmanComments.ToString());
+
                                 qind++;
                             });
+
                             tind++;
                         });
+
                         rind++;
                     });
 
@@ -2753,6 +2773,8 @@ namespace SIQuester.ViewModel
             Dialog = selectThemesViewModel;
         }
 
+        private void PlayQuestion_Executed(object arg) => Dialog = new QuestionPlayViewModel((Question)arg, this);
+
         private void ExpandAll_Executed(object arg)
         {
             var expand = Convert.ToBoolean(arg);
@@ -2820,11 +2842,11 @@ namespace SIQuester.ViewModel
             base.Dispose(disposing);
         }
 
-        internal IMedia Wrap(AtomViewModel atomViewModel)
+        internal IMedia Wrap(Atom atom)
         {
             var collection = Images;
 
-            switch (atomViewModel.Model.Type)
+            switch (atom.Type)
             {
                 case AtomTypes.Audio:
                     collection = Audio;
@@ -2835,9 +2857,9 @@ namespace SIQuester.ViewModel
                     break;
             }
 
-            var link = atomViewModel.Model.Text;
+            var link = atom.Text;
 
-            if (!atomViewModel.Model.IsLink) // External link
+            if (!atom.IsLink) // External link
             {
                 return new Media(link);
             }

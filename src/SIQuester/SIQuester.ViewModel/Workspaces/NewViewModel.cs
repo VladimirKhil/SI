@@ -18,7 +18,7 @@ namespace SIQuester.ViewModel
         private string _packageAuthor = Environment.UserName;
 
         /// <summary>
-        /// Создать пакет
+        /// Creates a new package.
         /// </summary>
         public ICommand Create { get; }
 

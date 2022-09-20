@@ -42,6 +42,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\SIEngine.Core\SIEngine.Core.csproj" />
     <ProjectReference Include="..\..\Common\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.Client\SIStorageService.Client.csproj" />

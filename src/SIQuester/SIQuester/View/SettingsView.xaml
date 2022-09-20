@@ -91,6 +91,7 @@
                 <TextBlock VerticalAlignment="Center"><Run Text="Базовая стоимость вопроса"/></TextBlock>
                 <l:NumericTextBox Margin="5,0" Padding="0,1" x:Name="tbQuestionBase" Width="50" Text="{Binding QuestionBase, Mode=TwoWay}" />
             </StackPanel>
+            
             <TextBlock Style="{StaticResource Header}" Text="Шрифт документа" />
             
             <ComboBox

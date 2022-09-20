@@ -1,25 +1,31 @@
-﻿<UserControl x:Class="SIQuester.SelectThemesView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:l="clr-namespace:SIQuester"
-             mc:Ignorable="d" FontSize="14"
-             d:DesignHeight="300" d:DesignWidth="300">
+﻿<UserControl
+    x:Class="SIQuester.SelectThemesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:l="clr-namespace:SIQuester"
+    mc:Ignorable="d"
+    FontSize="14"
+    d:DesignHeight="300"
+    d:DesignWidth="300">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10,10,0,0">
             <GroupBox Header="Интервал">
                 <StackPanel>
                     <TextBlock Text="{Binding Total, StringFormat='Всего тем: {0}'}" />
+                    
                     <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
                         <TextBlock Text="с" VerticalAlignment="Center" />
                         <l:NumericTextBox Text="{Binding From}" Margin="5,0,0,0" Width="40" Minimum="1" Maximum="{Binding To}" />
                         <TextBlock Text="по" VerticalAlignment="Center" Margin="5,0,0,0" />
                         <l:NumericTextBox Text="{Binding To}" Margin="5,0,0,0" Width="40" Minimum="{Binding From}" Maximum="{Binding Total}" />
                     </StackPanel>
+                    
                     <Button Command="{Binding Select}" HorizontalAlignment="Left" Margin="0,7,0,0" Padding="30,2">Выбрать</Button>
                 </StackPanel>
             </GroupBox>
+            
             <GroupBox Header="Точечная выборка">
                 <StackPanel>
                     <ItemsControl ItemsSource="{Binding Themes}">
@@ -29,6 +35,7 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    
                     <Button Command="{Binding Select2}" HorizontalAlignment="Left" Margin="0,7,0,0" Padding="30,2">Выбрать</Button>
                 </StackPanel>
             </GroupBox>

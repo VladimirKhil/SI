@@ -25,6 +25,8 @@ namespace SIQuester.ViewModel
 
         private readonly ILoggerFactory _loggerFactory;
 
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+
         public ImportSIStorageViewModel(
             StorageContextViewModel storageContextViewModel,
             SIStorage siStorage,
@@ -37,8 +39,9 @@ namespace SIQuester.ViewModel
 
             Storage.Error += OnError;
             Storage.PropertyChanged += Storage_PropertyChanged;
-            Storage.Open();
         }
+
+        internal Task OpenAsync() => Storage.OpenAsync(_cancellationTokenSource.Token);
 
         private void Storage_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -77,6 +80,14 @@ namespace SIQuester.ViewModel
             };
 
             OnNewItem(new DocumentLoaderViewModel(Storage.CurrentPackage.Description, loader));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }

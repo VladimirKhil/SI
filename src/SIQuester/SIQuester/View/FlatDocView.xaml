@@ -78,6 +78,10 @@
                 <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
                     <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
                 </DataTrigger>
+
+                <DataTrigger Binding="{Binding IsDragged}" Value="True">
+                    <Setter TargetName="bd" Property="Opacity" Value="0.2" />
+                </DataTrigger>
                 
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -463,7 +467,7 @@
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
-                            <Setter TargetName="switch" Property="Content" Value="{x:Static lp:Resources.MakeNonEmpty}" />
+                            <Setter TargetName="switch" Property="ToolTip" Value="{x:Static lp:Resources.MakeNonEmpty}" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
 
@@ -495,6 +499,7 @@
                         <ItemsControl.Style>
                             <Style TargetType="ItemsControl">
                                 <Setter Property="ItemTemplate" Value="{StaticResource ExpandedRoundView}" />
+                                
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatScale.Round}">
                                         <Setter Property="ItemTemplate" Value="{StaticResource RoundView}" />

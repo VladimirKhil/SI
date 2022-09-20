@@ -19,6 +19,7 @@
                     <TextBox Name="tb" Text="{Binding Uri, UpdateSourceTrigger=PropertyChanged}" Width="350" VerticalContentAlignment="Center" />
                     <Button Name="ok" Click="Button_Click" Content="OK" Margin="10,0,0,0" Padding="30,2" IsDefault="True" />
                 </StackPanel>
+                
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsMultiline}" Value="True">
                         <Setter TargetName="panel" Property="Orientation" Value="Vertical" />
@@ -29,6 +30,7 @@
                         <Setter TargetName="ok" Property="IsDefault" Value="False" />
                         <Setter TargetName="ok" Property="Margin" Value="0,10,0,0" />
                     </DataTrigger>
+                    
                     <Trigger SourceName="tb" Property="Text" Value="">
                         <Setter TargetName="ok" Property="IsEnabled" Value="False" />
                     </Trigger>

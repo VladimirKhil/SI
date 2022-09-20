@@ -35,10 +35,11 @@ namespace SIPackages.Core
         /// Initializes a new instance of <see cref="Media" /> class.
         /// </summary>
         /// <param name="uri">Media uri.</param>
-        public Media(string uri)
+        /// <param name="streamLength">Media stream length.</param>
+        public Media(string uri, long streamLength = -1)
         {
             Uri = uri;
-            StreamLength = -1;
+            StreamLength = streamLength;
         }
     }
 }

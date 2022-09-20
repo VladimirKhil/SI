@@ -33,26 +33,26 @@ namespace SIQuester.Behaviors
                 return;
             }
 
-            bool blocked = false;
+            var blocked = false;
 
             slider.ValueChanged += (s, e2) =>
+            {
+                if (blocked)
                 {
-                    if (blocked)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (media.NaturalDuration.HasTimeSpan)
-                    {
-                        media.Position = TimeSpan.FromSeconds(media.NaturalDuration.TimeSpan.TotalSeconds * slider.Value / 100);
-                    }
-                };
+                if (media.NaturalDuration.HasTimeSpan)
+                {
+                    media.Position = TimeSpan.FromSeconds(media.NaturalDuration.TimeSpan.TotalSeconds * slider.Value / 100);
+                }
+            };
 
             var timer = new System.Timers.Timer(1000);
 
             timer.Elapsed += (sender, e2) =>
             {
-                media.Dispatcher.BeginInvoke((Action)(() =>
+                media.Dispatcher.BeginInvoke(() =>
                 {
                     if (media.NaturalDuration.HasTimeSpan)
                     {
@@ -66,7 +66,7 @@ namespace SIQuester.Behaviors
                             blocked = false;
                         }
                     }
-                }));
+                });
             };
 
             media.MediaOpened += (sender, e2) =>
@@ -99,7 +99,11 @@ namespace SIQuester.Behaviors
         public static void SetPlayPauseButton(DependencyObject obj, ToggleButton value) => obj.SetValue(PlayPauseButtonProperty, value);
 
         public static readonly DependencyProperty PlayPauseButtonProperty =
-            DependencyProperty.RegisterAttached("PlayPauseButton", typeof(ToggleButton), typeof(MediaController), new PropertyMetadata(null, OnPlayPauseButtonChanged));
+            DependencyProperty.RegisterAttached(
+                "PlayPauseButton",
+                typeof(ToggleButton),
+                typeof(MediaController),
+                new PropertyMetadata(null, OnPlayPauseButtonChanged));
 
         public static void OnPlayPauseButtonChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -107,60 +111,72 @@ namespace SIQuester.Behaviors
             var button = (ToggleButton)e.NewValue;
 
             if (media == null || button == null)
+            {
                 return;
+            }
 
             button.Checked += async (s, e2) =>
+            {
+                Uri mediaUri;
+
+                if (media.Source == null)
                 {
-                    Uri mediaUri;
-
-                    if (media.Source == null)
+                    try
                     {
-                        try
+                        var source = GetSource(media);
+                        var mediaUriStr = (await source?.LoadMediaAsync())?.Uri;
+
+                        if (mediaUriStr == null)
                         {
-                            var source = GetSource(media);
-                            var mediaUriStr = (await source?.LoadMediaAsync())?.Uri;
-
-                            if (mediaUriStr == null)
-                                return;
-
-                            mediaUri = new Uri(mediaUriStr, UriKind.RelativeOrAbsolute);
-
-                            media.Source = mediaUri;
-                        }
-                        catch (Exception exc)
-                        {
-                            MessageBox.Show(exc.ToString());
                             return;
                         }
-                    }
-                    else
-                    {
-                        mediaUri = media.Source;
-                    }
 
+                        mediaUri = new Uri(mediaUriStr, UriKind.RelativeOrAbsolute);
 
-                    try
-                    {
-                        media.Play();
-                        SetIsPlaying(media, true);
+                        media.Source = mediaUri;
                     }
                     catch (Exception exc)
                     {
-                        MessageBox.Show("Ошибка проигрывания мультимедиа: " + exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        MessageBox.Show($"Media play error: {exc}", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
                     }
-                };
-            button.Unchecked += (s, e2) =>
+                }
+                else
                 {
-                    try
-                    {
-                        media.Pause();
-                        SetIsPlaying(media, false);
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show("Ошибка проигрывания мультимедиа: " + exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                    }
-                };
+                    mediaUri = media.Source;
+                }
+
+                try
+                {
+                    media.Play();
+                    SetIsPlaying(media, true);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(
+                        "Ошибка проигрывания мультимедиа: " + exc.Message,
+                        App.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
+                }
+            };
+
+            button.Unchecked += (s, e2) =>
+            {
+                try
+                {
+                    media.Pause();
+                    SetIsPlaying(media, false);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(
+                        "Ошибка проигрывания мультимедиа: " + exc.Message,
+                        App.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
+                }
+            };
 
             media.MediaEnded += (s, e2) => 
             {
@@ -173,13 +189,19 @@ namespace SIQuester.Behaviors
                 try
                 {
                     if (GetIsPlaying(media))
+                    {
                         media.Stop();
+                    }
 
                     media.SetValue(IsPlayingProperty, DependencyProperty.UnsetValue);
                 }
                 catch (Exception exc)
                 {
-                    MessageBox.Show("Ошибка проигрывания мультимедиа: " + exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    MessageBox.Show(
+                        "Ошибка проигрывания мультимедиа: " + exc.Message,
+                        App.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
                 }
             };
         }

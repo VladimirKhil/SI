@@ -13,38 +13,36 @@ namespace SIStorageService.Client
         private static readonly JsonSerializer Serializer = new();
         private readonly HttpClient _client;
 
-        private readonly string _serverUri;
-
         public SIStorageServiceClient(HttpClient client)
         {
             _client = client;
         }
 
-        public Task<Package[]> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
+        public Task<Package[]?> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
             GetAsync<Package[]>("Packages", cancellationToken);
 
-        public Task<PackageCategory[]> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
+        public Task<PackageCategory[]?> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
             GetAsync<PackageCategory[]>("Categories", cancellationToken);
 
-        public Task<Package[]> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction, CancellationToken cancellationToken = default) =>
+        public Task<Package[]?> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction, CancellationToken cancellationToken = default) =>
             GetAsync<Package[]>($"Packages?categoryID={categoryID}&restriction={Uri.EscapeDataString(restriction)}", cancellationToken);
 
-        public Task<Uri> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+        public Task<Uri?> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
             GetAsync<Uri>($"Package?packageID={packageID}", cancellationToken);
 
-        public Task<PackageLink> GetPackage2ByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+        public Task<PackageLink?> GetPackage2ByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
             GetAsync<PackageLink>($"Package2?packageID={packageID}", cancellationToken);
 
-        public Task<Uri> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+        public Task<Uri?> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
             GetAsync<Uri>($"PackageByGuid?packageGuid={packageGuid}", cancellationToken);
 
-        public Task<PackageLink> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default) =>
+        public Task<PackageLink?> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default) =>
             GetAsync<PackageLink>($"PackageByGuid2?packageGuid={packageGuid}", cancellationToken);
 
-        public Task<string> GetPackageNameByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+        public Task<string?> GetPackageNameByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
             GetAsync<string>($"packages/{packageGuid}/name", cancellationToken);
 
-        public Task<string[]> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
+        public Task<string[]?> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
         {
             var queryString = new StringBuilder();
 
@@ -59,19 +57,19 @@ namespace SIStorageService.Client
         }
 
         [Obsolete]
-        public Task<NewServerInfo[]> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
+        public Task<NewServerInfo[]?> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NewServerInfo[]>("servers", cancellationToken);
 
-        public Task<NamedObject[]> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
+        public Task<NamedObject[]?> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NamedObject[]>("Authors", cancellationToken);
 
-        public Task<NamedObject[]> GetPublishersAsync(CancellationToken cancellationToken = default) =>
+        public Task<NamedObject[]?> GetPublishersAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NamedObject[]>("Publishers", cancellationToken);
 
-        public Task<NamedObject[]> GetTagsAsync(CancellationToken cancellationToken = default) =>
+        public Task<NamedObject[]?> GetTagsAsync(CancellationToken cancellationToken = default) =>
             GetAsync<NamedObject[]>("Tags", cancellationToken);
 
-        public Task<PackageInfo[]> GetPackagesAsync(
+        public Task<PackageInfo[]?> GetPackagesAsync(
             int? tagId = null,
             int difficultyRelation = 0,
             int difficulty = 1,
@@ -160,7 +158,7 @@ namespace SIStorageService.Client
                 if (!responseMessage.IsSuccessStatusCode)
                 {
                     throw new Exception(
-                        $"GetAsync {_serverUri}/{request} error ({responseMessage.StatusCode}): " +
+                        $"GetAsync {request} error ({responseMessage.StatusCode}): " +
                         $"{await responseMessage.Content.ReadAsStringAsync(cancellationToken)}");
                 }
                 
@@ -171,7 +169,7 @@ namespace SIStorageService.Client
             }
             catch (SocketException exc)
             {
-                throw new Exception($"SIStorage exception accessing uri {_serverUri}/{request}: {exc.ErrorCode}", exc);
+                throw new Exception($"SIStorage exception accessing uri {request}: {exc.ErrorCode}", exc);
             }
         }
     }

@@ -38,7 +38,7 @@ namespace SIQuester.ViewModel
 
         public ICommand SelectAtomObject { get; private set; }
 
-        public override QDocument OwnerDocument => Owner?.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
+        public override QDocument OwnerDocument => Owner?.OwnerTheme.OwnerRound.OwnerPackage.Document;
 
         private bool _isComplex;
 
@@ -170,11 +170,7 @@ namespace SIQuester.ViewModel
                     {
                         atom.OwnerScenario = null;
                         Model.RemoveAt(e.OldStartingIndex);
-
-                        if (OwnerDocument != null)
-                        {
-                            OwnerDocument.ClearLinks(atom);
-                        }
+                        OwnerDocument?.ClearLinks(atom);
                     }
 
                     IsComplex = Items.Any(atom => atom.Model.Type == AtomTypes.Marker);
@@ -308,6 +304,12 @@ namespace SIQuester.ViewModel
                 return;
             }
 
+            if (mediaType == AtomTypes.Html)
+            {
+                LinkAtomObject(mediaType, asAnswer);
+                return;
+            }
+
             if (media is not string text)
             {
                 return;
@@ -378,6 +380,7 @@ namespace SIQuester.ViewModel
         private void SelectAtomObject_Do(string mediaType, MediaItemViewModel file, bool asAnswer)
         {
             var index = CurrentPosition;
+
             if (index == -1)
             {
                 index = Count - 1;
@@ -419,6 +422,7 @@ namespace SIQuester.ViewModel
         private void AddAtomObject(string mediaType, bool asAnswer)
         {
             QDocument document;
+
             try
             {
                 document = OwnerDocument;

@@ -475,6 +475,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} превышает рекомендуемый размер в {1} КБ.
+        /// </summary>
+        public static string MediaFileTooLarge {
+            get {
+                return ResourceManager.GetString("MediaFileTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Имя:.
         /// </summary>
         public static string NameOfPackage {
@@ -678,6 +687,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Question {
             get {
                 return ResourceManager.GetString("Question", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Проигрывание вопроса.
+        /// </summary>
+        public static string QuestionPlay {
+            get {
+                return ResourceManager.GetString("QuestionPlay", resourceCulture);
             }
         }
         
@@ -970,6 +988,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Unrecognized {
             get {
                 return ResourceManager.GetString("Unrecognized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Неподдерживаемый фрагмент: {0}.
+        /// </summary>
+        public static string UnsupportedFragment {
+            get {
+                return ResourceManager.GetString("UnsupportedFragment", resourceCulture);
             }
         }
         

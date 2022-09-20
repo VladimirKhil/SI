@@ -1,10 +1,13 @@
-﻿<UserControl xmlns:my="clr-namespace:SIQuester"  x:Class="SIQuester.SpardEditorView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+﻿<UserControl
+    xmlns:my="clr-namespace:SIQuester"
+    x:Class="SIQuester.SpardEditorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="300">
     <DockPanel>
         <Menu DockPanel.Dock="Left" FocusManager.IsFocusScope="False">
             <Menu.ItemsPanel>
@@ -12,6 +15,7 @@
                     <StackPanel Orientation="Vertical"/>
                 </ItemsPanelTemplate>
             </Menu.ItemsPanel>
+            
             <MenuItem Header="&lt;&gt;" ItemsSource="{Binding Aliases}" ToolTip="Объект" FontSize="13" Height="25">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="MenuItem">
@@ -19,12 +23,14 @@
                         <Setter Property="CommandParameter" Value="{Binding Key}" />
                     </Style>
                 </MenuItem.ItemContainerStyle>
+                
                 <MenuItem.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Value.VisibleName}" />
                     </DataTemplate>
                 </MenuItem.ItemTemplate>
             </MenuItem>
+            
             <MenuItem Header="?" Command="{Binding InsertOptional}" ToolTip="Необязательный фрагмент" Height="25">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
@@ -32,6 +38,7 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
+            
             <MenuItem Command="{Binding Cut}" ToolTip="Вырезать шаблон" Height="25">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
@@ -39,21 +46,38 @@
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
+            
             <MenuItem Command="{Binding Copy}" ToolTip="Копировать шаблон" Height="25">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
-                        <Path Stretch="Uniform" Fill="#FF555555" Width="18" Margin="2" Data="{Binding Source={StaticResource app_copy},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Width="18"
+                            Margin="2"
+                            Data="{Binding Source={StaticResource app_copy},Path=Data}" />
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
+            
             <MenuItem Command="{Binding Paste}" ToolTip="Вставить шаблон" Height="25">
                 <MenuItem.HeaderTemplate>
                     <DataTemplate>
-                        <Path Stretch="Uniform" Fill="#FF555555" Width="18" Margin="2" Data="{Binding Source={StaticResource app_paste},Path=Data}" />
+                        <Path
+                            Stretch="Uniform"
+                            Fill="#FF555555"
+                            Width="18"
+                            Margin="2"
+                            Data="{Binding Source={StaticResource app_paste},Path=Data}" />
                     </DataTemplate>
                 </MenuItem.HeaderTemplate>
             </MenuItem>
         </Menu>
-        <my:SimpleSpardEditor ScrollViewer.VerticalScrollBarVisibility="Auto" ContextMenu="{x:Null}" UndoLimit="0" Spard="{Binding Transform, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        
+        <my:SimpleSpardEditor
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ContextMenu="{x:Null}"
+            UndoLimit="0"
+            Spard="{Binding Transform, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </DockPanel>
 </UserControl>

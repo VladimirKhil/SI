@@ -145,7 +145,6 @@ namespace SIQuester.ViewModel
 
             AddCommandBinding(ApplicationCommands.SaveAs, (s, e) => ActiveDocument?.SaveAs_Executed(), CanExecuteDocumentCommand);
 
-            AddCommandBinding(ApplicationCommands.Cut, (s, e) => ActiveDocument?.Cut_Executed(), CanExecuteDocumentCommand);
             AddCommandBinding(ApplicationCommands.Copy, (s, e) => ActiveDocument?.Copy_Executed(), CanExecuteDocumentCommand);
             AddCommandBinding(ApplicationCommands.Paste, (s, e) => ActiveDocument?.Paste_Executed(), CanExecuteDocumentCommand);
 
@@ -171,7 +170,7 @@ namespace SIQuester.ViewModel
             }
         }
 
-        public async Task InitializeAsync()
+        public void Initialize()
         {
             if (_args.Length > 0)
             {
@@ -257,7 +256,7 @@ namespace SIQuester.ViewModel
             return true;
         }
 
-        private void Feedback_Executed(object arg) => OpenUri(Uri.EscapeDataString(Resources.AuthorSiteUrl));
+        private void Feedback_Executed(object arg) => OpenUri(Resources.AuthorSiteUrl);
 
         private void Donate_Executed(object arg) => OpenUri(DonateUrl);
 
@@ -475,7 +474,6 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Импортировать текст из буфера обмена
         /// </summary>
-        /// <param name="arg"></param>
         private void ImportClipboardTxt_Executed(object arg)
         {
             var model = new ImportTextViewModel(typeof(Clipboard), _storageContextViewModel, _loggerFactory);
@@ -570,11 +568,17 @@ namespace SIQuester.ViewModel
         /// <summary>
         /// Imports package from SI Storage.
         /// </summary>
-        private void ImportFromSIStore_Executed(object arg) => DocList.Add(
-            new ImportSIStorageViewModel(
+        private async void ImportFromSIStore_Executed(object arg)
+        {
+            var importViewModel = new ImportSIStorageViewModel(
                 _storageContextViewModel,
                 PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>(),
-                _loggerFactory));
+                _loggerFactory);
+
+            DocList.Add(importViewModel);
+
+            await importViewModel.OpenAsync();
+        }
 
         private async void SaveAll_Executed(object arg)
         {

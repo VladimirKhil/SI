@@ -449,4 +449,13 @@ theme - тема Кота</value>
   <data name="AddTheme" xml:space="preserve">
     <value>Добавить тему</value>
   </data>
+  <data name="MediaFileTooLarge" xml:space="preserve">
+    <value>Файл {0} превышает рекомендуемый размер в {1} КБ</value>
+  </data>
+  <data name="QuestionPlay" xml:space="preserve">
+    <value>Проигрывание вопроса</value>
+  </data>
+  <data name="UnsupportedFragment" xml:space="preserve">
+    <value>Неподдерживаемый фрагмент: {0}</value>
+  </data>
 </root>

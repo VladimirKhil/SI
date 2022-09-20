@@ -216,13 +216,18 @@ namespace Notions
         public static string ProlongString(this string str)
         {
             if (str.Length < 2)
+            {
                 return str + Environment.NewLine;
+            }
 
             var length = str.Length - 2;
-            while (length >= 0 && str.Substring(length, 2) == Environment.NewLine)
-                length -= 2;
 
-            return str.Substring(0, length + 2) + Environment.NewLine;
+            while (length >= 0 && str.Substring(length, 2) == Environment.NewLine)
+            {
+                length -= 2;
+            }
+
+            return string.Concat(str.AsSpan(0, length + 2), Environment.NewLine);
         }
 
         /// <summary>
@@ -262,13 +267,18 @@ namespace Notions
         public static string ClearPoints(this string s)
         {
             if (s.Length == 0)
+            {
                 return "";
+            }
 
             var length = s.Length - 1;
-            while (length > 0 && (s[length] == '.' || char.IsWhiteSpace(s[length])))
-                length--;
 
-            return s.Substring(0, length + 1);
+            while (length > 0 && (s[length] == '.' || char.IsWhiteSpace(s[length])))
+            {
+                length--;
+            }
+
+            return s[..(length + 1)];
         }
 
         /// <summary>
@@ -279,13 +289,18 @@ namespace Notions
         public static string GrowFirstLetter(this string s)
         {
             if (s.Length == 0)
+            {
                 return "";
+            }
 
-            if (Uri.TryCreate(s, UriKind.Absolute, out Uri uri) && uri.IsWellFormedOriginalString())
+            if (Uri.TryCreate(s, UriKind.Absolute, out Uri? uri) && uri.IsWellFormedOriginalString())
+            {
                 return s;
+            }
 
             var i = 0;
             var res = new StringBuilder();
+
             while (i < s.Length && !char.IsLetter(s[i]) && !char.IsNumber(s[i]))
             {
                 res.Append(s[i++]);
@@ -294,8 +309,11 @@ namespace Notions
             if (i < s.Length)
             {
                 res.Append(char.ToUpper(s[i]));
+
                 if (i + 1 < s.Length)
-                    res.Append(s.Substring(i + 1));
+                {
+                    res.Append(s.AsSpan(i + 1));
+                }
             }
 
             return res.ToString();
@@ -330,18 +348,24 @@ namespace Notions
         /// <param name="str">Входная строка</param>
         /// <param name="n">Пределная длина</param>
         /// <returns>Результирующая обрезанная строка</returns>
-        public static string LeaveFirst(this string str, int n) => (str.Length > n) ? str.Substring(n - 1) + "…" : str;
+        public static string LeaveFirst(this string str, int n) => (str.Length > n) ? string.Concat(str.AsSpan(n - 1), "…") : str;
 
         public static string FormatNumber(this string s, bool format = false)
         {
             if (s.Length == 0)
+            {
                 return "";
+            }
 
             if (!format && !char.IsDigit(s[0]))
-                return s[0] + FormatNumber(s.Substring(1));
+            {
+                return s[0] + FormatNumber(s[1..]);
+            }
 
             if (s.Length <= 4)
+            {
                 return s;
+            }
 
             return $"{FormatNumber(s[..^3], true)} {s[^3..]}";
         }
@@ -353,6 +377,7 @@ namespace Notions
         {
             var length = s.Length;
             var res = new StringBuilder();
+
             for (var i = 0; i < length; i++)
             {
                 if (s[i] == '-' && i > 0 && char.IsWhiteSpace(s[i - 1]) && i < length - 1 && char.IsWhiteSpace(s[i + 1]))

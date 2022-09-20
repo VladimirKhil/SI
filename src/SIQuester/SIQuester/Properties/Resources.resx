@@ -117,17 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>О программе…</value>
+  </data>
   <data name="Accept" xml:space="preserve">
     <value>Зачёт</value>
   </data>
   <data name="AddEmptyQuestion" xml:space="preserve">
     <value>Добавить пустой вопрос</value>
   </data>
+  <data name="AddHtml" xml:space="preserve">
+    <value>Добавить HTML</value>
+  </data>
   <data name="AddQuestion" xml:space="preserve">
     <value>Добавить вопрос (Insert)</value>
   </data>
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
+  </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Аудио</value>
   </data>
   <data name="Author" xml:space="preserve">
     <value>Автор</value>
@@ -153,6 +162,9 @@
   <data name="BasicSettings" xml:space="preserve">
     <value>Основные настройки</value>
   </data>
+  <data name="Bytes" xml:space="preserve">
+    <value>байт</value>
+  </data>
   <data name="Championship" xml:space="preserve">
     <value>Чемпионат</value>
   </data>
@@ -162,17 +174,29 @@
   <data name="CloneTheme" xml:space="preserve">
     <value>Клонировать тему</value>
   </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
   <data name="Comment" xml:space="preserve">
     <value>Комментарий</value>
   </data>
   <data name="Comments" xml:space="preserve">
     <value>Комментарии</value>
   </data>
+  <data name="ContactAuthor" xml:space="preserve">
+    <value>Написать замечания автору…</value>
+  </data>
+  <data name="ContactAuthorToolTip" xml:space="preserve">
+    <value>Сообщить автору о багах или что-нибудь предложить</value>
+  </data>
   <data name="Create5QuestionsWithTheme" xml:space="preserve">
     <value>Создавать 5 вопросов вместе с темой</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
+  </data>
+  <data name="Donate" xml:space="preserve">
+    <value>Поблагодарить автора…</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>Без имени</value>
@@ -194,6 +218,12 @@
   </data>
   <data name="FullUpdates" xml:space="preserve">
     <value>Обнаружено обновление программы до версии {0}. Будет произведена дополнительная установка. Установить обновление сейчас?</value>
+  </data>
+  <data name="Help" xml:space="preserve">
+    <value>Помощь</value>
+  </data>
+  <data name="HowToUse" xml:space="preserve">
+    <value>Как использовать программу…</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -217,8 +247,14 @@
   <data name="MakeNonEmpty" xml:space="preserve">
     <value>Сделать непустым</value>
   </data>
+  <data name="Next" xml:space="preserve">
+    <value>Дальше</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>Нет</value>
+  </data>
+  <data name="PlayQuestion" xml:space="preserve">
+    <value>Запустить вопрос</value>
   </data>
   <data name="PublishersAll" xml:space="preserve">
     <value>(все)</value>
@@ -244,6 +280,9 @@
   <data name="SendErrorHeader" xml:space="preserve">
     <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
   </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
   <data name="SortQuestionsByPrice" xml:space="preserve">
     <value>Отсортировать вопросы по стоимости</value>
   </data>
@@ -258,6 +297,12 @@
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="ToolTipFileSearch" xml:space="preserve">
+    <value>Поиск файлов</value>
+  </data>
+  <data name="ToolTipNew" xml:space="preserve">
+    <value>Новый… (Ctrl+N)</value>
   </data>
   <data name="Tour" xml:space="preserve">
     <value>Тур</value>

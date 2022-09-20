@@ -11,7 +11,7 @@ using Utils;
 
 namespace SIQuester.ViewModel
 {
-    public sealed class SearchFolderViewModel: WorkspaceViewModel
+    public sealed class SearchFolderViewModel : WorkspaceViewModel
     {
         public override string Header => "Поиск файлов";
 
@@ -30,7 +30,8 @@ namespace SIQuester.ViewModel
         }
 
         private CancellationTokenSource _searchLink = null;
-        private readonly object _searchSync = new object();
+
+        private readonly object _searchSync = new();
 
         private async void StartSearch()
         {
@@ -120,6 +121,7 @@ namespace SIQuester.ViewModel
         }
 
         public SimpleCommand SelectFolderPath { get; private set; }
+
         public ICommand Open { get; private set; }
 
         public ObservableCollection<SearchResult> SearchResults { get; } = new ObservableCollection<SearchResult>();
@@ -149,6 +151,7 @@ namespace SIQuester.ViewModel
         private void SelectFolderPath_Executed(object arg)
         {
             var path = PlatformSpecific.PlatformManager.Instance.SelectSearchFolder();
+
             if (path != null)
             {
                 FolderPath = path;
@@ -173,16 +176,20 @@ namespace SIQuester.ViewModel
                 lock (_searchSync)
                 {
                     if (token.IsCancellationRequested)
+                    {
                         return;
+                    }
                 }
 
                 found = null;
+
                 try
                 {
                     using (var stream = File.OpenRead(file.FullName))
                     {
                         using var doc = SIDocument.Load(stream);
                         var package = doc.Package;
+
                         if ((found = package.SearchFragment(searchText)) == null)
                         {
                             foreach (var round in package.Rounds)
@@ -225,13 +232,16 @@ namespace SIQuester.ViewModel
                     {
                         var fileNameLocal = file.FullName;
                         var foundLocal = found;
-                        Task.Factory.StartNew(
+
+                        UI.Execute(
                             () =>
                             {
                                 lock (_searchSync)
                                 {
                                     if (token.IsCancellationRequested)
+                                    {
                                         return;
+                                    }
 
                                     SearchResults.Add(new SearchResult
                                     {
@@ -240,17 +250,18 @@ namespace SIQuester.ViewModel
                                     });
                                 }
                             },
-                            CancellationToken.None,
-                            TaskCreationOptions.None,
-                            UI.Scheduler);
+                            exc => OnError(exc),
+                            token);
                     }
                 }
                 catch
                 {
+                    // TODO: log
                 }
                 finally
                 {
                     done++;
+
                     if (level == 0)
                     {
                         lock (_searchSync)
@@ -271,12 +282,15 @@ namespace SIQuester.ViewModel
                     SearchInDirectory(dir, searchText, subfoldersSearch, token, level + 1);
 
                     done++;
+
                     if (level == 0)
                     {
                         lock (_searchSync)
                         {
                             if (token.IsCancellationRequested)
+                            {
                                 return;
+                            }
 
                             SearchProgress = 100 * done / total;
                         }
