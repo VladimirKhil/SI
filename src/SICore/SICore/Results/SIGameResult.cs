@@ -13,26 +13,32 @@ namespace SICore.Results
         /// Имя игрового пакета
         /// </summary>
         public string PackageName { get; set; }
+
         /// <summary>
         /// Лог произошедших ошибок
         /// </summary>
         public string ErrorLog { get; set; }
+
         /// <summary>
         /// Комментарии
         /// </summary>
         public string Comments { get; set; }
+
         /// <summary>
         /// Результаты участников
         /// </summary>
         public List<PersonResult> PersonResults { get; set; }
+
         /// <summary>
         /// Правильные (апеллированные) ответы
         /// </summary>
         public List<AnswerInfo> RightAnswers { get; set; }
+
         /// <summary>
         /// Неправильные ответы
         /// </summary>
         public List<AnswerInfo> WrongAnswers { get; set; }
+
         /// <summary>
         /// Помеченные вопросы
         /// </summary>
@@ -48,20 +54,15 @@ namespace SICore.Results
             Comments = "";
         }
 
-        public GameResult CreateResult()
+        public GameResult CreateResult() => new GameResult
         {
-            return new GameResult
-            {
-                PackageName = PackageName,
-                Results = PersonResults,
-                ApellatedQuestions = RightAnswers,
-                WrongVersions = WrongAnswers,
-                MarkedQuestions = MarkedQuestions,
-                ErrorLog = ErrorLog,
-                Comments = Comments
-            };
-        }
-
-        
+            PackageName = PackageName,
+            Results = PersonResults,
+            ApellatedQuestions = RightAnswers,
+            WrongVersions = WrongAnswers,
+            MarkedQuestions = MarkedQuestions,
+            ErrorLog = ErrorLog,
+            Comments = Comments
+        };
     }
 }

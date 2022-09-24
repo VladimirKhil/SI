@@ -72,7 +72,7 @@ namespace SICore.Results
                 var quest = theme.Questions[answerInfo.Question];
 
                 result.AppendFormat(DescriptionFormat, localizer[nameof(R.Question)], quest.Scenario.ToString()).AppendLine();
-                var right = quest.GetRightAnswers();
+                var right = quest.Right;
                 result.AppendFormat(DescriptionFormat, localizer[nameof(R.Answer)], right.FirstOrDefault()).AppendLine();
                 result.AppendFormat(DescriptionFormat, answerTitle, answerInfo.Answer).AppendLine();
 

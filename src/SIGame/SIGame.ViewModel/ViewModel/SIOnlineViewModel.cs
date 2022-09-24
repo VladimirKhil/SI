@@ -35,7 +35,9 @@ namespace SIGame.ViewModel
 
         public string ServerLicense => _gamesHostInfo?.License;
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        protected override long? MaxPackageSize => _gamesHostInfo?.MaxPackageSizeMb;
+
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         private GameInfo _currentGame = null;
 
@@ -165,9 +167,13 @@ namespace SIGame.ViewModel
             set
             {
                 if (value)
+                {
                     GamesFilter |= GamesFilter.New;
+                }
                 else
+                {
                     GamesFilter &= ~GamesFilter.New;
+                }
             }
         }
 
@@ -212,7 +218,7 @@ namespace SIGame.ViewModel
         public ObservableCollection<GameInfo> ServerGames { get; } = new ObservableCollection<GameInfo>();
         public List<GameInfo> ServerGamesCache { get; private set; } = new List<GameInfo>();
 
-        private readonly object _serverGamesLock = new object();
+        private readonly object _serverGamesLock = new();
 
         private string _password = "";
 
@@ -300,7 +306,8 @@ namespace SIGame.ViewModel
             }
         }
 
-        public string[] Emoji { get; } = new string[] { "😃", "😁", "😪", "🎄", "🎓", "💥", "🦄", "🍋", "🍄", "🔥", "❤️", "✨", "🎅", "🎁", "☃️", "🦌" };
+        public string[] Emoji { get; } =
+            new string[] { "😃", "😁", "😪", "🎄", "🎓", "💥", "🦄", "🍋", "🍄", "🔥", "❤️", "✨", "🎅", "🎁", "☃️", "🦌" };
 
         private string _chatText;
 
@@ -330,7 +337,7 @@ namespace SIGame.ViewModel
         /// </summary>
         private readonly IGameServerClient _gameServerClient;
 
-        public ObservableCollection<string> Users { get; } = new ObservableCollection<string>();
+        public ObservableCollection<string> Users { get; } = new();
 
         private readonly object _usersLock = new();
 

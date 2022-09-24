@@ -11,6 +11,7 @@ namespace SICore
         private const int MaxFileSize = 1_000_000;
 
         protected Dictionary<string, Func<StreamInfo>> _files = new();
+
         protected object _filesSync = new();
 
         public event Action<Exception> Error;

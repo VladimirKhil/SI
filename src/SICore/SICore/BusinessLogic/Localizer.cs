@@ -7,6 +7,7 @@ namespace SICore.BusinessLogic
     public sealed class Localizer : ILocalizer
     {
         private readonly ResourceManager _resourceManager;
+
         private ResourceManager _packagesResourceManager;
 
         public CultureInfo Culture { get; }
@@ -21,12 +22,9 @@ namespace SICore.BusinessLogic
 
         public string GetPackagesString(string key)
         {
-            if (_packagesResourceManager == null)
-            {
-                _packagesResourceManager = new ResourceManager(
-                    "SIPackages.Properties.Resources",
-                    typeof(SIPackages.Properties.Resources).Assembly);
-            }
+            _packagesResourceManager ??= new ResourceManager(
+                "SIPackages.Properties.Resources",
+                typeof(SIPackages.Properties.Resources).Assembly);
 
             return _packagesResourceManager.GetString(key, Culture);
         }

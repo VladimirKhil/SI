@@ -1518,7 +1518,7 @@ namespace SICore
         /// <summary>
         /// Получение части вопроса
         /// </summary>
-        public void OnAtom(string[] mparams)
+        public void OnPlayerAtom(string[] mparams)
         {
             var playerData = _data.PlayerDataExtensions;
 

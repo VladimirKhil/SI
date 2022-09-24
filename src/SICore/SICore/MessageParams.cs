@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SICore
+﻿namespace SICore
 {
+    /// <summary>
+    /// Contains well-known messaging protocol parameters.
+    /// </summary>
     public static class MessageParams
     {
         /// <summary>
@@ -19,7 +16,7 @@ namespace SICore
         public const string Answer_Wrong = "WRONG";
 
         /// <summary>
-        /// Адрес расположения единицы сценария
+        /// Question fragment uri.
         /// </summary>
         public const string Atom_Uri = "URI";
 
@@ -64,9 +61,19 @@ namespace SICore
         public const string Timer_Go = "GO";
 
         /// <summary>
+        /// Timer pause.
+        /// </summary>
+        public const string Timer_Pause = "PAUSE";
+
+        /// <summary>
         /// Остановка таймера
         /// </summary>
         public const string Timer_Stop = "STOP";
+
+        /// <summary>
+        /// Timer pause caused by user.
+        /// </summary>
+        public const string Timer_UserPause = "USER_PAUSE";
 
         /// <summary>
         /// Можно жать на кнопку, но вопрос ещё не окончен

@@ -448,7 +448,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на External link: {0} . You can enable automatic loading of external links in game settings.
+        ///   Ищет локализованную строку, похожую на External link: {0} . External link download could be unsafe and is disabled.
         /// </summary>
         public static string ExternalLink {
             get {

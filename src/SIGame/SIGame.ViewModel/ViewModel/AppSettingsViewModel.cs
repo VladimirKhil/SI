@@ -57,13 +57,13 @@ namespace SIGame.ViewModel
 
         public bool IsEditable
         {
-            get { return _isEditable; }
+            get => _isEditable;
             set { if (_isEditable != value) { _isEditable = value; OnPropertyChanged(); } }
         }
 
         public GameModes GameMode
         {
-            get { return _model.GameMode; }
+            get => _model.GameMode;
             set
             {
                 if (_model.GameMode != value)
@@ -101,8 +101,11 @@ namespace SIGame.ViewModel
         private async void Import_Executed(object arg)
         {
             var settingsFile = PlatformSpecific.PlatformManager.Instance.SelectSettingsForImport();
+
             if (settingsFile == null)
+            {
                 return;
+            }
 
             try
             {
@@ -122,19 +125,23 @@ namespace SIGame.ViewModel
 
                         if (partUri.StartsWith("Human"))
                         {
-                            var name = Path.GetFileNameWithoutExtension(partUri.Substring(partUri.IndexOf('_') + 1));
+                            var name = Path.GetFileNameWithoutExtension(partUri[(partUri.IndexOf('_') + 1)..]);
                             var item = CommonSettings.Default.Humans2.FirstOrDefault(human => human.Name == name);
 
                             if (item != null)
-                                await SetPicture(part, partUri, item);
+                            {
+                                await SetPictureAsync(part, partUri, item);
+                            }
                         }
                         else if (partUri.StartsWith("Computer"))
                         {
-                            var name = Path.GetFileNameWithoutExtension(partUri.Substring(partUri.IndexOf('_') + 1));
+                            var name = Path.GetFileNameWithoutExtension(partUri[(partUri.IndexOf('_') + 1)..]);
                             var item = CommonSettings.Default.CompPlayers2.FirstOrDefault(comp => comp.Name == name);
 
                             if (item != null)
-                                await SetPicture(part, partUri, item);
+                            {
+                                await SetPictureAsync(part, partUri, item);
+                            }
                         }
                     }
 
@@ -157,8 +164,11 @@ namespace SIGame.ViewModel
         private async void Export_Executed(object arg)
         {
             var exportFile = PlatformSpecific.PlatformManager.Instance.SelectSettingsForExport();
+
             if (exportFile == null)
+            {
                 return;
+            }
 
             try
             {
@@ -174,17 +184,17 @@ namespace SIGame.ViewModel
 
                     foreach (var item in CommonSettings.Default.Humans2)
                     {
-                        await AddImage(package, "Human", item);
+                        await AddImageAsync(package, "Human", item);
                     }
 
                     foreach (var item in CommonSettings.Default.CompPlayers2)
                     {
-                        await AddImage(package, "Computer", item);
+                        await AddImageAsync(package, "Computer", item);
                     }
 
                     foreach (var item in CommonSettings.Default.CompShowmans2)
                     {
-                        await AddImage(package, "Showman", item);
+                        await AddImageAsync(package, "Showman", item);
                     }
 
                     var userSettingsPart = package.CreateEntry(UserPart);
@@ -200,16 +210,22 @@ namespace SIGame.ViewModel
             catch (Exception exc)
             {
                 PlatformSpecific.PlatformManager.Instance.ShowMessage(exc.ToString(), PlatformSpecific.MessageType.Warning);
+
                 if (File.Exists(exportFile))
+                {
                     File.Delete(exportFile);
+                }
             }
         }
 
         private void MoveLogs_Executed(object arg)
         {
             var path = PlatformSpecific.PlatformManager.Instance.SelectLogsFolder(_model.LogsFolder);
+
             if (path != null)
+            {
                 MoveLogsTo(path);
+            }
         }
 
         private void SetDefault_Executed(object arg)
@@ -227,6 +243,7 @@ namespace SIGame.ViewModel
             _model.RandomRoundsCount = AppSettingsCore.DefaultRandomRoundsCount;
             _model.RandomThemesCount = AppSettingsCore.DefaultRandomThemesCount;
             _model.RandomQuestionsBasePrice = AppSettingsCore.DefaultRandomQuestionsBasePrice;
+            _model.UseApellations = AppSettingsCore.DefaultUseApellations;
 
             foreach (var item in TimeSettings.All)
             {
@@ -239,6 +256,7 @@ namespace SIGame.ViewModel
         private void Apply_Executed(object arg)
         {
             UserSettings.Default.GameSettings.AppSettings = _model;
+
             if (_oldLogsFolder != null && _oldLogsFolder != _model.LogsFolder)
             {
                 try
@@ -247,14 +265,16 @@ namespace SIGame.ViewModel
                 }
                 catch (Exception exc)
                 {
-                    PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.LogsMovingError + ": " + exc.Message, PlatformSpecific.MessageType.Error);
+                    PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                        $"{Resources.LogsMovingError}: {exc.Message}",
+                        PlatformSpecific.MessageType.Error);
                 }
             }
 
             Close?.Invoke();
         }
 
-        private static async Task SetPicture(ZipArchiveEntry part, string partUri, Account item)
+        private static async Task SetPictureAsync(ZipArchiveEntry part, string partUri, Account item)
         {
             var ext = Path.GetExtension(partUri);
 
@@ -264,37 +284,37 @@ namespace SIGame.ViewModel
 
                 using (var stream = part.Open())
                 {
-                    using (var fileStream = File.Create(localPath))
-                    {
-                        await stream.CopyToAsync(fileStream);
-                    }
+                    using var fileStream = File.Create(localPath);
+                    await stream.CopyToAsync(fileStream);
                 }
 
                 item.Picture = localPath;
             }
         }
 
-        private static async Task AddImage(ZipArchive package, string category, Account account)
+        private static async Task AddImageAsync(ZipArchive package, string category, Account account)
         {
             if (!account.CanBeDeleted || string.IsNullOrWhiteSpace(account.Picture))
+            {
                 return;
+            }
 
             if (!Uri.TryCreate(account.Picture, UriKind.RelativeOrAbsolute, out Uri uri))
+            {
                 return;
+            }
 
             if (!uri.IsAbsoluteUri || uri.Scheme != "file" || !File.Exists(uri.LocalPath))
+            {
                 return;
+            }
 
             var partUri = string.Format("{0}_{1}{2}", category, account.Name, Path.GetExtension(account.Picture));
             var part = package.CreateEntry(partUri);
 
-            using (var stream = part.Open())
-            {
-                using (var fileStream = File.Open(account.Picture, FileMode.Open))
-                {
-                    await fileStream.CopyToAsync(stream);
-                }
-            }
+            using var stream = part.Open();
+            using var fileStream = File.Open(account.Picture, FileMode.Open);
+            await fileStream.CopyToAsync(stream);
         }
 
         private void MoveLogsTo(string newPath)
@@ -302,7 +322,10 @@ namespace SIGame.ViewModel
             if (_model.LogsFolder != newPath)
             {
                 if (_oldLogsFolder == null)
+                {
                     _oldLogsFolder = _model.LogsFolder;
+                }
+
                 _model.LogsFolder = newPath;
             }
         }
@@ -310,7 +333,9 @@ namespace SIGame.ViewModel
         private static void MoveData(string source, string destination)
         {
             if (!Directory.Exists(source))
+            {
                 return;
+            }
 
             MoveData(new DirectoryInfo(source), destination);
         }
@@ -318,18 +343,25 @@ namespace SIGame.ViewModel
         private static void MoveData(DirectoryInfo source, string destination)
         {
             Directory.CreateDirectory(destination);
+
             foreach (var dir in source.GetDirectories())
             {
                 MoveData(dir, Path.Combine(destination, dir.Name));
+
                 if (dir.GetFileSystemInfos().Length == 0)
+                {
                     Directory.Delete(dir.FullName);
+                }
             }
 
             foreach (var file in source.GetFiles())
             {
                 var targetFile = Path.Combine(destination, file.Name);
+
                 if (!File.Exists(targetFile))
+                {
                     File.Move(file.FullName, targetFile);
+                }
             }
         }
     }

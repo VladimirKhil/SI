@@ -172,6 +172,7 @@ namespace SIEngine
         public event Action<IMedia, IMedia> QuestionImage;
         public event Action<IMedia> QuestionSound;
         public event Action<IMedia> QuestionVideo;
+        public event Action<IMedia> QuestionHtml;
         public event Action<Atom> QuestionOther;
         public event Action<Question, bool, bool> QuestionProcessed;
         public event Action QuestionFinished;
@@ -239,6 +240,8 @@ namespace SIEngine
         protected void OnQuestionSound(IMedia sound) => QuestionSound?.Invoke(sound);
 
         protected void OnQuestionVideo(IMedia video) => QuestionVideo?.Invoke(video);
+
+        protected void OnQuestionHtml(IMedia html) => QuestionHtml?.Invoke(html);
 
         protected void OnQuestionOther(Atom atom) => QuestionOther?.Invoke(atom);
 
@@ -601,6 +604,19 @@ namespace SIEngine
                         _atomIndex++;
                         break;
                     }
+
+                case AtomTypes.Html:
+                    var html = GetMedia();
+
+                    if (html == null)
+                    {
+                        break;
+                    }
+
+                    OnQuestionHtml(html);
+
+                    _atomIndex++;
+                    break;
 
                 case AtomTypes.Marker:
                     _atomIndex++;

@@ -2,6 +2,11 @@ name: SIQuester release
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: '1.0.0'
 
 jobs:
   build:
@@ -19,12 +24,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore SIQuester.sln
     - name: Publish x86
-      run: dotnet publish src\SIQuester\SIQuester\SIQuester.csproj -c Release -p:PublishSingleFile=true -r win-x86 --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=5.8.1
+      run: dotnet publish --no-restore src\SIQuester\SIQuester\SIQuester.csproj -c Release -p:PublishSingleFile=true -r win-x86 --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=${{ github.event.inputs.version }}
     - name: Publish x64
-      run: dotnet publish src\SIQuester\SIQuester\SIQuester.csproj -c Release -p:PublishSingleFile=true -r win-x64 --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=5.8.1
+      run: dotnet publish --no-restore src\SIQuester\SIQuester\SIQuester.csproj -c Release -p:PublishSingleFile=true -r win-x64 --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=${{ github.event.inputs.version }}
     - name: Build MSI x86
-      run: msbuild deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x86 /p:OutputPath=../../bin/.Release/SIQuester.Setup/x86 /p:BuildProjectReferences=false /p:MsiProductVersion=5.8.1
+      run: msbuild deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x86 /p:OutputPath=../../bin/.Release/SIQuester.Setup/x86 /p:BuildProjectReferences=false /p:MsiProductVersion=${{ github.event.inputs.version }}
     - name: Build MSI x64
-      run: msbuild deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x64 /p:OutputPath=../../bin/.Release/SIQuester.Setup/x64 /p:BuildProjectReferences=false /p:MsiProductVersion=5.8.1
+      run: msbuild deploy\SIQuester.Setup\SIQuester.Setup.wixproj /p:Configuration=Release /p:Platform=x64 /p:OutputPath=../../bin/.Release/SIQuester.Setup/x64 /p:BuildProjectReferences=false /p:MsiProductVersion=${{ github.event.inputs.version }}
     - name: Build Setup
-      run: msbuild deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj /p:Configuration=Release /p:OutputPath=../../bin/.Release/SIQuester.Bootstrapper /p:BuildProjectReferences=false /p:MsiProductVersion=5.8.1
+      run: msbuild deploy\SIQuester.Bootstrapper\SIQuester.Bootstrapper.wixproj /p:Configuration=Release /p:OutputPath=../../bin/.Release/SIQuester.Bootstrapper /p:BuildProjectReferences=false /p:MsiProductVersion=${{ github.event.inputs.version }}

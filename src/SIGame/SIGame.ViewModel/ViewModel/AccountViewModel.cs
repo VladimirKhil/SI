@@ -40,6 +40,7 @@ namespace SIGame.ViewModel
             try
             {
                 var avatar = PlatformManager.Instance.SelectHumanAvatar();
+
                 if (avatar != null)
                 {
                     _model.Picture = avatar;

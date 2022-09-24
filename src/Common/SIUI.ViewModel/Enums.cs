@@ -76,36 +76,41 @@ namespace SIUI.ViewModel
     }
 
     /// <summary>
-    /// Тип содержимого вопроса, отображаемого на табло
+    /// Defines well-known content types displayed on the table.
     /// </summary>
     [DataContract]
     public enum QuestionContentType
     {
         /// <summary>
-        /// Пустое содержимое
+        /// Empty content.
         /// </summary>
         [EnumMember]
         None,
         /// <summary>
-        /// Текст
+        /// Text content.
         /// </summary>
         [EnumMember]
         Text,
         /// <summary>
-        /// Изображение
+        /// Image content.
         /// </summary>
         [EnumMember]
         Image,
         /// <summary>
-        /// Видео
+        /// Video content.
         /// </summary>
         [EnumMember]
         Video,
         /// <summary>
-        /// Специальный текст
+        /// Special text content.
         /// </summary>
         [EnumMember]
-        SpecialText
+        SpecialText,
+        /// <summary>
+        /// Html content.
+        /// </summary>
+        [EnumMember]
+        Html
     }
 
     /// <summary>

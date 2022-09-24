@@ -8,17 +8,14 @@ using System.Windows.Media.Animation;
 
 namespace SIUI.Behaviors
 {
+    /// <summary>
+    /// Enables text reading effects ("karaoke").
+    /// </summary>
     public static class QuestionReading
     {
-        public static bool GetIsAttached(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(IsAttachedProperty);
-        }
+        public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
 
-        public static void SetIsAttached(DependencyObject obj, bool value)
-        {
-            obj.SetValue(IsAttachedProperty, value);
-        }
+        public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
 
         // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsAttachedProperty =
@@ -28,6 +25,11 @@ namespace SIUI.Behaviors
         {
             var textBlock = (TextBlock)d;
             var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+
+            if (tableInfoViewModel.TextSpeed < double.Epsilon)
+            {
+                return;
+            }
 
             textBlock.Loaded += (sender, e2) =>
             {
@@ -41,27 +43,31 @@ namespace SIUI.Behaviors
             };
         }
 
-        public static bool GetIsAttachedPartial(DependencyObject obj)
-        {
-            return (bool)obj.GetValue(IsAttachedPartialProperty);
-        }
+        public static bool GetIsAttachedPartial(DependencyObject obj) => (bool)obj.GetValue(IsAttachedPartialProperty);
 
-        public static void SetIsAttachedPartial(DependencyObject obj, bool value)
-        {
-            obj.SetValue(IsAttachedPartialProperty, value);
-        }
+        public static void SetIsAttachedPartial(DependencyObject obj, bool value) => obj.SetValue(IsAttachedPartialProperty, value);
 
         // Using a DependencyProperty as the backing store for IsAttachedPartial.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsAttachedPartialProperty =
             DependencyProperty.RegisterAttached("IsAttachedPartial", typeof(bool), typeof(QuestionReading), new PropertyMetadata(false, OnIsAttachedPartialChanged));
 
         // Пока сделано синглтоном
-        public static int CurrentTarget;
+        private static int CurrentTarget;
 
         public static void OnIsAttachedPartialChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var textBlock = (TextBlock)d;
             var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+
+            if (!(bool)e.NewValue)
+            {
+                return;
+            }
+
+            if (tableInfoViewModel.TextSpeed < double.Epsilon)
+            {
+                return;
+            }
 
             void handler(object sender, PropertyChangedEventArgs e2)
             {
@@ -69,11 +75,6 @@ namespace SIUI.Behaviors
                 {
                     UpdateAnimation(textBlock, tableInfoViewModel);
                 }
-            }
-
-            if (!(bool)e.NewValue)
-            {
-                return;
             }
 
             tableInfoViewModel.PropertyChanged += handler;

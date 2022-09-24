@@ -9,6 +9,7 @@
 	  <Description>SIGame utils</Description>
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+	  <Nullable>enable</Nullable>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">

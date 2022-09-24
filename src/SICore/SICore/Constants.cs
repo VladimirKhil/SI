@@ -1,14 +1,18 @@
 ﻿namespace SICore
 {
     /// <summary>
-    /// Игровые константы (не путать с ресурсами, переводить нельзя)
+    /// Contains well-known unlocalizable game constants.
     /// </summary>
     public static class Constants
     {
         /// <summary>
-        /// Обозначение имени игрового хоста в Uri
+        /// Game host name placeholder in game host Uri.
         /// </summary>
         public const string GameHost = "<GAMEHOST>";
+
+        /// <summary>
+        /// Server host name placeholder in server host Uri.
+        /// </summary>
         public const string ServerHost = "<SERVERHOST>";
 
         /// <summary>

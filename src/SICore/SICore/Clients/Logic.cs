@@ -31,10 +31,12 @@ namespace SICore
         public Data Data => _data;
 
         private Timer _taskTimer = null;
+
         private int _taskArgument = -1;
+
         private readonly Stack<Tuple<int, int, int>> _oldTasks = new();
         
-        private readonly Lock _taskTimerLock = new Lock(nameof(_taskTimerLock));
+        private readonly Lock _taskTimerLock = new(nameof(_taskTimerLock));
         
         /// <summary>
         /// Estimated time for current task to fire.
@@ -146,10 +148,7 @@ namespace SICore
         /// Запись сообщения в лог
         /// </summary>
         /// <param name="s"></param>
-        public void AddLog(string s)
-        {
-            _data.OnAddString(null, s, LogMode.Log);
-        }
+        public void AddLog(string s) => _data.OnAddString(null, s, LogMode.Log);
 
         #region IDisposable Members
 

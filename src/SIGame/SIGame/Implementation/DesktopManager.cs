@@ -158,9 +158,10 @@ namespace SIGame.Implementation
             return null;
         }
 
-        public override string SelectLocalPackage()
+        public override string SelectLocalPackage(long? maxPackageSize)
         {
             var openDialog = new OpenFileDialog { Title = Resources.SelectGamePackage, Filter = Resources.SIQuestions + "|*.siq" };
+            
             if (_recentPackageDir != null)
             {
                 openDialog.InitialDirectory = _recentPackageDir;
@@ -173,6 +174,17 @@ namespace SIGame.Implementation
 
             if (openDialog.ShowDialog().Value)
             {
+                if (maxPackageSize.HasValue && new FileInfo(openDialog.FileName).Length > maxPackageSize.Value * 1024 * 1024)
+                {
+                    MessageBox.Show(
+                        $"{ViewModel.Properties.Resources.FileTooLarge} {string.Format(ViewModel.Properties.Resources.MaximumFileSize, maxPackageSize.Value)}",
+                        App.ProductName,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Exclamation);
+
+                    return null;
+                }
+
                 _recentPackageDir = Path.GetDirectoryName(openDialog.FileName);
                 return openDialog.FileName;
             }
@@ -182,7 +194,12 @@ namespace SIGame.Implementation
 
         public override string SelectStudiaBackground()
         {
-            var dialog = new OpenFileDialog { Title = Resources.SelectStudiaBackgroundFileName, Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff" };
+            var dialog = new OpenFileDialog
+            {
+                Title = Resources.SelectStudiaBackgroundFileName,
+                Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff"
+            };
+
             if (dialog.ShowDialog() != true)
             {
                 return null;

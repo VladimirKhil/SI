@@ -33,6 +33,7 @@ namespace SICore
         public IClient Client => _client;
 
         public abstract ValueTask OnMessageReceivedAsync(Message message);
+
         protected abstract L CreateLogic(Account personData);
 
         public ILocalizer LO { get; protected set; }

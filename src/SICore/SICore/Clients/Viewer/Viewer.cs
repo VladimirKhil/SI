@@ -283,9 +283,9 @@ namespace SICore
         }
 
         /// <summary>
-        /// Обработка полученного системного сообщения
+        /// Processes received system message.
         /// </summary>
-        /// <param name="mparams">Параметры сообщения</param>
+        /// <param name="mparams">Message arguments.</param>
         protected virtual async ValueTask OnSystemMessageReceivedAsync(string[] mparams)
         {
             try
@@ -371,9 +371,16 @@ namespace SICore
                             #region ReadingSpeed
                             if (mparams.Length > 1)
                             {
-                                if (int.TryParse(mparams[1], out int readingSpeed) && readingSpeed > 0)
+                                if (int.TryParse(mparams[1], out int readingSpeed))
                                 {
-                                    _logic.OnTextSpeed(1.0 / readingSpeed);
+                                    if (readingSpeed > 0)
+                                    {
+                                        _logic.OnTextSpeed(1.0 / readingSpeed);
+                                    }
+                                    else
+                                    {
+                                        _logic.OnTextSpeed(0.0);
+                                    }
                                 }
                             }
                             break;
@@ -387,6 +394,13 @@ namespace SICore
                             {
                                 ClientData.ButtonBlockingTime = buttonBlockingTime;
                             }
+                        }
+                        break;
+
+                    case Messages.ApellationEnabled:
+                        if (mparams.Length > 1)
+                        {
+                            ClientData.ApellationEnabled = mparams[1] == "+";
                         }
                         break;
 
@@ -449,7 +463,7 @@ namespace SICore
 
                             if (mparams.Length > 4)
                             {
-                                var message = ClientData.TInfo.Pause ? "USER_PAUSE" : "USER_RESUME";
+                                var message = ClientData.TInfo.Pause ? MessageParams.Timer_UserPause : "USER_RESUME";
 
                                 _logic.OnTimerChanged(0, message, mparams[2], null);
                                 _logic.OnTimerChanged(1, message, mparams[3], null);
@@ -727,7 +741,7 @@ namespace SICore
                         break;
 
                     case Messages.Atom:
-                        _logic.SetAtom(mparams);
+                        _logic.OnAtom(mparams);
                         break;
 
                     case Messages.Atom_Hint:
@@ -738,7 +752,7 @@ namespace SICore
                         break;
 
                     case Messages.Atom_Second:
-                        _logic.SetSecondAtom(mparams);
+                        _logic.OnSecondAtom(mparams);
                         break;
 
                     case Messages.RightAnswer:
@@ -1400,6 +1414,7 @@ namespace SICore
             ViewerAccount newAccount = null;
 
             ClientData.BeginUpdatePersons($"Config_DeleteTable {string.Join(" ", mparams)}");
+
             try
             {
                 account = ClientData.Players[index];
@@ -1429,6 +1444,7 @@ namespace SICore
                 }
 
                 var canDelete = ClientData.Players.Count > 2;
+
                 foreach (var player in ClientData.Players)
                 {
                     player.Delete.CanBeExecuted = canDelete;
@@ -1481,6 +1497,7 @@ namespace SICore
 
             // Кого заменяем
             var account = GetAccountByType(isPlayer, indexString);
+
             if (account == null || account.Name == replacer)
             {
                 return;
@@ -1519,6 +1536,7 @@ namespace SICore
                 GameRole role = GameRole.Viewer;
 
                 ClientData.BeginUpdatePersons($"Config_Set {string.Join(" ", mparams)}");
+
                 try
                 {
                     if (isPlayer && ClientData.ShowMan.Name == replacer)
@@ -1543,6 +1561,7 @@ namespace SICore
                     else
                     {
                         var found = false;
+
                         foreach (var item in ClientData.Players)
                         {
                             if (item.Name == replacer)
@@ -1609,6 +1628,7 @@ namespace SICore
                 if (account == me)
                 {
                     var newRole = isPlayer ? GameRole.Player : GameRole.Showman;
+
                     if (newRole != role)
                     {
                         await SwitchToNewTypeAsync(role, other, me);
@@ -1627,6 +1647,7 @@ namespace SICore
                 else if (other == me)
                 {
                     var newRole = isPlayer ? GameRole.Player : GameRole.Showman;
+
                     if (newRole != role)
                     {
                         await SwitchToNewTypeAsync(newRole, account, me);

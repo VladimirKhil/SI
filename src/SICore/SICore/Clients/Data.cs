@@ -52,7 +52,7 @@ namespace SICore
         /// </summary>
         public GameStage Stage
         {
-            get { return _stage; }
+            get => _stage;
             set { _stage = value; OnPropertyChanged(); }
         }
 
@@ -62,27 +62,29 @@ namespace SICore
         /// </summary>
         public int RoundTime
         {
-            get { return _roundTime; }
+            get => _roundTime;
             set { if (_roundTime != value) { _roundTime = value; OnPropertyChanged(); } }
         }
 
         private int _pressingTime = 0;
+
         /// <summary>
         /// Время на нажатие на кнопку
         /// </summary>
         public int PressingTime
         {
-            get { return _pressingTime; }
+            get => _pressingTime;
             set { if (_pressingTime != value) { _pressingTime = value; OnPropertyChanged(); } }
         }
 
         private int _thinkingTime = 0;
+
         /// <summary>
         /// Время для принятия решения
         /// </summary>
         public int ThinkingTime
         {
-            get { return _thinkingTime; }
+            get => _thinkingTime;
             set { if (_thinkingTime != value) { _thinkingTime = value; OnPropertyChanged(); } }
         }
 
@@ -111,15 +113,9 @@ namespace SICore
         {
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
     }
 }

@@ -1029,4 +1029,13 @@
   <data name="Sec" xml:space="preserve">
     <value>с</value>
   </data>
+  <data name="Apellations" xml:space="preserve">
+    <value>Апелляции ответов</value>
+  </data>
+  <data name="ApellationsHint" xml:space="preserve">
+    <value>Кнопки "Я прав" и "Я против"</value>
+  </data>
+  <data name="EnableMediaLoad" xml:space="preserve">
+    <value>Разрешить загрузку стороннего медиа</value>
+  </data>
 </root>

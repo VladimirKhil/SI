@@ -126,9 +126,9 @@ namespace SICore
         private void Share_Error(Exception exc) => _client.Server.OnError(exc, true);
 
         /// <summary>
-        /// Отправка данных об игре
+        /// Sends all current game data to the person.
         /// </summary>
-        /// <param name="person">Тот, кого надо проинформировать</param>
+        /// <param name="person">Receiver name.</param>
         private void Inform(string person = NetworkConstants.Everybody)
         {
             _gameActions.SendMessageToWithArgs(
@@ -168,7 +168,7 @@ namespace SICore
 
             _gameActions.SendMessage(msg, person);
 
-            // Сообщим об адресах картинок
+            // Send persons avatars info
             if (person != NetworkConstants.Everybody)
             {
                 InformPicture(ClientData.ShowMan, person);
@@ -188,13 +188,17 @@ namespace SICore
                 }
             }
 
-            _gameActions.SendMessageToWithArgs(person, Messages.ReadingSpeed, ClientData.Settings.AppSettings.ReadingSpeed);
+            _gameActions.SendMessageToWithArgs(
+                person,
+                Messages.ReadingSpeed,
+                ClientData.Settings.AppSettings.Managed ? 0 : ClientData.Settings.AppSettings.ReadingSpeed);
+
             _gameActions.SendMessageToWithArgs(person, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-");
             _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton);
+            _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, ClientData.Settings.AppSettings.UseApellations ? '+' : '-');
 
             var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
             _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
-
             _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
         }
 

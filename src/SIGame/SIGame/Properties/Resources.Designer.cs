@@ -223,6 +223,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Answer apellations.
+        /// </summary>
+        public static string Apellations {
+            get {
+                return ResourceManager.GetString("Apellations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Buttons &quot;I am right&quot; and &quot;I disagree&quot;.
+        /// </summary>
+        public static string ApellationsHint {
+            get {
+                return ResourceManager.GetString("ApellationsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Application language.
         /// </summary>
         public static string AppLanguage {
@@ -534,6 +552,15 @@ namespace SIGame.Properties {
         public static string DoNotSendReport {
             get {
                 return ResourceManager.GetString("DoNotSendReport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Enable external media load.
+        /// </summary>
+        public static string EnableMediaLoad {
+            get {
+                return ResourceManager.GetString("EnableMediaLoad", resourceCulture);
             }
         }
         

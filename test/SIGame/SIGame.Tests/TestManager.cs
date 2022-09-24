@@ -24,7 +24,7 @@ namespace SIGame.Tests
 
 		public override string SelectHumanAvatar() => throw new NotImplementedException();
 
-		public override string SelectLocalPackage() => System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SIGameTest.siq");
+		public override string SelectLocalPackage(long? maxPackageSize) => System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SIGameTest.siq");
 
 		public override string SelectLogsFolder(string initialFolder) => throw new NotImplementedException();
 

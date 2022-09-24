@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace SICore
 {
     public interface IConnector
     {
         string ServerAddress { get; }
+
         string Error { get; }
 
         bool CanRetry { get; }
@@ -15,8 +15,11 @@ namespace SICore
         int GameId { get; }
 
         Task<bool> ReconnectToServer();
+
         Task RejoinGame();
+
         void SetHost(IViewerClient newHost);
+
         void SetGameID(int gameID);
     }
 }

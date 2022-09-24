@@ -8,7 +8,7 @@ namespace SICore
 
         public int Stake
         {
-            get { return _stake; }
+            get => _stake;
             set { _stake = value; OnPropertyChanged(); }
         }
     }

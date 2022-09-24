@@ -249,7 +249,7 @@ namespace SICore
                         break;
 
                     case Messages.Atom:
-                        _logic.OnAtom(mparams);
+                        _logic.OnPlayerAtom(mparams);
 
                         if (ClientData.QuestionType == QuestionTypes.Simple)
                         {

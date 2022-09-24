@@ -9,6 +9,7 @@ namespace SICore
     public sealed class StoredComputerAccount : ComputerAccount
     {
         private const string UnsetName = "#";
+
         private const string DefaultCulture = "en";
 
         [JsonProperty]

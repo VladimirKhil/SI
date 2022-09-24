@@ -56,7 +56,6 @@ namespace SIPackages.Helpers
             foreach (var entry in archive.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
                 await ExtractEntryToDirectoryAsync(entry, destinationDirectoryPath, extractedFileNamingMode, cancellationToken);
             }
         }

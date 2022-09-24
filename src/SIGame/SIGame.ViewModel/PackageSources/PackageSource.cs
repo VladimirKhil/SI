@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 namespace SIGame.ViewModel.PackageSources
 {
     /// <summary>
-    /// Источник игрового пакета
-    /// Варианты: следующий, случайный набор тем, из списка загруженных, подгрузить с диска
+    /// Provides game package source.
     /// </summary>
     public abstract class PackageSource
     {
@@ -14,33 +13,36 @@ namespace SIGame.ViewModel.PackageSources
         /// Уникальный код источника
         /// </summary>
         public abstract PackageSourceKey Key { get; }
+
         /// <summary>
         /// Описание источника
         /// </summary>
         public abstract string Source { get; }
+
         /// <summary>
         /// Получить игровой пакет
         /// </summary>
         public abstract Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default);
+
         /// <summary>
-        /// Получить пакет в виде набора байт
+        /// Gets package contents as stream.
         /// </summary>
-        /// <returns></returns>
         public virtual Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default) => null;
+
         /// <summary>
         /// Получить имя игрового пакета
         /// </summary>
         /// <returns></returns>
         public abstract string GetPackageName();
+
         /// <summary>
         /// Получить идентификатор пакета
         /// </summary>
-        /// <returns></returns>
         public virtual string GetPackageId() => null;
+
         /// <summary>
         /// Получить уникальный хэш игрового пакета
         /// </summary>
-        /// <returns></returns>
         public abstract Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default);
 
         public virtual bool RandomSpecials => false;

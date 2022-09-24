@@ -16,19 +16,33 @@ namespace SIGame.ViewModel.PlatformSpecific
         }
 
         public abstract void ShowMessage(string text, MessageType messageType, bool uiThread = false);
+
         public abstract bool Ask(string text);
 
         public abstract void ShowHelp(bool asDialog);
+
         public abstract string SelectColor();
 
         public abstract string SelectLogsFolder(string initialFolder);
+
         public abstract string SelectHumanAvatar();
-        public abstract string SelectLocalPackage();
+
+        /// <summary>
+        /// Selects local game package.
+        /// </summary>
+        /// <param name="maxPackageSize">Maximum allowed package size.</param>
+        public abstract string SelectLocalPackage(long? maxPackageSize);
+
         public abstract string SelectSettingsForExport();
+
         public abstract string SelectSettingsForImport();
+
         public abstract string SelectStudiaBackground();
+
         public abstract string SelectMainBackground();
+
         public abstract string SelectLogo();
+
         public abstract string SelectSound();
 
         public abstract void Activate();

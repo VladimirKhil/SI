@@ -223,7 +223,7 @@ namespace SICore
             
         }
 
-        public void OnAtom(string[] mparams)
+        public void OnPlayerAtom(string[] mparams)
         {
             
         }

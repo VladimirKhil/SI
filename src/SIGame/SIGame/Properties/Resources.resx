@@ -1029,4 +1029,13 @@
   <data name="Sec" xml:space="preserve">
     <value>sec</value>
   </data>
+  <data name="Apellations" xml:space="preserve">
+    <value>Answer apellations</value>
+  </data>
+  <data name="ApellationsHint" xml:space="preserve">
+    <value>Buttons "I am right" and "I disagree"</value>
+  </data>
+  <data name="EnableMediaLoad" xml:space="preserve">
+    <value>Enable external media load</value>
+  </data>
 </root>

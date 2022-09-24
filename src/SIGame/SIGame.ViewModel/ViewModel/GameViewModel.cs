@@ -15,9 +15,13 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace SIGame.ViewModel
 {
+    /// <summary>
+    /// Defines a single game view model.
+    /// </summary>
     public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         private readonly Server _server;
@@ -28,6 +32,9 @@ namespace SIGame.ViewModel
 
         public TableInfoViewModel TInfo => Host.MyLogic.TInfo;
 
+        /// <summary>
+        /// Ends the game and returns to main menu/lobby.
+        /// </summary>
         public CustomCommand EndGame { get; }
 
         /// <summary>
@@ -87,6 +94,11 @@ namespace SIGame.ViewModel
             set { TInfo.Volume = Math.Max(1, value) / 100; }
         }
 
+        /// <summary>
+        /// Enables loading of external media.
+        /// </summary>
+        public ICommand EnableExtrenalMediaLoad { get; set; }
+
         public GameViewModel(Server server, IViewerClient host, UserSettings userSettings)
         {
             _server = server;
@@ -110,12 +122,20 @@ namespace SIGame.ViewModel
             EndGame = new CustomCommand(EndGame_Executed);
             Cancel = new CustomCommand(Cancel_Executed);
 
+            EnableExtrenalMediaLoad = new CustomCommand(EnableExtrenalMediaLoad_Executed);
+
             for (int i = 0; i < Timers.Length; i++)
             {
                 Timers[i] = PlatformManager.Instance.GetAnimatableTimer();
             }
 
             Timers[1].TimeChanged += GameViewModel_TimeChanged;
+        }
+
+        private void EnableExtrenalMediaLoad_Executed(object arg)
+        {
+            UserSettings.LoadExternalMedia = true;
+            Host.MyLogic.ReloadMedia();
         }
 
         private void Host_IsPausedChanged(bool isPaused) => IsPaused = isPaused;
@@ -141,7 +161,8 @@ namespace SIGame.ViewModel
             }
         }
 
-        private void GameViewModel_TimeChanged(IAnimatableTimer timer) => Host.MyLogic.TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
+        private void GameViewModel_TimeChanged(IAnimatableTimer timer) =>
+            Host.MyLogic.TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
         private void Host_Timer(int timerIndex, string timerCommand, string arg)
         {
@@ -158,12 +179,12 @@ namespace SIGame.ViewModel
                     timer.Stop();
                     break;
 
-                case "PAUSE":
+                case MessageParams.Timer_Pause:
                     var currentTime = int.Parse(arg);
                     timer.Pause(currentTime, false);
                     break;
 
-                case "USER_PAUSE":
+                case MessageParams.Timer_UserPause:
                     var currentTime2 = int.Parse(arg);
                     timer.Pause(currentTime2, true);
                     break;
@@ -238,6 +259,9 @@ namespace SIGame.ViewModel
 
         public async ValueTask DisposeAsync()
         {
+            // For correct WebView2 disposal (https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136)
+            TInfo.TStage = TableStage.Void;
+
             await _server.DisposeAsync();
 
             Timers[1].TimeChanged -= GameViewModel_TimeChanged;

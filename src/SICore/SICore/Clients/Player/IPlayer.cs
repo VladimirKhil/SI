@@ -34,6 +34,6 @@
         /// <summary>
         /// Получена часть вопроса
         /// </summary>
-        void OnAtom(string[] mparams);
+        void OnPlayerAtom(string[] mparams);
     }
 }

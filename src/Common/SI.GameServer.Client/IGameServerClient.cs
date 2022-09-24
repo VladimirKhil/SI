@@ -32,6 +32,10 @@ namespace SI.GameServer.Client
 
         Task OpenAsync(string userName, CancellationToken token = default);
 
+        /// <summary>
+        /// Gets game server configuration info.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
 
         Task<string> GetNewsAsync(CancellationToken cancellationToken = default);

@@ -708,7 +708,7 @@
     <value>Выберите стол для удаления</value>
   </data>
   <data name="ExternalLink" xml:space="preserve">
-    <value>Внешняя ссылка: {0} . Включить автоматическую загрузку внешних ссылок можно в настройках игры</value>
+    <value>Внешняя ссылка: {0} . Загрузка внешних ссылок может быть небезопасной и отключена</value>
   </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Апеллированные ответы</value>

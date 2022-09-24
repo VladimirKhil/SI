@@ -15,16 +15,18 @@ namespace SICore
         #region Fields
 
         private readonly Action<object> _execute = null;
+
         private bool _canBeExecuted = true;
 
         public bool CanBeExecuted
         {
-            get { return _canBeExecuted; }
+            get => _canBeExecuted;
             set
             {
                 if (_canBeExecuted != value)
                 {
                     _canBeExecuted = value;
+
                     if (CanExecuteChanged != null)
                     {
                         if (SynchronizationContext.Current == null)
@@ -60,17 +62,11 @@ namespace SICore
         /// </summary>
         /// <param name="parameter">Этот параметр игнорируется</param>
         /// <returns></returns>
-        public bool CanExecute(object parameter)
-        {
-            return _canBeExecuted;
-        }
+        public bool CanExecute(object parameter) => _canBeExecuted;
 
         public event EventHandler CanExecuteChanged;
 
-        public void Execute(object parameter)
-        {
-            _execute(parameter);
-        }
+        public void Execute(object parameter) => _execute(parameter);
     }
 
 }

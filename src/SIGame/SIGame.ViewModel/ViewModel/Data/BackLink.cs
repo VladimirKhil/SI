@@ -19,7 +19,9 @@ namespace SIGame.ViewModel
         internal static BackLink Default { get; set; }
 
         private readonly AppSettingsViewModel _settings;
+
         private readonly UserSettings _userSettings;
+
         private readonly IServiceProvider _serviceProvider;
 
         internal BackLink(AppSettingsViewModel settings, UserSettings userSettings, IServiceProvider serviceProvider)
@@ -75,6 +77,7 @@ namespace SIGame.ViewModel
             };
 
             var gameResultService = _serviceProvider.GetRequiredService<SI.GameResultService.Client.IGameResultServiceClient>();
+            
             try
             {
                 await gameResultService.SendGameReportAsync(result, cancellationToken);
@@ -90,25 +93,17 @@ namespace SIGame.ViewModel
             }
         }
 
-        public override void OnPictureError(string remoteUri)
-        {
-            PlatformSpecific.PlatformManager.Instance.ShowMessage(string.Format(Resources.Error_UploadingAvatar + ": {0}", remoteUri), PlatformSpecific.MessageType.Warning, true);
-        }
+        public override void OnPictureError(string remoteUri) =>
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.Error_UploadingAvatar + ": {0}", remoteUri),
+                PlatformSpecific.MessageType.Warning,
+                true);
 
-        public override string PhotoUri
-        {
-            get { return Global.PhotoUri; }
-        }
+        public override string PhotoUri => Global.PhotoUri;
 
-        public override string GetPhotoUri(string name)
-        {
-            return System.IO.Path.Combine(Global.PhotoUri, name.Translit() + ".jpg");
-        }
+        public override string GetPhotoUri(string name) => System.IO.Path.Combine(Global.PhotoUri, name.Translit() + ".jpg");
 
-        public override bool SendReport
-        {
-            get { return _userSettings.SendReport; }
-        }
+        public override bool SendReport => _userSettings.SendReport;
 
         public override void SaveBestPlayers(IEnumerable<PlayerAccount> players)
         {
@@ -116,20 +111,23 @@ namespace SIGame.ViewModel
 
             foreach (var player in players)
             {
-                int d = bestPlayers.Count - 1;
+                var d = bestPlayers.Count - 1;
+
                 while (d > -1 && player.Sum >= bestPlayers[d].Result)
+                {
                     d--;
+                }
 
                 bestPlayers.Insert(d + 1, new BestPlayer { Name = player.Name, Result = player.Sum });
+
                 if (bestPlayers.Count > BestPlayer.Total)
+                {
                     bestPlayers.RemoveAt(bestPlayers.Count - 1);
+                }
             }
         }
 
-        public override SettingsViewModel GetSettings()
-        {
-            return _settings.ThemeSettings.SIUISettings;
-        }
+        public override SettingsViewModel GetSettings() => _settings.ThemeSettings.SIUISettings;
 
         public override void OnGameFinished(string packageId)
         {

@@ -369,12 +369,15 @@ namespace SIGame.ViewModel
             set { _message = value; OnPropertyChanged(); }
         }
 
+        private readonly long? _maxPackageSize;
+
         public GameSettingsViewModel(
             GameSettings gameSettings,
             CommonSettings commonSettings,
             UserSettings userSettings,
             SIStorage siStorage,
-            bool isNetworkGame = false)
+            bool isNetworkGame = false,
+            long? maxPackageSize = null)
             : base(gameSettings)
         {
             NetworkGame = isNetworkGame;
@@ -388,6 +391,8 @@ namespace SIGame.ViewModel
 
             gameSettings.Updated += GameSettings_Updated;
 
+            _maxPackageSize = maxPackageSize;
+
             _selectPackage = new ExtendedCommand(SelectPackage_Executed);
 
             _selectPackage.ExecutionArea.Add(PackageSourceTypes.Local);
@@ -397,13 +402,19 @@ namespace SIGame.ViewModel
             var packageDirExists = Directory.Exists(Global.PackagesUri);
 
             if (packageDirExists)
+            {
                 _selectPackage.ExecutionArea.Add(PackageSourceTypes.Random);
+            }
 
             if (NetworkGame && NetworkGameType == NetworkGameType.GameServer)
+            {
                 _selectPackage.ExecutionArea.Add(PackageSourceTypes.RandomServer);
+            }
 
             if (packageDirExists)
+            {
                 _selectPackage.ExecutionArea.Add(PackageSourceTypes.Next);
+            }
 
             if (_package == null)
             {
@@ -429,9 +440,11 @@ namespace SIGame.ViewModel
 
                         case PackageSourceTypes.SIStorage:
                             var key = _model.PackageKey;
-                            Uri uri;
-                            if (Uri.TryCreate(key.Data, UriKind.Absolute, out uri))
+
+                            if (Uri.TryCreate(key.Data, UriKind.Absolute, out var uri))
+                            {
                                 Package = new SIStoragePackageSource(uri, key.ID, key.Name, key.PackageID);
+                            }
                             break;
                     }
                 }
@@ -501,7 +514,8 @@ namespace SIGame.ViewModel
                     break;
 
                 case PackageSourceTypes.Local:
-                    var packagePath = PlatformManager.Instance.SelectLocalPackage();
+                    var packagePath = PlatformManager.Instance.SelectLocalPackage(_maxPackageSize);
+
                     if (packagePath != null)
                     {
                         Package = new CustomPackageSource(packagePath);
@@ -864,6 +878,7 @@ namespace SIGame.ViewModel
             var accounts = new List<Account>();
             accounts.AddRange(Players.Select(acc => acc.SelectedAccount));
             accounts.AddRange(Viewers.Select(acc => acc.SelectedAccount));
+
             if (Showman != null)
             {
                 accounts.Add(Showman.SelectedAccount);
@@ -920,17 +935,25 @@ namespace SIGame.ViewModel
             for (int i = 0; i < Players.Count; i++)
             {
                 if (i != player && !_model.NetworkGame)
+                {
                     Players[i].AccountType = AccountTypes.Computer;
+                }
                 else
+                {
                     UpdatePlayer(Players[i]);
+                }
             }
 
             if (Role == GameRole.Viewer)
             {
                 if (Viewers.Count == 0)
+                {
                     Viewers.Add(new SimpleAccount<HumanAccount>() { SelectedAccount = Human });
+                }
                 else
+                {
                     Viewers[0].SelectedAccount = Human;
+                }
             }
             else if (Viewers.Count > 0)
             {

@@ -1,27 +1,29 @@
-﻿using SICore.Connections;
-using SIData;
+﻿using SIData;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 
 namespace SICore
 {
     /// <summary>
-    /// Данные зрителя
+    /// Defines viewer data.
     /// </summary>
     public sealed class ViewerData : Data
     {
         public string ServerAddress { get; set; }
+
         public string ServerPublicUrl { get; set; }
+
         public string[] ContentPublicUrls { get; set; }
 
         private DialogModes _dialogMode = DialogModes.None;
 
         public DialogModes DialogMode
         {
-            get { return _dialogMode; }
+            get => _dialogMode;
             set { _dialogMode = value; OnPropertyChanged(); }
         }
 
@@ -29,7 +31,7 @@ namespace SICore
 
         public CustomCommand AtomViewed
         {
-            get { return _atomViewed; }
+            get => _atomViewed;
             set
             {
                 if (_atomViewed != value)
@@ -46,7 +48,7 @@ namespace SICore
 
         public CustomCommand Kick
         {
-            get { return _kick; }
+            get => _kick;
             set
             {
                 if (_kick != value)
@@ -61,7 +63,7 @@ namespace SICore
 
         public CustomCommand Ban
         {
-            get { return _ban; }
+            get => _ban;
             set
             {
                 if (_ban != value)
@@ -76,7 +78,7 @@ namespace SICore
 
         public CustomCommand ForceStart
         {
-            get { return _forceStart; }
+            get => _forceStart;
             set
             {
                 if (_forceStart != value)
@@ -91,7 +93,7 @@ namespace SICore
 
         public CustomCommand AddTable
         {
-            get { return _addTable; }
+            get => _addTable;
             set
             {
                 if (_addTable != value)
@@ -106,7 +108,7 @@ namespace SICore
 
         public CustomCommand DeleteTable
         {
-            get { return _deleteTable; }
+            get => _deleteTable;
             set
             {
                 if (_deleteTable != value)
@@ -121,7 +123,7 @@ namespace SICore
 
         public string Studia
         {
-            get { return _studia; }
+            get => _studia;
             set
             {
                 _studia = value;
@@ -140,7 +142,7 @@ namespace SICore
 
         public string PrintedText
         {
-            get { return _printedText; }
+            get => _printedText;
             set
             {
                 if (_printedText != value)
@@ -157,7 +159,7 @@ namespace SICore
 
         public string Hint
         {
-            get { return _hint; }
+            get => _hint;
             set { _hint = value; OnPropertyChanged(); }
         }
 
@@ -169,6 +171,7 @@ namespace SICore
         public bool IsPartial { get; set; }
 
         public string AtomType { get; set; } = "";
+
         /// <summary>
         /// Номер текущего атома сценария вопроса
         /// </summary>
@@ -202,7 +205,7 @@ namespace SICore
 
         public bool IsPlayer
         {
-            get { return _isPlayer; }
+            get => _isPlayer;
             set
             {
                 if (_isPlayer != value)
@@ -220,37 +223,37 @@ namespace SICore
         /// </summary>
         public bool IReady
         {
-            get { return _iReady; }
+            get => _iReady;
             set { _iReady = value; OnPropertyChanged(); }
         }
 
-        internal string Sound
-        {
-            set { BackLink.PlaySound(value); }
-        }
+        internal string Sound { set => BackLink.PlaySound(value); }
 
         internal bool FalseStart { get; set; } = true;
 
         public CustomCommand SendMessageCommand { get; set; }
 
-        public PersonData PersonDataExtensions { get; private set; } = new PersonData();
-        public PlayerData PlayerDataExtensions { get; private set; } = new PlayerData();
-        public ShowmanData ShowmanDataExtensions { get; private set; } = new ShowmanData();
+        public PersonData PersonDataExtensions { get; private set; } = new();
+
+        public PlayerData PlayerDataExtensions { get; private set; } = new();
+
+        public ShowmanData ShowmanDataExtensions { get; private set; } = new();
 
         /// <summary>
         /// Делегат, организующий отправку сообщения
         /// </summary>
         public Action<string> MessageSending { get; set; }
+
         public event Action<string, string, LogMode> StringAdding;
 
-        private List<PlayerAccount> _players = new List<PlayerAccount>();
+        private List<PlayerAccount> _players = new();
 
         /// <summary>
         /// Игроки
         /// </summary>
         public List<PlayerAccount> Players
         {
-            get { return _players; }
+            get => _players;
             internal set
             {
                 if (_players != value)
@@ -273,6 +276,7 @@ namespace SICore
             {
                 _showMan = value;
                 OnPropertyChanged();
+
                 if (_isUpdating)
                 {
                     return;
@@ -287,7 +291,7 @@ namespace SICore
 
         public bool ShowMainTimer
         {
-            get { return _showMainTimer; }
+            get => _showMainTimer;
             set
             {
                 if (_showMainTimer != value)
@@ -296,6 +300,17 @@ namespace SICore
                     OnPropertyChanged();
                 }
             }
+        }
+
+        private bool _enableMediaLoadButton;
+
+        /// <summary>
+        /// Shows button that enables external media load.
+        /// </summary>
+        public bool EnableMediaLoadButton
+        {
+            get => _enableMediaLoadButton;
+            set { if (_enableMediaLoadButton != value) { _enableMediaLoadButton = value; OnPropertyChanged(); } }
         }
 
         public void OnAllPersonsChanged()
@@ -328,6 +343,7 @@ namespace SICore
         public void OnMainPersonsChanged()
         {
             var accounts = new List<PersonAccount>();
+
             if (_showMan != null)
             {
                 accounts.Add(_showMan);
@@ -336,14 +352,14 @@ namespace SICore
             MainPersons = accounts.Concat(_players).ToArray();
         }
 
-        private List<ViewerAccount> _viewers = new List<ViewerAccount>();
+        private List<ViewerAccount> _viewers = new();
 
         /// <summary>
         /// Зрители
         /// </summary>
         public List<ViewerAccount> Viewers
         {
-            get { return _viewers; }
+            get => _viewers;
             internal set
             {
                 if (_viewers != value)
@@ -365,10 +381,7 @@ namespace SICore
         /// </summary>
         internal PersonAccount[] MainPersons
         {
-            get
-            {
-                return _mainPersons;
-            }
+            get => _mainPersons;
             private set
             {
                 _mainPersons = value;
@@ -376,7 +389,7 @@ namespace SICore
             }
         }
 
-        private Dictionary<string, ViewerAccount> _allPersons = new Dictionary<string, ViewerAccount>();
+        private Dictionary<string, ViewerAccount> _allPersons = new();
 
         /// <summary>
         /// Все участники
@@ -433,15 +446,16 @@ namespace SICore
             };
         }
 
-        private readonly List<string> _chatTable = new List<string>();
+        private readonly List<string> _chatTable = new();
 
         /// <summary>
-        /// Add mesage to the game chat
+        /// Adds mesage to the game chat.
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">Message to add.</param>
         internal void AddToChat(Message message)
         {
             var index = _chatTable.IndexOf(message.Sender);
+            
             // if user is not present in user list, add him
             if (index == -1)
             {
@@ -452,16 +466,13 @@ namespace SICore
             OnAddString(message.Sender, message.Text, LogMode.Chat + index);
         }
 
-        public override void OnAddString(string person, string text, LogMode mode)
-        {
-            StringAdding?.Invoke(person, text, mode);
-        }
+        public override void OnAddString(string person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
 
         private bool _autoReady = false;
 
         public bool AutoReady
         {
-            get { return _autoReady; }
+            get => _autoReady;
             set
             {
                 _autoReady = value;
@@ -473,24 +484,46 @@ namespace SICore
 
         public string QuestionCaption
         {
-            get { return _questionCaption; }
+            get => _questionCaption;
             set { _questionCaption = value; OnPropertyChanged(); }
         }
 
         public string PackageId { get; internal set; }
+
         public int ButtonBlockingTime { get; internal set; } = 3;
+
         public string ThemeName { get; internal set; }
 
+        private bool _apellationEnabled = true;
+
         /// <summary>
-        /// Имя хоста
+        /// Enables apellation buttons.
+        /// </summary>
+        public bool ApellationEnabled
+        {
+            get => _apellationEnabled;
+            set
+            {
+                if (_apellationEnabled != value)
+                {
+                    _apellationEnabled = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Game host name.
         /// </summary>
         public string HostName { get; internal set; }
 
+        /// <summary>
+        /// External media uri.
+        /// </summary>
+        public string ExternalUri { get; internal set; }
+
         internal event Action AutoReadyChanged;
 
-        private void OnAutoReadyChanged()
-        {
-            AutoReadyChanged?.Invoke();
-        }
+        private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();
     }
 }

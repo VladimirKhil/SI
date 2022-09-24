@@ -48,14 +48,14 @@ namespace SICore
         void Choice();
 
         /// <summary>
-        /// Получена часть вопроса
+        /// Question fragment received.
         /// </summary>
-        void SetAtom(string[] mparams);
+        void OnAtom(string[] mparams);
 
         /// <summary>
-        /// Получена фоновая часть вопроса
+        /// Question background fragment received.
         /// </summary>
-        void SetSecondAtom(string[] mparams);
+        void OnSecondAtom(string[] mparams);
 
         void SetRight(string answer);
 
@@ -145,5 +145,7 @@ namespace SICore
         void OnRoundContent(string[] mparams) { }
 
         void OnAtomHint(string hint) { }
+
+        void ReloadMedia() { }
     }
 }

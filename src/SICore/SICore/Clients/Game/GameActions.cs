@@ -89,6 +89,7 @@ namespace SICore
         public void InformRoundsNames(string person = NetworkConstants.Everybody)
         {
             var message = new StringBuilder(Messages.RoundsNames);
+
             for (var i = 0; i < _gameData.Rounds.Length; i++)
             {
                 message.Append(Message.ArgsSeparatorChar).Append(_gameData.Rounds[i].Name);

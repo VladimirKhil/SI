@@ -703,7 +703,7 @@
     <value>Game report</value>
   </data>
   <data name="ExternalLink" xml:space="preserve">
-    <value>External link: {0} . You can enable automatic loading of external links in game settings</value>
+    <value>External link: {0} . External link download could be unsafe and is disabled</value>
   </data>
   <data name="ApellatedAnswers" xml:space="preserve">
     <value>Apellated answers</value>

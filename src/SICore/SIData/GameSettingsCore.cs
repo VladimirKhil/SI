@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 
 namespace SIData
 {
+    /// <inheritdoc cref="IGameSettingsCore{T}" />
     [DataContract]
     public class GameSettingsCore<T>: IGameSettingsCore<T>
         where T: AppSettingsCore, new()

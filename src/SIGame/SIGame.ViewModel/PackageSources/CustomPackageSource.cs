@@ -1,26 +1,24 @@
-﻿using System;
+﻿using SIPackages;
+using System;
 using System.IO;
-using SIPackages;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SIGame.ViewModel.PackageSources
 {
     /// <summary>
-    /// Специально выбранный источник пакета
+    /// Represents a file-based package source.
     /// </summary>
-    internal sealed class CustomPackageSource: PackageSource
+    internal sealed class CustomPackageSource : PackageSource
     {
         private readonly string _file = null;
 
-        public override PackageSourceKey Key => new PackageSourceKey { Type = PackageSourceTypes.Local, Data = _file };
+        public override PackageSourceKey Key => new() { Type = PackageSourceTypes.Local, Data = _file };
 
         public override string Source => _file == null ? null : Path.GetFileName(_file);
 
-        public CustomPackageSource(string file)
-        {
-            _file = file ?? throw new ArgumentNullException(nameof(file));
-        }
+        public CustomPackageSource(string file) => _file = file ?? throw new ArgumentNullException(nameof(file));
 
         public override Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
             Task.FromResult((_file, false));
@@ -35,13 +33,12 @@ namespace SIGame.ViewModel.PackageSources
             var buffer = new byte[1024 * 1024];
             int count;
 
-            using var sha1 = new System.Security.Cryptography.SHA1Managed();
+            using var sha1 = SHA1.Create();
             using (var stream = File.OpenRead(_file))
             {
-                while ((count = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                while ((count = await stream.ReadAsync(buffer, cancellationToken)) > 0)
                 {
                     sha1.TransformBlock(buffer, 0, count, buffer, 0);
-
                     cancellationToken.ThrowIfCancellationRequested();
                 }
             }

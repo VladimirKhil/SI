@@ -19,6 +19,7 @@ namespace SICore.Clients.Viewer
         private readonly string _rootFolder;
 
         private readonly object _globalLock = new();
+
         private readonly HashSet<string> _lockedFiles = new();
 
         public LocalFileManager()

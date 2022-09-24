@@ -26,6 +26,12 @@
         public const string Apellate = "APELLATE";
 
         /// <summary>
+        /// Marks apellation option flag.
+        /// </summary>
+        [IdempotencyRequired]
+        public const string ApellationEnabled = "APELLATION_ENABLES";
+
+        /// <summary>
         /// Единица сценария вопроса
         /// </summary>
         public const string Atom = "ATOM";

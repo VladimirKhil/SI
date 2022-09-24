@@ -86,12 +86,12 @@ namespace SICore
             }
         }
 
-        virtual public void SetAtom(string[] mparams)
+        virtual public void OnAtom(string[] mparams)
         {
             // Do nothing
         }
 
-        virtual public void SetSecondAtom(string[] mparams)
+        virtual public void OnSecondAtom(string[] mparams)
         {
 
         }
@@ -224,14 +224,14 @@ namespace SICore
                     _timersInfo[timerIndex].PauseTime = -1;
                     break;
 
-                case "PAUSE":
+                case MessageParams.Timer_Pause:
                     var currentTime = int.Parse(arg);
 
                     _timersInfo[timerIndex].IsEnabled = false;
                     _timersInfo[timerIndex].PauseTime = currentTime;
                     break;
 
-                case "USER_PAUSE":
+                case MessageParams.Timer_UserPause:
 
                     var currentTime2 = int.Parse(arg);
 

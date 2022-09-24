@@ -12,6 +12,7 @@
     xmlns:locals="clr-namespace:SIUI.Selectors"
     xmlns:vm="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     mc:Ignorable="d"
     DataContextChanged="UserControl_DataContextChanged"
     d:DesignHeight="300"
@@ -353,9 +354,11 @@
                                         FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
                                 </ContentControl>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Text}">
                                 <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource QuestionTextSelector}" />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Image}">
                                 <Image
                                     Name="image"
@@ -363,9 +366,15 @@
                                     Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}"
                                     lb:ImageController.IsAttached="True" />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">
                                 <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.IsAttached="True" />
                             </DataTemplate>
+                            
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Html}">
+                                <wv2:WebView2 Source="{Binding MediaSource.Uri}" />
+                            </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.SpecialText}">
                                 <TextBlock
                                     Text="{Binding Text}"

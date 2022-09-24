@@ -22,6 +22,7 @@ namespace SIData
         public const int DefaultRandomRoundsCount = 3;
         public const int DefaultRandomThemesCount = 6;
         public const int DefaultRandomQuestionsBasePrice = 100;
+        public const bool DefaultUseApellations = true;
 
         /// <summary>
         /// Time settings.
@@ -60,13 +61,13 @@ namespace SIData
         private bool _falseStart = DefaultFalseStart;
 
         /// <summary>
-        /// Игра с фальстартами
+        /// False start game flag.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultFalseStart)]
         public bool FalseStart
         {
-            get { return _falseStart; }
+            get => _falseStart;
             set { _falseStart = value; OnPropertyChanged(); }
         }
 
@@ -74,14 +75,14 @@ namespace SIData
         private bool _hintShowman = DefaultHintShowman;
 
         /// <summary>
-        /// Игра с фальстартами
+        /// Send right answer to showman when the question starts.
         /// </summary>
 
         [XmlAttribute]
         [DefaultValue(DefaultHintShowman)]
         public bool HintShowman
         {
-            get { return _hintShowman; }
+            get => _hintShowman;
             set { _hintShowman = value; OnPropertyChanged(); }
         }
 
@@ -89,13 +90,13 @@ namespace SIData
         private bool _partialText = DefaultPartialText;
 
         /// <summary>
-        /// Частичный текст
+        /// Partial text flag.
         /// </summary>
         [XmlAttribute]
         [DefaultValue(DefaultPartialText)]
         public bool PartialText
         {
-            get { return _partialText; }
+            get => _partialText;
             set { _partialText = value; OnPropertyChanged(); }
         }
 
@@ -208,7 +209,7 @@ namespace SIData
         [DefaultValue(DefaultRandomThemesCount)]
         public int RandomThemesCount
         {
-            get { return _randomThemesCount; }
+            get => _randomThemesCount;
             set { _randomThemesCount = value; OnPropertyChanged(); }
         }
 
@@ -222,8 +223,22 @@ namespace SIData
         [DefaultValue(DefaultRandomQuestionsBasePrice)]
         public int RandomQuestionsBasePrice
         {
-            get { return _randomQuestionsBasePrice; }
+            get => _randomQuestionsBasePrice;
             set { _randomQuestionsBasePrice = value; OnPropertyChanged(); }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private bool _useApellations = DefaultUseApellations;
+
+        /// <summary>
+        /// Use apellations in game.
+        /// </summary>
+        [XmlAttribute]
+        [DefaultValue(DefaultUseApellations)]
+        public bool UseApellations
+        {
+            get => _useApellations;
+            set { _useApellations = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -231,7 +246,7 @@ namespace SIData
         /// </summary>
         [XmlAttribute]
         [DefaultValue("en-US")]
-        public string Culture { get; set; }
+        public string? Culture { get; set; }
 
         public AppSettingsCore()
         {
@@ -256,6 +271,8 @@ namespace SIData
             _randomThemesCount = origin._randomThemesCount;
             _randomQuestionsBasePrice = origin._randomQuestionsBasePrice;
 
+            _useApellations = origin.UseApellations;
+
             Culture = origin.Culture;
         }
 
@@ -278,14 +295,14 @@ namespace SIData
             _randomThemesCount = settings._randomThemesCount;
             _randomQuestionsBasePrice = settings._randomQuestionsBasePrice;
 
+            _useApellations = settings.UseApellations;
+
             Culture = settings.Culture;
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

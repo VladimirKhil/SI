@@ -1,8 +1,14 @@
 ﻿namespace SIData
 {
+    /// <summary>
+    /// Defines game basic settings.
+    /// </summary>
     public interface IGameSettingsCore<out T>
         where T: IAppSettingsCore
     {
+        /// <summary>
+        /// Game host name.
+        /// </summary>
         string HumanPlayerName { get; }
 
         Account Showman { get; }
@@ -12,7 +18,7 @@
         Account[] Viewers { get; }
 
         /// <summary>
-        /// Настройки приложения
+        /// Core settings.
         /// </summary>
         T AppSettings { get; }
 

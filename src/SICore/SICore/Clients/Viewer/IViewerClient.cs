@@ -3,7 +3,7 @@
 namespace SICore
 {
     /// <summary>
-    /// Зритель SIGame
+    /// Defines a common game viewer actor.
     /// </summary>
     public interface IViewerClient : IActor
     {
@@ -17,10 +17,13 @@ namespace SICore
         ViewerData MyData { get; }
 
         IViewer MyLogic { get; }
+
         string Avatar { get; set; }
 
         event Action PersonConnected;
+
         event Action PersonDisconnected;
+
         event Action<int, string, string> Timer;
 
         void GetInfo();
@@ -30,13 +33,17 @@ namespace SICore
         void Init();
 
         event Action<IViewerClient> Switch;
+
         event Action StageChanged;
+
         event Action<string> Ad;
+
         event Action<bool> IsPausedChanged;
 
         event Action OnIsHostChanged;
 
         void RecreateCommands();
+
         void Move(object arg);
     }
 }

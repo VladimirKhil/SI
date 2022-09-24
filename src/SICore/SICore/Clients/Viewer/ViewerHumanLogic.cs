@@ -63,6 +63,7 @@ namespace SICore
         private void TInfo_MediaLoadError(Exception exc)
         {
             string error;
+
             if (exc is NotSupportedException)
             {
                 error = $"{_localizer[nameof(R.MediaFileNotSupported)]}: {exc.Message}";
@@ -605,7 +606,7 @@ namespace SICore
             TInfo.TStage = TableStage.Question;
         }
 
-        virtual public void SetAtom(string[] mparams)
+        virtual public void OnAtom(string[] mparams)
         {
             if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
             {
@@ -634,6 +635,8 @@ namespace SICore
 
             TInfo.TStage = TableStage.Question;
             TInfo.IsMediaStopped = false;
+
+            _data.EnableMediaLoadButton = false;
 
             switch (_data.AtomType)
             {
@@ -676,7 +679,8 @@ namespace SICore
                 case AtomTypes.Video:
                 case AtomTypes.Audio:
                 case AtomTypes.Image:
-                    string uri = null;
+                case AtomTypes.Html:
+                    string uri;
 
                     switch (mparams[2])
                     {
@@ -699,15 +703,24 @@ namespace SICore
                             {
                                 uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
                             }
-                            else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
+                            else if (_data.AtomType != AtomTypes.Html
+                                && !uri.StartsWith("http://localhost")
+                                && !Data.BackLink.LoadExternalMedia
+                                && !ExternalUrlOk(uri))
                             {
                                 TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
+
+                                _data.EnableMediaLoadButton = true;
+                                _data.ExternalUri = uri;
                                 return;
                             }
 
                             break;
+
+                        default:
+                            return;
                     }
 
                     Uri mediaUri;
@@ -725,30 +738,57 @@ namespace SICore
                         TInfo.QuestionContentType = QuestionContentType.Image;
                         TInfo.Sound = false;
                     }
+                    else if (_data.AtomType == AtomTypes.Audio)
+                    {
+                        TInfo.SoundSource = new MediaSource(uri);
+                        TInfo.QuestionContentType = QuestionContentType.None;
+                        TInfo.Sound = true;
+                    }
+                    else if (_data.AtomType == AtomTypes.Video)
+                    {
+                        TInfo.MediaSource = new MediaSource(uri);
+                        TInfo.QuestionContentType = QuestionContentType.Video;
+                        TInfo.Sound = false;
+                    }
                     else
                     {
-                        if (_data.AtomType == AtomTypes.Audio)
-                        {
-                            TInfo.SoundSource = new MediaSource(uri);
-                            TInfo.QuestionContentType = QuestionContentType.None;
-                            TInfo.Sound = true;
-                        }
-                        else
-                        {
-                            TInfo.MediaSource = new MediaSource(uri);
-                            TInfo.QuestionContentType = QuestionContentType.Video;
-                            TInfo.Sound = false;
-                        }
+                        TInfo.MediaSource = new MediaSource(uri);
+                        TInfo.QuestionContentType = QuestionContentType.Html;
+                        TInfo.Sound = false;
                     }
 
                     break;
             }
         }
 
+        public void ReloadMedia()
+        {
+            _data.EnableMediaLoadButton = false;
+
+            if (_data.AtomType == AtomTypes.Image)
+            {
+                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.Image;
+                TInfo.Sound = false;
+            }
+            else if (_data.AtomType == AtomTypes.Audio)
+            {
+                TInfo.SoundSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.None;
+                TInfo.Sound = true;
+            }
+            else if (_data.AtomType == AtomTypes.Video)
+            {
+                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.Video;
+                TInfo.Sound = false;
+            }
+        }
+
         private bool ExternalUrlOk(string uri) =>
             ClientData.ContentPublicUrls != null && ClientData.ContentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
-        virtual public void SetSecondAtom(string[] mparams)
+        virtual public void OnSecondAtom(string[] mparams)
         {
             var atomType = mparams[1];
 
@@ -783,9 +823,15 @@ namespace SICore
                                 TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
                                 TInfo.QuestionContentType = QuestionContentType.SpecialText;
                                 TInfo.Sound = false;
+
+                                _data.EnableMediaLoadButton = true;
+                                _data.ExternalUri = uri;
                             }
 
                             break;
+
+                        default:
+                            return;
                     }
 
                     Uri mediaUri;

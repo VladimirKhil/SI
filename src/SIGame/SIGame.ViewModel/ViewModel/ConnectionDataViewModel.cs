@@ -114,6 +114,8 @@ namespace SIGame.ViewModel
 
         public string ServerAddress { get; protected set; }
 
+        protected virtual long? MaxPackageSize { get; } = null;
+
         #endregion
 
         #region Init
@@ -150,7 +152,7 @@ namespace SIGame.ViewModel
 
             var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>();
 
-            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage, true)
+            GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage, true, MaxPackageSize)
             {
                 Human = Human,
                 ChangeSettings = ChangeSettings

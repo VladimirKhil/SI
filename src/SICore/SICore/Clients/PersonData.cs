@@ -21,7 +21,7 @@ namespace SICore
 
         public StakeInfo StakeInfo
         {
-            get { return _stakeInfo; }
+            get => _stakeInfo;
             set
             {
                 if (_stakeInfo != value)
@@ -35,6 +35,7 @@ namespace SICore
         internal bool[] Var { get; set; } = new bool[4] { false, false, false, false };
 
         private string[] _right = System.Array.Empty<string>();
+
         private string[] _wrong = System.Array.Empty<string>();
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace SICore
         /// </summary>
         public string[] Right
         {
-            get { return _right; }
+            get => _right;
             set
             {
                 _right = value;
@@ -74,7 +75,7 @@ namespace SICore
         /// </summary>
         public string Answer
         {
-            get { return _answer; }
+            get => _answer;
             set { _answer = value; OnPropertyChanged(); }
         }
 
@@ -82,7 +83,7 @@ namespace SICore
 
         public bool AreAnswersShown
         {
-            get { return _areAnswersShown; }
+            get => _areAnswersShown;
             set
             {
                 if (_areAnswersShown != value)
@@ -97,7 +98,7 @@ namespace SICore
 
         public ICommand IsRight
         {
-            get { return _isRight; }
+            get => _isRight;
             set { _isRight = value; OnPropertyChanged(); }
         }
 
@@ -107,7 +108,7 @@ namespace SICore
 
         public ICommand IsWrong
         {
-            get { return _isWrong; }
+            get => _isWrong;
             set { _isWrong = value; OnPropertyChanged(); }
         }
 

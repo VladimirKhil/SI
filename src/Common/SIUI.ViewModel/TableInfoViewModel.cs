@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace SIUI.ViewModel
 {
     /// <summary>
-    /// Информация для табло
+    /// Defines game table view model.
     /// </summary>
     public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     {
@@ -17,22 +17,37 @@ namespace SIUI.ViewModel
         private TableStage _tStage = TableStage.Void;
 
         /// <summary>
-        /// Текущее состояние табло
+        /// Current table stage.
         /// </summary>
         public TableStage TStage
         {
-            get { return _tStage; }
-            set { if (_tStage != value) { _tStage = value; OnPropertyChanged(); } }
+            get => _tStage;
+            set
+            {
+                if (_tStage != value)
+                {
+                    _tStage = value;
+
+                    try
+                    {
+                        OnPropertyChanged();
+                    }
+                    catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+                    {
+                        // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+                    }
+                }
+            }
         }
 
         public object TStageLock { get; } = new object();
 
         /// <summary>
-        /// Пауза в игре
+        /// Is game paused.
         /// </summary>
         public bool Pause
         {
-            get { return _model.Pause; }
+            get => _model.Pause;
             set
             {
                 if (_model.Pause != value)
@@ -48,7 +63,7 @@ namespace SIUI.ViewModel
 
         public bool IsMediaStopped
         {
-            get { return _isMediaStopped; }
+            get => _isMediaStopped;
             set
             {
                 if (_isMediaStopped != value)
@@ -78,7 +93,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public string Text
         {
-            get { return _text; }
+            get => _text;
             set { if (_text != value) { _text = value; OnPropertyChanged(); } }
         }
 
@@ -90,7 +105,7 @@ namespace SIUI.ViewModel
         /// </summary>
         public int TextLength
         {
-            get { return _textLength; }
+            get => _textLength;
             set { if (_textLength != value) { _textLength = value; OnPropertyChanged(); } }
         }
 
@@ -137,12 +152,19 @@ namespace SIUI.ViewModel
         private double _textSpeed = 0.05;
 
         /// <summary>
-        /// Скорость чтения текста
+        /// Text reading speed (chars / second). Zero speed disables the reading.
         /// </summary>
         public double TextSpeed
         {
-            get { return _textSpeed; }
-            set { _textSpeed = value; OnPropertyChanged(); }
+            get => _textSpeed;
+            set
+            {
+                if (_textSpeed != value && _textSpeed >= 0.0)
+                {
+                    _textSpeed = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         private double _timeLeft = 1.0;
