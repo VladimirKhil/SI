@@ -10,13 +10,16 @@
             Manufacturer="Khil-soft"
             UpgradeCode="cb6fe944-ebb6-44a9-afcd-ba2ded1790b2"
             IconSourceFile="Resources\game.ico">
+		
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+			
             <bal:WixStandardBootstrapperApplication
 				LicenseUrl=""
                 LocalizationFile="HyperlinkTheme_ru-ru.wxl" 
                 LogoFile="Resources\game_small.jpg"
                 ThemeFile="HyperlinkTheme.xml"
                 SuppressOptionsUI="yes" />
+			
         </BootstrapperApplicationRef>
 
         <Chain>
@@ -24,7 +27,7 @@
 	            Id="SIGame.Setup.x86"
 				Compressed="no"
                 DisplayName="SIGame"
-                SourceFile="..\SIGame.Setup\bin\Release\x86\ru-ru\SIGame.x86.msi"
+                SourceFile="..\..\bin\.Release\SIGame.Setup\x86\ru-ru\SIGame.x86.msi"
 				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x86.msi"
 	            InstallCondition="NOT VersionNT64" />
 
@@ -32,7 +35,7 @@
 			    Id="SIGame.Setup.x64"
 				Compressed="no"
 			    DisplayName="SIGame"
-			    SourceFile="..\SIGame.Setup\bin\Release\x64\ru-ru\SIGame.x64.msi"
+			    SourceFile="..\..\bin\.Release\SIGame.Setup\x64\ru-ru\SIGame.x64.msi"
 				DownloadUrl="https://github.com/VladimirKhil/SI/releases/download/sigame-v$(var.ProductVersion)/SIGame.x64.msi"
 			    InstallCondition="VersionNT64" />
         </Chain>

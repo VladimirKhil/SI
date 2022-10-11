@@ -3,6 +3,7 @@ using SIUI.ViewModel.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace SIUI.ViewModel
@@ -117,7 +118,29 @@ namespace SIUI.ViewModel
         public string Hint
         {
             get => _hint;
-            set { if (_hint != value) { _hint = value; OnPropertyChanged(); } }
+            set 
+            {
+                if (_hint != value)
+                { 
+                    _hint = value;
+
+                    try
+                    {
+                        OnPropertyChanged();
+                    }
+                    catch (NullReferenceException)
+                    {
+                        // Occurs very rarely. Investigation required
+                        // System.NullReferenceException: Object reference not set to an instance of an object.
+                        // at void MS.Internal.Data.ClrBindingWorker.OnSourcePropertyChanged(object o, string propName)
+                        // at bool System.Windows.WeakEventManager + ListenerList.DeliverEvent(object sender, EventArgs e, Type managerType)
+                        // at void System.Windows.WeakEventManager.DeliverEventToList(object sender, EventArgs args, ListenerList list)
+                        // at void System.ComponentModel.PropertyChangedEventManager.OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+                        // at void SIUI.ViewModel.TableInfoViewModel.set_Hint(string value)
+                        // at async void SICore.ViewerHumanLogic.OnAtomHint(string hint) + (?) => { }
+                    }
+                }
+            }
         }
 
         private int _playerIndex = -1;

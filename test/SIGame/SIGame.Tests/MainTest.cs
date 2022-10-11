@@ -7,6 +7,8 @@ using SICore.PlatformSpecific;
 using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
+using SIStorageService.Client;
+using SIStorageService.ViewModel;
 using SIUI.ViewModel;
 using System;
 using System.Linq;
@@ -54,8 +56,11 @@ namespace SIGame.Tests
 
             services.AddSIGameServerClient(configuration);
             services.AddSingleton<IUIThreadExecutor>(manager);
+            services.AddSIStorageServiceClient(configuration);
+            services.AddTransient(typeof(SIStorage));
 
             var serviceProvider = services.BuildServiceProvider();
+            manager.ServiceProvider = serviceProvider;
 
             var mainViewModel = new MainViewModel(commonSettings, userSettings, serviceProvider);
 
@@ -75,7 +80,6 @@ namespace SIGame.Tests
             var gameSettings = (GameSettingsViewModel)siOnline.Content.Content.Data;
             gameSettings.NetworkGameName = "testGame" + new Random().Next(10000);
             gameSettings.NetworkGamePassword = "testpass";
-
             gameSettings.Role = gameRole;
 
             gameSettings.SelectPackage.Execute(packageSourceType);
@@ -118,6 +122,7 @@ namespace SIGame.Tests
             tInfo.PropertyChanged += TInfo_PropertyChanged;
 
             await Task.Delay(5000);
+
             if (gameRole != GameRole.Viewer)
             {
                 ((PersonAccount)game.Data.Me).BeReadyCommand.Execute(null);
