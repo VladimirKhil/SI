@@ -154,11 +154,6 @@ namespace SICore
             Greet();
         }
 
-        public void Table()
-        {
-
-        }
-
         private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
         {
             var found = false;
@@ -195,11 +190,6 @@ namespace SICore
             }
 
             Clear();
-        }
-
-        public void FinalThemes()
-        {
-            
         }
 
         public void Clear()

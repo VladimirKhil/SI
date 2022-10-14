@@ -31,7 +31,7 @@ namespace SIUI.Behaviors
 
         public static void OnFillChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is TextBlock textBlock))
+            if (d is not TextBlock textBlock)
             {
                 return;
             }
@@ -48,31 +48,17 @@ namespace SIUI.Behaviors
             }
         }
 
-        public static FrameworkElement GetParent(DependencyObject obj)
-        {
-            return (FrameworkElement)obj.GetValue(ParentProperty);
-        }
+        public static FrameworkElement GetParent(DependencyObject obj) => (FrameworkElement)obj.GetValue(ParentProperty);
 
-        public static void SetParent(DependencyObject obj, FrameworkElement value)
-        {
-            obj.SetValue(ParentProperty, value);
-        }
+        public static void SetParent(DependencyObject obj, FrameworkElement value) => obj.SetValue(ParentProperty, value);
 
-        // Using a DependencyProperty as the backing store for Parent.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ParentProperty =
             DependencyProperty.RegisterAttached("Parent", typeof(FrameworkElement), typeof(FillManager), new UIPropertyMetadata(null));
-        
-        public static SizeChangedEventHandler GetHandler(DependencyObject obj)
-        {
-            return (SizeChangedEventHandler)obj.GetValue(HandlerProperty);
-        }
 
-        public static void SetHandler(DependencyObject obj, SizeChangedEventHandler value)
-        {
-            obj.SetValue(HandlerProperty, value);
-        }
+        public static SizeChangedEventHandler GetHandler(DependencyObject obj) => (SizeChangedEventHandler)obj.GetValue(HandlerProperty);
 
-        // Using a DependencyProperty as the backing store for Handler.  This enables animation, styling, binding, etc...
+        public static void SetHandler(DependencyObject obj, SizeChangedEventHandler value) => obj.SetValue(HandlerProperty, value);
+
         public static readonly DependencyProperty HandlerProperty =
             DependencyProperty.RegisterAttached("Handler", typeof(SizeChangedEventHandler), typeof(FillManager), new UIPropertyMetadata(null));
 
@@ -80,7 +66,7 @@ namespace SIUI.Behaviors
         {
             var textBlock = (TextBlock)sender;
 
-            if (!(VisualTreeHelper.GetParent(textBlock) is FrameworkElement parent))
+            if (VisualTreeHelper.GetParent(textBlock) is not FrameworkElement parent)
             {
                 return;
             }
@@ -113,39 +99,24 @@ namespace SIUI.Behaviors
             TextDescriptor.RemoveValueChanged(textBlock, MeasureFontSize);
             FontFamilyDescriptor.RemoveValueChanged(textBlock, MeasureFontSize);
         }
-        
-        public static double GetMaxFontSize(DependencyObject obj)
-        {
-            return (double)obj.GetValue(MaxFontSizeProperty);
-        }
 
-        public static void SetMaxFontSize(DependencyObject obj, double value)
-        {
-            obj.SetValue(MaxFontSizeProperty, value);
-        }
+        public static double GetMaxFontSize(DependencyObject obj) => (double)obj.GetValue(MaxFontSizeProperty);
+
+        public static void SetMaxFontSize(DependencyObject obj, double value) => obj.SetValue(MaxFontSizeProperty, value);
 
         // Using a DependencyProperty as the backing store for MaxFontSize.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MaxFontSizeProperty =
             DependencyProperty.RegisterAttached("MaxFontSize", typeof(double), typeof(FillManager), new UIPropertyMetadata(100.0));
-        
-        public static double GetInterlinyage(DependencyObject obj)
-        {
-            return (double)obj.GetValue(InterlinyageProperty);
-        }
 
-        public static void SetInterlinyage(DependencyObject obj, double value)
-        {
-            obj.SetValue(InterlinyageProperty, value);
-        }
+        public static double GetInterlinyage(DependencyObject obj) => (double)obj.GetValue(InterlinyageProperty);
+
+        public static void SetInterlinyage(DependencyObject obj, double value) => obj.SetValue(InterlinyageProperty, value);
 
         // Using a DependencyProperty as the backing store for Interlinyage.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty InterlinyageProperty =
             DependencyProperty.RegisterAttached("Interlinyage", typeof(double), typeof(FillManager), new UIPropertyMetadata(0.0, OnInterlinyageChanged));
 
-        public static void OnInterlinyageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            MeasureFontSize(d, EventArgs.Empty);
-        }
+        public static void OnInterlinyageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => MeasureFontSize(d, EventArgs.Empty);
 
         /// <summary>
         /// Задаёт как можно больший размер шрифта текстового блока исходя из доступной для него области
@@ -155,7 +126,8 @@ namespace SIUI.Behaviors
         private static void MeasureFontSize(object sender, EventArgs e)
         {
             var textBlock = sender as TextBlock;
-            if (!(VisualTreeHelper.GetParent(textBlock) is FrameworkElement parent))
+
+            if (VisualTreeHelper.GetParent(textBlock) is not FrameworkElement parent)
             {
                 return;
             }
@@ -186,6 +158,7 @@ namespace SIUI.Behaviors
             };
 
             var lineHeight = GetInterlinyage(textBlock);
+
             if (lineHeight < textBlock.FontFamily.LineSpacing)
             {
                 lineHeight = textBlock.FontFamily.LineSpacing;
@@ -194,6 +167,7 @@ namespace SIUI.Behaviors
             var coef = lineHeight / textBlock.FontFamily.LineSpacing;
 
             double fontSize;
+
             if (textBlock.TextWrapping == TextWrapping.NoWrap)
             {
                 fontSize = GetMaxFontSize(textBlock);
@@ -223,12 +197,18 @@ namespace SIUI.Behaviors
                 ft.SetFontSize(fontSize);
                 double textHeight = ft.Height * coef;
 
-                if (fontSize > 1.0 && (textHeight > height || (textBlock.TextWrapping == TextWrapping.NoWrap ? ft.Width > width * 0.97 : ft.MinWidth > ft.MaxTextWidth)))
+                if (fontSize > 1.0
+                    && (textHeight > height
+                        || (textBlock.TextWrapping == TextWrapping.NoWrap
+                            ? ft.Width > width * 0.97
+                            : ft.MinWidth > ft.MaxTextWidth)))
                 {
                     var lower = 1.0;
 
                     if (textHeight > height && textBlock.TextWrapping == TextWrapping.NoWrap)
+                    {
                         lower = Math.Max(lower, (textHeight - height) / lineHeight);
+                    }
 
                     fontSize -= lower;
                     continue;

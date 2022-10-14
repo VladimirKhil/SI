@@ -1,5 +1,4 @@
 ﻿using SICore.BusinessLogic;
-using SICore.Connections;
 using SICore.Network.Clients;
 using SIData;
 using System;
@@ -14,7 +13,7 @@ namespace SICore
     /// </summary>
     public sealed class Showman : Viewer<IShowman>
     {
-        private readonly object _readyLock = new object();
+        private readonly object _readyLock = new();
 
         public Showman(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
             : base(client, personData, isHost, localizer, data)
@@ -281,8 +280,11 @@ namespace SICore
                         ClientData.PersonDataExtensions.SendStake.CanBeExecuted = mparams[2] == "+";
                         ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
                         ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
+
                         for (int i = 0; i < 4; i++)
+                        {
                             ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
+                        }
 
                         ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
                         {
@@ -294,27 +296,6 @@ namespace SICore
 
                         _logic.Stake();
                         break;
-
-                    case Messages.Table:
-                        {
-                            #region Tablo2
-
-                            _logic.Table();
-
-                            #endregion
-                            break;
-                        }
-
-                    case Messages.RoundThemes:
-                        {
-                            #region RoundThemes
-
-                            if (ClientData.Stage == GameStage.Final)
-                                _logic.FinalThemes();
-
-                            #endregion
-                            break;
-                        }
                 }
             }
             catch (Exception exc)
@@ -328,16 +309,18 @@ namespace SICore
             ClientData.PersonDataExtensions.ValidatorName = mparams[1];
             ClientData.PersonDataExtensions.Answer = mparams[2];
             _logic.IsRight();
-            int.TryParse(mparams[4], out var rightAnswersCount);
+            _ = int.TryParse(mparams[4], out var rightAnswersCount);
             rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
 
             var right = new List<string>();
+
             for (int i = 0; i < rightAnswersCount; i++)
             {
                 right.Add(mparams[5 + i]);
             }
 
             var wrong = new List<string>();
+
             for (int i = 5 + rightAnswersCount; i < mparams.Length; i++)
             {
                 wrong.Add(mparams[i]);

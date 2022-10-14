@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SICore;
 using SICore.Network.Servers;
 using SIGame.ViewModel.PlatformSpecific;
@@ -99,9 +100,12 @@ namespace SIGame.ViewModel
         /// </summary>
         public ICommand EnableExtrenalMediaLoad { get; set; }
 
-        public GameViewModel(Server server, IViewerClient host, UserSettings userSettings)
+        private readonly ILogger<GameViewModel> _logger;
+
+        public GameViewModel(Server server, IViewerClient host, UserSettings userSettings, ILogger<GameViewModel> logger)
         {
             _server = server;
+            _logger = logger;
 
             _server.Reconnecting += Server_Reconnecting;
             _server.Reconnected += Server_Reconnected;
@@ -329,15 +333,16 @@ namespace SIGame.ViewModel
                 {
                     ips.Add($"{ipInfo.Ip}:{NetworkGamePort}");
                 }
-            }
-            catch
-            {
 
+                foreach (var ip in await Dns.GetHostAddressesAsync(Environment.MachineName, cancellationToken))
+                {
+                    ips.Add($"{ip}:{NetworkGamePort}");
+                }
             }
-
-            foreach (var ip in await Dns.GetHostAddressesAsync(Environment.MachineName, cancellationToken))
+            catch (Exception exc)
             {
-                ips.Add($"{ip}:{NetworkGamePort}");
+                _logger.LogWarning(exc, "Error while getting network information");
+                return;
             }
 
             await Task.Delay(2000, cancellationToken);

@@ -325,6 +325,7 @@ namespace SICore
                         ClientData.PersonDataExtensions.SendStake.CanBeExecuted = mparams[2] == "+";
                         ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
                         ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
+
                         for (int i = 0; i < 4; i++)
                         {
                             ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
@@ -379,27 +380,6 @@ namespace SICore
                         _logic.PersonAnswered(playerIndex, isRight);
                         break;
 
-                    case Messages.Table:
-                        {
-                            #region Tablo2
-
-                            _logic.Table();
-
-                            #endregion
-                            break;
-                        }
-
-                    case Messages.RoundThemes:
-                        {
-                            #region RoundThemes
-
-                            if (ClientData.Stage == GameStage.Final)
-                                _logic.FinalThemes();
-
-                            #endregion
-                            break;
-                        }
-
                     case Messages.Report:
                         var report = new StringBuilder();
                         for (int r = 1; r < mparams.Length; r++)
@@ -425,16 +405,18 @@ namespace SICore
             ClientData.PersonDataExtensions.ValidatorName = mparams[1];
             ClientData.PersonDataExtensions.Answer = mparams[2];
             _logic.IsRight(mparams[3] == "+");
-            int.TryParse(mparams[4], out var rightAnswersCount);
+            _ = int.TryParse(mparams[4], out var rightAnswersCount);
             rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
 
             var right = new List<string>();
+
             for (int i = 0; i < rightAnswersCount; i++)
             {
                 right.Add(mparams[5 + i]);
             }
 
             var wrong = new List<string>();
+
             for (int i = 5 + rightAnswersCount; i < mparams.Length; i++)
             {
                 wrong.Add(mparams[i]);
