@@ -1662,16 +1662,6 @@ namespace SICore
 
         }
 
-        public void Table()
-        {
-
-        }
-
-        public void FinalThemes()
-        {
-
-        }
-
         public void Clear()
         {
 

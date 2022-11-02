@@ -38,9 +38,5 @@
         /// Определение стоимости Вопроса с секретом
         /// </summary>
         void CatCost();
-
-        void Table();
-
-        void FinalThemes();
     }
 }

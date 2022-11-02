@@ -372,7 +372,7 @@
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Html}">
-                                <wv2:WebView2 Source="{Binding MediaSource.Uri}" />
+                                <wv2:WebView2 Source="{Binding MediaSource.Uri}" lb:WebView2Behavior.IsAttached="True" />
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.SpecialText}">

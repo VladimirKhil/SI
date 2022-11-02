@@ -1157,7 +1157,7 @@ namespace SICore
                 
                 var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
-                var canonicalAnswer = _data.Question.GetRightAnswers().FirstOrDefault();
+                var canonicalAnswer = _data.Question.Right.FirstOrDefault();
                 var isAnswerCanonical = canonicalAnswer != null && _data.Answerer.Answer.Simplify().Contains(canonicalAnswer.Simplify());
 
                 if (!IsFinalRound())
@@ -1296,14 +1296,14 @@ namespace SICore
             {
                 if (!ClientData.Settings.AppSettings.FalseStart)
                 {
-                    _gameActions.SendMessage(Messages.Resume); // Для возобновления мультимедиа
+                    _gameActions.SendMessage(Messages.Resume); // To resume the media
                 }
 
                 ScheduleExecution(Tasks.AskToTry, 10, force: true);
                 return;
             }
 
-            // Возобновить чтение вопроса
+            // Resume question playing
             if (_data.IsPartial && _data.AtomType == AtomTypes.Text)
             {
                 ScheduleExecution(Tasks.PrintPartial, 5, force: true);
@@ -2569,6 +2569,12 @@ namespace SICore
 
         private void AskToTry()
         {
+            if (ClientData.Players.All(p => !p.CanPress))
+            {
+                ScheduleExecution(Tasks.WaitTry, 3, force: true);
+                return;
+            }
+
             if (_data.Settings.AppSettings.FalseStart)
             {
                 _gameActions.SendMessage(Messages.Try);

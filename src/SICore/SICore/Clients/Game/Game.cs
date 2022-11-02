@@ -1724,9 +1724,17 @@ namespace SICore
                 }
             }
 
-            if (canPressChanged && !ClientData.TInfo.Pause && ClientData.IsThinking && ClientData.Players.All(p => !p.CanPress))
+            if (canPressChanged && ClientData.Players.All(p => !p.CanPress) && !ClientData.TInfo.Pause)
             {
-                _logic.ScheduleExecution(Tasks.WaitTry, 3, force: true);
+                if (!ClientData.IsAnswer)
+                {
+                    if (!ClientData.IsQuestionFinished)
+                    {
+                        _logic.Engine.MoveToAnswer();
+                    }
+
+                    _logic.ExecuteImmediate();
+                }
             }
         }
 

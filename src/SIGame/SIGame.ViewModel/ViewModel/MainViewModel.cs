@@ -60,7 +60,7 @@ namespace SIGame.ViewModel
             }
         }
 
-        private async void DisposeAsync(IAsyncDisposable asyncDisposable)
+        private static async void DisposeAsync(IAsyncDisposable asyncDisposable)
         {
             try
             {
@@ -89,9 +89,10 @@ namespace SIGame.ViewModel
         }
 
         public ICommand CancelUpdate { get; set; }
+
         public CustomCommand Cancel { get; private set; }
 
-        private readonly StartMenuViewModel _startMenu = new StartMenuViewModel();
+        private readonly StartMenuViewModel _startMenu = new();
 
         private bool _isSlideMenuOpen;
 
@@ -227,7 +228,7 @@ namespace SIGame.ViewModel
                 throw new ArgumentNullException(nameof(host));
             }
 
-            var game = new GameViewModel(server, host, _userSettings)
+            var game = new GameViewModel(server, host, _userSettings, _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
             {
                 NetworkGame = isNetworkGame && server.IsMain,
                 NetworkGamePort = networkGamePort,

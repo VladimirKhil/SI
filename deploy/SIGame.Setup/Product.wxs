@@ -64,21 +64,21 @@
 
     <Fragment>
         <Directory Id="TARGETDIR" Name="SourceDir">
-        <Directory Id="LocalAppDataFolder">
-        <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
-          <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
-            <Directory Id="DataFolder" Name="Data" />
-            <Directory Id="PhotoFolder" Name="Photo" />
-            <Directory Id="SoundsFolder" Name="Sounds" />
-            <Directory Id="LicensesFolder" Name="licenses" />
+          <Directory Id="LocalAppDataFolder">
+            <Directory Id="ManufacturerFolder" Name="$(var.ManufacturerEn)">
+              <Directory Id="INSTALLLOCATION" Name="$(var.ProductNameEn)">
+                <Directory Id="DataFolder" Name="Data" />
+                <Directory Id="PhotoFolder" Name="Photo" />
+                <Directory Id="SoundsFolder" Name="Sounds" />
+                <Directory Id="LicensesFolder" Name="licenses" />
+              </Directory>
+            </Directory>
           </Directory>
-        </Directory>
-      </Directory>
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
-          <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
-        </Directory>
-      </Directory>
+          <Directory Id="ProgramMenuFolder">
+            <Directory Id="ManufacturerProgramMenuFolder" Name="$(var.Manufacturer)">
+              <Directory Id="ApplicationProgramMenuFolder" Name="$(var.ProductName)" />
+            </Directory>
+          </Directory>
         </Directory>
     </Fragment>
   
@@ -107,6 +107,9 @@
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
         <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
+		<Component Guid="{4687DB8D-2AA3-46AD-8B85-A8469390E198}">
+			<File KeyPath="yes" Source="$(var.PublishFolder)WebView2Loader.dll" />
+		</Component>
 	    <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
 		    <File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
 	    </Component>

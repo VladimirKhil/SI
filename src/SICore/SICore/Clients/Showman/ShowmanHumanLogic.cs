@@ -125,16 +125,6 @@ namespace SICore
             _data.BackLink.OnFlash();
         }
 
-        public void Table()
-        {
-            
-        }
-
-        public void FinalThemes()
-        {
-            
-        }
-
         private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
         {
             var found = false;
