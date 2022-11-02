@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -31,13 +32,16 @@ namespace SIPackages.Helpers
         /// Maximum allowed length of extracted data in the archive.
         /// <see cref="DefaultMaxArchiveDataLength" /> by default.
         /// </param>
+        /// <param name="entryFilter">Optional filter for archive entries.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Collection of filtered file names.</returns>
         /// <exception cref="InvalidOperationException" />
-        public static async Task ExtractToDirectoryAsync(
+        public static async Task<string[]> ExtractToDirectoryAsync(
             string sourceArchiveFilePath,
             string destinationDirectoryPath,
             ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal,
             long maxAllowedDataLength = DefaultMaxArchiveDataLength,
+            Predicate<ZipArchiveEntry>? entryFilter = null,
             CancellationToken cancellationToken = default)
         {
             Directory.CreateDirectory(destinationDirectoryPath);
@@ -53,11 +57,22 @@ namespace SIPackages.Helpers
                 throw new InvalidOperationException($"Archive data is too big ({declaredSize} bytes)");
             }
 
+            var skippedFiles = new List<string>();
+
             foreach (var entry in archive.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+
+                if (entryFilter != null && !entryFilter(entry))
+                {
+                    skippedFiles.Add(entry.FullName);
+                    continue;
+                }
+
                 await ExtractEntryToDirectoryAsync(entry, destinationDirectoryPath, extractedFileNamingMode, cancellationToken);
             }
+
+            return skippedFiles.ToArray();
         }
 
         /// <summary>
