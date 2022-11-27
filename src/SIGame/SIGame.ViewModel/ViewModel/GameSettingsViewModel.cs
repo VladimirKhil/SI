@@ -677,15 +677,15 @@ namespace SIGame.ViewModel
         {
             var localizer = new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name);
 
-            Server server;
+            Node server;
             if (NetworkGame)
             {
-                server = new TcpMasterServer(NetworkPort, ServerConfiguration.Default, localizer);
+                server = new TcpMasterServer(NetworkPort, NodeConfiguration.Default, localizer);
                 ((TcpMasterServer)server).StartListen();
             }
             else
             {
-                server = new BasicServer(ServerConfiguration.Default, localizer);
+                server = new BasicServer(NodeConfiguration.Default, localizer);
             }
 
             server.Error += Server_Error;
@@ -713,7 +713,7 @@ namespace SIGame.ViewModel
             MoveToGame(server, host, documentPath);
         }
 
-        private void MoveToGame(Server server, IViewerClient host, string tempDocFolder)
+        private void MoveToGame(Node server, IViewerClient host, string tempDocFolder)
         {
             if (host == null)
             {

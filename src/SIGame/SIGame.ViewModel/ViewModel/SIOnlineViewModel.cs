@@ -891,7 +891,7 @@ namespace SIGame.ViewModel
         private async Task InitServerAndClientNewAsync(CancellationToken cancellationToken = default)
         {
             _server = new GameServerSlave(
-                ServerConfiguration.Default,
+                NodeConfiguration.Default,
                 new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
             await _server.AddConnectionAsync(new GameServerConnection(_gameServerClient) { IsAuthenticated = true }, cancellationToken);

@@ -216,7 +216,7 @@ namespace SIGame.ViewModel
             };
 
         private void StartGame(
-            Server server,
+            Node server,
             IViewerClient host,
             bool isNetworkGame,
             bool isOnline,
@@ -248,7 +248,7 @@ namespace SIGame.ViewModel
             host.MyLogic.PrintGreeting();
         }
 
-        private void JoinGame(Server server, IViewerClient host, bool isOnline) => StartGame(server, host, false, isOnline, null);
+        private void JoinGame(Node server, IViewerClient host, bool isOnline) => StartGame(server, host, false, isOnline, null);
 
         private async void EndGame_Executed()
         {

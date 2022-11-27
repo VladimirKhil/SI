@@ -8,7 +8,7 @@ namespace SIGame.ViewModel.Implementation
     public sealed class GameServerSlave : SlaveServer
     {
         public GameServerSlave(
-            ServerConfiguration serverConfiguration,
+            NodeConfiguration serverConfiguration,
             INetworkLocalizer networkLocalizer)
             : base(serverConfiguration, networkLocalizer)
         {

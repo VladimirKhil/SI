@@ -25,7 +25,7 @@ namespace SIGame.ViewModel
     /// </summary>
     public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
-        private readonly Server _server;
+        private readonly Node _node;
 
         public IViewerClient Host { get; private set; }
 
@@ -102,13 +102,13 @@ namespace SIGame.ViewModel
 
         private readonly ILogger<GameViewModel> _logger;
 
-        public GameViewModel(Server server, IViewerClient host, UserSettings userSettings, ILogger<GameViewModel> logger)
+        public GameViewModel(Node server, IViewerClient host, UserSettings userSettings, ILogger<GameViewModel> logger)
         {
-            _server = server;
+            _node = server;
             _logger = logger;
 
-            _server.Reconnecting += Server_Reconnecting;
-            _server.Reconnected += Server_Reconnected;
+            _node.Reconnecting += Server_Reconnecting;
+            _node.Reconnected += Server_Reconnected;
 
             Host = host ?? throw new ArgumentNullException(nameof(host));
             Host.Switch += Host_Switch;
@@ -266,7 +266,7 @@ namespace SIGame.ViewModel
             // For correct WebView2 disposal (https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136)
             TInfo.TStage = TableStage.Void;
 
-            await _server.DisposeAsync();
+            await _node.DisposeAsync();
 
             Timers[1].TimeChanged -= GameViewModel_TimeChanged;
 

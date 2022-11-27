@@ -53,12 +53,10 @@ namespace SIGame.ViewModel
 
         public ICommand ChangeSettings { get; internal set; }
 
-        public event Action<Server, IViewerClient, bool, bool, string, int> StartGame;
+        public event Action<Node, IViewerClient, bool, bool, string, int> StartGame;
 
-        protected virtual void OnStartGame(Server server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort)
-        {
+        protected virtual void OnStartGame(Node server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort) =>
             StartGame?.Invoke(server, host, networkGame, isOnline, tempDocFolder, networkGamePort);
-        }
 
         protected ViewModelWithNewAccount()
         {

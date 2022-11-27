@@ -176,7 +176,7 @@ namespace SIGame.ViewModel
             };
         }
 
-        protected override void OnStartGame(Server server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort)
+        protected override void OnStartGame(Node server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort)
             => base.OnStartGame(server, host, networkGame, IsOnline, tempDocFolder, networkGamePort);
 
         protected virtual void Prepare(GameSettingsViewModel gameSettings)
@@ -199,7 +199,7 @@ namespace SIGame.ViewModel
             _server = new TcpSlaveServer(
                 port,
                 address,
-                ServerConfiguration.Default,
+                NodeConfiguration.Default,
                 new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
             _client = new Client(Human.Name);
@@ -360,7 +360,7 @@ namespace SIGame.ViewModel
 
         protected virtual Task ClearConnectionAsync() => Task.CompletedTask;
 
-        public event Action<Server, IViewerClient, bool> Ready;
+        public event Action<Node, IViewerClient, bool> Ready;
 
         #endregion
 
