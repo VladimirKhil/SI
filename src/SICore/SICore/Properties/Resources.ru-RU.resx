@@ -773,4 +773,7 @@
   <data name="PersonAlreadyExists" xml:space="preserve">
     <value>Участник {0} уже есть в игре!</value>
   </data>
+  <data name="MediaFiltered" xml:space="preserve">
+    <value>Медиафайл превышает допустимый размер и будет пропущен</value>
+  </data>
 </root>

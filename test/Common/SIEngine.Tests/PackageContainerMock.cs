@@ -1,5 +1,5 @@
-﻿using SIPackages.Core;
-using SIPackages.PlatformSpecific;
+﻿using SIPackages.Containers;
+using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,11 +12,11 @@ namespace SIEngine.Tests
     /// <summary>
     /// Defines a fake package source.
     /// </summary>
-    internal sealed class PackageMock : ISIPackage
+    internal sealed class PackageContainerMock : ISIPackageContainer
     {
         private readonly Dictionary<string, HashSet<string>> _streams = new();
 
-        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
+        public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
         public void CreateStream(string name, string contentType) => CreateStream("", name, contentType);
 

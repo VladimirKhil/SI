@@ -23,7 +23,7 @@ namespace SI.GameServer.Client
         event Action<string, string> Receieve;
 
         event Func<Exception?, Task> Reconnecting;
-        event Func<string, Task> Reconnected;
+        event Func<string?, Task> Reconnected;
 
         event Func<Exception?, Task> Closed;
 

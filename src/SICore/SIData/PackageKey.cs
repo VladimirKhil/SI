@@ -10,7 +10,7 @@ namespace SIData
         /// <summary>
         /// Package unique identifier.
         /// </summary>
-        public string ID { get; set; }
+        public string? ID { get; set; }
 
         public override bool Equals(object obj)
         {

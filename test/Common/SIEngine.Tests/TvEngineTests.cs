@@ -56,7 +56,7 @@ namespace SIEngine.Tests
 
         private static SIDocument CreateDocument()
         {
-            var document = SIDocument.Create("test", "author", new PackageMock());
+            var document = SIDocument.Create("test", "author", new PackageContainerMock());
 
             var round = new Round();
             document.Package.Rounds.Add(round);

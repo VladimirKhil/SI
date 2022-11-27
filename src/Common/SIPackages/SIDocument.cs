@@ -1,4 +1,5 @@
 ﻿using EnsureThat;
+using SIPackages.Containers;
 using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.PlatformSpecific;
@@ -46,7 +47,7 @@ namespace SIPackages
         private bool _disposed;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ISIPackage _source;
+        private ISIPackageContainer _source;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Package _package = new();
@@ -104,7 +105,7 @@ namespace SIPackages
 
         #region Document Functions
 
-        private SIDocument(ISIPackage source)
+        private SIDocument(ISIPackageContainer source)
         {
             Ensure.That(source).IsNotNull();
 
@@ -152,7 +153,7 @@ namespace SIPackages
         /// <param name="name">Document name.</param>
         /// <param name="author">Document author.</param>
         /// <param name="source">Source to write data.</param>
-        public static SIDocument Create(string name, string author, ISIPackage source) =>
+        public static SIDocument Create(string name, string author, ISIPackageContainer source) =>
             CreateInternal(source, name, author);
 
         private static SIDocument CreateInternal(Stream stream, string name, string author, bool leaveStreamOpen) =>
@@ -161,7 +162,7 @@ namespace SIPackages
         private static SIDocument CreateInternal(string folder, string name, string author) =>
             CreateInternal(SIPackageFactory.Instance.CreatePackage(folder), name, author);
 
-        private static SIDocument CreateInternal(ISIPackage source, string name, string author)
+        private static SIDocument CreateInternal(ISIPackageContainer source, string name, string author)
         {
             var document = new SIDocument(source);
             document.CreateCore(name, author);
@@ -221,7 +222,7 @@ namespace SIPackages
             return document;
         }
 
-        private static SIDocument LoadInternal(ISIPackage source)
+        private static SIDocument LoadInternal(ISIPackageContainer source)
         {
             var document = new SIDocument(source);
 
@@ -279,7 +280,12 @@ namespace SIPackages
         /// </summary>
         public void Save() => SaveCore(_source);
 
-        private void SaveCore(ISIPackage package)
+        /// <summary>
+        /// Gets filtered file names.
+        /// </summary>
+        public string[] GetFilteredFiles() => _source.GetFilteredEntries();
+
+        private void SaveCore(ISIPackageContainer package)
         {
             using (var stream = package.GetStream(ContentFileName, false).Stream)
             {
@@ -789,7 +795,7 @@ namespace SIPackages
         /// Switches document to the new source.
         /// </summary>
         /// <param name="source">New source.</param>
-        public void ResetTo(ISIPackage source)
+        public void ResetTo(ISIPackageContainer source)
         {
             Ensure.That(source).IsNotNull();
 

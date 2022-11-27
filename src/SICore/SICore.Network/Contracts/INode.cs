@@ -10,7 +10,7 @@ namespace SICore.Network.Contracts
     /// Represent a SI network node. Nodes could be connected to each other.
     /// Clients connect to some node and communicate with other client via it.
     /// </summary>
-    public interface IServer : IAsyncDisposable
+    public interface INode : IAsyncDisposable
     {
         /// <summary>
         /// Main node flag. Other nodes are connected to it ("star" topology).

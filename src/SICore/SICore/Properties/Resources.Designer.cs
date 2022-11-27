@@ -934,6 +934,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Media file is too large and will be skipped.
+        /// </summary>
+        public static string MediaFiltered {
+            get {
+                return ResourceManager.GetString("MediaFiltered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Media load error.
         /// </summary>
         public static string MediaLoadError {

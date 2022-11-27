@@ -12,7 +12,7 @@ namespace SICore
     /// </summary>
     public sealed class GameRunner
     {
-        private readonly Server _server;
+        private readonly Node _server;
         private readonly IGameSettingsCore<AppSettingsCore> _settings;
         private readonly SIDocument _document;
         private readonly IGameManager _backLink;
@@ -22,7 +22,7 @@ namespace SICore
         private readonly bool _createHost;
 
         public GameRunner(
-            Server server,
+            Node server,
             IGameSettingsCore<AppSettingsCore> settings,
             SIDocument document,
             IGameManager backLink,

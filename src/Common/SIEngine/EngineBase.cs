@@ -17,7 +17,7 @@ namespace SIEngine
 
         protected IEngineSettingsProvider _settingsProvider;
 
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         protected GameStage _stage = GameStage.Begin;
 
@@ -209,6 +209,7 @@ namespace SIEngine
         }
 
         public abstract void MoveNext();
+
         public abstract Tuple<int, int, int> MoveBack();
 
         #region Fire events

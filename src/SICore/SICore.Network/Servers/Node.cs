@@ -17,12 +17,12 @@ using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers
 {
-    /// <inheritdoc cref="IServer" />
-    public abstract class Server : IServer
+    /// <inheritdoc cref="INode" />
+    public abstract class Node : INode
     {
         private const char AnonymousSenderPrefix = '\n';
 
-        private readonly ServerConfiguration _serverConfiguration;
+        private readonly NodeConfiguration _serverConfiguration;
 
         /// <summary>
         /// Contains a list of node clients.
@@ -77,7 +77,7 @@ namespace SICore.Network.Servers
 
         protected readonly INetworkLocalizer _localizer;
 
-        protected Server(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+        protected Node(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
         {
             _serverConfiguration = serverConfiguration;
             _localizer = localizer;
@@ -133,6 +133,7 @@ namespace SICore.Network.Servers
             try
             {
                 string sender = m.Sender, receiver = m.Receiver;
+
                 if (string.IsNullOrEmpty(receiver))
                 {
                     receiver = IsMain ? NetworkConstants.GameName : NetworkConstants.Everybody;
@@ -168,6 +169,7 @@ namespace SICore.Network.Servers
                 }
 
                 var messageText = m.Text;
+
                 if (!m.IsSystem && messageText != null)
                 {
                     messageText = messageText.Shorten(_serverConfiguration.MaxChatMessageLength);

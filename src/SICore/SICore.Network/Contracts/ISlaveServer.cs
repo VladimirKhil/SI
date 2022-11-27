@@ -2,7 +2,7 @@
 
 namespace SICore.Network.Contracts
 {
-    public interface ISlaveServer: IServer
+    public interface ISlaveServer: INode
     {
         IConnection HostServer { get; }
     }

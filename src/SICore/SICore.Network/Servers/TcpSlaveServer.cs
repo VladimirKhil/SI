@@ -21,7 +21,7 @@ namespace SICore.Network.Servers
         /// </summary>
         /// <param name="port">Имя порта для подключения</param>
         /// <param name="serverAddress">Адрес сервера</param>
-        public TcpSlaveServer(int port, string serverAddress, ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+        public TcpSlaveServer(int port, string serverAddress, NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
             : base(serverConfiguration, localizer)
         {
             _serverAddress = serverAddress;

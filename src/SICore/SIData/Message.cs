@@ -6,7 +6,7 @@ namespace SIData
     /// <summary>
     /// Defines a game message.
     /// </summary>
-    public struct Message
+    public readonly struct Message
     {
         /// <summary>
         /// Message text arguments separator.
@@ -25,27 +25,27 @@ namespace SIData
         /// <summary>
         /// Message text.
         /// </summary>
-        public string Text { get; private set; }
+        public string Text { get; }
 
         /// <summary>
         /// Is the message a system message (not a chat message).
         /// </summary>
-        public bool IsSystem { get; private set; }
+        public bool IsSystem { get; }
 
         /// <summary>
         /// Is the message a private message.
         /// </summary>
-        public bool IsPrivate { get; private set; }
+        public bool IsPrivate { get; }
 
         /// <summary>
         /// Message sender.
         /// </summary>
-        public string Sender { get; private set; }
+        public string Sender { get; }
 
         /// <summary>
         /// Message reveiver.
         /// </summary>
-        public string Receiver { get; private set; }
+        public string? Receiver { get; }
 
         static Message()
         {
@@ -53,7 +53,7 @@ namespace SIData
             Settings.Encoding = System.Text.Encoding.UTF8;
         }
 
-        public Message(string text, string sender, string receiver = null, bool isSystem = true, bool isPrivate = false)
+        public Message(string text, string sender, string? receiver = null, bool isSystem = true, bool isPrivate = false)
         {
             Text = text;
             Sender = sender;
@@ -69,18 +69,20 @@ namespace SIData
             bool isSystem = true, isPrivate = false;
 
             var system = reader["sys"];
+
             if (system != null)
             {
                 _ = bool.TryParse(system, out isSystem);
             }
 
             var priv = reader["pri"];
+
             if (priv != null)
             {
                 _ = bool.TryParse(priv, out isPrivate);
             }
 
-            var sender = reader["sen"];
+            var sender = reader["sen"] ?? "";
             var receiver = reader["rec"];
 
             var text = reader.ReadElementContentAsString();
@@ -91,17 +93,26 @@ namespace SIData
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteStartElement("M");
+
             if (!IsSystem)
+            {
                 writer.WriteAttributeString("sys", IsSystem.ToString());
+            }
 
             if (IsPrivate)
+            {
                 writer.WriteAttributeString("pri", IsPrivate.ToString());
+            }
 
             if (Sender != null && Sender.Length != 0)
+            {
                 writer.WriteAttributeString("sen", Sender);
+            }
 
             if (Receiver != null && Receiver.Length != 0)
+            {
                 writer.WriteAttributeString("rec", Receiver);
+            }
 
             writer.WriteString(Text);
 
@@ -111,6 +122,7 @@ namespace SIData
         public byte[] Serialize()
         {
             using var memory = new MemoryStream();
+
             using (var writer = XmlWriter.Create(memory, Settings))
             {
                 WriteXml(writer);
@@ -119,7 +131,7 @@ namespace SIData
             return memory.ToArray();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is Message message)
             {

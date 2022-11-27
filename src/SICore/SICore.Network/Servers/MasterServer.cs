@@ -13,7 +13,7 @@ namespace SICore.Network.Servers
     /// <summary>
     /// Defines a main game server node.
     /// </summary>
-    public class MasterServer : Server, IMasterServer
+    public class MasterServer : Node, IMasterServer
     {
         private bool _isDisposed;
 
@@ -28,7 +28,7 @@ namespace SICore.Network.Servers
 
         public override IEnumerable<IConnection> Connections => _connections;
 
-        public MasterServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+        public MasterServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
             : base(serverConfiguration, localizer)
         {
 

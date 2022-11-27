@@ -1,5 +1,5 @@
-﻿using SIPackages.Core;
-using SIPackages.PlatformSpecific;
+﻿using SIPackages.Containers;
+using SIPackages.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +16,7 @@ namespace SIPackages
     {
         private readonly string _mediaType;
 
-        private ISIPackage _packageContainer;
+        private ISIPackageContainer _packageContainer;
 
         /// <summary>
         /// Current items in the collection.
@@ -39,7 +39,7 @@ namespace SIPackages
         /// <param name="package">Package that owns the collection.</param>
         /// <param name="name">Collection name.</param>
         /// <param name="mediaType">Collection media type.</param>
-        internal DataCollection(ISIPackage package, string name, string mediaType)
+        internal DataCollection(ISIPackageContainer package, string name, string mediaType)
         {
             Name = name;
             _mediaType = mediaType;
@@ -131,6 +131,6 @@ namespace SIPackages
             _files.Remove(oldName);
         }
 
-        internal void UpdateSource(ISIPackage package) => _packageContainer = package;
+        internal void UpdateSource(ISIPackageContainer package) => _packageContainer = package;
     }
 }

@@ -10,8 +10,8 @@ namespace SIPackages.Containers
     /// <summary>
     /// Defines an empty SI package container.
     /// </summary>
-    /// <inheritdoc cref="ISIPackage" />
-    public sealed class EmptySIPackageContainer : ISIPackage
+    /// <inheritdoc cref="ISIPackageContainer" />
+    public sealed class EmptySIPackageContainer : ISIPackageContainer
     {
         /// <summary>
         /// Singleton empty SI package container.
@@ -19,7 +19,7 @@ namespace SIPackages.Containers
         public static readonly EmptySIPackageContainer Instance = new();
 
         /// <inheritdoc />
-        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
+        public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
         /// <inheritdoc />
         public void CreateStream(string name, string contentType) => throw new NotImplementedException();

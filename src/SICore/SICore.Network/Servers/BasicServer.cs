@@ -9,7 +9,7 @@ namespace SICore.Network.Servers
     /// </summary>
     public sealed class BasicServer : MasterServer
     {
-        public BasicServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+        public BasicServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
             : base(serverConfiguration, localizer)
         {
 

@@ -6,19 +6,19 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SIPackages.PlatformSpecific.Net45
+namespace SIPackages.Containers
 {
-    internal sealed class FolderSIPackage : ISIPackage
+    internal sealed class FolderSIPackageContainer : ISIPackageContainer
     {
         private readonly string _folder;
 
-        public FolderSIPackage(string folder) => _folder = folder;
+        public FolderSIPackageContainer(string folder) => _folder = folder;
 
-        public ISIPackage CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
+        public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-        internal static ISIPackage Create(string folder) => new FolderSIPackage(folder);
+        internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder);
 
-        internal static ISIPackage Open(string folder) => new FolderSIPackage(folder);
+        internal static ISIPackageContainer Open(string folder) => new FolderSIPackageContainer(folder);
 
         public void CreateStream(string name, string contentType)
         {
@@ -39,7 +39,7 @@ namespace SIPackages.PlatformSpecific.Net45
             CancellationToken cancellationToken = default)
         {
             Directory.CreateDirectory(Path.Combine(_folder, category));
-            
+
             using var fs = File.Create(Path.Combine(_folder, category, name));
 
             await stream.CopyToAsync(fs, cancellationToken);
@@ -105,6 +105,18 @@ namespace SIPackages.PlatformSpecific.Net45
             }
 
             return GetStreamLength(Path.Combine(category, name));
+        }
+
+        public string[] GetFilteredEntries()
+        {
+            var filteredFile = new FileInfo(Path.Combine(_folder, "filtered.txt"));
+            
+            if (!filteredFile.Exists)
+            {
+                return Array.Empty<string>();
+            }
+
+            return File.ReadAllLines(filteredFile.FullName);
         }
     }
 }

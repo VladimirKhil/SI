@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SIPackages.PlatformSpecific.Net45
+namespace SIPackages.Containers
 {
     // TODO: Keep Uri.EscapeUriString only for backward compatibility; use original names in zip archive
 
@@ -16,28 +16,28 @@ namespace SIPackages.PlatformSpecific.Net45
     /// <remarks>
     /// Inner file names could be Uri-escaped.
     /// </remarks>
-    /// <inheritdoc cref="ISIPackage" />
-    internal sealed class ZipSIPackage : ISIPackage
+    /// <inheritdoc cref="ISIPackageContainer" />
+    internal sealed class ZipSIPackageContainer : ISIPackageContainer
     {
         private readonly Stream _stream;
         private readonly ZipArchive _zipArchive;
 
-        private ZipSIPackage(Stream stream, ZipArchive zipArchive)
+        private ZipSIPackageContainer(Stream stream, ZipArchive zipArchive)
         {
             _stream = stream;
             _zipArchive = zipArchive;
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="ZipSIPackage" /> class.
+        /// Creates a new instance of <see cref="ZipSIPackageContainer" /> class.
         /// </summary>
         /// <param name="stream">Stream that would contain package data.</param>
         /// <param name="leaveOpen">Should the stream be left open after packages disposal.</param>
         /// <returns>Created package.</returns>
-        public static ZipSIPackage Create(Stream stream, bool leaveOpen = false) =>
+        public static ZipSIPackageContainer Create(Stream stream, bool leaveOpen = false) =>
             new(stream, new ZipArchive(stream, ZipArchiveMode.Update, leaveOpen));
 
-        public static ZipSIPackage Open(Stream stream, bool read = true) =>
+        public static ZipSIPackageContainer Open(Stream stream, bool read = true) =>
             new(stream, new ZipArchive(stream, read ? ZipArchiveMode.Read : ZipArchiveMode.Update, false));
 
         public string[] GetEntries(string category)
@@ -61,7 +61,7 @@ namespace SIPackages.PlatformSpecific.Net45
             {
                 return null;
             }
-            
+
             var stream = entry.Open();
 
             if (!read)
@@ -105,7 +105,7 @@ namespace SIPackages.PlatformSpecific.Net45
             entry.Delete();
         }
 
-        public ISIPackage CopyTo(Stream stream, bool closeCurrent, out bool isNew)
+        public ISIPackageContainer CopyTo(Stream stream, bool closeCurrent, out bool isNew)
         {
             if (_stream.Length == 0)
             {
@@ -113,7 +113,7 @@ namespace SIPackages.PlatformSpecific.Net45
                 isNew = true;
                 return Create(stream);
             }
-            
+
             isNew = false;
 
             _stream.Position = 0; // strictly required

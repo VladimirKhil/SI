@@ -31,7 +31,7 @@ namespace SICore.Network.Clients
         /// <summary>
         /// Текущий сервер
         /// </summary>
-        public IServer Server { get; private set; }
+        public INode Server { get; private set; }
 
         /// <summary>
         /// Создание клиента
@@ -81,13 +81,13 @@ namespace SICore.Network.Clients
         /// <summary>
         /// Текущий сервер
         /// </summary>
-        public IServer CurrentServer => Server;
+        public INode CurrentServer => Server;
 
         /// <summary>
         /// Подсоединение к серверу
         /// </summary>
         /// <param name="server"></param>
-        public void ConnectTo(IServer server)
+        public void ConnectTo(INode server)
         {
             server.AddClient(this);
             Server = server;

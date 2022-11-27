@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SICore.Network.Servers
 {
-    public abstract class SlaveServer : Server, ISlaveServer
+    public abstract class SlaveServer : Node, ISlaveServer
     {
         public IConnection HostServer { get; set; }
 
@@ -24,7 +24,7 @@ namespace SICore.Network.Servers
             }
         }
 
-        protected SlaveServer(ServerConfiguration serverConfiguration, INetworkLocalizer localizer)
+        protected SlaveServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
             : base(serverConfiguration, localizer)
         {
 

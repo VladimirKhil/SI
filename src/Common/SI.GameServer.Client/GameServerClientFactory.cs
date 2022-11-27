@@ -37,7 +37,7 @@ namespace SI.GameServer.Client
 
             if (string.IsNullOrEmpty(_options.Value.ServiceUri))
             {
-                // Server Uri is undefined. We should locale it
+                // Server Uri is undefined. We should locate it
                 var serverUri = await LocateServerUriAsync(cancellationToken);
 
                 options = new OptionsWrapper<GameServerClientOptions>(

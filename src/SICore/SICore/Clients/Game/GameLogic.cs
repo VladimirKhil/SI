@@ -292,7 +292,7 @@ namespace SICore
 
             if (_data.Settings.AppSettings.HintShowman)
             {
-                var rightAnswers = question.GetRightAnswers();
+                var rightAnswers = question.Right;
                 var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
 
                 _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
@@ -307,7 +307,7 @@ namespace SICore
 
             if (_data.Settings.AppSettings.HintShowman)
             {
-                var rightAnswers = question.GetRightAnswers();
+                var rightAnswers = question.Right;
                 var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
 
                 _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
@@ -396,6 +396,10 @@ namespace SICore
                     .Append(atomType)
                     .Append(Message.ArgsSeparatorChar);
 
+                var mediaCategory = atomType == AtomTypes.Image ? SIDocument.ImagesStorageName
+                    : (atomType == AtomTypes.Audio ? SIDocument.AudioStorageName
+                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+
                 if (link.GetStream == null) // External link
                 {
                     if (Uri.TryCreate(link.Uri, UriKind.Absolute, out _))
@@ -404,6 +408,19 @@ namespace SICore
                         _gameActions.SendMessage(msg.ToString());
 
                         return true;
+                    }
+
+                    var checkedFileName = Path.Combine(mediaCategory, link.Uri).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
+
+                    if (_data.PackageDoc.GetFilteredFiles().Any(f =>
+                        f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
+                    {
+                        _gameActions.SendMessageWithArgs(
+                            isBackground ? Messages.Atom_Second : Messages.Atom,
+                            AtomTypes.Text,
+                            string.Format(LO[nameof(R.MediaFiltered)], link.Uri));
+
+                        return false;
                     }
 
                     // There is no file in the package and it's name is not a valid absolute uri.
@@ -447,10 +464,6 @@ namespace SICore
                         _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
                     }
                 }
-
-                var mediaCategory = atomType == AtomTypes.Image ? SIDocument.ImagesStorageName
-                    : (atomType == AtomTypes.Audio ? SIDocument.AudioStorageName
-                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
 
                 var uri = _data.Share.CreateUri(filename, link.GetStream, mediaCategory);
 
@@ -1937,9 +1950,10 @@ namespace SICore
 
             var isRight = false;
 
-            foreach (var s in _data.Question.GetRightAnswers())
+            foreach (var s in _data.Question.Right)
             {
                 isRight = AnswerChecker.IsAnswerRight(_data.Answerer.Answer, s);
+
                 if (isRight)
                 {
                     break;

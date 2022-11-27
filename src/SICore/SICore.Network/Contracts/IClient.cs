@@ -17,7 +17,7 @@ namespace SICore.Network.Contracts
         /// <summary>
         /// Client node.
         /// </summary>
-        IServer CurrentServer { get; }
+        INode CurrentServer { get; }
 
         /// <summary>
         /// Receives incoming message.
@@ -38,6 +38,6 @@ namespace SICore.Network.Contracts
         /// Connects to node.
         /// </summary>
         /// <param name="s">Node to connect.</param>
-        void ConnectTo(IServer s);
+        void ConnectTo(INode s);
     }
 }

@@ -619,7 +619,7 @@ namespace SICore
                         if (mparams.Length > 1)
                         {
                             _logic.SetText(mparams[1], TableStage.Theme);
-                            OnThemeOrQuestion(mparams);
+                            OnThemeOrQuestion();
                             ClientData.ThemeName = mparams[1];
                         }
                         break;
@@ -628,7 +628,7 @@ namespace SICore
                         if (mparams.Length > 1)
                         {
                             _logic.SetText(mparams[1], TableStage.QuestionPrice);
-                            OnThemeOrQuestion(mparams);
+                            OnThemeOrQuestion();
                             ClientData.QuestionCaption = $"{ClientData.ThemeName}, {mparams[1]}";
                         }
                         break;
@@ -1099,7 +1099,7 @@ namespace SICore
             OnAd();
         }
 
-        private void OnThemeOrQuestion(string[] mparams)
+        private void OnThemeOrQuestion()
         {
             foreach (var item in ClientData.Players)
             {
@@ -1130,7 +1130,11 @@ namespace SICore
                 stake = -3;
             else
             {
-                int.TryParse(mparams[3], out stake);
+                if (!int.TryParse(mparams[3], out stake))
+                {
+                    return;
+                }
+
                 if (mparams.Length > 4)
                 {
                     ClientData.Players[ClientData.LastStakerIndex].SafeStake = true;

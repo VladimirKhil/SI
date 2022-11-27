@@ -126,11 +126,6 @@ namespace SICore
             }
         }
 
-        private void AddLog(string s)
-        {
-            _data.OnAddString(null, s, LogMode.Log);
-        }
-
         private async void Greet()
         {
             try

@@ -25,7 +25,6 @@ namespace SI.GameServer.Client
         private const int _BufferSize = 80 * 1024;
 
         private bool _isOpened;
-        private string _login;
 
         private readonly GameServerClientOptions _options;
 
@@ -34,22 +33,22 @@ namespace SI.GameServer.Client
         private readonly HttpClient _client;
         private readonly ProgressMessageHandler _progressMessageHandler;
 
-        private HubConnection _connection;
+        private HubConnection? _connection;
 
         public string ServiceUri => _options.ServiceUri!;
 
-        public event Action<GameInfo> GameCreated;
-        public event Action<int> GameDeleted;
-        public event Action<GameInfo> GameChanged;
-        public event Action<string> Joined;
-        public event Action<string> Leaved;
-        public event Action<string, string> Receieve;
-        public event Action<int> UploadProgress;
-        public event Action<Message> IncomingMessage;
+        public event Action<GameInfo>? GameCreated;
+        public event Action<int>? GameDeleted;
+        public event Action<GameInfo>? GameChanged;
+        public event Action<string>? Joined;
+        public event Action<string>? Leaved;
+        public event Action<string, string>? Receieve;
+        public event Action<int>? UploadProgress;
+        public event Action<Message>? IncomingMessage;
 
-        public event Func<Exception?, Task> Closed;
-        public event Func<Exception?, Task> Reconnecting;
-        public event Func<string, Task> Reconnected;
+        public event Func<Exception?, Task>? Closed;
+        public event Func<Exception?, Task>? Reconnecting;
+        public event Func<string?, Task>? Reconnected;
 
         private readonly IUIThreadExecutor? _uIThreadExecutor;
 
@@ -175,15 +174,13 @@ namespace SI.GameServer.Client
             }
             
             var token = await AuthenticateUserAsync(userName, "", cancellationToken);
-
-            _login = userName;
             
             _connection = new HubConnectionBuilder()
                 .WithUrl(
                     $"{ServiceUri}sionline?token={token}",
                     options =>
                     {
-                        options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(_login)));
+                        options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(userName)));
                     })
                 .WithAutomaticReconnect()
                 .AddMessagePackProtocol()

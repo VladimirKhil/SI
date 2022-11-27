@@ -4,12 +4,12 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SIPackages.PlatformSpecific
+namespace SIPackages.Containers
 {
     /// <summary>
     /// Defines a SIGame package container.
     /// </summary>
-    public interface ISIPackage : IDisposable
+    public interface ISIPackageContainer : IDisposable
     {
         /// <summary>
         /// Gets container entries by category.
@@ -84,11 +84,16 @@ namespace SIPackages.PlatformSpecific
         /// <param name="close">Should this object be closed.</param>
         /// <param name="isNew">Has a new source been created.</param>
         /// <returns>Created copy.</returns>
-        ISIPackage CopyTo(Stream stream, bool close, out bool isNew);
+        ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew);
 
         /// <summary>
         /// Flushes container changes.
         /// </summary>
         void Flush();
+
+        /// <summary>
+        /// Gets entries filtered from package container.
+        /// </summary>
+        string[] GetFilteredEntries() => Array.Empty<string>();
     }
 }

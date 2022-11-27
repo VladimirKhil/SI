@@ -1590,7 +1590,7 @@ namespace SICore
             {
                 if (args[1] == MessageParams.Answer_Right)
                 {
-                    ClientData.Answerer.Answer = args[2].Replace(Constants.AnswerPlaceholder, ClientData.Question.GetRightAnswers().FirstOrDefault() ?? "(...)");
+                    ClientData.Answerer.Answer = args[2].Replace(Constants.AnswerPlaceholder, ClientData.Question.Right.FirstOrDefault() ?? "(...)");
                     ClientData.Answerer.AnswerIsWrong = false;
                 }
                 else
