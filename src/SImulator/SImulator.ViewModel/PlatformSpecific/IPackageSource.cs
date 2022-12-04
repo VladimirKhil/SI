@@ -1,13 +1,24 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿namespace SImulator.ViewModel.PlatformSpecific;
 
-namespace SImulator.ViewModel.PlatformSpecific
+/// <summary>
+/// Allows to get game package file.
+/// </summary>
+public interface IPackageSource
 {
-    public interface IPackageSource
-    {
-        string Name { get; }
-        string Token { get; }
+    /// <summary>
+    /// Package name.
+    /// </summary>
+    string Name { get; }
 
-        Task<Stream> GetPackageAsync();
-    }
+    /// <summary>
+    /// Unique package token which allows to recreate a link to the package in the future.
+    /// </summary>
+    string Token { get; }
+
+    /// <summary>
+    /// Tries go get the package file.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Package file path and isTemporary marker or null.</returns>
+    Task<(string filePath, bool isTemporary)> GetPackageFileAsync(CancellationToken cancellationToken = default);
 }

@@ -116,6 +116,7 @@ namespace SIGame.ViewModel
         private void SelectColor_Executed(object arg)
         {
             var color = PlatformSpecific.PlatformManager.Instance.SelectColor();
+
             if (color != null)
             {
                 if (Convert.ToInt32(arg) == 0)

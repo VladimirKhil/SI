@@ -1,22 +1,22 @@
 ﻿using SImulator.ViewModel.PlatformSpecific;
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace SImulator.Implementation
+namespace SImulator.Implementation;
+
+/// <summary>
+/// Defines a file-based package source.
+/// </summary>
+internal sealed class FilePackageSource : IPackageSource
 {
-    internal sealed class FilePackageSource : IPackageSource
-    {
-        public string Name { get; }
+    public string Name { get; }
 
-        public string Token => Name;
+    public string Token => Name;
 
-        public FilePackageSource(string path)
-        {
-            Name = path;
-        }
+    public FilePackageSource(string path) => Name = path;
 
-        public Task<Stream> GetPackageAsync() => Task.FromResult((Stream)File.OpenRead(Name));
+    public Task<(string filePath, bool isTemporary)> GetPackageFileAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult((Name, false));
 
-        public override string ToString() => Name;
-    }
+    public override string ToString() => Name;
 }

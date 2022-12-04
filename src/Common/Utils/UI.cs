@@ -1,39 +1,37 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Utils;
 
-namespace Utils
+/// <summary>
+/// Provides helper method to execute the code in the UI thread.
+/// </summary>
+public static class UI
 {
-    public static class UI
+    public static TaskScheduler Scheduler { get; private set; } // TODO: -> private
+
+    public static void Initialize()
     {
-        public static TaskScheduler Scheduler { get; private set; } // TODO: -> private
+        Scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+    }
 
-        public static void Initialize()
+    public static void Execute(Action action, Action<Exception> onError, CancellationToken cancellationToken = default)
+    {
+        void wrappedAction()
         {
-            Scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+            try
+            {
+                action();
+            }
+            catch (Exception exc)
+            {
+                onError(exc);
+            }
         }
 
-        public static void Execute(Action action, Action<Exception> onError, CancellationToken cancellationToken = default)
+        if (TaskScheduler.Current != Scheduler && Scheduler != null)
         {
-            void wrappedAction()
-            {
-                try
-                {
-                    action();
-                }
-                catch (Exception exc)
-                {
-                    onError(exc);
-                }
-            }
-
-            if (TaskScheduler.Current != Scheduler && Scheduler != null)
-            {
-                Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.DenyChildAttach, Scheduler);
-                return;
-            }
-
-            wrappedAction();
+            Task.Factory.StartNew(wrappedAction, cancellationToken, TaskCreationOptions.DenyChildAttach, Scheduler);
+            return;
         }
+
+        wrappedAction();
     }
 }

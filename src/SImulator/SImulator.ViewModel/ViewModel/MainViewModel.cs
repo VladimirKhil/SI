@@ -5,419 +5,420 @@ using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
+using SIPackages.Helpers;
 using SIUI.ViewModel;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Utils;
 
-namespace SImulator.ViewModel
+namespace SImulator.ViewModel;
+
+public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 {
-    public sealed class MainViewModel : INotifyPropertyChanged
+    #region Constants
+    /// <summary>
+    /// Максимальное число игровых кнопок, которое можно зарегистрировать в программе
+    /// </summary>
+    private const int MaxNumberOfButtons = 12;
+    /// <summary>
+    /// Название продукта
+    /// </summary>
+    public const string ProductName = "СИмулятор";
+
+    #endregion
+
+    private bool _lockPlayerButtonSync = false;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    /// <summary>
+    /// Менеджер игровых кнопок
+    /// </summary>
+    private IButtonManager _buttonManager;
+
+    private readonly SimpleUICommand _start;
+
+    private readonly SimpleCommand _selectPackage;
+    private readonly SimpleCommand _selectVideo;
+    private readonly SimpleCommand _selectBackgroundImageFile;
+    private readonly SimpleCommand _selectBackgroundVideoFile;
+    private readonly SimpleCommand _selectLogsFolder;
+    private readonly SimpleCommand _selectAudioFile;
+
+    private readonly SimpleUICommand _addPlayerButton;
+    private readonly SimpleUICommand _setPlayerButton;
+    private readonly SimpleCommand _removePlayerButton;
+
+    public ICommand Start => _start;
+
+    public ICommand SelectPackage => _selectPackage;
+    public ICommand SelectVideoFile => _selectVideo;
+    public ICommand SelectBackgroundImageFile => _selectBackgroundImageFile;
+    public ICommand SelectBackgroundVideoFile => _selectBackgroundVideoFile;
+    public ICommand SelectLogoFile { get; private set; }
+    public ICommand SelectLogsFolder => _selectLogsFolder;
+    public ICommand SelectAudioFile => _selectAudioFile;
+
+    public ICommand DeletePlayerKey => _removePlayerButton;
+
+    public ICommand NavigateToSite { get; private set; }
+
+    public ICommand SelectColor { get; private set; }
+
+    public ICommand AddPlayer { get; private set; }
+
+    public ICommand RemovePlayer { get; private set; }
+
+    private ICommand _activePlayerButtonCommand;
+
+    public ICommand ActivePlayerButtonCommand
     {
-        #region Constants
-        /// <summary>
-        /// Максимальное число игровых кнопок, которое можно зарегистрировать в программе
-        /// </summary>
-        private const int MaxNumberOfButtons = 12;
-        /// <summary>
-        /// Название продукта
-        /// </summary>
-        public const string ProductName = "СИмулятор";
+        get { return _activePlayerButtonCommand; }
+        set { if (_activePlayerButtonCommand != value) { _activePlayerButtonCommand = value; OnPropertyChanged(); } }
+    }
 
-        #endregion
+    public ICommand AddRight { get; private set; }
 
-        private bool _lockPlayerButtonSync = false;
+    public ICommand AddWrong { get; private set; }
 
-        /// <summary>
-        /// Менеджер игровых кнопок
-        /// </summary>
-        private IButtonManager _buttonManager;
+    public ICommand OpenLicensesFolder { get; private set; }
 
-        private readonly SimpleUICommand _start;
+    private IPackageSource _packageSource;
 
-        private readonly SimpleCommand _selectPackage;
-        private readonly SimpleCommand _selectVideo;
-        private readonly SimpleCommand _selectBackgroundImageFile;
-        private readonly SimpleCommand _selectBackgroundVideoFile;
-        private readonly SimpleCommand _selectLogsFolder;
-        private readonly SimpleCommand _selectAudioFile;
-
-        private readonly SimpleUICommand _addPlayerButton;
-        private readonly SimpleUICommand _setPlayerButton;
-        private readonly SimpleCommand _removePlayerButton;
-
-        public ICommand Start => _start;
-
-        public ICommand SelectPackage => _selectPackage;
-        public ICommand SelectVideoFile => _selectVideo;
-        public ICommand SelectBackgroundImageFile => _selectBackgroundImageFile;
-        public ICommand SelectBackgroundVideoFile => _selectBackgroundVideoFile;
-        public ICommand SelectLogoFile { get; private set; }
-        public ICommand SelectLogsFolder => _selectLogsFolder;
-        public ICommand SelectAudioFile => _selectAudioFile;
-
-        public ICommand DeletePlayerKey => _removePlayerButton;
-
-        public ICommand NavigateToSite { get; private set; }
-
-        public ICommand SelectColor { get; private set; }
-
-        public ICommand AddPlayer { get; private set; }
-
-        public ICommand RemovePlayer { get; private set; }
-
-        private ICommand _activePlayerButtonCommand;
-
-        public ICommand ActivePlayerButtonCommand
+    /// <summary>
+    /// Путь к отыгрываемому документу
+    /// </summary>
+    public IPackageSource PackageSource
+    {
+        get { return _packageSource; }
+        set
         {
-            get { return _activePlayerButtonCommand; }
-            set { if (_activePlayerButtonCommand != value) { _activePlayerButtonCommand = value; OnPropertyChanged(); } }
-        }
-
-        public ICommand AddRight { get; private set; }
-
-        public ICommand AddWrong { get; private set; }
-
-        public ICommand OpenLicensesFolder { get; private set; }
-
-        private IPackageSource _packageSource;
-
-        /// <summary>
-        /// Путь к отыгрываемому документу
-        /// </summary>
-        public IPackageSource PackageSource
-        {
-            get { return _packageSource; }
-            set
+            if (_packageSource != value)
             {
-                if (_packageSource != value)
-                {
-                    _packageSource = value;
-                    OnPropertyChanged();
-                    UpdateStartCommand();
-                }
+                _packageSource = value;
+                OnPropertyChanged();
+                UpdateStartCommand();
             }
         }
+    }
 
-        public AppSettings Settings { get; }
+    private bool _isStarting;
 
-        public AppSettingsViewModel SettingsViewModel { get; }
+    public bool IsStarting
+    {
+        get => _isStarting;
+        set { if (_isStarting != value) { _isStarting = value; OnPropertyChanged(); } }
+    }
 
-        private string[] _comPorts;
+    public AppSettings Settings { get; }
 
-        public string[] ComPorts
+    public AppSettingsViewModel SettingsViewModel { get; }
+
+    private string[] _comPorts;
+
+    public string[] ComPorts
+    {
+        get
         {
-            get
+            if (_comPorts == null)
             {
-                if (_comPorts == null)
+                _comPorts = PlatformManager.Instance.GetComPorts();
+
+                if (Settings.ComPort == null || _comPorts != null && _comPorts.Length > 0)
                 {
-                    _comPorts = PlatformManager.Instance.GetComPorts();
-
-                    if (Settings.ComPort == null || _comPorts != null && _comPorts.Length > 0)
-                        Settings.ComPort = _comPorts[0];
-                }
-
-                return _comPorts;
-            }
-        }
-
-        private GameEngine _game;
-
-        public GameEngine Game
-        {
-            get => _game;
-            private set
-            {
-                if (_game != value)
-                {
-                    _game = value;
-                    OnPropertyChanged();
+                    Settings.ComPort = _comPorts[0];
                 }
             }
+
+            return _comPorts;
         }
+    }
 
-        private GameMode _mode = GameMode.Start;
+    private GameEngine _game;
 
-        public GameMode Mode
+    public GameEngine Game
+    {
+        get => _game;
+        private set
         {
-            get => _mode;
-            set
+            if (_game != value)
             {
-                if (_mode != value)
-                {
-                    _mode = value;
-                    OnPropertyChanged();
-                    OnModeChanged();
-                }
+                _game = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private ModeTransition _transition = ModeTransition.ModeratorToStart;
+    private GameMode _mode = GameMode.Start;
 
-        public ModeTransition Transition
+    public GameMode Mode
+    {
+        get => _mode;
+        set
         {
-            get { return _transition; }
-            set { _transition = value; OnPropertyChanged(); }
+            if (_mode != value)
+            {
+                _mode = value;
+                OnPropertyChanged();
+                OnModeChanged();
+            }
         }
+    }
 
-        public bool CanSelectScreens => (_mode == GameMode.Start) && Screens.Length > 1;
+    private ModeTransition _transition = ModeTransition.ModeratorToStart;
 
-        public IScreen[] Screens { get; private set; }
+    public ModeTransition Transition
+    {
+        get { return _transition; }
+        set { _transition = value; OnPropertyChanged(); }
+    }
 
-        public string Host => "[Ваш IP-адрес]";
+    public bool CanSelectScreens => (_mode == GameMode.Start) && Screens.Length > 1;
 
-        /// <summary>
-        /// Список игроков, отображаемых на табло в особом режиме игры
-        /// </summary>
-        public ObservableCollection<SimplePlayerInfo> Players { get; set; }
+    public IScreen[] Screens { get; private set; }
 
-        public MainViewModel(AppSettings settings)
-        {
-            Settings = settings;
-            SettingsViewModel = new AppSettingsViewModel(Settings);
+    public string Host => "[Ваш IP-адрес]";
 
-            _start = new SimpleUICommand(Start_Executed) { Name = Resources.StartGame };
+    /// <summary>
+    /// Список игроков, отображаемых на табло в особом режиме игры
+    /// </summary>
+    public ObservableCollection<SimplePlayerInfo> Players { get; set; }
 
-            _selectPackage = new SimpleCommand(SelectPackage_Executed);
-            SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
-            _selectVideo = new SimpleCommand(SelectVideo_Executed);
-            _selectBackgroundImageFile = new SimpleCommand(SelectBackgroundImageFile_Executed);
-            _selectBackgroundVideoFile = new SimpleCommand(SelectBackgroundVideoFile_Executed);
-            _selectLogsFolder = new SimpleCommand(SelectLogsFolder_Executed);
-            _selectAudioFile = new SimpleCommand(SelectAudioFile_Executed);
+    public MainViewModel(AppSettings settings)
+    {
+        Settings = settings;
+        SettingsViewModel = new AppSettingsViewModel(Settings);
 
-            _addPlayerButton = new SimpleUICommand(AddPlayerButton_Executed) { Name = Resources.Add };
-            _setPlayerButton = new SimpleUICommand(SetPlayerButton_Executed) { Name = Resources.PressTheButton };
-            _removePlayerButton = new SimpleCommand(RemovePlayerButton_Executed);
+        _start = new SimpleUICommand(Start_Executed) { Name = Resources.StartGame };
 
-            NavigateToSite = new SimpleCommand(NavigateToSite_Executed);
-            SelectColor = new SimpleCommand(SelectColor_Executed);
+        _selectPackage = new SimpleCommand(SelectPackage_Executed);
+        SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
+        _selectVideo = new SimpleCommand(SelectVideo_Executed);
+        _selectBackgroundImageFile = new SimpleCommand(SelectBackgroundImageFile_Executed);
+        _selectBackgroundVideoFile = new SimpleCommand(SelectBackgroundVideoFile_Executed);
+        _selectLogsFolder = new SimpleCommand(SelectLogsFolder_Executed);
+        _selectAudioFile = new SimpleCommand(SelectAudioFile_Executed);
 
-            AddPlayer = new SimpleCommand(AddPlayer_Executed);
-            RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
+        _addPlayerButton = new SimpleUICommand(AddPlayerButton_Executed) { Name = Resources.Add };
+        _setPlayerButton = new SimpleUICommand(SetPlayerButton_Executed) { Name = Resources.PressTheButton };
+        _removePlayerButton = new SimpleCommand(RemovePlayerButton_Executed);
 
-            AddRight = new SimpleCommand(AddRight_Executed);
-            AddWrong = new SimpleCommand(AddWrong_Executed);
+        NavigateToSite = new SimpleCommand(NavigateToSite_Executed);
+        SelectColor = new SimpleCommand(SelectColor_Executed);
 
-            OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
+        AddPlayer = new SimpleCommand(AddPlayer_Executed);
+        RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
 
-            ActivePlayerButtonCommand = _addPlayerButton;
+        AddRight = new SimpleCommand(AddRight_Executed);
+        AddWrong = new SimpleCommand(AddWrong_Executed);
 
-            UpdateStartCommand();
-            UpdateCanAddPlayerButton();
+        OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
 
-            Players = new ObservableCollection<SimplePlayerInfo>();
+        ActivePlayerButtonCommand = _addPlayerButton;
 
-            Screens = PlatformManager.Instance.GetScreens();
-            
-            var screensLength = Screens.Length;
+        UpdateStartCommand();
+        UpdateCanAddPlayerButton();
+
+        Players = new ObservableCollection<SimplePlayerInfo>();
+
+        Screens = PlatformManager.Instance.GetScreens();
+        
+        var screensLength = Screens.Length;
 
 #if DEBUG
-            Settings.ScreenNumber = Math.Max(0, screensLength - 1);
+        Settings.ScreenNumber = Math.Max(0, screensLength - 1);
 #else
-            if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
-            {
-                Settings.ScreenNumber = screensLength - 1;
-            }
+        if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
+        {
+            Settings.ScreenNumber = screensLength - 1;
+        }
 #endif
 
-            Settings.PropertyChanged += MyDefault_PropertyChanged;
+        Settings.PropertyChanged += MyDefault_PropertyChanged;
+    }
+
+    private void AddPlayer_Executed(object arg)
+    {
+        var info = new PlayerInfo();
+        Players.Add(info);
+    }
+
+    private void RemovePlayer_Executed(object arg)
+    {
+        if (arg is not SimplePlayerInfo player)
+        {
+            return;
         }
 
-        private void AddPlayer_Executed(object arg)
+        Players.Remove(player);
+    }
+
+    private void AddRight_Executed(object arg)
+    {
+        _game?.AddRight.Execute(null);
+    }
+
+    private void AddWrong_Executed(object arg)
+    {
+        _game?.AddWrong.Execute(null);
+    }
+
+    private void OpenLicensesFolder_Executed(object arg)
+    {
+        var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "licenses");
+
+        if (!Directory.Exists(licensesFolder))
         {
-            var info = new PlayerInfo();
-            Players.Add(info);
+            PlatformManager.Instance.ShowMessage(Resources.NoLicensesFolder);
+            return;
         }
 
-        private void RemovePlayer_Executed(object arg)
+        try
         {
-            if (arg is not SimplePlayerInfo player)
-            {
-                return;
-            }
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {licensesFolder}") { CreateNoWindow = true });
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), true);
+        }
+    }
 
-            Players.Remove(player);
+    private void NavigateToSite_Executed(object arg) => PlatformManager.Instance.NavigateToSite();
+
+    private void SelectColor_Executed(object arg)
+    {
+        if (!int.TryParse(arg?.ToString(), out var colorMode) || colorMode < 0 || colorMode > 3)
+        {
+            return;
         }
 
-        private void AddRight_Executed(object arg)
+        var color = PlatformManager.Instance.AskSelectColor();
+
+        if (color == null)
         {
-            _game?.AddRight.Execute(null);
+            return;
         }
 
-        private void AddWrong_Executed(object arg)
+        var settings = Settings.SIUISettings;
+
+        switch (colorMode)
         {
-            _game?.AddWrong.Execute(null);
+            case 0:
+                settings.TableColorString = color;
+                break;
+            case 1:
+                settings.TableBackColorString = color;
+                break;
+            case 2:
+                settings.TableGridColorString = color;
+                break;
+            case 3:
+                settings.AnswererColorString = color;
+                break;
+        }
+    }
+
+    private void MyDefault_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(AppSettings.UsePlayersKeys):
+                Settings.PlayerKeys2.Clear();
+                UpdateCanAddPlayerButton();
+                break;
+
+            case nameof(AppSettings.PlayersView):
+                UpdatePlayersView();
+                break;
+        }
+    }
+
+    private async Task<string> PreparePackageAsync()
+    {
+        var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(_cancellationTokenSource.Token);
+
+        var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
+
+        await ZipHelper.ExtractToDirectoryAsync(
+            filePath,
+            tempDir,
+            maxAllowedDataLength: long.MaxValue,
+            cancellationToken: _cancellationTokenSource.Token);
+
+        if (isTemporary)
+        {
+            File.Delete(filePath);
         }
 
-        private void OpenLicensesFolder_Executed(object arg)
+        return tempDir;
+    }
+
+    /// <summary>
+    /// Starts the game.
+    /// </summary>
+    private async void Start_Executed(object _)
+    {
+        try
         {
-            var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "licenses");
-            if (!Directory.Exists(licensesFolder))
-            {
-                PlatformManager.Instance.ShowMessage(Resources.NoLicensesFolder);
-                return;
-            }
+            _start.CanBeExecuted = false;
+            IsStarting = true;
+
+            var tempDir = await PreparePackageAsync();
+
+            var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
+            ISIEngine engine;
 
             try
             {
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {licensesFolder}") { CreateNoWindow = true });
+                var document = SIDocument.Load(tempDir);
+                engine = EngineFactory.CreateEngine(SettingsViewModel.Model.GameMode == GameModes.Tv, document, engineSettingsProvider);
             }
             catch (Exception exc)
             {
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.OpenLicensesError, exc.Message), true);
-            }
-        }
-
-        private void NavigateToSite_Executed(object arg) => PlatformManager.Instance.NavigateToSite();
-
-        private void SelectColor_Executed(object arg)
-        {
-            if (!int.TryParse(arg?.ToString(), out var colorMode) || colorMode < 0 || colorMode > 3)
-            {
-                return;
+                throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
             }
 
-            var color = PlatformManager.Instance.AskSelectColor();
-            if (color == null)
+            var gameHost = new GameHost(engine);
+
+            var remoteGameUI = new RemoteGameUI
             {
-                return;
-            }
+                GameHost = gameHost,
+                ScreenIndex = SettingsViewModel.Model.ScreenNumber
+            };
 
-            var settings = Settings.SIUISettings;
-            switch (colorMode)
+            remoteGameUI.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+            remoteGameUI.OnError += ShowError;
+
+            var game = new GameEngine(SettingsViewModel, engine, gameHost, remoteGameUI, Players, tempDir);
+            Game = game;
+
+            game.Start();
+
+            game.Error += ShowError;
+            game.RequestStop += Game_RequestStop;
+
+            var recent = Settings.Recent;
+
+            if (!string.IsNullOrEmpty(_packageSource.Token) && !recent.Contains(_packageSource.Token))
             {
-                case 0:
-                    settings.TableColorString = color;
-                    break;
-                case 1:
-                    settings.TableBackColorString = color;
-                    break;
-                case 2:
-                    settings.TableGridColorString = color;
-                    break;
-                case 3:
-                    settings.AnswererColorString = color;
-                    break;
-            }
-        }
+                recent.Insert(0, _packageSource.Token);
 
-        private void MyDefault_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(AppSettings.UsePlayersKeys):
-                    Settings.PlayerKeys2.Clear();
-                    UpdateCanAddPlayerButton();
-                    break;
-
-                case nameof(AppSettings.PlayersView):
-                    UpdatePlayersView();
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Начало игры
-        /// </summary>
-        /// <param name="arg"></param>
-        private async void Start_Executed(object arg)
-        {
-            try
-            {
-                var packageStream = await _packageSource.GetPackageAsync();
-
-                var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
-                ISIEngine engine;
-
-                try
+                if (recent.Count > 10)
                 {
-                    var document = SIDocument.Load(packageStream);
-                    engine = EngineFactory.CreateEngine(SettingsViewModel.Model.GameMode == GameModes.Tv, document, engineSettingsProvider);
+                    recent.RemoveAt(10);
                 }
-                catch (Exception exc)
-                {
-                    throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
-                }
-
-                var gameHost = new GameHost(engine);
-
-                var remoteGameUI = new RemoteGameUI
-                {
-                    GameHost = gameHost,
-                    ScreenIndex = SettingsViewModel.Model.ScreenNumber
-                };
-
-                remoteGameUI.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-                remoteGameUI.OnError += ShowError;
-
-                var game = new GameEngine(SettingsViewModel, engine, gameHost, remoteGameUI, Players);
-                Game = game;
-
-                game.Start();
-
-                game.Error += ShowError;
-                game.RequestStop += Game_RequestStop;
-
-                var recent = Settings.Recent;
-                if (!string.IsNullOrEmpty(_packageSource.Token) && !recent.Contains(_packageSource.Token))
-                {
-                    recent.Insert(0, _packageSource.Token);
-                    if (recent.Count > 10)
-                    {
-                        recent.RemoveAt(10);
-                    }
-                }
-
-                Mode = GameMode.Moderator;
             }
-            catch (Exception exc)
-            {
-                var reason = exc.InnerException ?? exc;
 
-                PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, reason.Message), false);
-                if (_game != null)
-                {
-                    _game.CloseMainView();
-                }
-
-                await EndGameAsync();
-                return;
-            }
+            Mode = GameMode.Moderator;
         }
-
-        private void GameEngine_Closed(object sender, EventArgs e) =>
-            Task.Factory.StartNew(
-                async () =>
-                {
-                    await EndGameAsync();
-                    PlatformManager.Instance.ShowMessage(Resources.GameEndsBecauseOfConnectionLoss, false);
-                },
-                System.Threading.CancellationToken.None,
-                TaskCreationOptions.None,
-                UI.Scheduler);
-
-        private async void Game_RequestStop() => await RaiseStop();
-
-        public async Task<bool> RaiseStop()
+        catch (Exception exc)
         {
-            if (_game == null)
-            {
-                return true;
-            }
+            var reason = exc.InnerException ?? exc;
 
-            var result = await PlatformManager.Instance.AskStopGameAsync();
-
-            if (!result)
-            {
-                return false;
-            }
+            PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, reason.Message), false);
 
             if (_game != null)
             {
@@ -425,319 +426,379 @@ namespace SImulator.ViewModel
             }
 
             await EndGameAsync();
+            return;
+        }
+        finally
+        {
+            _start.CanBeExecuted = true;
+            IsStarting = false;
+        }
+    }
 
+    private void GameEngine_Closed(object sender, EventArgs e) =>
+        Task.Factory.StartNew(
+            async () =>
+            {
+                await EndGameAsync();
+                PlatformManager.Instance.ShowMessage(Resources.GameEndsBecauseOfConnectionLoss, false);
+            },
+            System.Threading.CancellationToken.None,
+            TaskCreationOptions.None,
+            UI.Scheduler);
+
+    private async void Game_RequestStop() => await RaiseStop();
+
+    public async Task<bool> RaiseStop()
+    {
+        if (_game == null)
+        {
             return true;
         }
 
-        /// <summary>
-        /// Ends the game.
-        /// </summary>
-        private async Task EndGameAsync()
+        var result = await PlatformManager.Instance.AskStopGameAsync();
+
+        if (!result)
         {
-            if (_game != null)
-            {
-                _game.Error -= ShowError;
-                _game.RequestStop -= Game_RequestStop;
-
-                await _game.DisposeAsync();
-
-                Game = null;
-            }
-
-            Mode = GameMode.Start;
-            Transition = ModeTransition.ModeratorToStart;
-
-            if (Settings.UsePlayersKeys == PlayerKeysModes.Web)
-            {
-                ActivePlayerButtonCommand = _addPlayerButton;
-            }
+            return false;
         }
 
-        private async void SelectPackage_Executed(object arg)
+        if (_game != null)
         {
-            var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(arg);
-            if (packageSource != null)
-            {
-                PackageSource = packageSource;
-            }
+            _game.CloseMainView();
         }
 
-        private async void SelectLogoFile_Executed(object arg)
+        await EndGameAsync();
+
+        return true;
+    }
+
+    /// <summary>
+    /// Ends the game.
+    /// </summary>
+    private async Task EndGameAsync()
+    {
+        if (_game != null)
         {
-            var logoUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectLogoImage);
-            if (logoUri != null)
-            {
-                Settings.SIUISettings.LogoUri = logoUri;
-            }
+            _game.Error -= ShowError;
+            _game.RequestStop -= Game_RequestStop;
+
+            await _game.DisposeAsync();
+
+            Game = null;
         }
 
-        private async void SelectVideo_Executed(object arg)
+        Mode = GameMode.Start;
+        Transition = ModeTransition.ModeratorToStart;
+
+        if (Settings.UsePlayersKeys == PlayerKeysModes.Web)
         {
-            var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectIntroVideo);
-            if (videoUrl != null)
-            {
-                Settings.VideoUrl = videoUrl;
-            }
+            ActivePlayerButtonCommand = _addPlayerButton;
+        }
+    }
+
+    private async void SelectPackage_Executed(object arg)
+    {
+        var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(arg);
+        if (packageSource != null)
+        {
+            PackageSource = packageSource;
+        }
+    }
+
+    private async void SelectLogoFile_Executed(object arg)
+    {
+        var logoUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectLogoImage);
+
+        if (logoUri != null)
+        {
+            Settings.SIUISettings.LogoUri = logoUri;
+        }
+    }
+
+    private async void SelectVideo_Executed(object arg)
+    {
+        var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectIntroVideo);
+
+        if (videoUrl != null)
+        {
+            Settings.VideoUrl = videoUrl;
+        }
+    }
+
+    private async void SelectBackgroundImageFile_Executed(object arg)
+    {
+        var imageUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundImage);
+
+        if (imageUrl != null)
+        {
+            Settings.SIUISettings.BackgroundImageUri = imageUrl;
+        }
+    }
+
+    private async void SelectBackgroundVideoFile_Executed(object arg)
+    {
+        var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundVideo);
+
+        if (videoUrl != null)
+        {
+            Settings.SIUISettings.BackgroundVideoUri = videoUrl;
+        }
+    }
+
+    private void SelectLogsFolder_Executed(object arg)
+    {
+        var folder = PlatformManager.Instance.AskSelectLogsFolder();
+
+        if (folder != null)
+        {
+            Settings.LogsFolder = folder;
+        }
+    }
+
+    private async void SelectAudioFile_Executed(object arg)
+    {
+        if (!int.TryParse(arg?.ToString(), out var fileId))
+        {
+            return;
         }
 
-        private async void SelectBackgroundImageFile_Executed(object arg)
+        var fileUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectAudioFile);
+
+        if (fileUri == null)
         {
-            var imageUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundImage);
-            if (imageUrl != null)
-            {
-                Settings.SIUISettings.BackgroundImageUri = imageUrl;
-            }
+            return;
         }
 
-        private async void SelectBackgroundVideoFile_Executed(object arg)
+        switch (fileId)
         {
-            var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundVideo);
-            if (videoUrl != null)
-            {
-                Settings.SIUISettings.BackgroundVideoUri = videoUrl;
-            }
+            case 0:
+                Settings.Sounds.BeginGame = fileUri;
+                break;
+
+            case 1:
+                Settings.Sounds.GameThemes = fileUri;
+                break;
+
+            case 2:
+                Settings.Sounds.QuestionSelected = fileUri;
+                break;
+
+            case 3:
+                Settings.Sounds.PlayerPressed = fileUri;
+                break;
+
+            case 4:
+                Settings.Sounds.SecretQuestion = fileUri;
+                break;
+
+            case 5:
+                Settings.Sounds.StakeQuestion = fileUri;
+                break;
+
+            case 6:
+                Settings.Sounds.NoRiskQuestion = fileUri;
+                break;
+
+            case 7:
+                Settings.Sounds.AnswerRight = fileUri;
+                break;
+
+            case 8:
+                Settings.Sounds.AnswerWrong = fileUri;
+                break;
+
+            case 9:
+                Settings.Sounds.NoAnswer = fileUri;
+                break;
+
+            case 10:
+                Settings.Sounds.RoundBegin = fileUri;
+                break;
+
+            case 11:
+                Settings.Sounds.RoundThemes = fileUri;
+                break;
+
+            case 12:
+                Settings.Sounds.RoundTimeout = fileUri;
+                break;
+
+            case 13:
+                Settings.Sounds.FinalDelete = fileUri;
+                break;
+
+            case 14:
+                Settings.Sounds.FinalThink = fileUri;
+                break;
         }
+    }
 
-        private void SelectLogsFolder_Executed(object arg)
+    private async void AddPlayerButton_Executed(object arg)
+    {
+        ActivePlayerButtonCommand = _setPlayerButton;
+
+        _lockPlayerButtonSync = true;
+
+        try
         {
-            var folder = PlatformManager.Instance.AskSelectLogsFolder();
-            if (folder != null)
+            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                Settings.LogsFolder = folder;
-            }
-        }
+                _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings);
 
-        private async void SelectAudioFile_Executed(object arg)
-        {
-            if (!int.TryParse(arg?.ToString(), out var fileId))
-            {
-                return;
-            }
-
-            var fileUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectAudioFile);
-            if (fileUri == null)
-            {
-                return;
-            }
-
-            switch (fileId)
-            {
-                case 0:
-                    Settings.Sounds.BeginGame = fileUri;
-                    break;
-
-                case 1:
-                    Settings.Sounds.GameThemes = fileUri;
-                    break;
-
-                case 2:
-                    Settings.Sounds.QuestionSelected = fileUri;
-                    break;
-
-                case 3:
-                    Settings.Sounds.PlayerPressed = fileUri;
-                    break;
-
-                case 4:
-                    Settings.Sounds.SecretQuestion = fileUri;
-                    break;
-
-                case 5:
-                    Settings.Sounds.StakeQuestion = fileUri;
-                    break;
-
-                case 6:
-                    Settings.Sounds.NoRiskQuestion = fileUri;
-                    break;
-
-                case 7:
-                    Settings.Sounds.AnswerRight = fileUri;
-                    break;
-
-                case 8:
-                    Settings.Sounds.AnswerWrong = fileUri;
-                    break;
-
-                case 9:
-                    Settings.Sounds.NoAnswer = fileUri;
-                    break;
-
-                case 10:
-                    Settings.Sounds.RoundBegin = fileUri;
-                    break;
-
-                case 11:
-                    Settings.Sounds.RoundThemes = fileUri;
-                    break;
-
-                case 12:
-                    Settings.Sounds.RoundTimeout = fileUri;
-                    break;
-
-                case 13:
-                    Settings.Sounds.FinalDelete = fileUri;
-                    break;
-
-                case 14:
-                    Settings.Sounds.FinalThink = fileUri;
-                    break;
-            }
-        }
-
-        private async void AddPlayerButton_Executed(object arg)
-        {
-            ActivePlayerButtonCommand = _setPlayerButton;
-
-            _lockPlayerButtonSync = true;
-
-            try
-            {
-                if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
+                if (_buttonManager == null)
                 {
-                    _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings);
-                    _buttonManager.KeyPressed += OnPlayerKeyPressed;
-                    if (!_buttonManager.Run())
-                    {
-                        ActivePlayerButtonCommand = _addPlayerButton;
-                        await _buttonManager.DisposeAsync();
-                        _buttonManager = null;
-                    }
+                    PlatformManager.Instance.ShowMessage($"Could not create button manager for mode {Settings.UsePlayersKeys}");
+                    return;
                 }
-            }
-            finally
-            {
-                _lockPlayerButtonSync = false;
-            }
-        }
 
-        internal bool OnPlayerKeyPressed(GameKey key)
-        {
-            // Задание кнопки для игрока (в настройках)
-            // Может быть не только при this.engine.stage == GameStage.Before, но и в процессе игры
-            if (_activePlayerButtonCommand == _setPlayerButton)
-            {
-                if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick)
+                _buttonManager.KeyPressed += OnPlayerKeyPressed;
+
+                if (!_buttonManager.Start())
                 {
-                    ProcessNewPlayerButton(key);
-
-                    _buttonManager.Stop();
-                    _buttonManager.DisposeAsync(); // no await
+                    ActivePlayerButtonCommand = _addPlayerButton;
+                    await _buttonManager.DisposeAsync();
                     _buttonManager = null;
                 }
             }
+        }
+        finally
+        {
+            _lockPlayerButtonSync = false;
+        }
+    }
 
-            return false;
+    internal bool OnPlayerKeyPressed(GameKey key)
+    {
+        // Задание кнопки для игрока (в настройках)
+        // Может быть не только при this.engine.stage == GameStage.Before, но и в процессе игры
+        if (_activePlayerButtonCommand == _setPlayerButton)
+        {
+            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick)
+            {
+                ProcessNewPlayerButton(key);
+
+                _buttonManager.Stop();
+                _buttonManager.DisposeAsync(); // no await
+                _buttonManager = null;
+            }
         }
 
-        public bool OnKeyPressed(GameKey key)
-        {
-            // Задание кнопки для игрока (в настройках)
-            if (_activePlayerButtonCommand == _setPlayerButton && Settings.UsePlayersKeys == PlayerKeysModes.Keyboard)
-            {
-                return ProcessNewPlayerButton(key);
-            }
+        return false;
+    }
 
-            return false;
+    public bool OnKeyPressed(GameKey key)
+    {
+        // Задание кнопки для игрока (в настройках)
+        if (_activePlayerButtonCommand == _setPlayerButton && Settings.UsePlayersKeys == PlayerKeysModes.Keyboard)
+        {
+            return ProcessNewPlayerButton(key);
         }
 
-        private bool ProcessNewPlayerButton(GameKey key)
-        {
-            if (!PlatformManager.Instance.IsEscapeKey(key) && !Settings.PlayerKeys2.Contains(key))
-            {
-                Settings.PlayerKeys2.Add(key);
-                UpdateCanAddPlayerButton();
-                ActivePlayerButtonCommand = _addPlayerButton;
-                return true;
-            }
+        return false;
+    }
 
+    private bool ProcessNewPlayerButton(GameKey key)
+    {
+        if (!PlatformManager.Instance.IsEscapeKey(key) && !Settings.PlayerKeys2.Contains(key))
+        {
+            Settings.PlayerKeys2.Add(key);
+            UpdateCanAddPlayerButton();
             ActivePlayerButtonCommand = _addPlayerButton;
-            return false;
+            return true;
         }
 
-        public async Task OnButtonsLeftAsync()
-        {
-            if (!_lockPlayerButtonSync)
-            {
-                if (_activePlayerButtonCommand == _setPlayerButton)
-                {
-                    ActivePlayerButtonCommand = _addPlayerButton;
+        ActivePlayerButtonCommand = _addPlayerButton;
+        return false;
+    }
 
-                    if (_mode == GameMode.Start && (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com) && _buttonManager != null)
-                    {
-                        _buttonManager.Stop();
-                        await _buttonManager.DisposeAsync();
-                        _buttonManager = null;
-                    }
+    public async Task OnButtonsLeftAsync()
+    {
+        if (!_lockPlayerButtonSync)
+        {
+            if (_activePlayerButtonCommand == _setPlayerButton)
+            {
+                ActivePlayerButtonCommand = _addPlayerButton;
+
+                if (_mode == GameMode.Start && (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com) && _buttonManager != null)
+                {
+                    _buttonManager.Stop();
+                    await _buttonManager.DisposeAsync();
+                    _buttonManager = null;
                 }
             }
         }
-
-        private void RemovePlayerButton_Executed(object arg)
-        {
-            var key = (GameKey)arg;
-            if (Settings.PlayerKeys2.Contains(key))
-            {
-                Settings.PlayerKeys2.Remove(key);
-                UpdateCanAddPlayerButton();
-            }
-        }
-
-        private void UpdateCanAddPlayerButton()
-        {
-            _addPlayerButton.CanBeExecuted = Settings.PlayerKeys2.Count < MaxNumberOfButtons;
-        }
-
-        private void SetPlayerButton_Executed(object arg)
-        {
-            // Do nothing; the command is activated by key press
-        }
-
-        private void ShowError(string error)
-        {
-            PlatformManager.Instance.ShowMessage(error);
-        }
-
-        /// <summary>
-        /// Вывести сообщение об ошибке
-        /// </summary>
-        /// <param name="exc"></param>
-        private void ShowError(Exception exc)
-        {
-            ShowError($"{Resources.Error}: {exc.Message}");
-        }
-
-        private void UpdateStartCommand()
-        {
-            _start.CanBeExecuted = _mode == GameMode.Start && _packageSource != null;
-        }
-
-        private void OnModeChanged()
-        {
-            OnPropertyChanged(nameof(CanSelectScreens));
-            _selectPackage.CanBeExecuted = _selectVideo.CanBeExecuted = _selectLogsFolder.CanBeExecuted = Mode == GameMode.Start;
-
-            UpdateStartCommand();
-
-            UpdatePlayersView();
-        }
-
-        private void UpdatePlayersView()
-        {
-            if (Settings.PlayersView == PlayersViewMode.Separate && _mode == GameMode.Moderator)
-            {
-                PlatformManager.Instance.CreatePlayersView(_game);
-            }
-            else
-            {
-                PlatformManager.Instance.ClosePlayersView();
-            }
-        }
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
+
+    private void RemovePlayerButton_Executed(object arg)
+    {
+        var key = (GameKey)arg;
+
+        if (Settings.PlayerKeys2.Contains(key))
+        {
+            Settings.PlayerKeys2.Remove(key);
+            UpdateCanAddPlayerButton();
+        }
+    }
+
+    private void UpdateCanAddPlayerButton()
+    {
+        _addPlayerButton.CanBeExecuted = Settings.PlayerKeys2.Count < MaxNumberOfButtons;
+    }
+
+    private void SetPlayerButton_Executed(object arg)
+    {
+        // Do nothing; the command is activated by key press
+    }
+
+    private void ShowError(string error)
+    {
+        PlatformManager.Instance.ShowMessage(error);
+    }
+
+    /// <summary>
+    /// Вывести сообщение об ошибке
+    /// </summary>
+    /// <param name="exc"></param>
+    private void ShowError(Exception exc)
+    {
+        ShowError($"{Resources.Error}: {exc.Message}");
+    }
+
+    private void UpdateStartCommand()
+    {
+        _start.CanBeExecuted = _mode == GameMode.Start && _packageSource != null;
+    }
+
+    private void OnModeChanged()
+    {
+        OnPropertyChanged(nameof(CanSelectScreens));
+        _selectPackage.CanBeExecuted = _selectVideo.CanBeExecuted = _selectLogsFolder.CanBeExecuted = Mode == GameMode.Start;
+
+        UpdateStartCommand();
+
+        UpdatePlayersView();
+    }
+
+    private void UpdatePlayersView()
+    {
+        if (Settings.PlayersView == PlayersViewMode.Separate && _mode == GameMode.Moderator)
+        {
+            PlatformManager.Instance.CreatePlayersView(_game);
+        }
+        else
+        {
+            PlatformManager.Instance.ClosePlayersView();
+        }
+    }
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public void Dispose()
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

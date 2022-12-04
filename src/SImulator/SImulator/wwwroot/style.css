@@ -3,15 +3,27 @@
     height: 100%;
 }
 
-body
-{
+body {
     background-color: #f1f1fe;
-    display: table; 
+    display: table;
     margin: 0 auto;
-	font-family: Tahoma;
-	background-image: -webkit-linear-gradient(top, #FFFFFF 0%, #8D94EF 100%);
-	background-image: -moz-linear-gradient(top, #FFFFFF 0%, #8D94EF 100%);
-	background-image: linear-gradient(to bottom, #FFFFFF 0%, #8D94EF 100%);
+    font-family: Tahoma;
+    background: linear-gradient(to bottom, #FFFFFF 0%, #8D94EF 100%);
+    background-size: 200% 200%;
+    animation: background;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes background {
+    from {
+        background-position: 0% 0%;
+    }
+
+    to {
+        background-position: 0% 100%;
+    }
 }
 
 #header
@@ -27,18 +39,23 @@ body
     text-align: center;
 	box-shadow: 1px 1px gray;
 	border-radius: 10px;
-	background-image: -webkit-radial-gradient(center, circle farthest-corner, #FFAF24 0%, #EF1F1F 100%);
-	background-image: -moz-radial-gradient(center, circle farthest-corner, #FFAF24 0%, #EF1F1F 100%);
 	background-image: radial-gradient(circle farthest-corner at center, #FFAF24 0%, #EF1F1F 100%);
+    cursor: pointer;
 }
 
-#press:disabled
-{
-    background-color: gray;
-	background-image: -webkit-radial-gradient(center, circle farthest-corner, darkgray 0%, gray 100%);
-	background-image: -moz-radial-gradient(center, circle farthest-corner, darkgray 0%, gray 100%);
-	background-image: radial-gradient(circle farthest-corner at center, darkgray 0%, gray 100%);
-}
+    #press:hover {
+        background-image: radial-gradient(circle farthest-corner at center, #ffed24 0%, #EF1F1F 100%);
+    }
+
+    #press:active {
+        background-image: radial-gradient(circle farthest-corner at center, #feff72 0%, #EF1F1F 100%);
+    }
+
+    #press:disabled
+    {
+        background-color: gray;
+	    background-image: radial-gradient(circle farthest-corner at center, darkgray 0%, gray 100%);
+    }
 
 #info
 {

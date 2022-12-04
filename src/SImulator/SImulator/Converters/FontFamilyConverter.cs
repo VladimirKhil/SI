@@ -2,26 +2,27 @@
 using System.Windows.Data;
 using System.Windows;
 using SIUI.ViewModel.Core;
+using System.Globalization;
 
-namespace SImulator.Converters
+namespace SImulator.Converters;
+
+public sealed class FontFamilyConverter : IValueConverter
 {
-    public sealed class FontFamilyConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (value is not string fontFamily)
         {
-            var fontFamily = value as string;
-            if (fontFamily == null)
-                return DependencyProperty.UnsetValue;
-
-            if (fontFamily == Settings.DefaultTableFontFamily || fontFamily.StartsWith("pack:"))
-                return "(по умолчанию)";
-
-            return fontFamily;
+            return DependencyProperty.UnsetValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (fontFamily == Settings.DefaultTableFontFamily || fontFamily.StartsWith("pack:"))
         {
-            throw new NotImplementedException();
+            return "(по умолчанию)";
         }
+
+        return fontFamily;
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

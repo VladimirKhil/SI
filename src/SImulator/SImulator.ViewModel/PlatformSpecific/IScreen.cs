@@ -1,13 +1,12 @@
-﻿namespace SImulator.ViewModel.PlatformSpecific
+﻿namespace SImulator.ViewModel.PlatformSpecific;
+
+/// <summary>
+/// Provides screen info.
+/// </summary>
+public interface IScreen
 {
     /// <summary>
-    /// Provides screen info.
+    /// Screen name.
     /// </summary>
-    public interface IScreen
-    {
-        /// <summary>
-        /// Screen name.
-        /// </summary>
-        string Name { get; }
-    }
+    string Name { get; }
 }

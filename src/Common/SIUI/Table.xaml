@@ -19,11 +19,13 @@
     d:DesignWidth="300"
     Foreground="{Binding Settings.Model.TableColorString}"
     d:DataContext="{d:DesignInstance vm:TableInfoViewModel}">
+    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes\generic.xaml" />
                 <ResourceDictionary>
+                    
                     <localc:HeightToThicknessConverter x:Key="HeightToThickness" />
                     <localc:RoundTabloConverter x:Key="RTConverter" />
                     <localc:UriToImageSourceConverter x:Key="UriConverter" />
@@ -69,9 +71,11 @@
                         <Setter Property="HorizontalAlignment" Value="Center" />
                         <Setter Property="VerticalAlignment" Value="Center" />
                         <Setter Property="lb:FillManager.Fill" Value="True" />
+                        
                         <Setter
                             Property="lb:FillManager.MaxFontSize"
                             Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=30}" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Price}" Value="-1">
                                 <Setter Property="Text" Value="" />
@@ -84,9 +88,11 @@
                         <Setter Property="TextAlignment" Value="Center" />
                         <Setter Property="Margin" Value="4" />
                         <Setter Property="lb:FillManager.Fill" Value="True" />
+                        
                         <Setter
                             Property="lb:FillManager.MaxFontSize"
                             Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=35}" />
+                        
                         <Setter Property="HorizontalAlignment" Value="Center" />
                         <Setter Property="VerticalAlignment" Value="Center" />
                         <Setter Property="TextWrapping" Value="Wrap" />
@@ -104,12 +110,14 @@
                         <Setter Property="Content" Value="{Binding}" />
                         <Setter Property="Background" Value="{StaticResource TransparentSIButtonBackground}" />
                         <Setter Property="Margin" Value="-1,-1,0,0" />
+                        
                         <Style.Triggers>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="lb:SelectionBehavior.IsSelectable" Value="True" />
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
+                                
                                 <Setter Property="Background" Value="{StaticResource SelectedSIButtonBackground}" />
                             </MultiTrigger>
                         </Style.Triggers>
@@ -117,14 +125,18 @@
 
                     <Style x:Key="SIQuestButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIItemButton}">
                         <Setter Property="ContentTemplate" Value="{StaticResource SIQuestionTemplate}" />
+                        
                         <Setter
                             Property="Command"
                             Value="{Binding DataContext.SelectQuestion, RelativeSource={RelativeSource AncestorType=ItemsControl,AncestorLevel=2}}" />
+                        
                         <Setter Property="CommandParameter" Value="{Binding}" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Price}" Value="-1">
                                 <Setter Property="IsEnabled" Value="False" />
                             </DataTrigger>
+                            
                             <DataTrigger Binding="{Binding State}" Value="Blinking">
                                 <DataTrigger.EnterActions>
                                     <BeginStoryboard Storyboard="{StaticResource QSelection}" />
@@ -135,10 +147,13 @@
 
                     <Style x:Key="SIThemeButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIItemButton}">
                         <Setter Property="ContentTemplate" Value="{StaticResource SIThemeTemplate}" />
+                        
                         <Setter
                             Property="Command"
                             Value="{Binding DataContext.SelectTheme, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                        
                         <Setter Property="CommandParameter" Value="{Binding}" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding State}" Value="Blinking">
                                 <DataTrigger.EnterActions>
@@ -161,6 +176,7 @@
                             <DataTrigger Binding="{Binding Active}" Value="False">
                                 <Setter Property="Text" Value="" />
                             </DataTrigger>
+                            
                             <DataTrigger Binding="{Binding Active}" Value="True">
                                 <Setter Property="Foreground" Value="DarkBlue" />
                             </DataTrigger>
@@ -184,12 +200,15 @@
 
                     <Style x:Key="QuestionText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
                         <Setter Property="lb:FillManager.Fill" Value="True" />
+                        
                         <Setter
                             Property="lb:FillManager.Interlinyage"
                             Value="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}" />
+                        
                         <Setter
                             Property="lb:FillManager.MaxFontSize"
                             Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}" />
+                        
                         <Setter Property="TextWrapping" Value="Wrap" />
                         <Setter Property="Margin" Value="10" />
                     </Style>
@@ -197,6 +216,7 @@
                     <Style x:Key="RoundText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
                         <Setter Property="Margin" Value="10" />
                         <Setter Property="lb:FillManager.Fill" Value="True" />
+                        
                         <Setter
                             Property="lb:FillManager.MaxFontSize"
                             Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=100}" />
@@ -221,6 +241,7 @@
                         <Setter
                             Property="FontSize"
                             Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=24}" />
+                        
                         <Setter Property="TextWrapping" Value="NoWrap" />
                         <Setter Property="TextAlignment" Value="Center" />
                     </Style>
@@ -237,18 +258,22 @@
                                     UpDirection="0,0,-1"
                                     Position="500,1800,500"  />
                             </Viewport3D.Camera>
+                            
                             <ContainerUIElement3D x:Name="World">
                                 <ModelUIElement3D x:Name="AmbientLightContainer">
                                     <AmbientLight x:Name="AmbientLight" Color="White" />
                                 </ModelUIElement3D>
                             </ContainerUIElement3D>
+                            
                             <Viewport2DVisual3D>
                                 <Viewport2DVisual3D.CacheMode>
                                     <BitmapCache RenderAtScale="10" EnableClearType="True" />
                                 </Viewport2DVisual3D.CacheMode>
+                                
                                 <Viewport2DVisual3D.Visual>
                                     <ContentPresenter Width="80" Height="80" />
                                 </Viewport2DVisual3D.Visual>
+                                
                                 <Viewport2DVisual3D.Geometry>
                                     <MeshGeometry3D
                                         Positions="0,0,1000 1000,0,1000 1000,0,0 0,0,0"
@@ -268,6 +293,7 @@
                                     </RotateTransform3D>
                                 </Viewport2DVisual3D.Transform>
                             </Viewport2DVisual3D>
+                            
                             <Viewport3D.Triggers>
                                 <EventTrigger RoutedEvent="Viewport3D.Loaded">
                                     <BeginStoryboard>
@@ -291,6 +317,7 @@
 
                     <Style x:Key="Rotator" TargetType="ContentControl">
                         <Setter Property="Template" Value="{StaticResource Rotator3D}" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Settings.Model.Animate3D}" Value="False">
                                 <Setter Property="Template" Value="{StaticResource RotatorSimple}" />
@@ -306,22 +333,26 @@
                                 <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" Margin="10" />
                             </DataTemplate>
                         </locals:QuestionTemplateSelector.Simple>
+                        
                         <locals:QuestionTemplateSelector.Animated>
                             <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
                                 <TextBlock
                                     Text="{Binding Text}"
                                     Style="{StaticResource QuestionText}"
                                     Margin="10"
-                                    TextOptions.TextFormattingMode="Ideal" lb:QuestionReading.IsAttached="True">
+                                    TextOptions.TextFormattingMode="Ideal"
+                                    lb:QuestionReading.IsAttached="True">
                                     <TextBlock.CacheMode>
                                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                     </TextBlock.CacheMode>
+                                    
                                     <TextBlock.TextEffects>
                                         <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
                                     </TextBlock.TextEffects>
                                 </TextBlock>
                             </DataTemplate>
                         </locals:QuestionTemplateSelector.Animated>
+                        
                         <locals:QuestionTemplateSelector.Partial>
                             <DataTemplate DataType="{x:Type vm:TableInfoViewModel}">
                                 <TextBlock
@@ -382,46 +413,57 @@
                                     Style="{StaticResource QuestionText}"
                                     Margin="10" />
                             </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Loading}">
+                                <ProgressBar Foreground="DarkBlue" IsIndeterminate="True" Width="300" Height="15" />
+                            </DataTemplate>
                         </localc:TemplateConverter.Templates>
                     </localc:TemplateConverter>
 
                     <localc:TemplateConverter x:Key="DecoratorSelector">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:QuestionStyle.Normal}" />
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionStyle.WaitingForPress}">
                                 <Grid>
                                     <Grid.Resources>
                                         <ScaleTransform x:Key="X" ScaleX="{Binding TimeLeft}" />
                                         <ScaleTransform x:Key="Y" ScaleY="{Binding TimeLeft}" />
                                     </Grid.Resources>
+                                    
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="10" />
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="10" />
                                     </Grid.RowDefinitions>
+                                    
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="10" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="10" />
                                     </Grid.ColumnDefinitions>
+                                    
                                     <Rectangle
                                         Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}"
                                         Grid.ColumnSpan="3"
                                         Stretch="Fill"
                                         RenderTransform="{StaticResource X}"
                                         RenderTransformOrigin="0.5,0.5" />
+                                    
                                     <Rectangle
                                         Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}"
                                         Grid.Row="2" Grid.ColumnSpan="3"
                                         Stretch="Fill"
                                         RenderTransform="{StaticResource X}"
                                         RenderTransformOrigin="0.5,0.5" />
+                                    
                                     <Rectangle
                                         Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}"
                                         Grid.RowSpan="3"
                                         Stretch="Fill"
                                         RenderTransform="{StaticResource Y}"
                                         RenderTransformOrigin="0.5,0.5" />
+                                    
                                     <Rectangle
                                         Fill="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}"
                                         Grid.Column="2"
@@ -431,6 +473,7 @@
                                         RenderTransformOrigin="0.5,0.5" />
                                 </Grid>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:QuestionStyle.Pressed}">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -438,6 +481,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
                                     </Grid.RowDefinitions>
+                                    
                                     <Border
                                         Grid.Row="1"
                                         Background="{Binding Settings.Model.AnswererColorString}"
@@ -447,12 +491,14 @@
                                             <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding ActivePlayer}" />
                                         </ContentControl>
                                     </Border>
+                                    
                                     <ItemsControl ItemsSource="{Binding LostButtonPlayers}" Grid.Row="2">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Columns="1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                        
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Background="#DD1D1F77" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -473,34 +519,41 @@
                     <localc:TemplateConverter x:Key="TableSelector">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:TableStage.Void}" />
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Sign}">
                                 <DockPanel>
                                     <TextBlock
                                         DockPanel.Dock="Bottom"
                                         TextAlignment="Right"
-                                        FontSize="40"
+                                        FontSize="30"
                                         Margin="0,15,50,15"
                                         Text="{x:Static lp:Resources.GameAuthor}" />
+                                    
                                     <Image Source="{Binding Settings.Model.LogoUri, Converter={StaticResource LogoConverter}}" Stretch="Uniform" />
                                 </DockPanel>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.GameThemes}">
                                 <StackPanel Orientation="Vertical" ClipToBounds="True">
                                     <ItemsControl
                                         ItemsSource="{Binding GameThemes}"
                                         lb:TableUtilities.GameThemesStoryboard="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type local:Table},AncestorLevel=1}}">
+                                        
                                         <ItemsControl.CacheMode>
                                             <BitmapCache RenderAtScale="3" />
                                         </ItemsControl.CacheMode>
+                                        
                                         <ItemsControl.RenderTransform>
                                             <TranslateTransform
                                                 Y="{Binding ActualHeight, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue=0}" />
                                         </ItemsControl.RenderTransform>
+                                        
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Columns="1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                        
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Style="{StaticResource GameThemeText}" Text="{Binding}" />
@@ -509,34 +562,42 @@
                                     </ItemsControl>
                                 </StackPanel>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Round}">
                                 <TextBlock Text="{Binding Text}" Style="{StaticResource RoundText}" />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Theme}">
                                 <TextBlock
                                     Text="{Binding Text}"
                                     Tag="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}"
                                     Style="{StaticResource QuestionText}" />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.QuestionPrice}">
                                 <TextBlock Text="{Binding Text}" Style="{StaticResource RoundText}" />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.RoundThemes}">
                                 <local:RoundThemesView />
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.RoundTable}">
                                 <Grid
                                     ClipToBounds="True"
                                     Name="mainGrid"
                                     lb:TableUtilities.Offset="{Binding RelativeSource={RelativeSource Self},Path=ActualWidth,Mode=OneWay}">
+                                    
                                     <Grid.Resources>
                                         <TranslateTransform
                                             x:Key="Even"
                                             X="{Binding ElementName=mainGrid,Path=(lb:TableUtilities.Offset),Converter={StaticResource RTConverter},ConverterParameter=True}" />
+                                        
                                         <TranslateTransform
                                             x:Key="Odd"
                                             X="{Binding ElementName=mainGrid,Path=(lb:TableUtilities.Offset),Converter={StaticResource RTConverter},ConverterParameter=False}" />
                                     </Grid.Resources>
+                                    
                                     <Grid.Triggers>
                                         <EventTrigger RoutedEvent="Control.Loaded">
                                             <BeginStoryboard>
@@ -546,21 +607,25 @@
                                             </BeginStoryboard>
                                         </EventTrigger>
                                     </Grid.Triggers>
+                                    
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="1.2*" />
                                         <RowDefinition Height="5*" />
                                     </Grid.RowDefinitions>
+                                    
                                     <ItemsControl
                                         Name="PART_Table"
                                         Grid.RowSpan="2"
                                         ItemsSource="{Binding RoundInfo}"
                                         AlternationCount="2"
                                         lb:SelectionBehavior.IsSelectable="{Binding Selectable}">
+                                        
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Columns="1" Margin="0,0,-1,-1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                        
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Name="grid" CacheMode="{StaticResource cache}">
@@ -568,15 +633,18 @@
                                                         <ColumnDefinition Width="1*" />
                                                         <ColumnDefinition Width="2*" />
                                                     </Grid.ColumnDefinitions>
+                                                    
                                                     <Border Style="{StaticResource SIMarginedBorder}">
                                                         <TextBlock Style="{StaticResource SIThemeExtended}" />
                                                     </Border>
+                                                    
                                                     <ItemsControl ItemsSource="{Binding Questions}" Grid.Column="1">
                                                         <ItemsControl.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <UniformGrid Rows="1" />
                                                             </ItemsPanelTemplate>
                                                         </ItemsControl.ItemsPanel>
+                                                        
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
                                                                 <Button Style="{StaticResource SIQuestButton}" />
@@ -584,10 +652,12 @@
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
                                                 </Grid>
+                                                
                                                 <DataTemplate.Triggers>
                                                     <Trigger Property="ItemsControl.AlternationIndex" Value="0">
                                                         <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Even}"/>
                                                     </Trigger>
+                                                    
                                                     <Trigger Property="ItemsControl.AlternationIndex" Value="1">
                                                         <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Odd}"/>
                                                     </Trigger>
@@ -595,12 +665,15 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
+                                    
                                     <ContentControl Name="PART_Bottom" Grid.Row="0" />
                                 </Grid>
+                                
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Settings.Model.ShowScore}" Value="True">
                                         <Setter TargetName="PART_Table" Property="Grid.RowSpan" Value="1" />
                                         <Setter TargetName="PART_Table" Property="Grid.Row" Value="1" />
+                                        
                                         <Setter TargetName="PART_Bottom" Property="Content">
                                             <Setter.Value>
                                                 <ItemsControl ItemsSource="{Binding Players}">
@@ -609,6 +682,7 @@
                                                             <UniformGrid Rows="1" />
                                                         </ItemsPanelTemplate>
                                                     </ItemsControl.ItemsPanel>
+                                                    
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate DataType="local:SimplePlayerInfo">
                                                             <UniformGrid Rows="2" Columns="1">
@@ -618,6 +692,7 @@
                                                                         Style="{StaticResource CenteredText}"
                                                                         lb:FillManager.Fill="True" />
                                                                 </ContentControl>
+                                                                
                                                                 <ContentControl>
                                                                     <TextBlock
                                                                         Text="{Binding Sum}"
@@ -633,6 +708,7 @@
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Score}">
                                 <Grid>
                                     <Grid.RowDefinitions>
@@ -640,12 +716,14 @@
                                         <RowDefinition Height="2*" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
+                                    
                                     <ItemsControl Grid.Row="1" ItemsSource="{Binding Players}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Rows="1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                        
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="local:SimplePlayerInfo">
                                                 <UniformGrid Rows="2" Columns="1">
@@ -655,6 +733,7 @@
                                                             Style="{StaticResource CenteredText}"
                                                             lb:FillManager.Fill="True" />
                                                     </ContentControl>
+                                                    
                                                     <ContentControl>
                                                         <TextBlock
                                                             Text="{Binding Sum}"
@@ -667,6 +746,7 @@
                                     </ItemsControl>
                                 </Grid>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
                                 <Grid>
                                     <!-- Main question content (text, image, video, treble clef) -->
@@ -735,23 +815,27 @@
                                     </ContentControl>
                                 </Grid>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Answer}">
                                 <Border Background="#55000000" Margin="0,40">
                                     <TextBlock Text="{Binding Text}" Style="{StaticResource QuestionText}" />
                                 </Border>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Special}">
                                 <Grid ClipToBounds="True" Width="{Binding RelativeSource={RelativeSource TemplatedParent},Path=ActualWidth}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="33*" />
                                         <ColumnDefinition Width="67*" />
                                     </Grid.ColumnDefinitions>
+                                    
                                     <ItemsControl ItemsSource="{Binding RoundInfo}" Grid.Column="0" Margin="-1,0,0,0">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Columns="1" Margin="0,0,-1,-1" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                        
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Style="{StaticResource SIThemeBorder2}">
@@ -760,11 +844,13 @@
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
+                                    
                                     <ContentControl Style="{StaticResource Rotator}" Grid.Column="1">
                                         <TextBlock Style="{StaticResource RotatingText}" />
                                     </ContentControl>
                                 </Grid>
                             </DataTemplate>
+                            
                             <DataTemplate x:Key="{x:Static vm:TableStage.Final}">
                                 <ItemsControl ItemsSource="{Binding RoundInfo}" Margin="20" lb:SelectionBehavior.IsSelectable="{Binding Selectable}">
                                     <ItemsControl.ItemsPanel>
@@ -772,6 +858,7 @@
                                             <UniformGrid Columns="1" />
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
+                                    
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Button Name="But" Style="{StaticResource SIThemeButton}" />
@@ -790,16 +877,19 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <UserControl.Background>
         <RadialGradientBrush>
             <GradientStop
                 Color="{Binding Settings.Model.TableBackColorString, Converter={StaticResource ColorConverter}}"
                 Offset="0" />
+            
             <GradientStop
                 Color="{Binding Settings.Model.TableBackColorString}"
                 Offset="1" />
         </RadialGradientBrush>
     </UserControl.Background>
+    
     <Grid>
         <ContentControl
             HorizontalContentAlignment="Stretch"
@@ -808,6 +898,7 @@
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                    
                     <Style.Triggers>
                         <DataTrigger
                             Binding="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource NotNullOrEmptyConverter}}"
@@ -822,6 +913,7 @@
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
+
                         <DataTrigger
                             Binding="{Binding Settings.Model.BackgroundVideoUri, Converter={StaticResource NotNullOrEmptyConverter}}"
                             Value="true">

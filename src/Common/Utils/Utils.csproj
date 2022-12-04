@@ -10,8 +10,9 @@
 	  <SignAssembly>True</SignAssembly>
 	  <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
 	  <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
+	
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
 		<DebugType>none</DebugType>
 		<DebugSymbols>false</DebugSymbols>

@@ -48,7 +48,7 @@ namespace SIEngine
                 case GameStage.Begin:
                     #region Begin
                     Stage = GameStage.GameThemes;
-                    OnPackage(_document.Package);
+                    OnPackage(_document.Package, _document.GetLogoLink());
                     break;
                     #endregion
 

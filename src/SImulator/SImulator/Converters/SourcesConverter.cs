@@ -2,29 +2,33 @@
 using System.Text;
 using System.Windows.Data;
 using System.Collections;
+using System.Globalization;
 
-namespace SImulator.Converters
+namespace SImulator.Converters;
+
+public sealed class SourcesConverter : IValueConverter
 {
-    public sealed class SourcesConverter : IValueConverter
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (value is not IEnumerable sources)
         {
-            if (!(value is IEnumerable sources))
-                return null;
+            return null;
+        }
 
-            var result = new StringBuilder();
-            foreach (var item in sources)
+        var result = new StringBuilder();
+
+        foreach (var item in sources)
+        {
+            if (result.Length > 0)
             {
-                if (result.Length > 0)
-                    result.Append(", ");
-                result.Append(item);
+                result.Append(", ");
             }
-            return result;
+
+            result.Append(item);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        return result;
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 }

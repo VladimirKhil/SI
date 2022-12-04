@@ -10,6 +10,8 @@
     <Company>Khil-soft</Company>
     <Version>5.7.8</Version>
     <Copyright>Copyright © Khil-soft 2009 - 2022</Copyright>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />

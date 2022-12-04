@@ -29,7 +29,7 @@ namespace SICore
 
         private readonly CancellationTokenSource _cancellation = new();
 
-        private readonly LocalFileManager _localFileManager = new();
+        private readonly ILocalFileManager _localFileManager = new LocalFileManager();
 
         protected readonly ViewerActions _viewerActions;
 
@@ -58,6 +58,8 @@ namespace SICore
 
             //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
             //ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
+
+            _localFileManager.Start(_cancellation.Token);
         }
 
         private void TInfo_MediaLoadError(Exception exc)
@@ -204,7 +206,7 @@ namespace SICore
         /// <param name="text">сообщение</param>
         public void OnReplic(string replicCode, string text)
         {
-            string logString = null;
+            string? logString = null;
 
             if (replicCode == ReplicCodes.Showman.ToString())
             {
@@ -795,7 +797,7 @@ namespace SICore
             switch (atomType)
             {
                 case AtomTypes.Audio:
-                    string uri = null;
+                    string uri;
 
                     switch (mparams[2])
                     {
@@ -1380,8 +1382,7 @@ namespace SICore
                     e => _data.OnAddString(
                         null,
                         $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
-                        LogMode.Log),
-                    _cancellation.Token);
+                        LogMode.Log));
             }
         }
     }

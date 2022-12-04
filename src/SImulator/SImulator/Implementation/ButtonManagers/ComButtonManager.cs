@@ -21,7 +21,7 @@ namespace SImulator.Implementation.ButtonManagers
             _comPort.DataReceived += ComPort_DataReceived;
         }
 
-        public override bool Run()
+        public override bool Start()
         {
             try
             {

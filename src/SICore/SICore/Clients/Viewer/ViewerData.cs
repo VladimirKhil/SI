@@ -244,7 +244,7 @@ namespace SICore
         /// </summary>
         public Action<string> MessageSending { get; set; }
 
-        public event Action<string, string, LogMode> StringAdding;
+        public event Action<string?, string, LogMode> StringAdding;
 
         private List<PlayerAccount> _players = new();
 
@@ -466,7 +466,7 @@ namespace SICore
             OnAddString(message.Sender, message.Text, LogMode.Chat + index);
         }
 
-        public override void OnAddString(string person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
+        public override void OnAddString(string? person, string text, LogMode mode) => StringAdding?.Invoke(person, text, mode);
 
         private bool _autoReady = false;
 

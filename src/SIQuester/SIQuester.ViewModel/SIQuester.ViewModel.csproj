@@ -7,6 +7,8 @@
     <Description>SIQuester business logic</Description>
     <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
     <Version>5.7.8</Version>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>portable</DebugType>

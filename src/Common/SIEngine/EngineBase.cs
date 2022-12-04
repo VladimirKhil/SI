@@ -40,29 +40,37 @@ namespace SIEngine
         protected readonly SIDocument _document;
 
         protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0, _atomIndex = 0;
+
         protected bool _isMedia;
 
         protected Round _activeRound;
+
         protected Theme _activeTheme;
+
         protected Question _activeQuestion;
 
         protected bool _inAutoMode;
-        protected object _autoLock = new object();
+
+        protected object _autoLock = new();
 
         protected bool _timeout = false;
 
         protected bool _useAnswerMarker = false;
 
         private bool _canMoveNext = true;
+
         private bool _canMoveBack;
 
         private bool _canMoveNextRound;
+
         private bool _canMoveBackRound;
 
         public string PackageName => _document.Package.Name;
 
         public int RoundIndex => _roundIndex;
+
         public int ThemeIndex => _themeIndex;
+
         public int QuestionIndex => _questionIndex;
 
         private Atom ActiveAtom => _atomIndex < _activeQuestion.Scenario.Count ? _activeQuestion.Scenario[_atomIndex] : null;
@@ -157,7 +165,7 @@ namespace SIEngine
 
         #region Events
 
-        public event Action<Package> Package;
+        public event Action<Package, IMedia> Package;
         public event Action<string[]> GameThemes;
         public event Action<bool> NextRound;
         public event Action<Round> Round;
@@ -214,7 +222,7 @@ namespace SIEngine
 
         #region Fire events
 
-        protected void OnPackage(Package package) => Package?.Invoke(package);
+        protected void OnPackage(Package package, IMedia packageLogo) => Package?.Invoke(package, packageLogo);
 
         protected void OnGameThemes(string[] gameThemes) => GameThemes?.Invoke(gameThemes);
 
@@ -682,10 +690,13 @@ namespace SIEngine
         private string CollectText(string atomType = AtomTypes.Text)
         {
             var text = new StringBuilder();
+
             while (ActiveAtom != null && ActiveAtom.Type == atomType)
             {
                 if (text.Length > 0)
+                {
                     text.AppendLine();
+                }
 
                 text.Append(ActiveAtom.Text);
 
@@ -720,7 +731,7 @@ namespace SIEngine
         /// Задать дополнительные изображение или текст к текущему элементу
         /// </summary>
         /// <returns></returns>
-        private Tuple<IMedia, string> GetBackgroundImageOrText()
+        private Tuple<IMedia?, string?> GetBackgroundImageOrText()
         {
             if (ActiveAtom != null && ActiveAtom.AtomTime == -1 && _atomIndex + 1 < _activeQuestion.Scenario.Count) // Объединить со следующим
             {
@@ -731,12 +742,12 @@ namespace SIEngine
 
                     var media = GetMedia();
                     if (media != null)
-                        return Tuple.Create(media, (string)null);
+                        return Tuple.Create((IMedia?)media, (string?)null);
                 }
                 else if (nextAtom.Type == AtomTypes.Text)
                 {
                     _atomIndex++;
-                    return Tuple.Create((IMedia)null, CollectText());
+                    return Tuple.Create((IMedia?)null, (string?)CollectText());
                 }
             }
 

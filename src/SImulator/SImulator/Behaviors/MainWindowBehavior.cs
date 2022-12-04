@@ -2,44 +2,42 @@
 using SImulator.ViewModel.Core;
 using System.Windows;
 
-namespace SImulator.Behaviors
+namespace SImulator.Behaviors;
+
+public static class MainWindowBehavior
 {
-    public static class MainWindowBehavior
+    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
+
+    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
+
+    // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty IsAttachedProperty =
+        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(MainWindowBehavior), new UIPropertyMetadata(false, IsAttachedChanged));
+
+    private static void IsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        public static bool GetIsAttached(DependencyObject obj)
+        if (d is not MainWindow window)
         {
-            return (bool)obj.GetValue(IsAttachedProperty);
+            return;
         }
 
-        public static void SetIsAttached(DependencyObject obj, bool value)
+        if ((bool)e.NewValue)
         {
-            obj.SetValue(IsAttachedProperty, value);
+            window.PreviewKeyDown += Window_PreviewKeyDown;
         }
-
-        // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IsAttachedProperty =
-            DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(MainWindowBehavior), new UIPropertyMetadata(false, IsAttachedChanged));
-
-        private static void IsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        else
         {
-            if (!(d is MainWindow window))
-                return;
-
-            if ((bool)e.NewValue)
-            {
-                window.PreviewKeyDown += Window_PreviewKeyDown;
-            }
-            else
-            {
-                window.PreviewKeyDown -= Window_PreviewKeyDown;
-            }
+            window.PreviewKeyDown -= Window_PreviewKeyDown;
         }
+    }
 
-        private static void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    private static void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        var window = (MainWindow)sender;
+
+        if (window.DataContext is RemoteGameUI remoteGameUI)
         {
-            var window = (MainWindow)sender;
-            if (window.DataContext is RemoteGameUI remoteGameUI)
-                e.Handled = remoteGameUI.OnKeyPressed((GameKey)e.Key);
+            e.Handled = remoteGameUI.OnKeyPressed((GameKey)e.Key);
         }
     }
 }

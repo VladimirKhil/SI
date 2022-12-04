@@ -1,13 +1,12 @@
-﻿namespace SIUI.Model
+﻿namespace SIUI.Model;
+
+/// <summary>
+/// Defines question information.
+/// </summary>
+public sealed class QuestionInfo
 {
     /// <summary>
-    /// Defines question information.
+    /// Question price.
     /// </summary>
-    public sealed class QuestionInfo
-    {
-        /// <summary>
-        /// Question price.
-        /// </summary>
-        public int Price { get; set; } = -1;
-    }
+    public int Price { get; set; } = -1;
 }

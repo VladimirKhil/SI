@@ -1,46 +1,44 @@
 ﻿using SIUI.Model;
-using System.Threading.Tasks;
 
-namespace SIUI.ViewModel
+namespace SIUI.ViewModel;
+
+/// <summary>
+/// Defines question information view model.
+/// </summary>
+public sealed class QuestionInfoViewModel : ViewModelBase<QuestionInfo>
 {
+    private QuestionInfoStages _state = QuestionInfoStages.None;
+
     /// <summary>
-    /// Defines question information view model.
+    /// Question price.
     /// </summary>
-    public sealed class QuestionInfoViewModel : ViewModelBase<QuestionInfo>
+    public int Price
     {
-        private QuestionInfoStages _state = QuestionInfoStages.None;
+        get => _model.Price;
+        set { _model.Price = value; OnPropertyChanged(); }
+    }
 
-        /// <summary>
-        /// Question price.
-        /// </summary>
-        public int Price
-        {
-            get => _model.Price;
-            set { _model.Price = value; OnPropertyChanged(); }
-        }
+    public QuestionInfoStages State
+    {
+        get => _state;
+        set { _state = value; OnPropertyChanged(); }
+    }
 
-        public QuestionInfoStages State
-        {
-            get => _state;
-            set { _state = value; OnPropertyChanged(); }
-        }
+    public QuestionInfoViewModel()
+    {
+        
+    }
 
-        public QuestionInfoViewModel()
-        {
-            
-        }
+    public QuestionInfoViewModel(QuestionInfo questionInfo) : this()
+    {
+        _model = questionInfo;
+    }
 
-        public QuestionInfoViewModel(QuestionInfo questionInfo) : this()
-        {
-            _model = questionInfo;
-        }
+    internal async Task SilentFlashOutAsync()
+    {
+        await Task.Delay(500);
 
-        internal async Task SilentFlashOutAsync()
-        {
-            await Task.Delay(500);
-
-            _state = QuestionInfoStages.None;
-            _model.Price = -1;
-        }
+        _state = QuestionInfoStages.None;
+        _model.Price = -1;
     }
 }

@@ -43,6 +43,8 @@ namespace SIGame.ViewModel.PackageSources
         {
             var response = await Client.GetAsync(_packageUri, cancellationToken);
 
+            response.EnsureSuccessStatusCode();
+
             var fileName = Path.GetTempFileName();
             using (var fs = File.OpenWrite(fileName))
             using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))

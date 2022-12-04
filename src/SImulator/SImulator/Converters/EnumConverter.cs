@@ -1,39 +1,48 @@
 ﻿using SImulator.Properties;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows.Data;
 
-namespace SImulator.Converters
+namespace SImulator.Converters;
+
+/// <summary>
+/// Converts an enum value to its localized or unlocalized description.
+/// </summary>
+[ValueConversion(typeof(Enum), typeof(string))]
+public sealed class EnumConverter : IValueConverter
 {
-    [ValueConversion(typeof(Enum), typeof(string))]
-    public sealed class EnumConverter : IValueConverter
+    public Type? EnumType { get; set; }
+
+    public bool IsLocalized { get; set; } = true;
+
+    public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public Type EnumType { get; set; }
-        public bool IsLocalized { get; set; } = true;
+        var enumName = value?.ToString();
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (value == null)
-                return null;
-
-            var field = EnumType.GetField(value.ToString());
-            if (field == null)
-                return value.ToString();
-
-            var description = (DisplayAttribute)Attribute.GetCustomAttribute(field, typeof(DisplayAttribute));
-
-            return description != null ?
-                (IsLocalized ? Resources.ResourceManager.GetString(description.Description) : description.Description) :
-                value.ToString();
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (enumName == null)
         {
             return null;
         }
+
+        if (EnumType == null)
+        {
+            throw new InvalidOperationException("EnumType is undefined");
+        }
+
+        var field = EnumType.GetField(enumName);
+
+        if (field == null)
+        {
+            return enumName;
+        }
+
+        var description = (DisplayAttribute?)Attribute.GetCustomAttribute(field, typeof(DisplayAttribute));
+
+        return description?.Description != null ?
+            (IsLocalized ? Resources.ResourceManager.GetString(description.Description) : description.Description) :
+            enumName;
     }
+
+    public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => null;
 }

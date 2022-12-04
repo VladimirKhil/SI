@@ -225,12 +225,12 @@ namespace SIUI.ViewModel
         public event Action<QuestionInfoViewModel> QuestionSelected;
         public event Action<ThemeInfoViewModel> ThemeSelected;
 
-        public void SelectQuestion_Executed(object arg)
+        public void SelectQuestion_Executed(object? arg)
         {
             QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
         }
 
-        public void SelectTheme_Executed(object arg)
+        public void SelectTheme_Executed(object? arg)
         {
             ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
         }

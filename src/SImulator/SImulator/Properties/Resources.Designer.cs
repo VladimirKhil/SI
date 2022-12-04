@@ -61,6 +61,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ответ.
+        /// </summary>
+        internal static string Answer {
+            get {
+                return ResourceManager.GetString("Answer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Аудио.
+        /// </summary>
+        internal static string Audio {
+            get {
+                return ResourceManager.GetString("Audio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику..
         /// </summary>
         internal static string CommonAppError {
@@ -115,6 +133,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на HTML.
+        /// </summary>
+        internal static string Html {
+            get {
+                return ResourceManager.GetString("Html", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Изображение.
+        /// </summary>
+        internal static string Image {
+            get {
+                return ResourceManager.GetString("Image", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка завершения прослушивания клавиатуры.
         /// </summary>
         internal static string KeyboardDetachError {
@@ -156,6 +192,15 @@ namespace SImulator.Properties {
         internal static string NavigateToSiteError {
             get {
                 return ResourceManager.GetString("NavigateToSiteError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Устный текст.
+        /// </summary>
+        internal static string Oral {
+            get {
+                return ResourceManager.GetString("Oral", resourceCulture);
             }
         }
         
@@ -237,6 +282,24 @@ namespace SImulator.Properties {
         internal static string TestPackage {
             get {
                 return ResourceManager.GetString("TestPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Неизвестный тип.
+        /// </summary>
+        internal static string UnknownType {
+            get {
+                return ResourceManager.GetString("UnknownType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Видео.
+        /// </summary>
+        internal static string Video {
+            get {
+                return ResourceManager.GetString("Video", resourceCulture);
             }
         }
         

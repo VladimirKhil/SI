@@ -1,34 +1,33 @@
-﻿namespace SImulator.ViewModel.Core
+﻿namespace SImulator.ViewModel.Core;
+
+/// <summary>
+/// Provides callback methods for game UI.
+/// </summary>
+public interface IGameHost
 {
-    /// <summary>
-    /// Provides callback methods for game UI.
-    /// </summary>
-    public interface IGameHost
-    {
-        void OnQuestionSelected(int theme, int question);
+    void OnQuestionSelected(int theme, int question);
 
-        void OnThemeSelected(int themeIndex);
+    void OnThemeSelected(int themeIndex);
 
-        void AskNext();
+    void AskNext();
 
-        void AskBack();
+    void AskBack();
 
-        void AskNextRound();
+    void AskNextRound();
 
-        void AskBackRound();
+    void AskBackRound();
 
-        void AskStop();
+    void AskStop();
 
-        void OnReady();
+    void OnReady();
 
-        void OnMediaStart();
+    void OnMediaStart();
 
-        void OnMediaEnd();
+    void OnMediaEnd();
 
-        void OnMediaProgress(double progress);
+    void OnMediaProgress(double progress);
 
-        void OnIntroFinished();
+    void OnIntroFinished();
 
-        void OnRoundThemesFinished();
-    }
+    void OnRoundThemesFinished();
 }

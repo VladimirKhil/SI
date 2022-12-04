@@ -25,7 +25,7 @@ namespace SImulator.Implementation.ButtonManagers
             _callbackPtr = new Win32.LowLevelKeyboardProcDelegate(KeyboardHookHandler);
         }
 
-        public override bool Run()
+        public override bool Start()
         {
             using (var process = Process.GetCurrentProcess())
             using (var module = process.MainModule)

@@ -3,28 +3,25 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace SImulator.Behaviors
+namespace SImulator.Behaviors;
+
+public static class TipBehavior
 {
-    public static class TipBehavior
+    public static UIElement GetTip(DependencyObject obj) => (UIElement)obj.GetValue(TipProperty);
+
+    public static void SetTip(DependencyObject obj, UIElement value) => obj.SetValue(TipProperty, value);
+
+    public static readonly DependencyProperty TipProperty =
+        DependencyProperty.RegisterAttached("Tip", typeof(UIElement), typeof(TipBehavior), new PropertyMetadata(null, TipChanged));
+
+    private static void TipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        public static UIElement GetTip(DependencyObject obj)
-        {
-            return (UIElement)obj.GetValue(TipProperty);
-        }
+        var button = (Button)d;
 
-        public static void SetTip(DependencyObject obj, UIElement value)
+        var popup = new Popup
         {
-            obj.SetValue(TipProperty, value);
-        }
-
-        // Using a DependencyProperty as the backing store for Tip.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty TipProperty =
-            DependencyProperty.RegisterAttached("Tip", typeof(UIElement), typeof(TipBehavior), new PropertyMetadata(null, TipChanged));
-
-        private static void TipChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var button = (Button)d;
-            var popup = new Popup { Focusable = true, Child = new Border
+            Focusable = true,
+            Child = new Border
             {
                 Background = Brushes.WhiteSmoke, 
                 BorderThickness = new Thickness(1.0),
@@ -32,20 +29,22 @@ namespace SImulator.Behaviors
                 Padding = new Thickness(6.0, 3.0, 6.0, 3.0),
                 Child = (UIElement)e.NewValue,
                 MaxWidth = 400.0
-            }, PlacementTarget = button, Placement = PlacementMode.Mouse,
-            StaysOpen = false};
+            },
+            PlacementTarget = button,
+            Placement = PlacementMode.Mouse,
+            StaysOpen = false
+        };
 
-            TextBlock.SetFontSize(popup, 12.0);
+        TextBlock.SetFontSize(popup, 12.0);
 
-            popup.LostFocus += (sender2, e3) =>
-                {
-                    popup.IsOpen = false;
-                };
+        popup.LostFocus += (sender2, e3) =>
+        {
+            popup.IsOpen = false;
+        };
 
-            button.Click += (sender, e2) =>
-            {
-                popup.IsOpen = true;
-            };
-        }
+        button.Click += (sender, e2) =>
+        {
+            popup.IsOpen = true;
+        };
     }
 }

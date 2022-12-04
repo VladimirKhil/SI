@@ -147,8 +147,6 @@ namespace SIGame
 
                 if (Environment.OSVersion.Version < new Version(10, 0))
                 {
-                    ServicePointManager.Expect100Continue = true;
-
                     try
                     {
                         ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls

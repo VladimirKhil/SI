@@ -15,7 +15,7 @@ namespace SImulator.ViewModel.Tests
 {
     internal sealed class TestPlatformManager : PlatformManager
     {
-        public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManager();
+        public override ButtonManagerFactory ButtonManagerFactory { get; } = new TestButtonManagerFactory();
 
         public override string AskSelectColor()
         {
@@ -101,11 +101,6 @@ namespace SImulator.ViewModel.Tests
         public override void PlaySound(string name, Action onFinish)
         {
             
-        }
-
-        public override Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
         }
 
         public override void ShowMessage(string text, bool error = true) => Assert.Fail(text);

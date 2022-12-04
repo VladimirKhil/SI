@@ -9,7 +9,7 @@ namespace SIData
     public class FileKey
     {
         /// <summary>
-        /// Fine name.
+        /// File name.
         /// </summary>
         public string Name { get; set; }
 

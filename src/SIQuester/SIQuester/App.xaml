@@ -1311,7 +1311,7 @@
                                                         </MenuItem>
                                                     </Menu>
 
-                                                    <!--<Menu Style="{StaticResource MenuMenu}">
+                                                    <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Command="{Binding SelectAtomObject}"
                                                             CommandParameter="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}"
@@ -1319,7 +1319,7 @@
                                                             Header="{StaticResource AddHtmlImage}"
                                                             Style="{StaticResource MenuMenuHeader}">
                                                         </MenuItem>
-                                                    </Menu>-->
+                                                    </Menu>
 
                                                     <Button
                                                         ToolTip="Добавить маркер ответа"
@@ -1467,7 +1467,7 @@
                                                             </MenuItem>
                                                         </Menu>
 
-                                                        <!--<Menu
+                                                        <Menu
                                                             Style="{StaticResource MenuMenu}"
                                                             Visibility="{Binding IsRight, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem
@@ -1477,7 +1477,7 @@
                                                                 Header="{StaticResource AddHtmlImage}"
                                                                 Style="{StaticResource MenuMenuHeader}">
                                                             </MenuItem>
-                                                        </Menu>-->
+                                                        </Menu>
                                                     </StackPanel>
                                                     
                                                     <Button

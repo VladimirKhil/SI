@@ -12,6 +12,8 @@
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
     <Version>5.7.8</Version>
     <UseWPF>true</UseWPF>
+	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>portable</DebugType>

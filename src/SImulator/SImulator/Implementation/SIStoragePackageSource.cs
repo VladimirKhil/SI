@@ -1,75 +1,50 @@
-﻿using SImulator.Implementation.WinAPI;
-using SImulator.ViewModel;
-using SImulator.ViewModel.PlatformSpecific;
+﻿using SImulator.ViewModel.PlatformSpecific;
 using SIStorageService.Client.Models;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
-namespace SImulator.Implementation
+namespace SImulator.Implementation;
+
+/// <summary>
+/// Defines a SIStorage-based package source.
+/// </summary>
+internal sealed class SIStoragePackageSource : IPackageSource
 {
-    internal sealed class SIStoragePackageSource : IPackageSource
+    private readonly PackageInfo _package;
+    private readonly Uri _packageUri;
+
+    private static readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
+
+    public string Name => _package.Description ?? "";
+
+    public string Token => "";
+
+    public SIStoragePackageSource(PackageInfo package, Uri packageUri)
     {
-        private readonly PackageInfo _package;
-        private readonly Uri _packageUri;
-
-        private static readonly HttpClient _client = new();
-
-        public string Name => _package.Description;
-
-        public string Token => "";
-
-        public SIStoragePackageSource(PackageInfo package, Uri packageUri)
-        {
-            _package = package;
-            _packageUri = packageUri;
-        }
-
-        public async Task<Stream> GetPackageAsync()
-        {
-            ProgressDialog progress = null;
-            try
-            {
-                if (Environment.OSVersion.Version.Major >= 6)
-                {
-                    progress = new ProgressDialog { Title = MainViewModel.ProductName };
-
-                    progress.SetLine(1, "Загрузка файла…", false);
-                    progress.Start(ProgressDialog.ProgressDialogFlags.MarqueeProgress | ProgressDialog.ProgressDialogFlags.NoCancel | ProgressDialog.ProgressDialogFlags.NoMinimize);
-                }
-                
-                using var response = await _client.GetAsync(_packageUri);
-
-                var stream = new MemoryStream();
-                using (var s = await response.Content.ReadAsStreamAsync())
-                {
-                    await s.CopyToAsync(stream);
-                }
-
-                return stream;
-
-            }
-            catch (Exception exc)
-            {
-                if (progress != null)
-                {
-                    progress.Stop();
-                    progress = null;
-                }
-
-                MessageBox.Show(string.Format("Ошибка работы с библиотекой вопросов: {0}", exc.ToString()), MainViewModel.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-            finally
-            {
-                if (progress != null)
-                    progress.Stop();
-            }
-
-            return null;
-        }
-
-        public override string ToString() => Name;
+        _package = package;
+        _packageUri = packageUri;
     }
+
+    public async Task<(string filePath, bool isTemporary)> GetPackageFileAsync(CancellationToken cancellationToken = default)
+    {
+        using var response = await _client.GetAsync(_packageUri, cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        var fileName = Path.GetTempFileName();
+
+        using (var stream = File.OpenWrite(fileName))
+        using (var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken))
+        {
+            await responseStream.CopyToAsync(stream, cancellationToken);
+        }
+
+        return (fileName, true);
+    }
+
+    public override string ToString() => Name;
 }

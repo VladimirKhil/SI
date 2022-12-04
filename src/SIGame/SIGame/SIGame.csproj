@@ -11,6 +11,8 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+	<Nullable>enable</Nullable>
+	<!--<ImplicitUsings>enable</ImplicitUsings> Get rid of Windows Forms dependency to enable this-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugType>portable</DebugType>

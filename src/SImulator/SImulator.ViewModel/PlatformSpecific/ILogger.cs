@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace SImulator.ViewModel.PlatformSpecific;
 
-namespace SImulator.ViewModel.PlatformSpecific
+public interface ILogger : IDisposable
 {
-    public interface ILogger : IDisposable
-    {
-        void Write(string message, params object[] args);
-    }
+    void Write(string message, params object[] args);
 }

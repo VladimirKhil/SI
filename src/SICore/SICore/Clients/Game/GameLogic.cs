@@ -157,9 +157,10 @@ namespace SICore
             ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
         }
 
-        private void Engine_Package(Package package)
+        private void Engine_Package(Package package, IMedia packageLogo)
         {
             _data.Package = package;
+            _data.PackageLogo = packageLogo;
 
             _data.Rounds = _data.Package.Rounds
                 .Select((round, index) => (round, index))
@@ -4057,7 +4058,7 @@ namespace SICore
                     _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
                     informed = true;
 
-                    var logoLink = _data.PackageDoc.GetLogoLink();
+                    var logoLink = _data.PackageLogo;
 
                     if (logoLink.GetStream != null)
                     {

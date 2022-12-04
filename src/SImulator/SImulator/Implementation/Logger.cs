@@ -12,9 +12,10 @@ namespace SImulator.Implementation
 
         }
 
-        public static Logger Create(string filename)
+        public static Logger Create(string? filename)
         {
             var logger = new Logger();
+
             if (filename != null)
             {
                 logger._writer = new StreamWriter(filename) { AutoFlush = true };

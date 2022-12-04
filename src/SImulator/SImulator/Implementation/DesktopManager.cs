@@ -6,7 +6,6 @@ using SImulator.ViewModel;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
-using SIPackages.Core;
 using SIStorageService.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -36,17 +34,15 @@ namespace SImulator.Implementation
 
         public IServiceProvider ServiceProvider { get; set; }
 
-        private Window _window = null;
-        private PlayersWindow _playersWindow = null;
+        private Window? _window = null;
+        private PlayersWindow? _playersWindow = null;
         private readonly ButtonManagerFactoryDesktop _buttonManager = new();
 
-        private MediaTimeline _mediaTimeline = null;
-        private MediaClock _mediaClock = null;
-        private MediaPlayer _player = null;
+        private MediaTimeline? _mediaTimeline = null;
+        private MediaClock? _mediaClock = null;
+        private MediaPlayer? _player = null;
 
-        private readonly List<string> _mediaFiles = new();
-
-        internal static XmlSerializer SettingsSerializer = new(typeof(AppSettings));
+        internal static XmlSerializer SettingsSerializer { get; } = new(typeof(AppSettings));
 
         public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
 
@@ -127,6 +123,7 @@ namespace SImulator.Implementation
             var list = new List<string>();
 
             var current = Dns.GetHostName().ToUpper();
+
             using (var root = new DirectoryEntry("WinNT:"))
             {
                 foreach (DirectoryEntry dom in root.Children)
@@ -237,6 +234,7 @@ namespace SImulator.Implementation
         public override string AskSelectColor()
         {
             var diag = new System.Windows.Forms.ColorDialog();
+
             if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var color = diag.Color;
@@ -250,6 +248,7 @@ namespace SImulator.Implementation
         public override Task<string> AskSelectFileAsync(string header)
         {
             var dialog = new OpenFileDialog { Title = header };
+
             if (dialog.ShowDialog().Value)
             {
                 return Task.FromResult(dialog.FileName);
@@ -258,7 +257,7 @@ namespace SImulator.Implementation
             return Task.FromResult<string>(null);
         }
 
-        public override string AskSelectLogsFolder()
+        public override string? AskSelectLogsFolder()
         {
             using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = Resources.SelectLogsFolder })
             {
@@ -355,81 +354,21 @@ namespace SImulator.Implementation
             return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
         }
 
-        public override async Task<IMedia> PrepareMediaAsync(IMedia media, CancellationToken cancellationToken = default)
-        {
-            if (media.GetStream == null) // It is a link to the external file
-            {
-                return media;
-            }
-
-            // It is a file itself
-            var fileName = Path.Combine(Path.GetTempPath(), new Random().Next() + media.Uri);
-
-            try
-            {
-                var streamInfo = media.GetStream();
-                if (streamInfo == null)
-                {
-                    return null;
-                }
-
-                // WPF can show media only from local file, not from memory
-                // So we need to copy this file to disk
-                using (streamInfo.Stream)
-                {
-                    using var fs = File.Create(fileName);
-                    await streamInfo.Stream.CopyToAsync(fs, StreamCopyBufferSize, cancellationToken);
-                }
-            }
-            catch (IOException exc)
-            {
-                ShowMessage(exc.Message);
-                return null;
-            }
-            catch (InvalidDataException exc)
-            {
-                ShowMessage(exc.Message);
-                return null;
-            }
-            catch (IndexOutOfRangeException exc)
-            {
-                ShowMessage(exc.Message);
-                return null;
-            }
-
-            _mediaFiles.Add(fileName);
-
-            return new Media(fileName);
-        }
-
         public override void ClearMedia()
         {
-            foreach (var file in _mediaFiles)
+            if (_mediaClock == null)
             {
-                try
-                {
-                    if (File.Exists(file))
-                    {
-                        File.Delete(file);
-                    }
-                }
-                catch (Exception exc)
-                {
-                    ShowMessage(string.Format(Resources.FileDeletionError, exc.Message));
-                }
+                return;
             }
 
-            if (_mediaClock != null)
+            if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
             {
-                if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
-                {
-                    _mediaClock.Controller.Stop();
-                }
-
-                _mediaTimeline = null;
-                _mediaClock = null;
-                _player = null;
+                _mediaClock.Controller.Stop();
             }
+
+            _mediaTimeline = null;
+            _mediaClock = null;
+            _player = null;
         }
 
         public override void InitSettings(AppSettings defaultSettings)

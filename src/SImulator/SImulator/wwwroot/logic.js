@@ -1,8 +1,11 @@
 ﻿var disabledLocal = false;
 var disabledServer = false;
 
+var token = localStorage.getItem('token') || '';
+var userName = localStorage.getItem('userName') || '';
+
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/buttonHost")
+    .withUrl('/buttonHost')
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
     .build();
@@ -16,7 +19,7 @@ async function start() {
     try {
         await connection.start();
         console.log("SignalR Connected.");
-        document.getElementById('info').innerText = '';
+        document.getElementById('info').innerText = userName;
         updateButtonState();
     } catch (err) {
         console.error(err);
@@ -30,8 +33,14 @@ function buttonClick() {
 
     window.setTimeout(enableButton, 3000);
 
-    connection.invoke('press')
-        .then((res) => { document.getElementById('info').innerText = res; })
+    connection.invoke('press', token)
+        .then((res) => {
+            document.getElementById('info').innerText = res.userName;
+            token = res.token;
+
+            localStorage.setItem('userName', res.userName);
+            localStorage.setItem('token', res.token);
+        })
         .catch((err) => { document.getElementById('error').innerText = err.message; });
 }
 
@@ -43,5 +52,12 @@ function enableButton() {
 function updateButtonState() {
     document.getElementById('press').disabled = disabledLocal || disabledServer;
 }
+
+var noSleep = new NoSleep();
+
+document.addEventListener('click', function enableNoSleep() {
+    document.removeEventListener('click', enableNoSleep, false);
+    noSleep.enable();
+}, false);
 
 start();

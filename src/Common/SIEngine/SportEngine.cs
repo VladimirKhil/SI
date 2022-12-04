@@ -23,10 +23,7 @@ namespace SIEngine
             _activeTheme = _activeRound.Themes[_themeIndex];
         }
 
-        private void SetActiveQuestion()
-        {
-            _activeQuestion = _activeTheme.Questions[_questionIndex];
-        }
+        private void SetActiveQuestion() => _activeQuestion = _activeTheme.Questions[_questionIndex];
 
         /// <summary>
         /// Перейти к следующему шагу игры
@@ -38,7 +35,7 @@ namespace SIEngine
                 case GameStage.Begin:
                     #region Begin
                     //this.Stage = GameStage.GameThemes;
-                    OnPackage(_document.Package);
+                    OnPackage(_document.Package, _document.GetLogoLink());
 
                     MoveNextRound(false);
                     AutoNext(1000);

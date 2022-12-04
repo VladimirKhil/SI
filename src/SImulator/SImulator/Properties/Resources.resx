@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Answer" xml:space="preserve">
+    <value>Ответ</value>
+  </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Аудио</value>
+  </data>
   <data name="CommonAppError" xml:space="preserve">
     <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
   </data>
@@ -135,6 +141,12 @@
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Классическая</value>
   </data>
+  <data name="Html" xml:space="preserve">
+    <value>HTML</value>
+  </data>
+  <data name="Image" xml:space="preserve">
+    <value>Изображение</value>
+  </data>
   <data name="KeyboardDetachError" xml:space="preserve">
     <value>Ошибка завершения прослушивания клавиатуры</value>
   </data>
@@ -149,6 +161,9 @@
   </data>
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
+  </data>
+  <data name="Oral" xml:space="preserve">
+    <value>Устный текст</value>
   </data>
   <data name="OutOfMemoryError" xml:space="preserve">
     <value>Недостаточно памяти для выполнения программы!</value>
@@ -176,6 +191,12 @@
   </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="UnknownType" xml:space="preserve">
+    <value>Неизвестный тип</value>
+  </data>
+  <data name="Video" xml:space="preserve">
+    <value>Видео</value>
   </data>
   <data name="Window" xml:space="preserve">
     <value>Окно</value>

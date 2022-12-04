@@ -1,18 +1,19 @@
-﻿using System;
+﻿using System.Globalization;
 using System.Windows.Data;
 
-namespace SIUI.Converters
-{
-    public sealed class LogoConverter: IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return string.IsNullOrEmpty((string)value) ? "/SIUI;component/Resources/logo.png" : value;
-        }
+namespace SIUI.Converters;
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+/// <summary>
+/// Allows to use provided logo uri or the default logo uri.
+/// </summary>
+[ValueConversion(typeof(string), typeof(string))]
+public sealed class LogoConverter : IValueConverter
+{
+    private const string DefaultLogoUri = "/SIUI;component/Resources/logo.png";
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        string.IsNullOrEmpty((string)value) ? DefaultLogoUri : value;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

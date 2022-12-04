@@ -1,26 +1,25 @@
-﻿namespace SIEngine
+﻿namespace SIEngine;
+
+/// <summary>
+/// Implements SIGame engine allowing to play any SIGame package (<see cref="SIDocument" />).
+/// </summary>
+public interface ISIEngine
 {
-    /// <summary>
-    /// Implements SIGame engine allowing to play any SIGame package (<see cref="SIDocument" />).
-    /// </summary>
-    public interface ISIEngine
-    {
-        GameStage Stage { get; }
+    GameStage Stage { get; }
 
-        int LeftQuestionsCount { get; }
+    int LeftQuestionsCount { get; }
 
-        bool CanMoveBack { get; }
+    bool CanMoveBack { get; }
 
-        bool IsIntro();
+    bool IsIntro();
 
-        void OnIntroFinished();
+    void OnIntroFinished();
 
-        void MoveNext();
+    void MoveNext();
 
-        void SelectQuestion(int theme, int question);
+    void SelectQuestion(int theme, int question);
 
-        void SelectTheme(int publicThemeIndex);
+    void SelectTheme(int publicThemeIndex);
 
-        int OnReady(out bool more);
-    }
+    int OnReady(out bool more);
 }

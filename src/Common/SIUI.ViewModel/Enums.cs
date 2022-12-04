@@ -110,7 +110,12 @@ namespace SIUI.ViewModel
         /// Html content.
         /// </summary>
         [EnumMember]
-        Html
+        Html,
+        /// <summary>
+        /// Loading content mode.
+        /// </summary>
+        [EnumMember]
+        Loading
     }
 
     /// <summary>

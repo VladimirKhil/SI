@@ -21,312 +21,319 @@ using System.Windows;
 using Utils;
 using Settings = SImulator.ViewModel.Model.AppSettings;
 
-namespace SImulator
+namespace SImulator;
+
+/// <summary>
+/// Provides interaction logic for App.xaml.
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Provides interaction logic for App.xaml.
-    /// </summary>
-    public partial class App : Application
-    {
-        private IHost _host;
+    private IHost? _host;
 
 #pragma warning disable IDE0052
-        private readonly DesktopManager _manager = new();
+    private readonly DesktopManager _manager = new();
 #pragma warning restore IDE0052
 
-        /// <summary>
-        /// User settings configuration file name.
-        /// </summary>
-        private const string ConfigFileName = "user.config";
+    /// <summary>
+    /// User settings configuration file name.
+    /// </summary>
+    private const string ConfigFileName = "user.config";
 
-        internal Settings Settings { get; } = LoadSettings();
+    internal Settings Settings { get; } = LoadSettings();
 
-        private IConfiguration _configuration;
+    private IConfiguration? _configuration;
 
-        private bool _useAppService;
+    private bool _useAppService;
 
-        private async void Application_Startup(object sender, StartupEventArgs e)
-        {
-            _host = new HostBuilder()
+    private async void Application_Startup(object sender, StartupEventArgs e)
+    {
+        _host = new HostBuilder()
 #if DEBUG
-                .UseEnvironment("Development")
+            .UseEnvironment("Development")
 #endif
-                .ConfigureAppConfiguration((context, configurationBuilder) =>
-                {
-                    var env = context.HostingEnvironment;
-
-                    configurationBuilder
-                        .SetBasePath(context.HostingEnvironment.ContentRootPath)
-                        .AddJsonFile("appsettings.json", optional: true)
-                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-                    _configuration = configurationBuilder.Build();
-                })
-                .ConfigureServices(ConfigureServices)
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
-                })
-                .UseNLog()
-                .Build();
-
-            await _host.StartAsync();
-
-            _manager.ServiceProvider = _host.Services;
-
-            var options = _configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
-            var appServiceClientOptions = options.Get<AppServiceClientOptions>();
-
-            _useAppService = appServiceClientOptions.ServiceUri != null;
-        }
-
-        private void ConfigureServices(IServiceCollection services)
-        {
-            services.AddAppServiceClient(_configuration);
-            services.AddSIStorageServiceClient(_configuration);
-
-            services.AddTransient(typeof(SIStorage));
-
-            services.AddTransient<CommandWindow>();
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-
-            UI.Initialize();
-
-            var main = new MainViewModel(Settings);
-
-            if (e.Args.Length > 0)
+            .ConfigureAppConfiguration((context, configurationBuilder) =>
             {
-                main.PackageSource = new FilePackageSource(e.Args[0]);
-            }
+                var env = context.HostingEnvironment;
+
+                configurationBuilder
+                    .SetBasePath(context.HostingEnvironment.ContentRootPath)
+                    .AddJsonFile("appsettings.json", optional: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                _configuration = configurationBuilder.Build();
+            })
+            .ConfigureServices(ConfigureServices)
+            .ConfigureLogging((hostingContext, logging) =>
+            {
+                NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
+            })
+            .UseNLog()
+            .Build();
+
+        await _host.StartAsync();
+
+        _manager.ServiceProvider = _host.Services;
+
+        var options = _configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
+        var appServiceClientOptions = options.Get<AppServiceClientOptions>();
+
+        _useAppService = appServiceClientOptions.ServiceUri != null;
+    }
+
+    private void ConfigureServices(IServiceCollection services)
+    {
+        services.AddAppServiceClient(_configuration);
+        services.AddSIStorageServiceClient(_configuration);
+
+        services.AddTransient(typeof(SIStorage));
+
+        services.AddTransient<CommandWindow>();
+    }
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        UI.Initialize();
+
+        var main = new MainViewModel(Settings);
+
+        if (e.Args.Length > 0)
+        {
+            main.PackageSource = new FilePackageSource(e.Args[0]);
+        }
 
 #if DEBUG
-            main.PackageSource = new SIStoragePackageSource(
-                new PackageInfo
-                {
-                    Description = SImulator.Properties.Resources.TestPackage
-                },
-                new Uri("https://vladimirkhil.com/sistorage/Основные/1.siq"));
+        main.PackageSource = new SIStoragePackageSource(
+            new PackageInfo
+            {
+                Description = SImulator.Properties.Resources.TestPackage
+            },
+            new Uri("https://vladimirkhil.com/sistorage/Основные/1.siq"));
 #else
-            ProcessAsync();
+        ProcessAsync();
 #endif
 
-            MainWindow = new CommandWindow { DataContext = main };
-            MainWindow.Show();
-        }
+        MainWindow = new CommandWindow { DataContext = main };
+        MainWindow.Show();
+    }
 
-        private async void Application_Exit(object sender, ExitEventArgs e)
+    private async void Application_Exit(object sender, ExitEventArgs e)
+    {
+        await _host.StopAsync();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {            
+        SaveSettings(Settings);           
+
+        base.OnExit(e);
+    }
+
+    private static void SaveSettings(Settings settings)
+    {
+        try
         {
-            await _host.StopAsync();
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {            
-            SaveSettings(Settings);           
-
-            base.OnExit(e);
-        }
-
-        private static void SaveSettings(Settings settings)
-        {
-            try
+            if (Monitor.TryEnter(ConfigFileName, 2000))
             {
-                if (Monitor.TryEnter(ConfigFileName, 2000))
-                {
-                    try
-                    {
-                        using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                        using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
-                        settings.Save(stream, DesktopManager.SettingsSerializer);
-                    }
-                    finally
-                    {
-                        Monitor.Exit(ConfigFileName);
-                    }
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(
-                    $"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}",
-                    MainViewModel.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Exclamation);
-            }
-        }
-
-        /// <summary>
-        /// Loads user settings.
-        /// </summary>
-        public static Settings LoadSettings()
-        {
-            try
-            {
-                using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
-                {
-                    try
-                    {
-                        using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        return Settings.Load(stream, DesktopManager.SettingsSerializer);
-                    }
-                    catch { }
-                    finally
-                    {
-                        Monitor.Exit(ConfigFileName);
-                    }
-                }
-            }
-            catch { }
-
-            return Settings.Create();
-        }
-
-#if !DEBUG
-        private async void ProcessAsync()
-        {
-            if (!_useAppService)
-            {
-                return;
-            }
-
-            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
-            try
-            {
-                // Увеличим счётчик запусков программы
-                await appService.GetProductAsync("SImulator");
-
-                var delayedErrors = Settings.DelayedErrors;
-                while (delayedErrors.Count > 0)
-                {
-                    var error = delayedErrors[0];
-                    await appService.SendErrorReportAsync("SImulator", error.Error, Version.Parse(error.Version), error.Time);
-                    delayedErrors.RemoveAt(0);
-                }
-            }
-            catch
-            {
-            }
-        }
-#endif
-
-        private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
-        {
-            var msg = e.Exception.ToString();
-
-            if (msg.Contains("WmClose")) // Normal closing, it's ok
-            {
-                return;
-            }
-
-            if (e.Exception is OutOfMemoryException)
-            {
-                MessageBox.Show(
-                    SImulator.Properties.Resources.OutOfMemoryError,
-                    MainViewModel.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception is IOException ioException && IsDiskFullError(ioException))
-            {
-                MessageBox.Show(
-                    SImulator.Properties.Resources.DiskFullError,
-                    MainViewModel.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception is System.Windows.Markup.XamlParseException || e.Exception is NotImplementedException)
-            {
-                MessageBox.Show(
-                    string.Format(SImulator.Properties.Resources.RuntimeBrokenError, e.Exception),
-                    MainViewModel.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception is Win32Exception)
-            {
-                MessageBox.Show(
-                    e.Exception.Message,
-                    MainViewModel.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (_useAppService &&
-                MessageBox.Show(
-                    string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message),
-                    MainViewModel.ProductName,
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
-                var errorMessage = e.Exception.ToStringDemystified();
                 try
                 {
-                    var result = await appService.SendErrorReportAsync("SImulator", errorMessage, version, DateTime.UtcNow);
-
-                    switch (result)
-                    {
-                        case ErrorStatus.Fixed:
-                            MessageBox.Show(
-                                "Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.",
-                                MainViewModel.ProductName,
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
-                            break;
-
-                        case ErrorStatus.CannotReproduce:
-                            MessageBox.Show(
-                                "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
-                                MainViewModel.ProductName,
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
-                            break;
-                    }
+                    using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                    using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
+                    settings.Save(stream, DesktopManager.SettingsSerializer);
                 }
-                catch (Exception)
+                finally
                 {
-                    MessageBox.Show(
-                        "Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.",
-                        MainViewModel.ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-
-                    if (Settings.DelayedErrors.Count < 10)
-                    {
-                        Settings.DelayedErrors.Add(
-                            new ViewModel.Core.ErrorInfo
-                            {
-                                Time = DateTime.Now,
-                                Error = errorMessage,
-                                Version = version.ToString()
-                            });
-                    }
+                    Monitor.Exit(ConfigFileName);
                 }
             }
-            else
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show(
+                $"{SImulator.Properties.Resources.SavingSettingsError}: {exc.Message}",
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+        }
+    }
+
+    /// <summary>
+    /// Loads user settings.
+    /// </summary>
+    public static Settings LoadSettings()
+    {
+        try
+        {
+            using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+
+            if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
+            {
+                try
+                {
+                    using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    return Settings.Load(stream, DesktopManager.SettingsSerializer);
+                }
+                catch { }
+                finally
+                {
+                    Monitor.Exit(ConfigFileName);
+                }
+            }
+        }
+        catch { }
+
+        return new Settings();
+    }
+
+#if !DEBUG
+    private async void ProcessAsync()
+    {
+        if (!_useAppService)
+        {
+            return;
+        }
+
+        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+        try
+        {
+            // Увеличим счётчик запусков программы
+            await appService.GetProductAsync("SImulator");
+
+            var delayedErrors = Settings.DelayedErrors;
+            while (delayedErrors.Count > 0)
+            {
+                var error = delayedErrors[0];
+                await appService.SendErrorReportAsync("SImulator", error.Error, Version.Parse(error.Version), error.Time);
+                delayedErrors.RemoveAt(0);
+            }
+        }
+        catch
+        {
+        }
+    }
+#endif
+
+    private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        var msg = e.Exception.ToString();
+
+        if (msg.Contains("WmClose")) // Normal closing, it's ok
+        {
+            return;
+        }
+
+        if (e.Exception is OutOfMemoryException)
+        {
+            MessageBox.Show(
+                SImulator.Properties.Resources.OutOfMemoryError,
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception is IOException ioException && IsDiskFullError(ioException))
+        {
+            MessageBox.Show(
+                SImulator.Properties.Resources.DiskFullError,
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception is NotImplementedException && e.Exception.Message.Contains("The Source property cannot be set to null"))
+        {
+            // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+            e.Handled = true;
+            return;
+        }
+        else if (e.Exception is System.Windows.Markup.XamlParseException || e.Exception is NotImplementedException)
+        {
+            MessageBox.Show(
+                string.Format(SImulator.Properties.Resources.RuntimeBrokenError, e.Exception),
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception is Win32Exception)
+        {
+            MessageBox.Show(
+                e.Exception.Message,
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (_useAppService &&
+            MessageBox.Show(
+                string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message),
+                MainViewModel.ProductName,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) == MessageBoxResult.Yes)
+        {
+            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var errorMessage = e.Exception.ToStringDemystified();
+
+            try
+            {
+                var result = await appService.SendErrorReportAsync("SImulator", errorMessage, version, DateTime.UtcNow);
+
+                switch (result)
+                {
+                    case ErrorStatus.Fixed:
+                        MessageBox.Show(
+                            "Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.",
+                            MainViewModel.ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                        break;
+
+                    case ErrorStatus.CannotReproduce:
+                        MessageBox.Show(
+                            "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
+                            MainViewModel.ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                        break;
+                }
+            }
+            catch (Exception)
             {
                 MessageBox.Show(
-                    string.Format(SImulator.Properties.Resources.CommonAppError, e.Exception.Message),
+                    "Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.",
                     MainViewModel.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+
+                if (Settings.DelayedErrors.Count < 10)
+                {
+                    Settings.DelayedErrors.Add(
+                        new ViewModel.Core.ErrorInfo
+                        {
+                            Time = DateTime.Now,
+                            Error = errorMessage,
+                            Version = version?.ToString() ?? ""
+                        });
+                }
             }
-
-            e.Handled = true;
-            Shutdown();
         }
-
-        private static bool IsDiskFullError(Exception ex)
+        else
         {
-            const int HR_ERROR_HANDLE_DISK_FULL = unchecked((int)0x80070027);
-            const int HR_ERROR_DISK_FULL = unchecked((int)0x80070070);
-
-            return ex.HResult == HR_ERROR_HANDLE_DISK_FULL
-                || ex.HResult == HR_ERROR_DISK_FULL;
+            MessageBox.Show(
+                string.Format(SImulator.Properties.Resources.CommonAppError, e.Exception.Message),
+                MainViewModel.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
+
+        e.Handled = true;
+        Shutdown();
+    }
+
+    private static bool IsDiskFullError(Exception ex)
+    {
+        const int HR_ERROR_HANDLE_DISK_FULL = unchecked((int)0x80070027);
+        const int HR_ERROR_DISK_FULL = unchecked((int)0x80070070);
+
+        return ex.HResult == HR_ERROR_HANDLE_DISK_FULL
+            || ex.HResult == HR_ERROR_DISK_FULL;
     }
 }

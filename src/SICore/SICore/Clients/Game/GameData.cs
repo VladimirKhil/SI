@@ -528,6 +528,8 @@ namespace SICore
         /// </summary>
         internal int OversizedMediaNotificationsCount { get; set; }
 
+        public IMedia PackageLogo { get; internal set; }
+
         public GameData(IGameManager gameManager) : base(gameManager)
         {
 

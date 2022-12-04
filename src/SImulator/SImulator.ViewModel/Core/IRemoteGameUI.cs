@@ -23,12 +23,6 @@ namespace SImulator.ViewModel.Core
 
         void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
 
-        void ClearBuffer();
-
-        void AppendToBuffer(byte[] data);
-
-        void SetMediaFromBuffer(string uri, bool background);
-
         void SetMedia(MediaSource media, bool background);
 
         void SetStage(TableStage stage);
@@ -51,7 +45,7 @@ namespace SImulator.ViewModel.Core
 
         void UpdateSettings(Settings settings);
 
-        void SetSound(string sound);
+        void SetSound(string sound = "");
 
         void PlaySimpleSelection(int theme, int quest);
 

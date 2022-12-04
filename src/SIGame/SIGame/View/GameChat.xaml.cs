@@ -1,5 +1,4 @@
 ﻿using SICore;
-using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,15 +46,15 @@ namespace SIGame
             }
         }
 
-        private void AddMessage(string person, string message, LogMode mode)
+        private void AddMessage(string? person, string message, LogMode mode)
         {
             if (Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
-                Dispatcher.BeginInvoke((Action<string, string, LogMode>)AddMessage, person, message, mode);
+                Dispatcher.BeginInvoke(AddMessage, person, message, mode);
                 return;
             }
 
-            if (!ModeColors.TryGetValue(mode, out Brush c))
+            if (!ModeColors.TryGetValue(mode, out var c))
             {
                 c = ModeColors[LogMode.Chat];
             }

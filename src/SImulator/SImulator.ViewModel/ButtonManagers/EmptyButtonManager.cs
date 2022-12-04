@@ -1,12 +1,11 @@
-﻿namespace SImulator.ViewModel.ButtonManagers
-{
-    /// <summary>
-    /// Provides a no-op button manager (useful for external buttons).
-    /// </summary>
-    internal sealed class EmptyButtonManager : ButtonManagerBase
-    {
-        public override bool Run() => true;
+﻿namespace SImulator.ViewModel.ButtonManagers;
 
-        public override void Stop() { }
-    }
+/// <summary>
+/// Provides a no-op button manager (useful for external buttons).
+/// </summary>
+internal sealed class EmptyButtonManager : ButtonManagerBase
+{
+    public override bool Start() => true;
+
+    public override void Stop() { }
 }

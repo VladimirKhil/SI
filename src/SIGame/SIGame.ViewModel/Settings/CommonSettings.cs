@@ -1,6 +1,4 @@
-﻿using SICore;
-using SICore.Results;
-using SIData;
+﻿using SIData;
 using SIGame.ViewModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,7 +31,7 @@ namespace SIGame
 
         public const string LogsFolderName = "Logs";
 
-        internal const string OnlineGameUrl = "https://vladimirkhil.com/si/online?gameId=";
+        internal const string OnlineGameUrl = "https://vladimirkhil.com/si/online/?gameId=";
 
         /// <summary>
         /// Экземпляр общих настроек
@@ -98,9 +96,7 @@ namespace SIGame
 
         public void Save(Stream stream, XmlSerializer serializer = null)
         {
-            if (serializer == null)
-                serializer = new XmlSerializer(typeof(CommonSettings));
-
+            serializer ??= new XmlSerializer(typeof(CommonSettings));
             serializer.Serialize(stream, this);
         }
 
@@ -116,10 +112,8 @@ namespace SIGame
                 {
                     try
                     {
-                        using (var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        {
-                            return Load(stream);
-                        }
+                        using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        return Load(stream);
                     }
                     catch { }
                     finally
@@ -134,8 +128,7 @@ namespace SIGame
 
         public static CommonSettings Load(Stream stream, XmlSerializer serializer = null)
         {
-            if (serializer == null)
-                serializer = new XmlSerializer(typeof(CommonSettings));
+            serializer ??= new XmlSerializer(typeof(CommonSettings));
 
             var settings = (CommonSettings)serializer.Deserialize(stream);
 
