@@ -2,6 +2,6 @@
 
 namespace SImulator.ViewModel.Tests;
 
-internal sealed class TestButtonManagerFactoryFactory : ButtonManagerFactory
+internal sealed class TestButtonManagerFactory : ButtonManagerFactory
 {
 }
