@@ -23,6 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
 </Project>

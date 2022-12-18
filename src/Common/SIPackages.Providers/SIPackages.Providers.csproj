@@ -21,9 +21,6 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SIPackages\SIPackages.csproj" />
     <ProjectReference Include="..\SIStorageService.Client\SIStorageService.Client.csproj" />
   </ItemGroup>
