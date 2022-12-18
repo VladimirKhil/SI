@@ -1,25 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 
-namespace SIQuester.ViewModel.PlatformSpecific
+namespace SIQuester.ViewModel.PlatformSpecific;
+
+public interface IFlowDocumentWrapper
 {
-    public interface IFlowDocumentWrapper
-    {
-        object GetDocument();
+    object GetDocument();
 
-        void ExportXps(string filename);
+    void ExportXps(string filename);
 
-        void ExportDocx(string filename);
+    void ExportDocx(string filename);
 
-        void WalkAndSave(
-            string filename,
-            Encoding encoding,
-            Action<StreamWriter> onLineBreak,
-            Action<StreamWriter, string> onText,
-            Action<StreamWriter> onHeader = null,
-            Action<StreamWriter> onFooter = null);
+    void WalkAndSave(
+        string filename,
+        Encoding encoding,
+        Action<StreamWriter> onLineBreak,
+        Action<StreamWriter, string> onText,
+        Action<StreamWriter>? onHeader = null,
+        Action<StreamWriter>? onFooter = null);
 
-        bool Print();
-    }
+    bool Print();
 }

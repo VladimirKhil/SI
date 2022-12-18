@@ -78,10 +78,10 @@ namespace SIQuester.ViewModel
         {
             var document = Owner.OwnerTheme.OwnerRound.OwnerPackage.Document;
 
-            document.BeginChange();
-
             try
             {
+                using var change = document.OperationsManager.BeginComplexChange();
+
                 var index = CurrentPosition;
                 var text = this[index];
                 var s = text.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
@@ -89,6 +89,7 @@ namespace SIQuester.ViewModel
                 if (s.Length > 1)
                 {
                     var comments = Owner.Info.Comments;
+
                     if (comments.Text.Length > 0)
                     {
                         comments.Text += Environment.NewLine;
@@ -107,11 +108,10 @@ namespace SIQuester.ViewModel
                     this[index] = str.ToString();
                 }
 
-                document.CommitChange();
+                change.Commit();
             }
             catch (Exception exc)
             {
-                document.RollbackChange();
                 document.OnError(exc);
             }
         }

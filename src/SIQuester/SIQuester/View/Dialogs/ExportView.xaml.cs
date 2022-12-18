@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для ExportView.xaml
+/// </summary>
+public partial class ExportView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для ExportView.xaml
-    /// </summary>
-    public partial class ExportView : UserControl
-    {
-        public ExportView()
-        {
-            InitializeComponent();
-        }
-    }
+    public ExportView() => InitializeComponent();
 }

@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Interaction logic for TextsStorageDialog.xaml
+/// </summary>
+public partial class TextsStorageView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for TextsStorageDialog.xaml
-    /// </summary>
-    public partial class TextsStorageView : UserControl
-    {
-        public TextsStorageView()
-        {
-            InitializeComponent();
-        }
-    }
+    public TextsStorageView() => InitializeComponent();
 }

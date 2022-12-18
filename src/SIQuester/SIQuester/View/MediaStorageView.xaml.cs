@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Interaction logic for MediaStorageDialog.xaml
+/// </summary>
+public partial class MediaStorageView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MediaStorageDialog.xaml
-    /// </summary>
-    public partial class MediaStorageView : UserControl
-    {
-        public MediaStorageView()
-        {
-            InitializeComponent();
-        }
-    }
+    public MediaStorageView() => InitializeComponent();
 }

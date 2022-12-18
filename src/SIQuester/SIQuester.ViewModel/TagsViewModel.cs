@@ -1,38 +1,41 @@
-﻿using System.Collections.Generic;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+public sealed class TagsViewModel : ItemsViewModel<string>
 {
-    public sealed class TagsViewModel : ItemsViewModel<string>
+    internal PackageViewModel Owner { get; private set; }
+
+    public override QDocument OwnerDocument => Owner.Document;
+
+    public ICommand AddTag { get; private set; }
+
+    public TagsViewModel(PackageViewModel owner, IEnumerable<string> collection)
+        : base(collection)
     {
-        internal PackageViewModel Owner { get; private set; }
+        Owner = owner;
 
-        public override QDocument OwnerDocument => Owner.Document;
+        AddTag = new SimpleCommand(AddTag_Executed);
 
-        public ICommand AddTag { get; private set; }
+        UpdateCommands();
+    }
 
-        public TagsViewModel(PackageViewModel owner, IEnumerable<string> collection)
-            : base(collection)
+    private void AddTag_Executed(object? arg)
+    {
+        if (arg == null)
         {
-            Owner = owner;
-
-            AddTag = new SimpleCommand(AddTag_Executed);
-
-            UpdateCommands();
+            throw new ArgumentNullException(nameof(arg));
         }
 
-        private void AddTag_Executed(object arg)
-        {
-            var index = CurrentPosition;
+        var index = CurrentPosition;
 
-            if (string.IsNullOrWhiteSpace(this[index]))
-            {
-                this[index] = arg.ToString();
-            }
-            else
-            {
-                Add(arg.ToString());
-            }
+        if (string.IsNullOrWhiteSpace(this[index]))
+        {
+            this[index] = arg.ToString();
+        }
+        else
+        {
+            Add(arg.ToString());
         }
     }
 }

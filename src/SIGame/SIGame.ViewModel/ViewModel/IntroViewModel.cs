@@ -1,6 +1,5 @@
-﻿namespace SIGame.ViewModel
+﻿namespace SIGame.ViewModel;
+
+public sealed class IntroViewModel
 {
-    public sealed class IntroViewModel
-    {
-    }
 }

@@ -349,6 +349,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Поиск файлов.
+        /// </summary>
+        public static string FileSearch {
+            get {
+                return ResourceManager.GetString("FileSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Размер файла превышает допустимое значение для игры через Игровой сервер ({0} байт)!.
         /// </summary>
         public static string FileSizeLimitExceed {
@@ -471,6 +480,24 @@ namespace SIQuester.ViewModel.Properties {
         public static string LostFile {
             get {
                 return ResourceManager.GetString("LostFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Расширение мультимедиа файла не относится к рекомендуемым ({0})!.
+        /// </summary>
+        public static string MediaFileExtensionIsNotRecommened {
+            get {
+                return ResourceManager.GetString("MediaFileExtensionIsNotRecommened", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Размер мультимедиа файла превышает рекомендуемое значение ({0} МБ)!.
+        /// </summary>
+        public static string MediaFileSizeExceedsRecommenedValue {
+            get {
+                return ResourceManager.GetString("MediaFileSizeExceedsRecommenedValue", resourceCulture);
             }
         }
         
@@ -956,6 +983,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Файлы вопросов (*.txt) | *.txt.
+        /// </summary>
+        public static string TxtFilesFilter {
+            get {
+                return ResourceManager.GetString("TxtFilesFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Не распознано:.
         /// </summary>
         public static string Undefined {
@@ -1006,6 +1042,33 @@ namespace SIQuester.ViewModel.Properties {
         public static string WrongBrackets {
             get {
                 return ResourceManager.GetString("WrongBrackets", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файлы вопросов (*.xml) | *.xml.
+        /// </summary>
+        public static string XmlFilesFilter {
+            get {
+                return ResourceManager.GetString("XmlFilesFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на YAML файлы.
+        /// </summary>
+        public static string YamlFiles {
+            get {
+                return ResourceManager.GetString("YamlFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на YAML файлы (*.yaml) | *.yaml.
+        /// </summary>
+        public static string YamlFilesFilter {
+            get {
+                return ResourceManager.GetString("YamlFilesFilter", resourceCulture);
             }
         }
         

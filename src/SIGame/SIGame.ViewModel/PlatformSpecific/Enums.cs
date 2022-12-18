@@ -1,16 +1,15 @@
-﻿namespace SIGame.ViewModel.PlatformSpecific
-{
-    public enum MessageType
-    {
-        OK,
-        Warning,
-        Error
-    }
+﻿namespace SIGame.ViewModel.PlatformSpecific;
 
-    public enum TimerState
-    {
-        Running,
-        Stopped,
-        Paused
-    }
+public enum MessageType
+{
+    OK,
+    Warning,
+    Error
+}
+
+public enum TimerState
+{
+    Running,
+    Stopped,
+    Paused
 }

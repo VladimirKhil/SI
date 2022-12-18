@@ -1,7 +1,6 @@
-﻿namespace SIQuester.Utilities
+﻿namespace SIQuester.Utilities;
+
+internal interface IDataContextOwner
 {
-    internal interface IDataContextOwner
-    {
-        object DataContext { get; set; }
-    }
+    object DataContext { get; set; }
 }

@@ -1,162 +1,161 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SIUI.ViewModel
+namespace SIUI.ViewModel;
+
+/// <summary>
+/// Состояние табло
+/// </summary>
+[DataContract]
+public enum TableStage
 {
     /// <summary>
-    /// Состояние табло
+    /// Пустое
     /// </summary>
-    [DataContract]
-    public enum TableStage
-    {
-        /// <summary>
-        /// Пустое
-        /// </summary>
-        [EnumMember]
-        Void,
-        /// <summary>
-        /// Эмблема игры
-        /// </summary>
-        [EnumMember]
-        Sign,
-        /// <summary>
-        /// Темы игры
-        /// </summary>
-        [EnumMember]
-        GameThemes,
-        /// <summary>
-        /// Раунд
-        /// </summary>
-        [EnumMember]
-        Round,
-        /// <summary>
-        /// Темы раунда
-        /// </summary>
-        [EnumMember]
-        RoundThemes,
-        /// <summary>
-        /// Игровое табло раунда
-        /// </summary>
-        [EnumMember]
-        RoundTable,
-        /// <summary>
-        /// Тема
-        /// </summary>
-        [EnumMember]
-        Theme,
-        /// <summary>
-        /// Цена вопроса
-        /// </summary>
-        [EnumMember]
-        QuestionPrice,
-        /// <summary>
-        /// Текст вопроса
-        /// </summary>
-        [EnumMember]
-        Question,
-        /// <summary>
-        /// Правильный ответ
-        /// </summary>
-        [EnumMember]
-        Answer,
-        /// <summary>
-        /// Спецвопрос
-        /// </summary>
-        [EnumMember]
-        Special,
-        /// <summary>
-        /// Список финальных тем
-        /// </summary>
-        [EnumMember]
-        Final,
-        /// <summary>
-        /// Счёт
-        /// </summary>
-        [EnumMember]
-        Score
-    }
-
+    [EnumMember]
+    Void,
     /// <summary>
-    /// Defines well-known content types displayed on the table.
+    /// Эмблема игры
     /// </summary>
-    [DataContract]
-    public enum QuestionContentType
-    {
-        /// <summary>
-        /// Empty content.
-        /// </summary>
-        [EnumMember]
-        None,
-        /// <summary>
-        /// Text content.
-        /// </summary>
-        [EnumMember]
-        Text,
-        /// <summary>
-        /// Image content.
-        /// </summary>
-        [EnumMember]
-        Image,
-        /// <summary>
-        /// Video content.
-        /// </summary>
-        [EnumMember]
-        Video,
-        /// <summary>
-        /// Special text content.
-        /// </summary>
-        [EnumMember]
-        SpecialText,
-        /// <summary>
-        /// Html content.
-        /// </summary>
-        [EnumMember]
-        Html,
-        /// <summary>
-        /// Loading content mode.
-        /// </summary>
-        [EnumMember]
-        Loading
-    }
-
+    [EnumMember]
+    Sign,
     /// <summary>
-    /// Стиль отображения вопроса
+    /// Темы игры
     /// </summary>
-    [DataContract]
-    public enum QuestionStyle
-    {
-        /// <summary>
-        /// Просто вопрос
-        /// </summary>
-        [EnumMember]
-        Normal,
-        /// <summary>
-        /// Подсвеченный текст вопроса
-        /// </summary>
-        [EnumMember]
-        WaitingForPress,
-        /// <summary>
-        /// Вопрос + выигравший кнопку игрок
-        /// </summary>
-        [EnumMember]
-        Pressed
-    }
-
+    [EnumMember]
+    GameThemes,
     /// <summary>
-    /// Состояние ячейки на табло
+    /// Раунд
     /// </summary>
-    public enum QuestionInfoStages
-    {
-        /// <summary>
-        /// Обычное
-        /// </summary>
-        None,
-        /// <summary>
-        /// Мигающее
-        /// </summary>
-        Blinking,
-        /// <summary>
-        /// Выбранное
-        /// </summary>
-        Active
-    }
+    [EnumMember]
+    Round,
+    /// <summary>
+    /// Темы раунда
+    /// </summary>
+    [EnumMember]
+    RoundThemes,
+    /// <summary>
+    /// Игровое табло раунда
+    /// </summary>
+    [EnumMember]
+    RoundTable,
+    /// <summary>
+    /// Тема
+    /// </summary>
+    [EnumMember]
+    Theme,
+    /// <summary>
+    /// Цена вопроса
+    /// </summary>
+    [EnumMember]
+    QuestionPrice,
+    /// <summary>
+    /// Текст вопроса
+    /// </summary>
+    [EnumMember]
+    Question,
+    /// <summary>
+    /// Правильный ответ
+    /// </summary>
+    [EnumMember]
+    Answer,
+    /// <summary>
+    /// Спецвопрос
+    /// </summary>
+    [EnumMember]
+    Special,
+    /// <summary>
+    /// Список финальных тем
+    /// </summary>
+    [EnumMember]
+    Final,
+    /// <summary>
+    /// Счёт
+    /// </summary>
+    [EnumMember]
+    Score
+}
+
+/// <summary>
+/// Defines well-known content types displayed on the table.
+/// </summary>
+[DataContract]
+public enum QuestionContentType
+{
+    /// <summary>
+    /// Empty content.
+    /// </summary>
+    [EnumMember]
+    None,
+    /// <summary>
+    /// Text content.
+    /// </summary>
+    [EnumMember]
+    Text,
+    /// <summary>
+    /// Image content.
+    /// </summary>
+    [EnumMember]
+    Image,
+    /// <summary>
+    /// Video content.
+    /// </summary>
+    [EnumMember]
+    Video,
+    /// <summary>
+    /// Special text content.
+    /// </summary>
+    [EnumMember]
+    SpecialText,
+    /// <summary>
+    /// Html content.
+    /// </summary>
+    [EnumMember]
+    Html,
+    /// <summary>
+    /// Loading content mode.
+    /// </summary>
+    [EnumMember]
+    Loading
+}
+
+/// <summary>
+/// Стиль отображения вопроса
+/// </summary>
+[DataContract]
+public enum QuestionStyle
+{
+    /// <summary>
+    /// Просто вопрос
+    /// </summary>
+    [EnumMember]
+    Normal,
+    /// <summary>
+    /// Подсвеченный текст вопроса
+    /// </summary>
+    [EnumMember]
+    WaitingForPress,
+    /// <summary>
+    /// Вопрос + выигравший кнопку игрок
+    /// </summary>
+    [EnumMember]
+    Pressed
+}
+
+/// <summary>
+/// Состояние ячейки на табло
+/// </summary>
+public enum QuestionInfoStages
+{
+    /// <summary>
+    /// Обычное
+    /// </summary>
+    None,
+    /// <summary>
+    /// Мигающее
+    /// </summary>
+    Blinking,
+    /// <summary>
+    /// Выбранное
+    /// </summary>
+    Active
 }

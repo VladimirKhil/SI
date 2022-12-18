@@ -1,57 +1,71 @@
 ﻿using SIPackages.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SIPackages.Helpers;
 
-namespace SIPackages
+namespace SIPackages;
+
+/// <summary>
+/// Defines a question scenario.
+/// </summary>
+/// <inheritdoc cref="List{T}" />
+public sealed class Scenario : List<Atom>, IEquatable<Scenario>
 {
+    /// <inheritdoc />
+    public override string ToString() => string.Join(Environment.NewLine, this.Select(atom => atom.ToString()).ToArray());
+
     /// <summary>
-    /// Сценарий вопроса
+    /// Does the atom text contain specified value.
     /// </summary>
-    public sealed class Scenario : List<Atom>
+    /// <param name="value">Text value.</param>
+    public bool ContainsQuery(string value) => this.Any(item => item.Contains(value));
+
+    /// <summary>
+    /// Searches a value inside the object.
+    /// </summary>
+    /// <param name="value">Value to search.</param>
+    /// <returns>Search results.</returns>
+    public IEnumerable<SearchData> Search(string value)
     {
-        public override string ToString() => string.Join(Environment.NewLine, this.Select(atom => atom.ToString()).ToArray());
-
-        public bool ContainsQuery(string value) => this.Any(item => item.Contains(value));
-
-        public IEnumerable<SearchData> Search(string value)
+        for (var i = 0; i < Count; i++)
         {
-            for (var i = 0; i < Count; i++)
+            foreach (var item in this[i].Search(value))
             {
-                foreach (var item in this[i].Search(value))
-                {
-                    item.ItemIndex = i;
-                    yield return item;
-                }
+                item.ItemIndex = i;
+                yield return item;
             }
         }
-
-        /// <summary>
-        /// Добавление атома
-        /// </summary>
-        /// <param name="type">Тип атома</param>
-        /// <param name="text">Добавляемая строка</param>
-        /// <param name="time">Время показа атома</param>
-        public Atom Add(string type, string text, int time = 0)
-        {
-            var atom = new Atom
-            {
-                Type = type,
-                Text = text,
-                AtomTime = time
-            };
-
-            Add(atom);
-            return atom;
-        }
-
-        /// <summary>
-        /// Добавление атома
-        /// </summary>
-        /// <param name="text">Добавляемая строка</param>
-        public Atom Add(string text)
-        {
-            return Add(AtomTypes.Text, text);
-        }
     }
+
+    /// <summary>
+    /// Adds new atom to this scenario.
+    /// </summary>
+    /// <param name="type">Atom type.</param>
+    /// <param name="text">Atom value.</param>
+    /// <param name="time">Atom time.</param>
+    public Atom Add(string type, string text, int time = 0)
+    {
+        var atom = new Atom
+        {
+            Type = type,
+            Text = text,
+            AtomTime = time
+        };
+
+        Add(atom);
+        return atom;
+    }
+
+    /// <summary>
+    /// Adds new text atom to this scenario.
+    /// </summary>
+    /// <param name="text">Atom text.</param>
+    public Atom Add(string text) => Add(AtomTypes.Text, text);
+
+    /// <inheritdoc />
+    public bool Equals(Scenario? other) => other is not null && this.SequenceEqual(other);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => Equals(obj as Scenario);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => this.GetCollectionHashCode();
 }

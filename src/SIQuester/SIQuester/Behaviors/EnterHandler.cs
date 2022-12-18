@@ -1,74 +1,70 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Input;
 
-namespace SIQuester.Behaviors
+namespace SIQuester.Behaviors;
+
+public static class EnterHandler
 {
-    public static class EnterHandler
+    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
+
+    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
+
+    public static readonly DependencyProperty IsAttachedProperty =
+        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(EnterHandler), new UIPropertyMetadata(false, IsAttachedChanged));
+
+    private static void IsAttachedChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        public static bool GetIsAttached(DependencyObject obj)
+        var box = (RichTextBox)sender;
+        if ((bool)e.NewValue)
         {
-            return (bool)obj.GetValue(IsAttachedProperty);
+            box.PreviewKeyDown += Box_PreviewKeyDown;
+            box.PreviewTextInput += Box_TextInput;
         }
-
-        public static void SetIsAttached(DependencyObject obj, bool value)
+        else
         {
-            obj.SetValue(IsAttachedProperty, value);
+            box.PreviewKeyDown -= Box_PreviewKeyDown;
+            box.PreviewTextInput -= Box_TextInput;
         }
+    }
 
-        // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IsAttachedProperty =
-            DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(EnterHandler), new UIPropertyMetadata(false, IsAttachedChanged));
+    private static void Box_TextInput(object sender, TextCompositionEventArgs e)
+    {
+        var box = (RichTextBox)sender;
+        box.Selection.Text = "";
+        InsertText(box, e.Text);
+        e.Handled = true;
+    }
 
-        private static void IsAttachedChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private static void InsertText(RichTextBox box, string text)
+    {
+        if (box.CaretPosition.LogicalDirection == LogicalDirection.Forward)
         {
-            var box = (RichTextBox)sender;
-            if ((bool)e.NewValue)
-            {
-                box.PreviewKeyDown += Box_PreviewKeyDown;
-                box.PreviewTextInput += Box_TextInput;
-            }
-            else
-            {
-                box.PreviewKeyDown -= Box_PreviewKeyDown;
-                box.PreviewTextInput -= Box_TextInput;
-            }
+            box.CaretPosition.InsertTextInRun(text);
         }
-
-        private static void Box_TextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        else
         {
-            var box = (RichTextBox)sender;
+            box.CaretPosition.InsertTextInRun(text);
+            box.CaretPosition = box.CaretPosition.GetPositionAtOffset(text.Length, LogicalDirection.Forward);
+        }
+    }
+
+    private static void Box_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        var box = (RichTextBox)sender;
+
+        if (e.Key == Key.Enter)
+        {
             box.Selection.Text = "";
-            InsertText(box, e.Text);
+            InsertText(box, "\r\n");
             e.Handled = true;
         }
-
-        private static void InsertText(RichTextBox box, string text)
+        else if (e.Key == Key.Space)
         {
-            if (box.CaretPosition.LogicalDirection == LogicalDirection.Forward)
-                box.CaretPosition.InsertTextInRun(text);
-            else
-            {
-                box.CaretPosition.InsertTextInRun(text);
-                box.CaretPosition = box.CaretPosition.GetPositionAtOffset(text.Length, LogicalDirection.Forward);
-            }
-        }
-
-        private static void Box_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            var box = (RichTextBox)sender;
-            if (e.Key == System.Windows.Input.Key.Enter)
-            {
-                box.Selection.Text = "";
-                InsertText(box, "\r\n");
-                e.Handled = true;
-            }
-            else if (e.Key == System.Windows.Input.Key.Space)
-            {
-                box.Selection.Text = "";
-                InsertText(box, " ");
-                e.Handled = true;
-            }
+            box.Selection.Text = "";
+            InsertText(box, " ");
+            e.Handled = true;
         }
     }
 }

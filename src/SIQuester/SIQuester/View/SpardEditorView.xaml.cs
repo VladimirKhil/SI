@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для SpardEditorView.xaml
+/// </summary>
+public partial class SpardEditorView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для SpardEditorView.xaml
-    /// </summary>
-    public partial class SpardEditorView : UserControl
-    {
-        public SpardEditorView()
-        {
-            InitializeComponent();
-        }
-    }
+    public SpardEditorView() => InitializeComponent();
 }

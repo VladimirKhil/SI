@@ -1,220 +1,236 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
-using System;
+using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Utils;
 
-namespace SIQuester.ViewModel
-{
-    public sealed class SearchFolderViewModel : WorkspaceViewModel
-    {
-        public override string Header => "Поиск файлов";
+namespace SIQuester.ViewModel;
 
-        public string FolderPath
+/// <summary>
+/// Searches for some text value in files inside provided folder.
+/// </summary>
+/// <remarks>
+/// The search is performed asynchronously when search value or target folder path changes.
+/// </remarks>
+public sealed class SearchFolderViewModel : WorkspaceViewModel
+{
+    public override string Header => Resources.FileSearch;
+
+    /// <summary>
+    /// Path of the folder to search.
+    /// </summary>
+    public string FolderPath
+    {
+        get => AppSettings.Default.SearchPath; // TODO: provide AppSettings via DI
+        set
         {
-            get => AppSettings.Default.SearchPath;
-            set
+            if (AppSettings.Default.SearchPath != value)
             {
-                if (AppSettings.Default.SearchPath != value)
-                {
-                    AppSettings.Default.SearchPath = value;
-                    OnPropertyChanged();
-                    StartSearch();
-                }
+                AppSettings.Default.SearchPath = value;
+                OnPropertyChanged();
+                StartSearch();
+            }
+        }
+    }
+
+    private CancellationTokenSource? _searchTokenSource = null;
+
+    private readonly object _searchSync = new();
+
+    private string _searchText = "";
+
+    /// <summary>
+    /// Text to search.
+    /// </summary>
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (_searchText != value)
+            {
+                _searchText = value;
+                OnPropertyChanged();
+                StartSearch();
+            }
+        }
+    }
+
+    private bool _subfoldersSearch = true;
+
+    /// <summary>
+    /// Should the search be performed in subfolders (or only in the provided foler otherwise).
+    /// </summary>
+    public bool SubfoldersSearch
+    {
+        get => _subfoldersSearch;
+        set
+        {
+            if (_subfoldersSearch != value)
+            {
+                _subfoldersSearch = value;
+                OnPropertyChanged();
+                StartSearch();
+            }
+        }
+    }
+
+    private byte _searchProgress = 0;
+
+    /// <summary>
+    /// Search progress in percentage from 0 to 100.
+    /// </summary>
+    public byte SearchProgress
+    {
+        get => _searchProgress;
+        set
+        {
+            if (_searchProgress != value)
+            {
+                _searchProgress = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public SimpleCommand SelectFolderPath { get; private set; }
+
+    public ICommand Open { get; private set; }
+
+    public ObservableCollection<SearchResult> SearchResults { get; } = new();
+
+    private readonly MainViewModel _main = null; // TODO: remove dependency
+
+    public SearchFolderViewModel(MainViewModel main)
+    {
+        _main = main;
+
+        SelectFolderPath = new SimpleCommand(SelectFolderPath_Executed);
+        Open = new SimpleCommand(Open_Executed);
+    }
+
+    private async void StartSearch()
+    {
+        lock (_searchSync)
+        {
+            if (_searchTokenSource != null)
+            {
+                _searchTokenSource.Cancel(); // TODO: wait and Dispose
+                _searchTokenSource = null;
             }
         }
 
-        private CancellationTokenSource _searchLink = null;
+        SearchResults.Clear();
+        SearchProgress = 0;
 
-        private readonly object _searchSync = new();
+        if (FolderPath.Length == 0 || !Directory.Exists(FolderPath) || _searchText.Length == 0)
+        {
+            return;
+        }
 
-        private async void StartSearch()
+        _searchTokenSource = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Run(
+                new Action(() =>
+                {
+                    var directoryInfo = new DirectoryInfo(FolderPath);
+                    SearchInDirectory(directoryInfo, _searchText, _subfoldersSearch, _searchTokenSource.Token);
+                }),
+                _searchTokenSource.Token);
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+        finally
+        {
+            SearchProgress = 0;
+        }
+    }
+
+    private async void Open_Executed(object? arg)
+    {
+        if (arg == null)
+        {
+            throw new ArgumentNullException(nameof(arg));
+        }
+
+        var result = (SearchResult)arg;
+
+        var document = await _main.OpenFileAsync(result.FileName);
+
+        if (document != null)
+        {
+            document.SearchText = _searchText;
+            PlatformSpecific.PlatformManager.Instance.AddToRecentCategory(result.FileName);
+        }
+    }
+
+    private void SelectFolderPath_Executed(object? arg)
+    {
+        var path = PlatformSpecific.PlatformManager.Instance.SelectSearchFolder();
+
+        if (path != null)
+        {
+            FolderPath = path;
+        }
+    }
+
+    private void SearchInDirectory(
+        DirectoryInfo directoryInfo,
+        string searchText,
+        bool subfoldersSearch,
+        CancellationToken token,
+        int level = 0)
+    {
+        var files = directoryInfo.GetFiles("*.siq");
+        var folders = directoryInfo.GetDirectories();
+        var total = files.Length + (subfoldersSearch ? folders.Length : 0);
+        var done = 0;
+        SearchMatch? found = null;
+
+        foreach (var file in files)
         {
             lock (_searchSync)
             {
-                if (_searchLink != null)
+                if (token.IsCancellationRequested)
                 {
-                    _searchLink.Cancel();
-                    _searchLink = null;
+                    return;
                 }
             }
 
-            SearchResults.Clear();
-            SearchProgress = 0;
-
-            if (FolderPath.Length == 0 || !Directory.Exists(FolderPath) || _searchText.Length == 0)
-            {
-                return;
-            }
-
-            _searchLink = new CancellationTokenSource();
+            found = null;
 
             try
             {
-                await Task.Run(
-                    new Action(() =>
+                using (var stream = File.OpenRead(file.FullName))
+                {
+                    using var doc = SIDocument.Load(stream);
+                    var package = doc.Package;
+
+                    if ((found = package.SearchFragment(searchText)) == null)
                     {
-                        var directoryInfo = new DirectoryInfo(FolderPath);
-                        SearchInDirectory(directoryInfo, _searchText, _subfoldersSearch, _searchLink.Token);
-                    }),
-                    _searchLink.Token);
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
-            finally
-            {
-                SearchProgress = 0;
-            }
-        }
-
-        private string _searchText = "";
-
-        public string SearchText
-        {
-            get => _searchText;
-            set
-            {
-                if (_searchText != value)
-                {
-                    _searchText = value;
-                    OnPropertyChanged();
-                    StartSearch();
-                }
-            }
-        }
-
-        private bool _subfoldersSearch = true;
-
-        public bool SubfoldersSearch
-        {
-            get => _subfoldersSearch;
-            set
-            {
-                if (_subfoldersSearch != value)
-                {
-                    _subfoldersSearch = value;
-                    StartSearch();
-                }
-            }
-        }
-
-        private int _searchProgress = 0;
-
-        public int SearchProgress
-        {
-            get => _searchProgress;
-            set
-            {
-                if (_searchProgress != value)
-                {
-                    _searchProgress = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public SimpleCommand SelectFolderPath { get; private set; }
-
-        public ICommand Open { get; private set; }
-
-        public ObservableCollection<SearchResult> SearchResults { get; } = new ObservableCollection<SearchResult>();
-
-        private readonly MainViewModel _main = null; // TODO: убрать такую зависимость
-
-        public SearchFolderViewModel(MainViewModel main)
-        {
-            _main = main;
-
-            SelectFolderPath = new SimpleCommand(SelectFolderPath_Executed);
-            Open = new SimpleCommand(Open_Executed);
-        }
-
-        private void Open_Executed(object arg)
-        {
-            var result = (SearchResult)arg;
-            _main.OpenFile(
-                result.FileName,
-                _searchText,
-                onSuccess: () =>
-                {
-                    PlatformSpecific.PlatformManager.Instance.AddToRecentCategory(result.FileName);
-                });
-        }
-
-        private void SelectFolderPath_Executed(object arg)
-        {
-            var path = PlatformSpecific.PlatformManager.Instance.SelectSearchFolder();
-
-            if (path != null)
-            {
-                FolderPath = path;
-            }
-        }
-
-        private void SearchInDirectory(
-            DirectoryInfo directoryInfo,
-            string searchText,
-            bool subfoldersSearch,
-            CancellationToken token,
-            int level = 0)
-        {
-            var files = directoryInfo.GetFiles("*.siq");
-            var folders = directoryInfo.GetDirectories();
-            var total = files.Length + (subfoldersSearch ? folders.Length : 0);
-            var done = 0;
-            SearchMatch found = null;
-
-            foreach (var file in files)
-            {
-                lock (_searchSync)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
-
-                found = null;
-
-                try
-                {
-                    using (var stream = File.OpenRead(file.FullName))
-                    {
-                        using var doc = SIDocument.Load(stream);
-                        var package = doc.Package;
-
-                        if ((found = package.SearchFragment(searchText)) == null)
+                        foreach (var round in package.Rounds)
                         {
-                            foreach (var round in package.Rounds)
+                            if ((found = round.SearchFragment(searchText)) != null)
                             {
-                                if ((found = round.SearchFragment(searchText)) != null)
+                                break;
+                            }
+
+                            foreach (var theme in round.Themes)
+                            {
+                                if ((found = theme.SearchFragment(searchText)) != null)
                                 {
                                     break;
                                 }
 
-                                foreach (var theme in round.Themes)
+                                foreach (var quest in theme.Questions)
                                 {
-                                    if ((found = theme.SearchFragment(searchText)) != null)
-                                    {
-                                        break;
-                                    }
-
-                                    foreach (var quest in theme.Questions)
-                                    {
-                                        if ((found = quest.SearchFragment(searchText)) != null)
-                                        {
-                                            break;
-                                        }
-                                    }
-
-                                    if (found != null)
+                                    if ((found = quest.SearchFragment(searchText)) != null)
                                     {
                                         break;
                                     }
@@ -225,89 +241,94 @@ namespace SIQuester.ViewModel
                                     break;
                                 }
                             }
+
+                            if (found != null)
+                            {
+                                break;
+                            }
                         }
                     }
+                }
 
-                    if (found != null)
-                    {
-                        var fileNameLocal = file.FullName;
-                        var foundLocal = found;
+                if (found != null)
+                {
+                    var fileNameLocal = file.FullName;
+                    var foundLocal = found;
 
-                        UI.Execute(
-                            () =>
+                    UI.Execute(
+                        () =>
+                        {
+                            lock (_searchSync)
                             {
-                                lock (_searchSync)
+                                if (token.IsCancellationRequested)
                                 {
-                                    if (token.IsCancellationRequested)
-                                    {
-                                        return;
-                                    }
-
-                                    SearchResults.Add(new SearchResult
-                                    {
-                                        FileName = fileNameLocal,
-                                        Fragment = foundLocal
-                                    });
+                                    return;
                                 }
-                            },
-                            exc => OnError(exc),
-                            token);
-                    }
-                }
-                catch
-                {
-                    // TODO: log
-                }
-                finally
-                {
-                    done++;
 
-                    if (level == 0)
-                    {
-                        lock (_searchSync)
-                        {
-                            if (!token.IsCancellationRequested)
-                            {
-                                SearchProgress = 100 * done / total;
+                                SearchResults.Add(new SearchResult
+                                {
+                                    FileName = fileNameLocal,
+                                    Fragment = foundLocal
+                                });
                             }
-                        }
-                    }
+                        },
+                        exc => OnError(exc),
+                        token);
                 }
             }
-
-            if (subfoldersSearch)
+            catch
             {
-                foreach (var dir in folders)
+                // TODO: log
+            }
+            finally
+            {
+                done++;
+
+                if (level == 0)
                 {
-                    SearchInDirectory(dir, searchText, subfoldersSearch, token, level + 1);
-
-                    done++;
-
-                    if (level == 0)
+                    lock (_searchSync)
                     {
-                        lock (_searchSync)
+                        if (!token.IsCancellationRequested)
                         {
-                            if (token.IsCancellationRequested)
-                            {
-                                return;
-                            }
-
-                            SearchProgress = 100 * done / total;
+                            SearchProgress = (byte)(100 * done / total);
                         }
                     }
                 }
             }
         }
 
-        protected override void Dispose(bool disposing)
+        if (subfoldersSearch)
         {
-            if (_searchLink != null)
+            foreach (var dir in folders)
             {
-                _searchLink.Cancel();
-                _searchLink = null;
-            }
+                SearchInDirectory(dir, searchText, subfoldersSearch, token, level + 1);
 
-            base.Dispose(disposing);
+                done++;
+
+                if (level == 0)
+                {
+                    lock (_searchSync)
+                    {
+                        if (token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        SearchProgress = (byte)(100 * done / total);
+                    }
+                }
+            }
         }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (_searchTokenSource != null)
+        {
+            _searchTokenSource.Cancel();
+            _searchTokenSource = null; // TODO: wait and dispose
+        }
+
+        base.Dispose(disposing);
     }
 }

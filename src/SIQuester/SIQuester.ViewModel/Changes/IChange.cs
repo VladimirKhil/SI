@@ -1,18 +1,17 @@
-﻿namespace SIQuester
+﻿namespace SIQuester;
+
+/// <summary>
+/// Defines a data change that can be undone or redone.
+/// </summary>
+public interface IChange
 {
     /// <summary>
-    /// Defines a data change that can be undone or redone.
+    /// Undoes the change.
     /// </summary>
-    public interface IChange
-    {
-        /// <summary>
-        /// Undoes the change.
-        /// </summary>
-        void Undo();
+    void Undo();
 
-        /// <summary>
-        /// Redoes the change.
-        /// </summary>
-        void Redo();
-    }
+    /// <summary>
+    /// Redoes the change.
+    /// </summary>
+    void Redo();
 }

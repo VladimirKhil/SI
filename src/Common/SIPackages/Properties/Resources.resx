@@ -153,4 +153,7 @@
   <data name="Html" xml:space="preserve">
     <value>HTML</value>
   </data>
+  <data name="UnsupportedVersion" xml:space="preserve">
+    <value>Package version {0} is not supported. Maximum supported version is {1}</value>
+  </data>
 </root>

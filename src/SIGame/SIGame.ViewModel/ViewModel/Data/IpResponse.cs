@@ -1,7 +1,6 @@
-﻿namespace SIGame.ViewModel.ViewModel.Data
+﻿namespace SIGame.ViewModel.ViewModel.Data;
+
+internal readonly struct IpResponse
 {
-    internal sealed class IpResponse
-    {
-        public string Ip { get; set; }
-    }
+    public string Ip { get; init; }
 }

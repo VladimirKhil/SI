@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Provides interaction logic for QuestionPlayView.xaml.
+/// </summary>
+public partial class QuestionPlayView : UserControl
 {
-    /// <summary>
-    /// Provides interaction logic for QuestionPlayView.xaml.
-    /// </summary>
-    public partial class QuestionPlayView : UserControl
-    {
-        public QuestionPlayView()
-        {
-            InitializeComponent();
-        }
-    }
+    public QuestionPlayView() => InitializeComponent();
 }

@@ -1,235 +1,229 @@
 ﻿using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.PlatformSpecific;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+public sealed class ExportViewModel : WorkspaceViewModel
 {
-    public sealed class ExportViewModel: WorkspaceViewModel
+    private readonly QDocument _source = null;
+
+    public override string Header => _source.Document.Package.Name + ": экспорт и печать";
+
+    public ICommand Save { get; private set; }
+    public ICommand Print { get; private set; }
+
+    private IFlowDocumentWrapper _documentWrapper = null;
+
+    private object _document = null;
+
+    public object Document
     {
-        private readonly QDocument _source = null;
-
-        public override string Header => _source.Document.Package.Name + ": экспорт и печать";
-
-        public ICommand Save { get; private set; }
-        public ICommand Print { get; private set; }
-
-        private IFlowDocumentWrapper _documentWrapper = null;
-
-        private object _document = null;
-
-        public object Document
+        get => _document;
+        set
         {
-            get => _document;
-            set
+            if (_document != value)
             {
-                if (_document != value)
-                {
-                    _document = value;
-                    OnPropertyChanged();
-                }
+                _document = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private ExportFormats _format = ExportFormats.Dinabank;
+    private ExportFormats _format = ExportFormats.Dinabank;
 
-        public ExportFormats Format
+    public ExportFormats Format
+    {
+        get => _format;
+        set
         {
-            get => _format;
-            set
+            if (_format != value)
             {
-                if (_format != value)
-                {
-                    _format = value;
-                    OnPropertyChanged();
+                _format = value;
+                OnPropertyChanged();
 
-                    BuildDocument();
-                }
+                BuildDocument();
             }
         }
+    }
 
-        private void BuildDocument()
+    private void BuildDocument()
+    {
+        try
         {
-            try
-            {
-                _documentWrapper = PlatformManager.Instance.BuildDocument(_source.Document, _format);
-                Document = _documentWrapper.GetDocument();
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
+            _documentWrapper = PlatformManager.Instance.BuildDocument(_source.Document, _format);
+            Document = _documentWrapper.GetDocument();
         }
-
-        public ExportViewModel(QDocument source, ExportFormats format)
+        catch (Exception exc)
         {
-            _source = source;
-            _format = format;
-
-            Save = new SimpleCommand(Save_Executed);
-            Print = new SimpleCommand(Print_Executed);
-
-            BuildDocument();
+            OnError(exc);
         }
+    }
 
-        private async void Save_Executed(object arg)
+    public ExportViewModel(QDocument source, ExportFormats format)
+    {
+        _source = source;
+        _format = format;
+
+        Save = new SimpleCommand(Save_Executed);
+        Print = new SimpleCommand(Print_Executed);
+
+        BuildDocument();
+    }
+
+    private async void Save_Executed(object arg)
+    {
+        try
         {
-            try
+            string filename = _source.FileName.Replace(".", "-");
+            var filter = new Dictionary<string, string>
             {
-                string filename = _source.FileName.Replace(".", "-");
-                var filter = new Dictionary<string, string>
-                {
-                    ["Текстовые файлы"] = "txt",
-                    ["Файлы HTML"] = "html",
-                    ["Документы DOCX"] = "docx",
-                    ["Документы RTF"] = "rtf",
-                    ["Документы XPS"] = "xps"
-                };
+                ["Текстовые файлы"] = "txt",
+                ["Файлы HTML"] = "html",
+                ["Документы DOCX"] = "docx",
+                ["Документы RTF"] = "rtf",
+                ["Документы XPS"] = "xps"
+            };
 
-                int index = 0;
+            int index = 0;
 
-                if (PlatformManager.Instance.ShowExportUI("Экспорт", filter, ref filename, ref index, out Encoding encoding, out bool start))
+            if (PlatformManager.Instance.ShowExportUI("Экспорт", filter, ref filename, ref index, out Encoding encoding, out bool start))
+            {
+                OnClosed();
+                await ExportAsync(filename, index, encoding);
+                if (start)
                 {
-                    OnClosed();
-                    await ExportAsync(filename, index, encoding);
-                    if (start)
+                    try
                     {
-                        try
-                        {
-                            Process.Start(filename);
-                        }
-                        catch (Exception exc)
-                        {
-                            OnError(exc);
-                        }
+                        Process.Start(filename);
+                    }
+                    catch (Exception exc)
+                    {
+                        OnError(exc);
                     }
                 }
             }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
+        }
+    }
+
+    internal async Task ExportAsync(string filename, int index, Encoding encoding)
+    {
+        switch (index)
+        {
+            case 2:
+                ExportHtml(filename);
+                break;
+
+            case 3:
+                _documentWrapper.ExportDocx(filename);
+                break;
+
+            case 4:
+                ExportRtf(filename);
+                break;
+
+            case 5:
+                _documentWrapper.ExportXps(filename);
+                break;
+
+            default:
+                ExportTxt(filename, encoding);
+                break;
         }
 
-        internal async Task ExportAsync(string filename, int index, Encoding encoding)
+        await ExportMediaAsync(filename);
+    }
+
+    /// <summary>
+    /// Выгрузить медиа в подпапку
+    /// </summary>
+    /// <param name="filename">Имя основного файла для экспорта</param>
+    private async Task ExportMediaAsync(string filename)
+    {
+        var extMedia = new List<IMedia>();
+
+        foreach (var round in _source.Package.Rounds)
         {
-            switch (index)
+            foreach (var theme in round.Themes)
             {
-                case 2:
-                    ExportHtml(filename);
-                    break;
-
-                case 3:
-                    _documentWrapper.ExportDocx(filename);
-                    break;
-
-                case 4:
-                    ExportRtf(filename);
-                    break;
-
-                case 5:
-                    _documentWrapper.ExportXps(filename);
-                    break;
-
-                default:
-                    ExportTxt(filename, encoding);
-                    break;
-            }
-
-            await ExportMediaAsync(filename);
-        }
-
-        /// <summary>
-        /// Выгрузить медиа в подпапку
-        /// </summary>
-        /// <param name="filename">Имя основного файла для экспорта</param>
-        private async Task ExportMediaAsync(string filename)
-        {
-            var extMedia = new List<IMedia>();
-
-            foreach (var round in _source.Package.Rounds)
-            {
-                foreach (var theme in round.Themes)
+                foreach (var quest in theme.Questions)
                 {
-                    foreach (var quest in theme.Questions)
+                    foreach (var atom in quest.Scenario)
                     {
-                        foreach (var atom in quest.Scenario)
+                        var type = atom.Model.Type;
+                        if (type == AtomTypes.Image || type == AtomTypes.Audio || type == AtomTypes.Video)
                         {
-                            var type = atom.Model.Type;
-                            if (type == AtomTypes.Image || type == AtomTypes.Audio || type == AtomTypes.Video)
+                            var media = _source.Document.GetLink(atom.Model);
+                            if (media.GetStream != null)
                             {
-                                var media = _source.Document.GetLink(atom.Model);
-                                if (media.GetStream != null)
+                                if (media.Uri != null)
                                 {
-                                    if (media.Uri != null)
-                                    {
-                                        extMedia.Add(media);
-                                    }
+                                    extMedia.Add(media);
                                 }
                             }
                         }
                     }
                 }
             }
-
-            if (extMedia.Any())
-            {
-                var name = Path.GetFileNameWithoutExtension(filename);
-                var folder = Path.Combine(Path.GetDirectoryName(filename), name + "_Media");
-                Directory.CreateDirectory(folder);
-
-                foreach (var media in extMedia)
-                {
-                    using var stream = media.GetStream().Stream;
-                    var file = Path.Combine(folder, media.Uri);
-                    using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
-                    await stream.CopyToAsync(fs);
-                }
-            }
         }
 
-        private void ExportTxt(string filename, Encoding encoding) =>
-            _documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));
-
-        private void ExportHtml(string filename) =>
-            _documentWrapper.WalkAndSave(
-                filename,
-                Encoding.UTF8,
-                sr => sr.Write("<br>"),
-                (sr, text) => sr.Write(text),
-                sr => sr.Write(
-                    string.Format("<!DOCTYPE html><html><head><title>{0}</title></head><body>",
-                    _source.Document.Package.Name)),
-                sr => sr.Write("</body></html>"));
-
-        private void ExportRtf(string filename) =>
-            // RTF does not support Unicode!
-            _documentWrapper.WalkAndSave(
-                filename,
-                Encoding.GetEncoding(1251),
-                sr => sr.Write(@"\par "),
-                (sr, text) => sr.Write(text.Replace(@"\", @"\\")),
-                sr =>
-                {
-                    sr.Write("{\\rtf1\\ansi\\ansicpg1251\\deff0\\deflang1049");
-                    sr.Write("{\\fonttbl{\\f0\\fnil\\fcharset204{\\*\\fname Times New Roman;}Times New Roman;}}");
-                    sr.Write("\r\n\\viewkind4\\uc1\\pard\\f0\\fs24 ");
-                },
-                sr => sr.Write("\r\n}\r\n"));
-
-        private void Print_Executed(object arg)
+        if (extMedia.Any())
         {
-            if (_documentWrapper.Print())
+            var name = Path.GetFileNameWithoutExtension(filename);
+            var folder = Path.Combine(Path.GetDirectoryName(filename), name + "_Media");
+            Directory.CreateDirectory(folder);
+
+            foreach (var media in extMedia)
             {
-                OnClosed();
+                using var stream = media.GetStream().Stream;
+                var file = Path.Combine(folder, media.Uri);
+                using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
+                await stream.CopyToAsync(fs);
             }
+        }
+    }
+
+    private void ExportTxt(string filename, Encoding encoding) =>
+        _documentWrapper.WalkAndSave(filename, encoding, sr => sr.WriteLine(), (sr, text) => sr.Write(text));
+
+    private void ExportHtml(string filename) =>
+        _documentWrapper.WalkAndSave(
+            filename,
+            Encoding.UTF8,
+            sr => sr.Write("<br>"),
+            (sr, text) => sr.Write(text),
+            sr => sr.Write(
+                string.Format("<!DOCTYPE html><html><head><title>{0}</title></head><body>",
+                _source.Document.Package.Name)),
+            sr => sr.Write("</body></html>"));
+
+    private void ExportRtf(string filename) =>
+        // RTF does not support Unicode!
+        _documentWrapper.WalkAndSave(
+            filename,
+            Encoding.GetEncoding(1251),
+            sr => sr.Write(@"\par "),
+            (sr, text) => sr.Write(text.Replace(@"\", @"\\")),
+            sr =>
+            {
+                sr.Write("{\\rtf1\\ansi\\ansicpg1251\\deff0\\deflang1049");
+                sr.Write("{\\fonttbl{\\f0\\fnil\\fcharset204{\\*\\fname Times New Roman;}Times New Roman;}}");
+                sr.Write("\r\n\\viewkind4\\uc1\\pard\\f0\\fs24 ");
+            },
+            sr => sr.Write("\r\n}\r\n"));
+
+    private void Print_Executed(object arg)
+    {
+        if (_documentWrapper.Print())
+        {
+            OnClosed();
         }
     }
 }

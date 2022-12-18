@@ -1,161 +1,160 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewModel
 {
-    public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewModel
+    public ICommand AddItem { get; private set; }
+    public new SimpleCommand RemoveItem { get; private set; }
+
+    public SimpleCommand MoveLeft { get; private set; }
+    public SimpleCommand MoveRight { get; private set; }
+
+    public abstract QDocument? OwnerDocument { get; }
+
+    private int _currentPosition;
+
+    public int CurrentPosition
     {
-        public ICommand AddItem { get; private set; }
-        public new SimpleCommand RemoveItem { get; private set; }
-
-        public SimpleCommand MoveLeft { get; private set; }
-        public SimpleCommand MoveRight { get; private set; }
-
-        public abstract QDocument OwnerDocument { get; }
-
-        private int _currentPosition;
-
-        public int CurrentPosition
+        get => _currentPosition;
+        set
         {
-            get => _currentPosition;
-            set
+            if (_currentPosition != value)
             {
-                if (_currentPosition != value)
+                _currentPosition = value;
+                if (_currentPosition > -1 && _currentPosition < Count)
                 {
-                    _currentPosition = value;
-                    if (_currentPosition > -1 && _currentPosition < Count)
-                    {
-                        CurrentItem = this[_currentPosition];
-                        UpdateCommands();
-                    }
-
-                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentPosition)));
+                    CurrentItem = this[_currentPosition];
+                    UpdateCommands();
                 }
+
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentPosition)));
             }
         }
+    }
 
-        private T _currentItem;
+    private T _currentItem;
 
-        public T CurrentItem
+    public T CurrentItem
+    {
+        get => _currentItem;
+        set
         {
-            get => _currentItem;
-            set
+            if (!Equals(_currentItem, value))
             {
-                if (!Equals(_currentItem, value))
-                {
-                    var oldValue = _currentItem;
-                    _currentItem = value;
-                    CurrentPosition = IndexOf(_currentItem);
-                    OnCurrentItemChanged(oldValue, value);
+                var oldValue = _currentItem;
+                _currentItem = value;
+                CurrentPosition = IndexOf(_currentItem);
+                OnCurrentItemChanged(oldValue, value);
 
-                    OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentItem)));
-                }
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentItem)));
             }
         }
+    }
 
-        protected virtual void OnCurrentItemChanged(T oldValue, T newValue) { }
+    protected virtual void OnCurrentItemChanged(T oldValue, T newValue) { }
 
-        public void SetCurrentItem(object item)
+    public void SetCurrentItem(object item)
+    {
+        CurrentItem = (T)item;
+    }
+
+    protected ItemsViewModel() => Init();
+
+    protected ItemsViewModel(IEnumerable<T> collection)
+        : base(collection) => Init();
+
+    private void Init()
+    {
+        AddItem = new SimpleCommand(AddItem_Executed);
+        RemoveItem = new SimpleCommand(RemoveItem_Executed);
+
+        MoveLeft = new SimpleCommand(MoveLeft_Executed);
+        MoveRight = new SimpleCommand(MoveRight_Executed);
+    }
+
+    public void UpdateCommands()
+    {
+        var position = _currentPosition;
+
+        MoveLeft.CanBeExecuted = position > 0;
+        MoveRight.CanBeExecuted = position > -1 && position + 1 < Count;
+
+        RemoveItem.CanBeExecuted = CanRemove();
+    }
+
+    protected virtual bool CanRemove() => true;
+
+    private void AddItem_Executed(object? arg) => Add((T)(object)"");
+
+    private void RemoveItem_Executed(object? arg)
+    {
+        if (_currentPosition > -1 && _currentPosition < Count)
         {
-            CurrentItem = (T)item;
+            RemoveAt(_currentPosition);
         }
 
-        protected ItemsViewModel() => Init();
+        UpdateCommands();
+    }
 
-        protected ItemsViewModel(IEnumerable<T> collection)
-            : base(collection) => Init();
+    private void MoveLeft_Executed(object? arg)
+    {
+        var index = _currentPosition;
 
-        private void Init()
+        if (index < 1 || index >= Count)
         {
-            AddItem = new SimpleCommand(AddItem_Executed);
-            RemoveItem = new SimpleCommand(RemoveItem_Executed);
-
-            MoveLeft = new SimpleCommand(MoveLeft_Executed);
-            MoveRight = new SimpleCommand(MoveRight_Executed);
+            return;
         }
 
-        public void UpdateCommands()
+        var document = OwnerDocument;
+
+        if (document == null)
         {
-            var position = _currentPosition;
-
-            MoveLeft.CanBeExecuted = position > 0;
-            MoveRight.CanBeExecuted = position > -1 && position + 1 < Count;
-
-            RemoveItem.CanBeExecuted = CanRemove();
+            return;
         }
 
-        protected virtual bool CanRemove() => true;
-
-        private void AddItem_Executed(object arg) => Add((T)(object)"");
-
-        private void RemoveItem_Executed(object arg)
+        try
         {
-            if (_currentPosition > -1 && _currentPosition < Count)
-            {
-                RemoveAt(_currentPosition);
-            }
+            using var change = document.OperationsManager.BeginComplexChange();
 
+            (this[index - 1], this[index]) = (this[index], this[index - 1]);
+            CurrentItem = this[_currentPosition];
             UpdateCommands();
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.ShowExclamationMessage(exc.ToString());
+        }
+    }
+
+    private void MoveRight_Executed(object? arg)
+    {
+        var index = _currentPosition;
+
+        var document = OwnerDocument;
+
+        if (document == null)
+        {
+            return;
         }
 
-        private void MoveLeft_Executed(object arg)
+        try
         {
-            var index = _currentPosition;
-            if (index < 1 || index >= Count)
-            {
-                return;
-            }
+            using var change = document.OperationsManager.BeginComplexChange();
 
-            var document = OwnerDocument;
+            (this[index + 1], this[index]) = (this[index], this[index + 1]);
+            CurrentItem = this[_currentPosition];
+            UpdateCommands();
 
-            if (document == null)
-            {
-                return;
-            }
-
-            document.BeginChange();
-
-            try
-            {
-                (this[index - 1], this[index]) = (this[index], this[index - 1]);
-                CurrentItem = this[_currentPosition];
-                UpdateCommands();
-            }
-            finally
-            {
-                document.CommitChange();
-            }
+            change.Commit();
         }
-
-        private void MoveRight_Executed(object arg)
+        catch (Exception exc)
         {
-            var index = _currentPosition;
-
-            var document = OwnerDocument;
-
-            if (document == null)
-            {
-                return;
-            }
-
-            document.BeginChange();
-
-            try
-            {
-                (this[index + 1], this[index]) = (this[index], this[index + 1]);
-                CurrentItem = this[_currentPosition];
-                UpdateCommands();
-
-                document.CommitChange();
-            }
-            catch (Exception exc)
-            {
-                document.RollbackChange();
-                PlatformSpecific.PlatformManager.Instance.ShowExclamationMessage(exc.ToString());
-            }
+            PlatformSpecific.PlatformManager.Instance.ShowExclamationMessage(exc.ToString());
         }
     }
 }

@@ -1,45 +1,44 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+/// <summary>
+/// Класс, позволяющий передать привязки команд визуальному элементу
+/// </summary>
+public sealed class CommandBindingsManager : DependencyObject
 {
-    /// <summary>
-    /// Класс, позволяющий передать привязки команд визуальному элементу
-    /// </summary>
-    public sealed class CommandBindingsManager: DependencyObject
+    public static CommandBindingCollection GetRegisterCommandBindings(DependencyObject obj) =>
+        (CommandBindingCollection)obj.GetValue(RegisterCommandBindingsProperty);
+
+    public static void SetRegisterCommandBindings(DependencyObject obj, CommandBindingCollection value) =>
+        obj.SetValue(RegisterCommandBindingsProperty, value);
+
+    public static readonly DependencyProperty RegisterCommandBindingsProperty =
+        DependencyProperty.RegisterAttached(
+            "RegisterCommandBindings",
+            typeof(CommandBindingCollection),
+            typeof(CommandBindingsManager),
+            new UIPropertyMetadata(null, OnRegisterCommandBindingChanged));
+
+    private static void OnRegisterCommandBindingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        public static CommandBindingCollection GetRegisterCommandBindings(DependencyObject obj)
+        if (sender is not UIElement element)
         {
-            return (CommandBindingCollection)obj.GetValue(RegisterCommandBindingsProperty);
+            return;
         }
 
-        public static void SetRegisterCommandBindings(DependencyObject obj, CommandBindingCollection value)
+        if (e.OldValue is CommandBindingCollection bindings)
         {
-            obj.SetValue(RegisterCommandBindingsProperty, value);
-        }
-
-        // Using a DependencyProperty as the backing store for RegisterCommandBindings.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty RegisterCommandBindingsProperty =
-            DependencyProperty.RegisterAttached("RegisterCommandBindings", typeof(CommandBindingCollection), typeof(CommandBindingsManager), new UIPropertyMetadata(null, OnRegisterCommandBindingChanged));
-
-        private static void OnRegisterCommandBindingChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender is UIElement element)
+            foreach (CommandBinding item in bindings)
             {
-                if (e.OldValue is CommandBindingCollection bindings)
-                {
-                    foreach (CommandBinding item in bindings)
-                    {
-                        element.CommandBindings.Remove(item);
-                    }
-                }
-
-                bindings = e.NewValue as CommandBindingCollection;
-                if (bindings != null)
-                {
-                    element.CommandBindings.AddRange(bindings);
-                }
+                element.CommandBindings.Remove(item);
             }
+        }
+
+        if (e.NewValue is CommandBindingCollection newBindings)
+        {
+            element.CommandBindings.AddRange(newBindings);
         }
     }
 }

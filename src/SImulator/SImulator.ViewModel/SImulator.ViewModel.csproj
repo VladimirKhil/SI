@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<TargetFramework>net6.0</TargetFramework>
-	<SignAssembly>true</SignAssembly>
+    <TargetFramework>net6.0</TargetFramework>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Authors>Vladimir Khil</Authors>
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Company>Khil-soft</Company>
-    <Version>2.10.0</Version>
+    <Version>2.10.1</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-	<Nullable>enable</Nullable>
-	<ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-	<DebugType>none</DebugType>
-	<DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

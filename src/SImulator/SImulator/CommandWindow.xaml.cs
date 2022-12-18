@@ -5,40 +5,39 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace SImulator
+namespace SImulator;
+
+/// <summary>
+/// Provides interaction logic for CommandWindow.xaml.
+/// </summary>
+public partial class CommandWindow : Window
 {
     /// <summary>
-    /// Provides interaction logic for CommandWindow.xaml.
+    /// Application version.
     /// </summary>
-    public partial class CommandWindow : Window
+    public string? Version => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3);
+
+    public CommandWindow() => InitializeComponent();
+
+    private async void Window_Closing(object sender, CancelEventArgs e)
     {
-        /// <summary>
-        /// Application version.
-        /// </summary>
-        public string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-
-        public CommandWindow() => InitializeComponent();
-
-        private async void Window_Closing(object sender, CancelEventArgs e)
+        if (DataContext != null)
         {
-            if (DataContext != null)
-            {
-                var result = await ((MainViewModel)DataContext).RaiseStop();
-                e.Cancel = !result;
-            }
+            var result = await ((MainViewModel)DataContext).RaiseStop();
+            e.Cancel = !result;
         }
+    }
 
-        private async void Button_LostKeyboardFocus_1(object sender, KeyboardFocusChangedEventArgs e)
+    private async void Button_LostKeyboardFocus_1(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (DataContext is MainViewModel mainViewModel)
         {
-            if (DataContext is MainViewModel mainViewModel)
-            {
-                await mainViewModel.OnButtonsLeftAsync();
-            }
+            await mainViewModel.OnButtonsLeftAsync();
         }
+    }
 
-        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
-        {
-            e.Accepted = (ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;
-        }
+    private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
+    {
+        e.Accepted = (ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;
     }
 }

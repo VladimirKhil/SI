@@ -1,10 +1,11 @@
-﻿namespace SIQuester.Utilities
+﻿using System.Windows.Data;
+
+namespace SIQuester.Utilities;
+
+public sealed class QuestionTypeNameFilter : ICollectionFilter
 {
-    public sealed class QuestionTypeNameFilter: ICollectionFilter
+    public void Filter(object sender, FilterEventArgs e)
     {
-        public void Filter(object sender, System.Windows.Data.FilterEventArgs e)
-        {
-            e.Accepted = (e.Item as string).Length > 0;
-        }
+        e.Accepted = (e.Item as string).Length > 0;
     }
 }

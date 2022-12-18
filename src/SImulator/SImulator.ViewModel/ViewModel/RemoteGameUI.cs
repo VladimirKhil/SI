@@ -1,7 +1,6 @@
 ﻿using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
-using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Windows.Input;

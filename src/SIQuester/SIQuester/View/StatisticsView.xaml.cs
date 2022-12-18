@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для StatisticsView.xaml
+/// </summary>
+public partial class StatisticsView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для StatisticsView.xaml
-    /// </summary>
-    public partial class StatisticsView : UserControl
-    {
-        public StatisticsView()
-        {
-            InitializeComponent();
-        }
-    }
+    public StatisticsView() => InitializeComponent();
 }

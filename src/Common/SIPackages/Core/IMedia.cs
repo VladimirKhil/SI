@@ -1,25 +1,22 @@
-﻿using System;
+﻿namespace SIPackages.Core;
 
-namespace SIPackages.Core
+/// <summary>
+/// Defines a package media object.
+/// </summary>
+public interface IMedia
 {
     /// <summary>
-    /// Defines a package media object.
+    /// Gets media stream information.
     /// </summary>
-    public interface IMedia
-    {
-        /// <summary>
-        /// Gets media stream information.
-        /// </summary>
-        Func<StreamInfo>? GetStream { get; }
+    Func<StreamInfo>? GetStream { get; }
 
-        /// <summary>
-        /// Gets media stream length.
-        /// </summary>
-        long StreamLength { get; }
+    /// <summary>
+    /// Gets media stream length.
+    /// </summary>
+    long StreamLength { get; }
 
-        /// <summary>
-        /// Gets Media uri.
-        /// </summary>
-        string Uri { get; }
-    }
+    /// <summary>
+    /// Gets Media uri.
+    /// </summary>
+    string Uri { get; }
 }

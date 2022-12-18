@@ -1,7 +1,6 @@
-﻿namespace SIGame.ViewModel
+﻿namespace SIGame.ViewModel;
+
+public sealed class BestPlayersViewModel : ViewModel<object>
 {
-    public sealed class BestPlayersViewModel: ViewModel<object>
-    {
-        public bool IsProgress => false;
-    }
+    public bool IsProgress => false;
 }

@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIStorageService.ViewModel"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIQuester.ViewModel.Tests", "test\SIQuester\SIQuester.ViewModel.Tests\SIQuester.ViewModel.Tests.csproj", "{64E4E20D-318F-404F-B7D4-1039FD67F84B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIEngine.Core", "src\Common\SIEngine.Core\SIEngine.Core.csproj", "{D523BDCD-8370-4919-B7AA-51B167B27007}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIEngine.Core", "src\Common\SIEngine.Core\SIEngine.Core.csproj", "{D523BDCD-8370-4919-B7AA-51B167B27007}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

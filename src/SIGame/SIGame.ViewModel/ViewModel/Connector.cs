@@ -3,134 +3,130 @@ using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
 using SIData;
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SIGame.ViewModel
+namespace SIGame.ViewModel;
+
+public sealed class Connector : IDisposable
 {
-    public sealed class Connector : IDisposable
+    private readonly SlaveServer _server;
+    private readonly Client _client;
+
+    private TaskCompletionSource<string[]> _tcs;
+    private TaskCompletionSource<bool> _tcs2;
+
+    public Connector(SlaveServer server, Client client)
     {
-        private readonly SlaveServer _server;
-        private readonly Client _client;
+        _server = server ?? throw new ArgumentNullException(nameof(server));
+        _client = client ?? throw new ArgumentNullException(nameof(client));
 
-        private TaskCompletionSource<string[]> _tcs;
-        private TaskCompletionSource<bool> _tcs2;
+        client.MessageReceived += ProcessMessageAsync;
+    }
 
-        public Connector(SlaveServer server, Client client)
+    public Task<string[]> GetGameInfoAsync()
+    {
+        _tcs = new TaskCompletionSource<string[]>();
+
+        _server.ConnectionsLock.WithLock(async () =>
         {
-            _server = server ?? throw new ArgumentNullException(nameof(server));
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-
-            client.MessageReceived += ProcessMessageAsync;
-        }
-
-        public Task<string[]> GetGameInfoAsync()
-        {
-            _tcs = new TaskCompletionSource<string[]>();
-
-            _server.ConnectionsLock.WithLock(async () =>
+            if (_server.HostServer == null)
             {
-                if (_server.HostServer == null)
-                {
-                    Trace.TraceError("GetGameInfoAsync: _server.HostServer == null");
-                    return;
-                }
-
-                await _server.HostServer.SendMessageAsync(new Message(Messages.GameInfo, "", ""));
-            });
-
-            return _tcs.Task;
-        }
-
-        public Task<string[]> JoinGameAsync(string command)
-        {
-            _tcs = new TaskCompletionSource<string[]>();
-
-            var m = new Message(command, "", "");
-            _server.ConnectionsLock.WithLock(async () =>
-            {
-                if (_server.HostServer == null)
-                {
-                    Trace.TraceError("JoinGameAsync: _server.HostServer == null");
-                    return;
-                }
-
-                await _server.HostServer.SendMessageAsync(m);
-            });
-
-            return _tcs.Task;
-        }
-
-        private ValueTask ProcessMessageAsync(Message m)
-        {
-            var text = m.Text?.Split(Message.ArgsSeparatorChar);
-            if (text?.Length == 0)
-            {
-                return default;
+                Trace.TraceError("GetGameInfoAsync: _server.HostServer == null");
+                return;
             }
 
-            if (_tcs2 != null)
-            {
-                switch (text[0])
-                {
-                    case Messages.Game:
-                        _tcs2.TrySetResult(true);
-                        break;
+            await _server.HostServer.SendMessageAsync(new Message(Messages.GameInfo, "", ""));
+        });
 
-                    case Messages.NoGame:
-                        _tcs2.TrySetResult(false);
-                        break;
-                }
+        return _tcs.Task;
+    }
+
+    public Task<string[]> JoinGameAsync(string command)
+    {
+        _tcs = new TaskCompletionSource<string[]>();
+
+        var m = new Message(command, "", "");
+        _server.ConnectionsLock.WithLock(async () =>
+        {
+            if (_server.HostServer == null)
+            {
+                Trace.TraceError("JoinGameAsync: _server.HostServer == null");
+                return;
             }
 
-            if (_tcs != null)
-            {
-                switch (text[0])
-                {
-                    case Messages.GameInfo:
-                        _tcs.TrySetResult(text);
-                        break;
+            await _server.HostServer.SendMessageAsync(m);
+        });
 
-                    case Messages.Accepted:
-                        _tcs.TrySetResult(text);
-                        break;
+        return _tcs.Task;
+    }
 
-                    case SystemMessages.Refuse:
-                        if (text.Length > 1)
-                            _tcs.TrySetException(new Exception(text[1]));
-                        break;
-                }
-            }
-
+    private ValueTask ProcessMessageAsync(Message m)
+    {
+        var text = m.Text?.Split(Message.ArgsSeparatorChar);
+        if (text?.Length == 0)
+        {
             return default;
         }
 
-        public void Dispose()
+        if (_tcs2 != null)
         {
-            _client.MessageReceived -= ProcessMessageAsync;
-        }
-
-        internal Task<bool> SetGameIdAsync(int gameId)
-        {
-            _tcs2 = new TaskCompletionSource<bool>();
-
-            var ct = new CancellationTokenSource(10000);
-            ct.Token.Register(() => _tcs2.TrySetCanceled(), useSynchronizationContext: false);
-
-            _server.ConnectionsLock.WithLock(async () =>
+            switch (text[0])
             {
-                if (_server.HostServer == null)
-                {
-                    Trace.TraceError("SetGameIdAsync: _server.HostServer == null");
-                    return;
-                }
+                case Messages.Game:
+                    _tcs2.TrySetResult(true);
+                    break;
 
-                await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
-            });
-
-            return _tcs2.Task;
+                case Messages.NoGame:
+                    _tcs2.TrySetResult(false);
+                    break;
+            }
         }
+
+        if (_tcs != null)
+        {
+            switch (text[0])
+            {
+                case Messages.GameInfo:
+                    _tcs.TrySetResult(text);
+                    break;
+
+                case Messages.Accepted:
+                    _tcs.TrySetResult(text);
+                    break;
+
+                case SystemMessages.Refuse:
+                    if (text.Length > 1)
+                        _tcs.TrySetException(new Exception(text[1]));
+                    break;
+            }
+        }
+
+        return default;
+    }
+
+    public void Dispose()
+    {
+        _client.MessageReceived -= ProcessMessageAsync;
+    }
+
+    internal Task<bool> SetGameIdAsync(int gameId)
+    {
+        _tcs2 = new TaskCompletionSource<bool>();
+
+        var ct = new CancellationTokenSource(10000);
+        ct.Token.Register(() => _tcs2.TrySetCanceled(), useSynchronizationContext: false);
+
+        _server.ConnectionsLock.WithLock(async () =>
+        {
+            if (_server.HostServer == null)
+            {
+                Trace.TraceError("SetGameIdAsync: _server.HostServer == null");
+                return;
+            }
+
+            await _server.HostServer.SendMessageAsync(new Message($"{Messages.Game}{Message.ArgsSeparatorChar}{gameId}", "", ""));
+        });
+
+        return _tcs2.Task;
     }
 }

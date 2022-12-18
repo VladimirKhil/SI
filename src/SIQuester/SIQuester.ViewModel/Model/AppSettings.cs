@@ -1,522 +1,514 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
-namespace SIQuester.Model
+namespace SIQuester.Model;
+
+/// <summary>
+/// Defines application settings.
+/// </summary>
+public sealed class AppSettings : INotifyPropertyChanged
 {
     /// <summary>
-    /// Defines application settings.
+    /// Application name.
     /// </summary>
-    public sealed class AppSettings : INotifyPropertyChanged
+    public const string ProductName = "SIQuester";
+
+    /// <summary>
+    /// Name of the folder used to store simplified auto saves (packages without media).
+    /// </summary>
+    public const string AutoSaveSimpleFolderName = "AutoSaveNew";
+
+    /// <summary>
+    /// Name of the folder used to store unpacked media.
+    /// </summary>
+    public const string MediaFolderName = "Media";
+
+    /// <summary>
+    /// Name of the folder used to store temporary media files.
+    /// </summary>
+    public const string TempMediaFolderName = "TempMedia";
+
+    private const string DefaultFontFamily = "Calibri";
+
+    /// <summary>
+    /// Auto-save interval.
+    /// </summary>
+    public static readonly TimeSpan AutoSaveInterval = TimeSpan.FromSeconds(20);
+
+    /// <summary>
+    /// Is current Windows version a Windows Vista or a later version.
+    /// </summary>
+    public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
+
+    public static AppSettings Default { get; set; }
+
+    private bool _searchForUpdates = true;
+
+    [DefaultValue(true)]
+    public bool SearchForUpdates
     {
-        /// <summary>
-        /// Application name.
-        /// </summary>
-        public const string ProductName = "SIQuester";
-
-        /// <summary>
-        /// Name of the folder used to store auto saves.
-        /// </summary>
-        public const string AutoSaveFolderName = "AutoSave";
-
-        /// <summary>
-        /// Name of the folder used to store simplified auto saves (packages without media).
-        /// </summary>
-        public const string AutoSaveSimpleFolderName = "AutoSaveSimple";
-
-        /// <summary>
-        /// Name of the folder used to store restored auto saves.
-        /// </summary>
-        public const string AutoSaveRestoreFolderName = "AutoSaveRestore";
-
-        /// <summary>
-        /// Name of the folder used to store unpacked media.
-        /// </summary>
-        public const string MediaFolderName = "Media";
-
-        /// <summary>
-        /// Name of the folder used to store temporary media files.
-        /// </summary>
-        public const string TempMediaFolderName = "TempMedia";
-
-        private const string DefaultFontFamily = "Calibri";
-
-        /// <summary>
-        /// Is current Windows version a Windows Vista or a later version.
-        /// </summary>
-        public static readonly bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
-
-        public static AppSettings Default { get; set; }
-
-        private bool _searchForUpdates = true;
-
-        [DefaultValue(true)]
-        public bool SearchForUpdates
+        get => _searchForUpdates;
+        set
         {
-            get => _searchForUpdates;
-            set
+            if (_searchForUpdates != value)
             {
-                if (_searchForUpdates != value)
-                {
-                    _searchForUpdates = value;
-                    OnPropertyChanged();
-                }
+                _searchForUpdates = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _automaticTextImport = false;
+    private bool _automaticTextImport = false;
 
-        [DefaultValue(false)]
-        public bool AutomaticTextImport
+    [DefaultValue(false)]
+    public bool AutomaticTextImport
+    {
+        get => _automaticTextImport;
+        set
         {
-            get => _automaticTextImport;
-            set
+            if (_automaticTextImport != value)
             {
-                if (_automaticTextImport != value)
-                {
-                    _automaticTextImport = value;
-                    OnPropertyChanged();
-                }
+                _automaticTextImport = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _changePriceOnMove = true;
+    private bool _changePriceOnMove = true;
 
-        [DefaultValue(true)]
-        public bool ChangePriceOnMove
+    [DefaultValue(true)]
+    public bool ChangePriceOnMove
+    {
+        get => _changePriceOnMove;
+        set
         {
-            get => _changePriceOnMove;
-            set
+            if (_changePriceOnMove != value)
             {
-                if (_changePriceOnMove != value)
-                {
-                    _changePriceOnMove = value;
-                    OnPropertyChanged();
-                }
+                _changePriceOnMove = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _createQuestionsWithTheme = false;
+    private bool _createQuestionsWithTheme = false;
 
-        [DefaultValue(false)]
-        public bool CreateQuestionsWithTheme
+    [DefaultValue(false)]
+    public bool CreateQuestionsWithTheme
+    {
+        get => _createQuestionsWithTheme;
+        set
         {
-            get => _createQuestionsWithTheme;
-            set
+            if (_createQuestionsWithTheme != value)
             {
-                if (_createQuestionsWithTheme != value)
-                {
-                    _createQuestionsWithTheme = value;
-                    OnPropertyChanged();
-                }
+                _createQuestionsWithTheme = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _isFirstRun = true;
+    private bool _isFirstRun = true;
 
-        [DefaultValue(true)]
-        public bool IsFirstRun
+    [DefaultValue(true)]
+    public bool IsFirstRun
+    {
+        get => _isFirstRun;
+        set
         {
-            get => _isFirstRun;
-            set
+            if (_isFirstRun != value)
             {
-                if (_isFirstRun != value)
-                {
-                    _isFirstRun = value;
-                    OnPropertyChanged();
-                }
+                _isFirstRun = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _showToolTips = true;
+    private bool _showToolTips = true;
 
-        [DefaultValue(true)]
-        public bool ShowToolTips
+    [DefaultValue(true)]
+    public bool ShowToolTips
+    {
+        get => _showToolTips;
+        set
         {
-            get => _showToolTips;
-            set
+            if (_showToolTips != value)
             {
-                if (_showToolTips != value)
-                {
-                    _showToolTips = value;
-                    OnPropertyChanged();
-                }
+                _showToolTips = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private int _questionBase = 100;
+    private int _questionBase = 100;
 
-        /// <summary>
-        /// Basic question price.
-        /// </summary>
-        [DefaultValue(100)]
-        public int QuestionBase
+    /// <summary>
+    /// Basic question price.
+    /// </summary>
+    [DefaultValue(100)]
+    public int QuestionBase
+    {
+        get => _questionBase;
+        set
         {
-            get => _questionBase;
-            set
+            if (_questionBase != value)
             {
-                if (_questionBase != value)
-                {
-                    _questionBase = value;
-                    OnPropertyChanged();
-                }
+                _questionBase = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _autoSave = true;
+    private bool _autoSave = true;
 
-        [DefaultValue(true)]
-        public bool AutoSave
+    [DefaultValue(true)]
+    public bool AutoSave
+    {
+        get => _autoSave;
+        set
         {
-            get => _autoSave;
-            set
+            if (_autoSave != value)
             {
-                if (_autoSave != value)
-                {
-                    _autoSave = value;
-                    OnPropertyChanged();
-                }
+                _autoSave = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private StringCollection _delayedErrors = new();
+    private StringCollection _delayedErrors = new();
 
-        public StringCollection DelayedErrors
+    public StringCollection DelayedErrors
+    {
+        get => _delayedErrors;
+        set
         {
-            get => _delayedErrors;
-            set
+            if (_delayedErrors != value)
             {
-                if (_delayedErrors != value)
-                {
-                    _delayedErrors = value;
-                    OnPropertyChanged();
-                }
+                _delayedErrors = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private FileHistory _history = new();
+    private FileHistory _history = new();
 
-        /// <summary>
-        /// Defines a list of files that have been opened before.
-        /// </summary>
-        public FileHistory History
+    /// <summary>
+    /// Defines a list of files that have been opened before.
+    /// </summary>
+    public FileHistory History
+    {
+        get => _history;
+        set
         {
-            get => _history;
-            set
+            if (_history != value)
             {
-                if (_history != value)
-                {
-                    _history = value;
-                    OnPropertyChanged();
-                }
+                _history = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private string _searchPath = "";
+    private string _searchPath = "";
 
-        [DefaultValue("")]
-        public string SearchPath
+    [DefaultValue("")]
+    public string SearchPath
+    {
+        get => _searchPath;
+        set
         {
-            get => _searchPath;
-            set
+            if (_searchPath != value)
             {
-                if (_searchPath != value)
-                {
-                    _searchPath = value;
-                    OnPropertyChanged();
-                }
+                _searchPath = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private CostSetterList _costSetters = new();
+    private CostSetterList _costSetters = new();
 
-        public CostSetterList CostSetters
+    public CostSetterList CostSetters
+    {
+        get => _costSetters;
+        set
         {
-            get => _costSetters;
-            set
+            if (_costSetters != value)
             {
-                if (_costSetters != value)
-                {
-                    _costSetters = value;
-                    OnPropertyChanged();
-                }
+                _costSetters = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private ViewMode _view = ViewMode.TreeFull;
+    private ViewMode _view = ViewMode.TreeFull;
 
-        /// <summary>
-        /// Document view mode.
-        /// </summary>
-        [DefaultValue(ViewMode.TreeFull)]
-        public ViewMode View
+    /// <summary>
+    /// Document view mode.
+    /// </summary>
+    [DefaultValue(ViewMode.TreeFull)]
+    public ViewMode View
+    {
+        get => _view;
+        set
         {
-            get => _view;
-            set
+            if (_view != value)
             {
-                if (_view != value)
-                {
-                    _view = value;
-                    OnPropertyChanged();
-                }
+                _view = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private FlatLayoutMode _flatLayoutMode = FlatLayoutMode.Table;
+    private FlatLayoutMode _flatLayoutMode = FlatLayoutMode.Table;
 
-        /// <summary>
-        /// Layout mode in flat view.
-        /// </summary>
-        [DefaultValue(FlatLayoutMode.Table)]
-        public FlatLayoutMode FlatLayoutMode
+    /// <summary>
+    /// Layout mode in flat view.
+    /// </summary>
+    [DefaultValue(FlatLayoutMode.Table)]
+    public FlatLayoutMode FlatLayoutMode
+    {
+        get => _flatLayoutMode;
+        set
         {
-            get => _flatLayoutMode;
-            set
+            if (_flatLayoutMode != value)
             {
-                if (_flatLayoutMode != value)
-                {
-                    _flatLayoutMode = value;
-                    OnPropertyChanged();
-                }
+                _flatLayoutMode = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private FlatScale _flatScale = FlatScale.Theme;
+    private FlatScale _flatScale = FlatScale.Theme;
 
-        [DefaultValue(FlatScale.Theme)]
-        public FlatScale FlatScale
+    [DefaultValue(FlatScale.Theme)]
+    public FlatScale FlatScale
+    {
+        get => _flatScale;
+        set
         {
-            get => _flatScale;
-            set
+            if (_flatScale != value)
             {
-                if (_flatScale != value)
-                {
-                    _flatScale = value;
-                    OnPropertyChanged();
-                }
+                _flatScale = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _showEditPanel = false;
+    private bool _showEditPanel = false;
 
-        [DefaultValue(false)]
-        public bool ShowEditPanel
+    [DefaultValue(false)]
+    public bool ShowEditPanel
+    {
+        get => _showEditPanel;
+        set
         {
-            get => _showEditPanel;
-            set
+            if (_showEditPanel != value)
             {
-                if (_showEditPanel != value)
-                {
-                    _showEditPanel = value;
-                    OnPropertyChanged();
-                }
+                _showEditPanel = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private EditMode _edit = EditMode.None;
+    private EditMode _edit = EditMode.None;
 
-        [DefaultValue(EditMode.None)]
-        public EditMode Edit
+    [DefaultValue(EditMode.None)]
+    public EditMode Edit
+    {
+        get => _edit;
+        set
         {
-            get => _edit;
-            set
+            if (_edit != value)
             {
-                if (_edit != value)
-                {
-                    _edit = value;
-                    OnPropertyChanged();
-                }
+                _edit = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _alightAnswersRight = false;
+    private bool _alightAnswersRight = false;
 
-        [DefaultValue(false)]
-        public bool AlightAnswersRight
+    [DefaultValue(false)]
+    public bool AlightAnswersRight
+    {
+        get => _alightAnswersRight;
+        set
         {
-            get => _alightAnswersRight;
-            set
+            if (_alightAnswersRight != value)
             {
-                if (_alightAnswersRight != value)
-                {
-                    _alightAnswersRight = value;
-                    OnPropertyChanged();
-                }
+                _alightAnswersRight = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _spellChecking = true;
+    private bool _spellChecking = true;
 
-        [DefaultValue(true)]
-        public bool SpellChecking
+    [DefaultValue(true)]
+    public bool SpellChecking
+    {
+        get => _spellChecking;
+        set
         {
-            get => _spellChecking;
-            set
+            if (_spellChecking != value)
             {
-                if (_spellChecking != value)
-                {
-                    _spellChecking = value;
-                    OnPropertyChanged();
-                }
+                _spellChecking = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private int _fontSize = 15;
+    private int _fontSize = 15;
 
-        [DefaultValue(15)]
-        public int FontSize
+    [DefaultValue(15)]
+    public int FontSize
+    {
+        get => _fontSize;
+        set
         {
-            get => _fontSize;
-            set
+            if (_fontSize != value)
             {
-                if (_fontSize != value)
-                {
-                    _fontSize = value;
-                    OnPropertyChanged();
-                }
+                _fontSize = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private string _fontFamily = DefaultFontFamily;
+    private string _fontFamily = DefaultFontFamily;
 
-        [DefaultValue(DefaultFontFamily)]
-        public string FontFamily
+    [DefaultValue(DefaultFontFamily)]
+    public string FontFamily
+    {
+        get => _fontFamily;
+        set
         {
-            get => _fontFamily;
-            set
+            if (_fontFamily != value && value != null) // null could be provided by the WPF binding
             {
-                if (_fontFamily != value && value != null) // null could be provided by the WPF binding
-                {
-                    _fontFamily = value;
-                    OnPropertyChanged();
-                }
+                _fontFamily = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _removeLinks = true;
+    private bool _removeLinks = true;
 
-        /// <summary>
-        /// Remove media file after the removal of last link to it.
-        /// </summary>
-        [DefaultValue(true)]
-        public bool RemoveLinks
+    /// <summary>
+    /// Remove media file after the removal of last link to it.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool RemoveLinks
+    {
+        get => _removeLinks;
+        set
         {
-            get => _removeLinks;
-            set
+            if (_removeLinks != value)
             {
-                if (_removeLinks != value)
-                {
-                    _removeLinks = value;
-                    OnPropertyChanged();
-                }
+                _removeLinks = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        private bool _checkFileSize = true;
+    private bool _checkFileSize = true;
 
-        /// <summary>
-        /// Enables check that file size is greater than the default game server limit (100 MB).
-        /// </summary>
-        [DefaultValue(true)]
-        public bool CheckFileSize
+    /// <summary>
+    /// Enables check that file size is greater than the default game server limit (100 MB).
+    /// </summary>
+    [DefaultValue(true)]
+    public bool CheckFileSize
+    {
+        get => _checkFileSize;
+        set
         {
-            get => _checkFileSize;
-            set
+            if (_checkFileSize != value)
             {
-                if (_checkFileSize != value)
-                {
-                    _checkFileSize = value;
-                    OnPropertyChanged();
-                }
+                _checkFileSize = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        /// <summary>
-        /// Maximum recommended image size.
-        /// </summary>
-        public int MaxImageSizeKb { get; } = 1 * 1024;
+    /// <summary>
+    /// Maximum recommended image size.
+    /// </summary>
+    public int MaxImageSizeKb { get; } = 1 * 1024;
 
-        /// <summary>
-        /// Maximum recommended audio size.
-        /// </summary>
-        public int MaxAudioSizeKb { get; } = 5 * 1024;
+    /// <summary>
+    /// Maximum recommended audio size.
+    /// </summary>
+    public int MaxAudioSizeKb { get; } = 5 * 1024;
 
-        /// <summary>
-        /// Maximum recommended video size.
-        /// </summary>
-        public int MaxVideoSizeKb { get; } = 10 * 1024;
+    /// <summary>
+    /// Maximum recommended video size.
+    /// </summary>
+    public int MaxVideoSizeKb { get; } = 10 * 1024;
 
-        /// <summary>
-        /// Loads settings from stream.
-        /// </summary>
-        public static AppSettings Load(Stream stream)
-        {
-            try
-            {
-                var serializer = new XmlSerializer(typeof(AppSettings));
-                return (AppSettings)serializer.Deserialize(stream);
-            }
-            catch { }
-
-            return Create();
-        }
-
-        public static AppSettings Create()
-        {
-            var newSettings = new AppSettings();
-            newSettings.Initialize();
-            return newSettings;
-        }
-
-        internal void Initialize()
-        {
-            _costSetters.Add(new CostSetter(10));
-            _costSetters.Add(new CostSetter(20));
-            _costSetters.Add(new CostSetter(100));
-            _costSetters.Add(new CostSetter(200));
-            _costSetters.Add(new CostSetter(300));
-        }
-
-        public void Save(Stream stream)
+    /// <summary>
+    /// Loads settings from stream.
+    /// </summary>
+    public static AppSettings Load(Stream stream)
+    {
+        try
         {
             var serializer = new XmlSerializer(typeof(AppSettings));
-            serializer.Serialize(stream, this);
+            return (AppSettings)serializer.Deserialize(stream);
         }
+        catch { }
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        return Create();
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public static AppSettings Create()
+    {
+        var newSettings = new AppSettings();
+        newSettings.Initialize();
+        return newSettings;
+    }
 
-        internal void Reset()
+    internal void Initialize()
+    {
+        _costSetters.Add(new CostSetter(10));
+        _costSetters.Add(new CostSetter(20));
+        _costSetters.Add(new CostSetter(100));
+        _costSetters.Add(new CostSetter(200));
+        _costSetters.Add(new CostSetter(300));
+    }
+
+    public void Save(Stream stream)
+    {
+        var serializer = new XmlSerializer(typeof(AppSettings));
+        serializer.Serialize(stream, this);
+    }
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    internal void Reset()
+    {
+        var defaultSettings = new AppSettings();
+        defaultSettings.Initialize();
+
+        AlightAnswersRight = defaultSettings.AlightAnswersRight;
+        AutomaticTextImport = defaultSettings.AutomaticTextImport;
+        AutoSave = defaultSettings.AutoSave;
+        ChangePriceOnMove = defaultSettings.ChangePriceOnMove;
+
+        _costSetters.Clear();
+
+        foreach (var item in defaultSettings.CostSetters)
         {
-            var defaultSettings = new AppSettings();
-            defaultSettings.Initialize();
-
-            AlightAnswersRight = defaultSettings.AlightAnswersRight;
-            AutomaticTextImport = defaultSettings.AutomaticTextImport;
-            AutoSave = defaultSettings.AutoSave;
-            ChangePriceOnMove = defaultSettings.ChangePriceOnMove;
-
-            _costSetters.Clear();
-
-            foreach (var item in defaultSettings.CostSetters)
-            {
-                _costSetters.Add(item);
-            }
-
-            CreateQuestionsWithTheme = defaultSettings.CreateQuestionsWithTheme;
-            FontFamily = defaultSettings.FontFamily;
-            FontSize = defaultSettings.FontSize;
-            QuestionBase = defaultSettings.QuestionBase;
-            SearchForUpdates = defaultSettings.SearchForUpdates;
-            RemoveLinks = defaultSettings.RemoveLinks;
-            CheckFileSize = defaultSettings.CheckFileSize;
-            _flatScale = defaultSettings._flatScale;
-            FlatLayoutMode = defaultSettings.FlatLayoutMode;
+            _costSetters.Add(item);
         }
+
+        CreateQuestionsWithTheme = defaultSettings.CreateQuestionsWithTheme;
+        FontFamily = defaultSettings.FontFamily;
+        FontSize = defaultSettings.FontSize;
+        QuestionBase = defaultSettings.QuestionBase;
+        SearchForUpdates = defaultSettings.SearchForUpdates;
+        RemoveLinks = defaultSettings.RemoveLinks;
+        CheckFileSize = defaultSettings.CheckFileSize;
+        _flatScale = defaultSettings._flatScale;
+        FlatLayoutMode = defaultSettings.FlatLayoutMode;
     }
 }

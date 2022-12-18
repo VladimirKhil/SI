@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,12 +8,11 @@
 	<Company>Khil-soft</Company>
 	<Copyright>Copyright © Khil-soft 2022</Copyright>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-		<DebugType>none</DebugType>
-		<DebugSymbols>false</DebugSymbols>
-	</PropertyGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\SIPackages\SIPackages.csproj" />
-	</ItemGroup>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+	<DebugType>none</DebugType>
+	<DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+	<ProjectReference Include="..\SIPackages\SIPackages.csproj" />
+  </ItemGroup>
 </Project>

@@ -1,21 +1,14 @@
 ﻿using SIPackages;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+public sealed class SelectableTheme
 {
-    public sealed class SelectableTheme
-    {
-        public bool IsSelected { get; set; }
+    public bool IsSelected { get; set; }
 
-        public string Name
-        {
-            get { return Theme.Name; }
-        }
+    public string Name => Theme.Name;
 
-        public Theme Theme { get; }
+    public Theme Theme { get; }
 
-        public SelectableTheme(Theme theme)
-        {
-            Theme = theme;
-        }
-    }
+    public SelectableTheme(Theme theme) => Theme = theme;
 }

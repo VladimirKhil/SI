@@ -1,30 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SIQuester.Converters
+namespace SIQuester.Converters;
+
+public sealed class TemplateConverter : IValueConverter
 {
-    public sealed class TemplateConverter : IValueConverter
+    public DataTemplate? DefaultTemplate { get; set; }
+
+    public Dictionary<object, DataTemplate> Templates { get; set; } = new();
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public DataTemplate DefaultTemplate { get; set; }
-
-        public Dictionary<object, DataTemplate> Templates { get; set; }
-
-        public TemplateConverter() => Templates = new Dictionary<object, DataTemplate>();
-
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        if (Templates != null && Templates.TryGetValue(value, out var template))
         {
-            if (Templates != null && Templates.TryGetValue(value, out DataTemplate template))
-            {
-                return template;
-            }
-
-            return DefaultTemplate ?? DependencyProperty.UnsetValue;
+            return template;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
-            throw new NotImplementedException();
+        return DefaultTemplate ?? DependencyProperty.UnsetValue;
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

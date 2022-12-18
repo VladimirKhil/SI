@@ -1,100 +1,98 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
-namespace SIPackages
+namespace SIPackages;
+
+/// <summary>
+/// Defines a collection of sources.
+/// </summary>
+[CollectionDataContract(Name = "Sources", Namespace = "")]
+public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
 {
-    /// <summary>
-    /// Defines a collection of sources.
-    /// </summary>
-    [CollectionDataContract(Name = "Sources", Namespace = "")]
-    public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
+    /// <inheritdoc />
+    public System.Xml.Schema.XmlSchema? GetSchema() => null;
+
+    /// <inheritdoc />
+    public void ReadXml(System.Xml.XmlReader reader)
     {
-        /// <inheritdoc />
-        public System.Xml.Schema.XmlSchema? GetSchema() => null;
+        SourceInfo? sourceInfo = null;
 
-        /// <inheritdoc />
-        public void ReadXml(System.Xml.XmlReader reader)
+        var read = true;
+
+        while (!read || reader.Read())
         {
-            SourceInfo? sourceInfo = null;
+            read = true;
 
-            var read = true;
-
-            while (!read || reader.Read())
+            switch (reader.NodeType)
             {
-                read = true;
+                case System.Xml.XmlNodeType.Element:
+                    switch (reader.LocalName)
+                    {
+                        case "Source":
+                            sourceInfo = new SourceInfo
+                            {
+                                Id = reader["id"]
+                            };
 
-                switch (reader.NodeType)
-                {
-                    case System.Xml.XmlNodeType.Element:
-                        switch (reader.LocalName)
-                        {
-                            case "Source":
-                                sourceInfo = new SourceInfo
-                                {
-                                    Id = reader["id"]
-                                };
+                            Add(sourceInfo);
+                            break;
 
-                                Add(sourceInfo);
-                                break;
+                        case "Author":
+                            var author = reader.ReadElementContentAsString();
 
-                            case "Author":
-                                var author = reader.ReadElementContentAsString();
+                            if (sourceInfo != null)
+                            {
+                                sourceInfo.Author = author;
+                            }
 
-                                if (sourceInfo != null)
-                                {
-                                    sourceInfo.Author = author;
-                                }
+                            read = false;
+                            break;
 
-                                read = false;
-                                break;
+                        case "Title":
+                            sourceInfo.Title = reader.ReadElementContentAsString();
+                            read = false;
+                            break;
 
-                            case "Title":
-                                sourceInfo.Title = reader.ReadElementContentAsString();
-                                read = false;
-                                break;
+                        case "Year":
+                            sourceInfo.Year = reader.ReadElementContentAsInt();
+                            read = false;
+                            break;
 
-                            case "Year":
-                                sourceInfo.Year = reader.ReadElementContentAsInt();
-                                read = false;
-                                break;
+                        case "Publish":
+                            sourceInfo.Publish = reader.ReadElementContentAsString();
+                            read = false;
+                            break;
 
-                            case "Publish":
-                                sourceInfo.Publish = reader.ReadElementContentAsString();
-                                read = false;
-                                break;
+                        case "City":
+                            sourceInfo.City = reader.ReadElementContentAsString();
+                            read = false;
+                            break;
+                    }
 
-                            case "City":
-                                sourceInfo.City = reader.ReadElementContentAsString();
-                                read = false;
-                                break;
-                        }
-
-                        break;
-                }
+                    break;
             }
         }
+    }
 
-        /// <inheritdoc />
-        public void WriteXml(System.Xml.XmlWriter writer)
+    /// <inheritdoc />
+    public void WriteXml(System.Xml.XmlWriter writer)
+    {
+        writer.WriteStartElement("Sources");
+
+        foreach (var sourceInfo in this)
         {
-            writer.WriteStartElement("Sources");
+            writer.WriteStartElement("Source");
 
-            foreach (var sourceInfo in this)
-            {
-                writer.WriteStartElement("Source");
-
-                writer.WriteAttributeString("id", sourceInfo.Id);
-                writer.WriteElementString("Author", sourceInfo.Author);
-                writer.WriteElementString("Title", sourceInfo.Title);
-                writer.WriteElementString("Year", sourceInfo.Year.ToString());
-                writer.WriteElementString("Publish", sourceInfo.Publish);
-                writer.WriteElementString("City", sourceInfo.City);
-
-                writer.WriteEndElement();
-            }
+            writer.WriteAttributeString("id", sourceInfo.Id);
+            writer.WriteElementString("Author", sourceInfo.Author);
+            writer.WriteElementString("Title", sourceInfo.Title);
+            writer.WriteElementString("Year", sourceInfo.Year.ToString());
+            writer.WriteElementString("Publish", sourceInfo.Publish);
+            writer.WriteElementString("City", sourceInfo.City);
 
             writer.WriteEndElement();
         }
+
+        writer.WriteEndElement();
     }
 }

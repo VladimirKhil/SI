@@ -1,23 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
     <Version>7.7.3</Version>
     <Description>SIGame app</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\SI.GameServer.Client\SI.GameServer.Client.csproj" />

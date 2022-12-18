@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 
-namespace SIQuester.Utilities
+namespace SIQuester.Utilities;
+
+public interface ILinkManager
 {
-    public interface ILinkManager
-    {
-        string GetLinkText(IList collection, int index, out bool canBeSpecified, out string tail);
-    }
+    string GetLinkText(IList collection, int index, out bool canBeSpecified, out string tail);
 }

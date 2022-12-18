@@ -1,77 +1,72 @@
 ﻿using SICore.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIPackages;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SIGame.ViewModel.PackageSources
+namespace SIGame.ViewModel.PackageSources;
+
+/// <summary>
+/// Случайный набор тем
+/// </summary>
+internal sealed class RandomPackageSource: PackageSource
 {
-    /// <summary>
-    /// Случайный набор тем
-    /// </summary>
-    internal sealed class RandomPackageSource: PackageSource
+    private readonly int _packageId = new Random().Next(int.MaxValue);
+
+    public override PackageSourceKey Key => new PackageSourceKey { Type = PackageSourceTypes.Random };
+
+    public override string Source => Resources.RandomThemes;
+
+    public override bool RandomSpecials { get { return true; } }
+
+    public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
     {
-        private readonly int _packageId = new Random().Next(int.MaxValue);
+        var fileName = Path.GetTempFileName();
 
-        public override PackageSourceKey Key => new PackageSourceKey { Type = PackageSourceTypes.Random };
-
-        public override string Source => Resources.RandomThemes;
-
-        public override bool RandomSpecials { get { return true; } }
-
-        public override async Task<(string, bool)> GetPackageFileAsync(CancellationToken cancellationToken = default)
+        using (var fs = File.Open(fileName, FileMode.Create, FileAccess.ReadWrite))
+        using (var document = await GetPackageCore(fs))
         {
-            var fileName = Path.GetTempFileName();
+            document.Save();
+        }
 
-            using (var fs = File.Open(fileName, FileMode.Create, FileAccess.ReadWrite))
-            using (var document = await GetPackageCore(fs))
+        return (fileName, true);
+    }
+
+    private static Task<SIDocument> GetPackageCore(Stream stream = null)
+    {
+        var settings = UserSettings.Default.GameSettings.AppSettings;
+
+        return SIPackages.Providers.PackageHelper.GenerateRandomPackageAsync(
+            new PackageProvider(Global.PackagesUri),
+            Resources.RandomThemes,
+            Resources.Mixed,
+            Resources.RoundTrailing,
+            Resources.GameStage_Final,
+            settings.RandomRoundsCount,
+            settings.RandomThemesCount,
+            settings.RandomQuestionsBasePrice,
+            stream);
+    }
+
+    public override string GetPackageName() => _packageId.ToString();
+
+    public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(BitConverter.GetBytes(_packageId));
+
+    public override string GetPackageId() => _packageId.ToString();
+
+    public override async Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default)
+    {
+        byte[] data;
+
+        using (var ms = new MemoryStream())
+        {
+            using (var package = await GetPackageCore(ms))
             {
-                document.Save();
+                package.Save();
             }
 
-            return (fileName, true);
+            data = ms.ToArray();
         }
 
-        private static Task<SIDocument> GetPackageCore(Stream stream = null)
-        {
-            var settings = UserSettings.Default.GameSettings.AppSettings;
-
-            return SIPackages.Providers.PackageHelper.GenerateRandomPackageAsync(
-                new PackageProvider(Global.PackagesUri),
-                Resources.RandomThemes,
-                Resources.Mixed,
-                Resources.RoundTrailing,
-                Resources.GameStage_Final,
-                settings.RandomRoundsCount,
-                settings.RandomThemesCount,
-                settings.RandomQuestionsBasePrice,
-                stream);
-        }
-
-        public override string GetPackageName() => _packageId.ToString();
-
-        public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
-            Task.FromResult(BitConverter.GetBytes(_packageId));
-
-        public override string GetPackageId() => _packageId.ToString();
-
-        public override async Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default)
-        {
-            byte[] data;
-
-            using (var ms = new MemoryStream())
-            {
-                using (var package = await GetPackageCore(ms))
-                {
-                    package.Save();
-                }
-
-                data = ms.ToArray();
-            }
-
-            return new MemoryStream(data);
-        }
+        return new MemoryStream(data);
     }
 }

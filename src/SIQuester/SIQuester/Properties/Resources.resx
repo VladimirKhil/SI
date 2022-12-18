@@ -123,6 +123,9 @@
   <data name="Accept" xml:space="preserve">
     <value>Зачёт</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
   <data name="AddEmptyQuestion" xml:space="preserve">
     <value>Добавить пустой вопрос</value>
   </data>
@@ -132,8 +135,17 @@
   <data name="AddQuestion" xml:space="preserve">
     <value>Добавить вопрос (Insert)</value>
   </data>
+  <data name="AddRound" xml:space="preserve">
+    <value>Добавить раунд (Insert)</value>
+  </data>
+  <data name="AllFiles" xml:space="preserve">
+    <value>Все файлы</value>
+  </data>
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
+  </data>
+  <data name="AnswerHeader" xml:space="preserve">
+    <value>Ответ:</value>
   </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
@@ -143,6 +155,9 @@
   </data>
   <data name="Authors" xml:space="preserve">
     <value>Авторы</value>
+  </data>
+  <data name="AuthorsHeader" xml:space="preserve">
+    <value>Авторы:</value>
   </data>
   <data name="AutoDetectTemplateWhenImportingText" xml:space="preserve">
     <value>Автоматический подбор шаблона при импорте текста</value>
@@ -168,6 +183,9 @@
   <data name="Championship" xml:space="preserve">
     <value>Чемпионат</value>
   </data>
+  <data name="ChangeLanguage" xml:space="preserve">
+    <value>Поменять язык</value>
+  </data>
   <data name="CheckFileSize" xml:space="preserve">
     <value>Проверять, что файл вопросов подходит для игры через Игровой сервер</value>
   </data>
@@ -183,6 +201,12 @@
   <data name="Comments" xml:space="preserve">
     <value>Комментарии</value>
   </data>
+  <data name="CommentsHeader" xml:space="preserve">
+    <value>Комментарии:</value>
+  </data>
+  <data name="Common" xml:space="preserve">
+    <value>Обычный</value>
+  </data>
   <data name="ContactAuthor" xml:space="preserve">
     <value>Написать замечания автору…</value>
   </data>
@@ -192,11 +216,20 @@
   <data name="Create5QuestionsWithTheme" xml:space="preserve">
     <value>Создавать 5 вопросов вместе с темой</value>
   </data>
+  <data name="CreationDate" xml:space="preserve">
+    <value>Дата создания</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>
+  <data name="Difficulty" xml:space="preserve">
+    <value>Сложность</value>
+  </data>
   <data name="Donate" xml:space="preserve">
     <value>Поблагодарить автора…</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Редактировать</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>Без имени</value>
@@ -211,7 +244,7 @@
     <value>Задать стоимости</value>
   </data>
   <data name="Final" xml:space="preserve">
-    <value>ФИНАЛ</value>
+    <value>Финал</value>
   </data>
   <data name="FlatLayoutModeHeader" xml:space="preserve">
     <value>Расположение элементов в режиме плиток</value>
@@ -229,6 +262,27 @@
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Images" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="ImportClipboardText" xml:space="preserve">
+    <value>Текст из буфера обмена…</value>
+  </data>
+  <data name="ImportDB" xml:space="preserve">
+    <value>База вопросов…</value>
+  </data>
+  <data name="ImportSIStorage" xml:space="preserve">
+    <value>Библиотека вопросов…</value>
+  </data>
+  <data name="ImportText" xml:space="preserve">
+    <value>Текст…</value>
+  </data>
+  <data name="ImportTextTip" xml:space="preserve">
+    <value>Преобразование текстового файла в SIQ формат</value>
+  </data>
+  <data name="ImportXml" xml:space="preserve">
+    <value>XML-файл…</value>
+  </data>
   <data name="Increase" xml:space="preserve">
     <value>Приращение</value>
   </data>
@@ -237,6 +291,9 @@
   </data>
   <data name="InstallUpdatesHint" xml:space="preserve">
     <value>Программа будет автоматически проверять наличие обновлений на сайте разработчика и устанавливать их</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Язык</value>
   </data>
   <data name="List" xml:space="preserve">
     <value>Список</value>
@@ -253,8 +310,14 @@
   <data name="No" xml:space="preserve">
     <value>Нет</value>
   </data>
+  <data name="PackageLogo" xml:space="preserve">
+    <value>Логотип пакета</value>
+  </data>
   <data name="PlayQuestion" xml:space="preserve">
     <value>Запустить вопрос</value>
+  </data>
+  <data name="Publisher" xml:space="preserve">
+    <value>Издатель</value>
   </data>
   <data name="PublishersAll" xml:space="preserve">
     <value>(все)</value>
@@ -274,11 +337,20 @@
   <data name="RemoveTheme" xml:space="preserve">
     <value>Удалить тему</value>
   </data>
+  <data name="Restriction" xml:space="preserve">
+    <value>Ограничение</value>
+  </data>
   <data name="SelectSearchFolder" xml:space="preserve">
     <value>Выберите папку для поиска</value>
   </data>
   <data name="SendErrorHeader" xml:space="preserve">
     <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
+  </data>
+  <data name="SetLogo" xml:space="preserve">
+    <value>Задать логотип</value>
+  </data>
+  <data name="SetTags" xml:space="preserve">
+    <value>Задать теги</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
@@ -292,8 +364,17 @@
   <data name="Sources" xml:space="preserve">
     <value>Источники</value>
   </data>
+  <data name="SourcesHeader" xml:space="preserve">
+    <value>Источники:</value>
+  </data>
+  <data name="Start" xml:space="preserve">
+    <value>Старт</value>
+  </data>
   <data name="Table" xml:space="preserve">
     <value>Таблица</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Теги</value>
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
@@ -307,11 +388,11 @@
   <data name="Tour" xml:space="preserve">
     <value>Тур</value>
   </data>
-  <data name="TxtFilesFilter" xml:space="preserve">
-    <value>Файлы вопросов (*.txt) | *.txt</value>
-  </data>
   <data name="UpdateException" xml:space="preserve">
     <value>При поиске обновления возникла следующая ошибка: {0}</value>
+  </data>
+  <data name="UpdatePrices" xml:space="preserve">
+    <value>Задать стоимости</value>
   </data>
   <data name="UpdatePricesOnDragAndDrop" xml:space="preserve">
     <value>Изменять стоимости вопросов при перетаскивании</value>
@@ -319,8 +400,8 @@
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
     <value>Вопросы будут перемещаться, а распределение стоимостей останется прежним</value>
   </data>
-  <data name="XmlFilesFilter" xml:space="preserve">
-    <value>Файлы вопросов (*.xml) | *.xml</value>
+  <data name="Video" xml:space="preserve">
+    <value>Видео</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
     <value>Ваши темы:</value>

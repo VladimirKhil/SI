@@ -1,18 +1,17 @@
-﻿namespace SIStorageService.Client.Models
+﻿namespace SIStorageService.Client.Models;
+
+/// <summary>
+/// Defines package sorting mode.
+/// </summary>
+public enum PackageSortMode
 {
     /// <summary>
-    /// Defines package sorting mode.
+    /// Sort packages by name.
     /// </summary>
-    public enum PackageSortMode
-    {
-        /// <summary>
-        /// Sort packages by name.
-        /// </summary>
-        Name = 0,
+    Name = 0,
 
-        /// <summary>
-        /// Sort packages by published date.
-        /// </summary>
-        PublishedDate = 1
-    }
+    /// <summary>
+    /// Sort packages by published date.
+    /// </summary>
+    PublishedDate = 1
 }

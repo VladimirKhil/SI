@@ -10,7 +10,7 @@
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2022</Copyright>
-    <Version>5.7.8</Version>
+    <Version>5.9.0</Version>
     <UseWPF>true</UseWPF>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
@@ -52,11 +52,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
   </ItemGroup>
   <ItemGroup>
     <None Include="licenses\MahApps.Metro.LICENSE">
@@ -214,6 +213,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\WindowsAPICodePack.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="licenses\YamlDotNet.LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ygpackage3.1.xsd">

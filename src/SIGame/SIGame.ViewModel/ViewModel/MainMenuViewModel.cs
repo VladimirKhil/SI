@@ -1,36 +1,30 @@
 ﻿using System.Windows.Input;
 
-namespace SIGame.ViewModel
+namespace SIGame.ViewModel;
+
+/// <summary>
+/// Главное меню программы
+/// </summary>
+public sealed class MainMenuViewModel : ViewModel<UserSettings>
 {
-    /// <summary>
-    /// Главное меню программы
-    /// </summary>
-    public sealed class MainMenuViewModel: ViewModel<UserSettings>
+    public ICommand OpenLogs => GameCommands.OpenLogs;
+    public ICommand Comment => GameCommands.Comment;
+    public ICommand Donate => GameCommands.Donate;
+    public ICommand Help => GameCommands.Help;
+
+    private bool _isVisible = false;
+
+    public bool IsVisible
     {
-        public ICommand OpenLogs => GameCommands.OpenLogs;
-        public ICommand Comment => GameCommands.Comment;
-        public ICommand Donate => GameCommands.Donate;
-        public ICommand Help => GameCommands.Help;
+        get => _isVisible;
+        set { _isVisible = value; OnPropertyChanged(); }
+    }
 
-        private bool _isVisible = false;
+    public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
-        public bool IsVisible
-        {
-            get { return _isVisible; }
-            set { _isVisible = value; OnPropertyChanged(); }
-        }
-
-        public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
-
-        public MainMenuViewModel(UserSettings settings)
-            : base(settings)
-        {
-            
-        }
-
-        protected override void Initialize()
-        {
-            base.Initialize();
-        }
+    public MainMenuViewModel(UserSettings settings)
+        : base(settings)
+    {
+        
     }
 }

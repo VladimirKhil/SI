@@ -1,26 +1,23 @@
-﻿namespace SIQuester
+﻿namespace SIQuester;
+
+internal sealed class SimplePropertyValueChange : IChange
 {
-    internal sealed class SimplePropertyValueChange : IChange
+    public object Element { get; set; }
+
+    public string PropertyName { get; set; }
+
+    public object Value { get; set; }
+
+    public void Undo()
     {
-        public object Element { get; set; }
-        public string PropertyName { get; set; }
-        public object Value { get; set; }
+        var type = Element.GetType();
+        var property = type.GetProperty(PropertyName);
 
-        #region IChange Members
+        var oldValue = property.GetValue(Element, null);
+        property.SetValue(Element, Value, null);
 
-        public void Undo()
-        {
-            var type = Element.GetType();
-            var property = type.GetProperty(PropertyName);
-
-            var oldValue = property.GetValue(Element, null);
-            property.SetValue(Element, Value, null);
-
-            Value = oldValue;
-        }
-
-        public void Redo() => Undo();
-
-        #endregion
+        Value = oldValue;
     }
+
+    public void Redo() => Undo();
 }

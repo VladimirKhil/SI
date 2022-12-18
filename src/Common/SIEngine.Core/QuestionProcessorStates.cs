@@ -1,28 +1,27 @@
-﻿namespace SIEngine.Core
+﻿namespace SIEngine.Core;
+
+/// <summary>
+/// Defines <see cref="QuestionProcessor" /> states.
+/// </summary>
+internal enum QuestionProcessorStates
 {
     /// <summary>
-    /// Defines <see cref="QuestionProcessor" /> states.
+    /// Final state.
     /// </summary>
-    internal enum QuestionProcessorStates
-    {
-        /// <summary>
-        /// Final state.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Question state.
-        /// </summary>
-        Question,
+    /// <summary>
+    /// Question state.
+    /// </summary>
+    Question,
 
-        /// <summary>
-        /// Asking answer state.
-        /// </summary>
-        AskAnswer,
+    /// <summary>
+    /// Asking answer state.
+    /// </summary>
+    AskAnswer,
 
-        /// <summary>
-        /// Answer state.
-        /// </summary>
-        Answer,
-    }
+    /// <summary>
+    /// Answer state.
+    /// </summary>
+    Answer,
 }

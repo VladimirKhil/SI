@@ -137,6 +137,7 @@
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
                     <Path Data="M0,0L8,0L4,4z" Fill="#FF555555" />
+                    
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
                             <MenuItem Style="{StaticResource CommandRoutedItem}" Name="miSaveAs" Header="Сохранить как…" Command="ApplicationCommands.SaveAs" />
@@ -144,24 +145,32 @@
                             <MenuItem Header="HTML" Command="{Binding ExportHtml}" />
                             <MenuItem Header="HTML для печати" Command="{Binding ExportPrintHtml}" />
                             <MenuItem Header="Настраиваемый HTML" Command="{Binding ExportFormattedHtml}" ToolTip="Возможность настройки специфического представления пакета"/>
+                            
                             <MenuItem Header="Скрипт mIRC" Command="{Binding ExportMirc}" ToolTip="Проведение игры в IRC">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource MircImage}" />
                                 </MenuItem.Icon>
                             </MenuItem>
+                            
                             <MenuItem Header="Табличный формат" Command="{Binding ExportTable}" />
+                            <MenuItem Header="YAML" Command="{Binding ExportYaml}" />
                             <Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Выбрать темы…" ToolTip="Сохранить часть тем данного пакета в отдельный пакет" Command="{Binding SelectThemes}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="Выбрать темы…"
+                                ToolTip="Сохранить часть тем данного пакета в отдельный пакет"
+                                Command="{Binding SelectThemes}" />
                         </ContextMenu>
                     </siq:DropDownButton.DropDown>
                 </siq:DropDownButton>
                 <Separator />
-                
-                <Button Style="{StaticResource blured}" ToolTip="Отменить" Command="{Binding Undo}">
+
+                <Button Style="{StaticResource blured}" ToolTip="Отменить" Command="{Binding OperationsManager.Undo}">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_undo},Path=Data}" />
                 </Button>
-                
-                <Button Style="{StaticResource blured}" ToolTip="Повторить" Command="{Binding Redo}">
+
+                <Button Style="{StaticResource blured}" ToolTip="Повторить" Command="{Binding OperationsManager.Redo}">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_redo},Path=Data}" />
                 </Button>
                 
@@ -509,7 +518,13 @@
             </ContentControl.Style>
         </ContentControl>
         
-        <GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Width="3" Visibility="{Binding IsChecked, ElementName=bSidebar,Converter={StaticResource VisibilityConverter}}" />
+        <GridSplitter
+            Grid.Row="1"
+            Grid.Column="1"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Stretch"
+            Width="3"
+            Visibility="{Binding IsChecked, ElementName=bSidebar,Converter={StaticResource VisibilityConverter}}" />
         
         <ContentControl
             Grid.Row="1"
@@ -519,6 +534,7 @@
                 <Style TargetType="ContentControl">
                     <Setter Property="Grid.Column" Value="0" />
                     <Setter Property="Grid.ColumnSpan" Value="3" />
+                    
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsChecked, ElementName=bSidebar}" Value="True">
                             <Setter Property="Grid.Column" Value="2" />
@@ -528,9 +544,26 @@
             </ContentControl.Style>
         </ContentControl>
         
-        <Line Grid.ColumnSpan="3" Grid.Row="1" X1="0" X2="1" Y1="0" Y2="0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Stretch="Fill" Stroke="#FFAEAEAE" StrokeThickness="1" />
+        <Line
+            Grid.ColumnSpan="3"
+            Grid.Row="1"
+            X1="0"
+            X2="1"
+            Y1="0"
+            Y2="0"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Stretch"
+            Stretch="Fill"
+            Stroke="#FFAEAEAE"
+            StrokeThickness="1" />
         
-        <ProgressBar Grid.ColumnSpan="3" Grid.Row="2" VerticalAlignment="Top" Height="3" IsIndeterminate="True" Visibility="{Binding IsProgress, Converter={StaticResource VisibilityConverter}}" />
+        <ProgressBar
+            Grid.ColumnSpan="3"
+            Grid.Row="2"
+            VerticalAlignment="Top"
+            Height="3"
+            IsIndeterminate="True"
+            Visibility="{Binding IsProgress, Converter={StaticResource VisibilityConverter}}" />
         
         <Grid
             Grid.ColumnSpan="3"

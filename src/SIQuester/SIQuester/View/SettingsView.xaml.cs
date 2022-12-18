@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для SettingsView.xaml
+/// </summary>
+public partial class SettingsView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для SettingsView.xaml
-    /// </summary>
-    public partial class SettingsView : UserControl
-    {
-        public SettingsView()
-        {
-            InitializeComponent();
-        }
-    }
+    public SettingsView() => InitializeComponent();
 }

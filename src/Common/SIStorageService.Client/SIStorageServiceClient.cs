@@ -3,174 +3,173 @@ using SIStorageService.Client.Models;
 using System.Net.Sockets;
 using System.Text;
 
-namespace SIStorageService.Client
+namespace SIStorageService.Client;
+
+// TODO: Implement retries via Polly
+
+/// <inheritdoc cref="ISIStorageServiceClient" />
+public sealed class SIStorageServiceClient : ISIStorageServiceClient
 {
-    // TODO: Implement retries via Polly
+    private static readonly JsonSerializer Serializer = new();
+    private readonly HttpClient _client;
 
-    /// <inheritdoc cref="ISIStorageServiceClient" />
-    public sealed class SIStorageServiceClient : ISIStorageServiceClient
+    public SIStorageServiceClient(HttpClient client)
     {
-        private static readonly JsonSerializer Serializer = new();
-        private readonly HttpClient _client;
+        _client = client;
+    }
 
-        public SIStorageServiceClient(HttpClient client)
+    public Task<Package[]?> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<Package[]>("Packages", cancellationToken);
+
+    public Task<PackageCategory[]?> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<PackageCategory[]>("Categories", cancellationToken);
+
+    public Task<Package[]?> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction, CancellationToken cancellationToken = default) =>
+        GetAsync<Package[]>($"Packages?categoryID={categoryID}&restriction={Uri.EscapeDataString(restriction)}", cancellationToken);
+
+    public Task<Uri?> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+        GetAsync<Uri>($"Package?packageID={packageID}", cancellationToken);
+
+    public Task<PackageLink?> GetPackage2ByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
+        GetAsync<PackageLink>($"Package2?packageID={packageID}", cancellationToken);
+
+    public Task<Uri?> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+        GetAsync<Uri>($"PackageByGuid?packageGuid={packageGuid}", cancellationToken);
+
+    public Task<PackageLink?> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default) =>
+        GetAsync<PackageLink>($"PackageByGuid2?packageGuid={packageGuid}", cancellationToken);
+
+    public Task<string?> GetPackageNameByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
+        GetAsync<string>($"packages/{packageGuid}/name", cancellationToken);
+
+    public Task<string[]?> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
+    {
+        var queryString = new StringBuilder();
+
+        if (tagId.HasValue)
         {
-            _client = client;
+            queryString.Append("tagId=").Append(tagId.Value);
         }
 
-        public Task<Package[]?> GetAllPackagesAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<Package[]>("Packages", cancellationToken);
+        var packageFilter = queryString.Length > 0 ? $"?{queryString}" : "";
 
-        public Task<PackageCategory[]?> GetCategoriesAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<PackageCategory[]>("Categories", cancellationToken);
+        return GetAsync<string[]>($"PackagesByTag{packageFilter}", cancellationToken);
+    }
 
-        public Task<Package[]?> GetPackagesByCategoryAndRestrictionAsync(int categoryID, string restriction, CancellationToken cancellationToken = default) =>
-            GetAsync<Package[]>($"Packages?categoryID={categoryID}&restriction={Uri.EscapeDataString(restriction)}", cancellationToken);
+    [Obsolete]
+    public Task<NewServerInfo[]?> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<NewServerInfo[]>("servers", cancellationToken);
 
-        public Task<Uri?> GetPackageByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
-            GetAsync<Uri>($"Package?packageID={packageID}", cancellationToken);
+    public Task<NamedObject[]?> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<NamedObject[]>("Authors", cancellationToken);
 
-        public Task<PackageLink?> GetPackage2ByIDAsync(int packageID, CancellationToken cancellationToken = default) =>
-            GetAsync<PackageLink>($"Package2?packageID={packageID}", cancellationToken);
+    public Task<NamedObject[]?> GetPublishersAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<NamedObject[]>("Publishers", cancellationToken);
 
-        public Task<Uri?> GetPackageByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
-            GetAsync<Uri>($"PackageByGuid?packageGuid={packageGuid}", cancellationToken);
+    public Task<NamedObject[]?> GetTagsAsync(CancellationToken cancellationToken = default) =>
+        GetAsync<NamedObject[]>("Tags", cancellationToken);
 
-        public Task<PackageLink?> GetPackageByGuid2Async(string packageGuid, CancellationToken cancellationToken = default) =>
-            GetAsync<PackageLink>($"PackageByGuid2?packageGuid={packageGuid}", cancellationToken);
+    public Task<PackageInfo[]?> GetPackagesAsync(
+        int? tagId = null,
+        int difficultyRelation = 0,
+        int difficulty = 1,
+        int? publisherId = null,
+        int? authorId = null,
+        string? restriction = null,
+        PackageSortMode sortMode = PackageSortMode.Name,
+        bool sortAscending = true,
+        CancellationToken cancellationToken = default)
+    {
+        var queryString = new StringBuilder();
 
-        public Task<string?> GetPackageNameByGuidAsync(string packageGuid, CancellationToken cancellationToken = default) =>
-            GetAsync<string>($"packages/{packageGuid}/name", cancellationToken);
-
-        public Task<string[]?> GetPackagesByTagAsync(int? tagId = null, CancellationToken cancellationToken = default)
+        if (tagId.HasValue)
         {
-            var queryString = new StringBuilder();
+            if (queryString.Length > 0)
+                queryString.Append('&');
 
-            if (tagId.HasValue)
-            {
-                queryString.Append("tagId=").Append(tagId.Value);
-            }
-
-            var packageFilter = queryString.Length > 0 ? $"?{queryString}" : "";
-
-            return GetAsync<string[]>($"PackagesByTag{packageFilter}", cancellationToken);
+            queryString.Append("tagId=").Append(tagId.Value);
         }
 
-        [Obsolete]
-        public Task<NewServerInfo[]?> GetGameServersUrisAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<NewServerInfo[]>("servers", cancellationToken);
-
-        public Task<NamedObject[]?> GetAuthorsAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<NamedObject[]>("Authors", cancellationToken);
-
-        public Task<NamedObject[]?> GetPublishersAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<NamedObject[]>("Publishers", cancellationToken);
-
-        public Task<NamedObject[]?> GetTagsAsync(CancellationToken cancellationToken = default) =>
-            GetAsync<NamedObject[]>("Tags", cancellationToken);
-
-        public Task<PackageInfo[]?> GetPackagesAsync(
-            int? tagId = null,
-            int difficultyRelation = 0,
-            int difficulty = 1,
-            int? publisherId = null,
-            int? authorId = null,
-            string? restriction = null,
-            PackageSortMode sortMode = PackageSortMode.Name,
-            bool sortAscending = true,
-            CancellationToken cancellationToken = default)
+        if (difficultyRelation > 0)
         {
-            var queryString = new StringBuilder();
+            if (queryString.Length > 0)
+                queryString.Append('&');
 
-            if (tagId.HasValue)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("tagId=").Append(tagId.Value);
-            }
-
-            if (difficultyRelation > 0)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("difficultyRelation=").Append(difficultyRelation);
-            }
-
-            if (difficulty > 1)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("difficulty=").Append(difficulty);
-            }
-
-            if (publisherId.HasValue)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("publisherId=").Append(publisherId.Value);
-            }
-
-            if (authorId.HasValue)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("authorId=").Append(authorId.Value);
-            }
-
-            if (restriction != null)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("restriction=").Append(Uri.EscapeDataString(restriction));
-            }
-
-            if (sortMode != PackageSortMode.Name)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("sortMode=").Append((int)sortMode);
-            }
-
-            if (!sortAscending)
-            {
-                if (queryString.Length > 0)
-                    queryString.Append('&');
-
-                queryString.Append("sortAscending=false");
-            }
-
-            return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}", cancellationToken);
+            queryString.Append("difficultyRelation=").Append(difficultyRelation);
         }
 
-        private async Task<T?> GetAsync<T>(string request, CancellationToken cancellationToken = default)
+        if (difficulty > 1)
         {
-            try
-            {
-                using var responseMessage = await _client.GetAsync(request, cancellationToken);
+            if (queryString.Length > 0)
+                queryString.Append('&');
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    throw new Exception(
-                        $"GetAsync {request} error ({responseMessage.StatusCode}): " +
-                        $"{await responseMessage.Content.ReadAsStringAsync(cancellationToken)}");
-                }
-                
-                using var responseStream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
-                using var reader = new StreamReader(responseStream);
+            queryString.Append("difficulty=").Append(difficulty);
+        }
 
-                return (T?)Serializer.Deserialize(reader, typeof(T));
-            }
-            catch (SocketException exc)
+        if (publisherId.HasValue)
+        {
+            if (queryString.Length > 0)
+                queryString.Append('&');
+
+            queryString.Append("publisherId=").Append(publisherId.Value);
+        }
+
+        if (authorId.HasValue)
+        {
+            if (queryString.Length > 0)
+                queryString.Append('&');
+
+            queryString.Append("authorId=").Append(authorId.Value);
+        }
+
+        if (restriction != null)
+        {
+            if (queryString.Length > 0)
+                queryString.Append('&');
+
+            queryString.Append("restriction=").Append(Uri.EscapeDataString(restriction));
+        }
+
+        if (sortMode != PackageSortMode.Name)
+        {
+            if (queryString.Length > 0)
+                queryString.Append('&');
+
+            queryString.Append("sortMode=").Append((int)sortMode);
+        }
+
+        if (!sortAscending)
+        {
+            if (queryString.Length > 0)
+                queryString.Append('&');
+
+            queryString.Append("sortAscending=false");
+        }
+
+        return GetAsync<PackageInfo[]>($"FilteredPackages{(queryString.Length > 0 ? $"?{queryString}" : "")}", cancellationToken);
+    }
+
+    private async Task<T?> GetAsync<T>(string request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var responseMessage = await _client.GetAsync(request, cancellationToken);
+
+            if (!responseMessage.IsSuccessStatusCode)
             {
-                throw new Exception($"SIStorage exception accessing uri {request}: {exc.ErrorCode}", exc);
+                throw new Exception(
+                    $"GetAsync {request} error ({responseMessage.StatusCode}): " +
+                    $"{await responseMessage.Content.ReadAsStringAsync(cancellationToken)}");
             }
+            
+            using var responseStream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken);
+            using var reader = new StreamReader(responseStream);
+
+            return (T?)Serializer.Deserialize(reader, typeof(T));
+        }
+        catch (SocketException exc)
+        {
+            throw new Exception($"SIStorage exception accessing uri {request}: {exc.ErrorCode}", exc);
         }
     }
 }

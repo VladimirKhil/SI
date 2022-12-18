@@ -3,46 +3,92 @@ using SIPackages.Core;
 using SIQuester.Contracts;
 using SIQuester.Model;
 using SIQuester.ViewModel;
-using System;
 using System.Text;
 using System.Windows;
 using System.Xml;
 
-namespace SIQuester.Implementation
+namespace SIQuester.Implementation;
+
+internal static class DragManager
 {
-    internal static class DragManager
+    private const string FormatMarker = "1";
+
+    internal static void DoDrag(
+        FrameworkElement host,
+        QDocument active,
+        InfoOwner item,
+        InfoOwnerData itemData,
+        Action? beforeDrag = null,
+        Action? afterDrag = null)
     {
-        private const string FormatMarker = "1";
+        ArgumentNullException.ThrowIfNull(host, nameof(host));
+        ArgumentNullException.ThrowIfNull(active, nameof(active));
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
+        ArgumentNullException.ThrowIfNull(itemData, nameof(itemData));
 
-        internal static void DoDrag(
-            FrameworkElement host,
-            QDocument active,
-            InfoOwner item,
-            InfoOwnerData itemData,
-            Action beforeDrag = null,
-            Action afterDrag = null)
+        var dataObject = new DataObject(itemData);
+
+        if (host.DataContext is RoundViewModel roundViewModel)
         {
-            ArgumentNullException.ThrowIfNull(host, nameof(host));
-            ArgumentNullException.ThrowIfNull(active, nameof(active));
-            ArgumentNullException.ThrowIfNull(item, nameof(item));
-            ArgumentNullException.ThrowIfNull(itemData, nameof(itemData));
+            var packageViewModel = roundViewModel.OwnerPackage;
 
-            var dataObject = new DataObject(itemData);
-
-            if (host.DataContext is RoundViewModel roundViewModel)
+            if (packageViewModel == null)
             {
-                var packageViewModel = roundViewModel.OwnerPackage;
+                throw new ArgumentException(nameof(packageViewModel));
+            }
 
-                if (packageViewModel == null)
+            roundViewModel.IsDragged = true;
+
+            int index = packageViewModel.Rounds.IndexOf(roundViewModel);
+
+            using var change = active.OperationsManager.BeginComplexChange();
+
+            try
+            {
+                var sb = new StringBuilder();
+
+                using (var writer = XmlWriter.Create(sb))
                 {
-                    throw new ArgumentException(nameof(packageViewModel));
+                    roundViewModel.Model.WriteXml(writer);
                 }
 
-                roundViewModel.IsDragged = true;
+                dataObject.SetData(WellKnownDragFormats.Round, FormatMarker);
+                dataObject.SetData(DataFormats.Serializable, sb);
 
-                int index = packageViewModel.Rounds.IndexOf(roundViewModel);
+                var result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
 
-                active.BeginChange();
+                if (result == DragDropEffects.Move)
+                {
+                    if (packageViewModel.Rounds[index] != roundViewModel)
+                    {
+                        index++;
+                    }
+
+                    packageViewModel.Rounds.RemoveAt(index);
+                    change.Commit();
+                }
+            }
+            finally
+            {
+                roundViewModel.IsDragged = false;
+            }
+        }
+        else
+        {
+            if (host.DataContext is ThemeViewModel themeViewModel)
+            {
+                roundViewModel = themeViewModel.OwnerRound;
+
+                if (roundViewModel == null)
+                {
+                    throw new ArgumentException(nameof(roundViewModel));
+                }
+
+                themeViewModel.IsDragged = true;
+
+                int index = roundViewModel.Themes.IndexOf(themeViewModel);
+
+                using var change = active.OperationsManager.BeginComplexChange();
 
                 try
                 {
@@ -50,190 +96,123 @@ namespace SIQuester.Implementation
 
                     using (var writer = XmlWriter.Create(sb))
                     {
-                        roundViewModel.Model.WriteXml(writer);
+                        themeViewModel.Model.WriteXml(writer);
                     }
 
-                    dataObject.SetData(WellKnownDragFormats.Round, FormatMarker);
+                    dataObject.SetData(WellKnownDragFormats.Theme, FormatMarker);
                     dataObject.SetData(DataFormats.Serializable, sb);
 
                     var result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
 
                     if (result == DragDropEffects.Move)
                     {
-                        if (packageViewModel.Rounds[index] != roundViewModel)
+                        if (roundViewModel.Themes[index] != themeViewModel)
                         {
                             index++;
                         }
 
-                        packageViewModel.Rounds.RemoveAt(index);
-                        active.CommitChange();
+                        roundViewModel.Themes.RemoveAt(index);
                     }
-                    else
-                    {
-                        active.RollbackChange();
-                    }
-                }
-                catch
-                {
-                    active.RollbackChange();
-                    throw;
+
+                    change.Commit();
                 }
                 finally
                 {
-                    roundViewModel.IsDragged = false;
+                    themeViewModel.IsDragged = false;
                 }
             }
             else
             {
-                if (host.DataContext is ThemeViewModel themeViewModel)
+                var questionViewModel = host.DataContext as QuestionViewModel;
+                themeViewModel = questionViewModel.OwnerTheme;
+
+                if (themeViewModel == null)
                 {
-                    roundViewModel = themeViewModel.OwnerRound;
-
-                    if (roundViewModel == null)
-                    {
-                        throw new ArgumentException(nameof(roundViewModel));
-                    }
-
-                    themeViewModel.IsDragged = true;
-
-                    int index = roundViewModel.Themes.IndexOf(themeViewModel);
-
-                    active.BeginChange();
-
-                    try
-                    {
-                        var sb = new StringBuilder();
-
-                        using (var writer = XmlWriter.Create(sb))
-                        {
-                            themeViewModel.Model.WriteXml(writer);
-                        }
-
-                        dataObject.SetData(WellKnownDragFormats.Theme, FormatMarker);
-                        dataObject.SetData(DataFormats.Serializable, sb);
-
-                        var result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
-
-                        if (result == DragDropEffects.Move)
-                        {
-                            if (roundViewModel.Themes[index] != themeViewModel)
-                            {
-                                index++;
-                            }
-
-                            roundViewModel.Themes.RemoveAt(index);
-                        }
-
-                        active.CommitChange();
-                    }
-                    catch
-                    {
-                        active.RollbackChange();
-                        throw;
-                    }
-                    finally
-                    {
-                        themeViewModel.IsDragged = false;
-                    }
+                    throw new ArgumentException(nameof(themeViewModel));
                 }
-                else
-                {
-                    var questionViewModel = host.DataContext as QuestionViewModel;
-                    themeViewModel = questionViewModel.OwnerTheme;
 
-                    if (themeViewModel == null)
+                questionViewModel.IsDragged = true;
+
+                var index = themeViewModel.Questions.IndexOf(questionViewModel);
+                using var change = active.OperationsManager.BeginComplexChange();
+
+                try
+                {
+                    var sb = new StringBuilder();
+
+                    using (var writer = XmlWriter.Create(sb))
                     {
-                        throw new ArgumentException(nameof(themeViewModel));
+                        questionViewModel.Model.WriteXml(writer);
                     }
 
-                    questionViewModel.IsDragged = true;
+                    dataObject.SetData(WellKnownDragFormats.Question, FormatMarker);
+                    dataObject.SetData(DataFormats.Serializable, sb);
 
-                    var index = themeViewModel.Questions.IndexOf(questionViewModel);
-                    active.BeginChange();
+                    beforeDrag?.Invoke();
+
+                    DragDropEffects result;
 
                     try
                     {
-                        var sb = new StringBuilder();
-
-                        using (var writer = XmlWriter.Create(sb))
-                        {
-                            questionViewModel.Model.WriteXml(writer);
-                        }
-
-                        dataObject.SetData(WellKnownDragFormats.Question, FormatMarker);
-                        dataObject.SetData(DataFormats.Serializable, sb);
-
-                        beforeDrag?.Invoke();
-
-                        DragDropEffects result;
-
-                        try
-                        {
-                            result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
-                        }
-                        catch (InvalidOperationException)
-                        {
-                            result = DragDropEffects.None;
-                        }
-                        finally
-                        {
-                            host.Opacity = 1.0;
-
-                            afterDrag?.Invoke();
-                        }
-
-                        if (result == DragDropEffects.Move)
-                        {
-                            if (themeViewModel.Questions[index] != questionViewModel)
-                            {
-                                index++;
-                            }
-
-                            themeViewModel.Questions.RemoveAt(index);
-
-                            if (AppSettings.Default.ChangePriceOnMove)
-                            {
-                                RecountPrices(themeViewModel);
-                            }
-                        }
-
-                        active.CommitChange();
+                        result = DragDrop.DoDragDrop(host, dataObject, DragDropEffects.Move);
                     }
-                    catch
+                    catch (InvalidOperationException)
                     {
-                        active.RollbackChange();
-                        throw;
+                        result = DragDropEffects.None;
                     }
                     finally
                     {
-                        questionViewModel.IsDragged = false;
+                        host.Opacity = 1.0;
+
+                        afterDrag?.Invoke();
                     }
+
+                    if (result == DragDropEffects.Move)
+                    {
+                        if (themeViewModel.Questions[index] != questionViewModel)
+                        {
+                            index++;
+                        }
+
+                        themeViewModel.Questions.RemoveAt(index);
+
+                        if (AppSettings.Default.ChangePriceOnMove)
+                        {
+                            RecountPrices(themeViewModel);
+                        }
+                    }
+
+                    change.Commit();
+                }
+                finally
+                {
+                    questionViewModel.IsDragged = false;
                 }
             }
         }
+    }
 
-        internal static void RecountPrices(ThemeViewModel theme)
+    internal static void RecountPrices(ThemeViewModel theme)
+    {
+        var round = theme.OwnerRound;
+
+        if (round == null || round.Model == null || round.OwnerPackage?.Rounds == null)
         {
-            var round = theme.OwnerRound;
+            return;
+        }
 
-            if (round == null || round.Model == null || round.OwnerPackage?.Rounds == null)
+        var coef = round.Model.Type == RoundTypes.Final ? 0 : round.OwnerPackage.Rounds.IndexOf(round) + 1;
+        var counter = 0;
+
+        for (int i = 0; i < theme.Questions.Count; i++)
+        {
+            if (theme.Questions[i].Model.Price == Question.InvalidPrice) // Price is not recounted
             {
-                return;
+                continue;
             }
 
-            var coef = round.Model.Type == RoundTypes.Final ? 0 : round.OwnerPackage.Rounds.IndexOf(round) + 1;
-            var counter = 0;
-
-            for (int i = 0; i < theme.Questions.Count; i++)
-            {
-                if (theme.Questions[i].Model.Price == Question.InvalidPrice) // Price is not recounted
-                {
-                    continue;
-                }
-
-                theme.Questions[i].Model.Price = coef * AppSettings.Default.QuestionBase * (counter + 1);
-                counter++;
-            }
+            theme.Questions[i].Model.Price = coef * AppSettings.Default.QuestionBase * (counter + 1);
+            counter++;
         }
     }
 }

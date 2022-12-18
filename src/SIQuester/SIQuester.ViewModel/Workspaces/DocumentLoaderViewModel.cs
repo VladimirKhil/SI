@@ -1,49 +1,46 @@
 ﻿using SIQuester.ViewModel.Properties;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+// TODO: show load progress
+
+public sealed class DocumentLoaderViewModel : WorkspaceViewModel
 {
-    // TODO: show load progress
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private Task<QDocument>? _loadTask;
+    
+    public override string Header => Resources.DocumentLoading;
 
-    public sealed class DocumentLoaderViewModel : WorkspaceViewModel
+    public string Title { get; private set; }
+
+    public DocumentLoaderViewModel(string title) => Title = title;
+
+    protected override void Dispose(bool disposing)
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new();
-        
-        public override string Header => Resources.DocumentLoading;
+        _cancellationTokenSource.Cancel();
+        // TODO: await _loadTask if not null
+        _cancellationTokenSource.Dispose();
 
-        public string Title { get; private set; }
+        base.Dispose(disposing);
+    }
 
-        public DocumentLoaderViewModel(string title, Func<CancellationToken, Task<QDocument>> loader, Action onSuccess = null)
+    public async Task<QDocument> LoadAsync(Func<CancellationToken, Task<QDocument>> loader)
+    {
+        try
         {
-            Title = title;
+            _loadTask = loader(_cancellationTokenSource.Token);
 
-            Load(loader, onSuccess);
+            var qDocument = await _loadTask;
+
+            OnNewItem(qDocument);
+            OnClosed();
+
+            return qDocument;
         }
-
-        protected override void Dispose(bool disposing)
+        catch (Exception exc)
         {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-
-            base.Dispose(disposing);
-        }
-
-        private async void Load(Func<CancellationToken, Task<QDocument>> loader, Action onSuccess = null)
-        {
-            try
-            {
-                var qDocument = await loader(_cancellationTokenSource.Token);
-                onSuccess?.Invoke();
-
-                OnNewItem(qDocument);
-                OnClosed();
-            }
-            catch (Exception exc)
-            {
-                ErrorMessage = $"{Title}: {exc.Message}";
-            }
+            ErrorMessage = $"{Title}: {exc.Message}";
+            throw;
         }
     }
 }

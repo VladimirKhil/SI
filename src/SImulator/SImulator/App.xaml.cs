@@ -74,7 +74,7 @@ public partial class App : Application
 
         _manager.ServiceProvider = _host.Services;
 
-        var options = _configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
+        var options = _configuration!.GetSection(AppServiceClientOptions.ConfigurationSectionName);
         var appServiceClientOptions = options.Get<AppServiceClientOptions>();
 
         _useAppService = appServiceClientOptions.ServiceUri != null;
@@ -82,8 +82,8 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
-        services.AddAppServiceClient(_configuration);
-        services.AddSIStorageServiceClient(_configuration);
+        services.AddAppServiceClient(_configuration!);
+        services.AddSIStorageServiceClient(_configuration!);
 
         services.AddTransient(typeof(SIStorage));
 

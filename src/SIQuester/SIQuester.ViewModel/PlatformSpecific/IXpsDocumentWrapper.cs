@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace SIQuester.ViewModel.PlatformSpecific;
 
-namespace SIQuester.ViewModel.PlatformSpecific
+public interface IXpsDocumentWrapper : IDisposable
 {
-    public interface IXpsDocumentWrapper : IDisposable
-    {
-        object GetDocument();
-    }
+    object GetDocument();
 }

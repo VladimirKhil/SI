@@ -1,38 +1,36 @@
 ﻿using SICore;
 using SIGame.ViewModel.Properties;
-using System;
 using System.Windows.Input;
 using Utils;
 
-namespace SIGame.ViewModel
+namespace SIGame.ViewModel;
+
+public sealed class StartMenuViewModel
 {
-    public sealed class StartMenuViewModel
+    public UICommandCollection MainCommands { get; } = new UICommandCollection();
+
+    public HumanPlayerViewModel Human { get; set; }
+
+    public ICommand SetProfile { get; set; }
+
+    public ICommand NavigateToVK { get; private set; }
+
+    public StartMenuViewModel()
     {
-        public UICommandCollection MainCommands { get; } = new UICommandCollection();
+        NavigateToVK = new CustomCommand(NavigateToVK_Executed);
+    }
 
-        public HumanPlayerViewModel Human { get; set; }
-
-        public ICommand SetProfile { get; set; }
-
-        public ICommand NavigateToVK { get; private set; }
-
-        public StartMenuViewModel()
+    private void NavigateToVK_Executed(object arg)
+    {
+        try
         {
-            NavigateToVK = new CustomCommand(NavigateToVK_Executed);
+            Browser.Open(Resources.GroupLink);
         }
-
-        private void NavigateToVK_Executed(object arg)
+        catch (Exception exc)
         {
-            try
-            {
-                Browser.Open(Resources.GroupLink);
-            }
-            catch (Exception exc)
-            {
-                PlatformSpecific.PlatformManager.Instance.ShowMessage(
-                    string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
-                    PlatformSpecific.MessageType.Error);
-            }
+            PlatformSpecific.PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.SiteNavigationError + "\r\n{1}", Resources.GroupLink, exc.Message),
+                PlatformSpecific.MessageType.Error);
         }
     }
 }

@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для SelectThemesView.xaml
+/// </summary>
+public partial class SelectThemesView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для SelectThemesView.xaml
-    /// </summary>
-    public partial class SelectThemesView : UserControl
-    {
-        public SelectThemesView()
-        {
-            InitializeComponent();
-        }
-    }
+    public SelectThemesView() => InitializeComponent();
 }

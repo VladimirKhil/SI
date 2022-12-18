@@ -1,147 +1,157 @@
 ﻿using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.Properties;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
+using System.Xml;
 
-namespace SIPackages
+namespace SIPackages;
+
+/// <summary>
+/// Defines a game round.
+/// </summary>
+/// <inheritdoc cref="InfoOwner" />
+public sealed class Round : InfoOwner, IEquatable<Round>
 {
     /// <summary>
-    /// Defines a game round.
+    /// Round themes.
     /// </summary>
-    /// <inheritdoc cref="InfoOwner" />
-    public sealed class Round : InfoOwner
+    public List<Theme> Themes { get; } = new();
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private string _type = RoundTypes.Standart;
+
+    /// <summary>
+    /// Round type.
+    /// </summary>
+    [DefaultValue(RoundTypes.Standart)]
+    public string Type
     {
-        /// <summary>
-        /// Round themes.
-        /// </summary>
-        public List<Theme> Themes { get; } = new List<Theme>();
+        get => _type;
+        set { var oldValue = _type; if (oldValue != value) { _type = value; OnPropertyChanged(oldValue); } }
+    }
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string _type = RoundTypes.Standart;
+    /// <inheritdoc/>
+    public override string ToString() => $"{Resources.Round}: {Resources.Round}";
 
-        /// <summary>
-        /// Round type.
-        /// </summary>
-        public string Type
+    /// <summary>
+    /// Создание темы
+    /// </summary>
+    /// <param name="name">Название темы</param>
+    public Theme CreateTheme(string? name)
+    {
+        var theme = new Theme { Name = name ?? "" };
+        Themes.Add(theme);
+        return theme;
+    }
+
+    /// <inheritdoc/>
+    public override void ReadXml(XmlReader reader)
+    {
+        Name = reader.GetAttribute("name") ?? "";
+
+        if (reader.MoveToAttribute("type"))
         {
-            get => _type;
-            set { var oldValue = _type; if (oldValue != value) { _type = value; OnPropertyChanged(oldValue); } }
+            _type = reader.Value;
         }
 
-        /// <inheritdoc/>
-        public override string ToString() => $"{Resources.Round}: {Resources.Round}";
-
-        /// <summary>
-        /// Создание темы
-        /// </summary>
-        /// <param name="name">Название темы</param>
-        public Theme CreateTheme(string name)
+        if (reader.IsEmptyElement)
         {
-            var theme = new Theme { Name = name ?? "" };
-            Themes.Add(theme);
-            return theme;
+            reader.Read();
+            return;
         }
 
-        /// <inheritdoc/>
-        public override void ReadXml(System.Xml.XmlReader reader)
+        var read = true;
+        while (!read || reader.Read())
         {
-            Name = reader.GetAttribute("name") ?? "";
+            read = true;
 
-            if (reader.MoveToAttribute("type"))
+            switch (reader.NodeType)
             {
-                _type = reader.Value;
-            }
+                case XmlNodeType.Element:
+                    switch (reader.LocalName)
+                    {
+                        case "info":
+                            base.ReadXml(reader);
+                            read = false;
+                            break;
 
-            if (reader.IsEmptyElement)
-            {
-                reader.Read();
-                return;
-            }
+                        case "theme":
+                            var theme = new Theme();
+                            theme.ReadXml(reader);
+                            Themes.Add(theme);
+                            read = false;
+                            break;
+                    }
 
-            var read = true;
-            while (!read || reader.Read())
-            {
-                read = true;
+                    break;
 
-                switch (reader.NodeType)
-                {
-                    case System.Xml.XmlNodeType.Element:
-                        switch (reader.LocalName)
-                        {
-                            case "info":
-                                base.ReadXml(reader);
-                                read = false;
-                                break;
-
-                            case "theme":
-                                var theme = new Theme();
-                                theme.ReadXml(reader);
-                                Themes.Add(theme);
-                                read = false;
-                                break;
-                        }
-
-                        break;
-
-                    case System.Xml.XmlNodeType.EndElement:
-                        if (reader.LocalName == "round")
-                        {
-                            reader.Read();
-                            return;
-                        }
-                        break;
-                }
+                case XmlNodeType.EndElement:
+                    if (reader.LocalName == "round")
+                    {
+                        reader.Read();
+                        return;
+                    }
+                    break;
             }
         }
+    }
 
-        /// <inheritdoc/>
-        public override void WriteXml(System.Xml.XmlWriter writer)
+    /// <inheritdoc/>
+    public override void WriteXml(XmlWriter writer)
+    {
+        writer.WriteStartElement("round");
+        writer.WriteAttributeString("name", Name);
+
+        if (_type != RoundTypes.Standart)
         {
-            writer.WriteStartElement("round");
-            writer.WriteAttributeString("name", _name);
+            writer.WriteAttributeString("type", _type);
+        }
 
-            if (_type != RoundTypes.Standart)
+        base.WriteXml(writer);
+
+        if (Themes.Any())
+        {
+            writer.WriteStartElement("themes");
+
+            foreach (var item in Themes)
             {
-                writer.WriteAttributeString("type", _type);
-            }
-
-            base.WriteXml(writer);
-
-            if (Themes.Any())
-            {
-                writer.WriteStartElement("themes");
-
-                foreach (var item in Themes)
-                {
-                    item.WriteXml(writer);
-                }
-
-                writer.WriteEndElement();
+                item.WriteXml(writer);
             }
 
             writer.WriteEndElement();
         }
 
-        /// <summary>
-        /// Creates a copy of round.
-        /// </summary>
-        public Round Clone()
-        {
-            var round = new Round
-            {
-                _name = _name,
-                _type = _type
-            };
-
-            round.SetInfoFromOwner(this);
-
-            foreach (var theme in Themes)
-            {
-                round.Themes.Add(theme.Clone());
-            }
-
-            return round;
-        }
+        writer.WriteEndElement();
     }
+
+    /// <summary>
+    /// Creates a copy of round.
+    /// </summary>
+    public Round Clone()
+    {
+        var round = new Round
+        {
+            Name = Name,
+            _type = _type
+        };
+
+        round.SetInfoFromOwner(this);
+
+        foreach (var theme in Themes)
+        {
+            round.Themes.Add(theme.Clone());
+        }
+
+        return round;
+    }
+
+    /// <inheritdoc />
+    public bool Equals(Round? other) => other is not null && base.Equals(other) && Type.Equals(other.Type) && Themes.SequenceEqual(other.Themes);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => Equals(obj as Round);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Type, Themes.GetCollectionHashCode());
 }

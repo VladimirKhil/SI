@@ -11,7 +11,6 @@ using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIStorageService.Client;
 using SIStorageService.ViewModel;
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -21,8 +20,6 @@ using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using System.Xaml;
@@ -30,544 +27,557 @@ using System.Xaml;
 using Microsoft.WindowsAPICodePack.Dialogs;
 #endif
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Provides interaction logic for App.xaml.
+/// </summary>
+public partial class App : Application
 {
+    private IHost _host;
+    private IConfiguration _configuration;
+    private bool _useAppService;
+
     /// <summary>
-    /// Provides interaction logic for App.xaml.
+    /// Имя конфигурационного файла пользовательских настроек
     /// </summary>
-    public partial class App : Application
+    private const string ConfigFileName = "user.config";
+
+    private readonly Implementation.DesktopManager _manager = new();
+
+    /// <summary>
+    /// Используется ли версия Windows от Vista и выше
+    /// </summary>
+    public static bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
+
+    public static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
+
+    /// <summary>
+    /// Имя приложения
+    /// </summary>
+    public static string ProductName => Assembly.GetExecutingAssembly().GetName().Name;
+
+    /// <summary>
+    /// Директория приложения
+    /// </summary>
+    public static string StartupPath => AppDomain.CurrentDomain.BaseDirectory;
+
+    private MainViewModel? _mainViewModel;
+
+    private bool _hasError = false;
+
+    private ILogger<App> _logger;
+
+
+    private DispatcherTimer? _autoSaveTimer;
+
+    private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        private IHost _host;
-        private IConfiguration _configuration;
-        private bool _useAppService;
+        AppSettings.Default = LoadSettings();
 
-        /// <summary>
-        /// Имя конфигурационного файла пользовательских настроек
-        /// </summary>
-        private const string ConfigFileName = "user.config";
-
-        private readonly Implementation.DesktopManager _manager = new();
-
-        /// <summary>
-        /// Используется ли версия Windows от Vista и выше
-        /// </summary>
-        public static bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
-
-        public static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
-
-        /// <summary>
-        /// Имя приложения
-        /// </summary>
-        public static string ProductName => Assembly.GetExecutingAssembly().GetName().Name;
-
-        /// <summary>
-        /// Директория приложения
-        /// </summary>
-        public static string StartupPath => AppDomain.CurrentDomain.BaseDirectory;
-
-        private bool _hasError = false;
-
-        private ILogger<App> _logger;
-
-        private async void Application_Startup(object sender, StartupEventArgs e)
+        if (!IsWindows8_1OrLater)
         {
-            AppSettings.Default = LoadSettings();
+            AppSettings.Default.SpellChecking = false;
+        }
 
-            if (!IsWindows8_1OrLater)
-            {
-                AppSettings.Default.SpellChecking = false;
-            }
+        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-
-            _host = new HostBuilder()
+        _host = new HostBuilder()
 #if DEBUG
-                .UseEnvironment("Development")
+            .UseEnvironment("Development")
 #endif
-                .ConfigureAppConfiguration((context, configurationBuilder) =>
-                {
-                    var env = context.HostingEnvironment;
-
-                    configurationBuilder
-                        .SetBasePath(context.HostingEnvironment.ContentRootPath)
-                        .AddJsonFile("appsettings.json", optional: true)
-                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-                    _configuration = configurationBuilder.Build();
-                })
-                .ConfigureServices(ConfigureServices)
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
-                })
-                .UseNLog()
-                .Build();
-
-            await _host.StartAsync();
-
-            _manager.ServiceProvider = _host.Services;
-
-            var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
-            _useAppService = appServiceClientOptions.ServiceUri != null;
-
-            if (e.Args.Length > 0)
+            .ConfigureAppConfiguration((context, configurationBuilder) =>
             {
-                if (e.Args[0] == "backup")
-                {
-                    // Бэкап хранилища вопросов
-                    var folder = e.Args[1];
-                    Backup(folder);
-                    return;
-                }
-            }
+                var env = context.HostingEnvironment;
 
-#if !DEBUG
-            if (AppSettings.Default.SearchForUpdates)
+                configurationBuilder
+                    .SetBasePath(context.HostingEnvironment.ContentRootPath)
+                    .AddJsonFile("appsettings.json", optional: true)
+                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                _configuration = configurationBuilder.Build();
+            })
+            .ConfigureServices(ConfigureServices)
+            .ConfigureLogging((hostingContext, logging) =>
             {
-                SearchForUpdatesAsync();
-            }
+                NLog.LogManager.Configuration = new NLogLoggingConfiguration(hostingContext.Configuration.GetSection("NLog"));
+            })
+            .UseNLog()
+            .Build();
 
-            SendDelayedReports();
-#endif
+        await _host.StartAsync();
 
-            _logger = _host.Services.GetRequiredService<ILogger<App>>();
-            _logger.LogInformation("Application started");
-        }
+        _manager.ServiceProvider = _host.Services;
 
-        protected override void OnStartup(StartupEventArgs e)
+        var appServiceClientOptions = _host.Services.GetRequiredService<IOptions<AppServiceClientOptions>>().Value;
+        _useAppService = appServiceClientOptions.ServiceUri != null;
+
+        if (e.Args.Length > 0)
         {
-            base.OnStartup(e);
-
-            try
+            if (e.Args[0] == "backup")
             {
-                var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
-                var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
-
-                MainWindow = new MainWindow { DataContext = new MainViewModel(e.Args, siStorageClient, loggerFactory) };
-                MainWindow.Show();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show($"Ошибка при запуске программы: {exc.Message}.\r\nПрограмма будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику.", ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
-                Shutdown();
-            }
-        }
-
-        private void ConfigureServices(IServiceCollection services)
-        {
-            services.AddAppServiceClient(_configuration);
-            services.AddSIStorageServiceClient(_configuration);
-
-            services.AddTransient(typeof(SIStorage));
-
-            services.AddTransient(typeof(MainWindow));
-
-            services.AddSingleton(AppSettings.Default);
-        }
-
-        /// <summary>
-        /// Backups SIStorage to folder. This method is called from the console.
-        /// </summary>
-        /// <param name="folder">Folder to backup.</param>
-        private async void Backup(string folder)
-        {
-            int code = 0;
-
-            try
-            {
-                var directoryInfo = new DirectoryInfo(folder);
-
-                if (!directoryInfo.Exists)
-                {
-                    directoryInfo.Create();
-                }
-
-                var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
-                var packages = await siStorageClient.GetPackagesAsync();
-                using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
-
-                foreach (var package in packages)
-                {
-                    var link = await siStorageClient.GetPackageByGuid2Async(package.Guid);
-                    var fileName = Path.GetFileName(link.Name);
-
-                    var targetFile = Path.Combine(folder, fileName);
-                    using var stream = await client.GetStreamAsync(link.Uri);
-                    using var fileStream = File.Create(targetFile);
-                    await stream.CopyToAsync(fileStream);
-                }
-            }
-            catch (Exception exc)
-            {
-                Console.Write($"Backup error: {exc}");
-                code = 1;
-            }
-            finally
-            {
-                Environment.Exit(code);
-            }
-        }
-
-#if !DEBUG
-        private async void SendDelayedReports()
-        {
-            if (!_useAppService)
-            {
+                // Бэкап хранилища вопросов
+                var folder = e.Args[1];
+                Backup(folder);
                 return;
             }
-
-            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
-
-            try
-            {
-                while (AppSettings.Default.DelayedErrors.Count > 0)
-                {
-                    var error = AppSettings.Default.DelayedErrors[0];
-                    var errorInfo = (Model.ErrorInfo)XamlServices.Load(error);
-
-                    await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
-                    AppSettings.Default.DelayedErrors.RemoveAt(0);
-                }
-            }
-            catch
-            {
-            }
         }
 
-        private async void SearchForUpdatesAsync()
+#if !DEBUG
+        if (AppSettings.Default.SearchForUpdates)
         {
-            var close = await SearchForUpdatesNewAsync();
-            if (close)
-            {
-                Shutdown();
-            }
+            SearchForUpdatesAsync();
         }
 
-        /// <summary>
-        /// Произвести поиск и установку обновлений
-        /// </summary>
-        /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
-        private async Task<bool> SearchForUpdatesNewAsync(CancellationToken cancellationToken = default)
+        SendDelayedReports();
+#endif
+
+        _logger = _host.Services.GetRequiredService<ILogger<App>>();
+        _logger.LogInformation("Application started");
+    }
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        try
         {
-            if (!_useAppService)
+            var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
+            var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
+
+            _mainViewModel = new MainViewModel(e.Args, siStorageClient, loggerFactory);
+
+            MainWindow = new MainWindow { DataContext = _mainViewModel };
+            MainWindow.Show();
+
+            if (AppSettings.Default.AutoSave)
             {
-                return false;
+                _autoSaveTimer = new DispatcherTimer(AppSettings.AutoSaveInterval, DispatcherPriority.Background, AutoSave, Dispatcher);
+            }
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show($"Ошибка при запуске программы: {exc.Message}.\r\nПрограмма будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику.", ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+        }
+    }
+
+    private void AutoSave(object? sender, EventArgs args) => _mainViewModel?.AutoSave();
+
+    private void ConfigureServices(IServiceCollection services)
+    {
+        services.AddAppServiceClient(_configuration);
+        services.AddSIStorageServiceClient(_configuration);
+        services.AddTransient(typeof(SIStorage));
+        services.AddTransient(typeof(MainWindow));
+        services.AddSingleton(AppSettings.Default);
+    }
+
+    /// <summary>
+    /// Backups SIStorage to folder. This method is called from the console.
+    /// </summary>
+    /// <param name="folder">Folder to backup.</param>
+    private async void Backup(string folder)
+    {
+        int code = 0;
+
+        try
+        {
+            var directoryInfo = new DirectoryInfo(folder);
+
+            if (!directoryInfo.Exists)
+            {
+                directoryInfo.Create();
             }
 
-            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+            var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
+            var packages = await siStorageClient.GetPackagesAsync();
+            using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
 
-            try
+            foreach (var package in packages)
             {
-                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
-                var product = await appService.GetProductAsync("SIQuester", cancellationToken);
+                var link = await siStorageClient.GetPackageByGuid2Async(package.Guid);
+                var fileName = Path.GetFileName(link.Name);
 
-                if (product.Version > currentVersion)
-                {
-                    _logger.LogInformation(
-                        "Update detected. Current version: {currentVersion}. Product version: {productVersion}. Product uri: {productUri}",
-                        currentVersion,
-                        product.Version,
-                        product.Uri);
-
-                    var updateUri = product.Uri;
-
-                    var localFile = Path.Combine(Path.GetTempPath(), "setup.exe");
-
-                    using (var httpClient = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 })
-                    using (var stream = await httpClient.GetStreamAsync(updateUri, cancellationToken))
-                    using (var fs = File.Create(localFile))
-                    {
-                        await stream.CopyToAsync(fs, cancellationToken);
-                    }
-
-                    try
-                    {
-                        Process.Start(localFile, "/passive");
-                    }
-                    catch (Win32Exception)
-                    {
-                        Thread.Sleep(10000); // Иногда проверяется антивирусом и не сразу запускается
-                        Process.Start(localFile);
-                    }
-
-                    return true;
-                }
-
+                var targetFile = Path.Combine(folder, fileName);
+                using var stream = await client.GetStreamAsync(link.Uri);
+                using var fileStream = File.Create(targetFile);
+                await stream.CopyToAsync(fileStream);
             }
-            catch (Exception exc)
+        }
+        catch (Exception exc)
+        {
+            Console.Write($"Backup error: {exc}");
+            code = 1;
+        }
+        finally
+        {
+            Environment.Exit(code);
+        }
+    }
+
+#if !DEBUG
+    private async void SendDelayedReports()
+    {
+        if (!_useAppService)
+        {
+            return;
+        }
+
+        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+        try
+        {
+            while (AppSettings.Default.DelayedErrors.Count > 0)
             {
-                MessageBox.Show(
-                    string.Format(SIQuester.Properties.Resources.UpdateException, exc.Message),
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
+                var error = AppSettings.Default.DelayedErrors[0];
+                var errorInfo = (Model.ErrorInfo)XamlServices.Load(error);
 
+                await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+                AppSettings.Default.DelayedErrors.RemoveAt(0);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private async void SearchForUpdatesAsync()
+    {
+        var close = await SearchForUpdatesNewAsync();
+        if (close)
+        {
+            Shutdown();
+        }
+    }
+
+    /// <summary>
+    /// Произвести поиск и установку обновлений
+    /// </summary>
+    /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
+    private async Task<bool> SearchForUpdatesNewAsync(CancellationToken cancellationToken = default)
+    {
+        if (!_useAppService)
+        {
             return false;
         }
 
-#endif
+        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
 
-        private async void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        try
         {
-            if (_hasError)
-            {
-                return;
-            }
+            var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+            var product = await appService.GetProductAsync("SIQuester", cancellationToken);
 
-            _hasError = true;
-
-            _logger?.LogError(e.Exception, "Application error: {message}", e.Exception.Message);
-
-            if (e.Exception is OutOfMemoryException)
+            if (product.Version > currentVersion)
             {
-                MessageBox.Show(
-                    "Недостаточно памяти для выполнения программы!",
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception is Win32Exception || e.Exception is NotImplementedException || e.Exception.ToString().Contains("VerifyNotClosing"))
-            {
-                if (e.Exception.Message != "Параметр задан неверно")
+                _logger.LogInformation(
+                    "Update detected. Current version: {currentVersion}. Product version: {productVersion}. Product uri: {productUri}",
+                    currentVersion,
+                    product.Version,
+                    product.Uri);
+
+                var updateUri = product.Uri;
+
+                var localFile = Path.Combine(Path.GetTempPath(), "setup.exe");
+
+                using (var httpClient = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 })
+                using (var stream = await httpClient.GetStreamAsync(updateUri, cancellationToken))
+                using (var fs = File.Create(localFile))
                 {
-                    MessageBox.Show(
-                        string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message),
-                        ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
-                }
-            }
-            else if (e.Exception is InvalidOperationException
-                && e.Exception.Message.Contains("Идет завершение работы объекта Application"))
-            {
-                // Это нормально, ничего не сделаешь
-            }
-            else if (e.Exception is BadImageFormatException
-                || e.Exception is ArgumentException && e.Exception.Message.Contains("Rect..ctor")
-                || e.Exception is NullReferenceException && e.Exception.Message.Contains("UpdateTaskbarThumbButtons"))
-            {
-                MessageBox.Show(
-                    string.Format("Ошибка запуска программы: {0}!", e.Exception.Message),
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception.ToString().Contains("MediaPlayerState.OpenMedia"))
-            {
-                MessageBox.Show(
-                    string.Format(
-                        "Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой: {0}!",
-                        e.Exception.Message),
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception is COMException
-                || e.Exception.ToString().Contains("UpdateTaskbarProgressState")
-                || e.Exception.ToString().Contains("FindNameInTemplateContent"))
-            {
-                MessageBox.Show(
-                    string.Format("Ошибка выполнения программы: {0}!", e.ToString()),
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            }
-            else if (e.Exception.ToString().Contains("MahApps.Metro"))
-            {
-                // Ничего не сделаешь
-            }
-            else if (e.Exception is InvalidOperationException invalidOperationException
-                && (invalidOperationException.Message.Contains("Невозможно выполнить эту операцию, когда привязка отсоединена")
-                || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))
-            {
-                MessageBox.Show(invalidOperationException.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            else if (e.Exception.Message.Contains("System.Windows.Automation")
-                || e.Exception.Message.Contains("UIAutomationCore.dll")
-                || e.Exception.Message.Contains("UIAutomationTypes"))
-            {
-                MessageBox.Show(
-                    "Ошибка старта приложения, связанная с Windows Automation." +
-                    " Попробуйте установить обновления для своей операционной системы, для .NET Framework 4" +
-                    " или установить библиотеку API Windows Automation (ссылка находится на странице приложения).",
-                    ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return;
-            }
-            else
-            {
-                var exception = e.Exception;
-                var message = new StringBuilder();
-                var systemMessage = new StringBuilder();
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
-
-                while (exception != null)
-                {
-                    if (systemMessage.Length > 0)
-                    {
-                        systemMessage.AppendLine().AppendLine("======").AppendLine();
-                    }
-
-                    message.AppendLine(exception.Message).AppendLine();
-                    systemMessage.AppendLine(exception.ToStringDemystified());
-                    exception = exception.InnerException;
+                    await stream.CopyToAsync(fs, cancellationToken);
                 }
 
-                var errorInfo = new Model.ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
-#if !DEBUG
-                if (IsVistaOrLater)
+                try
                 {
-                    var dialog = new TaskDialog
-                    {
-                        Caption = ProductName,
-                        InstructionText = SIQuester.Properties.Resources.SendErrorHeader,
-                        Text = message.ToString().Trim(),
-                        Icon = TaskDialogStandardIcon.Warning,
-                        StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
-                    };
-
-                    if (dialog.Show() == TaskDialogResult.Yes)
-                    {
-                        await SendMessageAsync(errorInfo);
-                    }
+                    Process.Start(localFile, "/passive");
                 }
-                else
+                catch (Win32Exception)
+                {
+                    Thread.Sleep(10000); // Иногда проверяется антивирусом и не сразу запускается
+                    Process.Start(localFile);
+                }
+
+                return true;
+            }
+
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show(
+                string.Format(SIQuester.Properties.Resources.UpdateException, exc.Message),
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+
+        return false;
+    }
+
 #endif
-                    if (MessageBox.Show(
-                        $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
-                        ProductName,
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+
+    private async void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        if (_hasError)
+        {
+            return;
+        }
+
+        _hasError = true;
+
+        _logger?.LogError(e.Exception, "Application error: {message}", e.Exception.Message);
+
+        if (e.Exception is OutOfMemoryException)
+        {
+            MessageBox.Show(
+                "Недостаточно памяти для выполнения программы!",
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception is Win32Exception || e.Exception is NotImplementedException || e.Exception.ToString().Contains("VerifyNotClosing"))
+        {
+            if (e.Exception.Message != "Параметр задан неверно")
+            {
+                MessageBox.Show(
+                    string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message),
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+        else if (e.Exception is InvalidOperationException
+            && e.Exception.Message.Contains("Идет завершение работы объекта Application"))
+        {
+            // Это нормально, ничего не сделаешь
+        }
+        else if (e.Exception is BadImageFormatException
+            || e.Exception is ArgumentException && e.Exception.Message.Contains("Rect..ctor")
+            || e.Exception is NullReferenceException && e.Exception.Message.Contains("UpdateTaskbarThumbButtons"))
+        {
+            MessageBox.Show(
+                string.Format("Ошибка запуска программы: {0}!", e.Exception.Message),
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception.ToString().Contains("MediaPlayerState.OpenMedia"))
+        {
+            MessageBox.Show(
+                string.Format(
+                    "Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой: {0}!",
+                    e.Exception.Message),
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception is COMException
+            || e.Exception.ToString().Contains("UpdateTaskbarProgressState")
+            || e.Exception.ToString().Contains("FindNameInTemplateContent"))
+        {
+            MessageBox.Show(
+                string.Format("Ошибка выполнения программы: {0}!", e.ToString()),
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else if (e.Exception.ToString().Contains("MahApps.Metro"))
+        {
+            // Ничего не сделаешь
+        }
+        else if (e.Exception is InvalidOperationException invalidOperationException
+            && (invalidOperationException.Message.Contains("Невозможно выполнить эту операцию, когда привязка отсоединена")
+            || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))
+        {
+            MessageBox.Show(invalidOperationException.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        else if (e.Exception.Message.Contains("System.Windows.Automation")
+            || e.Exception.Message.Contains("UIAutomationCore.dll")
+            || e.Exception.Message.Contains("UIAutomationTypes"))
+        {
+            MessageBox.Show(
+                "Ошибка старта приложения, связанная с Windows Automation." +
+                " Попробуйте установить обновления для своей операционной системы, для .NET Framework 4" +
+                " или установить библиотеку API Windows Automation (ссылка находится на странице приложения).",
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        }
+        else
+        {
+            var exception = e.Exception;
+            var message = new StringBuilder();
+            var systemMessage = new StringBuilder();
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+            while (exception != null)
+            {
+                if (systemMessage.Length > 0)
+                {
+                    systemMessage.AppendLine().AppendLine("======").AppendLine();
+                }
+
+                message.AppendLine(exception.Message).AppendLine();
+                systemMessage.AppendLine(exception.ToStringDemystified());
+                exception = exception.InnerException;
+            }
+
+            var errorInfo = new Model.ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
+#if !DEBUG
+            if (IsVistaOrLater)
+            {
+                var dialog = new TaskDialog
+                {
+                    Caption = ProductName,
+                    InstructionText = SIQuester.Properties.Resources.SendErrorHeader,
+                    Text = message.ToString().Trim(),
+                    Icon = TaskDialogStandardIcon.Warning,
+                    StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
+                };
+
+                if (dialog.Show() == TaskDialogResult.Yes)
                 {
                     await SendMessageAsync(errorInfo);
                 }
             }
-
-            e.Handled = true;
-            Shutdown();
-        }
-
-        private async Task SendMessageAsync(Model.ErrorInfo errorInfo)
-        {
-            if (!_useAppService)
-            {
-                return;
-            }
-
-            using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
-
-            try
-            {
-                var result = await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
-
-                switch (result)
-                {
-                    case ErrorStatus.Fixed:
-                        MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", ProductName);
-                        break;
-
-                    case ErrorStatus.CannotReproduce:
-                        MessageBox.Show(
-                            "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
-                            ProductName);
-                        break;
-                }
-            }
-            catch
-            {
-                MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", ProductName);
-                if (AppSettings.Default.DelayedErrors.Count < 10)
-                {
-                    AppSettings.Default.DelayedErrors.Add(XamlServices.Save(errorInfo));
-                }
-            }
-        }
-
-        private async void Application_Exit(object sender, ExitEventArgs e)
-        {
-            _logger.LogInformation("Application exited");
-
-            await _host.StopAsync();
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            try
-            {
-                if (AppSettings.Default != null)
-                {
-                    SaveSettings(AppSettings.Default);
-                }
-
-                _manager.Dispose();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(
-                    string.Format("Ошибка сохранения настроек при выходе: {0}.", exc),
+            else
+#endif
+                if (MessageBox.Show(
+                    $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
                     ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+            {
+                await SendMessageAsync(errorInfo);
             }
-
-            base.OnExit(e);
         }
 
-        private static void SaveSettings(AppSettings settings)
+        e.Handled = true;
+        Shutdown();
+    }
+
+    private async Task SendMessageAsync(Model.ErrorInfo errorInfo)
+    {
+        if (!_useAppService)
         {
-            try
+            return;
+        }
+
+        using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
+
+        try
+        {
+            var result = await appService.SendErrorReportAsync("SIQuester", errorInfo.Error, errorInfo.Version, errorInfo.Time);
+
+            switch (result)
             {
-                if (Monitor.TryEnter(ConfigFileName, 2000))
+                case ErrorStatus.Fixed:
+                    MessageBox.Show("Эта ошибка исправлена в новой версии программы. Обновитесь, пожалуйста.", ProductName);
+                    break;
+
+                case ErrorStatus.CannotReproduce:
+                    MessageBox.Show(
+                        "Эта ошибка не воспроизводится. Если вы можете её гарантированно воспроизвести, свяжитесь с автором, пожалуйста.",
+                        ProductName);
+                    break;
+            }
+        }
+        catch
+        {
+            MessageBox.Show("Не удалось подключиться к серверу при отправке отчёта об ошибке. Отчёт будет отправлен позднее.", ProductName);
+            if (AppSettings.Default.DelayedErrors.Count < 10)
+            {
+                AppSettings.Default.DelayedErrors.Add(XamlServices.Save(errorInfo));
+            }
+        }
+    }
+
+    private async void Application_Exit(object sender, ExitEventArgs e)
+    {
+        _logger.LogInformation("Application exited");
+
+        _autoSaveTimer?.Stop();
+        _mainViewModel?.Dispose();
+
+        await _host.StopAsync();
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        try
+        {
+            if (AppSettings.Default != null)
+            {
+                SaveSettings(AppSettings.Default);
+            }
+
+            _manager.Dispose();
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show(
+                string.Format("Ошибка сохранения настроек при выходе: {0}.", exc),
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+
+        base.OnExit(e);
+    }
+
+    private static void SaveSettings(AppSettings settings)
+    {
+        try
+        {
+            if (Monitor.TryEnter(ConfigFileName, 2000))
+            {
+                try
                 {
-                    try
-                    {
-                        using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                        using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
-                        settings.Save(stream);
-                    }
-                    finally
-                    {
-                        Monitor.Exit(ConfigFileName);
-                    }
+                    using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+                    using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
+                    settings.Save(stream);
+                }
+                finally
+                {
+                    Monitor.Exit(ConfigFileName);
                 }
             }
-            catch (Exception exc)
-            {
-                MessageBox.Show(
-                    $"Ошибка при сохранении настроек программы: {exc.Message}",
-                    AppSettings.ProductName,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Exclamation);
-            }
         }
-
-        /// <summary>
-        /// Загрузить пользовательские настройки
-        /// </summary>
-        public static AppSettings LoadSettings()
+        catch (Exception exc)
         {
-            try
+            MessageBox.Show(
+                $"Ошибка при сохранении настроек программы: {exc.Message}",
+                AppSettings.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+        }
+    }
+
+    /// <summary>
+    /// Загрузить пользовательские настройки
+    /// </summary>
+    public static AppSettings LoadSettings()
+    {
+        try
+        {
+            using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+            if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
             {
-                using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
+                try
                 {
-                    try
-                    {
-                        using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        return AppSettings.Load(stream);
-                    }
-                    catch { }
-                    finally
-                    {
-                        Monitor.Exit(ConfigFileName);
-                    }
+                    using var stream = file.OpenFile(ConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    return AppSettings.Load(stream);
+                }
+                catch { }
+                finally
+                {
+                    Monitor.Exit(ConfigFileName);
                 }
             }
-            catch { }
-
-            return new AppSettings();
         }
+        catch { }
+
+        return new AppSettings();
     }
 }

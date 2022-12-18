@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel;
 
-namespace SIPackages.Core
+namespace SIPackages.Core;
+
+/// <summary>
+/// Defines an object with name.
+/// </summary>
+public interface INamed : INotifyPropertyChanged
 {
     /// <summary>
-    /// Defines an object with name.
+    /// Object name.
     /// </summary>
-    public interface INamed : INotifyPropertyChanged
-    {
-        /// <summary>
-        /// Object name.
-        /// </summary>
-        string Name { get; set; }
-    }
+    string Name { get; set; }
 }

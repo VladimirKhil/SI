@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<SignAssembly>true</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
     <Company>Khil-soft</Company>
-    <Version>5.7.8</Version>
+    <Version>5.9.0</Version>
     <Copyright>Copyright © Khil-soft 2009 - 2022</Copyright>
-	<Nullable>enable</Nullable>
-	<ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />

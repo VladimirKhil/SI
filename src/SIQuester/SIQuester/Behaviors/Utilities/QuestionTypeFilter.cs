@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Windows.Data;
 
-namespace SIQuester.Utilities
+namespace SIQuester.Utilities;
+
+public sealed class QuestionTypeFilter : ICollectionFilter
 {
-    public sealed class QuestionTypeFilter: ICollectionFilter
+    public void Filter(object sender, FilterEventArgs e)
     {
-        public void Filter(object sender, System.Windows.Data.FilterEventArgs e)
-        {
-            e.Accepted = ((KeyValuePair<string, string>)e.Item).Key.Length > 0;
-        }
+        e.Accepted = ((KeyValuePair<string, string>)e.Item).Key.Length > 0;
     }
 }

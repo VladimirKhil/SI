@@ -1,52 +1,51 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SIGame.ViewModel
+namespace SIGame.ViewModel;
+
+/// <summary>
+/// Типы аккаунта
+/// </summary>
+public enum AccountTypes
 {
     /// <summary>
-    /// Типы аккаунта
+    /// Человек
     /// </summary>
-    public enum AccountTypes
-    {
-        /// <summary>
-        /// Человек
-        /// </summary>
-        [Display(Description = "AccountTypes_Human")]
-        Human,
-        /// <summary>
-        /// Компьютер
-        /// </summary>
-        [Display(Description = "AccountTypes_Computer")]
-        Computer
-    }
-
+    [Display(Description = "AccountTypes_Human")]
+    Human,
     /// <summary>
-    /// Стадия настроек
+    /// Компьютер
     /// </summary>
-    public enum SettingsStages
-    {
-        None,
-        Human,
-        Computer,
-        Showman,
-        Time,
-        PackageStore,
-        New
-    }
+    [Display(Description = "AccountTypes_Computer")]
+    Computer
+}
 
+/// <summary>
+/// Стадия настроек
+/// </summary>
+public enum SettingsStages
+{
+    None,
+    Human,
+    Computer,
+    Showman,
+    Time,
+    PackageStore,
+    New
+}
+
+/// <summary>
+/// Варианты сетевой игры
+/// </summary>
+public enum NetworkGameType
+{
     /// <summary>
-    /// Варианты сетевой игры
+    /// Игровой сервер СИ
     /// </summary>
-    public enum NetworkGameType
-    {
-        /// <summary>
-        /// Игровой сервер СИ
-        /// </summary>
-        [Display(Description = "NetworkGameType_NetworkGameServer")]
-        GameServer,
-        /// <summary>
-        /// Прямое подключение
-        /// </summary>
-        [Display(Description = "NetworkGameType_DirectConnection")]
-        DirectConnection
-    }
+    [Display(Description = "NetworkGameType_NetworkGameServer")]
+    GameServer,
+    /// <summary>
+    /// Прямое подключение
+    /// </summary>
+    [Display(Description = "NetworkGameType_DirectConnection")]
+    DirectConnection
 }

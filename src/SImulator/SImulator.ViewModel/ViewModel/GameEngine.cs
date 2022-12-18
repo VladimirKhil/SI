@@ -851,7 +851,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         }
         else
         {
-            if (packageLogo != null)
+            if (!string.IsNullOrEmpty(packageLogo?.Uri))
             {
                 if (SetMedia(packageLogo, SIDocument.AudioStorageName))
                 {
@@ -1307,7 +1307,6 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     private void Engine_QuestionSound(IMedia sound)
     {
         UserInterface.SetQuestionSound(true);
-        UserInterface.SetQuestionContentType(QuestionContentType.Loading);
 
         var result = SetMedia(sound, SIDocument.AudioStorageName, true);
 
@@ -1323,7 +1322,6 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     private void Engine_QuestionVideo(IMedia video)
     {
         UserInterface.SetQuestionSound(false);
-        UserInterface.SetQuestionContentType(QuestionContentType.Loading);
 
         var result = SetMedia(video, SIDocument.VideoStorageName);
 
@@ -1350,7 +1348,6 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     private void Engine_QuestionImage(IMedia image, IMedia sound)
     {
         UserInterface.SetQuestionSound(sound != null);
-        UserInterface.SetQuestionContentType(QuestionContentType.Loading);
 
         var resultImage = SetMedia(image, SIDocument.ImagesStorageName);
 

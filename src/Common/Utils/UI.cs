@@ -5,7 +5,7 @@
 /// </summary>
 public static class UI
 {
-    public static TaskScheduler Scheduler { get; private set; } // TODO: -> private
+    public static TaskScheduler? Scheduler { get; private set; } // TODO: -> private
 
     public static void Initialize()
     {

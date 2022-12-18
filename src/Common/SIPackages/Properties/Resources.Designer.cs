@@ -160,6 +160,15 @@ namespace SIPackages.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Package version {0} is not supported. Maximum supported version is {1}.
+        /// </summary>
+        public static string UnsupportedVersion {
+            get {
+                return ResourceManager.GetString("UnsupportedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Video.
         /// </summary>
         public static string Video {

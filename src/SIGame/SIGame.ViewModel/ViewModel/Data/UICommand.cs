@@ -1,13 +1,12 @@
 ﻿using System.Windows.Input;
 
-namespace SIGame
+namespace SIGame;
+
+/// <summary>
+/// Команда, выражаемая пользовательским интерфейсом
+/// </summary>
+public sealed class UICommand
 {
-    /// <summary>
-    /// Команда, выражаемая пользовательским интерфейсом
-    /// </summary>
-    public sealed class UICommand
-    {
-        public string Header { get; set; }
-        public ICommand Command { get; set; }
-    }
+    public string Header { get; set; }
+    public ICommand Command { get; set; }
 }

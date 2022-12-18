@@ -61,6 +61,7 @@ public sealed class Lock : IDisposable
     public async ValueTask WithLockAsync(Action action, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
+
         try
         {
             action();
@@ -102,6 +103,7 @@ public sealed class Lock : IDisposable
     public T WithLock<T>(Func<T> func, CancellationToken cancellationToken = default)
     {
         _semaphore.Wait(cancellationToken);
+
         try
         {
             return func();
@@ -136,6 +138,7 @@ public sealed class Lock : IDisposable
     public async ValueTask<T> WithLockAsync<T>(Func<T> func, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
+
         try
         {
             return func();
@@ -156,6 +159,7 @@ public sealed class Lock : IDisposable
     public async ValueTask WithLockAsync(Func<Task> asyncAction, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
+
         try
         {
             await asyncAction();
@@ -176,6 +180,7 @@ public sealed class Lock : IDisposable
     public async ValueTask<T> WithLockAsync<T>(Func<Task<T>> asyncFunc, CancellationToken cancellationToken = default)
     {
         await _semaphore.WaitAsync(cancellationToken);
+
         try
         {
             return await asyncFunc();

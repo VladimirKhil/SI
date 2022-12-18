@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
+﻿namespace SIGame;
 
-namespace SIGame
+public sealed class UICommandCollection : List<UICommand>
 {
-    public sealed class UICommandCollection: List<UICommand>
-    {
-    }
 }

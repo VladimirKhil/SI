@@ -3,113 +3,118 @@ using SIQuester.ViewModel.Properties;
 using System.Collections;
 using System.Collections.Specialized;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Defines a collection change.
+/// </summary>
+public sealed class CollectionChange : IChange
 {
     /// <summary>
-    /// Изменение коллекции
+    /// Collection that has been changed.
     /// </summary>
-    public sealed class CollectionChange : IChange
+    public IList Collection { get; init; }
+
+    /// <summary>
+    /// Change arguments.
+    /// </summary>
+    public NotifyCollectionChangedEventArgs Args { get; init; }
+
+    public CollectionChange(IList collection, NotifyCollectionChangedEventArgs args)
     {
-        /// <summary>
-        /// Коллекция, которая была изменена
-        /// </summary>
-        public IList Collection { get; set; }
-        /// <summary>
-        /// Элементы, затронутые изменением
-        /// </summary>
-        public NotifyCollectionChangedEventArgs Args { get; set; }
+        Collection = collection;
+        Args = args;
+    }
 
-        #region IChange Members
-
-        public void Undo()
+    public void Undo()
+    {
+        try
         {
-            try
-            {
-                switch (this.Args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        for (int i = 0; i < this.Args.NewItems.Count; i++)
-                        {
-                            if (this.Args.NewStartingIndex > -1 && this.Args.NewStartingIndex < this.Collection.Count)
-                                this.Collection.RemoveAt(this.Args.NewStartingIndex);
-                            else
-                            {
-                                PlatformManager.Instance.ShowErrorMessage(Resources.UndoError);
-                                return;
-                            }
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        {
-                            var index = this.Args.OldStartingIndex;
-                            foreach (var item in this.Args.OldItems)
-                            {
-                                this.Collection.Insert(index++, item);
-                            }
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Replace:
-                        {
-                            var index = this.Args.OldStartingIndex;
-                            foreach (var item in this.Args.OldItems)
-                            {
-                                this.Collection[index++] = item;
-                            }
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Move:
-                        var newIndex = this.Args.NewStartingIndex - (this.Args.OldStartingIndex < this.Args.NewStartingIndex ? 1 : 0);
-                        var tmp = this.Collection[newIndex];
-                        this.Collection.RemoveAt(newIndex);
-                        this.Collection.Insert(this.Args.OldStartingIndex, tmp);
-                        break;
-                }
-            }
-            catch
-            {
-                PlatformManager.Instance.ShowErrorMessage(Resources.UndoError);
-            }
-        }
-
-        public void Redo()
-        {
-            switch (this.Args.Action)
+            switch (Args.Action)
             {
                 case NotifyCollectionChangedAction.Add:
+                    for (int i = 0; i < Args.NewItems.Count; i++)
                     {
-                        var index = this.Args.NewStartingIndex;
-                        for (int i = 0; i < this.Args.NewItems.Count; i++)
+                        if (Args.NewStartingIndex > -1 && Args.NewStartingIndex < Collection.Count)
+                            Collection.RemoveAt(Args.NewStartingIndex);
+                        else
                         {
-                            this.Collection.Insert(index++, this.Args.NewItems[i]);
+                            PlatformManager.Instance.ShowErrorMessage(Resources.UndoError);
+                            return;
                         }
                     }
                     break;
-                case NotifyCollectionChangedAction.Move:
-                    var tmp = this.Collection[this.Args.OldStartingIndex];
-                    this.Collection.RemoveAt(this.Args.OldStartingIndex);
-                    this.Collection.Insert(this.Args.NewStartingIndex - (this.Args.OldStartingIndex < this.Args.NewStartingIndex ? 1 : 0), tmp);
-                    break;
+
                 case NotifyCollectionChangedAction.Remove:
-                    for (int i = 0; i < this.Args.OldItems.Count; i++)
                     {
-                        this.Collection.RemoveAt(this.Args.OldStartingIndex);
+                        var index = Args.OldStartingIndex;
+                        foreach (var item in Args.OldItems)
+                        {
+                            Collection.Insert(index++, item);
+                        }
                     }
                     break;
+
                 case NotifyCollectionChangedAction.Replace:
                     {
-                        var index = this.Args.NewStartingIndex;
-                        foreach (var item in this.Args.NewItems)
+                        var index = Args.OldStartingIndex;
+                        foreach (var item in Args.OldItems)
                         {
-                            this.Collection[index++] = item;
+                            Collection[index++] = item;
                         }
                     }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    var newIndex = Args.NewStartingIndex - (Args.OldStartingIndex < Args.NewStartingIndex ? 1 : 0);
+                    var tmp = Collection[newIndex];
+                    Collection.RemoveAt(newIndex);
+                    Collection.Insert(Args.OldStartingIndex, tmp);
                     break;
             }
         }
+        catch
+        {
+            PlatformManager.Instance.ShowErrorMessage(Resources.UndoError);
+        }
+    }
 
-        #endregion
+    public void Redo()
+    {
+        switch (Args.Action)
+        {
+            case NotifyCollectionChangedAction.Add:
+                {
+                    var index = Args.NewStartingIndex;
+                    for (int i = 0; i < Args.NewItems.Count; i++)
+                    {
+                        Collection.Insert(index++, Args.NewItems[i]);
+                    }
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Move:
+                var tmp = Collection[Args.OldStartingIndex];
+                Collection.RemoveAt(Args.OldStartingIndex);
+                Collection.Insert(Args.NewStartingIndex - (Args.OldStartingIndex < Args.NewStartingIndex ? 1 : 0), tmp);
+                break;
+
+            case NotifyCollectionChangedAction.Remove:
+                for (int i = 0; i < Args.OldItems.Count; i++)
+                {
+                    Collection.RemoveAt(Args.OldStartingIndex);
+                }
+                break;
+
+            case NotifyCollectionChangedAction.Replace:
+                {
+                    var index = Args.NewStartingIndex;
+                    foreach (var item in Args.NewItems)
+                    {
+                        Collection[index++] = item;
+                    }
+                }
+                break;
+        }
     }
 }

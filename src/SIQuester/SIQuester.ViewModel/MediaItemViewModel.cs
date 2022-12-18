@@ -1,86 +1,65 @@
-﻿using SIPackages.Core;
-using System;
-using System.Threading.Tasks;
+﻿using SIPackages;
+using SIPackages.Core;
+using SIQuester.ViewModel.Properties;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+/// <summary>
+/// Defines a sidebar media object view model.
+/// </summary>
+public sealed class MediaItemViewModel : MediaOwnerViewModel
 {
-    public sealed class MediaItemViewModel : ModelViewBase, IMediaOwner
+    private static readonly Dictionary<string, int> RecommenedSizeMb = new()
     {
-        public string Type { get; }
+        [SIDocument.ImagesStorageName] = 1,
+        [SIDocument.AudioStorageName] = 5,
+        [SIDocument.VideoStorageName] = 10,
+    };
 
-        public Named Model { get; }
+    private static readonly Dictionary<string, string[]> RecommenedExtensions = new()
+    {
+        [SIDocument.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png" },
+        [SIDocument.AudioStorageName] = new[] { ".mp3" },
+        [SIDocument.VideoStorageName] = new[] { ".mp4" },
+    };
 
-        private readonly Func<IMedia> _mediaGetter;
+    /// <summary>
+    /// Media item type.
+    /// </summary>
+    public string Type { get; }
 
-        private IMedia _media;
+    /// <summary>
+    /// Underlying media object.
+    /// </summary>
+    public Named Model { get; }
 
-        private bool _isMediaLoading;
+    private readonly Func<IMedia> _mediaGetter;
 
-        public IMedia MediaSource
-        {
-            get
-            {
-                if (_media == null && !_isMediaLoading)
-                {
-                    LoadMedia();
-                }
+    public MediaItemViewModel(Named named, string type, Func<IMedia> mediaGetter)
+    {
+        Model = named;
+        Type = type;
+        _mediaGetter = mediaGetter;
+    }
 
-                return _media;
-            }
-            set
-            {
-                _media = value;
-                OnPropertyChanged(nameof(MediaSource));
-            }
-        }
+    protected override IMedia GetMedia() => _mediaGetter();
 
-        private async void LoadMedia()
-        {
-            try
-            {
-                await LoadMediaAsync();
-            }
-            catch
-            {
+    protected override void OnError(Exception exc) => MainViewModel.ShowError(exc);
 
-            }
-        }
+    protected override string? DetectErrorMessage(IMedia media)
+    {
+        var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
 
-        public async Task<IMedia> LoadMediaAsync()
-        {
-            if (_media != null)
-            {
-                return _media;
-            }
+        var sizeWarning = RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
+            && media.StreamLength > recommendedMaxSize * 1024 * 1024
+                ? string.Format(Resources.MediaFileSizeExceedsRecommenedValue, recommendedMaxSize)
+                : null;
 
-            _isMediaLoading = true;
+        var extensionWarning = RecommenedExtensions.TryGetValue(Type, out var recommendedExtensions)
+            && !recommendedExtensions.Contains(extension)
+                ? string.Format(Resources.MediaFileExtensionIsNotRecommened, string.Join(',', recommendedExtensions))
+                : null;
 
-            try
-            {
-                return await Task.Run(() =>
-                {
-                    _media = _mediaGetter();
-                    OnPropertyChanged(nameof(MediaSource));
-
-                    return _media;
-                });
-            }
-            catch (Exception exc)
-            {
-                MainViewModel.ShowError(exc);
-                return null;
-            }
-            finally
-            {
-                _isMediaLoading = false;
-            }
-        }
-
-        public MediaItemViewModel(Named named, string type, Func<IMedia> mediaGetter)
-        {
-            Model = named;
-            Type = type;
-            _mediaGetter = mediaGetter;
-        }
+        return sizeWarning == null ? extensionWarning : (extensionWarning == null ? sizeWarning : $"{sizeWarning} {extensionWarning}");
     }
 }

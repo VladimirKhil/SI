@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace SIGame.ViewModel.Data;
 
-namespace SIGame.ViewModel.Data
+public interface INavigatable
 {
-    public interface INavigatable
-    {
-        event Action<ContentBox> Navigate;
+    event Action<ContentBox> Navigate;
 
-        void OnNavigatedFrom(object data);
-    }
+    void OnNavigatedFrom(object data);
 }

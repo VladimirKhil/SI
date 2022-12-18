@@ -345,7 +345,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         await ZipHelper.ExtractToDirectoryAsync(
             filePath,
             tempDir,
-            maxAllowedDataLength: long.MaxValue,
+            ExtractedFileNamingModes.Unescape,
+            long.MaxValue,
             cancellationToken: _cancellationTokenSource.Token);
 
         if (isTemporary)

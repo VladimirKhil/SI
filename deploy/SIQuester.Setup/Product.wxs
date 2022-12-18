@@ -157,6 +157,9 @@
 			<Component Guid="{61DE6CC1-243C-473A-B297-D5B35A113F5D}">
 				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\Ben.Demystifier.LICENSE.txt" />
 			</Component>
+			<Component Guid="{D24545DB-5745-4EFF-B17D-87EBFCAC2849}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)licenses\YamlDotNet.LICENSE.txt" />
+			</Component>
 			<Component Guid="{321D8DBD-C9A0-4216-827C-563F95BF02B0}">
 				<File KeyPath="yes" Source="$(var.SolutionDir)LICENSE" />
 			</Component>

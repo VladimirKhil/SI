@@ -1,33 +1,32 @@
-﻿namespace SIQuester.ViewModel.Workspaces.Dialogs.Play
+﻿namespace SIQuester.ViewModel.Workspaces.Dialogs.Play;
+
+/// <summary>
+/// Defines question table content types.
+/// </summary>
+public enum ContentTypes
 {
     /// <summary>
-    /// Defines question table content types.
+    /// Empty content.
     /// </summary>
-    public enum ContentTypes
-    {
-        /// <summary>
-        /// Empty content.
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// Text content.
-        /// </summary>
-        Text,
+    /// <summary>
+    /// Text content.
+    /// </summary>
+    Text,
 
-        /// <summary>
-        /// Image content.
-        /// </summary>
-        Image,
+    /// <summary>
+    /// Image content.
+    /// </summary>
+    Image,
 
-        /// <summary>
-        /// Audio content.
-        /// </summary>
-        Audio,
+    /// <summary>
+    /// Audio content.
+    /// </summary>
+    Audio,
 
-        /// <summary>
-        /// Video content.
-        /// </summary>
-        Video,
-    }
+    /// <summary>
+    /// Video content.
+    /// </summary>
+    Video,
 }

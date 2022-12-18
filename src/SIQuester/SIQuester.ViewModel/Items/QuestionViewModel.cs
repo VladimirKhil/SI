@@ -1,127 +1,124 @@
 ﻿using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
-using System;
 using System.Collections.Specialized;
 using System.Windows.Input;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+/// <summary>
+/// Defines a package question view model.
+/// </summary>
+public sealed class QuestionViewModel : ItemViewModel<Question>
 {
-    /// <summary>
-    /// Defines a package question view model.
-    /// </summary>
-    public sealed class QuestionViewModel : ItemViewModel<Question>
+    public ThemeViewModel OwnerTheme { get; set; }
+
+    public override IItemViewModel Owner => OwnerTheme;
+
+    public AnswersViewModel Right { get; private set; }
+
+    public AnswersViewModel Wrong { get; private set; }
+
+    public ScenarioViewModel Scenario { get; private set; }
+
+    public QuestionTypeViewModel Type { get; private set; }
+
+    public SimpleCommand AddWrongAnswers { get; private set; }
+
+    public override ICommand Add
     {
-        public ThemeViewModel OwnerTheme { get; set; }
+        get => null;
+        protected set { }
+    }
 
-        public override IItemViewModel Owner => OwnerTheme;
+    public override ICommand Remove { get; protected set; }
 
-        public AnswersViewModel Right { get; private set; }
+    public ICommand Clone { get; private set; }
 
-        public AnswersViewModel Wrong { get; private set; }
+    public ICommand SetQuestionType { get; private set; }
 
-        public ScenarioViewModel Scenario { get; private set; }
+    public ICommand SwitchEmpty { get; private set; }
 
-        public QuestionTypeViewModel Type { get; private set; }
+    public QuestionViewModel(Question question)
+        : base(question)
+    {
+        Type = new QuestionTypeViewModel(question.Type);
 
-        public SimpleCommand AddWrongAnswers { get; private set; }
+        Right = new AnswersViewModel(this, question.Right, true);
+        Wrong = new AnswersViewModel(this, question.Wrong, false);
+        Scenario = new ScenarioViewModel(this, question.Scenario);
 
-        public override ICommand Add
+        BindHelper.Bind(Right, question.Right);
+        BindHelper.Bind(Wrong, question.Wrong);
+
+        AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
+
+        Clone = new SimpleCommand(CloneQuestion_Executed);
+        Remove = new SimpleCommand(RemoveQuestion_Executed);
+
+        SetQuestionType = new SimpleCommand(SetQuestionType_Executed);
+        SwitchEmpty = new SimpleCommand(SwitchEmpty_Executed);
+
+        Wrong.CollectionChanged += Wrong_CollectionChanged;
+    }
+
+    private void Wrong_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+        AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
+
+    private void AddWrongAnswers_Executed(object? arg)
+    {
+        QDocument.ActivatedObject = Wrong;
+        Wrong.Add("");
+    }
+
+    private void CloneQuestion_Executed(object? arg)
+    {
+        if (OwnerTheme != null)
         {
-            get => null;
-            protected set { }
+            var quest = Model.Clone();
+            var newQuestionViewModel = new QuestionViewModel(quest);
+            OwnerTheme.Questions.Add(newQuestionViewModel);
+            OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
         }
+    }
 
-        public override ICommand Remove { get; protected set; }
+    private void RemoveQuestion_Executed(object? arg) => OwnerTheme?.Questions.Remove(this);
 
-        public ICommand Clone { get; private set; }
+    private void SetQuestionType_Executed(object? arg) => Type.Model.Name = (string)arg;
 
-        public ICommand SetQuestionType { get; private set; }
+    private void SwitchEmpty_Executed(object? arg)
+    {
+        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
 
-        public ICommand SwitchEmpty { get; private set; }
-
-        public QuestionViewModel(Question question)
-            : base(question)
+        try
         {
-            Type = new QuestionTypeViewModel(question.Type);
+            using var change = document.OperationsManager.BeginComplexChange();
 
-            Right = new AnswersViewModel(this, question.Right, true);
-            Wrong = new AnswersViewModel(this, question.Wrong, false);
-            Scenario = new ScenarioViewModel(this, question.Scenario);
-
-            BindHelper.Bind(Right, question.Right);
-            BindHelper.Bind(Wrong, question.Wrong);
-
-            AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
-
-            Clone = new SimpleCommand(CloneQuestion_Executed);
-            Remove = new SimpleCommand(RemoveQuestion_Executed);
-
-            SetQuestionType = new SimpleCommand(SetQuestionType_Executed);
-            SwitchEmpty = new SimpleCommand(SwitchEmpty_Executed);
-
-            Wrong.CollectionChanged += Wrong_CollectionChanged;
-        }
-
-        private void Wrong_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
-            AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
-
-        private void AddWrongAnswers_Executed(object arg)
-        {
-            QDocument.ActivatedObject = Wrong;
-            Wrong.Add("");
-        }
-
-        private void CloneQuestion_Executed(object arg)
-        {
-            if (OwnerTheme != null)
+            if (Model.Price == Question.InvalidPrice)
             {
-                var quest = Model.Clone();
-                var newQuestionViewModel = new QuestionViewModel(quest);
-                OwnerTheme.Questions.Add(newQuestionViewModel);
-                OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
-            }
-        }
-
-        private void RemoveQuestion_Executed(object arg) => OwnerTheme?.Questions.Remove(this);
-
-        private void SetQuestionType_Executed(object arg) => Type.Model.Name = (string)arg;
-
-        private void SwitchEmpty_Executed(object arg)
-        {
-            var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
-            document.BeginChange();
-
-            try
-            {
-                if (Model.Price == Question.InvalidPrice)
-                {
-                    Model.Price = AppSettings.Default.QuestionBase * ((OwnerTheme?.Questions.IndexOf(this) ?? 0) + 1);
-                    Model.Scenario.Clear();
-                    Model.Scenario.Add(new Atom());
-                    Model.Type.Params.Clear();
-                    Model.Right.Clear();
-                    Model.Right.Add("");
-                    Model.Wrong.Clear();
-
-                    document.CommitChange();
-                    return;
-                }
-
-                Model.Price = Question.InvalidPrice;
+                Model.Price = AppSettings.Default.QuestionBase * ((OwnerTheme?.Questions.IndexOf(this) ?? 0) + 1);
                 Model.Scenario.Clear();
+                Model.Scenario.Add(new Atom());
                 Model.Type.Params.Clear();
                 Model.Right.Clear();
+                Model.Right.Add("");
                 Model.Wrong.Clear();
 
-                document.CommitChange();
+                change.Commit();
+                return;
             }
-            catch (Exception exc)
-            {
-                document.RollbackChange();
 
-                PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
-            }
+            Model.Price = Question.InvalidPrice;
+            Model.Scenario.Clear();
+            Model.Type.Params.Clear();
+            Model.Right.Clear();
+            Model.Wrong.Clear();
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
         }
     }
 }

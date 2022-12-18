@@ -150,4 +150,7 @@
   <data name="Video" xml:space="preserve">
     <value>Видео</value>
   </data>
+  <data name="UnsupportedVersion" xml:space="preserve">
+    <value>Версия пакета {0} не поддерживается. Максимальная поддерживаемая версия: {1}</value>
+  </data>
 </root>

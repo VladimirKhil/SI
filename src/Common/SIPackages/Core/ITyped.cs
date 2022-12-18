@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel;
 
-namespace SIPackages.Core
+namespace SIPackages.Core;
+
+/// <summary>
+/// Defines an object with type.
+/// </summary>
+public interface ITyped : INotifyPropertyChanged
 {
     /// <summary>
-    /// Defines an object with type.
+    /// Object type.
     /// </summary>
-    public interface ITyped : INotifyPropertyChanged
-    {
-        /// <summary>
-        /// Object type.
-        /// </summary>
-        string Type { get; set; }
-    }
+    string Type { get; set; }
 }

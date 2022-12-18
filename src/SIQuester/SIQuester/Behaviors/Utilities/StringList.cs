@@ -1,8 +1,3 @@
-﻿using System.Collections.Generic;
+﻿namespace SIQuester.Utilities;
 
-namespace SIQuester.Utilities
-{
-    public sealed class StringList: List<string>
-    {
-    }
-}
+public sealed class StringList : List<string> { }

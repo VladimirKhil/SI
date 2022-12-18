@@ -1,10 +1,9 @@
-﻿namespace SIStorageService.Client.Models
-{
-    [Obsolete]
-    public sealed class NewServerInfo
-    {
-        public string Uri { get; set; }
+﻿namespace SIStorageService.Client.Models;
 
-        public int ProtocolVersion { get; set; }
-    }
+[Obsolete]
+public sealed class NewServerInfo
+{
+    public string Uri { get; set; }
+
+    public int ProtocolVersion { get; set; }
 }

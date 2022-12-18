@@ -1,12 +1,11 @@
-﻿namespace SIGame.ViewModel.PackageSources
+﻿namespace SIGame.ViewModel.PackageSources;
+
+public enum PackageSourceTypes
 {
-    public enum PackageSourceTypes
-    {
-        Next,
-        Random,
-        RandomServer,
-        Local,
-        SIStorage,
-        VK
-    }
+    Next,
+    Random,
+    RandomServer,
+    Local,
+    SIStorage,
+    VK
 }

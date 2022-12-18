@@ -1,27 +1,22 @@
 ﻿using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
-using System.Threading.Tasks;
 
-namespace SIQuester.ViewModel
+namespace SIQuester.ViewModel;
+
+public sealed class HowToViewModel : WorkspaceViewModel
 {
-    public sealed class HowToViewModel : WorkspaceViewModel
+    public override string Header => Resources.HowToUseApp;
+
+    private readonly IXpsDocumentWrapper _documentWrapper;
+
+    public object Document => _documentWrapper.GetDocument();
+
+    public HowToViewModel() => _documentWrapper = PlatformManager.Instance.GetHelp();
+
+    protected override async Task Close_Executed(object? arg)
     {
-        public override string Header => Resources.HowToUseApp;
+        _documentWrapper.Dispose();
 
-        private readonly IXpsDocumentWrapper _documentWrapper;
-
-        public object Document => _documentWrapper.GetDocument();
-
-        public HowToViewModel()
-        {
-            _documentWrapper = PlatformManager.Instance.GetHelp();
-        }
-
-        protected override async Task Close_Executed(object arg)
-        {
-            _documentWrapper.Dispose();
-
-            await base.Close_Executed(arg);
-        }
+        await base.Close_Executed(arg);
     }
 }

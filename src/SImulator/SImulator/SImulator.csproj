@@ -7,12 +7,12 @@
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <Version>2.10.0</Version>
+    <Version>2.10.1</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-	<Nullable>enable</Nullable>
-	<!--<ImplicitUsings>enable</ImplicitUsings>-->
+    <Nullable>enable</Nullable>
+    <!--<ImplicitUsings>enable</ImplicitUsings>-->
   </PropertyGroup>
   <PropertyGroup>
     <SatelliteResourceLanguages>ru-RU</SatelliteResourceLanguages>
@@ -38,10 +38,10 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
     <ItemGroup>
-	    <Content Update="ru-RU\SIUI.resources.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-	    </Content>
+      <Content Update="ru-RU\SIUI.resources.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </Content>
     </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\logo.png" />

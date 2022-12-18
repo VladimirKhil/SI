@@ -1,85 +1,90 @@
 ﻿using SIQuester.ViewModel;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Defines integration logic for ImportDBStorageView.
+/// </summary>
+public partial class ImportDBStorageView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для ImportDBStorageView.xaml
-    /// </summary>
-    public partial class ImportDBStorageView : UserControl
+    private bool _blockFlag;
+
+    public ImportDBStorageView() => InitializeComponent();
+
+    private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => Import();
+
+    private void Import()
     {
-        private bool _blockFlag;
-
-        public ImportDBStorageView()
+        if (tree.SelectedItem is not DBNode item)
         {
-            InitializeComponent();
+            return;
         }
 
-        private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        if (item.Children == null)
         {
-            Import();
-        }
-
-        private void Import()
-        {
-            if (tree.SelectedItem is DBNode item)
+            item.PropertyChanged += (sender2, e2) =>
             {
-                if (item.Children == null)
+                var item2 = (DBNode?)sender2;
+
+                if (item2.Children.Length == 0)
                 {
-                    item.PropertyChanged += (sender2, e2) =>
+                    Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        var item2 = (DBNode)sender2;
-                        if (item2.Children.Length == 0)
-                        {
-                            Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                ((ImportDBStorageViewModel)DataContext).Select(item2);
-                            }));
-                        }
-                    };
+                        ((ImportDBStorageViewModel)DataContext).SelectNodeAsync(item2);
+                    }));
                 }
-                else if (item.Children.Length == 0)
-                {
-                    ((ImportDBStorageViewModel)DataContext).Select(item);
-                }
-            }
+            };
+        }
+        else if (item.Children.Length == 0)
+        {
+            ((ImportDBStorageViewModel)DataContext).SelectNodeAsync(item);
+        }
+    }
+
+    private void Tree_Expanded(object sender, RoutedEventArgs e)
+    {
+        if (_blockFlag)
+        {
+            return;
         }
 
-        private void Tree_Expanded(object sender, RoutedEventArgs e)
+        var node = (DBNode)((TreeViewItem)e.OriginalSource).DataContext;
+
+        if (node == null)
         {
-            if (_blockFlag)
-                return;
+            return;
+        }
 
-            var node = (DBNode)((TreeViewItem)e.OriginalSource).DataContext;
-            if (node == null)
-                return;
+        if (node.Children.Length == 1 && node.Children[0] == null)
+        {
+            ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
+        }
+    }
 
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        if (tree.SelectedItem is DBNode node)
+        {
             if (node.Children.Length == 1 && node.Children[0] == null)
-                ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            if (tree.SelectedItem is DBNode node)
             {
-                if (node.Children.Length == 1 && node.Children[0] == null)
-                    ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
-
-                _blockFlag = true;
-                try
-                {
-                    node.IsExpanded = true;
-                }
-                finally
-                {
-                    _blockFlag = false;
-                }
+                ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
             }
 
-            Import();
+            _blockFlag = true;
+
+            try
+            {
+                node.IsExpanded = true;
+            }
+            finally
+            {
+                _blockFlag = false;
+            }
         }
+
+        Import();
     }
 }

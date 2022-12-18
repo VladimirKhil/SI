@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для DocumentView.xaml
+/// </summary>
+public partial class DocumentView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для DocumentView.xaml
-    /// </summary>
-    public partial class DocumentView : UserControl
-    {
-        public DocumentView()
-        {
-            InitializeComponent();
-        }
-    }
+    public DocumentView() => InitializeComponent();
 }

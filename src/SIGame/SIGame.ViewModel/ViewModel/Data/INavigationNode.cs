@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace SIGame.ViewModel;
 
-namespace SIGame.ViewModel
+public interface INavigationNode
 {
-    public interface INavigationNode
-    {
-        event Action Close;
-    }
+    event Action Close;
 }

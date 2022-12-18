@@ -1,15 +1,11 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для WaitDialog.xaml
+/// </summary>
+public partial class WaitDialog : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для WaitDialog.xaml
-    /// </summary>
-    public partial class WaitDialog : UserControl
-    {
-        public WaitDialog()
-        {
-            InitializeComponent();
-        }
-    }
+    public WaitDialog() => InitializeComponent();
 }

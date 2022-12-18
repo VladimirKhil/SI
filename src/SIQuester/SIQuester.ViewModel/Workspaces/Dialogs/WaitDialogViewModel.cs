@@ -1,6 +1,3 @@
-﻿namespace SIQuester.ViewModel.Workspaces.Dialogs
-{
-    public sealed class WaitDialogViewModel
-    {
-    }
-}
+﻿namespace SIQuester.ViewModel.Workspaces.Dialogs;
+
+public sealed class WaitDialogViewModel { }

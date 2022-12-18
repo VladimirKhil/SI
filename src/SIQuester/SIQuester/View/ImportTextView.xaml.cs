@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace SIQuester
+namespace SIQuester;
+
+/// <summary>
+/// Логика взаимодействия для ImportTextView.xaml
+/// </summary>
+public partial class ImportTextView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для ImportTextView.xaml
-    /// </summary>
-    public partial class ImportTextView : UserControl
+    public ImportTextView()
     {
-        public ImportTextView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

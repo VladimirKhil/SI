@@ -1,53 +1,46 @@
-﻿using System.Xml.Serialization;
-using SIData;
+﻿using SIData;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 
-namespace SIGame.ViewModel
+namespace SIGame.ViewModel;
+
+/// <summary>
+/// Игровой аккаунт
+/// </summary>
+public sealed class GameAccount : SimpleAccount<Account>
 {
-    /// <summary>
-    /// Игровой аккаунт
-    /// </summary>
-    public sealed class GameAccount: SimpleAccount<Account>
-    {
-        private AccountTypes accountType = AccountTypes.Human;
+    private AccountTypes _accountType = AccountTypes.Human;
 
-        public AccountTypes AccountType
+    public AccountTypes AccountType
+    {
+        get => _accountType;
+        set
         {
-            get { return this.accountType; }
-            set
+            if (_accountType != value)
             {
-                if (this.accountType != value)
-                {
-                    this.accountType = value;
-                    OnPropertyChanged();
-                }
+                _accountType = value;
+                OnPropertyChanged();
             }
         }
+    }
 
-        [XmlIgnore]
-        public bool IsCreator
+    [XmlIgnore]
+    public bool IsCreator => SelectedAccount == _settings.Human;
+
+    [XmlIgnore]
+    public GameSettingsViewModel GameSettings => _settings;
+
+    private readonly GameSettingsViewModel _settings;
+
+    public GameAccount(GameSettingsViewModel settings) => _settings = settings;
+
+    protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+
+        if (propertyName == nameof(SelectedAccount))
         {
-            get { return this.SelectedAccount == this.settings.Human; }
-        }
-
-        [XmlIgnore]
-        public GameSettingsViewModel GameSettings
-        {
-            get { return this.settings; }
-        }
-
-        private GameSettingsViewModel settings;
-
-        public GameAccount(GameSettingsViewModel settings)
-        {
-            this.settings = settings;
-        }
-
-        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            base.OnPropertyChanged(propertyName);
-            if (propertyName == "SelectedAccount")
-                OnPropertyChanged("IsCreator");
+            OnPropertyChanged(nameof(IsCreator));
         }
     }
 }

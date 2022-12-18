@@ -1,18 +1,17 @@
-﻿namespace SIPackages.Core
+﻿namespace SIPackages.Core;
+
+/// <summary>
+/// Provides well-known round types.
+/// </summary>
+public static class RoundTypes
 {
     /// <summary>
-    /// Provides well-known round types.
+    /// Simple round type.
     /// </summary>
-    public static class RoundTypes
-    {
-        /// <summary>
-        /// Simple round type.
-        /// </summary>
-        public const string Standart = "standart";
+    public const string Standart = "standart";
 
-        /// <summary>
-        /// Final round type.
-        /// </summary>
-        public const string Final = "final";
-    }
+    /// <summary>
+    /// Final round type.
+    /// </summary>
+    public const string Final = "final";
 }

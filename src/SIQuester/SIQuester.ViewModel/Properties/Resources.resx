@@ -458,4 +458,25 @@ theme - тема Кота</value>
   <data name="UnsupportedFragment" xml:space="preserve">
     <value>Неподдерживаемый фрагмент: {0}</value>
   </data>
+  <data name="FileSearch" xml:space="preserve">
+    <value>Поиск файлов</value>
+  </data>
+  <data name="MediaFileExtensionIsNotRecommened" xml:space="preserve">
+    <value>Расширение мультимедиа файла не относится к рекомендуемым ({0})!</value>
+  </data>
+  <data name="MediaFileSizeExceedsRecommenedValue" xml:space="preserve">
+    <value>Размер мультимедиа файла превышает рекомендуемое значение ({0} МБ)!</value>
+  </data>
+  <data name="YamlFiles" xml:space="preserve">
+    <value>YAML файлы</value>
+  </data>
+  <data name="TxtFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.txt) | *.txt</value>
+  </data>
+  <data name="XmlFilesFilter" xml:space="preserve">
+    <value>Файлы вопросов (*.xml) | *.xml</value>
+  </data>
+  <data name="YamlFilesFilter" xml:space="preserve">
+    <value>YAML файлы (*.yaml) | *.yaml</value>
+  </data>
 </root>

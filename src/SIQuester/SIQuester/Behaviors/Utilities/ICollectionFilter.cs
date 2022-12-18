@@ -1,12 +1,11 @@
 ﻿using System.Windows.Data;
 
-namespace SIQuester.Utilities
+namespace SIQuester.Utilities;
+
+/// <summary>
+/// Объект, который можно использовать для фильтрации коллекций
+/// </summary>
+public interface ICollectionFilter
 {
-    /// <summary>
-    /// Объект, который можно использовать для фильтрации коллекций
-    /// </summary>
-    public interface ICollectionFilter
-    {
-        void Filter(object sender, FilterEventArgs e);
-    }
+    void Filter(object sender, FilterEventArgs e);
 }

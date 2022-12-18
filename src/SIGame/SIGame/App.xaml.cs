@@ -216,7 +216,7 @@ namespace SIGame
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
             _logger.LogError("Common game error: {error}", e.ExceptionObject);
 
-        private void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(UserSettings.Sound))
             {

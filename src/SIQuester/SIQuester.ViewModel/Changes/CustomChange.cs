@@ -1,26 +1,17 @@
-﻿using System;
+﻿namespace SIQuester.ViewModel;
 
-namespace SIQuester.ViewModel
+internal sealed class CustomChange : IChange
 {
-    internal sealed class CustomChange : IChange
+    private readonly Action _undo;
+    private readonly Action _redo;
+
+    public void Undo() => _undo();
+
+    public void Redo() => _redo();
+
+    public CustomChange(Action undo, Action redo)
     {
-        private readonly Action _undo;
-        private readonly Action _redo;
-
-        public void Undo()
-        {
-            _undo();
-        }
-
-        public void Redo()
-        {
-            _redo();
-        }
-
-        public CustomChange(Action undo, Action redo)
-        {
-            _undo = undo;
-            _redo = redo;
-        }
+        _undo = undo;
+        _redo = redo;
     }
 }

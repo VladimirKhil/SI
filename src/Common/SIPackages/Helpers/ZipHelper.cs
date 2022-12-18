@@ -1,200 +1,193 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
+﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SIPackages.Helpers
+namespace SIPackages.Helpers;
+
+/// <summary>
+/// Provides helper methods for working with zip archives.
+/// </summary>
+public static class ZipHelper
 {
+    private const int DefaultMaxArchiveDataLength = 2 * 100 * 1024 * 1024;
+
     /// <summary>
-    /// Provides helper methods for working with zip archives.
+    /// Defines a maxumim file length on current platform.
     /// </summary>
-    public static class ZipHelper
+    internal static int MaxFileNameLength =
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // / 2 because of 2-byte non-ASCII symbols
+
+    /// <summary>
+    /// Etracts zip archive to directory.
+    /// </summary>
+    /// <param name="sourceArchiveFilePath">Arhive file path.</param>
+    /// <param name="destinationDirectoryPath">Target directory path.</param>
+    /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
+    /// <param name="maxAllowedDataLength">
+    /// Maximum allowed length of extracted data in the archive.
+    /// <see cref="DefaultMaxArchiveDataLength" /> by default.
+    /// </param>
+    /// <param name="entryFilter">Optional filter for archive entries.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Collection of filtered file names.</returns>
+    /// <exception cref="InvalidOperationException" />
+    public static async Task<string[]> ExtractToDirectoryAsync(
+        string sourceArchiveFilePath,
+        string destinationDirectoryPath,
+        ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal,
+        long maxAllowedDataLength = DefaultMaxArchiveDataLength,
+        Predicate<ZipArchiveEntry>? entryFilter = null,
+        CancellationToken cancellationToken = default)
     {
-        private const int DefaultMaxArchiveDataLength = 2 * 100 * 1024 * 1024;
+        Directory.CreateDirectory(destinationDirectoryPath);
 
-        /// <summary>
-        /// Defines a maxumim file length on current platform.
-        /// </summary>
-        internal static int MaxFileNameLength =
-            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 100 : 255 / 2; // / 2 because of 2-byte non-ASCII symbols
+        using var stream = File.OpenRead(sourceArchiveFilePath);
+        using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
 
-        /// <summary>
-        /// Etracts zip archive to directory.
-        /// </summary>
-        /// <param name="sourceArchiveFilePath">Arhive file path.</param>
-        /// <param name="destinationDirectoryPath">Target directory path.</param>
-        /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
-        /// <param name="maxAllowedDataLength">
-        /// Maximum allowed length of extracted data in the archive.
-        /// <see cref="DefaultMaxArchiveDataLength" /> by default.
-        /// </param>
-        /// <param name="entryFilter">Optional filter for archive entries.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Collection of filtered file names.</returns>
-        /// <exception cref="InvalidOperationException" />
-        public static async Task<string[]> ExtractToDirectoryAsync(
-            string sourceArchiveFilePath,
-            string destinationDirectoryPath,
-            ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal,
-            long maxAllowedDataLength = DefaultMaxArchiveDataLength,
-            Predicate<ZipArchiveEntry>? entryFilter = null,
-            CancellationToken cancellationToken = default)
+        // Quickly check the value from the zip header
+        var declaredSize = archive.Entries.Sum(entry => entry.Length);
+
+        if (declaredSize > maxAllowedDataLength)
         {
-            Directory.CreateDirectory(destinationDirectoryPath);
-
-            using var stream = File.OpenRead(sourceArchiveFilePath);
-            using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
-
-            // Quickly check the value from the zip header
-            var declaredSize = archive.Entries.Sum(entry => entry.Length);
-
-            if (declaredSize > maxAllowedDataLength)
-            {
-                throw new InvalidOperationException($"Archive data is too big ({declaredSize} bytes)");
-            }
-
-            var skippedFiles = new List<string>();
-
-            foreach (var entry in archive.Entries)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                if (entryFilter != null && !entryFilter(entry))
-                {
-                    skippedFiles.Add(entry.FullName);
-                    continue;
-                }
-
-                await ExtractEntryToDirectoryAsync(entry, destinationDirectoryPath, extractedFileNamingMode, cancellationToken);
-            }
-
-            return skippedFiles.ToArray();
+            throw new InvalidOperationException($"Archive data is too big ({declaredSize} bytes)");
         }
 
-        /// <summary>
-        /// Creates directory for entity extraction and returns target file name.
-        /// </summary>
-        /// <param name="entry">Entry to extract.</param>
-        /// <param name="destinationDirectoryPath">Target directory path.</param>
-        /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
-        /// <returns>Target entity file name or null if file extraction must be skipped.</returns>
-        public static string? PrepareForExtraction(
-            ZipArchiveEntry entry,
-            string destinationDirectoryPath,
-            ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal)
+        var skippedFiles = new List<string>();
+
+        foreach (var entry in archive.Entries)
         {
-            var directorySeparatorIndex = entry.FullName.IndexOf(Path.AltDirectorySeparatorChar);
+            cancellationToken.ThrowIfCancellationRequested();
 
-            string targetDir;
-
-            if (directorySeparatorIndex > -1)
+            if (entryFilter != null && !entryFilter(entry))
             {
-                var subDirectoryName = entry.FullName[..directorySeparatorIndex];
-
-                if (!ValidateDirectoryName(subDirectoryName))
-                {
-                    return null;
-                }
-
-                targetDir = Path.Combine(destinationDirectoryPath, subDirectoryName);
-                Directory.CreateDirectory(targetDir);
-            }
-            else
-            {
-                if (!ValidateRootFileName(entry.Name))
-                {
-                    return null;
-                }
-
-                targetDir = destinationDirectoryPath;
+                skippedFiles.Add(entry.FullName);
+                continue;
             }
 
-            var name = extractedFileNamingMode == ExtractedFileNamingModes.Unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
-
-            if (name != SIDocument.ContentFileName &&
-                name != SIDocument.AuthorsFileName &&
-                name != SIDocument.SourcesFileName &&
-                (extractedFileNamingMode == ExtractedFileNamingModes.Hash || name.Length > MaxFileNameLength))
-            {
-                name = CalculateHash(name);
-            }
-
-            return Path.Combine(targetDir, name);
+            await ExtractEntryToDirectoryAsync(entry, destinationDirectoryPath, extractedFileNamingMode, cancellationToken);
         }
 
-        private static bool ValidateRootFileName(string fileName) =>
-            fileName == SIDocument.ContentFileName;
+        return skippedFiles.ToArray();
+    }
 
-        private static bool ValidateDirectoryName(string subDirectoryName) =>
-            subDirectoryName == SIDocument.TextsStorageName ||
-            subDirectoryName == SIDocument.ImagesStorageName ||
-            subDirectoryName == SIDocument.AudioStorageName ||
-            subDirectoryName == SIDocument.VideoStorageName;
+    /// <summary>
+    /// Creates directory for entity extraction and returns target file name.
+    /// </summary>
+    /// <param name="entry">Entry to extract.</param>
+    /// <param name="destinationDirectoryPath">Target directory path.</param>
+    /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
+    /// <returns>Target entity file name or null if file extraction must be skipped.</returns>
+    public static string? PrepareForExtraction(
+        ZipArchiveEntry entry,
+        string destinationDirectoryPath,
+        ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal)
+    {
+        var directorySeparatorIndex = entry.FullName.IndexOf(Path.AltDirectorySeparatorChar);
 
-        /// <summary>
-        /// Extracts entity to directory.
-        /// </summary>
-        /// <param name="entry">Entry to extract.</param>
-        /// <param name="destinationDirectoryPath">Target directory path.</param>
-        /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <exception cref="InvalidOperationException">Target file name if too long.</exception>
-        public static async Task ExtractEntryToDirectoryAsync(
-            ZipArchiveEntry entry,
-            string destinationDirectoryPath,
-            ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal,
-            CancellationToken cancellationToken = default)
+        string targetDir;
+
+        if (directorySeparatorIndex > -1)
         {
-            var targetFile = PrepareForExtraction(entry, destinationDirectoryPath, extractedFileNamingMode);
+            var subDirectoryName = entry.FullName[..directorySeparatorIndex];
 
-            if (targetFile == null)
+            if (!ValidateDirectoryName(subDirectoryName))
             {
-                // Skipping file extraction
-                return;
+                return null;
             }
 
-            if (Path.GetFileName(targetFile).Length > MaxFileNameLength)
+            targetDir = Path.Combine(destinationDirectoryPath, subDirectoryName);
+            Directory.CreateDirectory(targetDir);
+        }
+        else
+        {
+            if (!ValidateRootFileName(entry.Name))
             {
-                throw new InvalidOperationException(
-                    $"Too long target file name: \"{targetFile}\", entry.Name: \"{entry.Name}\". " +
-                    $"Maximum allowed length: {MaxFileNameLength}");
+                return null;
             }
 
-            if (!entry.FullName.EndsWith(Path.AltDirectorySeparatorChar)) // Not a directory
-            {
-                await ZipFileExtensionsPatched.ExtractToFileAsync(entry, targetFile, true, cancellationToken);
-            }
+            targetDir = destinationDirectoryPath;
         }
 
-        /// <summary>
-        /// Creates a unqiue value hash. Used when an original value is too long to be used as a file name.
-        /// </summary>
-        /// <param name="value">Value to hash.</param>
-        /// <returns>Hashed value.</returns>
-        internal static string CalculateHash(string value)
+        var name = extractedFileNamingMode == ExtractedFileNamingModes.Unescape ? Uri.UnescapeDataString(entry.Name) : entry.Name;
+
+        if (name != SIDocument.ContentFileName &&
+            name != SIDocument.AuthorsFileName &&
+            name != SIDocument.SourcesFileName &&
+            (extractedFileNamingMode == ExtractedFileNamingModes.Hash || name.Length > MaxFileNameLength))
         {
-            var hashedValue = 3074457345618258791ul;
-
-            for (var i = 0; i < value.Length; i++)
-            {
-                hashedValue += value[i];
-                hashedValue *= 3074457345618258799ul;
-            }
-
-            var result = hashedValue.ToString("X2");
-
-            var extIndex = value.LastIndexOf('.');
-
-            if (extIndex > -1)
-            {
-                result += value[extIndex..];
-            }
-
-            return result;
+            name = CalculateHash(name);
         }
+
+        return Path.Combine(targetDir, name);
+    }
+
+    private static bool ValidateRootFileName(string fileName) =>
+        fileName == SIDocument.ContentFileName;
+
+    private static bool ValidateDirectoryName(string subDirectoryName) =>
+        subDirectoryName == SIDocument.TextsStorageName ||
+        subDirectoryName == SIDocument.ImagesStorageName ||
+        subDirectoryName == SIDocument.AudioStorageName ||
+        subDirectoryName == SIDocument.VideoStorageName;
+
+    /// <summary>
+    /// Extracts entity to directory.
+    /// </summary>
+    /// <param name="entry">Entry to extract.</param>
+    /// <param name="destinationDirectoryPath">Target directory path.</param>
+    /// <param name="extractedFileNamingMode">Extracted files naming mode.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <exception cref="InvalidOperationException">Target file name if too long.</exception>
+    public static async Task ExtractEntryToDirectoryAsync(
+        ZipArchiveEntry entry,
+        string destinationDirectoryPath,
+        ExtractedFileNamingModes extractedFileNamingMode = ExtractedFileNamingModes.KeepOriginal,
+        CancellationToken cancellationToken = default)
+    {
+        var targetFile = PrepareForExtraction(entry, destinationDirectoryPath, extractedFileNamingMode);
+
+        if (targetFile == null)
+        {
+            // Skipping file extraction
+            return;
+        }
+
+        if (Path.GetFileName(targetFile).Length > MaxFileNameLength)
+        {
+            throw new InvalidOperationException(
+                $"Too long target file name: \"{targetFile}\", entry.Name: \"{entry.Name}\". " +
+                $"Maximum allowed length: {MaxFileNameLength}");
+        }
+
+        if (!entry.FullName.EndsWith(Path.AltDirectorySeparatorChar)) // Not a directory
+        {
+            await ZipFileExtensionsPatched.ExtractToFileAsync(entry, targetFile, true, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Creates a unqiue value hash. Used when an original value is too long to be used as a file name.
+    /// </summary>
+    /// <param name="value">Value to hash.</param>
+    /// <returns>Hashed value.</returns>
+    internal static string CalculateHash(string value)
+    {
+        var hashedValue = 3074457345618258791ul;
+
+        for (var i = 0; i < value.Length; i++)
+        {
+            hashedValue += value[i];
+            hashedValue *= 3074457345618258799ul;
+        }
+
+        var result = hashedValue.ToString("X2");
+
+        var extIndex = value.LastIndexOf('.');
+
+        if (extIndex > -1)
+        {
+            result += value[extIndex..];
+        }
+
+        return result;
     }
 }

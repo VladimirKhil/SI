@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace SIQuester.Converters
+namespace SIQuester.Converters;
+
+[Serializable]
+public sealed class StringDictionary : Dictionary<string, string>
 {
-    [Serializable]
-    public sealed class StringDictionary : Dictionary<string, string>
+    public StringDictionary()
     {
-        public StringDictionary()
-        {
-        }
+    }
 
-        private StringDictionary(SerializationInfo serializationInfo, StreamingContext streamingContext)
-        {
-            
-        }
+    private StringDictionary(SerializationInfo serializationInfo, StreamingContext streamingContext)
+    {
+        
     }
 }

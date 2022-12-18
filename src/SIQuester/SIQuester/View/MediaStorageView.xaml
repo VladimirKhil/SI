@@ -11,35 +11,31 @@
     mc:Ignorable="d" 
     d:DataContext="{d:DesignInstance Type=vm:MediaStorageViewModel}"
     Name="root">
-    <UserControl.Resources>
-        
+    <UserControl.Resources>        
         <Style x:Key="Editor" TargetType="{x:Type TextBox}">
             <Setter Property="Control.BorderThickness" Value="0" />
             
-            <Style.Triggers>
-                
+            <Style.Triggers>                
                 <Trigger Property="Control.IsMouseOver" Value="True">
                     <Setter Property="Control.BorderThickness" Value="1" />
                 </Trigger>
                 
                 <Trigger Property="UIElement.IsFocused" Value="True">
                     <Setter Property="Control.BorderThickness" Value="1" />
-                </Trigger>
-                
+                </Trigger>                
             </Style.Triggers>
         </Style>
 
         <ls:AtomTypeSelector x:Key="TypeSelector">
             <ls:AtomTypeSelector.ImageTemplate>
                 <DataTemplate>
-                    <Image Margin="0,0,0,5" Source="{Binding MediaSource.Uri,Converter={StaticResource ImageConverter}}" />
+                    <Image Margin="0,0,0,5" Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
                 </DataTemplate>
             </ls:AtomTypeSelector.ImageTemplate>
             
             <ls:AtomTypeSelector.AudioTemplate>
                 <DataTemplate>
-                    <DockPanel VerticalAlignment="Center" Margin="4">
-                        
+                    <DockPanel VerticalAlignment="Center" Margin="4">                        
                         <MediaElement
                             Name="mediaElement1"
                             lb:MediaController.Source="{Binding}"
@@ -56,8 +52,7 @@
             
             <ls:AtomTypeSelector.VideoTemplate>
                 <DataTemplate>
-                    <Grid Margin="4">
-                        
+                    <Grid Margin="4">                        
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition Height="Auto" />
@@ -87,17 +82,14 @@
                             Grid.Row="1"
                             Grid.Column="1"
                             Margin="20,10,0,0"
-                            VerticalAlignment="Center" />
-                        
+                            VerticalAlignment="Center" />                        
                     </Grid>
                 </DataTemplate>
-            </ls:AtomTypeSelector.VideoTemplate>
-            
+            </ls:AtomTypeSelector.VideoTemplate>            
         </ls:AtomTypeSelector>
     </UserControl.Resources>
     
-    <DockPanel Margin="6">
-        
+    <DockPanel Margin="6">        
         <StackPanel Orientation="Horizontal" Background="Lavender" DockPanel.Dock="Top">
             <Button
                 Height="25"
@@ -105,9 +97,10 @@
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 Name="bAdd"
                 Command="{Binding AddItem}"
-                ToolTip="Добавить">
+                ToolTip="{x:Static lp:Resources.Add}">
                 
-                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add},Path=Data}" />
+                <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                
             </Button>
         </StackPanel>
         
@@ -126,28 +119,23 @@
             </ListBox.ItemsPanel>
             
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
-                    
+                <Style TargetType="{x:Type ListBoxItem}">                    
                     <Setter Property="Template">
                         <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                
+                            <ControlTemplate TargetType="ListBoxItem">                                
                                 <Border Name="bd" BorderThickness="1" Padding="8" Margin="5,5,0,0" Background="#FFD2DCFF">
                                     <ContentPresenter />
                                 </Border>
-                                
+
                                 <ControlTemplate.Triggers>
-                                    
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter TargetName="bd" Property="Background" Value="#FFADBCFF" />
                                     </Trigger>
-                                    
+
                                     <Trigger Property="IsSelected" Value="True">
                                         <Setter TargetName="bd" Property="Background" Value="#FF8AA0FF" />
                                     </Trigger>
-                                    
                                 </ControlTemplate.Triggers>
-                                
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
@@ -162,8 +150,7 @@
                                 </Storyboard>
                             </BeginStoryboard>
                         </EventTrigger>
-                    </Style.Triggers>
-                    
+                    </Style.Triggers>                    
                 </Style>
             </ListBox.ItemContainerStyle>
             
@@ -193,7 +180,7 @@
                             CommandParameter="{Binding}"
                             Width="25"
                             Height="25"
-                            ToolTip="Удалить">
+                            ToolTip="{x:Static lp:Resources.Delete}">
                             
                             <Path
                                 Stretch="Uniform"
@@ -212,19 +199,23 @@
                             Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                             Margin="5,0,0,0"
                             Width="25"
-                            ToolTip="Редактировать">
+                            ToolTip="{x:Static lp:Resources.Edit}">
                             
-                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
+                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />
                         
                         </ToggleButton>
-                        
-                        <ContentControl Grid.Row="1" Name="main" Content="{Binding}">
-                            <ContentControl.ContentTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Model.Name}" VerticalAlignment="Center" HorizontalAlignment="Left" />
-                                </DataTemplate>
-                            </ContentControl.ContentTemplate>
-                        </ContentControl>
+
+                        <DockPanel Grid.Row="1">
+                            <ContentControl DockPanel.Dock="Left" Style="{StaticResource WarningBox}" />
+
+                            <ContentControl Name="main" Content="{Binding}">
+                                <ContentControl.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Model.Name}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                                    </DataTemplate>
+                                </ContentControl.ContentTemplate>
+                            </ContentControl>
+                        </DockPanel>
 
                         <TextBlock Grid.Row="2">
                             <Run Text="{Binding MediaSource.StreamLength, Mode=OneWay}" />
