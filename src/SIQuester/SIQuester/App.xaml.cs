@@ -385,6 +385,12 @@ public partial class App : Application
         {
             // Ничего не сделаешь
         }
+        else if (e.Exception.ToString().Contains("StoryFragments part failed to load."))
+        {
+            // https://learn.microsoft.com/en-us/answers/questions/1129597/wpf-apps-crash-on-windows-1011-after-windows-updat.html
+            e.Handled = true;
+            return;
+        }
         else if (e.Exception is InvalidOperationException invalidOperationException
             && (invalidOperationException.Message.Contains("Невозможно выполнить эту операцию, когда привязка отсоединена")
             || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))

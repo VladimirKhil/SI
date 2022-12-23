@@ -3,10 +3,13 @@ using Microsoft.Extensions.Logging;
 using QTxtConverter;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
+using SIQuester.ViewModel.Services;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,22 +17,72 @@ using Utils;
 
 namespace SIQuester.ViewModel;
 
+// TODO: this class is too heavy. It requires a refactoring
+
 /// <summary>
-/// Импорт текстового файла
+/// Provides a view model for text file import.
 /// </summary>
 public sealed class ImportTextViewModel : WorkspaceViewModel
 {
-    private readonly object _arg = null;
-    private Task _task = null;
+    private Task? _task;
 
-    public override string Header => "Импорт текста";
+    private readonly string _header = Resources.TextImport;
+
+    public override string Header => _header;
+
+    public enum UIState
+    {
+        Initial,
+        ImportFile,
+        Split,
+        Parse,
+    }
+
+    private UIState _state = UIState.Initial;
+
+    public UIState State
+    {
+        get => _state;
+        set { if (_state != value) { _state = value; OnPropertyChanged(); } }
+    }
+
+    public ICommand SelectFile { get; private set; }
+
+    public ICommand Run { get; private set; }
+
+    public string? FileName => _textSource?.FileName;
+
+
+    private string _importText = "";
+
+    /// <summary>
+    /// Text to import.
+    /// </summary>
+    public string ImportText
+    {
+        get => _importText;
+        set { _importText = value; OnPropertyChanged(); }
+    }
 
     private string _text = "";
+    
+    private ITextSource? _textSource;
 
+    /// <summary>
+    /// Input text.
+    /// </summary>
     public string Text
     {
         get => _text;
         set { _text = value; OnPropertyChanged(); }
+    }
+
+    private string _goodText = "";
+
+    public string GoodText
+    {
+        get => _goodText;
+        set { _goodText = value; OnPropertyChanged(); }
     }
 
     private string _badText = "";
@@ -148,7 +201,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     /// <summary>
     /// Шаблоны распознавания
     /// </summary>
-    public ObservableCollection<SpardTemplateViewModel> Templates { get; set; }
+    public ObservableCollection<SpardTemplateViewModel> Templates { get; } = new();
 
     private readonly SpardTemplateViewModel _packageTemplate;
     private readonly SpardTemplateViewModel _roundTemplate;
@@ -175,7 +228,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     #endregion
 
     private readonly CancellationTokenSource _tokenSource = new();
-    private readonly TaskScheduler _scheduler = null;
+    private readonly TaskScheduler _scheduler;
 
     private readonly StorageContextViewModel _storageContextViewModel;
 
@@ -184,7 +237,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private readonly QConverter _converter = new();
 
     private SIDocument _existing = null;
-    private string _path = string.Empty;
     private bool _automaticTextImport = false;
 
     private SIPart[][] _parts = null;
@@ -195,14 +247,20 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private static Color BadSourceBackColor = Colors.Wheat;
 
     /// <summary>
-    /// Стадия работы распознавателя
+    /// Parser state machine stage.
     /// </summary>
     private enum Stage
     {
         /// <summary>
-        /// Разделение текста на темы и вопросы
-        /// </summary>        
+        /// Input text review.
+        /// </summary>
+        Review,
+
+        /// <summary>
+        /// Splitting text into themes and questions.
+        /// </summary>
         Splitting,
+        
         SplitResolve,
         Automation,
         Begin,
@@ -211,7 +269,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         None
     };
 
-    private Stage _stage = Stage.Splitting;
+    private Stage _stage = Stage.Review;
 
     private ParseErrorEventArgs _parseError = null;
     private ReadErrorEventArgs _readError = null;
@@ -220,13 +278,13 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private bool _fileChanged = false;
 
-    private Dictionary<string, EditAlias> Aliases { get; } = new Dictionary<string, EditAlias>();
+    private Dictionary<string, EditAlias> Aliases { get; } = new();
 
     private string _info = "";
 
     public string Info
     {
-        get { return _info; }
+        get => _info;
         set { _info = value; OnPropertyChanged(); }
     }
 
@@ -234,7 +292,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     public string Problem
     {
-        get { return _problem; }
+        get => _problem;
         set { _problem = value; OnPropertyChanged(); }
     }
 
@@ -242,7 +300,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     public bool CanChangeStandart
     {
-        get { return _canChangeStandart; }
+        get => _canChangeStandart;
         set
         {
             if (_canChangeStandart != value)
@@ -258,7 +316,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     public string SkipToolTip
     {
-        get { return _skipToolTip; }
+        get => _skipToolTip;
         set { _skipToolTip = value; OnPropertyChanged(); }
     }
 
@@ -266,15 +324,36 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private readonly ILoggerFactory _loggerFactory;
 
-    public ImportTextViewModel(object arg, StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    private Encoding _textEncoding = Encoding.UTF8;
+
+    public Encoding TextEncoding
     {
-        _arg = arg;
+        get => _textEncoding;
+        set
+        {
+            if (_textEncoding != value)
+            {
+                _textEncoding = value;
+                OnPropertyChanged();
+                ReloadImportText();
+            }
+        }
+    }
+
+    public Encoding[] Encodings { get; } = new Encoding[] { Encoding.UTF8, Encoding.GetEncoding(1251) };
+
+    static ImportTextViewModel() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="ImportTextViewModel" /> class.
+    /// </summary>
+    /// <param name="storageContextViewModel">Well-known SIStorage facets holder.</param>
+    /// <param name="loggerFactory">Factory to create loggers.</param>
+    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    {
         _storageContextViewModel = storageContextViewModel;
         _loggerFactory = loggerFactory;
         _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
-        #region Aliases
-        Templates = new ObservableCollection<SpardTemplateViewModel>();
 
         var trashAlias = new EditAlias("Мусор", Colors.LightGray);
 
@@ -284,20 +363,20 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         Templates.Add(_packageTemplate);
 
         _roundTemplate = new SpardTemplateViewModel { Name = "Раунд" };
-        _roundTemplate.Aliases["RName"] = new EditAlias("Раунд", Colors.Olive);
+        _roundTemplate.Aliases["RName"] = new EditAlias("Раунд", Colors.LightYellow);
         _roundTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_roundTemplate);
 
         _themeTemplate = new SpardTemplateViewModel { Name = "Тема" };
-        _themeTemplate.Aliases["TName"] = new EditAlias("Тема", Colors.BlueViolet);
+        _themeTemplate.Aliases["TName"] = new EditAlias("Тема", Colors.Wheat);
         _themeTemplate.Aliases["TAuthor"] = new EditAlias("Автор", Colors.Maroon);
-        _themeTemplate.Aliases["TComment"] = new EditAlias("Комментарий", Colors.Navy);
+        _themeTemplate.Aliases["TComment"] = new EditAlias("Комментарий", Colors.LightSalmon);
         _themeTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_themeTemplate);
 
         _questTemplate = new SpardTemplateViewModel { Name = "Вопрос" };
         _questTemplate.Aliases["Number"] = new EditAlias("Номер", Colors.SkyBlue);
-        _questTemplate.Aliases["QText"] = new EditAlias("Вопрос", Colors.SeaGreen);
+        _questTemplate.Aliases["QText"] = new EditAlias("Вопрос", Colors.PaleGreen);
         _questTemplate.Aliases["Answer"] = new EditAlias("Ответ", Colors.Yellow);
         _questTemplate.Aliases["QAuthor"] = new EditAlias("Автор", Colors.Goldenrod);
         _questTemplate.Aliases["QComment"] = new EditAlias("Комментарий", Colors.Cyan);
@@ -318,19 +397,95 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         foreach (var item in Templates)
         {
             item.PropertyChanged += Item_PropertyChanged;
+
             foreach (var alias in item.Aliases)
             {
                 if (!Aliases.ContainsKey(alias.Key))
+                {
                     Aliases[alias.Key] = alias.Value;
+                }
             }
         }
-
-        #endregion
 
         _sns = new SimpleCommand(Sns_Executed) { CanBeExecuted = false };
         _auto = new SimpleCommand(Auto_Executed) { CanBeExecuted = false };
         _go = new SimpleCommand(Go_Executed);
-        _skip = new SimpleCommand(Skip_Executed);
+        _skip = new SimpleCommand(Skip_Executed) { CanBeExecuted = false };
+
+        SelectFile = new SimpleCommand(SelectFile_Executed);
+        Run = new SimpleCommand(Run_Executed);
+        CancelImport = new SimpleCommand(CancelImport_Executed);
+        ApproveImport = new SimpleCommand(ApproveImport_Executed);
+        ApproveImportAndStart = new SimpleCommand(ApproveImportAndStart_Executed);
+
+        _automaticTextImport = AppSettings.Default.AutomaticTextImport;
+
+        _converter.ParseError += QTxtConverter_ParseError;
+        _converter.ReadError += QTxtConverter_ReadError;
+        _converter.Progress += QTxtConverter_Progress;
+
+        Free = false;
+        CanChangeStandart = false;
+        CanGo = true;
+    }
+
+    private void SelectFile_Executed(object? arg)
+    {
+        var sourceFile = PlatformManager.Instance.ShowImportUI("txt", Resources.TxtFilesFilter);
+
+        if (sourceFile == null)
+        {
+            return;
+        }
+
+        Import(new FileTextSource(sourceFile));
+    }
+
+    internal void Import(ITextSource textSource)
+    {
+        _textSource = textSource;
+        OnPropertyChanged(nameof(FileName));
+        ReloadImportText();
+        State = UIState.ImportFile;
+    }
+
+    private void ReloadImportText() => ImportText = _textSource?.GetText(TextEncoding) ?? "";
+
+    public ICommand CancelImport { get; private set; }
+
+    public ICommand ApproveImport { get; private set; }
+
+    public ICommand ApproveImportAndStart { get; private set; }
+
+    private void CancelImport_Executed(object? arg)
+    {
+        State = UIState.Initial;
+        _textSource?.Dispose();
+    }
+
+    private void ApproveImport_Executed(object? arg)
+    {
+        CommitImport();
+        State = UIState.Initial;
+    }
+
+    private void CommitImport()
+    {
+        Text = ImportText;
+        _textSource?.Dispose();
+    }
+
+    private void ApproveImportAndStart_Executed(object? arg)
+    {
+        CommitImport();
+        Run_Executed(arg);
+    }
+
+    private void Run_Executed(object? arg)
+    {
+        State = UIState.Split;
+        _stage = Stage.Splitting;
+        Task.Factory.StartNew(Split, _tokenSource.Token);
     }
 
     private void Sns_Executed(object? arg) => SetTemplate(QConverter.GetSnsTemplates(_parts, _standartLogic));
@@ -349,6 +504,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         CanChangeStandart = false;
 
         _stage = Stage.Automation;
+
         try
         {
             await Task.Run(Autogenerate, _tokenSource.Token);
@@ -399,7 +555,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             _template,
             ref _existing,
             false,
-            string.IsNullOrEmpty(_path) ? "Безымянный" : Path.GetFileNameWithoutExtension(_path),
+            string.IsNullOrEmpty(FileName) ? Resources.Untitled : Path.GetFileNameWithoutExtension(FileName),
             Resources.Empty,
             Resources.ThemesCollection,
             out int themesNum);
@@ -438,18 +594,16 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
             case Stage.ReadingResolve:
                 Info = Resources.Notice;
-
                 IsEditorOpened = false;
-
                 CanGo = false;
-                _skip.CanBeExecuted = false;
-                
+                _skip.CanBeExecuted = false;                
                 _stage = Stage.Reading;
 
                 OnSelectText(0, _text.Length, null, false);
+
                 if (_badTextCopy != _badText)
                 {
-                    Text = $"{_text.Substring(0, _position)}{_badText}{_text.Substring(_position + _badLength)}";
+                    Text = $"{_text[.._position]}{_badText}{_text[(_position + _badLength)..]}";
                     _parts[_readError.Index.Item1][_readError.Index.Item2].Value = _badText;
                     _fileChanged = true;
                 }
@@ -489,10 +643,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
                 _stage = Stage.Splitting;
 
-                var changedText = _text.Substring(_parseError.SourcePosition);
+                var changedText = _text[_parseError.SourcePosition..];
+
                 if (changedText != _badText)
                 {
-                    Text = _text.Substring(0, _parseError.SourcePosition) + _badText;
+                    Text = string.Concat(_text.AsSpan(0, _parseError.SourcePosition), _badText);
                     _fileChanged = true;
                 }
 
@@ -516,6 +671,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private static void AddTemplate(SpardTemplateViewModel template)
     {
         var text = template.Transform;
+
         if (!template.Enabled || template.Variants.Contains(text))
         {
             return;
@@ -530,15 +686,12 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         {
             case Stage.SplitResolve:
                 Info = Resources.Notice;
-
                 IsEditorOpened = false;
-
                 _stage = Stage.Splitting;
 
                 OnSelectText(0, _text.Length, null, false);
 
                 _parseError.Skip = true;
-
                 Free = false;
 
                 lock (_sync)
@@ -549,14 +702,12 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
             case Stage.ReadingResolve:
                 Info = Resources.Notice;
-
                 IsEditorOpened = false;
-
                 _stage = Stage.Reading;
+
                 OnSelectText(0, _text.Length, null, false);
 
                 _readError.Skip = true;
-
                 Free = false;
 
                 lock (_sync)
@@ -567,7 +718,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    protected override async Task Close_Executed(object arg)
+    protected override async Task Close_Executed(object? arg)
     {
         Clean();
         await base.Close_Executed(arg);            
@@ -599,10 +750,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         if (_task != null && _existing != null)
         {
-            if (!string.IsNullOrEmpty(_path))
+            if (!string.IsNullOrEmpty(FileName))
             {
-                string filename = Path.GetFileNameWithoutExtension(_path);
-                Task.Factory.StartNew(
+                string filename = Path.GetFileNameWithoutExtension(FileName);
+
+                UI.Execute(
                     new Action(() =>
                     {
                         var themesNum = _existing.Package.Rounds.Sum(r => r.Themes.Count);
@@ -612,13 +764,13 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
                         if (save)
                         {
-                            using var writer = new StreamWriter(Path.Combine(Path.GetDirectoryName(_path), string.Format("{0}_LostPart.txt", filename)));
+                            using var writer = new StreamWriter(Path.Combine(Path.GetDirectoryName(FileName), string.Format("{0}_LostPart.txt", filename)));
                         
                             if (themesNum < _parts.Length)
                             {
                                 if (_parts[themesNum].Length > 0)
                                 {
-                                    writer.Write(_parts[themesNum][_parts[themesNum].Length - 1].Value);
+                                    writer.Write(_parts[themesNum][^1].Value);
                                 }
 
                                 for (int i = themesNum + 1; i < _parts.Length; i++)
@@ -631,97 +783,29 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                             }
                         }
                     }),
-                    CancellationToken.None,
-                    TaskCreationOptions.None,
-                    UI.Scheduler);
+                    exc => OnError(exc, ""),
+                    CancellationToken.None);
 
                 OnNewItem(new QDocument(_existing, _storageContextViewModel, _loggerFactory) { FileName = _existing.Package.Name });
             }
         }
 
-        if (_fileChanged && !string.IsNullOrEmpty(_path))
-        {
-            if (PlatformManager.Instance.Confirm(Resources.SaveFile))
-            {
-                using var writer = new StreamWriter(_path, false);
-                writer.Write(_text);
-                writer.Close();
-            }
-        }
+        // TODO: ask user for a file location to save
+
+        //if (_fileChanged && !string.IsNullOrEmpty(_fileName))
+        //{
+        //    if (PlatformManager.Instance.Confirm(Resources.SaveFile))
+        //    {
+        //        using var writer = new StreamWriter(sourePath, false);
+        //        writer.Write(_text);
+        //        writer.Close();
+        //    }
+        //}
     }
 
-    private void Item_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) =>
-        OnReadyChanged();
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnReadyChanged();
 
-    internal void Start()
-    {
-        _automaticTextImport = AppSettings.Default.AutomaticTextImport;
-
-        if (_arg == null)
-            ImportNew();
-        else if (_arg is Stream)
-            ImportFromFile(null, _arg as Stream);
-        else if (_arg as Type == typeof(System.Windows.Clipboard))
-        {
-            if (System.Windows.Clipboard.ContainsText(System.Windows.TextDataFormat.UnicodeText))
-                Text = System.Windows.Clipboard.GetText(System.Windows.TextDataFormat.UnicodeText);
-            else if (System.Windows.Clipboard.ContainsText(System.Windows.TextDataFormat.Text))
-                Text = System.Windows.Clipboard.GetText(System.Windows.TextDataFormat.Text);
-        }
-        else
-            ImportFromFile(_arg.ToString(), null);
-
-        _converter.ParseError += QTxtConverter_ParseError;
-        _converter.ReadError += QTxtConverter_ReadError;
-        _converter.Progress += QTxtConverter_Progress;
-
-        Free = false;
-        CanChangeStandart = false;
-        _skip.CanBeExecuted = false;
-
-        Task.Factory.StartNew(Split, _tokenSource.Token);
-    }
-
-    public void ImportNew()
-    {
-        var file = PlatformManager.Instance.ShowImportUI("txt", Resources.TxtFilesFilter);
-        if (file == null)
-        {
-            OnClosed();
-            return;
-        }
-
-        ImportFromFile(file, null);
-    }
-
-    public void ImportFromFile(string filename, Stream source)
-    {
-        _path = filename;
-
-        try
-        {
-            if (!string.IsNullOrEmpty(_path))
-            {
-                Text = File.ReadAllText(_path);
-            }
-            else if (source != null)
-            {
-                using var reader = new StreamReader(source);
-                Text = reader.ReadToEnd();
-            }
-            else
-            {
-                Text = string.Empty;
-            }
-        }
-        catch (Exception exc)
-        {
-            PlatformManager.Instance.ShowErrorMessage(exc.Message);
-            OnClosed();
-        }
-    }
-
-    private void QTxtConverter_ParseError(object sender, ParseErrorEventArgs e)
+    private void QTxtConverter_ParseError(object? sender, ParseErrorEventArgs e)
     {
         _parseError = e;
         PrepareUI();
@@ -732,7 +816,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private void QTxtConverter_ReadError(object sender, ReadErrorEventArgs e)
+    private void QTxtConverter_ReadError(object? sender, ReadErrorEventArgs e)
     {
         _readError = e;
         PrepareUIForRead();
@@ -748,8 +832,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         if (_stage == Stage.Reading || _stage == Stage.Splitting)
         {
             _position = progress;
+
             if (_text.Length > 0)
+            {
                 Progress = progress * 100 / _text.Length;
+            }
         }
         else
         {
@@ -757,8 +844,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private void OnSelectText(int start, int length, Color? color, bool scroll) =>
-        SelectText?.Invoke(start, length, color, scroll);
+    private void OnSelectText(int start, int length, Color? color, bool scroll) => SelectText?.Invoke(start, length, color, scroll);
 
     private void PrepareUI()
     {
@@ -766,13 +852,14 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         _stage = Stage.SplitResolve;
         CanGo = true;
         GoText = Resources.Futher;
-        Info = Resources.PhraseTemplates;
+        Info = Resources.SplittingError;
         Problem = Resources.EnumerationError;
 
         _skip.CanBeExecuted = true;
         SkipToolTip = Resources.NotAQuestionNumber;
 
-        BadText = _text.Substring(_parseError.SourcePosition);
+        GoodText = _text[0.._parseError.SourcePosition];
+        BadText = _text[_parseError.SourcePosition..];
         IsEditorOpened = true;
         OnSelectText(_parseError.SourcePosition, _text.Length - _parseError.SourcePosition, BadSourceBackColor, true);
     }
@@ -787,7 +874,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         if (expression is Set set)
         {
             var name = ((StringValue)((Polynomial)set.Operand).OperandsArray[0]).Value;
-            Aliases.TryGetValue(name, out EditAlias alias);
+            Aliases.TryGetValue(name, out var alias);
 
             return alias == null ? (name == "Line" ? "\n" : name) : alias.VisibleName;
         }
@@ -837,6 +924,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         BadText = _parts[_readError.Index.Item1][_readError.Index.Item2].Value;
 
         int position = _position;
+
         if (!_template.StandartLogic && _readError.Index.Item1 != 0 && _readError.Index.Item1 % 2 == 0)
         {
             for (int j = _readError.Index.Item2; j < _parts[_readError.Index.Item1 - 1].Length; j++)
@@ -855,15 +943,20 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         Info = Resources.PhraseTemplates;
 
-        EditAlias alias;
+        EditAlias? alias;
+
         foreach (var item in _readError.BestTry.Match.GetAllMatches())
         {
             if (Aliases.TryGetValue(item.Key, out alias))
             {
                 if (item.Value.Index == 0)
+                {
                     OnSelectText(position + item.Value.Index, item.Value.ToString().Length - _readError.Move, alias.Color, true);
+                }
                 else
+                {
                     OnSelectText(position + item.Value.Index - _readError.Move, item.Value.ToString().Length, alias.Color, true);
+                }
             }
             else if (int.TryParse(item.Value.ToString(), out int num))
             {
@@ -872,18 +965,23 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                     case "p":
                         _packageTemplate.Transform = _template.PackageTemplate[num];
                         break;
+
                     case "r":
                         _roundTemplate.Transform = _template.RoundTemplate[num];
                         break;
+
                     case "t":
                         _themeTemplate.Transform = _template.ThemeTemplate[num];
                         break;
+
                     case "q":
                         _questTemplate.Transform = _template.QuestionTemplate[num];
                         break;
+
                     case "s":
                         _separatorTemplate.Transform = _template.SeparatorTemplate[num];
                         break;
+
                     case "a":
                         _answerTemplate.Transform = _template.AnswerTemplate[num];
                         break;
@@ -912,14 +1010,18 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         {
             Problem = string.Format(Resources.FragmentNotFound, str.Value.Replace(" ", Resources.Space))
                  + Environment.NewLine + problem + Environment.NewLine + Resources.SourceFail;
+
             return;
         }
 
         if (_readError.Missing is Set set)
         {
             var setName = set.Operand.Operands().First().ToString();
+
             if (Aliases.TryGetValue(setName, out alias))
+            {
                 Problem = string.Format(Resources.ObjectNotFound, alias.VisibleName) + Environment.NewLine + problem;
+            }
             else
             {
                 switch (setName)
@@ -933,8 +1035,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                         break;
                 }
 
-                Problem = string.Format(Resources.ObjectNotFound, setName)
-                    + Environment.NewLine + problem + Environment.NewLine + Resources.SourceFail;
+                Problem = string.Format(Resources.ObjectNotFound, setName) + Environment.NewLine + problem + Environment.NewLine + Resources.SourceFail;
             }
 
             return;
@@ -949,13 +1050,14 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         try
         {
             _parts = _converter.ExtractQuestions(_text);
-
             Progress = 0;
             
             if (_parts != null && _parts.Length == 1)
             {
                 if (!_tokenSource.IsCancellationRequested)
+                {
                     PlatformManager.Instance.ShowExclamationMessage(Resources.NoQuestionsFound);
+                }
 
                 return;
             }
@@ -969,19 +1071,20 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             _stage = Stage.Begin;
             Problem = "";
             Info = Resources.Notice;
+            State = UIState.Parse;
 
             OnSelectText(0, _text.Length, null, true);
 
             if (_automaticTextImport)
+            {
                 _auto.Execute(null);
+            }
         }
         catch (Exception exc)
         {
             MainViewModel.ShowError(exc);
         }
     }
-
-    #region ImportFormNew
 
     private void SetTemplate(SITemplate template)
     {
@@ -1008,6 +1111,4 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         BindHelper.Bind(_separatorTemplate.Variants, _template.SeparatorTemplate);
         BindHelper.Bind(_answerTemplate.Variants, _template.AnswerTemplate);
     }
-
-    #endregion
 }

@@ -1,16 +1,16 @@
 ﻿namespace QTxtConverter;
 
 /// <summary>
-/// Обработчик комбинируемых строк
+/// Generates a common string for a set of strings.
 /// </summary>
 public sealed class CombinedStringsOperator : List<CombinedString>
 {
     /// <summary>
     /// Создание оператора
     /// </summary>
-    public CombinedStringsOperator(): base()
-    {
-    }
+    public CombinedStringsOperator(): base() { }
+
+    // TODO: rewrite algorithm to combine all string at once instead of combining them in pairs
 
     /// <summary>
     /// Создание комбинации строк по индексам
@@ -19,11 +19,13 @@ public sealed class CombinedStringsOperator : List<CombinedString>
     /// <returns></returns>
     public CombinedString CreateCombination(params int[] ind)
     {
-        var L = ind.Length;
+        var indicesCount = ind.Length;
+
         foreach (var str in this)
         {
-            bool b = true;
-            if (str.Sources.Count != L)
+            var foundIndex = true;
+
+            if (str.Sources.Count != indicesCount)
             {
                 continue;
             }
@@ -32,29 +34,30 @@ public sealed class CombinedStringsOperator : List<CombinedString>
             {
                 if (!str.Sources.Contains(i))
                 {
-                    b = false;
+                    foundIndex = false;
                     break;
                 }
             }
 
-            if (!b)
+            if (!foundIndex)
             {
                 continue;
             }
+
             return str;
         }
 
-        var ind1 = new int[L/2];
-        var ind2 = new int[L - L/2];
+        var ind1 = new int[indicesCount / 2];
+        var ind2 = new int[indicesCount - indicesCount / 2];
 
-        for (int i = 0; i < L / 2; i++)
+        for (int i = 0; i < indicesCount / 2; i++)
         {
             ind1[i] = ind[i];
         }
 
-        for (int i = 0; i < L - L / 2; i++)
+        for (int i = 0; i < indicesCount - indicesCount / 2; i++)
         {
-            ind2[i] = ind[i + L / 2];
+            ind2[i] = ind[i + indicesCount / 2];
         }
 
         var s1 = CreateCombination(ind1);
@@ -81,13 +84,13 @@ public sealed class CombinedStringsOperator : List<CombinedString>
     /// <returns>Объединённая строка</returns>
     public string Union(List<int[]> s)
     {
-        int L = s.Count;
-        var ind = new int[L];
-        var use = new bool[L];
-        var cs = new CombinedString[L];
+        int indicesCount = s.Count;
+        var ind = new int[indicesCount];
+        var use = new bool[indicesCount];
+        var cs = new CombinedString[indicesCount];
         string rez = "";
 
-        for (int i = 0; i < L; i++)
+        for (int i = 0; i < indicesCount; i++)
         {
             ind[i] = 0;
             cs[i] = CreateCombination(s[i]);
@@ -96,12 +99,12 @@ public sealed class CombinedStringsOperator : List<CombinedString>
         bool b;
         do
         {
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < indicesCount; i++)
             {
                 use[i] = true;
             }
 
-            for (int i = 1; i < L; i++)
+            for (int i = 1; i < indicesCount; i++)
             {
                 if (ind[i] == cs[i].ToString().Length)
                 {
@@ -144,7 +147,7 @@ public sealed class CombinedStringsOperator : List<CombinedString>
             }
 
             bool t = true;
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < indicesCount; i++)
             {
                 if (use[i])
                 {
@@ -158,7 +161,7 @@ public sealed class CombinedStringsOperator : List<CombinedString>
             }
 
             b = false;
-            for (int i = 0; i < L; i++)
+            for (int i = 0; i < indicesCount; i++)
             {
                 if (ind[i] < cs[i].ToString().Length)
                 {

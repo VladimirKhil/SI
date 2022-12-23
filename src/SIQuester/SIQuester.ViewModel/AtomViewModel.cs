@@ -15,6 +15,17 @@ public sealed class AtomViewModel : MediaOwnerViewModel
     public Atom Model { get; }
 
     /// <summary>
+    /// Media item type.
+    /// </summary>
+    public override string Type => Model.Type switch
+    {
+        AtomTypes.Image => SIDocument.ImagesStorageName,
+        AtomTypes.Audio => SIDocument.AudioStorageName,
+        AtomTypes.Video => SIDocument.VideoStorageName,
+        _ => Model.Type,
+    };
+
+    /// <summary>
     /// Scenario view model that contains current view model.
     /// </summary>
     public ScenarioViewModel? OwnerScenario { get; set; }

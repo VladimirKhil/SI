@@ -169,7 +169,7 @@
     <value>-й раунд</value>
   </data>
   <data name="EnumerationError" xml:space="preserve">
-    <value>В следующей теме обнаружена ошибка нумерации.</value>
+    <value>В следующей теме обнаружена ошибка нумерации. Ожидается, что текст всех вопросов в каждой теме начинается с номера, последовательно возрастающего от вопроса к вопросу</value>
   </data>
   <data name="ExportToSns" xml:space="preserve">
     <value>Экспорт в формат СНС</value>
@@ -478,5 +478,17 @@ theme - тема Кота</value>
   </data>
   <data name="YamlFilesFilter" xml:space="preserve">
     <value>YAML файлы (*.yaml) | *.yaml</value>
+  </data>
+  <data name="TextImport" xml:space="preserve">
+    <value>Импорт текста</value>
+  </data>
+  <data name="Untitled" xml:space="preserve">
+    <value>Безымянный</value>
+  </data>
+  <data name="SplittingError" xml:space="preserve">
+    <value>Ошибка при поиске вопросов</value>
+  </data>
+  <data name="Statistic" xml:space="preserve">
+    <value>Статистика</value>
   </data>
 </root>

@@ -9,7 +9,11 @@
     d:DesignHeight="428"
     d:DesignWidth="569"
     xmlns:my="clr-namespace:SIQuester"
-    xmlns:lb="clr-namespace:SIQuester.Behaviors">
+    xmlns:lb="clr-namespace:SIQuester.Behaviors"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
+    xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    d:DataContext="{d:DesignInstance lvm:ImportTextViewModel}">
     <UserControl.Resources>
         <Style x:Key="Editor" TargetType="RichTextBox">
             <Style.Triggers>
@@ -29,16 +33,16 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style x:Key="TemplateContainer" TargetType="MenuItem" BasedOn="{StaticResource ChildMenuItem}">
             <Setter Property="Header" Value="{Binding}" />
-            
+
             <Setter
                 Property="Command"
                 Value="{Binding Path=DataContext.ChangeTemplate, RelativeSource={RelativeSource FindAncestor, AncestorType=Menu, AncestorLevel=1}}" />
-            
+
             <Setter Property="CommandParameter" Value="{Binding}" />
-            
+
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
                     <DataTemplate DataType="sys:String">
@@ -53,170 +57,431 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>
-    
-    <Grid Margin="4">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="4" />
-            <ColumnDefinition Width="2*" />
-        </Grid.ColumnDefinitions>
-        
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="4*"/>
-                <RowDefinition Height="4" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            
-            <TextBlock Text="Исходный файл" TextAlignment="Center" />
-            <RichTextBox
-                Grid.Row="1"
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                IsReadOnly="True"
-                lb:TextImportManager.TextSource="{Binding}" />
 
-            <GridSplitter Background="Transparent" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-            
-            <RichTextBox
-                Grid.Row="3"
-                Style="{StaticResource Editor}"
-                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                lb:EnterHandler.IsAttached="True">
-                <FlowDocument>
-                    <Paragraph>
-                        <Run Text="{Binding BadText}" />
-                    </Paragraph>
-                </FlowDocument>
-            </RichTextBox>
-            
-            <ProgressBar Grid.Row="4" Height="20" Margin="0,4,0,0" Value="{Binding Progress}" />
-        </Grid>
-        <GridSplitter Background="Transparent" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-        <Grid Grid.Column="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="80" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Grid.ColumnSpan="2" Text="{Binding Info}" TextWrapping="Wrap" />
-            <Label Grid.ColumnSpan="2" Grid.Row="1" BorderThickness="1" BorderBrush="Black" Margin="0,4,0,0" Content="{Binding Problem}" />
-            
-            <CheckBox
-                Grid.Row="2"
-                Margin="0,4,0,0"
-                Grid.ColumnSpan="2"
-                IsChecked="{Binding StandartLogic}"
-                IsEnabled="{Binding CanChangeStandart}"
-                Content="Ответ следует сразу после вопроса"
-                ToolTip="Ожидать, что за каждым вопросом немедленно идёт ответ, а не считывать сначала группу вопросов, а затем группу ответов" />
-            
-            <StackPanel Grid.ColumnSpan="2" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
-                <Button Command="{Binding Auto}" Width="166" ToolTip="Определить шаблоны входного файла автоматически" Padding="0,4">
-                    <StackPanel Orientation="Horizontal">
-                        <Path
-                            Stretch="Uniform"
-                            Fill="#FF555555"
-                            Margin="2"
-                            Width="17"
-                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+        <lc:ImportTextTemplateConverter x:Key="ImportTextTemplateConverter">
+            <lc:ImportTextTemplateConverter.InitialTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <TextBlock
+                            DockPanel.Dock="Top"
+                            Margin="0,5,0,0"
+                            FontSize="15"
+                            TextAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="{x:Static lp:Resources.TextToImport}" />
+
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15">
+                            <Button
+                                Width="150"
+                                FontSize="12"
+                                Padding="10,3"
+                                Content="{x:Static lp:Resources.SelectFile}"
+                                Command="{Binding SelectFile}" />
+
+                            <Button
+                                Width="150"
+                                Margin="10,0,0,0"
+                                FontSize="12"
+                                Padding="10,3"
+                                Command="{Binding Run}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="#FF555555"
+                                        Margin="2"
+                                        Width="14"
+                                        Data="{Binding Source={StaticResource app_next},Path=Data}" />
+
+                                    <TextBlock Margin="4,0,0,0" Text="{x:Static lp:Resources.StartImport}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBox
+                            TextWrapping="Wrap"
+                            AcceptsReturn="True"
+                            Text="{Binding Text}"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            FontSize="14"
+                            Padding="10"
+                            Margin="15,5,15,0" />
+                    </DockPanel>
+                </DataTemplate>
+            </lc:ImportTextTemplateConverter.InitialTemplate>
+
+            <lc:ImportTextTemplateConverter.ImportFileTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <ComboBox
+                                DockPanel.Dock="Right"
+                                ItemsSource="{Binding Encodings}"
+                                SelectedItem="{Binding TextEncoding}"
+                                ToolTip="{x:Static lp:Resources.Encoding}"
+                                Width="200"
+                                Margin="0,10,15,5">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding EncodingName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock
+                                DockPanel.Dock="Right"
+                                Text="{x:Static lp:Resources.Encoding}"
+                                VerticalAlignment="Center"
+                                Margin="0,4,10,0"
+                                FontSize="13" />
+
+                            <TextBlock FontSize="15" TextAlignment="Center" VerticalAlignment="Center">
+                                <Run Text="{x:Static lp:Resources.FileImport}" />
+                                <Run Text="{Binding FileName, Mode=OneWay}" FontStyle="Italic" />
+                            </TextBlock>
+                        </DockPanel>
+
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="15">
+                            <Button
+                                Width="180"
+                                FontSize="12"
+                                Padding="10,3"
+                                Content="{x:Static lp:Resources.Cancel}"
+                                Command="{Binding CancelImport}" />
+
+                            <Button
+                                Width="180"
+                                Margin="15,0,0,0"
+                                FontSize="12"
+                                Padding="10,3"
+                                Content="{x:Static lp:Resources.EditText}"
+                                Command="{Binding ApproveImport}" />
+
+                            <Button
+                                Width="180"
+                                Margin="15,0,0,0"
+                                FontSize="12"
+                                Padding="10,3"
+                                Command="{Binding ApproveImportAndStart}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="#FF555555"
+                                        Margin="2"
+                                        Width="14"
+                                        Data="{Binding Source={StaticResource app_next},Path=Data}" />
+
+                                    <TextBlock Margin="4,0,0,0" Text="{x:Static lp:Resources.StartImport}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <TextBox
+                            TextWrapping="Wrap"
+                            IsReadOnly="True"
+                            Background="LightGray"
+                            Padding="10"
+                            Text="{Binding ImportText}"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            FontSize="13"
+                            Margin="15,5,15,0" />
+                    </DockPanel>
+                </DataTemplate>
+            </lc:ImportTextTemplateConverter.ImportFileTemplate>
+
+            <lc:ImportTextTemplateConverter.SplitTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="4" />
+                            <RowDefinition Height="2*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Text="{x:Static lp:Resources.QuestionSplitting}"
+                            TextAlignment="Center"
+                            Height="25"
+                            VerticalAlignment="Center"
+                            FontSize="15" />
+
+                        <ProgressBar Grid.Row="1" Height="20" Margin="10,4,10,5" Value="{Binding Progress}" />
+
+                        <RichTextBox
+                            Grid.Row="2"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            IsReadOnly="True"
+                            FontSize="14"
+                            Background="LightGray"
+                            Margin="10,10,10,0"
+                            Padding="5"
+                            lb:ScrollableBehavior.IsAttached="True">
+                            <FlowDocument>
+                                <Paragraph>
+                                    <Run Text="{Binding GoodText}" />
+                                </Paragraph>
+                            </FlowDocument>
+                        </RichTextBox>
+
+                        <GridSplitter Background="Transparent" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                        <RichTextBox
+                            Grid.Row="4"
+                            FontSize="14"
+                            Style="{StaticResource Editor}"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            Margin="10,0,10,10"
+                            Padding="5"
+                            lb:EnterHandler.IsAttached="True">
+                            <FlowDocument>
+                                <Paragraph>
+                                    <Run Text="{Binding BadText}" />
+                                </Paragraph>
+                            </FlowDocument>
+                        </RichTextBox>
+
+                        <TextBlock Grid.Column="1" Grid.Row="2" FontSize="16" TextWrapping="Wrap" Margin="15" Foreground="DarkRed">
+                            <Run Text="{Binding Info}" /><Run Text=": " /><Run Text="{Binding Problem}" />
+                        </TextBlock>
                         
-                        <TextBlock Margin="4,0,0,0" Text="Автоопределение" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                
-                <Button Command="{Binding Sns}" Width="166" Margin="4,0,0,0" ToolTip="Использовать шаблоны проекта СНС" Padding="0,4">
-                    <StackPanel Orientation="Horizontal">
-                        <Path
-                            Stretch="Uniform"
-                            Fill="#FF555555"
-                            Margin="2"
-                            Width="17"
-                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
-                        
-                        <TextBlock Margin="4,0,0,0" Text="СНС" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-            </StackPanel>
+                        <StackPanel
+                            Grid.Column="1"
+                            Grid.Row="4"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Right"
+                            Margin="0,15,11,11">
+                            <Button Command="{Binding Go}" Width="166" Padding="0,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="#FF555555"
+                                        Margin="2"
+                                        Width="14"
+                                        Data="{Binding Source={StaticResource app_next},Path=Data}" />
+
+                                    <TextBlock Margin="4,0,0,0" Text="{Binding GoText}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Command="{Binding Skip}" Width="166" Margin="15,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="#FF555555"
+                                        Margin="2"
+                                        Width="14"
+                                        Data="{Binding Source={StaticResource app_warning},Path=Data}" />
+
+                                    <TextBlock Margin="4,0,0,0" Text="{x:Static lp:Resources.SkipFragment}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </lc:ImportTextTemplateConverter.SplitTemplate>
             
-            <DockPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,4,0,0">
-                <DockPanel DockPanel.Dock="Top">
-                    <Label Width="100" Content="Объект" HorizontalContentAlignment="Center" FontWeight="Bold" DockPanel.Dock="Left" />
-                    <Label Content="Шаблон" HorizontalAlignment="Center" FontWeight="Bold" />
-                </DockPanel>
-                
-                <ItemsControl ItemsSource="{Binding Templates}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="1" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel IsEnabled="{Binding Enabled}">
-                                <Menu Width="100" Margin="5" DockPanel.Dock="Left">
-                                    <Menu.ItemsPanel>
+            <lc:ImportTextTemplateConverter.ParseTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="4" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="5*"/>
+                                <RowDefinition Height="4" />
+                                <RowDefinition Height="2*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Text="{x:Static lp:Resources.SourceFile}"
+                                TextAlignment="Center"
+                                Height="25"
+                                VerticalAlignment="Center"
+                                FontSize="15" />
+
+                            <RichTextBox
+                                Grid.Row="1"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                FontSize="14"
+                                lb:TextImportManager.TextSource="{Binding}" />
+
+                            <GridSplitter Background="Transparent" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                            <RichTextBox
+                                Grid.Row="3"
+                                Style="{StaticResource Editor}"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                FontSize="14"
+                                lb:EnterHandler.IsAttached="True">
+                                <FlowDocument>
+                                    <Paragraph>
+                                        <Run Text="{Binding BadText}" />
+                                    </Paragraph>
+                                </FlowDocument>
+                            </RichTextBox>
+
+                            <ProgressBar Grid.Row="4" Height="20" Margin="0,4,0,0" Value="{Binding Progress}" />
+                        </Grid>
+
+                        <GridSplitter Background="Transparent" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="80" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.ColumnSpan="2" Text="{Binding Info}" TextWrapping="Wrap" />
+                            <Label Grid.ColumnSpan="2" Grid.Row="1" BorderThickness="1" BorderBrush="Black" Margin="0,4,0,0" Content="{Binding Problem}" />
+
+                            <CheckBox
+                                Grid.Row="2"
+                                Margin="0,4,0,0"
+                                Grid.ColumnSpan="2"
+                                IsChecked="{Binding StandartLogic}"
+                                IsEnabled="{Binding CanChangeStandart}"
+                                Content="{x:Static lp:Resources.StandardLogicDescription}"
+                                ToolTip="{x:Static lp:Resources.StandardLogicHint}" />
+
+                            <StackPanel Grid.ColumnSpan="2" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+                                <Button Command="{Binding Auto}" Width="166" ToolTip="{x:Static lp:Resources.AutomaticallyDetectTemplates}" Padding="0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            Stretch="Uniform"
+                                            Fill="#FF555555"
+                                            Margin="2"
+                                            Width="17"
+                                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+
+                                        <TextBlock Margin="4,0,0,0" Text="{x:Static lp:Resources.AutoDetect}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button
+                                    Command="{Binding Sns}"
+                                    Width="166"
+                                    Margin="4,0,0,0"
+                                    ToolTip="{x:Static lp:Resources.SnsTemplatesHint}"
+                                    Padding="0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            Stretch="Uniform"
+                                            Fill="#FF555555"
+                                            Margin="2"
+                                            Width="17"
+                                            Data="{Binding Source={StaticResource app_cog},Path=Data}" />
+
+                                        <TextBlock Margin="4,0,0,0" Text="СНС" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                            <DockPanel Grid.Row="4" Grid.ColumnSpan="2" Margin="0,4,0,0">
+                                <DockPanel DockPanel.Dock="Top">
+                                    <Label
+                                        Width="100"
+                                        Content="{x:Static lp:Resources.Object}"
+                                        HorizontalContentAlignment="Center"
+                                        FontWeight="Bold"
+                                        DockPanel.Dock="Left" />
+
+                                    <Label Content="{x:Static lp:Resources.Template}" HorizontalAlignment="Center" FontWeight="Bold" />
+                                </DockPanel>
+
+                                <ItemsControl ItemsSource="{Binding Templates}">
+                                    <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <Grid />
+                                            <UniformGrid Columns="1" />
                                         </ItemsPanelTemplate>
-                                    </Menu.ItemsPanel>
-                                    
-                                    <MenuItem
-                                        Style="{StaticResource TemplateSelector}"
-                                        ItemContainerStyle="{StaticResource TemplateContainer}"
-                                        Header="{Binding Name}"
-                                        ItemsSource="{Binding Variants}">
-                                        <MenuItem.HeaderTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                            </DataTemplate>
-                                        </MenuItem.HeaderTemplate>
-                                    </MenuItem>
-                                </Menu>
-                                <my:SpardEditorView />
+                                    </ItemsControl.ItemsPanel>
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <DockPanel IsEnabled="{Binding Enabled}">
+                                                <Menu Width="100" Margin="5" DockPanel.Dock="Left">
+                                                    <Menu.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <Grid />
+                                                        </ItemsPanelTemplate>
+                                                    </Menu.ItemsPanel>
+
+                                                    <MenuItem
+                                                        Style="{StaticResource TemplateSelector}"
+                                                        ItemContainerStyle="{StaticResource TemplateContainer}"
+                                                        Header="{Binding Name}"
+                                                        ItemsSource="{Binding Variants}"
+                                                        FontSize="16">
+                                                        <MenuItem.HeaderTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                            </DataTemplate>
+                                                        </MenuItem.HeaderTemplate>
+                                                    </MenuItem>
+                                                </Menu>
+                                                
+                                                <my:SpardEditorView FontSize="15" />
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </DockPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </DockPanel>
-            
-            <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
-                <Button Command="{Binding Go}" Width="166" Padding="0,4">
-                    <StackPanel Orientation="Horizontal">
-                        <Path
-                            Stretch="Uniform"
-                            Fill="#FF555555"
-                            Margin="2"
-                            Width="14"
-                            Data="{Binding Source={StaticResource app_next},Path=Data}" />
-                        
-                        <TextBlock Margin="4,0,0,0" Text="{Binding GoText}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                
-                <Button Command="{Binding Skip}" Width="166" Margin="4,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
-                    <StackPanel Orientation="Horizontal">
-                        <Path
-                            Stretch="Uniform"
-                            Fill="#FF555555"
-                            Margin="2"
-                            Width="14"
-                            Data="{Binding Source={StaticResource app_warning},Path=Data}" />
-                        
-                        <TextBlock Margin="4,0,0,0" Text="Пропустить фрагмент" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
-    </Grid>
+
+                            <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+                                <Button Command="{Binding Go}" Width="166" Padding="0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            Stretch="Uniform"
+                                            Fill="#FF555555"
+                                            Margin="2"
+                                            Width="14"
+                                            Data="{Binding Source={StaticResource app_next},Path=Data}" />
+
+                                        <TextBlock Margin="4,0,0,0" Text="{Binding GoText}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Command="{Binding Skip}" Width="166" Margin="4,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path
+                                            Stretch="Uniform"
+                                            Fill="#FF555555"
+                                            Margin="2"
+                                            Width="14"
+                                            Data="{Binding Source={StaticResource app_warning},Path=Data}" />
+
+                                        <TextBlock Margin="4,0,0,0" Text="{x:Static lp:Resources.SkipFragment}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </lc:ImportTextTemplateConverter.ParseTemplate>
+        </lc:ImportTextTemplateConverter>
+    </UserControl.Resources>
+
+    <ContentControl Content="{Binding}" ContentTemplate="{Binding State, Converter={StaticResource ImportTextTemplateConverter}}" />
 </UserControl>

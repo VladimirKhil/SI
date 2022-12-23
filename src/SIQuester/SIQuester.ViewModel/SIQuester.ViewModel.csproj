@@ -35,6 +35,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     <PackageReference Include="YamlDotNet" Version="12.2.1" />
   </ItemGroup>
   <ItemGroup>

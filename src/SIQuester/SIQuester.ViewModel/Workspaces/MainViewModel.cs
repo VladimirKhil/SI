@@ -2,15 +2,20 @@
 using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Serializers;
+using SIQuester.ViewModel.Services;
 using SIStorageService.Client;
 using SIStorageService.ViewModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -49,11 +54,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// Imports text file.
     /// </summary>
     public ICommand ImportTxt { get; private set; }
-
-    /// <summary>
-    /// Imports clipboard text.
-    /// </summary>
-    public ICommand ImportClipboardTxt { get; private set; }
 
     /// <summary>
     /// Imports XML file.
@@ -130,7 +130,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         RemoveRecent = new SimpleCommand(RemoveRecent_Executed);
 
         ImportTxt = new SimpleCommand(ImportTxt_Executed);
-        ImportClipboardTxt = new SimpleCommand(ImportClipboardTxt_Executed);
         ImportXml = new SimpleCommand(ImportXml_Executed);
         ImportYaml = new SimpleCommand(ImportYaml_Executed);
         ImportBase = new SimpleCommand(ImportBase_Executed);
@@ -427,21 +426,33 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Imports text from file.
+    /// </summary>
     private void ImportTxt_Executed(object? arg)
     {
-        var model = new ImportTextViewModel(arg, _storageContextViewModel, _loggerFactory);
-        DocList.Add(model);
-        model.Start();
-    }
+        try
+        {
+            ITextSource? textSource = arg switch
+            {
+                string filePath => new FileTextSource(filePath),
+                Stream stream => new StreamTextSource(stream),
+                null => null,
+                _ => throw new InvalidOperationException($"Incorrect text source: {arg}"),
+            };
 
-    /// <summary>
-    /// Imports text from Clipboard.
-    /// </summary>
-    private void ImportClipboardTxt_Executed(object? arg)
-    {
-        var model = new ImportTextViewModel(typeof(Clipboard), _storageContextViewModel, _loggerFactory);
-        DocList.Add(model);
-        model.Start();
+            var model = new ImportTextViewModel(_storageContextViewModel, _loggerFactory);
+            DocList.Add(model);
+
+            if (textSource != null)
+            {
+                model.Import(textSource);
+            }
+        }
+        catch (Exception exc)
+        {
+            ShowError(exc);
+        }
     }
 
     private void ImportXml_Executed(object? arg)
@@ -557,7 +568,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         }
     }
 
-    private async void SaveAll_Executed(object arg)
+    private async void SaveAll_Executed(object? arg)
     {
         foreach (var item in DocList.ToArray())
         {

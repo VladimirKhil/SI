@@ -78,6 +78,7 @@
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             ContextMenu="{x:Null}"
             UndoLimit="0"
+            Padding="2"
             Spard="{Binding Transform, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </DockPanel>
 </UserControl>

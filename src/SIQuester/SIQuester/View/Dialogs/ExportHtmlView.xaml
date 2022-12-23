@@ -5,7 +5,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:l="clr-namespace:SIQuester"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:lc="clr-namespace:SIQuester.Converters"
     mc:Ignorable="d"

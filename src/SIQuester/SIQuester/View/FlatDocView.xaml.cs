@@ -424,7 +424,7 @@ public partial class FlatDocView : UserControl
 
             var format = WellKnownDragFormats.GetDragFormat(e);
 
-            InfoOwnerData dragData = null;
+            InfoOwnerData dragData;
 
             try
             {
@@ -440,7 +440,7 @@ public partial class FlatDocView : UserControl
 
             if (format == WellKnownDragFormats.Question && _insertionPosition != null)
             {
-                Question question = null;
+                Question question;
 
                 if (dragData != null)
                 {

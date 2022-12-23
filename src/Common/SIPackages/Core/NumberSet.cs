@@ -1,17 +1,21 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using SIPackages.TypeConverters;
 
 namespace SIPackages.Core;
 
+// TODO: sealed
+
 /// <summary>
-/// Defines a secret question info.
+/// Defines a set of numbers.
 /// </summary>
-public class BagCatInfo : INotifyPropertyChanged
+[TypeConverter(typeof(NumberSetTypeConverter))]
+public class NumberSet : INotifyPropertyChanged
 {
     private int _minimum = 0;
 
     /// <summary>
-    /// Minimum stake value.
+    /// Minimum value.
     /// </summary>
     public int Minimum
     {
@@ -22,7 +26,7 @@ public class BagCatInfo : INotifyPropertyChanged
     private int _maximum = 0;
 
     /// <summary>
-    /// Maximum stake value.
+    /// Maximum value.
     /// </summary>
     public int Maximum
     {
@@ -33,7 +37,7 @@ public class BagCatInfo : INotifyPropertyChanged
     private int _step = 0;
 
     /// <summary>
-    /// Step (a minimum distance between two possible stakes) value.
+    /// Step (a minimum distance between two possible nubmbers) value.
     /// </summary>
     public int Step
     {

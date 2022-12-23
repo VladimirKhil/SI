@@ -132,9 +132,9 @@ namespace SICore
         /// </summary>
         internal QuestionType Type { get; set; }
 
-        private BagCatInfo _catInfo = null;
+        private NumberSet? _catInfo = null;
 
-        public BagCatInfo CatInfo
+        public NumberSet? CatInfo
         {
             get => _catInfo;
             set

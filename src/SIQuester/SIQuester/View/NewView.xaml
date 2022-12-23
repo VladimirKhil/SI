@@ -9,6 +9,7 @@
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance lvm:NewViewModel}"
     FontSize="14"
@@ -24,7 +25,7 @@
         <lc:PackageTypeNameConverter x:Key="PackageName" EnumType="m:PackageType" />
 
         <DataTemplate DataType="{x:Type m:NonStandartPackageParams}">
-            <GroupBox Header="Параметры нестандартного пакета">
+            <GroupBox Header="{x:Static lp:Resources.NonStandardPackageParameters}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -40,18 +41,18 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Text="Число раундов" />
+
+                    <TextBlock Text="{x:Static lp:Resources.RoundCount}" />
                     <l:NumericTextBox Grid.Column="1" Text="{Binding NumOfRounds}" />
-                    <TextBlock Grid.Row="1" Text="Число тем в раунде" />
+                    <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.RoundThemeCount}" />
                     <l:NumericTextBox Grid.Row="1" Grid.Column="1" Text="{Binding NumOfThemes}" />
-                    <TextBlock Grid.Row="2" Text="Число вопросов в теме" />
+                    <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.ThemeQuestionCount}" />
                     <l:NumericTextBox Grid.Row="2" Grid.Column="1" Text="{Binding NumOfQuestions}" />
-                    <TextBlock Grid.Row="3" Text="Базовая стоимость вопроса" />
+                    <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.BaseQuestionPrice}" />
                     <l:NumericTextBox Grid.Row="3" Grid.Column="1" Text="{Binding NumOfPoints}" />
-                    <TextBlock Grid.Row="4" Text="Финальный раунд" />
+                    <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.FinalRound}" />
                     <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding HasFinal}" />
-                    <TextBlock Grid.Row="5" Text="Число тем в финале" />
+                    <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.FinalThemeCount}" />
                     <l:NumericTextBox Grid.Row="5" Grid.Column="1" Text="{Binding NumOfFinalThemes}" />
                 </Grid>
             </GroupBox>
@@ -83,9 +84,9 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            
-            <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="4">Тип пакета</TextBlock>
-            
+
+            <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="4" Text="{x:Static lp:Resources.PackageType}" />
+
             <ListView
                 Grid.ColumnSpan="2"
                 Grid.Row="1"
@@ -114,12 +115,12 @@
                 Margin="4"
                 TextWrapping="Wrap"
                 Height="50" />
-            
-            <TextBlock Grid.Row="3" Margin="4">Имя пакета</TextBlock>
+
+            <TextBlock Grid.Row="3" Margin="4" Text="{x:Static lp:Resources.PackageName}" />
             <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding PackageName}" Margin="4" />
-            <TextBlock Grid.Row="4" Margin="4">Автор пакета</TextBlock>
+            <TextBlock Grid.Row="4" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
             <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
-            
+
             <Button
                 HorizontalAlignment="Right"
                 Grid.Row="5"
@@ -127,10 +128,9 @@
                 Command="{Binding Create}"
                 Margin="4"
                 Padding="15,2"
-                Name="bCreate">
-                Создать
-            </Button>
-            
+                Name="bCreate"
+                Content="{x:Static lp:Resources.Create}" />
+
             <ContentControl Grid.Row="6" Grid.ColumnSpan="2" Style="{StaticResource NonStandartArea}" />
         </Grid>
     </ScrollViewer>

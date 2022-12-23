@@ -4,9 +4,12 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="300"
-    d:DesignWidth="300">
+    d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance lvm:StatisticsViewModel}">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="TextWrapping" Value="Wrap" />
@@ -16,18 +19,18 @@
     <DockPanel Margin="5">
         <StackPanel Orientation="Vertical" DockPanel.Dock="Top">
             <CheckBox IsChecked="{Binding CheckEmptyAuthors}">
-                <TextBlock Text="Отсутствие авторов" />
+                <TextBlock Text="{x:Static lp:Resources.AuthorsAbsence}" />
             </CheckBox>
             
             <CheckBox IsChecked="{Binding CheckEmptySources}" Margin="0,2,0,0">
-                <TextBlock Text="Отсутствие источников" />
+                <TextBlock Text="{x:Static lp:Resources.SourcesAbsense}" />
             </CheckBox>
             
             <CheckBox IsChecked="{Binding CheckBrackets}" Margin="0,2,0,0">
-                <TextBlock Text="Несоответствие числа открывающих и закрывающих скобок" />
+                <TextBlock Text="{x:Static lp:Resources.OpenCloseBracketsIncosistency}" />
             </CheckBox>
-            
-            <Button Content="Обновить" Command="{Binding Create}" HorizontalAlignment="Left" Margin="0,5,0,0" Padding="8,2" />
+
+            <Button Content="{x:Static lp:Resources.Refresh}" Command="{Binding Create}" HorizontalAlignment="Left" Margin="0,5,0,0" Padding="8,2" />
         </StackPanel>
         
         <TextBox

@@ -3,12 +3,12 @@
 /// <summary>
 /// Ошибка разбора входного текста на вопросы
 /// </summary>
-public sealed class ParseErrorEventArgs: EventArgs
+public sealed class ParseErrorEventArgs : EventArgs
 {
     /// <summary>
     /// Отменить распознавание?
     /// </summary>
-    public bool Cancel { get; set; }
+    public bool Cancel { get; set; } = false;
 
     public bool Skip { get; set; }
 
@@ -19,8 +19,5 @@ public sealed class ParseErrorEventArgs: EventArgs
 
     public string Source { get; set; }
 
-    public ParseErrorEventArgs()
-    {
-        Cancel = false;
-    }
+    public ParseErrorEventArgs(string source) => Source = source;
 }

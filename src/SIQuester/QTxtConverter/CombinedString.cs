@@ -3,84 +3,73 @@
 namespace QTxtConverter;
 
 /// <summary>
-/// Строка-комбинация других строк (задаваемых номерами)
+/// Represents a string which is a result of combinations (intersectons) of a set of soure strings.
 /// </summary>
 public sealed class CombinedString
 {
-    private string _content;
+    private string _value;
 
     /// <summary>
-    /// Получить список номеров строк-источников
+    /// Source strings indicies in source array.
     /// </summary>
-    public List<int> Sources { get; } = new List<int>();
+    public List<int> Sources { get; } = new();
 
     /// <summary>
-    /// Создание комбинированной строки
+    /// Initializes a new instance of <see cref="CombinedString" /> class.
     /// </summary>
-    /// <param name="s">Содержание</param>
-    /// <param name="num">Список номеров строк-источников</param>
-    public CombinedString(string s, params int[] num)
+    /// <param name="value">String value.</param>
+    /// <param name="sourceIndicies">Source strings indicies in source array.</param>
+    public CombinedString(string value, params int[] sourceIndicies)
     {
-        _content = s;
-
-        foreach (var n in num)
-        {
-            Sources.Add(n);
-        }
+        _value = value;
+        Sources.AddRange(sourceIndicies);
     }
 
     /// <summary>
-    /// Создание комбинированной строки
+    /// Initializes a new instance of <see cref="CombinedString" /> class based on other combined strings.
     /// </summary>
-    /// <param name="s">Список строк-источников</param>
-    public CombinedString(params CombinedString[] s)
+    /// <param name="sources">Source strings.</param>
+    public CombinedString(params CombinedString[] sources)
     {
-        var index = 0;
-
-        foreach (CombinedString str in s)
+        if (sources.Length == 0)
         {
-            if (index == 0)
-            {
-                _content = str.ToString();
+            throw new ArgumentException("sources must not be empty", nameof(sources));
+        }
 
-                foreach (int n in str.Sources)
-                {
-                    Sources.Add(n);
-                }
-            }
-            else
-            {
-                CombineWith(str);
-            }
+        _value = sources[0].ToString();
 
-            index++;
+        foreach (var index in sources[0].Sources)
+        {
+            Sources.Add(index);
+        }
+
+        for (int i = 1; i < sources.Length; i++)
+        {
+            CombineWith(sources[i]);
         }
     }
 
-    private void CombineWith(CombinedString str)
+    private void CombineWith(CombinedString combinedString)
     {
-        int len = _content.Length;
+        var length = _value.Length;
 
-        _content = len > 0
+        _value = length > 0
             ? StringManager.BestCommonSubString(
-                _content,
-                str._content,
+                _value,
+                combinedString.ToString(),
                 new StringManager.StringNorm(StringManager.TemplateSearchingNorm),
                 true)
             : "";
 
-        foreach (int n in str.Sources)
+        foreach (var index in combinedString.Sources)
         {
-            if (!Sources.Contains(n))
+            if (!Sources.Contains(index))
             {
-                Sources.Add(n);
+                Sources.Add(index);
             }
         }
     }
 
-    /// <summary>
-    /// Содержание строки
-    /// </summary>
-    /// <returns>Содержание строки</returns>
-    override public string ToString() => _content;
+    /// <inheritdoc />
+    override public string ToString() => _value;
 }

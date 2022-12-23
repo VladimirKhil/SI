@@ -7,6 +7,7 @@ using SIData;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
+using SIPackages.TypeConverters;
 using SIUI.Model;
 using System;
 using System.Collections.Generic;
@@ -4489,7 +4490,7 @@ namespace SICore
             {
                 _data.CurPriceWrong = _data.CurPriceRight = questionPrice;
 
-                _data.CatInfo = new BagCatInfo
+                _data.CatInfo = new NumberSet
                 {
                     Minimum = _data.CurPriceRight,
                     Maximum = _data.CurPriceRight
@@ -4499,7 +4500,7 @@ namespace SICore
             }
             else if (_data.Type.Name == QuestionTypes.Cat)
             {
-                _data.CatInfo = new BagCatInfo();
+                _data.CatInfo = new NumberSet();
                 add = _data.Question.Price.ToString();
                 _data.CurPriceRight = _data.Question.Price;
                 _data.CurPriceWrong = _data.CurPriceRight;
@@ -4507,7 +4508,7 @@ namespace SICore
             else
             {
                 _data.CurPriceRight = -1;
-                _data.CatInfo = BagCatHelper.ParseCatCost(cost);
+                _data.CatInfo = NumberSetTypeConverter.ParseNumberSet(cost);
 
                 if (_data.CatInfo != null)
                 {
@@ -4528,7 +4529,7 @@ namespace SICore
                 }
                 else
                 {
-                    var catInfo = _data.CatInfo = new BagCatInfo();
+                    var catInfo = _data.CatInfo = new NumberSet();
 
                     catInfo.Minimum = -1;
                     catInfo.Maximum = 0;

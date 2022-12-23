@@ -1,5 +1,8 @@
-﻿using SIPackages.Core;
+﻿using SIPackages;
+using SIPackages.Core;
+using SIQuester.Model;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Properties;
 
 namespace SIQuester.ViewModel;
 
@@ -12,6 +15,20 @@ namespace SIQuester.ViewModel;
 /// <inheritdoc cref="ModelViewBase" />
 public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 {
+    private static readonly Dictionary<string, int> RecommenedSizeMb = new()
+    {
+        [SIDocument.ImagesStorageName] = 1,
+        [SIDocument.AudioStorageName] = 5,
+        [SIDocument.VideoStorageName] = 10,
+    };
+
+    private static readonly Dictionary<string, string[]> RecommenedExtensions = new()
+    {
+        [SIDocument.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png" },
+        [SIDocument.AudioStorageName] = new[] { ".mp3" },
+        [SIDocument.VideoStorageName] = new[] { ".mp4" },
+    };
+
     private IMedia? _mediaSource = null;
 
     private Task<IMedia?>? _mediaLoading = null;
@@ -44,6 +61,11 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
         }
     }
 
+    /// <summary>
+    /// Media item type.
+    /// </summary>
+    public abstract string Type { get; }
+
     private string? _errorMessage;
 
     /// <summary>
@@ -73,12 +95,31 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
             lock (_mediaLoadingLock)
             {
                 _mediaLoaded = true;
-                _mediaLoading = null;
             }
         }
     }
 
-    protected virtual string? DetectErrorMessage(IMedia media) => null;
+    private string? DetectErrorMessage(IMedia media)
+    {
+        if (!AppSettings.Default.CheckFileSize)
+        {
+            return null;
+        }
+
+        var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
+
+        var sizeWarning = RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
+            && media.StreamLength > recommendedMaxSize * 1024 * 1024
+                ? string.Format(Resources.MediaFileSizeExceedsRecommenedValue, recommendedMaxSize)
+                : null;
+
+        var extensionWarning = RecommenedExtensions.TryGetValue(Type, out var recommendedExtensions)
+            && !recommendedExtensions.Contains(extension)
+                ? string.Format(Resources.MediaFileExtensionIsNotRecommened, string.Join(',', recommendedExtensions))
+                : null;
+
+        return sizeWarning == null ? extensionWarning : (extensionWarning == null ? sizeWarning : $"{sizeWarning} {extensionWarning}");
+    }
 
     public async ValueTask<IMedia?> LoadMediaAsync(CancellationToken cancellationToken = default)
     {

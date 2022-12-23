@@ -124,6 +124,14 @@ internal sealed class YamlSerializer
             {
                 return new CommentsPropertyDesriptor();
             }
+            else if (type == typeof(Script) && name == nameof(Script.Steps).ToLowerInvariant())
+            {
+                return new CollectionPropertyDesriptor<Step>(nameof(Script.Steps), typeof(List<Step>));
+            }
+            else if (type == typeof(Step) && name == nameof(Step.Parameters).ToLowerInvariant())
+            {
+                return new ParametersPropertyDesriptor();
+            }
 
             return _typeInspector.GetProperty(type, container, name, ignoreUnmatched);
         }
@@ -245,14 +253,34 @@ internal sealed class YamlSerializer
 
         public override void Write(object target, object? value)
         {
-            var comments = (Comments)target;
+            var info = (Info)target;
 
-            if (value is not string text)
+            if (value is not Comments comments)
             {
                 return;
             }
 
-            comments.Text = text;
+            info.Comments.Text = comments.Text;
+        }
+    }
+
+    private sealed class ParametersPropertyDesriptor : CustomPropertyDesriptor
+    {
+        public ParametersPropertyDesriptor() : base(typeof(StepParameters)) { }
+
+        public override void Write(object target, object? value)
+        {
+            var step = (Step)target;
+
+            if (value is not StepParameters parameters)
+            {
+                return;
+            }
+
+            foreach (var item in parameters)
+            {
+                step.Parameters[item.Key] = item.Value;
+            }
         }
     }
 

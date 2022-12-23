@@ -1,0 +1,77 @@
+﻿<UserControl
+    x:Class="SIQuester.View.NumberSetEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:lc="clr-namespace:SIQuester.Converters"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:lvmm="clr-namespace:SIQuester.ViewModel.Model;assembly=SIQuester.ViewModel"
+    xmlns:c="clr-namespace:SIQuester"
+    mc:Ignorable="d" 
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    d:DataContext="{d:DesignInstance vm:NumberSetEditorViewModel}">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="Modes" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:TypeExtension TypeName="lvmm:NumberSetMode" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <lc:EnumConverter x:Key="ModeDescription" EnumType="lvmm:NumberSetMode" />
+
+        <Style TargetType="{x:Type c:NumericTextBox}">
+            <Setter Property="Minimum" Value="1" />
+            <Setter Property="Maximum" Value="100000" />
+            <Setter Property="Width" Value="50" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+
+        <lc:TemplateConverter x:Key="ModeContentSelector">
+            <lc:TemplateConverter.DefaultTemplate>
+                <DataTemplate />
+            </lc:TemplateConverter.DefaultTemplate>
+            
+            <lc:TemplateConverter.Templates>
+                <DataTemplate x:Key="{x:Static lvmm:NumberSetMode.FixedValue}">
+                    <c:NumericTextBox Text="{Binding Minimum}" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static lvmm:NumberSetMode.Range}">
+                    <StackPanel Orientation="Horizontal">
+                        <c:NumericTextBox Text="{Binding Minimum}" Margin="5,0,0,0" />
+                        <TextBlock Text="{x:Static lp:Resources.Or}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        <c:NumericTextBox Text="{Binding Maximum}" Margin="5,0,0,0" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static lvmm:NumberSetMode.RangeWithStep}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Static lp:Resources.From}" VerticalAlignment="Center" />
+                        <c:NumericTextBox Text="{Binding Minimum}" Margin="5,0,0,0" />
+                        <TextBlock Text="{x:Static lp:Resources.To}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        <c:NumericTextBox Text="{Binding Maximum}" Margin="5,0,0,0" />
+                        <TextBlock Text="{x:Static lp:Resources.WithStep}" Margin="5,0,0,0" VerticalAlignment="Center" />
+                        <c:NumericTextBox Text="{Binding Step}" Margin="5,0,0,0" />
+                    </StackPanel>
+                </DataTemplate>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
+    </UserControl.Resources>
+    
+    <StackPanel Orientation="Horizontal">
+        <ComboBox ItemsSource="{Binding Source={StaticResource Modes}}" SelectedValue="{Binding Mode}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ModeDescription}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <ContentControl Content="{Binding}" ContentTemplate="{Binding Mode,Converter={StaticResource ModeContentSelector}}" Margin="10,0,0,0" />
+    </StackPanel>
+</UserControl>

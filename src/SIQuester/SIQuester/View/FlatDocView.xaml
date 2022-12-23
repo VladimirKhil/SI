@@ -11,29 +11,38 @@
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"             
     xmlns:util="clr-namespace:SIQuester.Utilities"
     xmlns:lm="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
-    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
+    xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"    
+    xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:lb="clr-namespace:SIQuester.Behaviors"
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance vm:QDocument}">
-    
     <UserControl.Resources>
-        
         <lc:QTypeToColorConverter
             x:Key="QTypeToColorConverter"
             CommonBrush="Black"
             AuctionBrush="#FFFF3A00"
             CatBrush="#FFB900FF"
             SponsoredBrush="#FF00B900" />
-        
+
+        <lc:RoundTypeToColorConverter
+            x:Key="RoundTypeToColorConverter"
+            CommonBrush="Black"
+            FinalBrush="Firebrick" />
+
         <lc:EqualsToVisibilityConverter x:Key="Equals" />
         <lc:EqualityConverter x:Key="Equals2" />
 
         <Style x:Key="QHeaderStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{Binding Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}" />
         </Style>
-        
+
+        <Style x:Key="RoundHeaderStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{Binding Model.Type, Converter={StaticResource RoundTypeToColorConverter}}" />
+        </Style>
+
         <DataTemplate x:Key="CompactQuestionView">
             <Border
                 Name="bd"
@@ -43,22 +52,19 @@
                 BorderThickness="0"
                 HorizontalAlignment="Center"
                 Width="40">
-                
                 <TextBlock
                     x:Name="price"
                     Style="{StaticResource QHeaderStyle}"
                     Text="{Binding Model.Price}"
                     TextAlignment="Center"
                     TextTrimming="CharacterEllipsis" />
-                
+
                 <Border.ToolTip>
                     <TextBlock Text="{Binding Model}" TextWrapping="Wrap" MaxWidth="400" />
                 </Border.ToolTip>
-                
             </Border>
-            
+
             <DataTemplate.Triggers>
-                
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
                 </Trigger>
@@ -82,9 +88,89 @@
                 <DataTrigger Binding="{Binding IsDragged}" Value="True">
                     <Setter TargetName="bd" Property="Opacity" Value="0.2" />
                 </DataTrigger>
-                
             </DataTemplate.Triggers>
         </DataTemplate>
+
+        <lc:TemplateConverter x:Key="LocalAtomSelector">
+            <lc:TemplateConverter.DefaultTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Model.Text}" TextWrapping="WrapWithOverflow" />
+                </DataTemplate>
+            </lc:TemplateConverter.DefaultTemplate>
+
+            <lc:TemplateConverter.Templates>
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Oral}">
+                    <TextBlock Text="{Binding Model.Text}" TextWrapping="WrapWithOverflow" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
+                    <Image
+                        MinWidth="20"
+                        MinHeight="20"
+                        MaxWidth="100"
+                        MaxHeight="100"
+                        Stretch="Uniform"
+                        Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Audio}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
+                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                        <Slider Style="{StaticResource playSlider}" Name="progress" />
+
+                        <MediaElement
+                            lb:MediaController.Source="{Binding}"
+                            LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Rectangle Fill="Lavender" />
+
+                        <MediaElement
+                            lb:MediaController.Source="{Binding}"
+                            LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            Width="200"
+                            Height="100"
+                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                            <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                            <Slider Style="{StaticResource playSlider}" Name="progress" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
+                    <TextBlock Text="{Binding Model.Text}" TextWrapping="WrapWithOverflow" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Marker}">
+                    <TextBox
+                        FontStyle="Italic"
+                        FontSize="14"
+                        IsReadOnly="True"
+                        TextWrapping="Wrap"
+                        Height="Auto"
+                        MinWidth="50"
+                        Text="{x:Static lp:Resources.AnswerHeader}"
+                        Style="{StaticResource CommonTextBox}" />
+                </DataTemplate>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
 
         <DataTemplate x:Key="QuestionView">
             <Border
@@ -95,35 +181,39 @@
                 BorderThickness="0"
                 HorizontalAlignment="Left"
                 Width="240">
-                
                 <StackPanel>
                     <TextBlock Style="{StaticResource QHeaderStyle}" Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" />
                     
-                    <ItemsControl ItemsSource="{Binding Model.Scenario}">
+                    <ItemsControl ItemsSource="{Binding Scenario}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Text}" TextWrapping="WrapWithOverflow" />
+                                <ContentControl
+                                    Content="{Binding}"
+                                    ContentTemplate="{Binding Model.Type, Converter={StaticResource LocalAtomSelector}}"
+                                    KeyboardNavigation.IsTabStop="False" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-                
+
                 <Border.ToolTip>
                     <TextBlock Text="{Binding Model}" TextWrapping="Wrap" MaxWidth="400" />
                 </Border.ToolTip>
-                
             </Border>
             
             <DataTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
                 </Trigger>
+                
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter TargetName="bd" Property="Background" Value="#FF2F56FF" />
                 </DataTrigger>
+                
                 <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=ShowToolTips}" Value="False">
                     <Setter TargetName="bd" Property="ToolTip" Value="{x:Null}" />
                 </DataTrigger>
+                
                 <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
                     <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
                 </DataTrigger>
@@ -131,7 +221,6 @@
         </DataTemplate>
 
         <DataTemplate x:Key="CompactThemeView">
-            
             <Border
                 Name="bd"
                 Background="#FFD5DDFF"
@@ -140,30 +229,26 @@
                 BorderThickness="0"
                 HorizontalAlignment="Center"
                 Width="360">
-                
                 <TextBlock Text="{Binding Model.Name}" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
                 
                 <Border.ToolTip>
                     <TextBlock Text="{Binding Model.Name}" TextWrapping="Wrap" MaxWidth="400" />
                 </Border.ToolTip>
             </Border>
-            
+
             <DataTemplate.Triggers>
-                
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter TargetName="bd" Property="Background" Value="#FF6985FF" />
                 </Trigger>
-                
+
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter TargetName="bd" Property="Background" Value="#FF2F56FF" />
                 </DataTrigger>
-                
+
                 <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=ShowToolTips}" Value="False">
                     <Setter TargetName="bd" Property="ToolTip" Value="{x:Null}" />
                 </DataTrigger>
-                
             </DataTemplate.Triggers>
-            
         </DataTemplate>
 
         <ItemsPanelTemplate x:Key="Horizontal">
@@ -197,7 +282,6 @@
 
         <DataTemplate x:Key="ThemeView">
             <StackPanel Name="panel" Margin="0,6,6,0" Background="#FFA1C2DE" Width="240">
-                
                 <TextBlock
                     Name="name"
                     Text="{Binding Model.Name}"
@@ -224,15 +308,12 @@
                     Command="{Binding AddQuestion}"
                     ToolTip="{Binding AddHeader}"
                     Style="{StaticResource ToolButton}">
-
                     <Path
                         Stretch="Uniform"
                         Fill="Green"
                         Margin="1"
                         Data="{Binding Source={StaticResource app_add},Path=Data}" />
-
                 </Button>
-
             </StackPanel>
             
             <DataTemplate.Triggers>
@@ -250,11 +331,11 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ExpandedThemeView">
-            
             <StackPanel Name="panel">
                 <Border x:Name="bd" Margin="0,6,0,0">
                     <TextBlock x:Name="name" Text="{Binding Model.Name}" FontSize="16" FontWeight="Bold"/>
                 </Border>
+                
                 <ItemsControl ItemsSource="{Binding Questions}" ItemTemplate="{StaticResource QuestionView}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -276,39 +357,41 @@
                     <Setter TargetName="name" Property="TextAlignment" Value="Center" />
                 </DataTrigger>
             </DataTemplate.Triggers>
-            
         </DataTemplate>
 
         <DataTemplate x:Key="RoundView">
             <StackPanel Margin="6" Background="#FFA1C2DE">
-                
                 <TextBlock
                     Text="{Binding Model.Name}"
                     ToolTip="{Binding Model.Name}"
                     FontSize="14"
                     HorizontalAlignment="Center"
                     Margin="6,6,6,0"
-                    TextTrimming="CharacterEllipsis"  />
-                
-                <ItemsControl Margin="6,0,0,6" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CompactThemeView}">
+                    TextTrimming="CharacterEllipsis"
+                    Style="{StaticResource RoundHeaderStyle}" />
+
+                <ItemsControl Name="themes" Margin="6,0,0,6" ItemsSource="{Binding Themes}" ItemTemplate="{StaticResource CompactThemeView}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
-                
             </StackPanel>
+
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
+                    <Setter TargetName="themes" Property="ItemsControl.ItemsPanel" Value="{StaticResource Vertical}" />
+                    <Setter TargetName="themes" Property="Margin" Value="1,0,2,2" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
 
         <DataTemplate x:Key="ExpandedRoundView">
-            
             <StackPanel>
-                
-                <TextBlock Name="header" Text="{Binding Model.Name}" FontSize="16" FontWeight="Bold" Margin="0,6,0,0" />
+                <TextBlock Name="header" Text="{Binding Model.Name}" FontSize="16" FontWeight="Bold" Margin="0,6,0,0" Style="{StaticResource RoundHeaderStyle}" />
                 
                 <ItemsControl Name="themes" ItemsSource="{Binding Themes}">
-                    
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
@@ -327,13 +410,10 @@
                             </Style.Triggers>
                         </Style>
                     </ItemsControl.Style>
-                    
                 </ItemsControl>
-                
             </StackPanel>
             
             <DataTemplate.Triggers>
-                
                 <DataTrigger Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatScale.Question}">
                     <Setter TargetName="header" Property="FontSize" Value="20" />
                 </DataTrigger>
@@ -342,9 +422,7 @@
                     <Setter TargetName="themes" Property="ItemsControl.ItemsPanel" Value="{StaticResource Vertical}" />
                     <Setter TargetName="themes" Property="Margin" Value="0,5,0,0" />
                 </DataTrigger>
-                
             </DataTemplate.Triggers>
-            
         </DataTemplate>
         
         <ls:DictionaryTemplateSelector x:Key="CardSelector">
@@ -352,27 +430,27 @@
                 <DataTemplate x:Key="{x:Type vm:PackageViewModel}" />
                 <DataTemplate x:Key="{x:Type vm:RoundViewModel}" />
                 <DataTemplate x:Key="{x:Type vm:ThemeViewModel}" />
-                
+
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="10">
                         <TextBlock Text="Вопрос" FontSize="18" />
                         <TextBlock Text="Стоимость" Margin="0,5,0,0" />
-                        
+
                         <l:NumericTextBox
                             x:Name="price"
                             Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
                             Margin="0,1,0,0"
                             Padding="0,1" />
-                        
+
                         <TextBlock x:Name="typeHeader" Text="Тип" Margin="0,5,0,0" />
-                        
+
                         <ComboBox
                             x:Name="type"
                             Margin="0,1,0,0"
                             IsSynchronizedWithCurrentItem="False"
                             SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}"
                             ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}" />
-                        
+
                         <ItemsControl ItemsSource="{Binding Type.Params}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -393,9 +471,7 @@
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
-                    
                 </DataTemplate>
-                
             </ls:DictionaryTemplateSelector.Templates>
         </ls:DictionaryTemplateSelector>
         
@@ -435,16 +511,13 @@
                             Orientation="Horizontal"
                             Margin="0,10,0,0"
                             HorizontalAlignment="Center">
-
                             <Button
                                 x:Name="switch"
                                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 Padding="3"
                                 Command="{Binding SwitchEmpty}"
                                 ToolTip="{x:Static lp:Resources.MakeEmpty}">
-
                                 <Image Source="{StaticResource Contrast}" Width="15" Height="15" Margin="2" />
-
                             </Button>
 
                             <Button
@@ -453,13 +526,9 @@
                                 Margin="2,0,0,0"
                                 Command="{Binding Remove}"
                                 ToolTip="{x:Static lp:Resources.Delete}">
-
                                 <Image Source="{StaticResource RemoveImage}" Width="15" Height="15" Margin="2" />
-
                             </Button>
-
                         </StackPanel>
-
                     </StackPanel>
 
                     <DataTemplate.Triggers>
@@ -470,7 +539,6 @@
                             <Setter TargetName="switch" Property="ToolTip" Value="{x:Static lp:Resources.MakeNonEmpty}" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
-
                 </DataTemplate>
             </ls:DictionaryTemplateSelector.Templates>
         </ls:DictionaryTemplateSelector>
@@ -481,7 +549,7 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        
+
         <ScrollViewer
             Name="scroller"
             VerticalScrollBarVisibility="Auto"
@@ -490,17 +558,31 @@
             DragEnter="Main_DragEnter"
             DragOver="Main_DragOver"
             Drop="Main_Drop">
-            
             <Grid Name="grid">
                 <StackPanel DataContext="{Binding Package}" Margin="10">
                     <TextBlock Text="{Binding Model.Name}" FontSize="24" FontWeight="Bold" />
-                    
+
                     <ItemsControl ItemsSource="{Binding Rounds}">
                         <ItemsControl.Style>
                             <Style TargetType="ItemsControl">
                                 <Setter Property="ItemTemplate" Value="{StaticResource ExpandedRoundView}" />
-                                
+
                                 <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}" />
+                                            <Condition Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatScale.Round}" />
+                                        </MultiDataTrigger.Conditions>
+                                        
+                                        <Setter Property="ItemsControl.ItemsPanel">
+                                            <Setter.Value>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel />
+                                                </ItemsPanelTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </MultiDataTrigger>
+                                    
                                     <DataTrigger Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatScale.Round}">
                                         <Setter Property="ItemTemplate" Value="{StaticResource RoundView}" />
                                     </DataTrigger>
@@ -508,7 +590,6 @@
                             </Style>
                         </ItemsControl.Style>
                     </ItemsControl>
-                    
                 </StackPanel>
                 
                 <Line Name="line" Y2="24" StrokeThickness="2" Stroke="Black" Margin="105,105,0,0" Visibility="Hidden" />
@@ -520,6 +601,10 @@
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
                             <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+                        </DataTrigger>
+
+                        <DataTrigger Binding="{Binding FlatScale, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatScale.Round}">
+                            <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -533,7 +618,7 @@
             Visibility="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}">
             <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource CardSelector}" />
         </Border>
-        
+
         <Popup
             Name="popup"
             IsOpen="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals2},ConverterParameter={x:Static m:EditMode.FloatPanel},Mode=OneWay}"
@@ -544,11 +629,8 @@
             VerticalOffset="-2"
             HorizontalOffset="20"
             util:PopupManager.Owner="{Binding Source={x:Static l:App.Current},Path=MainWindow}">
-            
             <Border Background="#FFF1F1F1" BorderBrush="Gray" BorderThickness="1" Opacity="0.8">
-                
                 <Border.Triggers>
-                    
                     <EventTrigger RoutedEvent="Border.MouseEnter">
                         <BeginStoryboard>
                             <Storyboard>
@@ -556,7 +638,7 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
-                    
+
                     <EventTrigger RoutedEvent="Border.MouseLeave">
                         <BeginStoryboard>
                             <Storyboard>
@@ -564,12 +646,10 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
-                    
                 </Border.Triggers>
-                
+
                 <ContentControl Content="{Binding ActiveNode}" ContentTemplateSelector="{StaticResource SimpleCardSelector}" />
             </Border>
-            
         </Popup>
         
         <ContentControl
@@ -579,19 +659,17 @@
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
-                    
+
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                
                                 <Condition Binding="{Binding Edit, Source={x:Static m:AppSettings.Default}}" Value="{x:Static m:EditMode.FloatPanel}" />
-                                
+
                                 <Condition
                                     Binding="{Binding ActiveNode.Model.Price,Converter={StaticResource Equals2}, ConverterParameter={x:Static p:Question.InvalidPrice}}"
                                     Value="False" />
-                                
                             </MultiDataTrigger.Conditions>
-                            
+
                             <Setter Property="ContentTemplate">
                                 <Setter.Value>
                                     <DataTemplate>
@@ -614,7 +692,6 @@
                     </Style.Triggers>
                 </Style>
             </ContentControl.Style>
-
         </ContentControl>
     </Grid>
 </UserControl>

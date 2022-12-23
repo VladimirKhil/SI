@@ -123,16 +123,16 @@
                 
                 <Separator />
                 
-                <Button ToolTip="Сохранить" Command="{Binding Save}">
+                <Button ToolTip="{x:Static lp:Resources.Save}" Command="{Binding Save}">
                     <Path Stretch="Uniform" Fill="#FF5000C3" Margin="3" Data="{Binding Source={StaticResource app_save},Path=Data}" />
                 </Button>
-                
-                <Button ToolTip="Экспорт и печать" Command="{Binding ExportDinabank}" Padding="4,3">
+
+                <Button ToolTip="{x:Static lp:Resources.ExportAndPrint}" Command="{Binding ExportDinabank}" Padding="4,3">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_export},Path=Data}" />
                 </Button>
                 
                 <siq:DropDownButton
-                    ToolTip="Сохранение и экспорт"
+                    ToolTip="{x:Static lp:Resources.SaveAndExport}"
                     IsEnabled="{Binding ElementName=bExpand,Path=IsEnabled}"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
@@ -166,11 +166,11 @@
                 </siq:DropDownButton>
                 <Separator />
 
-                <Button Style="{StaticResource blured}" ToolTip="Отменить" Command="{Binding OperationsManager.Undo}">
+                <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Undo}" Command="{Binding OperationsManager.Undo}">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_undo},Path=Data}" />
                 </Button>
 
-                <Button Style="{StaticResource blured}" ToolTip="Повторить" Command="{Binding OperationsManager.Redo}">
+                <Button Style="{StaticResource blured}" ToolTip="{x:Static lp:Resources.Redo}" Command="{Binding OperationsManager.Redo}">
                     <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_redo},Path=Data}" />
                 </Button>
                 

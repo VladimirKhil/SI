@@ -277,7 +277,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на В следующей теме обнаружена ошибка нумерации..
+        ///   Ищет локализованную строку, похожую на В следующей теме обнаружена ошибка нумерации. Ожидается, что текст всех вопросов в каждой теме начинается с номера, последовательно возрастающего от вопроса к вопросу.
         /// </summary>
         public static string EnumerationError {
             get {
@@ -862,6 +862,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка при поиске вопросов.
+        /// </summary>
+        public static string SplittingError {
+            get {
+                return ResourceManager.GetString("SplittingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопрос со ставкой.
         /// </summary>
         public static string StakeQuestion {
@@ -876,6 +885,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Start {
             get {
                 return ResourceManager.GetString("Start", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Статистика.
+        /// </summary>
+        public static string Statistic {
+            get {
+                return ResourceManager.GetString("Statistic", resourceCulture);
             }
         }
         
@@ -903,6 +921,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string TeleSI {
             get {
                 return ResourceManager.GetString("TeleSI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Импорт текста.
+        /// </summary>
+        public static string TextImport {
+            get {
+                return ResourceManager.GetString("TextImport", resourceCulture);
             }
         }
         
@@ -1033,6 +1060,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string UnsupportedFragment {
             get {
                 return ResourceManager.GetString("UnsupportedFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Безымянный.
+        /// </summary>
+        public static string Untitled {
+            get {
+                return ResourceManager.GetString("Untitled", resourceCulture);
             }
         }
         

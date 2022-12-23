@@ -3,13 +3,20 @@ using System.Windows.Input;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Defines a view model for question type parameter.
+/// </summary>
+/// <inheritdoc />
 public sealed class QuestionTypeParamViewModel : ModelViewBase
 {
+    /// <summary>
+    /// Underlying question type parameter model.
+    /// </summary>
     public QuestionTypeParam Model { get; }
 
     public QuestionTypeViewModel Owner { get; internal set; }
 
-    public ICommand AddQuestionTypeParam => Owner?.AddQuestionTypeParam;
+    public ICommand? AddQuestionTypeParam => Owner?.AddQuestionTypeParam;
 
     public SimpleCommand RemoveQuestionTypeParam { get; private set; }
 

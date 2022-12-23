@@ -7,9 +7,9 @@ namespace SIQuester.ViewModel;
 
 public sealed class StatisticsViewModel : WorkspaceViewModel
 {
-    private readonly QDocument _document = null;
+    private readonly QDocument _document;
 
-    public override string Header => "Статистика";
+    public override string Header => Resources.Statistic;
 
     private bool _checkEmptyAuthors = false;
 
@@ -20,7 +20,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         {
             if (_checkEmptyAuthors != value)
             {
-                _checkEmptyAuthors = value; OnPropertyChanged(); Create_Executed();
+                _checkEmptyAuthors = value;
+                OnPropertyChanged();
+                Create_Executed();
             }
         }
     }
@@ -34,7 +36,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         {
             if (_checkEmptySources != value)
             {
-                _checkEmptySources = value; OnPropertyChanged(); Create_Executed();
+                _checkEmptySources = value;
+                OnPropertyChanged();
+                Create_Executed();
             }
         }
     }
@@ -43,21 +47,23 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
     public bool CheckBrackets
     {
-        get { return _checkBrackets; }
+        get => _checkBrackets;
         set
         {
             if (_checkBrackets != value)
-            { 
-                _checkBrackets = value; OnPropertyChanged(); Create_Executed();
+            {
+                _checkBrackets = value;
+                OnPropertyChanged();
+                Create_Executed();
             }
         }
     }
 
-    private string _result;
+    private string _result = "";
 
     public string Result
     {
-        get { return _result; }
+        get => _result;
         set { _result = value; OnPropertyChanged(); }
     }
 
@@ -71,7 +77,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         Create_Executed();
     }
 
-    private void Create_Executed(object arg = null)
+    private void Create_Executed(object? arg = null)
     {
         var stats = new StringBuilder();
         stats.Append(Resources.NameOfPackage);
@@ -82,6 +88,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         stats.AppendLine(_document.Document.Package.Rounds.Count.ToString());
 
         int allt = 0, allq = 0;
+
         _document.Document.Package.Rounds.ForEach(round =>
         {
             allt += round.Themes.Count;
@@ -91,6 +98,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, allt));
         stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, allq));
         stats.AppendLine();
+
         foreach (var round in _document.Document.Package.Rounds)
         {
             stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Name));
@@ -100,10 +108,12 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
             {
                 var themeData = new StringBuilder();
                 bool here = false;
+
                 bool tb1 = theme.Info.Comments.Text.Contains(Resources.Undefined);
                 bool tb2 = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
                 bool tb3 = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
                 bool tb4 = round.Type == RoundTypes.Standart && theme.Questions.Count < 5;
+                
                 if (tb1 || tb2 || tb3 || tb4)
                 {
                     if (!here)
@@ -135,6 +145,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     bool b3 = quest.Info.Sources.Count == 0 && _checkEmptySources;
 
                     var bracketsData = new StringBuilder();
+
                     if (_checkBrackets)
                     {
                         for (int i = 0; i < 4; i++)

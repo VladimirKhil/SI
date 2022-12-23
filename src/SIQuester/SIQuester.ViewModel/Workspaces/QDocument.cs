@@ -26,6 +26,8 @@ using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
+// TODO: this class is too heavy. It requires a refactoring
+
 /// <summary>
 /// Represents a document opened inside the editor.
 /// </summary>
@@ -1940,7 +1942,8 @@ public sealed class QDocument : WorkspaceViewModel
     internal ValueTask SaveAsInternalAsync(string path) =>
         Lock.WithLockAsync(async () =>
         {
-            FileStream stream = null;
+            FileStream? stream = null;
+
             try
             {
                 stream = File.Open(path, FileMode.Create, FileAccess.ReadWrite);
@@ -1972,6 +1975,7 @@ public sealed class QDocument : WorkspaceViewModel
                 FileName = System.IO.Path.GetFileNameWithoutExtension(_path);
 
                 var newStream = File.OpenRead(_path);
+
                 try
                 {
                     Document.ResetTo(newStream);

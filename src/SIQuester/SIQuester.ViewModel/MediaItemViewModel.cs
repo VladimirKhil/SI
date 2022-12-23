@@ -1,6 +1,4 @@
-﻿using SIPackages;
-using SIPackages.Core;
-using SIQuester.ViewModel.Properties;
+﻿using SIPackages.Core;
 
 namespace SIQuester.ViewModel;
 
@@ -9,24 +7,10 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class MediaItemViewModel : MediaOwnerViewModel
 {
-    private static readonly Dictionary<string, int> RecommenedSizeMb = new()
-    {
-        [SIDocument.ImagesStorageName] = 1,
-        [SIDocument.AudioStorageName] = 5,
-        [SIDocument.VideoStorageName] = 10,
-    };
-
-    private static readonly Dictionary<string, string[]> RecommenedExtensions = new()
-    {
-        [SIDocument.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png" },
-        [SIDocument.AudioStorageName] = new[] { ".mp3" },
-        [SIDocument.VideoStorageName] = new[] { ".mp4" },
-    };
-
     /// <summary>
     /// Media item type.
     /// </summary>
-    public string Type { get; }
+    public override string Type { get; }
 
     /// <summary>
     /// Underlying media object.
@@ -45,21 +29,4 @@ public sealed class MediaItemViewModel : MediaOwnerViewModel
     protected override IMedia GetMedia() => _mediaGetter();
 
     protected override void OnError(Exception exc) => MainViewModel.ShowError(exc);
-
-    protected override string? DetectErrorMessage(IMedia media)
-    {
-        var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
-
-        var sizeWarning = RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
-            && media.StreamLength > recommendedMaxSize * 1024 * 1024
-                ? string.Format(Resources.MediaFileSizeExceedsRecommenedValue, recommendedMaxSize)
-                : null;
-
-        var extensionWarning = RecommenedExtensions.TryGetValue(Type, out var recommendedExtensions)
-            && !recommendedExtensions.Contains(extension)
-                ? string.Format(Resources.MediaFileExtensionIsNotRecommened, string.Join(',', recommendedExtensions))
-                : null;
-
-        return sizeWarning == null ? extensionWarning : (extensionWarning == null ? sizeWarning : $"{sizeWarning} {extensionWarning}");
-    }
 }

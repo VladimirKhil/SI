@@ -2,7 +2,7 @@
 
 namespace SICore
 {
-    public sealed class StakeInfo : BagCatInfo
+    public sealed class StakeInfo : NumberSet
     {
         private int _stake = 0;
 

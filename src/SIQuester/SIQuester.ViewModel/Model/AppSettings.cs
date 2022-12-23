@@ -46,6 +46,9 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     private bool _searchForUpdates = true;
 
+    /// <summary>
+    /// Search and install updates automatically.
+    /// </summary>
     [DefaultValue(true)]
     public bool SearchForUpdates
     {
@@ -62,6 +65,9 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     private bool _automaticTextImport = false;
 
+    /// <summary>
+    /// Detect text template on import automatically.
+    /// </summary>
     [DefaultValue(false)]
     public bool AutomaticTextImport
     {
@@ -78,6 +84,9 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     private bool _changePriceOnMove = true;
 
+    /// <summary>
+    /// Recalculate question price after moving.
+    /// </summary>
     [DefaultValue(true)]
     public bool ChangePriceOnMove
     {
@@ -103,22 +112,6 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_createQuestionsWithTheme != value)
             {
                 _createQuestionsWithTheme = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private bool _isFirstRun = true;
-
-    [DefaultValue(true)]
-    public bool IsFirstRun
-    {
-        get => _isFirstRun;
-        set
-        {
-            if (_isFirstRun != value)
-            {
-                _isFirstRun = value;
                 OnPropertyChanged();
             }
         }

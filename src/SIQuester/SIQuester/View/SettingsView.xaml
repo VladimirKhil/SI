@@ -12,7 +12,6 @@
     d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300">
-    
     <UserControl.Resources>
         <Style x:Key="Header" TargetType="TextBlock">
             <Setter Property="Margin" Value="0,15,0,0" />
@@ -59,7 +58,7 @@
                             <l:NumericTextBox Margin="4,0,0,0" Text="{Binding BaseValue}" Width="40" VerticalContentAlignment="Center" />
                             <TextBlock VerticalAlignment="Center" Margin="4,0,0,0" Text="{x:Static lp:Resources.Increase}" />
                             <l:NumericTextBox Margin="4,0,0,0" Text="{Binding Increment}" Width="40" VerticalContentAlignment="Center" />
-                            
+
                             <Button
                                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 Margin="4,0,0,0"
@@ -70,7 +69,6 @@
                                 Height="20">
                                 <Path Data="M0,0L1,1M0,1L1,0" Stroke="Black" Stretch="Fill" Margin="3" />
                             </Button>
-                            
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
