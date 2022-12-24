@@ -56,9 +56,9 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             Multiselect = true,
             Filter = mediaCategory switch
             {
-                "Images" => $"{Resources.Images} (*.jpg, *.jpeg, *.png)| *.jpg;*.jpeg;*.png | {Resources.AllFiles} (*.*) | *.* ",
-                "Audio" => $"{Resources.Audio} (*.mp3)| *.mp3 | {Resources.AllFiles} (*.*) | *.* ",
-                _ => $"{Resources.Video} (*.mp4)| *.mp4 | {Resources.AllFiles} (*.*) | *.* ",
+                SIDocument.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpeg, *.png, *.gif)|*.jpg;*.jpeg;*.png;*.gif|{Resources.AllFiles} (*.*)|*.*",
+                SIDocument.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3|{Resources.AllFiles} (*.*)|*.*",
+                _ => $"{Resources.Video} (*.mp4)|*.mp4|{Resources.AllFiles} (*.*)|*.*",
             }
         };
 
