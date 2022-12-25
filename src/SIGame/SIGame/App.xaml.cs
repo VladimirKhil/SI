@@ -359,6 +359,7 @@ namespace SIGame
             }
 
             if (inner is System.Windows.Markup.XamlParseException
+                || inner is System.Xaml.XamlParseException
                 || inner is NotImplementedException
                 || inner is TypeInitializationException
                 || inner is FileFormatException
@@ -438,6 +439,17 @@ namespace SIGame
             {
                 MessageBox.Show(
                     SIGame.Properties.Resources.Error_Typography,
+                    ProductName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                return;
+            }
+
+            if (message.Contains("WpfXamlLoader.TransformNodes"))
+            {
+                MessageBox.Show(
+                    SIGame.Properties.Resources.AppBroken,
                     ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);

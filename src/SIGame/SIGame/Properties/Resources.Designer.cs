@@ -241,6 +241,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Your app is broken. Try to reinstall it.
+        /// </summary>
+        public static string AppBroken {
+            get {
+                return ResourceManager.GetString("AppBroken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Application language.
         /// </summary>
         public static string AppLanguage {
@@ -327,6 +336,15 @@ namespace SIGame.Properties {
         public static string Ban {
             get {
                 return ResourceManager.GetString("Ban", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Banned list.
+        /// </summary>
+        public static string BannedList {
+            get {
+                return ResourceManager.GetString("BannedList", resourceCulture);
             }
         }
         
@@ -898,6 +916,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game info.
+        /// </summary>
+        public static string GameInfo {
+            get {
+                return ResourceManager.GetString("GameInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Game management.
         /// </summary>
         public static string GameManagement {
@@ -1254,6 +1281,15 @@ namespace SIGame.Properties {
         public static string MainPort {
             get {
                 return ResourceManager.GetString("MainPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на 20 years of project.
+        /// </summary>
+        public static string MainSubheader {
+            get {
+                return ResourceManager.GetString("MainSubheader", resourceCulture);
             }
         }
         
@@ -2694,6 +2730,15 @@ namespace SIGame.Properties {
         public static string UI {
             get {
                 return ResourceManager.GetString("UI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove ban.
+        /// </summary>
+        public static string Unban {
+            get {
+                return ResourceManager.GetString("Unban", resourceCulture);
             }
         }
         

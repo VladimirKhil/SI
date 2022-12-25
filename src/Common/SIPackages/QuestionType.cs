@@ -101,12 +101,12 @@ public sealed class QuestionType : Named, IEquatable<QuestionType>
     /// </summary>
     /// <param name="left">Left question type.</param>
     /// <param name="right">Right question type.</param>
-    public static bool operator ==(QuestionType left, QuestionType right) => left.Equals(right);
+    public static bool operator ==(QuestionType? left, QuestionType? right) => Equals(left, right);
 
     /// <summary>
     /// Checks that two question types are not equal to each other.
     /// </summary>
     /// <param name="left">Left question type.</param>
     /// <param name="right">Right question type.</param>
-    public static bool operator !=(QuestionType left, QuestionType right) => !left.Equals(right);
+    public static bool operator !=(QuestionType? left, QuestionType? right) => !(left == right);
 }

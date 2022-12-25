@@ -1843,6 +1843,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на User {0} was unbanned.
+        /// </summary>
+        public static string UserUnbanned {
+            get {
+                return ResourceManager.GetString("UserUnbanned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на ALL-IN!!!.
         /// </summary>
         public static string VaBank {

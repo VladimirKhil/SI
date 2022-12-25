@@ -776,4 +776,7 @@
   <data name="MediaFiltered" xml:space="preserve">
     <value>Медиафайл превышает допустимый размер и будет пропущен</value>
   </data>
+  <data name="UserUnbanned" xml:space="preserve">
+    <value>Пользователь {0} был разбанен</value>
+  </data>
 </root>

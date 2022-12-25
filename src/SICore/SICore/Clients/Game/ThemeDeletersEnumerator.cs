@@ -1,320 +1,316 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
-namespace SICore.Clients.Game
+namespace SICore.Clients.Game;
+
+/// <summary>
+/// Enumerates players that delete final themes.
+/// </summary>
+public sealed class ThemeDeletersEnumerator
 {
+    // TODO: move outside (nested classes are bad)
     /// <summary>
-    /// Enumerates players that delete final themes.
+    /// Информация об индексе игрока в очереди на удаление тем. Если игрок пока не определён, объект содержит допустимый набор индексов
+    /// В очереди имеются несколько экземпляров IndexInfo, разделяющих общий допустимый набор индексов
     /// </summary>
-    public sealed class ThemeDeletersEnumerator
+    public sealed class IndexInfo
     {
-        // TODO: move outside (nested classes are bad)
         /// <summary>
-        /// Информация об индексе игрока в очереди на удаление тем. Если игрок пока не определён, объект содержит допустимый набор индексов
-        /// В очереди имеются несколько экземпляров IndexInfo, разделяющих общий допустимый набор индексов
+        /// Current player index.
         /// </summary>
-        public sealed class IndexInfo
+        public int PlayerIndex { get; set; }
+
+        /// <summary>
+        /// Contains possible values for <see cref="PlayerIndex" /> when it is not selected yet.
+        /// Only one value should be selected after all.
+        /// </summary>
+        public HashSet<int> PossibleIndicies { get; private set; }
+
+        public IndexInfo(int index)
         {
-            /// <summary>
-            /// Current player index.
-            /// </summary>
-            public int PlayerIndex { get; set; }
-
-            /// <summary>
-            /// Contains possible values for <see cref="PlayerIndex" /> when it is not selected yet.
-            /// Only one value should be selected after all.
-            /// </summary>
-            public HashSet<int> PossibleIndicies { get; private set; }
-
-            public IndexInfo(int index)
+            if (index < 0)
             {
-                if (index < 0)
-                {
-                    throw new ArgumentException($"Invalid value: {index}", nameof(index));
-                }
-
-                PlayerIndex = index;
+                throw new ArgumentException($"Invalid value: {index}", nameof(index));
             }
 
-            public IndexInfo(HashSet<int> indicies)
-            {
-                PlayerIndex = -1;
-                PossibleIndicies = indicies; // IndexInfo instances share common PossibleIndicies
-            }
-
-            public void SetIndex(int index)
-            {
-                if (PlayerIndex != -1)
-                {
-                    throw new InvalidOperationException("Индекс уже задан!");
-                }
-
-                if (index == -1)
-                {
-                    throw new ArgumentException("Wrong index value", nameof(index));
-                }
-
-                if (!PossibleIndicies.Contains(index))
-                {
-                    throw new InvalidOperationException("Недопустимый индекс!");
-                }
-
-                PlayerIndex = index;
-                PossibleIndicies.Remove(index);
-            }
-
-            public override string ToString() => PlayerIndex == -1 ? $"[{string.Join("|", PossibleIndicies)}]" : PlayerIndex.ToString();
+            PlayerIndex = index;
         }
 
-        /// <summary>
-        /// Making stakes/theme deleting order.
-        /// </summary>
-        private IndexInfo[] _order;
-
-        /// <summary>
-        /// Current enumerator position in <see cref="_order" />.
-        /// </summary>
-        private int _orderIndex;
-
-        /// <summary>
-        /// Является ли перебор циклическим (с конца идём в начало)
-        /// </summary>
-        private bool _cycle;
-
-        /// <summary>
-        /// Current enumerator item.
-        /// </summary>
-        public IndexInfo Current => _order[_orderIndex];
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="ThemeDeletersEnumerator" /> class.
-        /// </summary>
-        /// <param name="players">Game players.</param>
-        /// <param name="themesCount">Numbers of themes in round.</param>
-        /// <exception cref="InvalidOperationException">Invalid players collection has been provided.</exception>
-        public ThemeDeletersEnumerator(IList<GamePlayerAccount> players, int themesCount)
+        public IndexInfo(HashSet<int> indicies)
         {
-            var playersCount = players.Count;
+            PlayerIndex = -1;
+            PossibleIndicies = indicies; // IndexInfo instances share common PossibleIndicies
+        }
 
-            // The player with the highest score should be the last to remove the theme
-            var goodPlayers = players.Where(p => p.InGame).ToArray();
-            var deletersCount = goodPlayers.Length;
-
-            if (deletersCount == 0)
+        public void SetIndex(int index)
+        {
+            if (PlayerIndex != -1)
             {
-                throw new InvalidOperationException("No InGame players found!");
+                throw new InvalidOperationException($"Index is already set. PlayerIndex: {PlayerIndex}; index: {index}");
             }
 
-            _order = new IndexInfo[deletersCount];
-
-            var leftThemesCount = (themesCount - 1) % deletersCount;
-
-            if (leftThemesCount == 0)
+            if (index == -1)
             {
-                leftThemesCount = deletersCount;
+                throw new ArgumentException("Wrong index value", nameof(index));
             }
 
-            // Split players to classes accourding to their sums
-            var levels = goodPlayers.GroupBy(p => p.Sum).OrderByDescending(g => g.Key).ToArray();
-            var k = leftThemesCount - 1;
-
-            for (var levelIndex = 0; levelIndex < levels.Length; levelIndex++)
+            if (!PossibleIndicies.Contains(index))
             {
-                var level = levels[levelIndex];
+                throw new InvalidOperationException("Недопустимый индекс!");
+            }
 
-                if (level.Count() == 1)
+            PlayerIndex = index;
+            PossibleIndicies.Remove(index);
+        }
+
+        public override string ToString() => PlayerIndex == -1 ? $"[{string.Join("|", PossibleIndicies)}]" : PlayerIndex.ToString();
+    }
+
+    /// <summary>
+    /// Making stakes/theme deleting order.
+    /// </summary>
+    private IndexInfo[] _order;
+
+    /// <summary>
+    /// Current enumerator position in <see cref="_order" />.
+    /// </summary>
+    private int _orderIndex;
+
+    /// <summary>
+    /// Является ли перебор циклическим (с конца идём в начало)
+    /// </summary>
+    private bool _cycle;
+
+    /// <summary>
+    /// Current enumerator item.
+    /// </summary>
+    public IndexInfo Current => _order[_orderIndex];
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="ThemeDeletersEnumerator" /> class.
+    /// </summary>
+    /// <param name="players">Game players.</param>
+    /// <param name="themesCount">Numbers of themes in round.</param>
+    /// <exception cref="InvalidOperationException">Invalid players collection has been provided.</exception>
+    public ThemeDeletersEnumerator(IList<GamePlayerAccount> players, int themesCount)
+    {
+        var playersCount = players.Count;
+
+        // The player with the highest score should be the last to remove the theme
+        var goodPlayers = players.Where(p => p.InGame).ToArray();
+        var deletersCount = goodPlayers.Length;
+
+        if (deletersCount == 0)
+        {
+            throw new InvalidOperationException("No InGame players found!");
+        }
+
+        _order = new IndexInfo[deletersCount];
+
+        var leftThemesCount = (themesCount - 1) % deletersCount;
+
+        if (leftThemesCount == 0)
+        {
+            leftThemesCount = deletersCount;
+        }
+
+        // Split players to classes accourding to their sums
+        var levels = goodPlayers.GroupBy(p => p.Sum).OrderByDescending(g => g.Key).ToArray();
+        var k = leftThemesCount - 1;
+
+        for (var levelIndex = 0; levelIndex < levels.Length; levelIndex++)
+        {
+            var level = levels[levelIndex];
+
+            if (level.Count() == 1)
+            {
+                _order[k--] = new IndexInfo(players.IndexOf(level.First()));
+
+                if (k == -1)
                 {
-                    _order[k--] = new IndexInfo(players.IndexOf(level.First()));
+                    k += deletersCount;
+                }
+            }
+            else
+            {
+                var indicies = new HashSet<int>();
+
+                foreach (var item in level)
+                {
+                    indicies.Add(players.IndexOf(item));
+                    _order[k--] = new IndexInfo(indicies);
 
                     if (k == -1)
                     {
                         k += deletersCount;
                     }
                 }
-                else
-                {
-                    var indicies = new HashSet<int>();
-
-                    foreach (var item in level)
-                    {
-                        indicies.Add(players.IndexOf(item));
-                        _order[k--] = new IndexInfo(indicies);
-
-                        if (k == -1)
-                        {
-                            k += deletersCount;
-                        }
-                    }
-                }
             }
         }
+    }
 
-        public ThemeDeletersEnumerator(IndexInfo[] order)
+    public ThemeDeletersEnumerator(IndexInfo[] order)
+    {
+        _order = order;
+    }
+
+    private readonly List<string> _removeLog = new(); // Temporary object to catch errors
+
+    public string GetRemoveLog() => string.Join(Environment.NewLine, _removeLog);
+
+    public void RemoveAt(int index)
+    {
+        var removeLog = new StringBuilder(ToString()).Append(' ').Append(index);
+
+        _removeLog.Add("Before: " + removeLog.ToString());
+
+        var processedPossibleIndicies = new HashSet<HashSet<int>>();
+
+        void updatePossibleIndices(IndexInfo indexInfo)
         {
-            _order = order;
-        }
+            var possibleIndices = indexInfo.PossibleIndicies;
 
-        private readonly List<string> _removeLog = new(); // Temporary object to catch errors
-
-        public string GetRemoveLog() => string.Join(Environment.NewLine, _removeLog);
-
-        public void RemoveAt(int index)
-        {
-            var removeLog = new StringBuilder(ToString()).Append(' ').Append(index);
-
-            _removeLog.Add("Before: " + removeLog.ToString());
-
-            var processedPossibleIndicies = new HashSet<HashSet<int>>();
-
-            void updatePossibleIndices(IndexInfo indexInfo)
+            if (processedPossibleIndicies.Contains(possibleIndices))
             {
-                var possibleIndices = indexInfo.PossibleIndicies;
-
-                if (processedPossibleIndicies.Contains(possibleIndices))
-                {
-                    return;
-                }
-
-                var allIndices = possibleIndices.ToArray();
-                possibleIndices.Clear();
-
-                foreach (var ind in allIndices)
-                {
-                    if (ind == index)
-                    {
-                        continue;
-                    }
-
-                    possibleIndices.Add(ind - (ind > index ? 1 : 0));
-                }
-
-                processedPossibleIndicies.Add(possibleIndices);
-            }
-
-            if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
-            {
-                for (var i = 0; i < _order.Length; i++)
-                {
-                    var playerIndex = _order[i].PlayerIndex;
-
-                    if (playerIndex > index)
-                    {
-                        _order[i].PlayerIndex--;
-                        continue;
-                    }
-
-                    if (playerIndex == -1)
-                    {
-                        updatePossibleIndices(_order[i]);
-                    }
-                }
-
-                _removeLog.Add("After: " + ToString());
                 return;
             }
 
-            try
+            var allIndices = possibleIndices.ToArray();
+            possibleIndices.Clear();
+
+            foreach (var ind in allIndices)
             {
-                var newOrder = new IndexInfo[_order.Length - 1];
-                var possibleVariantsCount = -1;
-                HashSet<int> variantWithIndex = null;
-
-                for (int i = 0, j = 0; i < _order.Length; i++)
+                if (ind == index)
                 {
-                    if (_order[i].PlayerIndex == index ||
-                            _order[i].PlayerIndex == -1 &&
-                            _order[i].PossibleIndicies.Count == 1 &&
-                            _order[i].PossibleIndicies.Contains(index))
-                    {
-                        continue;
-                    }
-
-                    newOrder[j] = _order[i];
-
-                    if (_order[i].PlayerIndex > index)
-                    {
-                        newOrder[j].PlayerIndex--;
-                    }
-
-                    if (_order[i].PlayerIndex == -1)
-                    {
-                        if (!processedPossibleIndicies.Contains(_order[i].PossibleIndicies) && _order[i].PossibleIndicies.Contains(index))
-                        {
-                            variantWithIndex = _order[i].PossibleIndicies;
-                            possibleVariantsCount = variantWithIndex.Count;
-                        }
-
-                        if (_order[i].PossibleIndicies == variantWithIndex)
-                        {
-                            possibleVariantsCount--;
-
-                            if (possibleVariantsCount == 0) // One variant should be deleted
-                            {
-                                continue;
-                            }
-                        }
-
-                        updatePossibleIndices(_order[i]);
-                    }
-
-                    j++;
-
-                    if (j == newOrder.Length)
-                    {
-                        break;
-                    }
+                    continue;
                 }
 
-                if (_orderIndex == _order.Length - 1)
-                {
-                    _orderIndex = _cycle ? 0 : newOrder.Length - 1;
-                }
-
-                _order = newOrder;
-
-                _removeLog.Add("After: " + ToString());
+                possibleIndices.Add(ind - (ind > index ? 1 : 0));
             }
-            catch (Exception exc)
-            {
-                throw new Exception("RemoveAt error: " + removeLog.ToString(), exc);
-            }
+
+            processedPossibleIndicies.Add(possibleIndices);
         }
 
-        public void Reset(bool cycle)
+        if (!_order.Any(o => o.PlayerIndex == index || o.PlayerIndex == -1 && o.PossibleIndicies.Contains(index)))
         {
-            _orderIndex = -1;
-            _cycle = cycle;
-        }
-
-        public bool MoveNext()
-        {
-            _orderIndex++;
-
-            if (_orderIndex == _order.Length)
+            for (var i = 0; i < _order.Length; i++)
             {
-                if (!_cycle || _order.Length == 0)
+                var playerIndex = _order[i].PlayerIndex;
+
+                if (playerIndex > index)
                 {
-                    return false;
+                    _order[i].PlayerIndex--;
+                    continue;
                 }
 
-                _orderIndex = 0;
+                if (playerIndex == -1)
+                {
+                    updatePossibleIndices(_order[i]);
+                }
             }
 
-            return true;
+            _removeLog.Add("After: " + ToString());
+            return;
         }
 
-        public void MoveBack() => _orderIndex--;
+        try
+        {
+            var newOrder = new IndexInfo[_order.Length - 1];
+            var possibleVariantsCount = -1;
+            HashSet<int> variantWithIndex = null;
 
-        public bool IsEmpty() => _order.Length == 0;
+            for (int i = 0, j = 0; i < _order.Length; i++)
+            {
+                if (_order[i].PlayerIndex == index ||
+                        _order[i].PlayerIndex == -1 &&
+                        _order[i].PossibleIndicies.Count == 1 &&
+                        _order[i].PossibleIndicies.Contains(index))
+                {
+                    continue;
+                }
 
-        public override string ToString() => 
-            new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
-            .Append(' ')
-            .Append(_orderIndex)
-            .Append(' ')
-            .Append(_cycle)
-            .ToString();
+                newOrder[j] = _order[i];
+
+                if (_order[i].PlayerIndex > index)
+                {
+                    newOrder[j].PlayerIndex--;
+                }
+
+                if (_order[i].PlayerIndex == -1)
+                {
+                    if (!processedPossibleIndicies.Contains(_order[i].PossibleIndicies) && _order[i].PossibleIndicies.Contains(index))
+                    {
+                        variantWithIndex = _order[i].PossibleIndicies;
+                        possibleVariantsCount = variantWithIndex.Count;
+                    }
+
+                    if (_order[i].PossibleIndicies == variantWithIndex)
+                    {
+                        possibleVariantsCount--;
+
+                        if (possibleVariantsCount == 0) // One variant should be deleted
+                        {
+                            continue;
+                        }
+                    }
+
+                    updatePossibleIndices(_order[i]);
+                }
+
+                j++;
+
+                if (j == newOrder.Length)
+                {
+                    break;
+                }
+            }
+
+            if (_orderIndex == _order.Length - 1)
+            {
+                _orderIndex = _cycle ? 0 : newOrder.Length - 1;
+            }
+
+            _order = newOrder;
+
+            _removeLog.Add("After: " + ToString());
+        }
+        catch (Exception exc)
+        {
+            throw new Exception("RemoveAt error: " + removeLog.ToString(), exc);
+        }
     }
+
+    public void Reset(bool cycle)
+    {
+        _orderIndex = -1;
+        _cycle = cycle;
+    }
+
+    public bool MoveNext()
+    {
+        _orderIndex++;
+
+        if (_orderIndex == _order.Length)
+        {
+            if (!_cycle || _order.Length == 0)
+            {
+                return false;
+            }
+
+            _orderIndex = 0;
+        }
+
+        return true;
+    }
+
+    public void MoveBack() => _orderIndex--;
+
+    public bool IsEmpty() => _order.Length == 0;
+
+    public override string ToString() => 
+        new StringBuilder(string.Join(",", _order.Select(o => o.ToString())))
+        .Append(' ')
+        .Append(_orderIndex)
+        .Append(' ')
+        .Append(_cycle)
+        .ToString();
 }

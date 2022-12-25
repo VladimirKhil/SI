@@ -1,19 +1,17 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Network.Contracts;
-using System;
 
-namespace SICore
+namespace SICore;
+
+public interface IActor : IAsyncDisposable
 {
-    public interface IActor : IAsyncDisposable
-    {
-        IClient Client { get; }
+    IClient Client { get; }
 
-        ILocalizer LO { get; }
+    ILocalizer LO { get; }
 
-        /// <summary>
-        /// Добавить сообщение в лог
-        /// </summary>
-        /// <param name="s">Текст сообщения</param>
-        void AddLog(string s);
-    }
+    /// <summary>
+    /// Добавить сообщение в лог
+    /// </summary>
+    /// <param name="s">Текст сообщения</param>
+    void AddLog(string s);
 }

@@ -771,4 +771,7 @@
   <data name="MediaFiltered" xml:space="preserve">
     <value>Media file is too large and will be skipped</value>
   </data>
+  <data name="UserUnbanned" xml:space="preserve">
+    <value>User {0} was unbanned</value>
+  </data>
 </root>

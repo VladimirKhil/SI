@@ -9,7 +9,6 @@
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
-             
     DispatcherUnhandledException="Application_DispatcherUnhandledException"
     Startup="Application_Startup"
     Exit="Application_Exit"
@@ -58,6 +57,7 @@
         <Style x:Key="CheckBoxBase" TargetType="CheckBox">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             <Setter Property="Cursor" Value="Hand" />
+            
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground" Value="{StaticResource HoverColor}" />
@@ -81,6 +81,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Padding" Value="0" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
@@ -91,6 +92,7 @@
 
         <Style x:Key="SIButtonSimple" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonBase}">
             <Setter Property="Background" Value="{StaticResource TransparentSIButtonBackground}" />
+            
             <Style.Triggers>
                 <EventTrigger RoutedEvent="MouseEnter">
                     <BeginStoryboard>
@@ -99,6 +101,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
+                
                 <EventTrigger RoutedEvent="MouseLeave">
                     <BeginStoryboard>
                         <Storyboard>
@@ -106,6 +109,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
+                
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="Gray" />
                 </Trigger>
@@ -115,6 +119,7 @@
         <Style x:Key="SIButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
             <Setter Property="TextBlock.LineHeight" Value="{Binding FontSize,RelativeSource={RelativeSource Self}}" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ButtonBase}">
@@ -124,6 +129,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
@@ -131,6 +137,7 @@
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Button.Click">
                     <BeginStoryboard>
@@ -148,6 +155,7 @@
         <Style x:Key="WhiteButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButton}">
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderBrush" Value="White" />
+            
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="Gray" />
@@ -190,6 +198,7 @@
 
         <Style x:Key="MainProgress" TargetType="ProgressBar">
             <Setter Property="Visibility" Value="Hidden" />
+            
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsProgress}" Value="True">
                     <Setter Property="Visibility" Value="Visible" />
@@ -207,7 +216,9 @@
                     <ScaleTransform ScaleX="0" ScaleY="0" />
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
@@ -224,10 +235,12 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
+                                
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <ProgressBar
                                     Grid.ColumnSpan="2"
                                     Foreground="DarkBlue"
@@ -236,6 +249,7 @@
                                     VerticalAlignment="Top"
                                     DataContext="{Binding Data}"
                                     Style="{StaticResource MainProgress}" />
+                                
                                 <TextBlock
                                     Text="{TemplateBinding Tag}"
                                     Style="{StaticResource CommonText}"
@@ -243,6 +257,7 @@
                                     FontWeight="Bold"
                                     Margin="20,24,10,4"
                                     VerticalAlignment="Center" />
+                                
                                 <Button
                                     Grid.Column="1"
                                     x:Name="bClose"
@@ -264,6 +279,7 @@
                                         Stretch="Uniform"
                                         Margin="2" />
                                 </Button>
+                                
                                 <ContentPresenter
                                     Grid.Row="1"
                                     Grid.ColumnSpan="2"
@@ -271,6 +287,7 @@
                                     VerticalAlignment="Center" />
                             </Grid>
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <EventTrigger RoutedEvent="Control.Loaded">
                                 <BeginStoryboard>
@@ -280,6 +297,7 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </EventTrigger>
+                            
                             <EventTrigger RoutedEvent="Button.Click" SourceName="bClose">
                                 <BeginStoryboard>
                                     <Storyboard>
@@ -292,6 +310,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
@@ -307,31 +326,70 @@
                     <ScaleTransform ScaleX="0" ScaleY="0" />
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border Name="Bd" BorderBrush="{StaticResource WindowBorderColor}" Background="{StaticResource WindowBackground}"
-                                BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                TextBlock.Foreground="{StaticResource MainColor}">
+                        <Border
+                            Name="Bd"
+                            BorderBrush="{StaticResource WindowBorderColor}"
+                            Background="{StaticResource WindowBackground}"
+                            BorderThickness="1"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            TextBlock.Foreground="{StaticResource MainColor}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
+                                
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressBar Grid.ColumnSpan="2" Foreground="DarkBlue" Height="8" VerticalAlignment="Top"
-                                             Minimum="0" Maximum="100"
-                                             Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"/>
+                                
+                                <ProgressBar
+                                    Grid.ColumnSpan="2"
+                                    Foreground="DarkBlue"
+                                    Height="8"
+                                    VerticalAlignment="Top"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}" />
+                                
                                 <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Fill="#FF183CF3" />
-                                <TextBlock Grid.Row="1" Text="{TemplateBinding Tag}" Style="{StaticResource CommonText}" FontSize="30" FontWeight="Bold" Margin="10,4" VerticalAlignment="Center" />
-                                <Button Grid.Row="1" Grid.Column="1" x:Name="bClose" Style="{StaticResource CloseButton}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" BorderThickness="0" Width="30" Height="30" Padding="0,1,1,0" Command="{Binding Cancel}" IsEnabled="{TemplateBinding IsEnabled}" ToolTip="{x:Static lp:Resources.Close}" IsCancel="True">
+                                
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Text="{TemplateBinding Tag}"
+                                    Style="{StaticResource CommonText}"
+                                    FontSize="30"
+                                    FontWeight="Bold"
+                                    Margin="10,4"
+                                    VerticalAlignment="Center" />
+                                
+                                <Button
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    x:Name="bClose"
+                                    Style="{StaticResource CloseButton}"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    BorderThickness="0"
+                                    Width="30"
+                                    Height="30"
+                                    Padding="0,1,1,0"
+                                    Command="{Binding Cancel}"
+                                    IsEnabled="{TemplateBinding IsEnabled}"
+                                    ToolTip="{x:Static lp:Resources.Close}"
+                                    IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
+                                
                                 <ContentPresenter Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Grid>
                         </Border>
@@ -344,6 +402,7 @@
                                     </Storyboard>
                                 </BeginStoryboard>
                             </EventTrigger>
+                            
                             <EventTrigger RoutedEvent="Button.Click" SourceName="bClose">
                                 <BeginStoryboard>
                                     <Storyboard>
@@ -356,6 +415,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
@@ -374,8 +434,10 @@
                     <ScaleTransform ScaleX="0" ScaleY="0" />
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="lb:FadeOutBehaviour.IsAttached" Value="True" />
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
@@ -392,10 +454,12 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
+                                
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <ProgressBar
                                     Grid.ColumnSpan="2"
                                     Foreground="DarkBlue"
@@ -404,6 +468,7 @@
                                     VerticalAlignment="Top"
                                     DataContext="{Binding Content.Data}"
                                     Style="{StaticResource MainProgress}" />
+                                
                                 <StackPanel Orientation="Horizontal">
                                     <Button
                                         Command="{Binding Back}"
@@ -426,6 +491,7 @@
                                             Stretch="Uniform"
                                             Margin="12" />
                                     </Button>
+                                    
                                     <TextBlock
                                         Text="{TemplateBinding Tag}"
                                         Style="{StaticResource CommonText}"
@@ -434,6 +500,7 @@
                                         Margin="10,4"
                                         VerticalAlignment="Center" />
                                 </StackPanel>
+                                
                                 <Button
                                     x:Name="bClose"
                                     Grid.Column="1"
@@ -450,9 +517,11 @@
                                     IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
+                                
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                             </Grid>
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <EventTrigger RoutedEvent="Control.Loaded">
                                 <BeginStoryboard>
@@ -466,6 +535,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
@@ -490,10 +560,12 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
+                                
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <ProgressBar
                                     Grid.ColumnSpan="2"
                                     Foreground="DarkBlue"
@@ -502,6 +574,7 @@
                                     VerticalAlignment="Top"                                    
                                     DataContext="{Binding Data}"
                                     Style="{StaticResource MainProgress}" />
+                                
                                 <TextBlock
                                     Text="{TemplateBinding Tag}"
                                     Style="{StaticResource CommonText}"
@@ -509,6 +582,7 @@
                                     FontWeight="Bold"
                                     Margin="10,4"
                                     VerticalAlignment="Center" />
+                                
                                 <Button
                                     x:Name="bClose"
                                     Grid.Column="1"
@@ -525,17 +599,20 @@
                                     IsCancel="True">
                                     <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
                                 </Button>
+                                
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Grid>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
                 </Setter.Value>
             </Setter>
+            
             <Style.Triggers>
                 <Trigger Property="Content" Value="{x:Null}">
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -558,10 +635,12 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
+                                
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <ProgressBar
                                     Grid.ColumnSpan="2"
                                     Foreground="DarkBlue"
@@ -570,6 +649,7 @@
                                     VerticalAlignment="Top"
                                     DataContext="{Binding Data}"
                                     Style="{StaticResource MainProgress}" />
+                                
                                 <TextBlock
                                     Text="{TemplateBinding Tag}"
                                     Style="{StaticResource CommonText}"
@@ -577,6 +657,7 @@
                                     FontWeight="Bold"
                                     Margin="10,4"
                                     VerticalAlignment="Center" />
+                                
                                 <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
                                     <Button
                                         x:Name="bClose"
@@ -599,6 +680,7 @@
                                             Margin="5" />
                                     </Button>
                                 </StackPanel>
+                                
                                 <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" />
                             </Grid>
                         </Border>
@@ -656,36 +738,45 @@
             <GradientStop Color="#FFF0F0F0" Offset="0.0"/>
             <GradientStop Color="#FFE5E5E5" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#FFACACAC"/>
         <SolidColorBrush x:Key="ComboBox.Static.Editable.Background" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="ComboBox.Static.Editable.Border" Color="#FFABADB3"/>
         <SolidColorBrush x:Key="ComboBox.Static.Editable.Button.Background" Color="Transparent"/>
         <SolidColorBrush x:Key="ComboBox.Static.Editable.Button.Border" Color="Transparent"/>
         <SolidColorBrush x:Key="ComboBox.MouseOver.Glyph" Color="#FF000000"/>
+        
         <LinearGradientBrush x:Key="ComboBox.MouseOver.Background" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#FFECF4FC" Offset="0.0"/>
             <GradientStop Color="#FFDCECFC" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#FF7EB4EA"/>
         <SolidColorBrush x:Key="ComboBox.MouseOver.Editable.Background" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="ComboBox.MouseOver.Editable.Border" Color="#FF7EB4EA"/>
+        
         <LinearGradientBrush x:Key="ComboBox.MouseOver.Editable.Button.Background" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#FFEBF4FC" Offset="0.0"/>
             <GradientStop Color="#FFDCECFC" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="ComboBox.MouseOver.Editable.Button.Border" Color="#FF7EB4EA"/>
         <SolidColorBrush x:Key="ComboBox.Pressed.Glyph" Color="#FF000000"/>
+        
         <LinearGradientBrush x:Key="ComboBox.Pressed.Background" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#FFDAECFC" Offset="0.0"/>
             <GradientStop Color="#FFC4E0FC" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="ComboBox.Pressed.Border" Color="#FF569DE5"/>
         <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Background" Color="#FFFFFFFF"/>
         <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Border" Color="#FF569DE5"/>
+        
         <LinearGradientBrush x:Key="ComboBox.Pressed.Editable.Button.Background" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#FFDAEBFC" Offset="0.0"/>
             <GradientStop Color="#FFC4E0FC" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Button.Border" Color="#FF569DE5"/>
         <SolidColorBrush x:Key="ComboBox.Disabled.Glyph" Color="#FFBFBFBF"/>
         <SolidColorBrush x:Key="ComboBox.Disabled.Background" Color="#FFF0F0F0"/>
@@ -695,12 +786,14 @@
         <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Button.Background" Color="Transparent"/>
         <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Button.Border" Color="Transparent"/>
         <SolidColorBrush x:Key="ComboBox.Static.Glyph" Color="#FF606060"/>
+        
         <Style x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="IsTabStop" Value="false"/>
             <Setter Property="Focusable" Value="false"/>
             <Setter Property="ClickMode" Value="Press"/>
             <Setter Property="Cursor" Value="Hand" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
@@ -709,6 +802,7 @@
                                 <Path x:Name="arrow" VerticalAlignment="Center" Margin="0" HorizontalAlignment="Center" Stroke="{TemplateBinding Foreground}" Data="F1 M 0,0 L4,4 L8,0"/>
                             </Border>
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
@@ -717,49 +811,60 @@
                                     <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="false"/>
                                     <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="true"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Static.Editable.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Static.Editable.Border}"/>
                                 <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Button.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Button.Border}"/>
                             </MultiDataTrigger>
+                            
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true"/>
                                     <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="false"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource Button.Highlight.Background}"/>
                             </MultiDataTrigger>
+                            
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true"/>
                                     <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Editable.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Editable.Border}"/>
                                 <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.MouseOver.Editable.Button.Border}"/>
                             </MultiDataTrigger>
+                            
                             <Trigger Property="IsPressed" Value="true">
                                 <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Pressed.Glyph}"/>
                             </Trigger>
+                            
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true"/>
                                     <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="false"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Border}"/>
                             </MultiDataTrigger>
+                            
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true"/>
                                     <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Editable.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Editable.Border}"/>
                                 <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Background}"/>
                                 <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Border}"/>
                             </MultiDataTrigger>
+                            
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Visibility" TargetName="arrow" Value="Hidden"/>
                             </Trigger>
@@ -768,12 +873,14 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
         <ControlTemplate x:Key="ComboBoxTemplate" TargetType="{x:Type ComboBox}">
             <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Width="0"/>
                 </Grid.ColumnDefinitions>
+                
                 <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
                     <Border x:Name="dropDownBorder"  MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{Binding ActualWidth, ElementName=templateRoot}" BorderBrush="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}" BorderThickness="1" Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
                         <ScrollViewer x:Name="DropDownScrollViewer">
@@ -786,6 +893,7 @@
                         </ScrollViewer>
                     </Border>
                 </Popup>
+                
                 <ToggleButton
                     x:Name="toggleButton"
                     BorderBrush="{TemplateBinding BorderBrush}"
@@ -794,6 +902,7 @@
                     Grid.ColumnSpan="2"
                     IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                     Style="{StaticResource ComboBoxToggleButton}" />
+                
                 <ContentPresenter
                     x:Name="contentPresenter"
                     TextBlock.Foreground="{TemplateBinding Foreground}"
@@ -807,26 +916,32 @@
                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
             </Grid>
+            
             <ControlTemplate.Triggers>
                 <Trigger Property="HasItems" Value="false">
                     <Setter Property="Height" TargetName="dropDownBorder" Value="95" />
                 </Trigger>
+                
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsGrouping" Value="true" />
                         <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false" />
                     </MultiTrigger.Conditions>
+                    
                     <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
                 </MultiTrigger>
+                
                 <Trigger Property="ScrollViewer.CanContentScroll" SourceName="DropDownScrollViewer" Value="false">
                     <Setter Property="Canvas.Top" TargetName="opaqueRect" Value="{Binding VerticalOffset, ElementName=DropDownScrollViewer}" />
                     <Setter Property="Canvas.Left" TargetName="opaqueRect" Value="{Binding HorizontalOffset, ElementName=DropDownScrollViewer}" />
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
+        
         <Style x:Key="ComboBoxItemStyle" TargetType="ComboBoxItem">
             <Setter Property="Foreground" Value="Black" />
         </Style>
+        
         <Style x:Key="ComboBoxStyle" TargetType="{x:Type ComboBox}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
             <Setter Property="Background" Value="Transparent" />
@@ -842,6 +957,7 @@
             <Setter Property="Template" Value="{StaticResource ComboBoxTemplate}" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource ComboBoxItemStyle}" />
         </Style>
+        
         <Style x:Key="ComboBoxMainStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
             <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
@@ -851,16 +967,20 @@
             <GradientStop Color="#F0F0F0" Offset="0.0"/>
             <GradientStop Color="#E5E5E5" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="TabItem.Static.Border" Color="#ACACAC"/>
+        
         <LinearGradientBrush x:Key="TabItem.MouseOver.Background" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#ECF4FC" Offset="0.0"/>
             <GradientStop Color="#DCECFC" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <SolidColorBrush x:Key="TabItem.MouseOver.Border" Color="#7EB4EA"/>
         <SolidColorBrush x:Key="TabItem.Disabled.Background" Color="#F0F0F0"/>
         <SolidColorBrush x:Key="TabItem.Disabled.Border" Color="#D9D9D9"/>
         <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
         <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
+        
         <Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
             <Setter Property="Foreground" Value="{StaticResource MainColor}"/>
@@ -871,6 +991,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="VerticalContentAlignment" Value="Stretch"/>
             <Setter Property="Cursor" Value="Hand" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
@@ -885,29 +1006,37 @@
                                 HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
                                 VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
                         </Grid>
+                        
                         <ControlTemplate.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="false"/>
                                     <Condition Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="Top"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="Foreground" Value="#66FFFFFF"/>
                             </MultiDataTrigger>
+                            
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding IsMouseOver, ElementName=templateRoot}" Value="true"/>
                                     <Condition Binding="{Binding TabStripPlacement, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" Value="Top"/>
                                 </MultiDataTrigger.Conditions>
+                                
                                 <Setter Property="TextBlock.Foreground" TargetName="contentPresenter" Value="#99FFFFFF"/>
                             </MultiDataTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <Border Margin="7,0,0,0" BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" >
+                        <Border
+                            Margin="7,0,0,0"
+                            BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}"
+                            BorderThickness="0,0,0,3">
                             <TextBlock Text="{Binding}" FontWeight="Bold" Effect="{StaticResource Effect}" />
                         </Border>
                     </DataTemplate>
@@ -916,12 +1045,21 @@
         </Style>
 
         <Style x:Key="StudiaTab" TargetType="TabItem" BasedOn="{StaticResource TabItemStyle1}">
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+
             <Setter Property="HeaderTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <Border Margin="7,0,0,0" BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3" Height="35">
-                            <TextBlock Text="{Binding}" FontWeight="Bold" Effect="{StaticResource Effect}" VerticalAlignment="Bottom" />
+                        <Border x:Name="border" Width="43" HorizontalAlignment="Center" Padding="7">
+                            <TextBlock Text="{Binding}" Effect="{StaticResource Effect}" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         </Border>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSelected}" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="White" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
@@ -1229,7 +1367,7 @@
         </ControlTemplate>
 
     </Application.Resources>
-    <!--Задачи приложения-->
+    <!--Application tasks-->
     <JumpList.JumpList>
         <JumpList>
             <JumpTask Title="{x:Static lp:Resources.JumpList_Logs}" Description="{x:Static lp:Resources.JumpList_Logs_Hint}" Arguments="/logs" />

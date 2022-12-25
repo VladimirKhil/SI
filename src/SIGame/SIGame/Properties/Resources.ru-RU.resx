@@ -1038,4 +1038,19 @@
   <data name="EnableMediaLoad" xml:space="preserve">
     <value>Разрешить загрузку стороннего медиа</value>
   </data>
+  <data name="AppBroken" xml:space="preserve">
+    <value>Ваше приложение повреждено. Попробуйте переустановить его</value>
+  </data>
+  <data name="MainSubheader" xml:space="preserve">
+    <value>20 лет проекту</value>
+  </data>
+  <data name="BannedList" xml:space="preserve">
+    <value>Список забаненных</value>
+  </data>
+  <data name="GameInfo" xml:space="preserve">
+    <value>Информация об игре</value>
+  </data>
+  <data name="Unban" xml:space="preserve">
+    <value>Снять бан</value>
+  </data>
 </root>

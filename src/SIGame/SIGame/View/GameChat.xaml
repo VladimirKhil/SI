@@ -1,60 +1,109 @@
-﻿<UserControl x:Class="SIGame.GameChat"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d"
-             d:DesignHeight="243" d:DesignWidth="389" Background="#88000000"
-             xmlns:lp="clr-namespace:SIGame.Properties"
-             xmlns:lc="clr-namespace:SIGame.Converters"
-             DataContextChanged="UserControl_DataContextChanged">
+﻿<UserControl
+    x:Class="SIGame.GameChat"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    mc:Ignorable="d"
+    d:DesignHeight="243"
+    d:DesignWidth="389"
+    Background="#88000000"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:lc="clr-namespace:SIGame.Converters"
+    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    d:DataContext="{d:DesignInstance sc:ViewerData}"
+    DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <SolidColorBrush x:Key="SemiTransparentLightBlueVioletBrushKey">#FFC0CFF4</SolidColorBrush>
-        
-        <CollectionViewSource x:Key="Persons" Source="{Binding AllPersons}" Filter="CollectionViewSource_Filter" />
-
-        <Style TargetType="TabItem" BasedOn="{StaticResource TabItemStyle1}">
-
-        </Style>
-
+        <CollectionViewSource x:Key="Persons" Source="{Binding AllPersons}" />
+        <CollectionViewSource x:Key="Banned" Source="{Binding Banned}" />
         <lc:HostNameConverter x:Key="HostNameConverter" />
     </UserControl.Resources>
+    
     <TabControl Padding="0" BorderThickness="0" FontSize="19">
-        <TabItem Header="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
+        <TabItem Header="💬" ToolTip="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
             <Grid TextBlock.FontFamily="Segoe UI">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="1" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBox Grid.Row="1" Grid.ColumnSpan="3" BorderThickness="0,1,0,0" Name="input" Padding="0,2" Text="{Binding PrintedText, UpdateSourceTrigger=PropertyChanged}" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
+                
+                <TextBox
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    BorderThickness="0,1,0,0"
+                    Name="input"
+                    Padding="0,2"
+                    Text="{Binding PrintedText, UpdateSourceTrigger=PropertyChanged}"
+                    Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
-                <RichTextBox Grid.ColumnSpan="3" BorderThickness="0" Name="text" Padding="1,10" VerticalScrollBarVisibility="Visible" IsReadOnly="True" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" FontSize="15" />
+                
+                <RichTextBox
+                    Grid.ColumnSpan="3"
+                    BorderThickness="0"
+                    Name="text"
+                    Padding="1,10"
+                    VerticalScrollBarVisibility="Visible"
+                    IsReadOnly="True"
+                    Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
+                    FontSize="15" />
             </Grid>
         </TabItem>
-        <TabItem Header="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
+
+        <TabItem Header="👤" ToolTip="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2">
-                    <Button Style="{StaticResource SIButton}" Background="#22000000" Margin="-1,-1,0,-1" Padding="20,4" Command="{Binding Kick}" CommandParameter="{Binding Source={StaticResource Persons},Path=Value}" FontSize="24" TextBlock.LineHeight="24" Content="{x:Static lp:Resources.Kick}" />
-                    <Button Style="{StaticResource SIButton}" Background="#22000000" Margin="-1,-1,-1,-1" Padding="20,4" Command="{Binding Ban}" CommandParameter="{Binding Source={StaticResource Persons},Path=Value}" FontSize="24" TextBlock.LineHeight="24" Content="{x:Static lp:Resources.Ban}" />
+                    <Button
+                        Style="{StaticResource SIButton}"
+                        Background="#22000000"
+                        Margin="-1,-1,0,-1"
+                        Padding="20,4"
+                        Command="{Binding Kick}"
+                        CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                        FontSize="24"
+                        TextBlock.LineHeight="24"
+                        Content="{x:Static lp:Resources.Kick}" />
+                    
+                    <Button
+                        Style="{StaticResource SIButton}"
+                        Background="#22000000"
+                        Margin="-1,-1,-1,-1"
+                        Padding="20,4"
+                        Command="{Binding Ban}"
+                        CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                        FontSize="24"
+                        TextBlock.LineHeight="24"
+                        Content="{x:Static lp:Resources.Ban}" />
                 </UniformGrid>
-                <ListBox IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Source={StaticResource Persons}}" Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" FontSize="16">
+                
+                <ListBox
+                    IsSynchronizedWithCurrentItem="True"
+                    ItemsSource="{Binding Source={StaticResource Persons}}"
+                    Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
+                    FontSize="16">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
                                 <Run Text="{Binding Key, Mode=OneWay}" />
+                                
                                 <Run>
                                     <Run.Text>
                                         <MultiBinding Converter="{StaticResource HostNameConverter}">
                                             <Binding Path="Key" Mode="OneWay" />
-                                            <Binding RelativeSource="{RelativeSource AncestorType=TabControl}" Path="DataContext.HostName" Mode="OneWay" />
+                                            
+                                            <Binding
+                                                RelativeSource="{RelativeSource AncestorType=TabControl}"
+                                                Path="DataContext.HostName"
+                                                Mode="OneWay" />
                                         </MultiBinding>
                                     </Run.Text>
                                 </Run>
@@ -63,6 +112,45 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </DockPanel>
+        </TabItem>
+
+        <TabItem Header="🚫" ToolTip="{x:Static lp:Resources.BannedList}" Style="{StaticResource StudiaTab}">
+            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
+                <Button
+                    DockPanel.Dock="Bottom"
+                    Style="{StaticResource SIButton}"
+                    Background="#22000000"
+                    Margin="-1,-1,-1,-1"
+                    Padding="20,4"
+                    Command="{Binding Unban}"
+                    CommandParameter="{Binding Source={StaticResource Banned},Path=CurrentItem}"
+                    FontSize="24"
+                    TextBlock.LineHeight="24"
+                    Content="{x:Static lp:Resources.Unban}" />
+
+                <ListBox
+                    IsSynchronizedWithCurrentItem="True"
+                    ItemsSource="{Binding Source={StaticResource Banned}}"
+                    Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
+                    FontSize="16">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Ip, Mode=OneWay}" />
+                                <Run Text=" (" />
+                                <Run Text="{Binding UserName, Mode=OneWay}" />
+                                <Run Text=")" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </TabItem>
+
+        <TabItem Header="ℹ" ToolTip="{x:Static lp:Resources.GameInfo}" Style="{StaticResource StudiaTab}">
+            <StackPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
+                <TextBlock />
+            </StackPanel>
         </TabItem>
     </TabControl>
 </UserControl>

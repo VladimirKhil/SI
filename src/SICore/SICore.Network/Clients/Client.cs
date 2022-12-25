@@ -29,9 +29,9 @@ namespace SICore.Network.Clients
         public string Name { get; }
 
         /// <summary>
-        /// Текущий сервер
+        /// A node that the client is currently connected to.
         /// </summary>
-        public INode Server { get; private set; }
+        public INode Node { get; private set; }
 
         /// <summary>
         /// Создание клиента
@@ -41,6 +41,26 @@ namespace SICore.Network.Clients
         {
             Name = name;
             WaitForMessages();
+        }
+
+        private Client(string name, INode node)
+        {
+            Name = name;
+            Node = node;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Client" /> connected to a node.
+        /// </summary>
+        /// <param name="name">Client name.</param>
+        /// <param name="node">A node that client is connected to.</param>
+        public static Client Create(string name, INode node)
+        {
+            var client = new Client(name, node);
+            node.AddClient(client);
+            client.WaitForMessages();
+
+            return client;
         }
 
         /// <summary>
@@ -74,23 +94,23 @@ namespace SICore.Network.Clients
             catch (Exception exc)
             {
                 Trace.TraceError($"{Name}: WaitForMessages error: {exc}");
-                Server.OnError(exc, true);
+                Node.OnError(exc, true);
             }
         }
 
         /// <summary>
         /// Текущий сервер
         /// </summary>
-        public INode CurrentServer => Server;
+        public INode CurrentServer => Node;
 
         /// <summary>
         /// Подсоединение к серверу
         /// </summary>
-        /// <param name="server"></param>
-        public void ConnectTo(INode server)
+        /// <param name="node"></param>
+        public void ConnectTo(INode node)
         {
-            server.AddClient(this);
-            Server = server;
+            node.AddClient(this);
+            Node = node;
         }
 
         /// <summary>

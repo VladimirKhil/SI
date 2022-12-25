@@ -13,7 +13,7 @@ namespace SICore.Network.Servers
     /// <summary>
     /// Сервер, обеспечивающий взаимодействие с клиентами по TCP
     /// </summary>
-    public sealed class TcpMasterServer : MasterServer
+    public sealed class TcpMasterServer : MasterNode
     {
         /// <summary>
         /// Порт для прослушивания

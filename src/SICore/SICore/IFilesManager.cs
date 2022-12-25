@@ -1,17 +1,16 @@
 ﻿using SIPackages.Core;
 
-namespace SICore
+namespace SICore;
+
+/// <summary>
+/// Allows to get file data by file name.
+/// </summary>
+public interface IFilesManager
 {
     /// <summary>
-    /// Allows to get file data by file name.
+    /// Gets file data by file name.
     /// </summary>
-    public interface IFilesManager
-    {
-        /// <summary>
-        /// Gets file data by file name.
-        /// </summary>
-        /// <param name="file">File name.</param>
-        /// <returns>File data.</returns>
-        StreamInfo GetFile(string file);
-    }
+    /// <param name="file">File name.</param>
+    /// <returns>File data.</returns>
+    StreamInfo? GetFile(string file);
 }

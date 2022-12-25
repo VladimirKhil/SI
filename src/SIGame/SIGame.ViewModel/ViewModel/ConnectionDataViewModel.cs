@@ -199,7 +199,6 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
             new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
         _client = new Client(Human.Name);
-
         _client.ConnectTo(_node);
     }
 

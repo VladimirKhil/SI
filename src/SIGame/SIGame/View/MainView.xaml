@@ -41,6 +41,7 @@
             <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
             <Setter Property="FontStretch" Value="Expanded" />
             <Setter Property="FontWeight" Value="Medium" />
+            
             <Setter Property="RenderTransform">
                 <Setter.Value>
                     <MultiBinding Converter="{StaticResource TransformConverter}">
@@ -49,6 +50,7 @@
                     </MultiBinding>
                 </Setter.Value>
             </Setter>
+            
             <Style.Triggers>
                 <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                     <BeginStoryboard>
@@ -57,6 +59,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
+                
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Visibility" Value="Hidden" />
                 </Trigger>
@@ -66,14 +69,17 @@
         <DataTemplate DataType="{x:Type my2:UICommand}">
             <Button Style="{StaticResource MenuButton}" />
         </DataTemplate>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationChromeBackground" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#FFFFFF" Offset="0"/>
             <GradientStop Color="#E3E8F4" Offset="0.5"/>
             <GradientStop Color="#CFD7EB" Offset="0.5"/>
             <GradientStop Color="#E9ECFA" Offset="1.0"/>
         </LinearGradientBrush>
+        
         <JournalEntryUnifiedViewConverter x:Key="JournalEntryUnifiedViewConverter"/>
         <SolidColorBrush x:Key="CurrentEntryBackground" Color="{StaticResource {x:Static SystemColors.HighlightColorKey}}" Opacity="0.25"/>
+        
         <Style x:Key="NavigationWindowNavigationButtonJournalEntryStyle" TargetType="{x:Type MenuItem}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Header" Value="{Binding (JournalEntry.Name)}"/>
@@ -81,6 +87,7 @@
             <Setter Property="CommandTarget" Value="{Binding TemplatedParent, RelativeSource={RelativeSource AncestorType={x:Type Menu}}}"/>
             <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}"/>
             <Setter Property="JournalEntryUnifiedViewConverter.JournalEntryPosition" Value="{Binding (JournalEntryUnifiedViewConverter.JournalEntryPosition)}"/>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -88,6 +95,7 @@
                             <Path x:Name="Glyph" Width="10" StrokeThickness="2" Stroke="{TemplateBinding Foreground}" StrokeEndLineCap="Triangle" SnapsToDevicePixels="false" StrokeStartLineCap="Triangle" Margin="7,5" Height="10" HorizontalAlignment="Left"/>
                             <ContentPresenter ContentSource="Header" Margin="24,5,21,5"/>
                         </Grid>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="JournalEntryUnifiedViewConverter.JournalEntryPosition" Value="Current">
                                 <Setter Property="Background" TargetName="Panel" Value="{StaticResource CurrentEntryBackground}"/>
@@ -95,23 +103,28 @@
                                 <Setter Property="FlowDirection" TargetName="Glyph" Value="LeftToRight"/>
                                 <Setter Property="StrokeLineJoin" TargetName="Glyph" Value="Miter"/>
                             </Trigger>
+                            
                             <Trigger Property="IsHighlighted" Value="true">
                                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                                 <Setter Property="Background" TargetName="Panel" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                             </Trigger>
+                            
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsHighlighted" Value="true"/>
                                     <Condition Property="JournalEntryUnifiedViewConverter.JournalEntryPosition" Value="Forward"/>
                                 </MultiTrigger.Conditions>
+                                
                                 <Setter Property="Stroke" TargetName="Glyph" Value="White"/>
                                 <Setter Property="Data" TargetName="Glyph" Value="M 1,5 L 7,5 M 5,1 L 9,5 L 5,9"/>
                             </MultiTrigger>
+                            
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsHighlighted" Value="true"/>
                                     <Condition Property="JournalEntryUnifiedViewConverter.JournalEntryPosition" Value="Back"/>
                                 </MultiTrigger.Conditions>
+                                
                                 <Setter Property="Stroke" TargetName="Glyph" Value="White"/>
                                 <Setter Property="Data" TargetName="Glyph" Value="M 9,5 L 3,5 M 5,1 L 1,5 L 5,9"/>
                             </MultiTrigger>
@@ -120,6 +133,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
         <LinearGradientBrush x:Key="NavigationWindowDownArrowFill" EndPoint="0,1" StartPoint="0,0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -128,62 +142,116 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <Style x:Key="NavigationWindowMenuItem" TargetType="{x:Type MenuItem}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
             <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type MenuItem}">
                         <Grid>
-                            <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" IsOpen="{Binding (MenuItem.IsSubmenuOpen), RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" Placement="Bottom" VerticalOffset="2">
+                            <Popup
+                                x:Name="PART_Popup"
+                                AllowsTransparency="true"
+                                Focusable="false"
+                                IsOpen="{Binding (MenuItem.IsSubmenuOpen), RelativeSource={RelativeSource TemplatedParent}}"
+                                PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}"
+                                Placement="Bottom"
+                                VerticalOffset="2">
                                 <Themes:SystemDropShadowChrome x:Name="Shdw" Color="Transparent">
-                                    <Border x:Name="SubMenuBorder" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="1" Background="{DynamicResource {x:Static SystemColors.MenuBrushKey}}">
-                                        <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                    <Border
+                                        x:Name="SubMenuBorder"
+                                        BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                                        BorderThickness="1"
+                                        Background="{DynamicResource {x:Static SystemColors.MenuBrushKey}}">
+                                        <ScrollViewer
+                                            x:Name="SubMenuScrollViewer"
+                                            Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}">
                                             <Grid RenderOptions.ClearTypeHint="Enabled">
                                                 <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
-                                                    <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
+                                                    <Rectangle
+                                                        x:Name="OpaqueRect"
+                                                        Fill="{Binding Background, ElementName=SubMenuBorder}"
+                                                        Height="{Binding ActualHeight, ElementName=SubMenuBorder}"
+                                                        Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
                                                 </Canvas>
-                                                <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="2" KeyboardNavigation.TabNavigation="Cycle"/>
+                                                
+                                                <ItemsPresenter
+                                                    x:Name="ItemsPresenter"
+                                                    KeyboardNavigation.DirectionalNavigation="Cycle"
+                                                    Margin="2"
+                                                    KeyboardNavigation.TabNavigation="Cycle"/>
                                             </Grid>
                                         </ScrollViewer>
                                     </Border>
                                 </Themes:SystemDropShadowChrome>
                             </Popup>
+                            
                             <Grid x:Name="Panel" Background="Transparent" HorizontalAlignment="Right" Width="26">
-                                <Border x:Name="HighlightBorder" BorderBrush="#B0B5BACE" BorderThickness="1,1,1,1" CornerRadius="2" SnapsToDevicePixels="True" Visibility="Hidden">
+                                <Border
+                                    x:Name="HighlightBorder"
+                                    BorderBrush="#B0B5BACE"
+                                    BorderThickness="1,1,1,1"
+                                    CornerRadius="2"
+                                    SnapsToDevicePixels="True"
+                                    Visibility="Hidden">
                                     <Border.Background>
                                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
                                             <GradientStop Color="#20DDDDDD" Offset="0"/>
                                             <GradientStop Color="#80FFFFFF" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Border.Background>
+                                    
                                     <Border BorderBrush="#A0FFFFFF" BorderThickness="1" CornerRadius="1.5"/>
                                 </Border>
-                                <Path x:Name="Arrow" Data="M 0 0 L 4.5 5 L 9 0 Z" Fill="{StaticResource NavigationWindowDownArrowFill}" HorizontalAlignment="Right" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="false" Stroke="White" StrokeThickness="1" StrokeLineJoin="Round" VerticalAlignment="Center"/>
+                                
+                                <Path
+                                    x:Name="Arrow"
+                                    Data="M 0 0 L 4.5 5 L 9 0 Z"
+                                    Fill="{StaticResource NavigationWindowDownArrowFill}"
+                                    HorizontalAlignment="Right"
+                                    Margin="{TemplateBinding Padding}"
+                                    SnapsToDevicePixels="false"
+                                    Stroke="White"
+                                    StrokeThickness="1"
+                                    StrokeLineJoin="Round"
+                                    VerticalAlignment="Center"/>
                             </Grid>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="true">
                                 <Setter Property="Visibility" TargetName="HighlightBorder" Value="Visible"/>
                             </Trigger>
+                            
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Fill" TargetName="Arrow" Value="#A5AABE"/>
                             </Trigger>
+                            
                             <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
                                 <Setter Property="Margin" TargetName="Shdw" Value="0,0,5,5"/>
                                 <Setter Property="SnapsToDevicePixels" TargetName="Shdw" Value="true"/>
                                 <Setter Property="Color" TargetName="Shdw" Value="#71000000"/>
                             </Trigger>
+                            
                             <Trigger Property="ScrollViewer.CanContentScroll" SourceName="SubMenuScrollViewer" Value="false">
-                                <Setter Property="Canvas.Top" TargetName="OpaqueRect" Value="{Binding VerticalOffset, ElementName=SubMenuScrollViewer}"/>
-                                <Setter Property="Canvas.Left" TargetName="OpaqueRect" Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}"/>
+                                <Setter
+                                    Property="Canvas.Top"
+                                    TargetName="OpaqueRect"
+                                    Value="{Binding VerticalOffset, ElementName=SubMenuScrollViewer}" />
+                                
+                                <Setter
+                                    Property="Canvas.Left"
+                                    TargetName="OpaqueRect"
+                                    Value="{Binding HorizontalOffset, ElementName=SubMenuScrollViewer}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        
         <Style x:Key="NavigationWindowMenu" TargetType="{x:Type Menu}">
             <Setter Property="ItemsPanel">
                 <Setter.Value>
@@ -192,9 +260,11 @@
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
             <Setter Property="IsMainMenu" Value="false"/>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Menu}">
@@ -203,6 +273,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationButtonFillDisabled" EndPoint="0.5,1.0" StartPoint="0.5,0.0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -213,6 +284,7 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationButtonFillHover" EndPoint="0.5,1.0" StartPoint="0.5,0.0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -227,6 +299,7 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationButtonFillPressed" EndPoint="0.5,1.0" StartPoint="0.5,0.0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -240,6 +313,7 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationButtonFillEnabled" EndPoint="0.5,1.0" StartPoint="0.5,0.0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -254,6 +328,7 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationButtonStrokeEnabled" EndPoint="0,1" StartPoint="0,0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -264,6 +339,7 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationArrowFill" EndPoint="0,1" StartPoint="0,0">
             <LinearGradientBrush.GradientStops>
                 <GradientStopCollection>
@@ -273,24 +349,29 @@
                 </GradientStopCollection>
             </LinearGradientBrush.GradientStops>
         </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="NavigationWindowNavigationArrowStrokeEnabled" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#8AB1FB" Offset="0"/>
             <GradientStop Color="#002874" Offset="1"/>
         </LinearGradientBrush>
+        
         <Style x:Key="NavigationWindowBackButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Command" Value="NavigationCommands.BrowseBack"/>
             <Setter Property="Focusable" Value="false"/>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
                         <Grid Background="Transparent" Height="25" Width="25">
                             <Path x:Name="Arrow" Data="M0,5 L11,5 M5,0 L0,5 L5,10" Stroke="{StaticResource MainColor}" StrokeThickness="3" Stretch="Uniform" />
                         </Grid>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="Visibility" TargetName="Arrow" Value="Collapsed" />
                             </Trigger>
+                            
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Stroke" TargetName="Arrow" Value="{StaticResource HoverColor}" />
                             </Trigger>
@@ -299,6 +380,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
         <ControlTemplate x:Key="FrameNavChromeTemplateKey" TargetType="{x:Type Frame}">
             <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                 <DockPanel>
@@ -308,21 +390,25 @@
                             <TextBlock Style="{StaticResource CommonText}" FontSize="25" VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding Content.Title, RelativeSource={RelativeSource TemplatedParent}}" />
                         </StackPanel>
                     </Border>
+                    
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ContentPresenter x:Name="PART_FrameCP"/>
                     </ScrollViewer>
                 </DockPanel>
             </Border>
         </ControlTemplate>
+        
         <Style x:Key="FrameStyle1" TargetType="{x:Type Frame}">
             <Setter Property="Template" Value="{StaticResource FrameNavChromeTemplateKey}"/>
         </Style>
 
         <my1:MainBackgroundConverter x:Key="MainBackgroundConverter" />
     </UserControl.Resources>
+    
     <UserControl.Background>
         <ImageBrush ImageSource="{Binding Settings.ThemeSettings.Model.CustomMainBackgroundUri, Converter={StaticResource MainBackgroundConverter}}" Stretch="UniformToFill" />
     </UserControl.Background>
+    
     <Grid>
         <Grid Background="Transparent" PreviewMouseDown="Body_PreviewMouseDown">
             <ContentControl x:Name="body" Content="{Binding ActiveView}">
@@ -335,14 +421,29 @@
                                 <RowDefinition Height="470*" />
                                 <RowDefinition Height="189*" />
                             </Grid.RowDefinitions>
+                            
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="234*" />
                                 <ColumnDefinition Width="532*" />
                                 <ColumnDefinition Width="234*" />
                             </Grid.ColumnDefinitions>
+                            
                             <Image Source="/SIGame;component/Theme/logo.png" Margin="25" Grid.Row="1" Grid.Column="1" />
+                            
+                            <TextBlock
+                                Text="{x:Static lp:Resources.MainSubheader}"
+                                Grid.Row="1"
+                                Grid.ColumnSpan="3"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom"
+                                Foreground="White"
+                                FontSize="20"
+                                FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
+                                FontWeight="Bold"
+                                Margin="0,0,0,-10" />
+
                             <Viewbox Grid.Column="1" Grid.Row="2">
-                                <ItemsControl ItemsSource="{Binding MainCommands}" Height="400" Width="667" AlternationCount="2" Margin="0,25,0,0">
+                                <ItemsControl ItemsSource="{Binding MainCommands}" Height="400" Width="667" AlternationCount="2" Margin="0,45,0,0">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="1" VerticalAlignment="Stretch" />
@@ -350,6 +451,7 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Viewbox>
+                            
                             <my:DropDownButton
                                 Grid.ColumnSpan="3"
                                 Grid.RowSpan="4"
@@ -368,8 +470,10 @@
                                         <Border x:Name="Border" BorderThickness="1">
                                             <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True" />
                                         </Border>
+                                        
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="ButtonBase.Command" Value="{x:Null}" />
+                                            
                                             <Trigger Property="IsHighlighted" Value="true">
                                                 <Setter Property="Background" TargetName="Border" Value="#FF94B7E7" />
                                                 <Setter Property="BorderBrush" TargetName="Border">
@@ -381,6 +485,7 @@
                                                     </Setter.Value>
                                                 </Setter>
                                             </Trigger>
+                                            
                                             <Trigger Property="IsEnabled" Value="false">
                                                 <Setter Property="Foreground">
                                                     <Setter.Value>
@@ -398,6 +503,7 @@
                                             <Button x:Name="e" Visibility="Hidden" DockPanel.Dock="Right" Height="20" Width="20" ToolTip="{x:Static lp:Resources.Person_Change}" Command="{Binding Data.Human.EditAccount, Source={StaticResource Proxy}}" CommandParameter="{Binding}" Template="{StaticResource EditButtonTemplate}" />
                                             <TextBlock FontSize="16" Margin="10,0,0,0" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                         </DockPanel>
+                                        
                                         <DataTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="e" Property="Visibility" Value="{Binding CanBeDeleted, Converter={StaticResource BooleanToHiddenConverter}}" />
@@ -408,6 +514,7 @@
 
                                     <CollectionViewSource x:Key="HumansMain2" Source="{Binding Human.HumanPlayers}" />
                                 </my:DropDownButton.Resources>
+                                
                                 <my:DropDownButton.DropDown>
                                     <ContextMenu
                                         Placement="Bottom"
@@ -483,6 +590,7 @@
                                     </TextBlock>
                                 </StackPanel>
                             </my:DropDownButton>
+                            
                             <TextBlock
                                 Grid.ColumnSpan="3"
                                 Grid.RowSpan="4"
@@ -500,6 +608,7 @@
                             </TextBlock>
                         </Grid>
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:ContentBox}">
                         <ContentControl Content="{Binding Data}" Tag="{Binding Title}">
                             <ContentControl.Style>
@@ -507,6 +616,7 @@
                             </ContentControl.Style>
                         </ContentControl>
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:NavigatorViewModel}">
                         <ContentControl
                             Content="{Binding Content.Data}"
@@ -518,49 +628,61 @@
                                 <DataTemplate DataType="{x:Type lvm:GameSettingsViewModel}">
                                     <my:NewGameView FontSize="16" />
                                 </DataTemplate>
+                                
                                 <DataTemplate DataType="{x:Type lvm:ComputerAccountViewModel}">
                                     <my:ComputerAccountView FontSize="16" />
                                 </DataTemplate>
+                                
                                 <DataTemplate DataType="{x:Type lvm:ShowmanViewModel}">
                                     <my:AccountView FontSize="16" />
                                 </DataTemplate>
+                                
                                 <DataTemplate DataType="{x:Type lvm:SIStorageViewModel}">
                                     <my:SIStorageView />
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:SINetworkViewModel}">
                         <my:SINetworkView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:SIOnlineViewModel}">
                         <my:SIOnlineView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:GameViewModel}">
                         <my:Studia />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:HumanPlayerViewModel}">
                         <my:AccountView DataContext="{Binding NewAccount}" FontSize="18" Height="Auto" Width="470" VerticalAlignment="Center" />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:BestPlayersViewModel}">
                         <my:BestPersonsView DataContext="{Binding BestPlayers, Source={x:Static my2:CommonSettings.Default}}" />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:AboutViewModel}">
                         <my:AboutView />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:LoginViewModel}">
                         <my:LoginView />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
         </Grid>
+        
         <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Orientation="Horizontal" Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <Button Style="{StaticResource SIButtonSimple}" Height="48" Width="48" BorderThickness="0" Margin="15,15,0,0" Command="{Binding ShowSlideMenu}">
                 <Border Padding="8" ToolTip="{x:Static lp:Resources.Options}" Background="Transparent">
                     <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="{StaticResource MainColor}" StrokeThickness="2" UseLayoutRounding="True" Stretch="Uniform" />
                 </Border>
-            </Button>            
+            </Button>
         </StackPanel>
+        
         <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Bottom" Orientation="Horizontal" Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
             <my:DropDownButton Content="{x:Static lp:Resources.Update}" Padding="15,3" FontSize="24" Cursor="Hand" TextBlock.LineHeight="24" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                 <my:DropDownButton.Style>
@@ -569,17 +691,20 @@
                         <Setter Property="BorderBrush" Value="{x:Null}" />
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                        
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
                                 <Setter Property="Background" Value="{StaticResource HoverColor}" />
                             </Trigger>
+                            
                             <DataTrigger Binding="{Binding Update}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </my:DropDownButton.Style>
+                
                 <my:DropDownButton.Template>
                     <ControlTemplate TargetType="{x:Type my:DropDownButton}">
                         <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
@@ -588,6 +713,7 @@
                         </Border>
                     </ControlTemplate>
                 </my:DropDownButton.Template>
+                
                 <my:DropDownButton.DropDown>
                     <ContextMenu Placement="Relative" HorizontalOffset="-20" VerticalOffset="-128" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                         <ContextMenu.Resources>
@@ -595,6 +721,7 @@
                                 <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
                                     <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                                 </Border>
+                                
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsHighlighted" Value="True">
                                         <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
@@ -603,6 +730,7 @@
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ContextMenu.Resources>
+                        
                         <ContextMenu.Template>
                             <ControlTemplate TargetType="{x:Type ContextMenu}">
                                 <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
@@ -611,6 +739,7 @@
                                         <StackPanel Orientation="Horizontal" IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
+                                
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="HasDropShadow" Value="true">
                                         <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
@@ -618,12 +747,14 @@
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ContextMenu.Template>
+                        
                         <MenuItem Header="{x:Static lp:Resources.RunUpdate}" Template="{StaticResource MenuTemplate}" Command="{Binding Update}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
                         <MenuItem Header="{x:Static lp:Resources.Skip}" Margin="5,0,0,0" Template="{StaticResource MenuTemplate}" Command="{Binding CancelUpdate}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
                     </ContextMenu>
                 </my:DropDownButton.DropDown>
             </my:DropDownButton>
         </StackPanel>
+        
         <ContentControl Content="{Binding}">
             <ContentControl.Style>
                 <Style TargetType="{x:Type ContentControl}">
@@ -632,6 +763,7 @@
                             <DataTemplate />
                         </Setter.Value>
                     </Setter>
+                    
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSlideMenuOpen}" Value="True">
                             <Setter Property="ContentTemplate">

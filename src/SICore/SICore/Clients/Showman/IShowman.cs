@@ -1,30 +1,29 @@
-﻿namespace SICore
+﻿namespace SICore;
+
+/// <summary>
+/// Ведущий
+/// </summary>
+public interface IShowman : IPerson
 {
     /// <summary>
-    /// Ведущий
+    /// Выбор начинающего раунд
     /// </summary>
-    public interface IShowman : IPerson
-    {
-        /// <summary>
-        /// Выбор начинающего раунд
-        /// </summary>
-        void StarterChoose();
+    void StarterChoose();
 
-        /// <summary>
-        /// Кто следующим делает ставку
-        /// </summary>
-        void FirstStake();
+    /// <summary>
+    /// Кто следующим делает ставку
+    /// </summary>
+    void FirstStake();
 
-        /// <summary>
-        /// Верен ли ответ
-        /// </summary>
-        void IsRight();
+    /// <summary>
+    /// Верен ли ответ
+    /// </summary>
+    void IsRight();
 
-        /// <summary>
-        /// Кто следующим убирает тему
-        /// </summary>
-        void FirstDelete();
+    /// <summary>
+    /// Кто следующим убирает тему
+    /// </summary>
+    void FirstDelete();
 
-        void ClearSelections(bool full = false);
-    }
+    void ClearSelections(bool full = false);
 }

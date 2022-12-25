@@ -1,146 +1,140 @@
 ﻿using SICore.Clients.Showman;
 using SIData;
-using System.Linq;
 
-namespace SICore
+namespace SICore;
+
+/// <summary>
+/// Логика ведущего-компьютера
+/// </summary>
+internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
 {
-    /// <summary>
-    /// Логика ведущего-компьютера
-    /// </summary>
-    internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
+    //private readonly ViewerActions _viewerActions;
+    //private readonly ViewerData _data;
+
+    public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
+        : base(data, viewerActions, computerAccount)
     {
-        //private readonly ViewerActions _viewerActions;
-        //private readonly ViewerData _data;
+        //_viewerActions = viewerActions;
+        //_data = data;
+    }
 
-        public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
-            : base(data, viewerActions, computerAccount)
+    internal void ScheduleExecution(ShowmanTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
+
+    protected override void ExecuteTask(int taskId, int arg)
+    {
+        var task = (ShowmanTasks)taskId;
+        switch (task)
         {
-            //_viewerActions = viewerActions;
-            //_data = data;
+
+            case ShowmanTasks.Ready:
+                Ready();
+                break;
+
+            case ShowmanTasks.AnswerFirst:
+                AnswerFirst();
+                break;
+
+            case ShowmanTasks.AnswerNextStake:
+                AnswerNextStake();
+                break;
+
+            case ShowmanTasks.AnswerRight:
+                AnswerRight();
+                break;
+
+            case ShowmanTasks.AnswerNextToDelete:
+                AnswerNextToDelete();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
+
+    private void SelectPlayer(string message)
+    {
+        int num = _data.Players.Count(p => p.CanBeSelected);
+        int i = Random.Shared.Next(num);
+        while (i < _data.Players.Count && !_data.Players[i].CanBeSelected)
+        {
+            i++;
         }
 
-        internal void ScheduleExecution(ShowmanTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
+        _viewerActions.SendMessage(message, i.ToString());
+    }
 
-        protected override void ExecuteTask(int taskId, int arg)
+    private void AnswerNextToDelete() => SelectPlayer(Messages.NextDelete);
+
+    private void AnswerNextStake() => SelectPlayer(Messages.Next);
+
+    private void AnswerFirst() => SelectPlayer(Messages.First);
+
+    private void AnswerRight()
+    {
+        bool right = false;
+
+        foreach (var s in _data.PersonDataExtensions.Right)
         {
-            var task = (ShowmanTasks)taskId;
-            switch (task)
+            right = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, s);
+            if (right)
             {
-
-                case ShowmanTasks.Ready:
-                    Ready();
-                    break;
-
-                case ShowmanTasks.AnswerFirst:
-                    AnswerFirst();
-                    break;
-
-                case ShowmanTasks.AnswerNextStake:
-                    AnswerNextStake();
-                    break;
-
-                case ShowmanTasks.AnswerRight:
-                    AnswerRight();
-                    break;
-
-                case ShowmanTasks.AnswerNextToDelete:
-                    AnswerNextToDelete();
-                    break;
-
-                default:
-                    break;
+                break;
             }
         }
 
-        private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
+        _viewerActions.SendMessage(Messages.IsRight, right ? "+" : "-");
+    }
 
-        private void SelectPlayer(string message)
-        {
-            int num = _data.Players.Count(p => p.CanBeSelected);
-            int i = _data.Rand.Next(num);
-            while (i < _data.Players.Count && !_data.Players[i].CanBeSelected)
-            {
-                i++;
-            }
+    public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + Random.Shared.Next(10));
 
-            _viewerActions.SendMessage(message, i.ToString());
-        }
+    public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + Random.Shared.Next(10));
 
-        private void AnswerNextToDelete() => SelectPlayer(Messages.NextDelete);
+    public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10));
 
-        private void AnswerNextStake() => SelectPlayer(Messages.Next);
+    public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Random.Shared.Next(10));
 
-        private void AnswerFirst() => SelectPlayer(Messages.First);
+    public void ChangeSum()
+    {
 
-        private void AnswerRight()
-        {
-            bool right = false;
+    }
 
-            foreach (var s in _data.PersonDataExtensions.Right)
-            {
-                right = AnswerChecker.IsAnswerRight(_data.PersonDataExtensions.Answer, s);
-                if (right)
-                {
-                    break;
-                }
-            }
+    public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 
-            _viewerActions.SendMessage(Messages.IsRight, right ? "+" : "-");
-        }
+    public void ClearSelections(bool full = false)
+    {
 
-        #region ShowmanInterface Members
-
-        public void StarterChoose() => ScheduleExecution(ShowmanTasks.AnswerFirst, 10 + _data.Rand.Next(10));
-
-        public void FirstStake() => ScheduleExecution(ShowmanTasks.AnswerNextStake, 10 + _data.Rand.Next(10));
-
-        public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + _data.Rand.Next(10));
-
-        public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + _data.Rand.Next(10));
-
-        public void ChangeSum()
-        {
-
-        }
-
-        #endregion
-
-        public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
-
-        public void ClearSelections(bool full = false)
-        {
-
-        }
+    }
 
 
-        public void ChooseQuest()
-        {
-            
-        }
+    public void ChooseQuest()
+    {
+        
+    }
 
-        public void Cat()
-        {
-            
-        }
+    public void Cat()
+    {
+        
+    }
 
-        public void Stake()
-        {
-            
-        }
+    public void Stake()
+    {
+        
+    }
 
-        public void ChooseFinalTheme()
-        {
-            
-        }
+    public void ChooseFinalTheme()
+    {
+        
+    }
 
-        public void FinalStake()
-        {
-            
-        }
+    public void FinalStake()
+    {
+        
+    }
 
-        public void CatCost()
-        {
-            
-        }
+    public void CatCost()
+    {
+        
     }
 }

@@ -1,47 +1,45 @@
 ﻿using SIPackages.Core;
-using System;
 
-namespace SICore
+namespace SICore;
+
+/// <inheritdoc cref="ShareBase" />
+public sealed class FilesManager : ShareBase, IFilesManager
 {
-    /// <inheritdoc cref="ShareBase" />
-    public sealed class FilesManager : ShareBase, IFilesManager
+    private readonly int _gameID = -1;
+    private readonly int _multimediaPort = -1;
+    private readonly string _rootPath;
+
+    public FilesManager(int gameID, int multimediaPort, string rootPath)
     {
-        private readonly int _gameID = -1;
-        private readonly int _multimediaPort = -1;
-        private readonly string _rootPath;
+        _gameID = gameID;
+        _multimediaPort = multimediaPort;
+        _rootPath = rootPath;
+    }
 
-        public FilesManager(int gameID, int multimediaPort, string rootPath)
+    public override string MakeUri(string file, string? category)
+    {
+        var uri = Uri.EscapeDataString(file);
+
+        if (category != null && !string.IsNullOrEmpty(_rootPath))
         {
-            _gameID = gameID;
-            _multimediaPort = multimediaPort;
-            _rootPath = rootPath;
+            return $"{_rootPath}/{category}/{uri}"; // The resource will be provided by the external server
         }
 
-        public override string MakeUri(string file, string category)
-        {
-            var uri = Uri.EscapeDataString(file);
+        return string.Format("http://localhost:{0}/data/{1}/{2}", _multimediaPort, _gameID, uri);
+    }
 
-            if (category != null && !string.IsNullOrEmpty(_rootPath))
+    public StreamInfo? GetFile(string file)
+    {
+        Func<StreamInfo>? response;
+
+        lock (_filesSync)
+        {
+            if (!_files.TryGetValue(Uri.UnescapeDataString(file), out response) && !_files.TryGetValue(file, out response))
             {
-                return $"{_rootPath}/{category}/{uri}"; // The resource will be provided by the external server
+                return null;
             }
-
-            return string.Format("http://localhost:{0}/data/{1}/{2}", _multimediaPort, _gameID, uri);
         }
 
-        public StreamInfo GetFile(string file)
-        {
-            Func<StreamInfo> response = null;
-
-            lock (_filesSync)
-            {
-                if (!_files.TryGetValue(Uri.UnescapeDataString(file), out response) && !_files.TryGetValue(file, out response))
-                {
-                    return null;
-                }
-            }
-
-            return response();
-        }
+        return response();
     }
 }

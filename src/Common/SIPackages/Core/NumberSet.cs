@@ -46,6 +46,21 @@ public class NumberSet : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Initializes a new instance of <see cref="NumberSet" /> class.
+    /// </summary>
+    public NumberSet() { }
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="NumberSet" /> class.
+    /// </summary>
+    /// <param name="value">Single value to include in the set.</param>
+    public NumberSet(int value)
+    {
+        _minimum = value;
+        _maximum = value;
+    }
+
+    /// <summary>
     /// Raises object property change event.
     /// </summary>
     /// <param name="name">Name of the property wchich value has been changed.</param>

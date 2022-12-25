@@ -1038,4 +1038,19 @@
   <data name="EnableMediaLoad" xml:space="preserve">
     <value>Enable external media load</value>
   </data>
+  <data name="AppBroken" xml:space="preserve">
+    <value>Your app is broken. Try to reinstall it</value>
+  </data>
+  <data name="MainSubheader" xml:space="preserve">
+    <value>20 years of project</value>
+  </data>
+  <data name="BannedList" xml:space="preserve">
+    <value>Banned list</value>
+  </data>
+  <data name="GameInfo" xml:space="preserve">
+    <value>Game info</value>
+  </data>
+  <data name="Unban" xml:space="preserve">
+    <value>Remove ban</value>
+  </data>
 </root>

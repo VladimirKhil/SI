@@ -34,8 +34,6 @@ namespace SICore
 
         public abstract ValueTask OnMessageReceivedAsync(Message message);
 
-        protected abstract L CreateLogic(Account personData);
-
         public ILocalizer LO { get; protected set; }
 
         protected Actor(Client client, ILocalizer localizer, D data)

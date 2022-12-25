@@ -30,7 +30,7 @@ public abstract class PlatformManager : IUIThreadExecutor
     /// Selects local game package.
     /// </summary>
     /// <param name="maxPackageSize">Maximum allowed package size.</param>
-    public abstract string SelectLocalPackage(long? maxPackageSize);
+    public abstract string? SelectLocalPackage(long? maxPackageSize);
 
     public abstract string SelectSettingsForExport();
 

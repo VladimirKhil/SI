@@ -158,35 +158,42 @@ namespace SIGame.Implementation
             return null;
         }
 
-        public override string SelectLocalPackage(long? maxPackageSize)
+        public override string? SelectLocalPackage(long? maxPackageSize)
         {
-            var openDialog = new OpenFileDialog { Title = Resources.SelectGamePackage, Filter = Resources.SIQuestions + "|*.siq" };
-            
-            if (_recentPackageDir != null)
+            try
             {
-                openDialog.InitialDirectory = _recentPackageDir;
-            }
+                var openDialog = new OpenFileDialog { Title = Resources.SelectGamePackage, Filter = Resources.SIQuestions + "|*.siq" };
 
-            if (Directory.Exists(Global.PackagesUri))
-            {
-                openDialog.CustomPlaces.Add(new FileDialogCustomPlace(Global.PackagesUri));
-            }
-
-            if (openDialog.ShowDialog().Value)
-            {
-                if (maxPackageSize.HasValue && new FileInfo(openDialog.FileName).Length > maxPackageSize.Value * 1024 * 1024)
+                if (_recentPackageDir != null)
                 {
-                    MessageBox.Show(
-                        $"{ViewModel.Properties.Resources.FileTooLarge} {string.Format(ViewModel.Properties.Resources.MaximumFileSize, maxPackageSize.Value)}",
-                        App.ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
-
-                    return null;
+                    openDialog.InitialDirectory = _recentPackageDir;
                 }
 
-                _recentPackageDir = Path.GetDirectoryName(openDialog.FileName);
-                return openDialog.FileName;
+                if (Directory.Exists(Global.PackagesUri))
+                {
+                    openDialog.CustomPlaces.Add(new FileDialogCustomPlace(Global.PackagesUri));
+                }
+
+                if (openDialog.ShowDialog().Value)
+                {
+                    if (maxPackageSize.HasValue && new FileInfo(openDialog.FileName).Length > maxPackageSize.Value * 1024 * 1024)
+                    {
+                        MessageBox.Show(
+                            $"{ViewModel.Properties.Resources.FileTooLarge} {string.Format(ViewModel.Properties.Resources.MaximumFileSize, maxPackageSize.Value)}",
+                            App.ProductName,
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Exclamation);
+
+                        return null;
+                    }
+
+                    _recentPackageDir = Path.GetDirectoryName(openDialog.FileName);
+                    return openDialog.FileName;
+                }
+            }
+            catch (Exception exc)
+            {
+                ShowMessage(exc.Message, MessageType.Warning, true);
             }
 
             return null;
@@ -399,10 +406,10 @@ namespace SIGame.Implementation
 
                 if (uiThread)
                 {
-                    Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+                    Application.Current.Dispatcher.BeginInvoke(() =>
                     {
                         MessageBox.Show(text, CommonSettings.AppName, MessageBoxButton.OK, image);
-                    }));
+                    });
                 }
                 else
                 {
@@ -411,7 +418,7 @@ namespace SIGame.Implementation
             }
             catch (MissingMethodException)
             {
-                MessageBox.Show(Resources.NETFrameworkCorrupted);
+                MessageBox.Show(Resources.NETFrameworkCorrupted, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Application.Current.Dispatcher.BeginInvoke((Action)Application.Current.Shutdown);
             }
         }

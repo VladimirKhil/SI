@@ -1,151 +1,157 @@
-﻿using SIData;
+﻿using SICore.Clients.Viewer;
+using SIData;
 using SIUI.ViewModel;
 
-namespace SICore
+namespace SICore;
+
+/// <summary>
+/// Defines a game viewer.
+/// </summary>
+public interface IViewer : ILogic
 {
+    IPlayer PlayerLogic { get; }
+
+    IShowman ShowmanLogic { get; }
+
+    TableInfoViewModel TInfo { get; }
+
+    bool CanSwitchType { get; }
+
     /// <summary>
-    /// Defines a game viewer.
+    /// Получение сообщений
     /// </summary>
-    public interface IViewer : ILogic
-    {
-        IPlayer PlayerLogic { get; }
+    void ReceiveText(Message m);
 
-        IShowman ShowmanLogic { get; }
+    /// <summary>
+    /// Печать в протокол формы
+    /// </summary>
+    /// <param name="text">Текст</param>
+    void Print(string text);
 
-        TableInfoViewModel TInfo { get; }
+    /// <summary>
+    /// Новое состояние игры
+    /// </summary>
+    void Stage();
 
-        bool CanSwitchType { get; }
+    /// <summary>
+    /// Получены темы игры
+    /// </summary>
+    void GameThemes();
 
-        /// <summary>
-        /// Получение сообщений
-        /// </summary>
-        void ReceiveText(Message m);
+    /// <summary>
+    /// Получены темы раунда
+    /// </summary>
+    void RoundThemes(bool print);
 
-        /// <summary>
-        /// Печать в протокол формы
-        /// </summary>
-        /// <param name="text">Текст</param>
-        void Print(string text);
+    /// <summary>
+    /// Игрок выбрал вопрос
+    /// </summary>
+    void Choice();
 
-        /// <summary>
-        /// Новое состояние игры
-        /// </summary>
-        void Stage();
+    /// <summary>
+    /// Question fragment received.
+    /// </summary>
+    void OnAtom(string[] mparams);
 
-        /// <summary>
-        /// Получены темы игры
-        /// </summary>
-        void GameThemes();
+    /// <summary>
+    /// Question background fragment received.
+    /// </summary>
+    void OnSecondAtom(string[] mparams);
 
-        /// <summary>
-        /// Получены темы раунда
-        /// </summary>
-        void RoundThemes(bool print);
+    void SetRight(string answer);
 
-        /// <summary>
-        /// Игрок выбрал вопрос
-        /// </summary>
-        void Choice();
+    void Resume();
 
-        /// <summary>
-        /// Question fragment received.
-        /// </summary>
-        void OnAtom(string[] mparams);
+    /// <summary>
+    /// Можно жать на кнопку
+    /// </summary>
+    void Try();
 
-        /// <summary>
-        /// Question background fragment received.
-        /// </summary>
-        void OnSecondAtom(string[] mparams);
+    /// <summary>
+    /// Жать уже нельзя
+    /// </summary>
+    void EndTry(string text);
 
-        void SetRight(string answer);
+    /// <summary>
+    /// Показать табло
+    /// </summary>
+    void ShowTablo();
 
-        void Resume();
+    /// <summary>
+    /// Игрок получил или потерял деньги
+    /// </summary>
+    void Person(int playerIndex, bool isRight);
 
-        /// <summary>
-        /// Можно жать на кнопку
-        /// </summary>
-        void Try();
+    /// <summary>
+    /// Известен тип вопроса
+    /// </summary>
+    void QType();
 
-        /// <summary>
-        /// Жать уже нельзя
-        /// </summary>
-        void EndTry(string text);
+    /// <summary>
+    /// Завершение раунда
+    /// </summary>
+    void StopRound();
 
-        /// <summary>
-        /// Показать табло
-        /// </summary>
-        void ShowTablo();
+    /// <summary>
+    /// Удалена тема
+    /// </summary>
+    void Out(int themeIndex);
 
-        /// <summary>
-        /// Игрок получил или потерял деньги
-        /// </summary>
-        void Person(int playerIndex, bool isRight);
+    /// <summary>
+    /// Победитель игры
+    /// </summary>
+    void Winner();
 
-        /// <summary>
-        /// Известен тип вопроса
-        /// </summary>
-        void QType();
+    /// <summary>
+    /// Время вышло
+    /// </summary>
+    void TimeOut();
 
-        /// <summary>
-        /// Завершение раунда
-        /// </summary>
-        void StopRound();
+    /// <summary>
+    /// Размышления в финале
+    /// </summary>
+    void FinalThink();
 
-        /// <summary>
-        /// Удалена тема
-        /// </summary>
-        void Out(int themeIndex);
+    /// <summary>
+    /// Обновление изображения
+    /// </summary>
+    /// <param name="i"></param>
+    /// <param name="path"></param>
+    void UpdatePicture(Account account, string path);
 
-        /// <summary>
-        /// Победитель игры
-        /// </summary>
-        void Winner();
+    /// <summary>
+    /// Попытка подключения
+    /// </summary>
+    void TryConnect(IConnector connector);
 
-        /// <summary>
-        /// Время вышло
-        /// </summary>
-        void TimeOut();
+    void OnTextSpeed(double speed);
 
-        /// <summary>
-        /// Размышления в финале
-        /// </summary>
-        void FinalThink();
+    void SetText(string text, TableStage stage = TableStage.Round);
 
-        /// <summary>
-        /// Обновление изображения
-        /// </summary>
-        /// <param name="i"></param>
-        /// <param name="path"></param>
-        void UpdatePicture(Account account, string path);
+    void OnPauseChanged(bool isPaused);
 
-        /// <summary>
-        /// Попытка подключения
-        /// </summary>
-        void TryConnect(IConnector connector);
+    void TableLoaded();
 
-        void OnTextSpeed(double speed);
+    void PrintGreeting();
+    void TextShape(string[] mparams);
+    void OnTimeChanged();
+    void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
+    void OnPersonFinalStake(int playerIndex);
+    void OnPersonFinalAnswer(int playerIndex);
+    void OnPackageLogo(string v);
+    void OnPersonApellated(int playerIndex);
+    void OnPersonPass(int playerIndex);
+    void OnReplic(string personCode, string text);
 
-        void SetText(string text, TableStage stage = TableStage.Round);
+    void OnRoundContent(string[] mparams) { }
 
-        void OnPauseChanged(bool isPaused);
+    void OnAtomHint(string hint) { }
 
-        void TableLoaded();
+    void ReloadMedia() { }
 
-        void PrintGreeting();
-        void TextShape(string[] mparams);
-        void OnTimeChanged();
-        void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
-        void OnPersonFinalStake(int playerIndex);
-        void OnPersonFinalAnswer(int playerIndex);
-        void OnPackageLogo(string v);
-        void OnPersonApellated(int playerIndex);
-        void OnPersonPass(int playerIndex);
-        void OnReplic(string personCode, string text);
+    void OnBannedList(IEnumerable<BannedInfo> banned) { }
 
-        void OnRoundContent(string[] mparams) { }
+    void OnBanned(BannedInfo bannedInfo) { }
 
-        void OnAtomHint(string hint) { }
-
-        void ReloadMedia() { }
-    }
+    void OnUnbanned(string ip) { }
 }

@@ -92,8 +92,5 @@ namespace SIGame
                 text.ScrollToEnd();
             }
         }
-
-        private void CollectionViewSource_Filter(object sender, FilterEventArgs e) =>
-            e.Accepted = e.Item is KeyValuePair<string, ViewerAccount> account && account.Value.IsConnected;
     }
 }
