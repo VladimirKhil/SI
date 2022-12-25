@@ -983,11 +983,8 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         StopWaiting();
-
         _gameActions.ShowmanReplic($"{LO[nameof(R.ThemeDeletes)]} {_data.Players[_data.ThemeDeleters.Current.PlayerIndex].Name}");
-
         _data.ThemeDeleters.MoveBack();
-
         ScheduleExecution(Tasks.AskToDelete, 1);
         return true;
     }
@@ -995,8 +992,7 @@ public sealed class GameLogic : Logic<GameData>
     private bool OnAppellationDecision()
     {
         StopWaiting();
-        ScheduleExecution(Tasks.CheckAppellation, 20);
-
+        ScheduleExecution(Tasks.CheckAppellation, 10);
         return true;
     }
 
@@ -1011,7 +1007,8 @@ public sealed class GameLogic : Logic<GameData>
 
         Engine.SelectTheme(_data.ThemeIndexToDelete);
 
-        var innerThemeIndex = Engine.OnReady(out bool more);
+        var innerThemeIndex = Engine.OnReady(out var more);
+
         if (innerThemeIndex > -1)
         {
             // innerThemeIndex может не совпадать с _data.ThemeIndex. См. TvEngine.SelectTheme()
@@ -1965,6 +1962,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
+
         if (_data.IsOralNow)
         {
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
@@ -1978,13 +1976,19 @@ public sealed class GameLogic : Logic<GameData>
 
     private void WaitAppellationDecision()
     {
-        foreach (var item in _data.Players)
-        {
-            _gameActions.SendMessage(Messages.Cancel, item.Name);
-        }
-
-        _data.AppellationAnswersReceivedCount = _data.Players.Count - 1;
+        SendCancellationsToActivePlayers();
         OnDecision();
+    }
+
+    private void SendCancellationsToActivePlayers()
+    {
+        foreach (var player in _data.Players)
+        {
+            if (player.Flag)
+            {
+                _gameActions.SendMessage(Messages.Cancel, player.Name);
+            }
+        }
     }
 
     private void MoveNext()
@@ -3791,21 +3795,42 @@ public sealed class GameLogic : Logic<GameData>
 
         var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
 
+        _data.AppellationAwaitedVoteCount = 0;
+        _data.AppellationTotalVoteCount = _data.Players.Count + 1; // players and showman
+        _data.AppellationPositiveVoteCount = 0;
+        _data.AppellationNegativeVoteCount = 0;
+
+        // Showman vote
+        if (_data.IsAppelationForRightAnswer)
+        {
+            _data.AppellationNegativeVoteCount++;
+        }
+        else
+        {
+            _data.AppellationPositiveVoteCount++;
+        }
+
         for (var i = 0; i < _data.Players.Count; i++)
         {
             if (i == _data.AppelaerIndex)
             {
                 _data.Players[i].Flag = false;
+                _data.AppellationPositiveVoteCount++;
+            }
+            else if (!_data.IsAppelationForRightAnswer && i == _data.AppellationCallerIndex)
+            {
+                _data.Players[i].Flag = false;
+                _data.AppellationNegativeVoteCount++;
+                _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
             }
             else
             {
+                _data.AppellationAwaitedVoteCount++;
                 _data.Players[i].Flag = true;
                 _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
             }
         }
 
-        _data.AppellationAnswersReceivedCount = 0;
-        _data.AppellationAnswersRightReceivedCount = 0;
         var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
         ScheduleExecution(Tasks.WaitAppellationDecision, waitTime);
         WaitFor(DecisionType.AppellationDecision, waitTime, -2);
@@ -3820,117 +3845,129 @@ public sealed class GameLogic : Logic<GameData>
             return;
         }
 
-        var appelaer = _data.Players[_data.AppelaerIndex];
-        var rightAns = _data.AppellationAnswersRightReceivedCount;
-        var dec = !_data.IsAppelationForRightAnswer;
+        var votingForRight = _data.IsAppelationForRightAnswer;
+        var positiveVoteCount = _data.AppellationPositiveVoteCount;
+        var negativeVoteCount = _data.AppellationNegativeVoteCount;
 
-        if (dec && rightAns > 0 || !dec && rightAns < _data.AppellationAnswersReceivedCount)
+        if (votingForRight && positiveVoteCount <= negativeVoteCount || !votingForRight && positiveVoteCount >= negativeVoteCount)
         {
             _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationDenied)]}!");
+            _tasksHistory.AddLogEntry($"CheckAppellation denied and resumed normally ({PrintOldTasks()})");
+            ResumeExecution(40);
+            return;
         }
-        else
+
+        // Commit appellation
+        _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
+
+        if (votingForRight)
         {
-            // Осуществляем апелляцию
-            _gameActions.ShowmanReplic($"{LO[nameof(R.ApellationAccepted)]}!");
-
-            if (_data.IsAppelationForRightAnswer)
-            {
-                int theme = 0, quest = 0;
-
-                lock (_data.ChoiceLock)
-                {
-                    theme = _data.ThemeIndex > -1 ? _data.ThemeIndex : _data.PrevoiusTheme;
-                    quest = _data.QuestionIndex > -1 ? _data.QuestionIndex : _data.PreviousQuest;
-                }
-
-                // Запишем в отчёт апеллированную версию
-                var answerInfo = _data.GameResultInfo.WrongVersions.FirstOrDefault(
-                    answer =>
-                        answer.Round == Engine.RoundIndex &&
-                        answer.Theme == theme &&
-                        answer.Question == quest &&
-                        answer.Answer == appelaer.Answer);
-
-                if (!Equals(answerInfo, default(AnswerInfo)))
-                {
-                    _data.GameResultInfo.WrongVersions.Remove(answerInfo);
-                }
-
-                _data.GameResultInfo.ApellatedQuestions.Add(new AnswerInfo
-                {
-                    Round = Engine.RoundIndex,
-                    Theme = theme,
-                    Question = quest,
-                    Answer = appelaer.Answer
-                });
-            }
-
-            // Изменим суммы
-            var change = false;
-
-            for (var i = 0; i < _data.QuestionHistory.Count; i++)
-            {
-                var index = _data.QuestionHistory[i].PlayerIndex;
-
-                if (_data.IsAppelationForRightAnswer && _data.Stage == GameStage.Round && index != _data.AppelaerIndex)
-                {
-                    if (!change)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        if (_data.QuestionHistory[i].IsRight)
-                        {
-                            _data.Players[index].Sum -= _data.CurPriceRight;
-                        }
-                        else
-                        {
-                            _data.Players[index].Sum += _data.CurPriceWrong;
-                        }
-                    }
-                }
-                else if (index == _data.AppelaerIndex)
-                {
-                    if (_data.Stage == GameStage.Round)
-                    {
-                        change = true;
-
-                        if (_data.QuestionHistory[i].IsRight)
-                        {
-                            _data.Players[index].Sum -= _data.CurPriceRight + _data.CurPriceWrong;
-                        }
-                        else
-                        {
-                            _data.Players[index].Sum += _data.CurPriceWrong + _data.CurPriceRight;
-
-                            if (Engine.CanMoveBack) // Не начало раунда
-                            {
-                                _data.ChooserIndex = index;
-                                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (_data.QuestionHistory[i].IsRight)
-                        {
-                            _data.Players[index].Sum -= _data.Players[index].FinalStake * 2;
-                        }
-                        else
-                        {
-                            _data.Players[index].Sum += _data.Players[index].FinalStake * 2;
-                        }
-                    }
-                }
-            }
-
-            _gameActions.InformSums();
-            _gameActions.AnnounceSums();
+            ApplyAppellationForRightAnswer();
         }
+
+        UpdatePlayersSumsAfterAppellation(votingForRight);
+
+        _gameActions.InformSums();
+        _gameActions.AnnounceSums();
 
         _tasksHistory.AddLogEntry($"CheckAppellation resumed normally ({PrintOldTasks()})");
         ResumeExecution(40);
+    }
+
+    private void ApplyAppellationForRightAnswer()
+    {
+        var appelaer = _data.Players[_data.AppelaerIndex];
+
+        int theme = 0, quest = 0;
+
+        lock (_data.ChoiceLock)
+        {
+            theme = _data.ThemeIndex > -1 ? _data.ThemeIndex : _data.PrevoiusTheme;
+            quest = _data.QuestionIndex > -1 ? _data.QuestionIndex : _data.PreviousQuest;
+        }
+
+        // Add appellated answer to game report
+        var answerInfo = _data.GameResultInfo.WrongVersions.FirstOrDefault(
+            answer =>
+                answer.Round == Engine.RoundIndex &&
+                answer.Theme == theme &&
+                answer.Question == quest &&
+                answer.Answer == appelaer.Answer);
+
+        if (answerInfo != null)
+        {
+            _data.GameResultInfo.WrongVersions.Remove(answerInfo);
+        }
+
+        _data.GameResultInfo.ApellatedQuestions.Add(new AnswerInfo
+        {
+            Round = Engine.RoundIndex,
+            Theme = theme,
+            Question = quest,
+            Answer = appelaer.Answer
+        });
+    }
+
+    private void UpdatePlayersSumsAfterAppellation(bool isVotingForRightAnswer)
+    {
+        var change = false;
+
+        for (var i = 0; i < _data.QuestionHistory.Count; i++)
+        {
+            var index = _data.QuestionHistory[i].PlayerIndex;
+
+            if (isVotingForRightAnswer && _data.Stage == GameStage.Round && index != _data.AppelaerIndex)
+            {
+                if (!change)
+                {
+                    continue;
+                }
+                else
+                {
+                    if (_data.QuestionHistory[i].IsRight)
+                    {
+                        _data.Players[index].Sum -= _data.CurPriceRight;
+                    }
+                    else
+                    {
+                        _data.Players[index].Sum += _data.CurPriceWrong;
+                    }
+                }
+            }
+            else if (index == _data.AppelaerIndex)
+            {
+                if (_data.Stage == GameStage.Round)
+                {
+                    change = true;
+
+                    if (_data.QuestionHistory[i].IsRight)
+                    {
+                        _data.Players[index].Sum -= _data.CurPriceRight + _data.CurPriceWrong;
+                    }
+                    else
+                    {
+                        _data.Players[index].Sum += _data.CurPriceWrong + _data.CurPriceRight;
+
+                        if (Engine.CanMoveBack) // Not the biginning of a round
+                        {
+                            _data.ChooserIndex = index;
+                            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                        }
+                    }
+                }
+                else
+                {
+                    if (_data.QuestionHistory[i].IsRight)
+                    {
+                        _data.Players[index].Sum -= _data.Players[index].FinalStake * 2;
+                    }
+                    else
+                    {
+                        _data.Players[index].Sum += _data.Players[index].FinalStake * 2;
+                    }
+                }
+            }
+        }
     }
 
     private void ProcessTheme(Theme theme, int arg)

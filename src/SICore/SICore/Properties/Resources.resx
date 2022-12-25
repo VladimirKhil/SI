@@ -774,4 +774,7 @@
   <data name="UserUnbanned" xml:space="preserve">
     <value>User {0} was unbanned</value>
   </data>
+  <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
+    <value>Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game</value>
+  </data>
 </root>

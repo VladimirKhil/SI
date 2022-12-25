@@ -779,4 +779,7 @@
   <data name="UserUnbanned" xml:space="preserve">
     <value>Пользователь {0} был разбанен</value>
   </data>
+  <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
+    <value>Игрок {0} попытался оспорить последний правильный ответ, но в настоящий момент в игре недостаточно других игроков для оспаривания ответа</value>
+  </data>
 </root>

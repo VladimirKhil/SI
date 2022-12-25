@@ -339,14 +339,24 @@ public sealed class GameData : Data
     internal List<AnswerResult> QuestionHistory { get; } = new();
 
     /// <summary>
-    /// Количество полученных ответов на апелляцию
+    /// Number of awaited appellation votes.
     /// </summary>
-    public int AppellationAnswersReceivedCount { get; set; }
+    public int AppellationAwaitedVoteCount { get; set; }
 
     /// <summary>
-    /// Количество полученных положительных ответов на апелляцию
+    /// Number of total appellation votes.
     /// </summary>
-    public int AppellationAnswersRightReceivedCount { get; set; }
+    public int AppellationTotalVoteCount { get; set; }
+
+    /// <summary>
+    /// Number of positive appellation votes.
+    /// </summary>
+    public int AppellationPositiveVoteCount { get; set; }
+
+    /// <summary>
+    /// Number of negative appellation votes.
+    /// </summary>
+    public int AppellationNegativeVoteCount { get; set; }
 
     internal bool IsAnswer { get; set; }
 
@@ -544,6 +554,11 @@ public sealed class GameData : Data
     internal int OversizedMediaNotificationsCount { get; set; }
 
     public IMedia PackageLogo { get; internal set; }
+
+    /// <summary>
+    /// Index of player called for negative appellation.
+    /// </summary>
+    public int AppellationCallerIndex { get; internal set; } = -1;
 
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {

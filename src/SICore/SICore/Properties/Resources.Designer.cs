@@ -457,6 +457,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game.
+        /// </summary>
+        public static string FailedToAppellateForWrongAnswer {
+            get {
+                return ResourceManager.GetString("FailedToAppellateForWrongAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на File.
         /// </summary>
         public static string File {

@@ -1283,6 +1283,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         ClientData.IsAppelationForRightAnswer = args.Length == 1 || args[1] == "+";
         ClientData.AppellationSource = message.Sender;
 
+        ClientData.AppellationCallerIndex = -1;
         ClientData.AppelaerIndex = -1;
 
         if (ClientData.IsAppelationForRightAnswer)
@@ -1312,13 +1313,31 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else
         {
-            if (!ClientData.Players.Any(player => player.Name == message.Sender))
+            if (ClientData.Players.Count <= 3)
             {
-                // Апеллировать могут только игроки
+                // If there are 2 or 3 players, there are already 2 positive votes for the answer
+                // from answered player and showman. And only 1 or 2 votes left.
+                // So there is no chance to win a vote against the answer
+                _gameActions.SpecialReplic(string.Format(LO[nameof(R.FailedToAppellateForWrongAnswer)], message.Sender));
                 return;
             }
 
-            // Утверждение, что ответ неверен
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (ClientData.Players[i].Name == message.Sender)
+                {
+                    ClientData.AppellationCallerIndex = i;
+                    break;
+                }
+            }
+
+            if (ClientData.AppellationCallerIndex == -1)
+            {
+                // Only players can appellate
+                return;
+            }
+
+            // Last person has right answer and is responsible for appellation
             var count = ClientData.QuestionHistory.Count;
 
             if (count > 0 && ClientData.QuestionHistory[count - 1].IsRight)
@@ -1329,7 +1348,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (ClientData.AppelaerIndex != -1)
         {
-            // Начата процедура апелляции
+            // Appellation started
             ClientData.AllowAppellation = false;
             _logic.Stop(StopReason.Appellation);
         }
@@ -1739,10 +1758,10 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        if (ClientData.ShowMan != null &&
+        if ((ClientData.Decision == DecisionType.AnswerValidating || ClientData.IsOralNow && ClientData.Decision == DecisionType.Answering) &&
+            ClientData.ShowMan != null &&
             message.Sender == ClientData.ShowMan.Name &&
-            ClientData.Answerer != null &&
-            (ClientData.Decision == DecisionType.AnswerValidating || ClientData.IsOralNow && ClientData.Decision == DecisionType.Answering))
+            ClientData.Answerer != null)
         {
             ClientData.Decision = DecisionType.AnswerValidating;
             ClientData.Answerer.AnswerIsRight = args[1] == "+";
@@ -1758,16 +1777,44 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 if (ClientData.Players[i].Flag && ClientData.Players[i].Name == message.Sender)
                 {
-                    ClientData.AppellationAnswersRightReceivedCount += args[1] == "+" ? 1 : 0;
+                    if (args[1] == "+")
+                    {
+                        ClientData.AppellationPositiveVoteCount++;
+                    }
+                    else
+                    {
+                        ClientData.AppellationNegativeVoteCount++;
+                    }
+
                     ClientData.Players[i].Flag = false;
-                    ClientData.AppellationAnswersReceivedCount++;
+                    ClientData.AppellationAwaitedVoteCount--;
                     _gameActions.SendMessageWithArgs(Messages.PersonApellated, i);
+                    break;
                 }
             }
 
-            if (ClientData.AppellationAnswersReceivedCount == ClientData.Players.Count - 1)
+            if (ClientData.AppellationAwaitedVoteCount == 0)
             {
                 _logic.Stop(StopReason.Decision);
+            }
+
+            var halfVotesCount = ClientData.AppellationTotalVoteCount / 2;
+
+            if (ClientData.AppellationPositiveVoteCount > halfVotesCount || ClientData.AppellationNegativeVoteCount > halfVotesCount)
+            {
+                SendCancellationsToActivePlayers();
+                _logic.Stop(StopReason.Decision);
+            }
+        }
+    }
+
+    private void SendCancellationsToActivePlayers()
+    {
+        foreach (var player in ClientData.Players)
+        {
+            if (player.Flag)
+            {
+                _gameActions.SendMessage(Messages.Cancel, player.Name);
             }
         }
     }
@@ -2872,10 +2919,9 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         ClientData.ShowMan = newAccount;
 
-        var showmanClient = new Client(newAccount.Name);
+        var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
         var showman = new Showman(showmanClient, account, false, LO, new ViewerData(ClientData.BackLink));
 
-        showmanClient.ConnectTo(_client.Node);
         Inform(newAccount.Name);
 
         return newAccount;
@@ -3049,11 +3095,11 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
     }
 
-    private string CreateUri(string id, string file, string receiver)
+    private string? CreateUri(string id, string file, string receiver)
     {
         var local = _client.Node.Contains(receiver);
 
-        if (!Uri.TryCreate(file, UriKind.RelativeOrAbsolute, out Uri uri))
+        if (!Uri.TryCreate(file, UriKind.RelativeOrAbsolute, out var uri))
         {
             return null;
         }
@@ -3068,7 +3114,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (isURI || remote)
         {
-            string path = null;
+            string path;
 
             if (isURI)
             {
