@@ -8,13 +8,13 @@ namespace SImulator.Implementation.ButtonManagers;
 /// <inheritdoc cref="ButtonManagerFactory" />
 internal sealed class ButtonManagerFactoryDesktop : ButtonManagerFactory
 {
-    public override IButtonManager? Create(AppSettings settings) =>
+    public override IButtonManager? Create(AppSettings settings, IButtonManagerListener buttonManagerListener) =>
         settings.UsePlayersKeys switch
         {
-            PlayerKeysModes.Keyboard => new KeyboardHook(),
-            PlayerKeysModes.Joystick => new JoystickListener(),
-            PlayerKeysModes.Com => new ComButtonManager(settings.ComPort),
-            PlayerKeysModes.Web => new WebManager(settings.WebPort),
-            _ => base.Create(settings),
+            PlayerKeysModes.Keyboard => new KeyboardHook(buttonManagerListener),
+            PlayerKeysModes.Joystick => new JoystickListener(buttonManagerListener),
+            PlayerKeysModes.Com => new ComButtonManager(settings.ComPort, buttonManagerListener),
+            PlayerKeysModes.Web => new WebManager(settings.WebPort, buttonManagerListener),
+            _ => base.Create(settings, buttonManagerListener),
         };
 }

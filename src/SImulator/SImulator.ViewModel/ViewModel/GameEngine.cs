@@ -19,7 +19,7 @@ namespace SImulator.ViewModel;
 /// <summary>
 /// Controls a single game run.
 /// </summary>
-public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
+public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener, IAsyncDisposable
 {
     #region Fields
 
@@ -351,7 +351,19 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         _gameHost.ThemeDeleted += GameHost_ThemeDeleted;
     }
 
-    private void Engine_QuestionPostInfo() => Task.Run(_engine.MoveNext);
+    private async void Engine_QuestionPostInfo()
+    {
+        await Task.Yield();
+
+        try
+        {
+            _engine.MoveNext();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc.ToString());
+        }
+    }
 
     private void GameHost_ThemeDeleted(int themeIndex) => LocalInfo.RoundInfo[themeIndex].Name = null;
 
@@ -693,37 +705,24 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     {
         UpdateNextCommand();
 
-        try
-        {
-            UserInterface.ClearPlayers();
+        UserInterface.ClearPlayers();
 
-            for (int i = 0; i < LocalInfo.Players.Count; i++)
-            {
-                UserInterface.AddPlayer();
-                UserInterface.UpdatePlayerInfo(i, (PlayerInfo)LocalInfo.Players[i]);
-            }
-
-            UserInterface.Start();
-        }
-        catch (TimeoutException exc)
+        for (int i = 0; i < LocalInfo.Players.Count; i++)
         {
-            PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
+            UserInterface.AddPlayer();
+            UserInterface.UpdatePlayerInfo(i, (PlayerInfo)LocalInfo.Players[i]);
         }
+
+        UserInterface.Start();
 
         ShowingRoundThemes = false;
 
-        _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model);
-
-        if (_buttonManager != null)
-        {
-            _buttonManager.KeyPressed += OnPlayerKeyPressed;
-            _buttonManager.PlayerPressed += OnPlayerPressed;
-            _buttonManager.GetPlayerById += OnGetPlayerById;
-        }
+        _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
         if (Settings.Model.SaveLogs)
         {
             var logsFolder = Settings.Model.LogsFolder;
+
             if (string.IsNullOrWhiteSpace(logsFolder))
             {
                 PlatformManager.Instance.ShowMessage("Папка для записи логов не задана! Логи вестись не будут.");
@@ -751,7 +750,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         _logger.Write("Пакет: {0}", _engine.PackageName);
 
         _selectedPlayers.Clear();
-        UserInterface?.ClearLostButtonPlayers();
+        UserInterface.ClearLostButtonPlayers();
 
         if (Settings.Model.AutomaticGame)
         {
@@ -761,8 +760,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
     private void Engine_Question(Question question)
     {
-        UserInterface?.SetText(question.Price.ToString());
-        UserInterface?.SetStage(TableStage.QuestionPrice);
+        UserInterface.SetText(question.Price.ToString());
+        UserInterface.SetStage(TableStage.QuestionPrice);
+        UserInterface.SetCaption($"{ActiveTheme.Name}, {question.Price}");
 
         LocalInfo.Text = question.Price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
@@ -771,8 +771,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
     private void Engine_Theme(Theme theme)
     {
-        UserInterface?.SetText($"{Resources.Theme}: {theme.Name}");
-        UserInterface?.SetStage(TableStage.Theme);
+        UserInterface.SetText($"{Resources.Theme}: {theme.Name}");
+        UserInterface.SetStage(TableStage.Theme);
 
         LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
         LocalInfo.TStage = TableStage.Theme;
@@ -978,10 +978,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     {
         StopQuestionTimer.Execute(0);
 
-        if (_buttonManager != null)
-        {
-            _buttonManager.Stop();
-        }
+        _buttonManager?.Stop();
 
         UserInterface.SetQuestionStyle(QuestionStyle.Normal);
         UserInterface.SetSound();
@@ -1012,10 +1009,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     {
         StopQuestionTimer_Executed(0);
 
-        if (_buttonManager != null)
-        {
-            _buttonManager.Stop();
-        }
+        _buttonManager?.Stop();
 
         UnselectPlayer();
         _selectedPlayers.Clear();
@@ -1088,10 +1082,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
         StopQuestionTimer_Executed(0);
 
-        if (_buttonManager != null)
-        {
-            _buttonManager.Stop();
-        }
+        _buttonManager?.Stop();
 
         UnselectPlayer();
         _selectedPlayers.Clear();
@@ -1134,8 +1125,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
     private void Engine_ThemeSelected(int themeIndex)
     {
-        UserInterface?.PlaySelection(themeIndex);
-        UserInterface?.SetSound(Settings.Model.Sounds.FinalDelete);
+        UserInterface.PlaySelection(themeIndex);
+        UserInterface.SetSound(Settings.Model.Sounds.FinalDelete);
     }
 
     private void UpdateNextCommand()
@@ -1145,7 +1136,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
     private void Engine_ShowScore()
     {
-        UserInterface?.SetStage(TableStage.Score);
+        UserInterface.SetStage(TableStage.Score);
         LocalInfo.TStage = TableStage.Score;
     }
 
@@ -1222,7 +1213,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
                     _logger = null;
                 }
 
-                UserInterface?.SetSound("");
+                UserInterface.SetSound("");
 
                 PlatformManager.Instance.ClearMedia();
             }
@@ -1239,6 +1230,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         ActiveQuestion = question;
 
         UserInterface.SetSound("");
+        UserInterface.SetCaption(theme.Name);
     }
 
     /// <summary>
@@ -1246,23 +1238,26 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
     /// </summary>
     private void LogScore()
     {
-        if (Settings.Model.SaveLogs && LocalInfo.Players.Count > 0)
+        if (!Settings.Model.SaveLogs || LocalInfo.Players.Count <= 0)
         {
-            var sb = new StringBuilder("\r\n").Append(Resources.Score).Append(": ");
-            var first = true;
-            foreach (var player in LocalInfo.Players)
-            {
-                if (!first)
-                {
-                    sb.Append(", ");
-                }
+            return;
+        }
 
-                first = false;
-                sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
+        var sb = new StringBuilder("\r\n").Append(Resources.Score).Append(": ");
+        var first = true;
+
+        foreach (var player in LocalInfo.Players)
+        {
+            if (!first)
+            {
+                sb.Append(", ");
             }
 
-            _logger.Write(sb.ToString());
+            first = false;
+            sb.AppendFormat("{0}:{1}", player.Name, player.Sum);
         }
+
+        _logger?.Write(sb.ToString());
     }
 
     private void Engine_NextRound(bool showSign)
@@ -1293,6 +1288,12 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
     private bool SetMedia(IMedia media, string category, bool background = false)
     {
+        if (media.GetStream == null)
+        {
+            UserInterface.SetMedia(new MediaSource(media.Uri), background);
+            return true;
+        }
+
         var localFile = Path.Combine(_packageFolder, category, media.Uri);
 
         if (!File.Exists(localFile))
@@ -1426,6 +1427,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
 
         Price = question.Price;
+        UserInterface.SetCaption($"{theme.Name}, {question.Price}");
 
         if (question.Type.Name == QuestionTypes.Simple)
         {
@@ -1444,12 +1446,19 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
                     PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                     setActive = false;
 
+                    var newTheme = question.Type[QuestionTypeParams.Cat_Theme];
                     var newPriceString = question.Type[QuestionTypeParams.Cat_Cost];
 
                     if (newPriceString != null && int.TryParse(newPriceString, out var newPrice) && newPrice > 0)
                     {
                         Price = newPrice;
+                        UserInterface.SetCaption($"{newTheme}, {newPrice}");
                     }
+                    else
+                    {
+                        UserInterface.SetCaption(newTheme);
+                    }
+                    
                     break;
 
                 case QuestionTypes.Auction:
@@ -1478,7 +1487,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         _logger.Write(question.Scenario.ToString());
     }
 
-    private void PrintQuestionType(string originalTypeName, string aliasName)
+    private void PrintQuestionType(string originalTypeName, string? aliasName)
     {
         var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
 
@@ -1486,12 +1495,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         _logger.Write(actualName);
     }
 
-    private void OnError(string error)
-    {
-        Error?.Invoke(error);
-    }
+    private void OnError(string error) => Error?.Invoke(error);
 
-    internal PlayerInfo? OnGetPlayerById(string playerId, bool strict)
+    public PlayerInfo? GetPlayerById(string playerId, bool strict)
     {
         if (Settings.Model.UsePlayersKeys != PlayerKeysModes.Web)
         {
@@ -1525,7 +1531,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         return null;
     }
 
-    internal bool OnPlayerKeyPressed(GameKey key)
+    public bool OnKeyPressed(GameKey key)
     {
         var index = Settings.Model.PlayerKeys2.IndexOf(key);
 
@@ -1539,10 +1545,11 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         return ProcessPlayerPress(index, player);
     }
 
-    internal bool OnPlayerPressed(PlayerInfo player)
+    public bool OnPlayerPressed(PlayerInfo player)
     {
         // Нет такого игрока
         var index = LocalInfo.Players.IndexOf(player);
+
         if (index == -1)
         {
             return false;
@@ -1582,22 +1589,17 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
 
         // Заблокирован
         if (player.BlockedTime.HasValue && DateTime.Now.Subtract(player.BlockedTime.Value).TotalSeconds < Settings.Model.BlockingTime)
+        {
             return false;
+        }
 
         // Все проверки пройдены, фиксируем нажатие
         player.IsSelected = true;
         _selectedPlayer = player;
         _selectedPlayers.Add(_selectedPlayer);
 
-        try
-        {
-            UserInterface.SetSound(Settings.Model.Sounds.PlayerPressed);
-            UserInterface.SetPlayer(index);
-        }
-        catch (Exception exc) when (exc is TimeoutException)
-        {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-        }
+        UserInterface.SetSound(Settings.Model.Sounds.PlayerPressed);
+        UserInterface.SetPlayer(index);
 
         _timerStopped = ActiveQuestionCommand == StopQuestionTimer;
         if (_timerStopped)
@@ -1628,23 +1630,10 @@ public sealed class GameEngine : INotifyPropertyChanged, IAsyncDisposable
         }            
     }
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    internal void CloseMainView()
-    {
-        try
-        {
-            if (UserInterface != null)
-                UserInterface.StopGame();
-        }
-        catch (TimeoutException)
-        {
-
-        }
-    }
+    internal void CloseMainView() => UserInterface.StopGame();
 }

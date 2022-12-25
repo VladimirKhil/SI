@@ -504,7 +504,7 @@ public sealed class ViewerData : Data
     public string QuestionCaption
     {
         get => _questionCaption;
-        set { _questionCaption = value; OnPropertyChanged(); }
+        set { if (_questionCaption != value) { _questionCaption = value; OnPropertyChanged(); } }
     }
 
     public string PackageId { get; internal set; }

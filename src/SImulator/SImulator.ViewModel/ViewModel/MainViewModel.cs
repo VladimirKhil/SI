@@ -16,7 +16,7 @@ using Utils;
 
 namespace SImulator.ViewModel;
 
-public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
+public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListener, IDisposable
 {
     #region Constants
     /// <summary>
@@ -37,7 +37,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     /// <summary>
     /// Менеджер игровых кнопок
     /// </summary>
-    private IButtonManager _buttonManager;
+    private IButtonManager? _buttonManager;
 
     private readonly SimpleUICommand _start;
 
@@ -76,7 +76,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand ActivePlayerButtonCommand
     {
-        get { return _activePlayerButtonCommand; }
+        get => _activePlayerButtonCommand;
         set { if (_activePlayerButtonCommand != value) { _activePlayerButtonCommand = value; OnPropertyChanged(); } }
     }
 
@@ -93,7 +93,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     /// </summary>
     public IPackageSource PackageSource
     {
-        get { return _packageSource; }
+        get => _packageSource;
         set
         {
             if (_packageSource != value)
@@ -644,15 +644,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         {
             if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick || Settings.UsePlayersKeys == PlayerKeysModes.Com)
             {
-                _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings);
+                _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings, this);
 
                 if (_buttonManager == null)
                 {
                     PlatformManager.Instance.ShowMessage($"Could not create button manager for mode {Settings.UsePlayersKeys}");
                     return;
                 }
-
-                _buttonManager.KeyPressed += OnPlayerKeyPressed;
 
                 if (!_buttonManager.Start())
                 {
@@ -668,26 +666,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    internal bool OnPlayerKeyPressed(GameKey key)
-    {
-        // Задание кнопки для игрока (в настройках)
-        // Может быть не только при this.engine.stage == GameStage.Before, но и в процессе игры
-        if (_activePlayerButtonCommand == _setPlayerButton)
-        {
-            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick)
-            {
-                ProcessNewPlayerButton(key);
-
-                _buttonManager.Stop();
-                _buttonManager.DisposeAsync(); // no await
-                _buttonManager = null;
-            }
-        }
-
-        return false;
-    }
-
-    public bool OnKeyPressed(GameKey key)
+    public bool OnKeyboardPressed(GameKey key)
     {
         // Задание кнопки для игрока (в настройках)
         if (_activePlayerButtonCommand == _setPlayerButton && Settings.UsePlayersKeys == PlayerKeysModes.Keyboard)
@@ -802,4 +781,27 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public PlayerInfo? GetPlayerById(string playerId, bool strict) => throw new NotImplementedException();
+
+    public bool OnKeyPressed(GameKey key)
+    {
+        // Задание кнопки для игрока (в настройках)
+        // Может быть не только при this.engine.stage == GameStage.Before, но и в процессе игры
+        if (_activePlayerButtonCommand == _setPlayerButton)
+        {
+            if (Settings.UsePlayersKeys == PlayerKeysModes.Joystick)
+            {
+                ProcessNewPlayerButton(key);
+
+                _buttonManager.Stop();
+                _buttonManager.DisposeAsync(); // no await
+                _buttonManager = null;
+            }
+        }
+
+        return false;
+    }
+
+    public bool OnPlayerPressed(PlayerInfo player) => throw new NotImplementedException();
 }

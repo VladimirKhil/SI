@@ -238,7 +238,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnQuestion(Question question) => Question?.Invoke(question);
 
-    protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question) => QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
+    protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question) =>
+        QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
 
     protected void OnQuestionAtom(Atom atom) => QuestionAtom?.Invoke(atom);
 

@@ -22,358 +22,356 @@ using System.Xml.Serialization;
 using Utils;
 using Screen = System.Windows.Forms.Screen;
 
-namespace SImulator.Implementation
+namespace SImulator.Implementation;
+
+/// <summary>
+/// Provides desktop implementation of SImulator API.
+/// </summary>
+internal sealed class DesktopManager : PlatformManager
 {
-    /// <summary>
-    /// Provides desktop implementation of SImulator API.
-    /// </summary>
-    internal sealed class DesktopManager : PlatformManager
+    private const string GameSiteUri = "https://vladimirkhil.com";
+
+    public IServiceProvider ServiceProvider { get; set; }
+
+    private Window? _window = null;
+    private PlayersWindow? _playersWindow = null;
+    private readonly ButtonManagerFactoryDesktop _buttonManager = new();
+
+    private MediaTimeline? _mediaTimeline = null;
+    private MediaClock? _mediaClock = null;
+    private MediaPlayer? _player = null;
+
+    internal static XmlSerializer SettingsSerializer { get; } = new(typeof(AppSettings));
+
+    public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
+
+    public override void CreatePlayersView(object dataContext)
     {
-        private const int StreamCopyBufferSize = 81920;
-        private const string GameSiteUri = "https://vladimirkhil.com";
-
-        public IServiceProvider ServiceProvider { get; set; }
-
-        private Window? _window = null;
-        private PlayersWindow? _playersWindow = null;
-        private readonly ButtonManagerFactoryDesktop _buttonManager = new();
-
-        private MediaTimeline? _mediaTimeline = null;
-        private MediaClock? _mediaClock = null;
-        private MediaPlayer? _player = null;
-
-        internal static XmlSerializer SettingsSerializer { get; } = new(typeof(AppSettings));
-
-        public override ViewModel.ButtonManagers.ButtonManagerFactory ButtonManagerFactory => _buttonManager;
-
-        public override void CreatePlayersView(object dataContext)
+        if (_playersWindow == null)
         {
-            if (_playersWindow == null)
+            _playersWindow = new PlayersWindow { DataContext = dataContext };
+            _playersWindow.Show();
+        }
+    }
+
+    public override void ClosePlayersView()
+    {
+        if (_playersWindow != null)
+        {
+            _playersWindow.CanClose = true;
+            _playersWindow.Close();
+            _playersWindow = null;
+        }
+    }
+
+    public override Task CreateMainViewAsync(object dataContext, int screenNumber)
+    {
+        var fullScreen = screenNumber < Screen.AllScreens.Length;
+
+        _window = new MainWindow(fullScreen)
+        {
+            DataContext = dataContext
+        };
+
+        if (fullScreen)
+        {
+            screenNumber = Math.Min(screenNumber, Screen.AllScreens.Length - 1);
+            var area = Screen.AllScreens[screenNumber].WorkingArea;
+            _window.Left = area.Left;
+            _window.Top = area.Top;
+            _window.Width = area.Width;
+            _window.Height = area.Height;
+        }
+
+        _window.Show();
+
+        if (fullScreen)
+        {
+            _window.WindowState = WindowState.Maximized;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public override Task CloseMainViewAsync()
+    {
+        if (_window != null)
+        {
+            MainWindow.CanClose = true;
+            try
             {
-                _playersWindow = new PlayersWindow { DataContext = dataContext };
-                _playersWindow.Show();
+                _window.Close();
+                _window = null;
+            }
+            finally
+            {
+                MainWindow.CanClose = false;
             }
         }
 
-        public override void ClosePlayersView()
+        return Task.CompletedTask;
+    }
+
+    public override IScreen[] GetScreens() =>
+        Screen.AllScreens.Select(screen => new ScreenInfo(screen))
+            .Concat(new ScreenInfo[] { new ScreenInfo(null) })
+            .ToArray();
+
+    public override string[] GetLocalComputers()
+    {
+        var list = new List<string>();
+
+        var current = Dns.GetHostName().ToUpper();
+
+        using (var root = new DirectoryEntry("WinNT:"))
         {
-            if (_playersWindow != null)
+            foreach (DirectoryEntry dom in root.Children)
             {
-                _playersWindow.CanClose = true;
-                _playersWindow.Close();
-                _playersWindow = null;
-            }
-        }
-
-        public override Task CreateMainViewAsync(object dataContext, int screenNumber)
-        {
-            var fullScreen = screenNumber < Screen.AllScreens.Length;
-
-            _window = new MainWindow(fullScreen)
-            {
-                DataContext = dataContext
-            };
-
-            if (fullScreen)
-            {
-                screenNumber = Math.Min(screenNumber, Screen.AllScreens.Length - 1);
-                var area = Screen.AllScreens[screenNumber].WorkingArea;
-                _window.Left = area.Left;
-                _window.Top = area.Top;
-                _window.Width = area.Width;
-                _window.Height = area.Height;
-            }
-
-            _window.Show();
-
-            if (fullScreen)
-            {
-                _window.WindowState = WindowState.Maximized;
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public override Task CloseMainViewAsync()
-        {
-            if (_window != null)
-            {
-                MainWindow.CanClose = true;
-                try
+                using (dom)
                 {
-                    _window.Close();
-                    _window = null;
-                }
-                finally
-                {
-                    MainWindow.CanClose = false;
-                }
-            }
-
-            return Task.CompletedTask;
-        }
-
-        public override IScreen[] GetScreens() =>
-            Screen.AllScreens.Select(screen => new ScreenInfo(screen))
-                .Concat(new ScreenInfo[] { new ScreenInfo(null) })
-                .ToArray();
-
-        public override string[] GetLocalComputers()
-        {
-            var list = new List<string>();
-
-            var current = Dns.GetHostName().ToUpper();
-
-            using (var root = new DirectoryEntry("WinNT:"))
-            {
-                foreach (DirectoryEntry dom in root.Children)
-                {
-                    using (dom)
+                    foreach (DirectoryEntry entry in dom.Children)
                     {
-                        foreach (DirectoryEntry entry in dom.Children)
+                        using (entry)
                         {
-                            using (entry)
+                            if (entry.Name != "Schema" && entry.SchemaClassName == "Computer" && entry.Name.ToUpper() != current)
                             {
-                                if (entry.Name != "Schema" && entry.SchemaClassName == "Computer" && entry.Name.ToUpper() != current)
-                                {
-                                    list.Add(entry.Name);
-                                }
+                                list.Add(entry.Name);
                             }
                         }
                     }
                 }
             }
-
-            return list.ToArray();
         }
 
-        public override string[] GetComPorts() => SerialPort.GetPortNames();
+        return list.ToArray();
+    }
 
-        public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
+    public override string[] GetComPorts() => SerialPort.GetPortNames();
 
-        public override int GetKeyNumber(GameKey key)
+    public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
+
+    public override int GetKeyNumber(GameKey key)
+    {
+        var key2 = (Key)key;
+        int code = -1;
+
+        if (key2 >= Key.D1 && key2 <= Key.D9)
         {
-            var key2 = (Key)key;
-            int code = -1;
-
-            if (key2 >= Key.D1 && key2 <= Key.D9)
-            {
-                code = key2 - Key.D1;
-            }
-            else if (key2 >= Key.NumPad1 && key2 <= Key.NumPad9)
-            {
-                code = key2 - Key.NumPad1;
-            }
-
-            return code;
+            code = key2 - Key.D1;
+        }
+        else if (key2 >= Key.NumPad1 && key2 <= Key.NumPad9)
+        {
+            code = key2 - Key.NumPad1;
         }
 
-        public override async Task<IPackageSource> AskSelectPackageAsync(object arg)
+        return code;
+    }
+
+    public override async Task<IPackageSource> AskSelectPackageAsync(object arg)
+    {
+        if (arg.ToString() == "0")
         {
-            if (arg.ToString() == "0")
+            var dialog = new OpenFileDialog
             {
-                var dialog = new OpenFileDialog
-                {
-                    Title = Resources.SelectQuestionPackage,
-                    DefaultExt = ".siq",
-                    Filter = $"{Resources.SIQuestions}|*.siq"
-                };
-
-                if (dialog.ShowDialog().Value)
-                {
-                    return new FilePackageSource(dialog.FileName);
-                }
-            }
-            else if (arg.ToString() == "1")
-            {
-                var storage = ServiceProvider.GetRequiredService<SIStorage>();
-                storage.CurrentRestriction = ((App)Application.Current).Settings.Restriction;
-
-                storage.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(SIStorage.CurrentRestriction))
-                    {
-                        ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction;
-                    }
-                };
-
-                storage.Error += (exc, message) =>
-                {
-                    ShowMessage(string.Format(Resources.SIStorageError, $"{message} {exc}"), false);
-                };
-
-                try
-                {
-                    await storage.OpenAsync();
-
-                    var packageStoreWindow = new PackageStoreWindow { DataContext = storage };
-                    var package = packageStoreWindow.ShowDialog().Value ? storage.CurrentPackage : null;
-
-                    if (package == null)
-                    {
-                        return null;
-                    }
-
-                    var link = await storage.LoadSelectedPackageUriAsync();
-                    return new SIStoragePackageSource(package, link.Uri);
-                }
-                catch (Exception exc)
-                {
-                    ShowMessage(string.Format(Resources.SIStorageError, exc.ToString()), false);
-                    return null;
-                }
-            }
-            else
-            {
-                return new FilePackageSource(arg.ToString());
-            }
-
-            return null;
-        }
-
-        public override string AskSelectColor()
-        {
-            var diag = new System.Windows.Forms.ColorDialog();
-
-            if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                var color = diag.Color;
-                var convertedColor = Color.FromRgb(color.R, color.G, color.B);
-                return convertedColor.ToString();
-            }
-
-            return null;
-        }
-
-        public override Task<string> AskSelectFileAsync(string header)
-        {
-            var dialog = new OpenFileDialog { Title = header };
+                Title = Resources.SelectQuestionPackage,
+                DefaultExt = ".siq",
+                Filter = $"{Resources.SIQuestions}|*.siq"
+            };
 
             if (dialog.ShowDialog().Value)
             {
-                return Task.FromResult(dialog.FileName);
+                return new FilePackageSource(dialog.FileName);
             }
-
-            return Task.FromResult<string>(null);
         }
-
-        public override string? AskSelectLogsFolder()
+        else if (arg.ToString() == "1")
         {
-            using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = Resources.SelectLogsFolder })
+            var storage = ServiceProvider.GetRequiredService<SIStorage>();
+            storage.CurrentRestriction = ((App)Application.Current).Settings.Restriction;
+
+            storage.PropertyChanged += (s, e) =>
             {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                if (e.PropertyName == nameof(SIStorage.CurrentRestriction))
                 {
-                    return dialog.SelectedPath;
+                    ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction;
                 }
-            }
+            };
 
-            return null;
-        }
+            storage.Error += (exc, message) =>
+            {
+                ShowMessage(string.Format(Resources.SIStorageError, $"{message} {exc}"), false);
+            };
 
-        public override Task<bool> AskStopGameAsync() =>
-            Task.FromResult(MessageBox.Show(
-                Resources.FinishGameQuestion,
-                MainViewModel.ProductName,
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question) == MessageBoxResult.Yes);
-
-        public override void ShowMessage(string text, bool error = true) =>
-            MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
-
-        public override void NavigateToSite()
-        {
             try
             {
-                Browser.Open(GameSiteUri);
+                await storage.OpenAsync();
+
+                var packageStoreWindow = new PackageStoreWindow { DataContext = storage };
+                var package = packageStoreWindow.ShowDialog().Value ? storage.CurrentPackage : null;
+
+                if (package == null)
+                {
+                    return null;
+                }
+
+                var link = await storage.LoadSelectedPackageUriAsync();
+                return new SIStoragePackageSource(package, link.Uri);
             }
             catch (Exception exc)
             {
-                ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message));
+                ShowMessage(string.Format(Resources.SIStorageError, exc.ToString()), false);
+                return null;
             }
         }
-
-        public override void PlaySound(string name, Action onFinish)
+        else
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                StopSound();
-                return;
-            }
-
-            if (!Uri.TryCreate(name, UriKind.RelativeOrAbsolute, out var uri))
-            {
-                return;
-            }
-
-            var source = uri.IsAbsoluteUri && uri.IsFile ? name : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds", name);
-
-            if (uri.IsAbsoluteUri && uri.IsFile && !File.Exists(source))
-            {
-                StopSound();
-                return;
-            }
-
-            if (_mediaTimeline == null)
-            {
-                _mediaTimeline = new MediaTimeline();
-                _player = new MediaPlayer();
-                _mediaTimeline.Completed += (sender, e) => onFinish();
-            }
-            else
-            {
-                StopSound();
-            }
-
-            _mediaTimeline.Source = new Uri(source, UriKind.RelativeOrAbsolute);
-            _mediaClock = _mediaTimeline.CreateClock();
-            _player.Clock = _mediaClock;
-
-            _mediaClock.Controller.Begin();
+            return new FilePackageSource(arg.ToString());
         }
 
-        private void StopSound()
+        return null;
+    }
+
+    public override string AskSelectColor()
+    {
+        var diag = new System.Windows.Forms.ColorDialog();
+
+        if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
-            if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
-            {
-                _mediaClock.Controller.Stop();
-            }
+            var color = diag.Color;
+            var convertedColor = Color.FromRgb(color.R, color.G, color.B);
+            return convertedColor.ToString();
         }
 
-        public override ILogger CreateLogger(string folder)
+        return null;
+    }
+
+    public override Task<string> AskSelectFileAsync(string header)
+    {
+        var dialog = new OpenFileDialog { Title = header };
+
+        if (dialog.ShowDialog().Value)
         {
-            if (folder == null)
-            {
-                return Logger.Create(null);
-            }
-
-            if (!Directory.Exists(folder))
-            {
-                throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
-            }
-
-            return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
+            return Task.FromResult(dialog.FileName);
         }
 
-        public override void ClearMedia()
+        return Task.FromResult<string>(null);
+    }
+
+    public override string? AskSelectLogsFolder()
+    {
+        using (var dialog = new System.Windows.Forms.FolderBrowserDialog { Description = Resources.SelectLogsFolder })
         {
-            if (_mediaClock == null)
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                return;
+                return dialog.SelectedPath;
             }
-
-            if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
-            {
-                _mediaClock.Controller.Stop();
-            }
-
-            _mediaTimeline = null;
-            _mediaClock = null;
-            _player = null;
         }
 
-        public override void InitSettings(AppSettings defaultSettings)
+        return null;
+    }
+
+    public override Task<bool> AskStopGameAsync() =>
+        Task.FromResult(MessageBox.Show(
+            Resources.FinishGameQuestion,
+            MainViewModel.ProductName,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question) == MessageBoxResult.Yes);
+
+    public override void ShowMessage(string text, bool error = true) =>
+        MessageBox.Show(text, MainViewModel.ProductName, MessageBoxButton.OK, error ? MessageBoxImage.Error : MessageBoxImage.Exclamation);
+
+    public override void NavigateToSite()
+    {
+        try
         {
-            
+            Browser.Open(GameSiteUri);
         }
+        catch (Exception exc)
+        {
+            ShowMessage(string.Format(Resources.NavigateToSiteError, GameSiteUri, exc.Message));
+        }
+    }
+
+    public override void PlaySound(string name, Action onFinish)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            StopSound();
+            return;
+        }
+
+        if (!Uri.TryCreate(name, UriKind.RelativeOrAbsolute, out var uri))
+        {
+            return;
+        }
+
+        var source = uri.IsAbsoluteUri && uri.IsFile ? name : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Sounds", name);
+
+        if (uri.IsAbsoluteUri && uri.IsFile && !File.Exists(source))
+        {
+            StopSound();
+            return;
+        }
+
+        if (_mediaTimeline == null)
+        {
+            _mediaTimeline = new MediaTimeline();
+            _player = new MediaPlayer();
+            _mediaTimeline.Completed += (sender, e) => onFinish();
+        }
+        else
+        {
+            StopSound();
+        }
+
+        _mediaTimeline.Source = new Uri(source, UriKind.RelativeOrAbsolute);
+        _mediaClock = _mediaTimeline.CreateClock();
+        _player.Clock = _mediaClock;
+
+        _mediaClock.Controller.Begin();
+    }
+
+    private void StopSound()
+    {
+        if (_mediaClock != null && _mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
+        {
+            _mediaClock.Controller.Stop();
+        }
+    }
+
+    public override ILogger CreateLogger(string folder)
+    {
+        if (folder == null)
+        {
+            return Logger.Create(null);
+        }
+
+        if (!Directory.Exists(folder))
+        {
+            throw new Exception(string.Format(Resources.LogsFolderNotFound, folder));
+        }
+
+        return Logger.Create(Path.Combine(folder, string.Format("{0}.log", DateTime.Now).Replace(':', '.')));
+    }
+
+    public override void ClearMedia()
+    {
+        if (_mediaClock == null)
+        {
+            return;
+        }
+
+        if (_mediaClock.CurrentState == System.Windows.Media.Animation.ClockState.Active)
+        {
+            _mediaClock.Controller.Stop();
+        }
+
+        _mediaTimeline = null;
+        _mediaClock = null;
+        _player = null;
+    }
+
+    public override void InitSettings(AppSettings defaultSettings)
+    {
+        
     }
 }

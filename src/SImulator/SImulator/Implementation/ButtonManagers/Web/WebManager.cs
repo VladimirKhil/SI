@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.PlatformSpecific;
 using System;
 using System.Threading.Tasks;
+using Utils;
 
 namespace SImulator.Implementation.ButtonManagers.Web;
 
@@ -14,7 +16,7 @@ public sealed class WebManager : ButtonManagerBase, IButtonProcessor
 {
     private readonly WebApplication _webApplication;
 
-    public WebManager(int port)
+    public WebManager(int port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
         var builder = WebApplication.CreateBuilder();
 
@@ -53,16 +55,16 @@ public sealed class WebManager : ButtonManagerBase, IButtonProcessor
 
     public PressResponse Press(string token)
     {
-        var player = !string.IsNullOrEmpty(token) ? OnGetPlayerById(token, true) : null;
+        var player = !string.IsNullOrEmpty(token) ? Listener.GetPlayerById(token, true) : null;
 
         if (player != null)
         {
-            OnPlayerPressed(player);
+            UI.Execute(() => Listener.OnPlayerPressed(player), exc => PlatformManager.Instance.ShowMessage(exc.Message));
         }
         else
         {
             token = Guid.NewGuid().ToString();
-            player = OnGetPlayerById(token, false);
+            player = Listener.GetPlayerById(token, false);
         }
 
         return new PressResponse(player?.Name ?? "", token);

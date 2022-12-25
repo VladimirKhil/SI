@@ -2,69 +2,70 @@
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 
-namespace SImulator.ViewModel.Core
+namespace SImulator.ViewModel.Core;
+
+/// <summary>
+/// Represents a game UI.
+/// </summary>
+public interface IRemoteGameUI
 {
     /// <summary>
-    /// Represents a game UI.
+    /// Начать игру
     /// </summary>
-    public interface IRemoteGameUI
-    {
-        /// <summary>
-        /// Начать игру
-        /// </summary>
-        void Start();
+    void Start();
 
-        /// <summary>
-        /// Остановить игру
-        /// </summary>
-        void StopGame();
+    /// <summary>
+    /// Остановить игру
+    /// </summary>
+    void StopGame();
 
-        void SetGameThemes(string[] themes);
+    void SetGameThemes(string[] themes);
 
-        void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
+    void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
 
-        void SetMedia(MediaSource media, bool background);
+    void SetMedia(MediaSource media, bool background);
 
-        void SetStage(TableStage stage);
+    void SetStage(TableStage stage);
 
-        void SetText(string text);
+    void SetText(string text);
 
-        void SetQuestionContentType(QuestionContentType questionContentType);
+    void SetQuestionContentType(QuestionContentType questionContentType);
 
-        void SetQuestionStyle(QuestionStyle questionStyle);
+    void SetQuestionStyle(QuestionStyle questionStyle);
 
-        void SetQuestionSound(bool sound);
+    void SetQuestionSound(bool sound);
 
-        void AddPlayer();
+    void AddPlayer();
 
-        void RemovePlayer(string playerName);
+    void RemovePlayer(string playerName);
 
-        void ClearPlayers();
+    void ClearPlayers();
 
-        void UpdatePlayerInfo(int index, PlayerInfo player);
+    void UpdatePlayerInfo(int index, PlayerInfo player);
 
-        void UpdateSettings(Settings settings);
+    void UpdateSettings(Settings settings);
 
-        void SetSound(string sound = "");
+    void SetSound(string sound = "");
 
-        void PlaySimpleSelection(int theme, int quest);
+    void PlaySimpleSelection(int theme, int quest);
 
-        void PlayComplexSelection(int theme, int quest, bool setActive);
+    void PlayComplexSelection(int theme, int quest, bool setActive);
 
-        void PlaySelection(int theme);
+    void PlaySelection(int theme);
 
-        void SetPlayer(int playerIndex);
+    void SetPlayer(int playerIndex);
 
-        void AddLostButtonPlayer(string name);
+    void AddLostButtonPlayer(string name);
 
-        void ClearLostButtonPlayers();
+    void ClearLostButtonPlayers();
 
-        void SeekMedia(int position);
+    void SeekMedia(int position);
 
-        void RunMedia();
+    void RunMedia();
 
-        void StopMedia();
+    void StopMedia();
 
-        void RestoreQuestion(int themeIndex, int questionIndex, int price);
-    }
+    void RestoreQuestion(int themeIndex, int questionIndex, int price);
+
+    void SetCaption(string caption);
 }

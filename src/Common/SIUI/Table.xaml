@@ -19,13 +19,12 @@
     d:DesignWidth="300"
     Foreground="{Binding Settings.Model.TableColorString}"
     d:DataContext="{d:DesignInstance vm:TableInfoViewModel}">
-    
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes\generic.xaml" />
+                
                 <ResourceDictionary>
-                    
                     <localc:HeightToThicknessConverter x:Key="HeightToThickness" />
                     <localc:RoundTabloConverter x:Key="RTConverter" />
                     <localc:UriToImageSourceConverter x:Key="UriConverter" />
@@ -477,9 +476,13 @@
                             <DataTemplate x:Key="{x:Static vm:QuestionStyle.Pressed}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedTopRowHeightConverter}}" />
+                                        <RowDefinition
+                                            Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedTopRowHeightConverter}}" />
+                                        
                                         <RowDefinition Height="*" />
-                                        <RowDefinition Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
+                                        
+                                        <RowDefinition
+                                            Height="{Binding LostButtonPlayers.Count, Converter={StaticResource PressedBottomRowHeightConverter}}" />
                                     </Grid.RowDefinitions>
                                     
                                     <Border
@@ -488,7 +491,10 @@
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch">
                                         <ContentControl>
-                                            <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding ActivePlayer}" />
+                                            <TextBlock
+                                                Style="{StaticResource CenteredText}"
+                                                lb:FillManager.Fill="True"
+                                                Text="{Binding ActivePlayer}" />
                                         </ContentControl>
                                     </Border>
                                     
@@ -503,7 +509,10 @@
                                             <DataTemplate>
                                                 <Border Background="#DD1D1F77" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                                     <ContentControl>
-                                                        <TextBlock Style="{StaticResource CenteredText}" lb:FillManager.Fill="True" Text="{Binding}" />
+                                                        <TextBlock
+                                                            Style="{StaticResource CenteredText}"
+                                                            lb:FillManager.Fill="True"
+                                                            Text="{Binding}" />
                                                     </ContentControl>
                                                 </Border>
                                             </DataTemplate>
@@ -749,14 +758,30 @@
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
                                 <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="15*" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#4C000000">
+                                        <TextBlock
+                                            Text="{Binding Caption}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Margin="2"
+                                            lb:FillManager.Fill="True" />
+                                    </Border>
+
                                     <!-- Main question content (text, image, video, treble clef) -->
                                     <ContentControl
+                                        Grid.Row="1"
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionContentType, Converter={StaticResource QuestionContentSelector}}"
                                         Margin="10" />
                                     
                                     <!-- Border for pressing mode / Answerer name -->
                                     <ContentControl
+                                        Grid.Row="1"
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionStyle, Converter={StaticResource DecoratorSelector}}" />
 
@@ -765,6 +790,7 @@
                                         <ContentControl.Style>
                                             <Style TargetType="ContentControl">
                                                 <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+                                                
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Hint, Converter={StaticResource NotNullOrEmptyConverter}}" Value="true">
                                                         <Setter Property="ContentTemplate">
@@ -775,6 +801,7 @@
                                                                             <RowDefinition Height="3*" />
                                                                             <RowDefinition Height="*" />
                                                                         </Grid.RowDefinitions>
+                                                                        
                                                                         <Border Grid.Row="1" Background="#88000000">
                                                                             <TextBlock Text="{Binding Hint}" Style="{StaticResource QuestionText}" Opacity="0.4" />
                                                                         </Border>
@@ -797,6 +824,7 @@
                                                         <DataTemplate />
                                                     </Setter.Value>
                                                 </Setter>
+                                                
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Sound}" Value="True">
                                                         <Setter Property="ContentTemplate">
@@ -873,6 +901,41 @@
                             </DataTemplate>
                         </localc:TemplateConverter.Templates>
                     </localc:TemplateConverter>
+
+                    <Style x:Key="BackgroundStyle" TargetType="ContentControl">
+                        <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
+
+                        <Style.Triggers>
+                            <DataTrigger
+                                Binding="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource NotNullOrEmptyConverter}}"
+                                Value="true">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <Image
+                                                Stretch="UniformToFill"
+                                                Source="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource UriConverter}}" />
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+
+                            <DataTrigger
+                                Binding="{Binding Settings.Model.BackgroundVideoUri, Converter={StaticResource NotNullOrEmptyConverter}}"
+                                Value="true">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <MediaElement
+                                                lb:LoopBehavior.IsAttached="True"
+                                                Stretch="UniformToFill"
+                                                Source="{Binding Settings.Model.BackgroundVideoUri}" />
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -894,44 +957,8 @@
         <ContentControl
             HorizontalContentAlignment="Stretch"
             VerticalContentAlignment="Stretch"
-            Content="{Binding}">
-            <ContentControl.Style>
-                <Style TargetType="ContentControl">
-                    <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
-                    
-                    <Style.Triggers>
-                        <DataTrigger
-                            Binding="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource NotNullOrEmptyConverter}}"
-                            Value="true">
-                            <Setter Property="ContentTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <Image
-                                            Stretch="UniformToFill"
-                                            Source="{Binding Settings.Model.BackgroundImageUri, Converter={StaticResource UriConverter}}" />
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-
-                        <DataTrigger
-                            Binding="{Binding Settings.Model.BackgroundVideoUri, Converter={StaticResource NotNullOrEmptyConverter}}"
-                            Value="true">
-                            <Setter Property="ContentTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <MediaElement
-                                            lb:LoopBehavior.IsAttached="True"
-                                            Stretch="UniformToFill"
-                                            Source="{Binding Settings.Model.BackgroundVideoUri}" />
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ContentControl.Style>
-        </ContentControl>
+            Content="{Binding}"
+            Style="{StaticResource BackgroundStyle}" />
 
         <ContentControl
             Name="main"

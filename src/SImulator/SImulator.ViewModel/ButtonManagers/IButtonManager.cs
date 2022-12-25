@@ -1,7 +1,4 @@
-﻿using SImulator.ViewModel.Core;
-using SImulator.ViewModel.Model;
-
-namespace SImulator.ViewModel.ButtonManagers;
+﻿namespace SImulator.ViewModel.ButtonManagers;
 
 /// <summary>
 /// Supports players buttons.
@@ -18,10 +15,4 @@ public interface IButtonManager : IAsyncDisposable
     /// Disables players buttons.
     /// </summary>
     void Stop();
-
-    event Func<GameKey, bool>? KeyPressed;
-
-    event Func<PlayerInfo, bool>? PlayerPressed;
-
-    event Func<string, bool, PlayerInfo?>? GetPlayerById;
 }

@@ -37,7 +37,7 @@ public static class CommandWindowBehavior
 
         if (window.DataContext is MainViewModel main)
         {
-            e.Handled = main.OnKeyPressed((GameKey)e.Key);
+            e.Handled = main.OnKeyboardPressed((GameKey)e.Key);
         }
     }
 }

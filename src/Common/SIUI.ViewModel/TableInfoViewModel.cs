@@ -83,6 +83,24 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
     }
 
+    private string _caption = "";
+
+    /// <summary>
+    /// Table caption.
+    /// </summary>
+    public string Caption
+    {
+        get => _caption;
+        set
+        {
+            if (_caption != value)
+            {
+                _caption = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private string _text = "";
 
     /// <summary>
@@ -150,12 +168,12 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         set { _playerIndex = value; OnPropertyChanged(nameof(ActivePlayer)); }
     }
 
-    public string ActivePlayer => _playerIndex < 0 || _playerIndex >= Players.Count ? "" : Players[_playerIndex].Name;
+    public string? ActivePlayer => (_playerIndex < 0 || _playerIndex >= Players.Count) ? "" : Players[_playerIndex].Name;
 
     /// <summary>
     /// Players lost the button chase.
     /// </summary>
-    public ObservableCollection<string> LostButtonPlayers { get; } = new ObservableCollection<string>();
+    public ObservableCollection<string> LostButtonPlayers { get; } = new();
 
     private bool _animateText = false;
 

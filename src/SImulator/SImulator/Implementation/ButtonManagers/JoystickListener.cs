@@ -28,7 +28,7 @@ internal sealed class JoystickListener : ButtonManagerBase
 
     private readonly object _sync = new();
 
-    public JoystickListener()
+    public JoystickListener(IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
         _form = new System.Windows.Forms.Form();
         _timer = new Timer(Timer_Elapsed, null, Timeout.Infinite, Period);
@@ -73,7 +73,7 @@ internal sealed class JoystickListener : ButtonManagerBase
         }
     }
 
-    private void Pressed(int button) => _dispatcher.BeginInvoke(() => OnKeyPressed((GameKey)(System.Windows.Input.Key.D1 + button)));
+    private void Pressed(int button) => _dispatcher.BeginInvoke(() => Listener.OnKeyPressed((GameKey)(System.Windows.Input.Key.D1 + button)));
 
     public override bool Start()
     {

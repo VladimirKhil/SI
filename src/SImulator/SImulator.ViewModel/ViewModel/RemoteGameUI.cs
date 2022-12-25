@@ -9,15 +9,15 @@ using Utils;
 namespace SImulator.ViewModel;
 
 /// <summary>
-/// Класс, реализующий удалённое проведение игры
+/// Implements a game UI.
 /// </summary>
-public class RemoteGameUI : IRemoteGameUI
+public sealed class RemoteGameUI : IRemoteGameUI
 {
     private int _previousCode = -1;
 
-    private IGameHost _gameHost;
+    private IGameHost? _gameHost;
 
-    internal IGameHost GameHost
+    internal IGameHost? GameHost
     {
         get => _gameHost;
         set
@@ -57,16 +57,20 @@ public class RemoteGameUI : IRemoteGameUI
     public TableInfoViewModel TInfo { get; private set; }
 
     public ICommand Next { get; private set; }
+
     public ICommand Back { get; private set; }
+
     public ICommand NextRound { get; private set; }
+
     public ICommand BackRound { get; private set; }
+
     public ICommand Stop { get; private set; }
 
     private bool _stageCallbackBlock = false;
 
     public int ScreenIndex { get; set; }
 
-    public event Action<Exception> OnError;
+    public event Action<Exception>? OnError;
 
     public RemoteGameUI()
     {
@@ -82,20 +86,21 @@ public class RemoteGameUI : IRemoteGameUI
         TInfo.QuestionSelected += QuestionInfo_Selected;
         TInfo.ThemeSelected += ThemeInfo_Selected;
 
-        Next = new SimpleCommand(arg => { if (_gameHost != null) _gameHost.AskNext(); });
-        Back = new SimpleCommand(arg => { if (_gameHost != null) _gameHost.AskBack(); });
-        NextRound = new SimpleCommand(arg => { if (_gameHost != null) _gameHost.AskNextRound(); });
-        BackRound = new SimpleCommand(arg => { if (_gameHost != null) _gameHost.AskBackRound(); });
+        Next = new SimpleCommand(arg => _gameHost?.AskNext());
+        Back = new SimpleCommand(arg => _gameHost?.AskBack());
+        NextRound = new SimpleCommand(arg => _gameHost?.AskNextRound());
+        BackRound = new SimpleCommand(arg => _gameHost?.AskBackRound());
+
         Stop = new SimpleCommand(arg => 
         {
             if (_gameHost != null)
             {
-                UI.Execute(() => _gameHost.AskStop(), OnError);
+                UI.Execute(() => _gameHost.AskStop(), exc => OnError?.Invoke(exc));
             }
         });
     }
 
-    private void TInfo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TableInfoViewModel.TStage))
         {
@@ -111,13 +116,7 @@ public class RemoteGameUI : IRemoteGameUI
         }
     }
 
-    private void TInfo_Ready(object sender, EventArgs e)
-    {
-        if (GameHost != null)
-        {
-            GameHost.OnReady();
-        }
-    }
+    private void TInfo_Ready(object? sender, EventArgs e) => GameHost?.OnReady();
 
     public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound, SoundFinished), OnError);
 
@@ -125,7 +124,7 @@ public class RemoteGameUI : IRemoteGameUI
     {
         if (TInfo.TStage == TableStage.Sign)
         {
-            _gameHost.OnIntroFinished();
+            _gameHost?.OnIntroFinished();
         }
     }
 
@@ -135,8 +134,7 @@ public class RemoteGameUI : IRemoteGameUI
         TInfo.TStage = TableStage.Sign;
     }
 
-    private void RemoteGameUI_Closed(object sender, EventArgs e) =>
-        Task.Factory.StartNew(StopGame, CancellationToken.None, TaskCreationOptions.None, UI.Scheduler);
+    private void RemoteGameUI_Closed(object sender, EventArgs e) => UI.Execute(StopGame, exc => OnError?.Invoke(exc));
 
     public async void StopGame()
     {
@@ -193,45 +191,28 @@ public class RemoteGameUI : IRemoteGameUI
             TInfo.QuestionStyle = QuestionStyle.Normal;
         }
     }
-    
-    public void SetText(string text)
-    {
-        TInfo.Text = text;
-    }
 
-    public void SetQuestionContentType(QuestionContentType questionContentType)
-    {
-        TInfo.QuestionContentType = questionContentType;
-    }
+    public void SetText(string text) => TInfo.Text = text;
 
-    public void SetQuestionStyle(QuestionStyle questionStyle)
-    {
-        TInfo.QuestionStyle = questionStyle;
-    }
+    public void SetQuestionContentType(QuestionContentType questionContentType) => TInfo.QuestionContentType = questionContentType;
 
-    public void SetQuestionSound(bool sound)
-    {
-        TInfo.Sound = sound;
-    }
+    public void SetQuestionStyle(QuestionStyle questionStyle) => TInfo.QuestionStyle = questionStyle;
 
-    public void AddPlayer()
-    {
-        TInfo.Players.Add(new SimplePlayerInfo());
-    }
+    public void SetQuestionSound(bool sound) => TInfo.Sound = sound;
+
+    public void AddPlayer() => TInfo.Players.Add(new SimplePlayerInfo());
 
     public void RemovePlayer(string playerName)
     {
         var player = TInfo.Players.FirstOrDefault(info => info.Name == playerName);
+
         if (player != null)
         {
             TInfo.Players.Remove(player);
         }
     }
 
-    public void ClearPlayers()
-    {
-        TInfo.Players.Clear();
-    }
+    public void ClearPlayers() => TInfo.Players.Clear();
 
     public void UpdatePlayerInfo(int index, PlayerInfo player)
     {
@@ -260,13 +241,16 @@ public class RemoteGameUI : IRemoteGameUI
     private void ThemeInfo_Selected(ThemeInfoViewModel theme)
     {
         int themeIndex;
+
         for (themeIndex = 0; themeIndex < TInfo.RoundInfo.Count; themeIndex++)
         {
             if (TInfo.RoundInfo[themeIndex] == theme)
+            {
                 break;
+            }
         }
 
-        GameHost.OnThemeSelected(themeIndex);
+        GameHost?.OnThemeSelected(themeIndex);
     }
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
@@ -281,12 +265,15 @@ public class RemoteGameUI : IRemoteGameUI
 
         int questionIndex = -1;
         int themeIndex;
+
         for (themeIndex = 0; themeIndex < TInfo.RoundInfo.Count; themeIndex++)
         {
-            bool found = false;
-            for (questionIndex = 0; questionIndex < TInfo.RoundInfo[themeIndex].Questions.Count; questionIndex++)
+            var found = false;
+            var theme = TInfo.RoundInfo[themeIndex];
+
+            for (questionIndex = 0; questionIndex < theme.Questions.Count; questionIndex++)
             {
-                if (TInfo.RoundInfo[themeIndex].Questions[questionIndex] == question)
+                if (theme.Questions[questionIndex] == question)
                 {
                     found = true;
                     break;
@@ -299,7 +286,7 @@ public class RemoteGameUI : IRemoteGameUI
             }
         }
 
-        GameHost.OnQuestionSelected(themeIndex, questionIndex);
+        GameHost?.OnQuestionSelected(themeIndex, questionIndex);
     }
 
     public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
@@ -326,6 +313,7 @@ public class RemoteGameUI : IRemoteGameUI
                         }
 
                         var code = PlatformManager.Instance.GetKeyNumber(key);
+
                         if (code == -1)
                         {
                             _previousCode = -1;
@@ -339,10 +327,11 @@ public class RemoteGameUI : IRemoteGameUI
                         }
                         else
                         {
-                            if (_previousCode < TInfo.RoundInfo.Count && code < TInfo.RoundInfo[_previousCode].Questions.Count
+                            if (_previousCode < TInfo.RoundInfo.Count
+                                && code < TInfo.RoundInfo[_previousCode].Questions.Count
                                 && TInfo.RoundInfo[_previousCode].Questions[code].Price > -1)
                             {
-                                GameHost.OnQuestionSelected(_previousCode, code);
+                                GameHost?.OnQuestionSelected(_previousCode, code);
                                 _previousCode = -1;
                                 return true;
                             }
@@ -351,6 +340,7 @@ public class RemoteGameUI : IRemoteGameUI
                         }
 
                     }
+
                     break;
 
                 case TableStage.Final:
@@ -364,10 +354,11 @@ public class RemoteGameUI : IRemoteGameUI
 
                         if (code < TInfo.RoundInfo.Count && TInfo.RoundInfo[code].Name != null)
                         {
-                            GameHost.OnThemeSelected(code);
+                            GameHost?.OnThemeSelected(code);
                             return true;
                         }
                     }
+
                     break;
             }
         }
@@ -405,8 +396,7 @@ public class RemoteGameUI : IRemoteGameUI
 
     public void StopMedia() => TInfo.OnMediaPause();
 
-    public void RestoreQuestion(int themeIndex, int questionIndex, int price)
-    {
-        TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
-    }
+    public void RestoreQuestion(int themeIndex, int questionIndex, int price) => TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
+
+    public void SetCaption(string caption) => TInfo.Caption = caption;
 }
