@@ -499,14 +499,6 @@ public sealed class ViewerData : Data
         }
     }
 
-    private string _questionCaption;
-
-    public string QuestionCaption
-    {
-        get => _questionCaption;
-        set { if (_questionCaption != value) { _questionCaption = value; OnPropertyChanged(); } }
-    }
-
     public string PackageId { get; internal set; }
 
     public int ButtonBlockingTime { get; internal set; } = 3;

@@ -154,4 +154,6 @@ public interface IViewer : ILogic
     void OnBanned(BannedInfo bannedInfo) { }
 
     void OnUnbanned(string ip) { }
+
+    void SetCaption(string caption) { }
 }

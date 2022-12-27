@@ -569,12 +569,14 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                             }
 
                             if (ClientData.ShowMan != null)
+                            {
                                 ClientData.ShowMan.GameStarted = true;
+                            }
 
                             ClientData.ForceStart.CanBeExecuted = false;
                         }
 
-                        ClientData.QuestionCaption = null;
+                        _logic.SetCaption("");
 
                         switch (ClientData.Stage)
                         {
@@ -656,7 +658,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     {
                         _logic.SetText(mparams[1], TableStage.QuestionPrice);
                         OnThemeOrQuestion();
-                        ClientData.QuestionCaption = $"{ClientData.ThemeName}, {mparams[1]}";
+                        _logic.SetCaption($"{ClientData.ThemeName}, {mparams[1]}");
                     }
                     break;
 
@@ -720,7 +722,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                                 var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
                                 var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
                                 ClientData.CurPriceRight = ClientData.CurPriceWrong = selectedQuestion.Price;
-                                ClientData.QuestionCaption = $"{selectedTheme.Name}, {selectedQuestion.Price}";
+                                _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
                             }
                         }
 
@@ -740,7 +742,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 case Messages.QuestionCaption:
                     if (mparams.Length > 1)
                     {
-                        ClientData.QuestionCaption = mparams[1];
+                        _logic.SetCaption(mparams[1]);
                     }
                     break;
 
@@ -780,7 +782,6 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                 case Messages.RightAnswer:
                     _logic.SetRight(mparams[2]);
-                    ClientData.QuestionCaption = null;
                     break;
 
                 case Messages.Resume:

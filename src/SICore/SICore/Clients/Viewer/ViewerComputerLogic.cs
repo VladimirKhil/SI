@@ -208,7 +208,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
         switch (timerCommand)
         {
             case MessageParams.Timer_Go:
-
                 var maxTime = int.Parse(arg);
                 var now = DateTime.UtcNow;
                 _timersInfo[timerIndex].IsEnabled = true;
@@ -225,15 +224,12 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
 
             case MessageParams.Timer_Pause:
                 var currentTime = int.Parse(arg);
-
                 _timersInfo[timerIndex].IsEnabled = false;
                 _timersInfo[timerIndex].PauseTime = currentTime;
                 break;
 
             case MessageParams.Timer_UserPause:
-
                 var currentTime2 = int.Parse(arg);
-
                 _timersInfo[timerIndex].IsUserEnabled = false;
 
                 if (_timersInfo[timerIndex].IsEnabled)
@@ -244,7 +240,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
                 break;
 
             case "RESUME":
-
                 _timersInfo[timerIndex].IsEnabled = true;
 
                 if (!_timersInfo[timerIndex].IsUserEnabled)
@@ -259,7 +254,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
                 break;
 
             case "USER_RESUME":
-
                 _timersInfo[timerIndex].IsUserEnabled = true;
 
                 if (!_timersInfo[timerIndex].IsEnabled || _timersInfo[timerIndex].PauseTime == -1)

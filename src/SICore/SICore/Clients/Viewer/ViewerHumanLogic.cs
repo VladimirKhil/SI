@@ -1356,4 +1356,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
             }
         },
         exc => ClientData.BackLink.OnError(exc));
+
+    public void SetCaption(string caption) => TInfo.Caption = caption;
 }
