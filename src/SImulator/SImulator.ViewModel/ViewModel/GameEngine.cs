@@ -287,7 +287,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         LocalInfo = new TableInfoViewModel(players);
 
-        foreach (var playerInfo in LocalInfo.Players)
+        foreach (var playerInfo in LocalInfo.Players.Cast<PlayerInfo>())
         {
             playerInfo.IsRegistered = false;
             playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
