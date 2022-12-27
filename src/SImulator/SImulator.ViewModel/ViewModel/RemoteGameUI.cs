@@ -399,4 +399,6 @@ public sealed class RemoteGameUI : IRemoteGameUI
     public void RestoreQuestion(int themeIndex, int questionIndex, int price) => TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = price;
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
+
+    public void SetLeftTime(double leftTime) => TInfo.TimeLeft = leftTime;
 }

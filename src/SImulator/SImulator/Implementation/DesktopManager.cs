@@ -338,7 +338,7 @@ internal sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override ILogger CreateLogger(string folder)
+    public override ILogger CreateLogger(string? folder)
     {
         if (folder == null)
         {

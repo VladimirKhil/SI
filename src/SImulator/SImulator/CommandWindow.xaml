@@ -620,20 +620,25 @@
                 </DockPanel>
             </Grid>
         </TabItem>
-        
+
         <TabItem
             Header="Игра"
             IsSelected="{Binding Mode, Converter={StaticResource IsModerator}, Mode=OneWay}"
             Visibility="{Binding Mode, Converter={StaticResource ModeratorView}}">
-            
             <DockPanel Margin="2,2,0,0" DataContext="{Binding Game}">
-                <Grid DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Margin="0,5,4,5" HorizontalAlignment="Center" Background="{StaticResource AreaBrush}">
+                <Grid
+                    DockPanel.Dock="Bottom"
+                    VerticalAlignment="Bottom"
+                    Margin="0,5,4,5"
+                    HorizontalAlignment="Center"
+                    Background="{StaticResource AreaBrush}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     
                     <Grid.RowDefinitions>
+                        <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
@@ -646,8 +651,13 @@
                                         <DrawingImage.Drawing>
                                             <DrawingGroup>
                                                 <DrawingGroup.Children>
-                                                    <GeometryDrawing Geometry="M0,0L-11.6,6.7L0,13.4z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                    <GeometryDrawing Geometry="M14,0L2.4,6.7L14,13.4z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                                    <GeometryDrawing
+                                                        Geometry="M0,0L-11.6,6.7L0,13.4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                                    
+                                                    <GeometryDrawing
+                                                        Geometry="M14,0L2.4,6.7L14,13.4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                                 </DrawingGroup.Children>
                                             </DrawingGroup>
                                         </DrawingImage.Drawing>
@@ -655,11 +665,19 @@
                                 </Image.Source>
                             </Image>
                         </Button>
+
+                        <TextBlock Margin="5,0,0,0" Text="Раунд" VerticalAlignment="Center" Width="100" />
                         
-                        <TextBlock Margin="5,0,0,0" Text="Раунд" VerticalAlignment="Center" Width="50" />
-                        <ProgressBar Foreground="{StaticResource ImageBrush}" Width="120" Margin="5,3,0,3" Minimum="0" Maximum="{Binding Settings.Model.RoundTime}" Value="{Binding RoundTime}" />
+                        <ProgressBar
+                            Foreground="{StaticResource ImageBrush}"
+                            Width="120"
+                            Margin="5,3,0,3"
+                            Minimum="0"
+                            Maximum="{Binding Settings.Model.RoundTime}"
+                            Value="{Binding RoundTime}" />
+                        
                         <Button BorderThickness="0" Style="{StaticResource TimeButton}" Margin="5,0,0,0" DataContext="{Binding ActiveRoundCommand}" />
-                        
+
                         <Button Style="{StaticResource ToolButton}" Margin="5,0,0,0" Padding="9,5,7,5" ToolTip="Следующий раунд" Command="{Binding NextRound}">
                             <Image Stretch="Uniform">
                                 <Image.Source>
@@ -667,8 +685,13 @@
                                         <DrawingImage.Drawing>
                                             <DrawingGroup>
                                                 <DrawingGroup.Children>
-                                                    <GeometryDrawing Geometry="M0,0L11.6,6.7L0,13.4z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                    <GeometryDrawing Geometry="M14,0L25.6,6.7L14,13.4z" Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                                    <GeometryDrawing
+                                                        Geometry="M0,0L11.6,6.7L0,13.4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                                                    <GeometryDrawing
+                                                        Geometry="M14,0L25.6,6.7L14,13.4z"
+                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                                 </DrawingGroup.Children>
                                             </DrawingGroup>
                                         </DrawingImage.Drawing>
@@ -676,16 +699,20 @@
                                 </Image.Source>
                             </Image>
                         </Button>
-                        
                     </StackPanel>
                     
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <TextBlock Text="Вопрос" VerticalAlignment="Center" Width="50" />
+                        <TextBlock Text="Вопрос" VerticalAlignment="Center" Width="100" />
                         <ProgressBar Foreground="{StaticResource ImageBrush}" Width="120" Margin="5,3,0,3" Minimum="0" Maximum="{Binding QuestionTimeMax}" Value="{Binding QuestionTime}" />
                         <Button BorderThickness="0" Style="{StaticResource TimeButton}" Margin="5,0,0,0" DataContext="{Binding ActiveQuestionCommand}" />
                     </StackPanel>
-                    
-                    <Button Style="{StaticResource ToolButton}" Grid.Column="1" Grid.RowSpan="2" BorderThickness="0" HorizontalAlignment="Center" ToolTip="Завершить игру" Margin="5,0,5,0" Height="30" Width="30" Padding="8" Command="{Binding Stop}">
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
+                        <TextBlock Text="Размышление" VerticalAlignment="Center" Width="100" />
+                        <ProgressBar Foreground="{StaticResource ImageBrush}" Width="120" Margin="5,3,40,3" Minimum="0" Maximum="{Binding ThinkingTimeMax}" Value="{Binding ThinkingTime}" />
+                    </StackPanel>
+
+                    <Button Style="{StaticResource ToolButton}" Grid.Column="1" Grid.RowSpan="3" BorderThickness="0" HorizontalAlignment="Center" ToolTip="Завершить игру" Margin="5,0,5,0" Height="30" Width="30" Padding="8" Command="{Binding Stop}">
                         <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
                     </Button>
                 </Grid>
@@ -719,6 +746,7 @@
                             <Setter Property="Height" Value="25" />
                             <Setter Property="Padding" Value="4" />
                             <Setter Property="Margin" Value="0" />
+                            
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="RadioButton">
@@ -823,6 +851,7 @@
                 <UniformGrid Columns="2" Margin="0,0,4,0">
                     <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет текста" />
+                        
                         <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
@@ -834,6 +863,7 @@
                     
                     <StackPanel Margin="5,0,0,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет фона" />
+                        
                         <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
@@ -857,6 +887,7 @@
                     
                     <StackPanel Margin="5,0,0,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет фона отвечающего игрока" />
+                        
                         <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="3" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
@@ -897,29 +928,52 @@
                 
                 <DockPanel>
                     <Button Margin="5,0,4,0" Command="{Binding SelectLogoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
-                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.SIUISettings.Model.LogoUri}" />
+                    
+                    <TextBox
+                        Width="Auto"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SettingsViewModel.SIUISettings.Model.LogoUri}" />
                 </DockPanel>
                 
                 <TextBlock Style="{StaticResource Header}" Text="Заставочный видеофайл" />
                 
                 <DockPanel>
                     <Button Margin="5,0,4,0" Command="{Binding SelectVideoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
-                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding Settings.VideoUrl}" />
+                    
+                    <TextBox
+                        Width="Auto"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding Settings.VideoUrl}" />
                 </DockPanel>
                 
                 <TextBlock Style="{StaticResource Header}" Text="Изображение-фон" />
-                
+
                 <DockPanel>
-                    
                     <Button Margin="5,0,4,0" Command="{Binding SelectBackgroundImageFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
-                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundImageUri}" />
+                    
+                    <TextBox
+                        Width="Auto"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundImageUri}" />
                 </DockPanel>
                 
                 <TextBlock Style="{StaticResource Header}" Text="Видеофайл-фон" />
                 
                 <DockPanel>
                     <Button Margin="5,0,4,0" Command="{Binding SelectBackgroundVideoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
-                    <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundVideoUri}" />
+                    
+                    <TextBox
+                        Width="Auto"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Stretch"
+                        Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundVideoUri}" />
                 </DockPanel>
                 <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="1" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
             </StackPanel>
@@ -1023,28 +1077,35 @@
                 <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="2" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
             </StackPanel>
         </TabItem>
+        
         <TabItem Header="Кнопки" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
             <StackPanel Margin="2,2,0,0">
                 <TextBlock Style="{StaticResource Title}">Кнопки</TextBlock>
                 <TextBlock FontStyle="Italic" TextWrapping="Wrap">Горячие клавиши игрового табло:<LineBreak />Пробел (левая кнопка мыши) - перейти дальше<LineBreak />Backspace - перейти назад<LineBreak />Escape (правая кнопка мыши) - завершить игру</TextBlock>
+                
                 <StackPanel Orientation="Horizontal">
                     <CheckBox IsChecked="{Binding SettingsViewModel.SIUISettings.Model.KeyboardControl}" Margin="0,5">Использовать клавиатурный выбор на табло</CheckBox>
+                    
                     <Button Style="{StaticResource HelpButton}">
                         <lb:TipBehavior.Tip>
                             <TextBlock TextWrapping="Wrap">Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия</TextBlock>
                         </lb:TipBehavior.Tip>
                     </Button>
                 </StackPanel>
+                
                 <TextBlock Style="{StaticResource Header}">Игровые кнопки</TextBlock>
-                <ComboBox ItemsSource="{Binding Source={StaticResource TempPlayerButtonTypes}}"
-                          SelectedItem="{Binding Settings.UsePlayersKeys}"
-                          IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
+                
+                <ComboBox
+                    ItemsSource="{Binding Source={StaticResource TempPlayerButtonTypes}}"
+                    SelectedItem="{Binding Settings.UsePlayersKeys}"
+                    IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="vmc:PlayerKeysModes">
                             <TextBlock Text="{Binding Converter={StaticResource PlayerButtonTypesConverter}}" />
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+                
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
@@ -1056,9 +1117,11 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
+                    
                     <TextBlock Style="{StaticResource Header}">Номер COM-порта</TextBlock>
                     <ComboBox Margin="0,5" ItemsSource="{Binding ComPorts}" SelectedItem="{Binding Settings.ComPort}" />
                 </StackPanel>
+                
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
@@ -1067,16 +1130,20 @@
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.None}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.External}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
+                    
                     <TextBlock FontStyle="Italic" TextWrapping="Wrap" Margin="0,0,0,6">Соответствуют позициям игроков в списке</TextBlock>
+                    
                     <ItemsControl HorizontalAlignment="Left" Margin="0,5" ItemsSource="{Binding Settings.PlayerKeys2}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -1088,17 +1155,20 @@
                                 </DockPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
+                        
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel Orientation="Vertical" Height="110" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
+                    
                     <Button Command="{Binding ActivePlayerButtonCommand}" HorizontalAlignment="Left" Height="25" Width="140" Content="{Binding ActivePlayerButtonCommand.Name}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" LostKeyboardFocus="Button_LostKeyboardFocus_1" />
                     <CheckBox IsChecked="{Binding Settings.SignalsAfterTimer}" Margin="0,10,0,5">Принимать сигналы игроков после истечения времени на размышление</CheckBox>
                     <TextBlock Style="{StaticResource Header}" Text="Время блокировки кнопки (с)" />
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.BlockingTime}" />
                 </StackPanel>
+                
                 <TextBlock FontStyle="Italic" Margin="0,5,0,0" TextWrapping="Wrap" Text="В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -1111,6 +1181,7 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
+                
                 <StackPanel>
                     <TextBlock FontStyle="Italic" Margin="0,5,0,0" TextWrapping="Wrap">
                         <Run>В данном режиме в качестве кнопок используются мобильные устройства участников (телефоны, планшеты и пр.). Перед началом игры производится регистрация этих устройств и их связывание с игроками.</Run>

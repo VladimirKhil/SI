@@ -1,45 +1,44 @@
 ﻿using SImulator.ViewModel.PlatformSpecific;
 using System.IO;
 
-namespace SImulator.Implementation
+namespace SImulator.Implementation;
+
+internal sealed class Logger : ILogger
 {
-    internal sealed class Logger : ILogger
+    private StreamWriter _writer;
+
+    private Logger()
     {
-        private StreamWriter _writer;
 
-        private Logger()
+    }
+
+    public static Logger Create(string? filename)
+    {
+        var logger = new Logger();
+
+        if (filename != null)
         {
-
+            logger._writer = new StreamWriter(filename) { AutoFlush = true };
         }
 
-        public static Logger Create(string? filename)
+        return logger;
+    }
+
+    public void Write(string message, params object?[] args)
+    {
+        if (_writer == null)
         {
-            var logger = new Logger();
-
-            if (filename != null)
-            {
-                logger._writer = new StreamWriter(filename) { AutoFlush = true };
-            }
-
-            return logger;
+            return;
         }
 
-        public void Write(string message, params object[] args)
-        {
-            if (_writer == null)
-            {
-                return;
-            }
+        _writer.WriteLine(message, args);
+    }
 
-            _writer.WriteLine(message, args);
-        }
-
-        public void Dispose()
+    public void Dispose()
+    {
+        if (_writer != null)
         {
-            if (_writer != null)
-            {
-                _writer.Dispose();
-            }
+            _writer.Dispose();
         }
     }
 }

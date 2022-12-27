@@ -68,4 +68,6 @@ public interface IRemoteGameUI
     void RestoreQuestion(int themeIndex, int questionIndex, int price);
 
     void SetCaption(string caption);
+
+    void SetLeftTime(double leftTime);
 }

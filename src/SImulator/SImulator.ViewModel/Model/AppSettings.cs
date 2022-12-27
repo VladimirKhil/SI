@@ -43,7 +43,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     private int _thinkingTime = ThinkingTimeDefaultValue;
 
     /// <summary>
-    /// Time for thinking on question.
+    /// Time for pressing button.
     /// </summary>
     [DefaultValue(ThinkingTimeDefaultValue)]
     public int ThinkingTime
@@ -54,6 +54,69 @@ public sealed class AppSettings : INotifyPropertyChanged
             if (_thinkingTime != value && value > 0)
             {
                 _thinkingTime = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private const int ThinkingTime2DefaultValue = 15;
+
+    private int _thinkingTime2 = ThinkingTime2DefaultValue;
+
+    /// <summary>
+    /// Time for thinking on question.
+    /// </summary>
+    [DefaultValue(ThinkingTime2DefaultValue)]
+    public int ThinkingTime2
+    {
+        get => _thinkingTime2;
+        set
+        {
+            if (_thinkingTime2 != value && value > 0)
+            {
+                _thinkingTime2 = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private const int SpecialQuestionThinkingTimeDefaultValue = 30;
+
+    private int _specialQuestionThinkingTime = SpecialQuestionThinkingTimeDefaultValue;
+
+    /// <summary>
+    /// Time for thinking on special question.
+    /// </summary>
+    [DefaultValue(SpecialQuestionThinkingTimeDefaultValue)]
+    public int SpecialQuestionThinkingTime
+    {
+        get => _specialQuestionThinkingTime;
+        set
+        {
+            if (_specialQuestionThinkingTime != value && value > 0)
+            {
+                _specialQuestionThinkingTime = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private const int FinalQuestionThinkingTimeDefaultValue = 30;
+
+    private int _finalQuestionThinkingTime = FinalQuestionThinkingTimeDefaultValue;
+
+    /// <summary>
+    /// Time for thinking on final question.
+    /// </summary>
+    [DefaultValue(FinalQuestionThinkingTimeDefaultValue)]
+    public int FinalQuestionThinkingTime
+    {
+        get => _finalQuestionThinkingTime;
+        set
+        {
+            if (_finalQuestionThinkingTime != value && value > 0)
+            {
+                _finalQuestionThinkingTime = value;
                 OnPropertyChanged();
             }
         }

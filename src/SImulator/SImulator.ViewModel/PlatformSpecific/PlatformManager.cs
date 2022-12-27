@@ -51,7 +51,7 @@ public abstract class PlatformManager
 
     public abstract void PlaySound(string name, Action onFinish);
 
-    public abstract ILogger CreateLogger(string folder);
+    public abstract ILogger CreateLogger(string? folder);
 
     public abstract void ClearMedia();
 

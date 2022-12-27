@@ -23,8 +23,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 {
     #region Fields
 
-    internal event Action<string> Error;
-    internal event Action RequestStop;
+    internal event Action<string>? Error;
+    internal event Action? RequestStop;
 
     private readonly Stack<Tuple<PlayerInfo, int, bool>> _answeringHistory = new();
 
@@ -41,6 +41,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private ILogger? _logger;
 
     private readonly Timer _roundTimer;
+    private readonly Timer _questionTimer;
     private readonly Timer _thinkingTimer;
 
     private bool _timerStopped;
@@ -89,9 +90,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     public ICommand PreviousRound => _previousRound;
 
-    private ICommand _activeRoundCommand;
+    private ICommand? _activeRoundCommand;
 
-    public ICommand ActiveRoundCommand
+    public ICommand? ActiveRoundCommand
     {
         get => _activeRoundCommand;
         set { _activeRoundCommand = value; OnPropertyChanged(); }
@@ -162,7 +163,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private int _questionTime = 0;
 
     /// <summary>
-    /// Current thinking time value.
+    /// Current question time value.
     /// </summary>
     public int QuestionTime
     {
@@ -173,7 +174,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private int _questionTimeMax = int.MaxValue;
 
     /// <summary>
-    /// Maximum thinking time value.
+    /// Maximum question time value.
     /// </summary>
     public int QuestionTimeMax
     {
@@ -181,19 +182,41 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         set { _questionTimeMax = value; OnPropertyChanged(); }
     }
 
-    private Round _activeRound;
+    private int _thinkingTime = 0;
 
-    private Question _activeQuestion;
+    /// <summary>
+    /// Current thinking time value.
+    /// </summary>
+    public int ThinkingTime
+    {
+        get => _thinkingTime;
+        set { _thinkingTime = value; OnPropertyChanged(); }
+    }
 
-    public Question ActiveQuestion
+    private int _thinkingTimeMax = int.MaxValue;
+
+    /// <summary>
+    /// Maximum thinking time value.
+    /// </summary>
+    public int ThinkingTimeMax
+    {
+        get => _thinkingTimeMax;
+        set { _thinkingTimeMax = value; OnPropertyChanged(); }
+    }
+
+    private Round? _activeRound;
+
+    private Question? _activeQuestion;
+
+    public Question? ActiveQuestion
     {
         get => _activeQuestion;
         set { _activeQuestion = value; OnPropertyChanged(); }
     }
 
-    private Theme _activeTheme;
+    private Theme? _activeTheme;
 
-    public Theme ActiveTheme
+    public Theme? ActiveTheme
     {
         get => _activeTheme;
         set { _activeTheme = value; OnPropertyChanged(); }
@@ -264,10 +287,10 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         LocalInfo = new TableInfoViewModel(players);
 
-        foreach (PlayerInfo item in LocalInfo.Players.Cast<PlayerInfo>())
+        foreach (var playerInfo in LocalInfo.Players)
         {
-            item.IsRegistered = false;
-            item.PropertyChanged += Info_PropertyChanged;
+            playerInfo.IsRegistered = false;
+            playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
         }
 
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
@@ -302,6 +325,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         UpdateNextCommand();
 
         _roundTimer = new Timer(RoundTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+        _questionTimer = new Timer(QuestionTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
         _thinkingTimer = new Timer(ThinkingTimer_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
 
         settings.Model.SIUISettings.PropertyChanged += Default_PropertyChanged;
@@ -370,21 +394,39 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private void GameHost_RoundThemesFinished()
     {
         ShowingRoundThemes = false;
-        UserInterface?.SetStage(TableStage.RoundTable);
+        UserInterface.SetStage(TableStage.RoundTable);
     }
 
     private void GameHost_MediaEnd()
     {
         ActiveMediaCommand = RunMediaTimer;
 
-        if ((!Settings.Model.FalseStart || !Settings.Model.FalseStartMultimedia || Settings.Model.UsePlayersKeys == PlayerKeysModes.None) && _engine.IsQuestionFinished())
+        if ((!Settings.Model.FalseStart
+            || !Settings.Model.FalseStartMultimedia
+            || Settings.Model.UsePlayersKeys == PlayerKeysModes.None)
+            && _engine.IsQuestionFinished())
         {
-            if (Settings.Model.ThinkingTime > 0)
+            if (_activeRound.Type == RoundTypes.Standart && ActiveQuestion.Type.Name == QuestionTypes.Simple)
             {
-                // Запуск таймера при игре на мультимедиа без фальстартов
-                // С фальстартами - по дополнительному нажатию кнопки
-                QuestionTimeMax = Settings.Model.ThinkingTime;
-                RunQuestionTimer_Executed(0);
+                if (Settings.Model.ThinkingTime > 0)
+                {
+                    // Запуск таймера при игре на мультимедиа без фальстартов
+                    // С фальстартами - по дополнительному нажатию кнопки
+                    QuestionTimeMax = Settings.Model.ThinkingTime;
+                    RunQuestionTimer_Executed(0);
+                }
+            }
+            else
+            {
+                var time = _activeRound.Type == RoundTypes.Standart
+                    ? Settings.Model.SpecialQuestionThinkingTime
+                    : Settings.Model.FinalQuestionThinkingTime;
+
+                if (time > 0)
+                {
+                    ThinkingTimeMax = time;
+                    RunThinkingTimer_Executed(0);
+                }
             }
         }
     }
@@ -403,17 +445,14 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
     }
 
-    private void GameHost_MediaStart()
-    {
-        IsMediaControlled = true;
-    }
+    private void GameHost_MediaStart() => IsMediaControlled = true;
 
     #region Event handlers
 
     private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
         UserInterface?.UpdateSettings(Settings.SIUISettings.Model);
 
-    private void Info_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void PlayerInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(PlayerInfo.IsSelected) || e.PropertyName == nameof(PlayerInfo.IsRegistered))
         {
@@ -446,17 +485,18 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         UserInterface?.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
     }
 
-    private void ThinkingTimer_Elapsed(object? state) => UI.Execute(
+    private void QuestionTimer_Elapsed(object? state) => UI.Execute(
         () =>
         {
             QuestionTime++;
+            UserInterface.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
 
             if (QuestionTime < QuestionTimeMax)
             {
                 return;
             }
 
-            UserInterface?.SetSound(Settings.Model.Sounds.NoAnswer);
+            UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
             StopQuestionTimer_Executed(null);
             ActiveQuestionCommand = null;
 
@@ -471,6 +511,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         () =>
         {
             RoundTime++;
+
             if (RoundTime >= Settings.Model.RoundTime)
             {
                 _engine.SetTimeout();
@@ -479,9 +520,24 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         },
         exc => OnError(exc.ToString()));
 
+    private void ThinkingTimer_Elapsed(object? state) => UI.Execute(
+        () =>
+        {
+            ThinkingTime++;
+
+            if (ThinkingTime < ThinkingTimeMax)
+            {
+                return;
+            }
+
+            StopThinkingTimer_Executed(null);
+        },
+        exc => OnError(exc.ToString()));
+
     private void ThemeInfo_Selected(ThemeInfoViewModel theme)
     {
         int themeIndex;
+
         for (themeIndex = 0; themeIndex < LocalInfo.RoundInfo.Count; themeIndex++)
         {
             if (LocalInfo.RoundInfo[themeIndex] == theme)
@@ -527,38 +583,26 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     #region Command handlers
 
-    private void NextRound_Executed(object arg)
+    private void NextRound_Executed(object? arg)
     {
-        try
-        {
-            StopRoundTimer_Executed(0);
-            StopQuestionTimer_Executed(0);
-            _engine.MoveNextRound();
-        }
-        catch (TimeoutException exc)
-        {
-            PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-        }
+        StopRoundTimer_Executed(0);
+        StopQuestionTimer_Executed(0);
+        StopThinkingTimer_Executed(0);
+        _engine.MoveNextRound();
     }
 
-    private void PreviousRound_Executed(object arg)
+    private void PreviousRound_Executed(object? arg)
     {
-        try
-        {
-            StopRoundTimer_Executed(0);
-            StopQuestionTimer_Executed(0);
-            ActiveRoundCommand = null;
-            UserInterface.SetStage(TableStage.Sign);
+        StopRoundTimer_Executed(0);
+        StopQuestionTimer_Executed(0);
+        StopThinkingTimer_Executed(0);
+        ActiveRoundCommand = null;
+        UserInterface.SetStage(TableStage.Sign);
 
-            _engine.MoveBackRound();
-        }
-        catch (TimeoutException exc)
-        {
-            PlatformManager.Instance.ShowMessage(string.Format("Ошибка связи: {0}", exc.Message));
-        }
+        _engine.MoveBackRound();
     }
 
-    private void RunRoundTimer_Executed(object arg)
+    private void RunRoundTimer_Executed(object? arg)
     {
         if (arg != null)
         {
@@ -589,7 +633,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             QuestionTime = 0;
         }
 
-        _thinkingTimer.Change(1000, 1000);
+        _questionTimer.Change(1000, 1000);
 
         ActiveQuestionCommand = StopQuestionTimer;
     }
@@ -601,8 +645,28 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             QuestionTime = 0;
         }
 
-        _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
         ActiveQuestionCommand = RunQuestionTimer;
+    }
+
+    private void RunThinkingTimer_Executed(object? arg)
+    {
+        if (arg != null)
+        {
+            ThinkingTime = 0;
+        }
+
+        _thinkingTimer.Change(1000, 1000);
+    }
+
+    private void StopThinkingTimer_Executed(object? arg)
+    {
+        if (arg != null)
+        {
+            ThinkingTime = 0;
+        }
+
+        _thinkingTimer.Change(Timeout.Infinite, Timeout.Infinite);
     }
 
     private void RunMediaTimer_Executed(object? arg)
@@ -617,34 +681,34 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveMediaCommand = RunMediaTimer;
     }
 
-    private void AddPlayer_Executed(object arg)
+    private void AddPlayer_Executed(object? arg)
     {
         var playerInfo = new PlayerInfo();
-        playerInfo.PropertyChanged += Info_PropertyChanged;
+        playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
 
         LocalInfo.Players.Add(playerInfo);
         UserInterface.AddPlayer();
     }
 
-    private void RemovePlayer_Executed(object arg)
+    private void RemovePlayer_Executed(object? arg)
     {
         if (arg is not SimplePlayerInfo player)
         {
             return;
         }
 
-        player.PropertyChanged -= Info_PropertyChanged;
+        player.PropertyChanged -= PlayerInfo_PropertyChanged;
         LocalInfo.Players.Remove(player);
-        UserInterface?.RemovePlayer(player.Name);
+        UserInterface.RemovePlayer(player.Name);
     }
 
-    private void ClearPlayers_Executed(object arg)
+    private void ClearPlayers_Executed(object? arg)
     {
         LocalInfo.Players.Clear();
-        UserInterface?.ClearPlayers();
+        UserInterface.ClearPlayers();
     }
 
-    private void AddRight_Executed(object arg)
+    private void AddRight_Executed(object? arg)
     {
         if (arg is not PlayerInfo player)
         {
@@ -659,7 +723,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         player.Right++;
         player.Sum += Price;
 
-        UserInterface?.SetSound(Settings.Model.Sounds.AnswerRight);
+        UserInterface.SetSound(Settings.Model.Sounds.AnswerRight);
 
         _logger.Write("{0} +{1}", player.Name, Price);
 
@@ -675,7 +739,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
     }
 
-    private void AddWrong_Executed(object arg)
+    private void AddWrong_Executed(object? arg)
     {
         if (arg is not PlayerInfo player)
         {
@@ -692,7 +756,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         var substract = Settings.Model.SubstractOnWrong ? Price : 0;
         player.Sum -= substract;
 
-        UserInterface?.SetSound(Settings.Model.Sounds.AnswerWrong);
+        UserInterface.SetSound(Settings.Model.Sounds.AnswerWrong);
 
         _logger.Write("{0} -{1}", player.Name, substract);
 
@@ -832,7 +896,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
     }
 
-    private async void Engine_Package(Package package, IMedia packageLogo)
+    private void Engine_Package(Package package, IMedia packageLogo)
     {
         if (UserInterface == null)
         {
@@ -936,13 +1000,26 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         if (finished)
         {
-            if (!pressMode && Settings.Model.ThinkingTime > 0 && ActiveMediaCommand == null)
+            if (_activeRound.Type == RoundTypes.Standart && question.Type.Name == QuestionTypes.Simple)
             {
-                // Запуск таймера при игре:
-                // 1) без фальстартов - на фальстартах он активируется доп. нажатием (см. WaitTry)
-                // 2) не мультимедиа-элемент - таймер будет запущен только по его завершении
-                QuestionTimeMax = Settings.Model.ThinkingTime + question.Scenario.ToString().Length / 20;
-                RunQuestionTimer_Executed(0);
+                if (!pressMode && Settings.Model.ThinkingTime > 0 && ActiveMediaCommand == null)
+                {
+                    // Запуск таймера при игре:
+                    // 1) без фальстартов - на фальстартах он активируется доп. нажатием (см. WaitTry)
+                    // 2) не мультимедиа-элемент - таймер будет запущен только по его завершении
+                    QuestionTimeMax = Settings.Model.ThinkingTime + question.Scenario.ToString().Length / 20;
+                    RunQuestionTimer_Executed(0);
+                }
+            }
+            else if (_activeRound.Type == RoundTypes.Standart)
+            {
+                var time = Settings.Model.SpecialQuestionThinkingTime;
+
+                if (time > 0)
+                {
+                    ThinkingTimeMax = time;
+                    RunThinkingTimer_Executed(0);
+                }
             }
         }
     }
@@ -951,13 +1028,17 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         if (final)
         {
-            UserInterface?.SetSound(Settings.Model.Sounds.FinalThink);
-            return;
-        }
+            UserInterface.SetSound(Settings.Model.Sounds.FinalThink);
 
-        if (question.Type.Name == QuestionTypes.Simple)
-        {
-            UserInterface?.SetQuestionStyle(QuestionStyle.WaitingForPress);
+            var time = Settings.Model.FinalQuestionThinkingTime;
+
+            if (time > 0)
+            {
+                ThinkingTimeMax = time;
+                RunThinkingTimer_Executed(0);
+            }
+
+            return;
         }
 
         if (ActiveMediaCommand == StopMediaTimer)
@@ -966,11 +1047,16 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             MediaProgress = 100;
         }
 
-        if (Settings.Model.ThinkingTime > 0)
+        if (question.Type.Name == QuestionTypes.Simple)
         {
-            // Runs timer in game with false starts
-            QuestionTimeMax = Settings.Model.ThinkingTime;
-            RunQuestionTimer_Executed(0);
+            UserInterface.SetQuestionStyle(QuestionStyle.WaitingForPress);
+
+            if (Settings.Model.ThinkingTime > 0)
+            {
+                // Runs timer in game with false starts
+                QuestionTimeMax = Settings.Model.ThinkingTime;
+                RunQuestionTimer_Executed(0);
+            }
         }
     }
 
@@ -1008,6 +1094,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private void Engine_EndQuestion(int themeIndex, int questionIndex)
     {
         StopQuestionTimer_Executed(0);
+        StopThinkingTimer_Executed(0);
 
         _buttonManager?.Stop();
 
@@ -1081,6 +1168,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
 
         StopQuestionTimer_Executed(0);
+        StopThinkingTimer_Executed(0);
 
         _buttonManager?.Stop();
 
@@ -1178,6 +1266,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             _roundTimer.Dispose();
 
             StopQuestionTimer_Executed(0);
+            _questionTimer.Dispose();
+
+            StopThinkingTimer_Executed(0);
             _thinkingTimer.Dispose();
 
             Settings.Model.SIUISettings.PropertyChanged -= Default_PropertyChanged;
@@ -1602,16 +1693,21 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         UserInterface.SetPlayer(index);
 
         _timerStopped = ActiveQuestionCommand == StopQuestionTimer;
+
         if (_timerStopped)
         {
             StopQuestionTimer.Execute(null);
         }
 
         _mediaStopped = ActiveMediaCommand == StopMediaTimer;
+
         if (_mediaStopped)
         {
             StopMediaTimer_Executed(null);
         }
+
+        ThinkingTimeMax = Settings.Model.ThinkingTime2;
+        RunThinkingTimer_Executed(0);
 
         return true;
     }
