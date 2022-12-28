@@ -1140,6 +1140,7 @@
 
         <Style x:Key="stakeTB" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource PersonTextStyle}">
             <Setter Property="Foreground" Value="#ffa000" />
+            
             <Style.Triggers>
                 <DataTrigger Binding="{Binding SafeStake}" Value="True">
                     <Setter Property="Foreground" Value="{StaticResource MainColor}" />

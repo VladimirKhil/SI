@@ -385,10 +385,10 @@
     <value>Вести логи</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>СООБЩЕНИЯ</value>
+    <value>Сообщения</value>
   </data>
   <data name="Persons" xml:space="preserve">
-    <value>УЧАСТНИКИ</value>
+    <value>Участники</value>
   </data>
   <data name="TimeSettings" xml:space="preserve">
     <value>Настройки времени</value>

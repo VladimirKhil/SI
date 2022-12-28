@@ -69,6 +69,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     public string PackageName => _document.Package.Name;
 
+    public string ContactUri => _document.Package.ContactUri;
+
     public int RoundIndex => _roundIndex;
 
     public int ThemeIndex => _themeIndex;

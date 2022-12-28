@@ -379,7 +379,7 @@
     <value>Multimedia port</value>
   </data>
   <data name="Messages" xml:space="preserve">
-    <value>MESSAGES</value>
+    <value>Messages</value>
   </data>
   <data name="Move" xml:space="preserve">
     <value>Move...</value>
@@ -439,7 +439,7 @@
     <value>Pause</value>
   </data>
   <data name="Persons" xml:space="preserve">
-    <value>PERSONS</value>
+    <value>Persons</value>
   </data>
   <data name="Players" xml:space="preserve">
     <value>Players</value>

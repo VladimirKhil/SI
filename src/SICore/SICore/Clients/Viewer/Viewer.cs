@@ -368,6 +368,13 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     await OnDisconnectedAsync(mparams);
                     break;
 
+                case Messages.GameMetadata:
+                    if (mparams.Length > 3)
+                    {
+                        _logic.OnGameMetadata(mparams[1], mparams[2], mparams[3]);
+                    }
+                    break;
+
                 case Messages.Info2:
                     await ProcessInfoAsync(mparams);
                     break;

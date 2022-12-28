@@ -181,6 +181,12 @@ public static class Messages
     public const string GameInfo = "GAMEINFO";
 
     /// <summary>
+    /// Game metadata: game name, package name, contact uri.
+    /// </summary>
+    [IdempotencyRequired]
+    public const string GameMetadata = "GAMEMETADATA";
+
+    /// <summary>
     /// Темы всей игры
     /// </summary>
     public const string GameThemes = "GAMETHEMES";

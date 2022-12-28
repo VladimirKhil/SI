@@ -133,14 +133,23 @@ public interface IViewer : ILogic
     void TableLoaded();
 
     void PrintGreeting();
+
     void TextShape(string[] mparams);
+
     void OnTimeChanged();
+
     void OnTimerChanged(int timerIndex, string timerCommand, string arg, string person);
+
     void OnPersonFinalStake(int playerIndex);
+
     void OnPersonFinalAnswer(int playerIndex);
-    void OnPackageLogo(string v);
+
+    void OnPackageLogo(string uri);
+
     void OnPersonApellated(int playerIndex);
+
     void OnPersonPass(int playerIndex);
+
     void OnReplic(string personCode, string text);
 
     void OnRoundContent(string[] mparams) { }
@@ -156,4 +165,6 @@ public interface IViewer : ILogic
     void OnUnbanned(string ip) { }
 
     void SetCaption(string caption) { }
+
+    void OnGameMetadata(string gameName, string packageName, string contactUri) { }
 }

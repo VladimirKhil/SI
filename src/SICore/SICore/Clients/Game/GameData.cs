@@ -560,6 +560,11 @@ public sealed class GameData : Data
     /// </summary>
     public int AppellationCallerIndex { get; internal set; } = -1;
 
+    /// <summary>
+    /// Game name.
+    /// </summary>
+    public string GameName { get; set; } = "";
+
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {
         _showMan = showman;

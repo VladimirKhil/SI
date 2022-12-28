@@ -1375,7 +1375,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на MESSAGES.
+        ///   Ищет локализованную строку, похожую на Messages.
         /// </summary>
         public static string Messages {
             get {
@@ -1627,7 +1627,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на PERSONS.
+        ///   Ищет локализованную строку, похожую на Persons.
         /// </summary>
         public static string Persons {
             get {

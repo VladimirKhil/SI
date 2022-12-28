@@ -134,11 +134,89 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// <param name="person">Receiver name.</param>
     private void Inform(string person = NetworkConstants.Everybody)
     {
+        InformSettings(person);
+        InformGameMetadata(person);
+        SendInfo(person);
+        InformAvatars(person);
+        InformBanned(person);
+    }
+
+    private void InformGameMetadata(string person)
+    {
+        _gameActions.SendMessageToWithArgs(
+            person,
+            Messages.GameMetadata,
+            ClientData.GameName,
+            _logic.Engine.PackageName,
+            _logic.Engine.ContactUri);
+
+        _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
+    }
+
+    private void InformSettings(string person)
+    {
         _gameActions.SendMessageToWithArgs(
             person,
             Messages.ComputerAccounts,
             string.Join(Message.ArgsSeparator, _defaultPlayers.Select(p => p.Name)));
 
+        var appSettings = ClientData.Settings.AppSettings;
+
+        _gameActions.SendMessageToWithArgs(
+            person,
+            Messages.ReadingSpeed,
+            appSettings.Managed ? 0 : appSettings.ReadingSpeed);
+
+        _gameActions.SendMessageToWithArgs(person, Messages.FalseStart, appSettings.FalseStart ? "+" : "-");
+        _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, appSettings.TimeSettings.TimeForBlockingButton);
+        _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, appSettings.UseApellations ? '+' : '-');
+
+        var maxPressingTime = appSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
+        _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
+    }
+
+    private void InformBanned(string person)
+    {
+        var banned = Master.Banned;
+
+        if (banned.Any())
+        {
+            var messageBuilder = new MessageBuilder(Messages.BannedList);
+
+            foreach (var item in banned)
+            {
+                messageBuilder.Add(item.Key).Add(item.Value);
+            }
+
+            _gameActions.SendMessage(messageBuilder.Build(), person);
+        }
+    }
+
+    private void InformAvatars(string person)
+    {
+        // Send persons avatars info
+        if (person != NetworkConstants.Everybody)
+        {
+            InformAvatar(ClientData.ShowMan, person);
+
+            foreach (var item in ClientData.Players)
+            {
+                InformAvatar(item, person);
+            }
+        }
+        else
+        {
+            InformAvatar(ClientData.ShowMan);
+
+            foreach (var item in ClientData.Players)
+            {
+                InformAvatar(item);
+            }
+        }
+    }
+
+    private void SendInfo(string person)
+    {
         var info = new StringBuilder(Messages.Info2)
             .Append(Message.ArgsSeparatorChar)
             .Append(ClientData.Players.Count)
@@ -170,53 +248,6 @@ public sealed class Game : Actor<GameData, GameLogic>
         var msg = info.ToString()[..(info.Length - 1)];
 
         _gameActions.SendMessage(msg, person);
-
-        // Send persons avatars info
-        if (person != NetworkConstants.Everybody)
-        {
-            InformPicture(ClientData.ShowMan, person);
-
-            foreach (var item in ClientData.Players)
-            {
-                InformPicture(item, person);
-            }
-        }
-        else
-        {
-            InformPicture(ClientData.ShowMan);
-
-            foreach (var item in ClientData.Players)
-            {
-                InformPicture(item);
-            }
-        }
-
-        _gameActions.SendMessageToWithArgs(
-            person,
-            Messages.ReadingSpeed,
-            ClientData.Settings.AppSettings.Managed ? 0 : ClientData.Settings.AppSettings.ReadingSpeed);
-
-        _gameActions.SendMessageToWithArgs(person, Messages.FalseStart, ClientData.Settings.AppSettings.FalseStart ? "+" : "-");
-        _gameActions.SendMessageToWithArgs(person, Messages.ButtonBlockingTime, ClientData.Settings.AppSettings.TimeSettings.TimeForBlockingButton);
-        _gameActions.SendMessageToWithArgs(person, Messages.ApellationEnabled, ClientData.Settings.AppSettings.UseApellations ? '+' : '-');
-
-        var maxPressingTime = ClientData.Settings.AppSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
-        _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
-        _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
-
-        var banned = Master.Banned;
-
-        if (banned.Any())
-        {
-            var messageBuilder = new MessageBuilder(Messages.BannedList);
-
-            foreach (var item in banned)
-            {
-                messageBuilder.Add(item.Key).Add(item.Value);
-            }
-
-            _gameActions.SendMessage(messageBuilder.Build(), person);
-        }
     }
 
     private static void AppendAccountExt(ViewerAccount account, StringBuilder info)
@@ -908,7 +939,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             person.Picture = path;
         }
 
-        InformPicture(person);
+        InformAvatar(person);
     }
 
     private void OnStake(Message message, string[] args)
@@ -2603,7 +2634,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         _gameActions.SendMessageWithArgs(Messages.Config, MessageParams.Config_Set, args[2], args[3], args[4], account.IsMale ? '+' : '-');
         _gameActions.SpecialReplic($"{ClientData.HostName} {ResourceHelper.GetSexString(LO[nameof(R.Sex_Replaced)], host.IsMale)} {oldName} {LO[nameof(R.To)]} {replacer}");
 
-        InformPicture(newAccount);
+        InformAvatar(newAccount);
         OnPersonsChanged();
     }
 
@@ -2729,7 +2760,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 }
             }
 
-            InformPicture(otherAccount);
+            InformAvatar(otherAccount);
         }
         finally
         {
@@ -2875,7 +2906,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (newAcc != null)
         {
-            InformPicture(newAcc);
+            InformAvatar(newAcc);
         }
 
         OnPersonsChanged();
@@ -3069,18 +3100,18 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnPersonsChanged(bool joined = true, bool withError = false) => PersonsChanged?.Invoke(joined, withError);
 
-    private void InformPicture(Account account)
+    private void InformAvatar(Account account)
     {
         foreach (var personName in ClientData.AllPersons.Keys)
         {
             if (account.Name != personName && personName != NetworkConstants.GameName)
             {
-                InformPicture(account, personName);
+                InformAvatar(account, personName);
             }
         }
     }
 
-    private void InformPicture(Account account, string receiver)
+    private void InformAvatar(Account account, string receiver)
     {
         if (string.IsNullOrEmpty(account.Picture))
         {

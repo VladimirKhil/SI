@@ -450,9 +450,13 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
             case GameStage.After:
                 if (_data.ProtocolWriter != null)
+                {
                     _data.ProtocolWriter.Write("</body></html>");
+                }
                 else
+                {
                     _data.OnAddString(null, _localizer[nameof(R.ErrorWritingLogs)], LogMode.Chat);
+                }
                 break;
 
             default:
@@ -648,7 +652,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
                             if (!string.IsNullOrWhiteSpace(address))
                             {
-                                if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
                                 {
                                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
                                 }
@@ -678,9 +682,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
                         return;
                 }
 
-                Uri mediaUri;
-
-                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
+                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
                 {
                     return;
                 }
@@ -720,23 +722,25 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
     {
         _data.EnableMediaLoadButton = false;
 
-        if (_data.AtomType == AtomTypes.Image)
+        switch (_data.AtomType)
         {
-            TInfo.MediaSource = new MediaSource(_data.ExternalUri);
-            TInfo.QuestionContentType = QuestionContentType.Image;
-            TInfo.Sound = false;
-        }
-        else if (_data.AtomType == AtomTypes.Audio)
-        {
-            TInfo.SoundSource = new MediaSource(_data.ExternalUri);
-            TInfo.QuestionContentType = QuestionContentType.None;
-            TInfo.Sound = true;
-        }
-        else if (_data.AtomType == AtomTypes.Video)
-        {
-            TInfo.MediaSource = new MediaSource(_data.ExternalUri);
-            TInfo.QuestionContentType = QuestionContentType.Video;
-            TInfo.Sound = false;
+            case AtomTypes.Image:
+                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.Image;
+                TInfo.Sound = false;
+                break;
+
+            case AtomTypes.Audio:
+                TInfo.SoundSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.None;
+                TInfo.Sound = true;
+                break;
+
+            case AtomTypes.Video:
+                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
+                TInfo.QuestionContentType = QuestionContentType.Video;
+                TInfo.Sound = false;
+                break;
         }
     }
 
@@ -763,7 +767,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
                             if (!string.IsNullOrWhiteSpace(address))
                             {
-                                if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
                                 {
                                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
                                 }
@@ -866,10 +870,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         _data.Players[number].State = PlayerState.Press;
     }
 
-    virtual public void ShowTablo()
-    {
-        TInfo.TStage = TableStage.RoundTable;
-    }
+    virtual public void ShowTablo() => TInfo.TStage = TableStage.RoundTable;
 
     /// <summary>
     /// Игрок получил или потерял деньги
@@ -1040,7 +1041,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
             {
                 var remoteUri = ClientData.ServerAddress;
 
-                if (Uri.TryCreate(remoteUri, UriKind.Absolute, out Uri hostUri))
+                if (Uri.TryCreate(remoteUri, UriKind.Absolute, out var hostUri))
                 {
                     account.Picture = path.Replace(Constants.GameHost, hostUri.Host);
                 }
@@ -1127,10 +1128,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
     #endregion
 
-    public void OnTextSpeed(double speed)
-    {
-        TInfo.TextSpeed = speed;
-    }
+    public void OnTextSpeed(double speed) => TInfo.TextSpeed = speed;
 
     public void SetText(string text, TableStage stage = TableStage.Round)
     {
@@ -1199,7 +1197,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
                 {
                     if (person != null && int.TryParse(person, out int personIndex))
                     {
-                        if (_data.DialogMode == DialogModes.ChangeSum || _data.DialogMode == DialogModes.Manage
+                        if (_data.DialogMode == DialogModes.ChangeSum
+                            || _data.DialogMode == DialogModes.Manage
                             || _data.DialogMode == DialogModes.None)
                         {
                             if (personIndex == -1)
@@ -1249,10 +1248,13 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         if (uri.Contains(Constants.GameHost))
         {
             var address = ClientData.ServerAddress;
+
             if (!string.IsNullOrWhiteSpace(address))
             {
-                if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
+                {
                     uri = uri.Replace(Constants.GameHost, hostUri.Host);
+                }
             }
         }
         else if (uri.Contains(Constants.ServerHost))
@@ -1358,4 +1360,17 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         exc => ClientData.BackLink.OnError(exc));
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
+
+    public void OnGameMetadata(string gameName, string packageName, string contactUri)
+    {
+        var gameInfo = new StringBuilder();
+
+        var coersedGameName = gameName.Length > 0 ? gameName : R.LocalGame;
+
+        gameInfo.AppendFormat(R.GameName).Append(": ").Append(coersedGameName).AppendLine();
+        gameInfo.AppendFormat(R.PackageName).Append(": ").Append(packageName).AppendLine();
+        gameInfo.AppendFormat(R.ContactUri).Append(": ").Append(contactUri).AppendLine();
+
+        ClientData.GameMetadata = gameInfo.ToString();
+    }
 }

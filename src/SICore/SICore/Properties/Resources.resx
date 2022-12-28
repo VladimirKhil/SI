@@ -777,4 +777,13 @@
   <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
     <value>Player {0} tried to appellate the last right answer, but there are not enough players to win the appellation currently in the game</value>
   </data>
+  <data name="ContactUri" xml:space="preserve">
+    <value>Authors contact</value>
+  </data>
+  <data name="GameName" xml:space="preserve">
+    <value>Game name</value>
+  </data>
+  <data name="LocalGame" xml:space="preserve">
+    <value>Local game</value>
+  </data>
 </root>

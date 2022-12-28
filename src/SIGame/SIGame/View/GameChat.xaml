@@ -148,9 +148,13 @@
         </TabItem>
 
         <TabItem Header="ℹ" ToolTip="{x:Static lp:Resources.GameInfo}" Style="{StaticResource StudiaTab}">
-            <StackPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
-                <TextBlock />
-            </StackPanel>
+            <TextBox
+                Text="{Binding GameMetadata}"
+                Padding="10"
+                IsReadOnly="True"
+                Foreground="Black"
+                TextWrapping="WrapWithOverflow"
+                Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" />
         </TabItem>
     </TabControl>
 </UserControl>

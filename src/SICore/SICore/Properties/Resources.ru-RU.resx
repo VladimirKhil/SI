@@ -782,4 +782,13 @@
   <data name="FailedToAppellateForWrongAnswer" xml:space="preserve">
     <value>Игрок {0} попытался оспорить последний правильный ответ, но в настоящий момент в игре недостаточно других игроков для оспаривания ответа</value>
   </data>
+  <data name="ContactUri" xml:space="preserve">
+    <value>Контакты авторов</value>
+  </data>
+  <data name="GameName" xml:space="preserve">
+    <value>Название игры</value>
+  </data>
+  <data name="LocalGame" xml:space="preserve">
+    <value>Локальная игра</value>
+  </data>
 </root>

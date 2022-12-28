@@ -423,6 +423,17 @@ public sealed class ViewerData : Data
     /// </summary>
     public ObservableCollection<BannedInfo> Banned { get; } = new();
 
+    private string _gameMetadata = "";
+
+    /// <summary>
+    /// Game metadata.
+    /// </summary>
+    public string GameMetadata
+    {
+        get => _gameMetadata;
+        set { if (_gameMetadata != value) { _gameMetadata = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>
     /// Default computer players known by server.
     /// </summary>

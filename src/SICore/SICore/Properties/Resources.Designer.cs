@@ -340,6 +340,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Authors contact.
+        /// </summary>
+        public static string ContactUri {
+            get {
+                return ResourceManager.GetString("ContactUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cost.
         /// </summary>
         public static string Cost {
@@ -516,6 +525,15 @@ namespace SICore.Properties {
         public static string GameBeginning {
             get {
                 return ResourceManager.GetString("GameBeginning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Game name.
+        /// </summary>
+        public static string GameName {
+            get {
+                return ResourceManager.GetString("GameName", resourceCulture);
             }
         }
         
@@ -903,6 +921,15 @@ namespace SICore.Properties {
         public static string LetsSee {
             get {
                 return ResourceManager.GetString("LetsSee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Local game.
+        /// </summary>
+        public static string LocalGame {
+            get {
+                return ResourceManager.GetString("LocalGame", resourceCulture);
             }
         }
         
