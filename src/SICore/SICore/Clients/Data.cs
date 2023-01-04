@@ -42,7 +42,7 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
     private GameStage _stage = GameStage.Before;
 
     /// <summary>
-    /// Состояние игры
+    /// Current game stage.
     /// </summary>
     public GameStage Stage
     {

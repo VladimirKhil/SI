@@ -77,7 +77,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
     public event Action<IViewerClient> Switch;
     public event Action StageChanged;
-    public event Action<string?> Ad;
+    public event Action<string?>? Ad;
     public event Action<bool> IsPausedChanged;
 
     public ViewerData MyData => ClientData;
@@ -196,7 +196,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             throw new ArgumentNullException(nameof(personData));
         }
 
-        _viewerActions = new ViewerActions(client, data, localizer);
+        _viewerActions = new ViewerActions(client, localizer);
         _logic = CreateLogic(personData);
 
         Initialize(isHost);
@@ -562,6 +562,10 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         break;
                     }
 
+                case Messages.RoundsNames:
+                    ClientData.RoundNames = mparams.Skip(1).ToArray();
+                    break;
+
                 case Messages.Stage:
                     {
                         #region Stage
@@ -585,6 +589,17 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                         _logic.SetCaption("");
 
+                        if (mparams.Length > 3)
+                        {
+                            if (int.TryParse(mparams[3], out var roundIndex))
+                            {
+                                if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
+                                {
+                                    ClientData.StageName = ClientData.RoundNames[roundIndex];
+                                }
+                            }
+                        }
+
                         switch (ClientData.Stage)
                         {
                             case GameStage.Round:
@@ -605,6 +620,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                             case GameStage.After:
                                 ClientData.BackLink.OnGameFinished(ClientData.PackageId);
+                                ClientData.StageName = "";
                                 break;
                         }
 
@@ -675,6 +691,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                         lock (ClientData.TInfoLock)
                         {
+                            // TODO: clear existing table and renew it
                             if (ClientData.TInfo.RoundInfo.Any(t => t.Questions.Any()))
                             {
                                 break;
@@ -689,7 +706,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                                     break;
                                 }
 
-                                while (index < mparams.Length && mparams[index].Length > 0) // пустой параметр разделяет темы
+                                while (index < mparams.Length && mparams[index].Length > 0) // empty value separates the themes content
                                 {
                                     if (!int.TryParse(mparams[index++], out int price))
                                     {
@@ -708,6 +725,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         #endregion
                         break;
                     }
+
+                case Messages.Toggle:
+                    OnToggle(mparams);
+                    break;
+
                 case Messages.ShowTable:
                     {
                         _logic.ShowTablo();
@@ -1026,6 +1048,35 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnToggle(string[] mparams)
+    {
+        if (mparams.Length < 4)
+        {
+            return;
+        }
+
+        if (!int.TryParse(mparams[1], out var themeIndex)
+            || !int.TryParse(mparams[2], out var questionIndex)
+            || !int.TryParse(mparams[3], out var price))
+        {
+            return;
+        }
+
+        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
+        var theme = ClientData.TInfo.RoundInfo[themeIndex];
+
+        if (questionIndex < 0 || questionIndex >= theme.Questions.Count)
+        {
+            return;
+        }
+
+        theme.Questions[questionIndex].Price = price;
     }
 
     private void OnUnbanned(string[] mparams)
@@ -1768,12 +1819,21 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             throw new InvalidOperationException($"Trying to switch type of computer account:\n{info}");
         }
 
-        ClientData.PersonDataExtensions.IsRight = ClientData.PersonDataExtensions.IsWrong = ClientData.PersonDataExtensions.SendCatCost =
+        ClientData.PersonDataExtensions.IsRight =
+            ClientData.PersonDataExtensions.IsWrong =
+            ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
-            ClientData.PlayerDataExtensions.SendAnswer = ClientData.ShowmanDataExtensions.ChangeSums = ClientData.ShowmanDataExtensions.ChangeSums2 =
-            ClientData.ShowmanDataExtensions.Manage = ClientData.PersonDataExtensions.SendNominal =
-            ClientData.PersonDataExtensions.SendPass = ClientData.PersonDataExtensions.SendStake =
-            ClientData.PersonDataExtensions.SendVabank = ClientData.PlayerDataExtensions.Apellate = ClientData.PlayerDataExtensions.PressGameButton = null;
+            ClientData.PlayerDataExtensions.SendAnswer =
+            ClientData.ShowmanDataExtensions.ChangeSums =
+            ClientData.ShowmanDataExtensions.ChangeSums2 =
+            ClientData.ShowmanDataExtensions.Manage =
+            ClientData.ShowmanDataExtensions.ManageTable =
+            ClientData.PersonDataExtensions.SendNominal =
+            ClientData.PersonDataExtensions.SendPass =
+            ClientData.PersonDataExtensions.SendStake =
+            ClientData.PersonDataExtensions.SendVabank =
+            ClientData.PlayerDataExtensions.Apellate =
+            ClientData.PlayerDataExtensions.PressGameButton = null;
 
         ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
 

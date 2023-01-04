@@ -827,9 +827,13 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         _isDisposed = true;
     }
 
-    public abstract void SelectQuestion(int theme, int question);
+    public abstract void SelectQuestion(int themeIndex, int questionIndex);
 
     public abstract int OnReady(out bool more);
 
     public abstract void SelectTheme(int publicThemeIndex);
+
+    public abstract bool RemoveQuestion(int themeIndex, int questionIndex);
+
+    public abstract int? RestoreQuestion(int themeIndex, int questionIndex);
 }

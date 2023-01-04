@@ -47,8 +47,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
-        TInfo.Ready += TInfo_Ready;
-
         TInfo.MediaLoadError += TInfo_MediaLoadError;
 
         //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
@@ -71,37 +69,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         }
 
         _data.OnAddString(null, $"{_localizer[nameof(R.MediaLoadError)]} {TInfo.MediaSource?.Uri}: {error}{Environment.NewLine}", LogMode.Log);
-    }
-
-    private void TInfo_Ready(object? sender, EventArgs e)
-    {
-        if (TInfo.TStage == TableStage.RoundTable || TInfo.TStage == TableStage.Special || TInfo.TStage == TableStage.Question)
-        {
-            lock (_data.ChoiceLock)
-            lock (_data.TInfoLock)
-            lock (TInfo.RoundInfoLock)
-            {
-                if (_data.ThemeIndex > -1 &&
-                    _data.ThemeIndex < _data.TInfo.RoundInfo.Count &&
-                    _data.QuestionIndex > -1 &&
-                    _data.QuestionIndex < _data.TInfo.RoundInfo[_data.ThemeIndex].Questions.Count)
-                {
-                    TInfo.RoundInfo[_data.ThemeIndex].Questions[_data.QuestionIndex].Price = SIPackages.Question.InvalidPrice;
-                }
-            }
-        }
-        else
-        {
-            lock (_data.ChoiceLock)
-            lock (_data.TInfoLock)
-            lock (TInfo.RoundInfoLock)
-            {
-                if (_data.ThemeIndex > -1 && _data.ThemeIndex < _data.TInfo.RoundInfo.Count)
-                {
-                    TInfo.RoundInfo[_data.ThemeIndex].Name = null;
-                }
-            }
-        }
     }
 
     private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -19,8 +19,6 @@ public interface IGameHost
 
     void AskStop();
 
-    void OnReady();
-
     void OnMediaStart();
 
     void OnMediaEnd();

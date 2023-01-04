@@ -7,6 +7,8 @@ namespace SIUI.ViewModel;
 /// </summary>
 public sealed class QuestionInfoViewModel : ViewModelBase<QuestionInfo>
 {
+    public const int InvalidPrice = -1;
+
     private QuestionInfoStages _state = QuestionInfoStages.None;
 
     /// <summary>
@@ -29,16 +31,13 @@ public sealed class QuestionInfoViewModel : ViewModelBase<QuestionInfo>
         
     }
 
-    public QuestionInfoViewModel(QuestionInfo questionInfo) : this()
-    {
-        _model = questionInfo;
-    }
+    public QuestionInfoViewModel(QuestionInfo questionInfo) : this() => _model = questionInfo;
 
     internal async Task SilentFlashOutAsync()
     {
         await Task.Delay(500);
 
         _state = QuestionInfoStages.None;
-        _model.Price = -1;
+        Price = InvalidPrice;
     }
 }

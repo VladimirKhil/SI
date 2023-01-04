@@ -14,7 +14,6 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     mc:Ignorable="d"
-    DataContextChanged="UserControl_DataContextChanged"
     d:DesignHeight="300"
     d:DesignWidth="300"
     Foreground="{Binding Settings.Model.TableColorString}"
@@ -34,6 +33,22 @@
                     <localc:PressedBottomRowHeightConverter x:Key="PressedBottomRowHeightConverter"/>
                     <localc:PressedTopRowHeightConverter x:Key="PressedTopRowHeightConverter"/>
                     <localc:NotNullOrEmptyConverter x:Key="NotNullOrEmptyConverter" />
+                    
+                    <localc:QuestionPriceEditorConverter x:Key="QuestionPriceEditorConverter">
+                        <localc:QuestionPriceEditorConverter.RemoveColor>
+                            <RadialGradientBrush RadiusX="1" RadiusY="1">
+                                <GradientStop Color="Red" Offset="0" />
+                                <GradientStop Color="Transparent" Offset="1.1" />
+                            </RadialGradientBrush>
+                        </localc:QuestionPriceEditorConverter.RemoveColor>
+                        
+                        <localc:QuestionPriceEditorConverter.RestoreColor>
+                            <RadialGradientBrush RadiusX="1" RadiusY="1">
+                                <GradientStop Color="Green" Offset="0" />
+                                <GradientStop Color="Transparent" Offset="1.1" />
+                            </RadialGradientBrush>
+                        </localc:QuestionPriceEditorConverter.RestoreColor>
+                    </localc:QuestionPriceEditorConverter>
 
                     <DataTemplate x:Key="EmptyDataTemplate" />
 
@@ -114,9 +129,10 @@
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="lb:SelectionBehavior.IsSelectable" Value="True" />
+                                    <Condition Property="lb:EditableBehavior.IsEditable" Value="False" />
                                     <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
-                                
+
                                 <Setter Property="Background" Value="{StaticResource SelectedSIButtonBackground}" />
                             </MultiTrigger>
                         </Style.Triggers>
@@ -128,19 +144,37 @@
                         <Setter
                             Property="Command"
                             Value="{Binding DataContext.SelectQuestion, RelativeSource={RelativeSource AncestorType=ItemsControl,AncestorLevel=2}}" />
-                        
+
                         <Setter Property="CommandParameter" Value="{Binding}" />
-                        
+
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Price}" Value="-1">
                                 <Setter Property="IsEnabled" Value="False" />
                             </DataTrigger>
-                            
+
                             <DataTrigger Binding="{Binding State}" Value="Blinking">
                                 <DataTrigger.EnterActions>
                                     <BeginStoryboard Storyboard="{StaticResource QSelection}" />
                                 </DataTrigger.EnterActions>
                             </DataTrigger>
+
+                            <Trigger Property="lb:EditableBehavior.IsEditable" Value="True">
+                                <Setter
+                                    Property="Command"
+                                    Value="{Binding DataContext.ToggleQuestion, RelativeSource={RelativeSource AncestorType=ItemsControl,AncestorLevel=2}}" />
+
+                                <Setter Property="Background" Value="{StaticResource EditableSIButtonBackground}" />
+                                <Setter Property="IsEnabled" Value="True" />
+                            </Trigger>
+
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="lb:EditableBehavior.IsEditable" Value="True" />
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                </MultiTrigger.Conditions>
+
+                                <Setter Property="Background" Value="{Binding Price, Converter={StaticResource QuestionPriceEditorConverter}}" />
+                            </MultiTrigger>
                         </Style.Triggers>
                     </Style>
 
@@ -627,8 +661,8 @@
                                         Grid.RowSpan="2"
                                         ItemsSource="{Binding RoundInfo}"
                                         AlternationCount="2"
-                                        lb:SelectionBehavior.IsSelectable="{Binding Selectable}">
-                                        
+                                        lb:SelectionBehavior.IsSelectable="{Binding Selectable}"
+                                        lb:EditableBehavior.IsEditable="{Binding IsEditable}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Columns="1" Margin="0,0,-1,-1" />
@@ -664,11 +698,11 @@
                                                 
                                                 <DataTemplate.Triggers>
                                                     <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Even}"/>
+                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Even}" />
                                                     </Trigger>
                                                     
                                                     <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Odd}"/>
+                                                        <Setter TargetName="grid" Property="RenderTransform" Value="{StaticResource Odd}" />
                                                     </Trigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -890,6 +924,7 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Button Name="But" Style="{StaticResource SIThemeButton}" />
+                                            
                                             <DataTemplate.Triggers>
                                                 <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
                                                     <Setter TargetName="But" Property="IsEnabled" Value="False" />

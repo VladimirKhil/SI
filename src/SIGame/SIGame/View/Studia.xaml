@@ -435,10 +435,7 @@
                 </ProgressBar.Style>
             </ProgressBar>
 
-            <ContentControl
-                Grid.Column="2"
-                Margin="0,0,0,0"
-                Visibility="{Binding TInfo.Pause,Converter={StaticResource BooleanToVisibilityConverter1}}">
+            <ContentControl Grid.Column="2" Margin="0,0,0,0">
                 <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#88000000">
                     <TextBlock
                         VerticalAlignment="Center"
@@ -454,6 +451,23 @@
                         </TextBlock.Effect>
                     </TextBlock>
                 </Border>
+
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Setter Property="Visibility" Value="Collapsed" />
+
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding TInfo.Pause}" Value="True" />
+                                    <Condition Binding="{Binding TInfo.IsEditable}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
             </ContentControl>
 
             <ContentControl Grid.Column="2" Margin="0,0,0,0" Visibility="{Binding Ad,Converter={StaticResource NotNullToVisibilityConverter1}}">
@@ -494,6 +508,7 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="18*" />
                     <RowDefinition Height="18*" />
                 </Grid.RowDefinitions>
@@ -505,7 +520,17 @@
                     ToolTip="{x:Static lp:Resources.Time_Round}"
                     Margin="68,0,0,0" />
 
-                <ContentControl Grid.Row="2" Content="{Binding}">
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Text="{Binding Data.StageName}"
+                    TextAlignment="Center"
+                    TextTrimming="CharacterEllipsis"
+                    Foreground="White"
+                    FontSize="25"
+                    Margin="73,10,5,0" />
+
+                <ContentControl Grid.Row="3" Content="{Binding}">
                     <ContentControl.Style>
                         <Style TargetType="ContentControl">
                             <Setter Property="ContentTemplate">
@@ -556,20 +581,6 @@
 
             <local:StudiaCommandPanel x:Name="studiaCommandPanel" Grid.Column="4" Grid.Row="1" />
         </Grid>
-
-        <Border Grid.RowSpan="2" Grid.ColumnSpan="3">
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="Background" Value="#66AAAAAA" />
-
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Data.DialogMode}" Value="{x:Static sc:DialogModes.None}">
-                            <Setter Property="Background" Value="{x:Null}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-        </Border>
 
         <TextBlock
             Grid.Row="1"

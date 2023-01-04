@@ -176,6 +176,17 @@ public sealed class ViewerData : Data
         set { _hint = value; OnPropertyChanged(); }
     }
 
+    private string _stageName = "";
+
+    /// <summary>
+    /// Human-readable game stage name.
+    /// </summary>
+    public string StageName
+    {
+        get => _stageName;
+        set { if (_stageName != value) { _stageName = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>
     /// Тип вопроса
     /// </summary>
@@ -543,6 +554,21 @@ public sealed class ViewerData : Data
     /// External media uri.
     /// </summary>
     public string ExternalUri { get; internal set; }
+
+    private string[] _roundNames = Array.Empty<string>();
+
+    /// <summary>
+    /// Game rounds names.
+    /// </summary>
+    public string[] RoundNames
+    {
+        get => _roundNames;
+        set
+        {
+            _roundNames = value;
+            OnPropertyChanged();
+        }
+    }
 
     internal event Action AutoReadyChanged;
 

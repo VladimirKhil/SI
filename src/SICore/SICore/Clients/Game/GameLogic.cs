@@ -4238,6 +4238,7 @@ public sealed class GameLogic : Logic<GameData>
             }
 
             var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
+
             var skipRoundAnnounce = isRandomPackage &&
                 _data.Settings.AppSettings.GameMode == GameModes.Sport &&
                 _data.Package.Rounds.Count == 2; // second round is always the final in random package

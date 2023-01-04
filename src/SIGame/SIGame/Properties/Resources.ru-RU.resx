@@ -1053,4 +1053,10 @@
   <data name="Unban" xml:space="preserve">
     <value>Снять бан</value>
   </data>
+  <data name="Table" xml:space="preserve">
+    <value>Табло</value>
+  </data>
+  <data name="EditTable" xml:space="preserve">
+    <value>Редактировать таблицу вопросов</value>
+  </data>
 </root>

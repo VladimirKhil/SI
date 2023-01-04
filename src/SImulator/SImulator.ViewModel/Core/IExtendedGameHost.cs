@@ -16,8 +16,6 @@ public interface IExtendedGameHost : IGameHost
 
     ICommand Stop { get; set; }
 
-    event Action<int> ThemeDeleted;
-
     event Action MediaStart;
 
     event Action MediaEnd;

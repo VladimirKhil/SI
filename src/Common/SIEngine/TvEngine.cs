@@ -11,10 +11,10 @@ namespace SIEngine;
 /// </summary>
 public sealed class TvEngine : EngineBase
 {
-    private readonly Stack<Tuple<int, int>> _history = new();
-    private readonly Stack<Tuple<int, int>> _forward = new();
+    private readonly Stack<(int, int)> _history = new();
+    private readonly Stack<(int, int)> _forward = new();
 
-    private readonly HashSet<Tuple<int, int>> _questionsTable = new();
+    private readonly HashSet<(int, int)> _questionsTable = new();
     private readonly HashSet<int> _themesTable = new();
     private readonly List<int> _finalMap = new();
 
@@ -33,10 +33,7 @@ public sealed class TvEngine : EngineBase
     public override int LeftQuestionsCount => _questionsTable.Count; // for debugging only
 
     public TvEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
-        : base(document, settingsProvider)
-    {
-        
-    }
+        : base(document, settingsProvider) { }
 
     /// <summary>
     /// Moves to the next game stage.
@@ -100,7 +97,7 @@ public sealed class TvEngine : EngineBase
                     {
                         if (_activeRound.Themes[i].Questions[j].Price != SIPackages.Question.InvalidPrice)
                         {
-                            _questionsTable.Add(Tuple.Create(i, j));
+                            _questionsTable.Add((i, j));
                         }
                     }
                 }
@@ -169,7 +166,6 @@ public sealed class TvEngine : EngineBase
 
             case GameStage.EndQuestion:
                 #region EndQuestion
-                _questionsTable.Remove(Tuple.Create(_themeIndex, _questionIndex));
 
                 OnEndQuestion(_themeIndex, _questionIndex);
 
@@ -367,7 +363,7 @@ public sealed class TvEngine : EngineBase
 
     private void OnQuestionSelected(bool clearForward = true)
     {
-        _history.Push(Tuple.Create(_themeIndex, _questionIndex));
+        _history.Push((_themeIndex, _questionIndex));
         CanMoveBack = true;
 
         if (clearForward)
@@ -381,6 +377,7 @@ public sealed class TvEngine : EngineBase
             _activeQuestion.Type.Name = QuestionTypes.Simple;
         }
 
+        _questionsTable.Remove((_themeIndex, _questionIndex));
         OnQuestionSelected(_themeIndex, _questionIndex, _activeTheme, _activeQuestion);
 
         _atomIndex = 0;
@@ -389,6 +386,7 @@ public sealed class TvEngine : EngineBase
         Stage = GameStage.Question;
 
         UpdateCanNext();
+
         if (_activeQuestion != null && _activeQuestion.Type.Name != QuestionTypes.Simple)
         {
             AutoNext(6000);
@@ -506,5 +504,29 @@ public sealed class TvEngine : EngineBase
 
             SelectTheme(themeIndex);
         }
+    }
+
+    public override bool RemoveQuestion(int themeIndex, int questionIndex) =>
+        _questionsTable.Remove((themeIndex, questionIndex));
+
+    public override int? RestoreQuestion(int themeIndex, int questionIndex)
+    {
+        if (_activeRound == null || themeIndex < 0 || themeIndex >= _activeRound.Themes.Count)
+        {
+            return null;
+        }
+
+        if (questionIndex < 0 || questionIndex >= _activeRound.Themes[themeIndex].Questions.Count)
+        {
+            return null;
+        }
+
+        if (_activeRound.Themes[themeIndex].Questions[questionIndex].Price == SIPackages.Question.InvalidPrice)
+        {
+            return null;
+        }
+
+        _questionsTable.Add((themeIndex, questionIndex));
+        return _activeRound.Themes[themeIndex].Questions[questionIndex].Price;
     }
 }

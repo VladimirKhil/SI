@@ -29,6 +29,7 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowman
 
         TInfo.QuestionSelected += PlayerClient_QuestionSelected;
         TInfo.ThemeSelected += PlayerClient_ThemeSelected;
+        TInfo.QuestionToggled += TInfo_QuestionToggled;
 
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
@@ -124,6 +125,7 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowman
     private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
     {
         var found = false;
+
         for (var i = 0; i < TInfo.RoundInfo.Count; i++)
         {
             for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
@@ -158,4 +160,29 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowman
 
         ClearSelections();
     }
+
+    private void TInfo_QuestionToggled(QuestionInfoViewModel question)
+    {
+        var found = false;
+
+        for (var i = 0; i < TInfo.RoundInfo.Count; i++)
+        {
+            for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
+            {
+                if (TInfo.RoundInfo[i].Questions[j] == question)
+                {
+                    found = true;
+                    _viewerActions.SendMessageWithArgs(Messages.Toggle, i, j);
+                    break;
+                }
+            }
+
+            if (found)
+            {
+                break;
+            }
+        }
+    }
+
+    public void ManageTable() => TInfo.IsEditable = !TInfo.IsEditable;
 }

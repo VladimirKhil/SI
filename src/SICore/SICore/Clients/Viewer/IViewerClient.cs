@@ -36,7 +36,7 @@ namespace SICore
 
         event Action StageChanged;
 
-        event Action<string> Ad;
+        event Action<string?> Ad;
 
         event Action<bool> IsPausedChanged;
 

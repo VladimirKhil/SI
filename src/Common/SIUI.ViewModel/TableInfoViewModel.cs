@@ -9,8 +9,6 @@ namespace SIUI.ViewModel;
 /// </summary>
 public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 {
-    public event EventHandler Ready;
-
     private TableStage _tStage = TableStage.Void;
 
     /// <summary>
@@ -233,57 +231,41 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
     }
 
+    private bool _isEditable = false;
+
+    /// <summary>
+    /// Can the table be edited.
+    /// </summary>
+    public bool IsEditable
+    {
+        get => _isEditable;
+        set
+        {
+            if (_isEditable != value)
+            {
+                _isEditable = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public SimpleCommand SelectQuestion { get; private set; }
 
     public SimpleCommand SelectTheme { get; private set; }
 
-    public event Action<QuestionInfoViewModel> QuestionSelected;
+    public SimpleCommand ToggleQuestion { get; private set; }
 
-    public event Action<ThemeInfoViewModel> ThemeSelected;
+    public event Action<QuestionInfoViewModel>? QuestionSelected;
 
-    public void SelectQuestion_Executed(object? arg)
-    {
-        QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
-    }
+    public event Action<ThemeInfoViewModel>? ThemeSelected;
 
-    public void SelectTheme_Executed(object? arg)
-    {
-        ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
-    }
+    public event Action<QuestionInfoViewModel>? QuestionToggled;
 
-    private bool _finished = false;
+    public void SelectQuestion_Executed(object? arg) => QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
 
-    public bool Finished
-    {
-        get => _finished;
-        set
-        {
-            _finished = value;
+    public void SelectTheme_Executed(object? arg) => ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
 
-            if (value)
-            {
-                OnReady();
-            }
-
-            OnPropertyChanged();
-        }
-    }
-
-    private void OnReady()
-    {
-        if (_isComplex)
-        {
-            lock (TStageLock)
-            {
-                if (_tStage == TableStage.RoundTable)
-                {
-                    TStage = TableStage.Special;
-                }
-            }
-        }
-
-        Ready?.Invoke(this, EventArgs.Empty);
-    }
+    public void ToggleQuestion_Executed(object? arg) => QuestionToggled?.Invoke((QuestionInfoViewModel)arg);
 
     private MediaSource? _mediaSource;
 
@@ -415,28 +397,24 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     {
         SelectQuestion = new SimpleCommand(SelectQuestion_Executed);
         SelectTheme = new SimpleCommand(SelectTheme_Executed);
+        ToggleQuestion = new SimpleCommand(ToggleQuestion_Executed);
     }
 
-    public void PlaySelection(int i)
+    public void PlaySelection(int themeIndex)
     {
-        Finished = false;
-        _isComplex = false;
-        RoundInfo[i].State = QuestionInfoStages.Blinking;
-        RoundInfo[i].SilentFlashOut();
+        RoundInfo[themeIndex].State = QuestionInfoStages.Blinking;
+        RoundInfo[themeIndex].SilentFlashOut();
     }
 
     /// <summary>
     /// Отобразить простой выбор
     /// </summary>
-    /// <param name="i"></param>
-    /// <param name="j"></param>
-    public Task PlaySimpleSelectionAsync(int i, int j)
+    /// <param name="themeIndex"></param>
+    /// <param name="questionIndex"></param>
+    public Task PlaySimpleSelectionAsync(int themeIndex, int questionIndex)
     {
-        Finished = false;
-        _isComplex = false;
-
-        RoundInfo[i].Questions[j].State = QuestionInfoStages.Blinking;
-        return RoundInfo[i].Questions[j].SilentFlashOutAsync();
+        RoundInfo[themeIndex].Questions[questionIndex].State = QuestionInfoStages.Blinking;
+        return RoundInfo[themeIndex].Questions[questionIndex].SilentFlashOutAsync();
     }
 
     /// <summary>
@@ -444,9 +422,6 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     /// </summary>
     public Task PlayComplexSelectionAsync(int themeIndex, int questionIndex, bool setActive)
     {
-        Finished = false;
-        _isComplex = true;
-
         for (var k = 0; k < RoundInfo.Count; k++)
         {
             RoundInfo[k].Active = k == themeIndex && setActive;
@@ -465,8 +440,6 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public event Action MediaResume;
 
     public event Action<Exception> MediaLoadError;
-
-    private bool _isComplex;
 
     public void OnMediaStart() => MediaStart?.Invoke();
 

@@ -574,6 +574,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Edit game table.
+        /// </summary>
+        public static string EditTable {
+            get {
+                return ResourceManager.GetString("EditTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Enable external media load.
         /// </summary>
         public static string EnableMediaLoad {
@@ -2622,6 +2631,15 @@ namespace SIGame.Properties {
         public static string Tab_Players {
             get {
                 return ResourceManager.GetString("Tab_Players", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Table.
+        /// </summary>
+        public static string Table {
+            get {
+                return ResourceManager.GetString("Table", resourceCulture);
             }
         }
         

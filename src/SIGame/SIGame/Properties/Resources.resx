@@ -1053,4 +1053,10 @@
   <data name="Unban" xml:space="preserve">
     <value>Remove ban</value>
   </data>
+  <data name="Table" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="EditTable" xml:space="preserve">
+    <value>Edit game table</value>
+  </data>
 </root>

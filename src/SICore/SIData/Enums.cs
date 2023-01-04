@@ -1,45 +1,48 @@
-﻿namespace SIData
+﻿namespace SIData;
+
+/// <summary>
+/// Defines well-known game stages.
+/// </summary>
+public enum GameStage
 {
     /// <summary>
-    /// Состояние игры
+    /// Before game start.
     /// </summary>
-    public enum GameStage
-    {
-        /// <summary>
-        /// Перед игрой
-        /// </summary>
-        Before,
-        /// <summary>
-        /// Начало игры
-        /// </summary>
-        Begin,
-        /// <summary>
-        /// Во время раунда
-        /// </summary>
-        Round,
-        /// <summary>
-        /// Финал
-        /// </summary>
-        Final,
-        /// <summary>
-        /// После игры
-        /// </summary>
-        After
-    }
+    Before,
 
-    public enum TimeSettingsTypes
-    {
-        ChoosingQuestion,
-        ThinkingOnQuestion,
-        PrintingAnswer,
-        GivingCat,
-        MakingStake,
-        ThinkingOnSpecial,
-        Round,
-        ChoosingFinalTheme,
-        FinalThinking,
-        ShowmanDecisions,
-        RightAnswer,
-        MediaDelay
-    }
+    /// <summary>
+    /// Game start.
+    /// </summary>
+    Begin,
+
+    /// <summary>
+    /// Standard round.
+    /// </summary>
+    Round,
+
+    /// <summary>
+    /// Final round.
+    /// </summary>
+    Final,
+
+    /// <summary>
+    /// After game finish.
+    /// </summary>
+    After
+}
+
+public enum TimeSettingsTypes
+{
+    ChoosingQuestion,
+    ThinkingOnQuestion,
+    PrintingAnswer,
+    GivingCat,
+    MakingStake,
+    ThinkingOnSpecial,
+    Round,
+    ChoosingFinalTheme,
+    FinalThinking,
+    ShowmanDecisions,
+    RightAnswer,
+    MediaDelay
 }

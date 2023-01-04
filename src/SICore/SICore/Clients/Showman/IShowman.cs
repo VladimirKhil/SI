@@ -26,4 +26,6 @@ public interface IShowman : IPerson
     void FirstDelete();
 
     void ClearSelections(bool full = false);
+
+    void ManageTable() { }
 }

@@ -8,6 +8,7 @@ using SICore.Results;
 using SICore.Special;
 using SICore.Utils;
 using SIData;
+using SIPackages;
 using SIPackages.Core;
 using System.Text;
 using R = SICore.Properties.Resources;
@@ -590,6 +591,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         }
                         break;
 
+                    case Messages.Toggle:
+                        OnToggle(message, args);
+                        break;
+
                     case Messages.I:
                         OnI(message.Sender);
                         break;
@@ -771,6 +776,78 @@ public sealed class Game : Actor<GameData, GameLogic>
                 Share_Error(new Exception(message.Text, exc));
             }
         }, 5000);
+
+    private void OnToggle(Message message, string[] args)
+    {
+        if (message.Sender != ClientData.ShowMan.Name || args.Length < 3)
+        {
+            return;
+        }
+
+
+        if (!int.TryParse(args[1], out int themeIndex) || !int.TryParse(args[2], out int questionIndex))
+        {
+            return;
+        }
+
+        if (themeIndex < 0 || themeIndex >= ClientData.TInfo.RoundInfo.Count)
+        {
+            return;
+        }
+
+        if (questionIndex < 0 || questionIndex >= ClientData.TInfo.RoundInfo[themeIndex].Questions.Count)
+        {
+            return;
+        }
+
+        var question = ClientData.TInfo.RoundInfo[themeIndex].Questions[questionIndex];
+
+        if (question.IsActive())
+        {
+            if (!_logic.Engine.RemoveQuestion(themeIndex, questionIndex))
+            {
+                return;
+            }
+
+            var oldPrice = question.Price;
+            question.Price = Question.InvalidPrice;
+            _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, Question.InvalidPrice);
+
+            _gameActions.SpecialReplic(
+                string.Format(LO[nameof(R.QuestionRemoved)],
+                message.Sender,
+                ClientData.TInfo.RoundInfo[themeIndex].Name,
+                oldPrice));
+        }
+        else
+        {
+            var restoredPrice = _logic.Engine.RestoreQuestion(themeIndex, questionIndex);
+
+            if (!restoredPrice.HasValue)
+            {
+                return;
+            }
+
+            question.Price = restoredPrice.Value;
+            _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, restoredPrice.Value);
+
+            _gameActions.SpecialReplic(
+                string.Format(LO[nameof(R.QuestionRestored)],
+                message.Sender,
+                ClientData.TInfo.RoundInfo[themeIndex].Name,
+                restoredPrice.Value));
+        }
+
+        ClientData.TableInformStageLock.WithLock(() =>
+            {
+                if (ClientData.TableInformStage > 1)
+                {
+                    _gameActions.InformRoundThemes(play: false);
+                    _gameActions.InformTable();
+                }
+            },
+            5000);
+    }
 
     private void OnKick(Message message, string[] args)
     {

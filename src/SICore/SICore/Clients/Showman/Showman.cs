@@ -24,14 +24,17 @@ public sealed class Showman : Viewer<IShowman>
             {
                 ClientData.Players[i].CanBeSelected = true;
                 int num = i;
+
                 ClientData.Players[i].SelectionCallback = player =>
                 {
                     ClientData.ShowmanDataExtensions.SelectedPlayer = new Pair { First = num + 1, Second = player.Sum };
                     ClientData.DialogMode = DialogModes.ChangeSum;
+
                     for (int j = 0; j < ClientData.Players.Count; j++)
                     {
                         ClientData.Players[j].CanBeSelected = false;
                     }
+
                     ClientData.Hint = LO[nameof(R.HintChangeSum)];
                 };
             }
@@ -41,11 +44,16 @@ public sealed class Showman : Viewer<IShowman>
 
         ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>
         {
-            _viewerActions.SendMessageWithArgs(Messages.Change, ClientData.ShowmanDataExtensions.SelectedPlayer.First, ClientData.ShowmanDataExtensions.SelectedPlayer.Second);
+            _viewerActions.SendMessageWithArgs(
+                Messages.Change,
+                ClientData.ShowmanDataExtensions.SelectedPlayer.First,
+                ClientData.ShowmanDataExtensions.SelectedPlayer.Second);
+
             ClearSelections();
         });
 
         ClientData.ShowmanDataExtensions.Manage = new CustomCommand(Manage_Executed);
+        ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed);
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
@@ -102,6 +110,8 @@ public sealed class Showman : Viewer<IShowman>
     {
         ClientData.DialogMode = DialogModes.Manage;
     }
+
+    private void ManageTable_Executed(object? arg) => _logic.ManageTable();
 
     void ClientData_AutoReadyChanged()
     {

@@ -366,8 +366,9 @@ public static class Messages
     public const string RoundsNames = "ROUNDSNAMES";
 
     /// <summary>
-    /// Темы раунда
+    /// Round themes names.
     /// </summary>
+    [IdempotencyRequired]
     public const string RoundThemes = "ROUNDTHEMES";
 
     /// <summary>
@@ -411,8 +412,9 @@ public static class Messages
     public const string Sums = "SUMS";
 
     /// <summary>
-    /// Игровое табло 2
+    /// Contains information about round table cells.
     /// </summary>
+    [IdempotencyRequired]
     public const string Table = "TABLO2";
 
     /// <summary>
@@ -435,6 +437,11 @@ public static class Messages
     /// Время вышло
     /// </summary>
     public const string Timeout = "TIMEOUT";
+
+    /// <summary>
+    /// Toggles (removes or restores a question).
+    /// </summary>
+    public const string Toggle = "TOGGLE";
 
     /// <summary>
     /// Можно нажимать на кнопку

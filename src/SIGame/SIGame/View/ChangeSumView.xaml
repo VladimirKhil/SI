@@ -1,17 +1,31 @@
-﻿<UserControl x:Class="SIGame.ChangeSumView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SIGame"
-      xmlns:lp="clr-namespace:SIGame.Properties" FontSize="16"
-             mc:Ignorable="d" Loaded="UserControl_Loaded" d:DesignHeight="50" d:DesignWidth="240">
+﻿<UserControl
+    x:Class="SIGame.ChangeSumView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:SIGame"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    FontSize="16"
+    mc:Ignorable="d"
+    Loaded="UserControl_Loaded"
+    d:DesignHeight="50"
+    d:DesignWidth="240"
+    d:DataContext="{d:DesignInstance sc:ShowmanData}">
     <StackPanel Orientation="Horizontal" Margin="5" Width="Auto">
         <TextBlock VerticalAlignment="Center" Text="{x:Static lp:Resources.PlayerSum}" Foreground="{StaticResource MainColor}" />
-        <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}"
-                              Text="{Binding SelectedPlayer.Second, UpdateSourceTrigger=PropertyChanged}"
-                              Maximum="100000" Margin="10,0" Width="100" VerticalAlignment="Center"
-                              VerticalContentAlignment="Center" Padding="0,2" x:Name="tbSum">
+        
+        <local:NumericTextBox
+            Style="{StaticResource {x:Type TextBox}}"
+            Text="{Binding SelectedPlayer.Second, UpdateSourceTrigger=PropertyChanged}"
+            Maximum="100000"
+            Margin="20,15"
+            Width="100"
+            VerticalAlignment="Center"
+            VerticalContentAlignment="Center"
+            Padding="0,2"
+            x:Name="tbSum">
             <local:NumericTextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding ChangeSums2}" />
             </local:NumericTextBox.InputBindings>

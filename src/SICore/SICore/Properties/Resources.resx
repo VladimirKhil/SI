@@ -786,4 +786,10 @@
   <data name="LocalGame" xml:space="preserve">
     <value>Local game</value>
   </data>
+  <data name="QuestionRemoved" xml:space="preserve">
+    <value>{0} removes question {1}, {2}</value>
+  </data>
+  <data name="QuestionRestored" xml:space="preserve">
+    <value>{0} restores question {1}, {2}</value>
+  </data>
 </root>

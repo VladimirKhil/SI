@@ -372,7 +372,6 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         _gameHost.MediaProgress += GameHost_MediaProgress;
         _gameHost.MediaEnd += GameHost_MediaEnd;
         _gameHost.RoundThemesFinished += GameHost_RoundThemesFinished;
-        _gameHost.ThemeDeleted += GameHost_ThemeDeleted;
     }
 
     private async void Engine_QuestionPostInfo()
@@ -388,8 +387,6 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             OnError(exc.ToString());
         }
     }
-
-    private void GameHost_ThemeDeleted(int themeIndex) => LocalInfo.RoundInfo[themeIndex].Name = null;
 
     private void GameHost_RoundThemesFinished()
     {
@@ -573,7 +570,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             }
 
             if (found)
+            {
                 break;
+            }
         }
 
         _gameHost.OnQuestionSelected(themeIndex, questionIndex);

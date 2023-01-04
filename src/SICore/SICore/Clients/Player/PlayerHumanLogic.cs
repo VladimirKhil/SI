@@ -142,14 +142,12 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayer
         }
     }
 
-    public void OnInitialized()
-    {
-        Greet();
-    }
+    public void OnInitialized() => Greet();
 
     private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
     {
         var found = false;
+
         for (var i = 0; i < TInfo.RoundInfo.Count; i++)
         {
             for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)

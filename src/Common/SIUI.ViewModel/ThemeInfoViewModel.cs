@@ -7,12 +7,12 @@ using System.Diagnostics;
 namespace SIUI.ViewModel;
 
 /// <summary>
-/// Defines theme information view model.s
+/// Defines theme information view model.
 /// </summary>
 public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
 {
     /// <summary>
-    /// Название темы
+    /// Theme name.
     /// </summary>
     public string Name
     {
@@ -23,7 +23,7 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
     private QuestionInfoStages _state = QuestionInfoStages.None;
 
     /// <summary>
-    /// Состояние темы
+    /// Theme state.
     /// </summary>
     public QuestionInfoStages State
     {
@@ -32,9 +32,9 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
     }
 
     /// <summary>
-    /// Вопросы темы
+    /// Theme questions.
     /// </summary>
-    public ObservableCollection<QuestionInfoViewModel> Questions { get; } = new ObservableCollection<QuestionInfoViewModel>();
+    public ObservableCollection<QuestionInfoViewModel> Questions { get; } = new();
 
     private bool _empty = true;
 
@@ -52,45 +52,59 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
         set { _active = value; OnPropertyChanged(); }
     }
 
-    public ThemeInfoViewModel()
-    {
-        Questions.CollectionChanged += Questions_CollectionChanged;
-    }
+    public ThemeInfoViewModel() => Questions.CollectionChanged += Questions_CollectionChanged;
 
-    public ThemeInfoViewModel(ThemeInfo themeInfo) : this()
-    {
-        _model = themeInfo;
-    }
+    public ThemeInfoViewModel(ThemeInfo themeInfo) : this() => _model = themeInfo;
 
     private void Questions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
+                if (e.NewItems == null)
+                {
+                    break;
+                }
+
                 foreach (QuestionInfoViewModel item in e.NewItems)
                 {
                     item.PropertyChanged += Item_PropertyChanged;
                 }
+
                 InvalidateIsEmpty();
                 break;
 
             case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems == null)
+                {
+                    break;
+                }
+
                 foreach (QuestionInfoViewModel item in e.OldItems)
                 {
                     item.PropertyChanged -= Item_PropertyChanged;
                 }
+
                 InvalidateIsEmpty();
                 break;
 
             case NotifyCollectionChangedAction.Replace:
-                foreach (QuestionInfoViewModel item in e.OldItems)
+                if (e.OldItems != null)
                 {
-                    item.PropertyChanged -= Item_PropertyChanged;
+                    foreach (QuestionInfoViewModel item in e.OldItems)
+                    {
+                        item.PropertyChanged -= Item_PropertyChanged;
+                    }
                 }
-                foreach (QuestionInfoViewModel item in e.NewItems)
+
+                if (e.NewItems != null)
                 {
-                    item.PropertyChanged += Item_PropertyChanged;
+                    foreach (QuestionInfoViewModel item in e.NewItems)
+                    {
+                        item.PropertyChanged += Item_PropertyChanged;
+                    }
                 }
+
                 break;
 
             case NotifyCollectionChangedAction.Reset:
@@ -107,10 +121,7 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
         }
     }
 
-    private void InvalidateIsEmpty()
-    {
-        Empty = !Questions.Any(questInfo => questInfo.Price > -1);
-    }
+    private void InvalidateIsEmpty() => Empty = !Questions.Any(questInfo => questInfo.Price > QuestionInfoViewModel.InvalidPrice);
 
     public override string ToString() => Name;
 
@@ -121,7 +132,7 @@ public sealed class ThemeInfoViewModel : ViewModelBase<ThemeInfo>
             await Task.Delay(500);
 
             _state = QuestionInfoStages.None;
-            Name = null;
+            Name = null; // TODO: introduce IsEnabled property
         }
         catch (Exception exc)
         {

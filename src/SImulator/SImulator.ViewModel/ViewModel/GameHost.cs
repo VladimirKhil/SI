@@ -1,7 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.Core;
-using SImulator.ViewModel.PlatformSpecific;
-using SImulator.ViewModel.Properties;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel;
@@ -13,45 +12,45 @@ public sealed class GameHost : IExtendedGameHost
     public bool IsMediaEnded { get; set; }
 
     public ICommand Next { get; set; }
+
     public ICommand Back { get; set; }
+
     public ICommand NextRound { get; set; }
+
     public ICommand PreviousRound { get; set; }
 
     public ICommand Stop { get; set; }
 
     public event Action<int> ThemeDeleted;
+
     public event Action MediaStart;
+
     public event Action MediaEnd;
+
     public event Action<double> MediaProgress;
+
     public event Action RoundThemesFinished;
 
-    public GameHost(ISIEngine engine)
-    {
-        _engine = engine;
-    }
+    public GameHost(ISIEngine engine) => _engine = engine;
 
-    public void OnQuestionSelected(int theme, int question)
+    public async void OnQuestionSelected(int theme, int question)
     {
         try
         {
             ((TvEngine)_engine).SelectQuestion(theme, question);
+            await Task.Delay(700);
+            ((TvEngine)_engine).OnReady(out _);
         }
-        catch (TimeoutException exc)
+        catch (Exception exc)
         {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
+            Trace.TraceError("OnQuestionSelected error: " + exc.Message);
         }
     }
 
     public void OnThemeSelected(int themeIndex)
     {
-        try
-        {
-            ((TvEngine)_engine).SelectTheme(themeIndex);
-        }
-        catch (TimeoutException exc)
-        {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
-        }
+        ((TvEngine)_engine).SelectTheme(themeIndex);
+        ((TvEngine)_engine).OnReady(out _);
     }
 
     private readonly object _moveLock = new();
@@ -61,7 +60,9 @@ public sealed class GameHost : IExtendedGameHost
         lock (_moveLock)
         {
             if (Next?.CanExecute(null) == true)
+            {
                 Next.Execute(null);
+            }
         }
     }
 
@@ -81,7 +82,9 @@ public sealed class GameHost : IExtendedGameHost
         lock (_moveLock)
         {
             if (NextRound?.CanExecute(null) == true)
+            {
                 NextRound.Execute(null);
+            }
         }
     }
 
@@ -90,7 +93,9 @@ public sealed class GameHost : IExtendedGameHost
         lock (_moveLock)
         {
             if (PreviousRound?.CanExecute(null) == true)
+            {
                 PreviousRound.Execute(null);
+            }
         }
     }
 
@@ -99,20 +104,6 @@ public sealed class GameHost : IExtendedGameHost
         if (Stop?.CanExecute(null) == true)
         {
             Stop.Execute(null);
-        }
-    }
-
-    public void OnReady()
-    {
-        try
-        {
-            var result = ((TvEngine)_engine).OnReady(out bool more);
-            if (result > -1)
-                ThemeDeleted?.Invoke(result);
-        }
-        catch (TimeoutException exc)
-        {
-            PlatformManager.Instance.ShowMessage(string.Format(Resources.ConnectionError, exc.Message));
         }
     }
 

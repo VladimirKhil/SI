@@ -1411,6 +1411,24 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} removes question {1}, {2}.
+        /// </summary>
+        public static string QuestionRemoved {
+            get {
+                return ResourceManager.GetString("QuestionRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} restores question {1}, {2}.
+        /// </summary>
+        public static string QuestionRestored {
+            get {
+                return ResourceManager.GetString("QuestionRestored", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на A question with a special theme.
         /// </summary>
         public static string QuestionWithSpecialTheme {

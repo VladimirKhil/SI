@@ -81,8 +81,6 @@ public sealed class RemoteGameUI : IRemoteGameUI
         };
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
-        TInfo.Ready += TInfo_Ready;
-
         TInfo.QuestionSelected += QuestionInfo_Selected;
         TInfo.ThemeSelected += ThemeInfo_Selected;
 
@@ -115,8 +113,6 @@ public sealed class RemoteGameUI : IRemoteGameUI
             }
         }
     }
-
-    private void TInfo_Ready(object? sender, EventArgs e) => GameHost?.OnReady();
 
     public void SetSound(string sound = "") => UI.Execute(() => PlatformManager.Instance.PlaySound(sound, SoundFinished), OnError);
 

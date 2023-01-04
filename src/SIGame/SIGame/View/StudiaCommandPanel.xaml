@@ -91,11 +91,13 @@
         </Style>
         
         <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-            <Setter Property="Content" Value="{x:Static lp:Resources.Pause}" />
-            
+            <Setter Property="Content" Value="⏸️" />
+            <Setter Property="ToolTip" Value="{x:Static lp:Resources.Pause}" />
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsPaused}" Value="True">
-                    <Setter Property="Content" Value="{x:Static lp:Resources.Continue}" />
+                    <Setter Property="Content" Value="▶️" />
+                    <Setter Property="ToolTip" Value="{x:Static lp:Resources.Continue}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -253,16 +255,17 @@
         </Grid.ColumnDefinitions>
         
         <Grid.RowDefinitions>
-            <RowDefinition Height="26*" />
-            <RowDefinition Height="8*" />
+            <RowDefinition Height="16*" />
             <RowDefinition Height="0*" />
-            <RowDefinition Height="12*" />
+            <RowDefinition Height="14*" />
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="8*" />
             <RowDefinition Height="8*" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
 
         <Button
-            Grid.Row="1"
+            Grid.Row="3"
             Grid.ColumnSpan="2"
             Cursor="Hand"
             ToolTip="{x:Static lp:Resources.Forward}"
@@ -272,16 +275,16 @@
             MaxWidth="100" />
 
         <Button
-            Grid.Row="3"
+            Grid.Row="2"
             Grid.ColumnSpan="3"
             Cursor="Hand"
-            Margin="5,10"
+            Margin="0,8"
             x:Name="gameButton"
             Style="{StaticResource GameButton}"
             Visibility="{Binding Data.IsPlayer,Converter={StaticResource BooleanToVisibilityConverter1}}"
             Command="{Binding Data.PlayerDataExtensions.PressGameButton}" />
         
-        <Border Grid.Row="3" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
+        <Border Grid.Row="2" Grid.ColumnSpan="3" Margin="6" Name="gameBorder" Visibility="Hidden" CornerRadius="20" Opacity="0">
             <Border.Background>
                 <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
                     <GradientStop Offset="0" Color="#EEFFFF00" />
@@ -293,34 +296,54 @@
 
         <Button
             Grid.Row="4"
+            Grid.ColumnSpan="2"
+            Cursor="Hand"
+            Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
+            Content="✏️"
+            ToolTip="{x:Static lp:Resources.EditTable}"
+            Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}">
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding TInfo.IsEditable}" Value="True">
+                            <Setter Property="Background" Value="#AACCCCCC" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
+
+        <Button
+            Grid.Row="5"
             Cursor="Hand"
             ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}"
             Command="{Binding Data.PlayerDataExtensions.Apellate}"
-            Content="{x:Static lp:Resources.Apellate_Right}"
+            Content="❗"
             CommandParameter="+"
             Style="{StaticResource ApellateButton}" />
         
         <Button
-            Grid.Row="4"
+            Grid.Row="5"
             Grid.Column="1"
             Cursor="Hand"
             ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}"
             Command="{Binding Data.PlayerDataExtensions.Apellate}"
-            Content="{x:Static lp:Resources.Apellate_Wrong}"
+            Content="🤨"
             CommandParameter="-"
             Style="{StaticResource ApellateButton}" />
 
         <Button
-            Grid.Row="4"
+            Grid.Row="5"
             Grid.ColumnSpan="2"
             Cursor="Hand"
             Command="{Binding Data.PlayerDataExtensions.Pass}"
-            Content="{x:Static lp:Resources.Pass}" />
+            Content="⏩"
+            ToolTip="{x:Static lp:Resources.Pass}" />
 
         <local:DropDownButton
-            Grid.Row="4"
+            Grid.Row="5"
             Cursor="Hand"
-            Content="{x:Static lp:Resources.Manage}"
+            Content="⚙️"
             ToolTip="{x:Static lp:Resources.Manage_Hint}"
             Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
             
@@ -394,21 +417,21 @@
         </local:DropDownButton>
         
         <Button
-            Grid.Row="4"
+            Grid.Row="5"
             Grid.Column="1"
             Cursor="Hand"
             Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
-            Content="{x:Static lp:Resources.Sums}"
+            Content="💰"
             ToolTip="{x:Static lp:Resources.Sums_Hint}" />
 
         <ToggleButton
-            Grid.Row="5"
+            Grid.Row="6"
             Cursor="Hand"
             Style="{StaticResource PauseButton}"
             IsChecked="{Binding IsPaused, Mode=OneWay}"
             Command="{Binding ChangePauseInGame}" />
-        
-        <local:DropDownButton Grid.Row="5" Grid.Column="1" Cursor="Hand" Content="{x:Static lp:Resources.Exit}">
+
+        <local:DropDownButton Grid.Row="6" Grid.Column="1" Cursor="Hand" Content="🚪" ToolTip="{x:Static lp:Resources.Exit}">
             <local:DropDownButton.DropDown>
                 <ContextMenu Placement="Relative" HorizontalOffset="100" VerticalOffset="-128">
                     <MenuItem

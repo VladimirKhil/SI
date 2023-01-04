@@ -86,31 +86,37 @@ public enum QuestionContentType
     /// </summary>
     [EnumMember]
     None,
+
     /// <summary>
     /// Text content.
     /// </summary>
     [EnumMember]
     Text,
+
     /// <summary>
     /// Image content.
     /// </summary>
     [EnumMember]
     Image,
+
     /// <summary>
     /// Video content.
     /// </summary>
     [EnumMember]
     Video,
+
     /// <summary>
     /// Special text content.
     /// </summary>
     [EnumMember]
     SpecialText,
+
     /// <summary>
     /// Html content.
     /// </summary>
     [EnumMember]
     Html,
+
     /// <summary>
     /// Loading content mode.
     /// </summary>
@@ -142,20 +148,22 @@ public enum QuestionStyle
 }
 
 /// <summary>
-/// Состояние ячейки на табло
+/// Defines a question table cell state.
 /// </summary>
 public enum QuestionInfoStages
 {
     /// <summary>
-    /// Обычное
+    /// Normal state.
     /// </summary>
     None,
+
     /// <summary>
-    /// Мигающее
+    /// Blinking state.
     /// </summary>
     Blinking,
+
     /// <summary>
-    /// Выбранное
+    /// Active state.
     /// </summary>
     Active
 }
