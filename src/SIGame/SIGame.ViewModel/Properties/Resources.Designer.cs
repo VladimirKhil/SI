@@ -97,6 +97,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Your avatar is bigger than 1 MB. Other players will not see it.
+        /// </summary>
+        public static string AvatarTooBig {
+            get {
+                return ResourceManager.GetString("AvatarTooBig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на This pack can&apos;t be used to play on the server.
         /// </summary>
         public static string BadPackage {
@@ -534,6 +543,15 @@ namespace SIGame.ViewModel.Properties {
         public static string ImportOk {
             get {
                 return ResourceManager.GetString("ImportOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid avatar data.
+        /// </summary>
+        public static string InvalidAvatarData {
+            get {
+                return ResourceManager.GetString("InvalidAvatarData", resourceCulture);
             }
         }
         

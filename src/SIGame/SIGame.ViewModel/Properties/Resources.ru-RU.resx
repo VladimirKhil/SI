@@ -486,4 +486,10 @@
   <data name="MaximumFileSize" xml:space="preserve">
     <value>Максимальный размер файла: {0} МБ</value>
   </data>
+  <data name="AvatarTooBig" xml:space="preserve">
+    <value>Ваш аватар по размеру превышает 1 Мб и не будет виден другим участникам!</value>
+  </data>
+  <data name="InvalidAvatarData" xml:space="preserve">
+    <value>Неверные данные аватара</value>
+  </data>
 </root>

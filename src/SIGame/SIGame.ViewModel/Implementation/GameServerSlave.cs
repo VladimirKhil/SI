@@ -4,7 +4,7 @@ using SICore.Network.Servers;
 
 namespace SIGame.ViewModel.Implementation;
 
-public sealed class GameServerSlave : SlaveServer
+public sealed class GameServerSlave : SecondaryNode
 {
     public GameServerSlave(
         NodeConfiguration serverConfiguration,

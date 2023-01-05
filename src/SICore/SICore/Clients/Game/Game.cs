@@ -1,5 +1,7 @@
 ﻿using Notions;
 using SICore.BusinessLogic;
+using SICore.Clients;
+using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
@@ -27,17 +29,15 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// </summary>
     public event Action<string>? DisconnectRequested;
 
-    /// <summary>
-    /// Maximum avatar size in bytes.
-    /// </summary>
-    private const int MaxAvatarSize = 1024 * 1024;
-
     private readonly GameActions _gameActions;
 
     private IPrimaryNode Master => (IPrimaryNode)_client.Node;
 
     private readonly ComputerAccount[] _defaultPlayers;
     private readonly ComputerAccount[] _defaultShowmans;
+
+    private readonly IFileShare _fileShare;
+    private readonly IAvatarHelper _avatarHelper;
 
     public Game(
         Client client,
@@ -47,7 +47,9 @@ public sealed class Game : Actor<GameData, GameLogic>
         GameActions gameActions,
         GameLogic gameLogic,
         ComputerAccount[] defaultPlayers,
-        ComputerAccount[] defaultShowmans)
+        ComputerAccount[] defaultShowmans,
+        IFileShare fileShare,
+        IAvatarHelper avatarHelper)
         : base(client, localizer, gameData)
     {
         _gameActions = gameActions;
@@ -56,10 +58,12 @@ public sealed class Game : Actor<GameData, GameLogic>
         _logic.AutoGame += AutoGame;
 
         gameData.DocumentPath = documentPath;
-        gameData.Share.Error += Share_Error;
 
         _defaultPlayers = defaultPlayers ?? throw new ArgumentNullException(nameof(defaultPlayers));
         _defaultShowmans = defaultShowmans ?? throw new ArgumentNullException(nameof(defaultShowmans));
+
+        _fileShare = fileShare;
+        _avatarHelper = avatarHelper;
 
         Master.Unbanned += Master_Unbanned;
     }
@@ -68,9 +72,6 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     public override async ValueTask DisposeAsync(bool disposing)
     {
-        ClientData.Share.Error -= Share_Error;
-        ClientData.Share.Dispose();
-
         // Logic must be disposed before TaskLock
         await base.DisposeAsync(disposing);
 
@@ -126,8 +127,6 @@ public sealed class Game : Actor<GameData, GameLogic>
             _client.Node.OnError(e, true);
         }
     }
-
-    private void Share_Error(Exception exc) => _client.Node.OnError(exc, true);
 
     /// <summary>
     /// Sends all current game data to the person.
@@ -777,7 +776,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             catch (Exception exc)
             {
-                Share_Error(new Exception(message.Text, exc));
+                _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
 
@@ -979,40 +978,25 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (args.Length > 2)
         {
+            if (!ClientData.BackLink.AreCustomAvatarsSupported)
+            {
+                return;
+            }
+
             var file = $"{message.Sender}_{Path.GetFileName(path)}";
-            string uri;
 
-            if (!ClientData.Share.ContainsUri(file))
+            if (!_avatarHelper.FileExists(file))
             {
-                var base64image = args[2];
+                var error = _avatarHelper.ExtractAvatarData(args[2], file);
 
-                var imageDataSize = ((base64image.Length * 3) + 3) / 4 -
-                    (base64image.Length > 0 && base64image[^1] == '=' ?
-                        base64image.Length > 1 && base64image[^2] == '=' ?
-                            2 : 1 : 0);
-
-                if (imageDataSize > MaxAvatarSize)
+                if (error != null)
                 {
-                    _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.AvatarTooBig)]);
+                    _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), error);
                     return;
                 }
-
-                var imageData = new byte[imageDataSize]; // TODO: save to file system. Disable for game server
-
-                if (!Convert.TryFromBase64String(args[2], imageData, out var bytesWritten))
-                {
-                    _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.InvalidAvatarData)]);
-                    return;
-                }
-                
-                Array.Resize(ref imageData, bytesWritten);
-
-                uri = ClientData.Share.CreateUri(file, imageData, null);
             }
-            else
-            {
-                uri = ClientData.Share.MakeUri(file, null);
-            }
+
+            var uri = _fileShare.CreateResourceUri(Clients.ResourceKind.Avatar, new Uri(file, UriKind.Relative));
 
             person.Picture = $"URI: {uri}";
         }
@@ -3208,57 +3192,48 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
     }
 
-    private string? CreateUri(string id, string file, string receiver)
+    private string? CreateUri(string personName, string avatarUri, string receiver)
     {
         var local = _client.Node.Contains(receiver);
 
-        if (!Uri.TryCreate(file, UriKind.RelativeOrAbsolute, out var uri))
+        if (!Uri.TryCreate(avatarUri, UriKind.RelativeOrAbsolute, out var uri))
         {
             return null;
         }
 
-        if (!uri.IsAbsoluteUri || uri.Scheme == "file" && !CoreManager.Instance.FileExists(file))
+        if (!uri.IsAbsoluteUri || uri.Scheme == "file" && !CoreManager.Instance.FileExists(avatarUri))
         {
             return null;
         }
 
         var remote = !local && uri.Scheme == "file";
-        var isURI = file.StartsWith("URI: ");
+        var isUri = avatarUri.StartsWith("URI: ");
 
-        if (isURI || remote)
+        if (isUri || remote)
         {
             string path;
 
-            if (isURI)
+            if (isUri)
             {
-                path = file[5..];
+                path = avatarUri[5..];
             }
             else
             {
-                var complexName = (id != null ? id + "_" : "") + Path.GetFileName(file);
+                var complexName = $"{(personName != null ? personName + "_" : "")}{Path.GetFileName(avatarUri)}";
 
-                if (!ClientData.Share.ContainsUri(complexName))
+                if (!_avatarHelper.FileExists(complexName))
                 {
-                    path = ClientData.Share.CreateUri(
-                        complexName,
-                        () =>
-                        {
-                            var stream = CoreManager.Instance.GetFile(file);
-                            return new StreamInfo { Stream = stream, Length = stream.Length };
-                        },
-                        null);
+                    _avatarHelper.AddFile(avatarUri, complexName);
                 }
-                else
-                {
-                    path = ClientData.Share.MakeUri(complexName, null);
-                }
+
+                path = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(complexName, UriKind.Relative)).AbsoluteUri;
             }
 
             return local ? path : path.Replace("http://localhost", "http://" + Constants.GameHost);
         }
         else
         {
-            return file;
+            return avatarUri;
         }
     }
 

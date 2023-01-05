@@ -52,9 +52,6 @@
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="licenses\Nowin.LICENSE.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.ru-RU.resx">
@@ -163,56 +160,10 @@
     <Resource Include="Resources\game.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GameData\Photo\Ada_Lovelace.jpg" />
-    <None Include="GameData\Photo\Agatha_Christie.jpg" />
-    <None Include="GameData\Photo\Albert_Einstein.jpg" />
-    <None Include="GameData\Photo\Aristotle.jpg" />
-    <None Include="GameData\Photo\Carl_Gustav_Jung.jpg" />
-    <None Include="GameData\Photo\Dmitriy_Mendeleev.jpg" />
-    <None Include="GameData\Photo\Fedor_Dostoevskiy.jpg" />
-    <None Include="GameData\Photo\Francis_Bacon.jpg" />
-    <None Include="GameData\Photo\Franz_Kafka.jpg" />
-    <None Include="GameData\Photo\Galileo.jpg" />
-    <None Include="GameData\Photo\Giordano_Bruno.jpg" />
-    <None Include="GameData\Photo\Goethe.jpg" />
-    <None Include="GameData\Photo\Heisenberg.jpg" />
-    <None Include="GameData\Photo\Heraclite.JPG" />
-    <None Include="GameData\Photo\Hypatia_Alexandria.jpg" />
-    <None Include="GameData\Photo\IsaacNewton.jpg" />
-    <None Include="GameData\Photo\Johannes_Kepler.jpg" />
-    <None Include="GameData\Photo\Kant.jpg" />
-    <None Include="GameData\Photo\Konfuzius.jpg" />
-    <None Include="GameData\Photo\Lao_Tzu.jpg" />
-    <None Include="GameData\Photo\Leonardo.jpg" />
-    <None Include="GameData\Photo\Leo_Tolstoy.jpg" />
-    <None Include="GameData\Photo\Lise_Meitner.jpg" />
-    <None Include="GameData\Photo\Marie_Curie.jpg" />
-    <None Include="GameData\Photo\Mikhail_Lomonosov.jpg" />
-    <None Include="GameData\Photo\Nicholas_of_Cusa.jpg" />
-    <None Include="GameData\Photo\Niels_Bohr.jpg" />
-    <None Include="GameData\Photo\Nietzsche.jpg" />
-    <None Include="GameData\Photo\Nikolaus_Kopernikus.jpg" />
-    <None Include="GameData\Photo\Paracelsus.jpg" />
-    <None Include="GameData\Photo\Pierre_de_Fermat.jpg" />
-    <None Include="GameData\Photo\Platon.jpg" />
-    <None Include="GameData\Photo\Pythagoras.jpg" />
-    <None Include="GameData\Photo\Rene_Descartes.jpg" />
-    <None Include="GameData\Photo\Sofja_Kovalevskaja.jpg" />
-    <None Include="GameData\Photo\Stephen_Hawking.jpg" />
-    <None Include="GameData\Photo\Tesla.jpg" />
-    <None Include="GameData\Photo\Thomas-Aquinas.jpg" />
-    <None Include="GameData\Photo\Thomas_Edison.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Theme\studia.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\fb_logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="licenses\Owin.LICENSE.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sounds\answer_wrong.mp3">
@@ -292,6 +243,123 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Polly.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Ada_Lovelace.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Agatha_Christie.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Albert_Einstein.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Aristotle.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Carl_Gustav_Jung.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Dmitriy_Mendeleev.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Fedor_Dostoevskiy.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Francis_Bacon.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Franz_Kafka.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Galileo.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Giordano_Bruno.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Goethe.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Heisenberg.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Heraclite.JPG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Hypatia_Alexandria.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\IsaacNewton.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Johannes_Kepler.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Kant.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Konfuzius.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Lao_Tzu.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Leonardo.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Leo_Tolstoy.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Lise_Meitner.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Marie_Curie.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Mikhail_Lomonosov.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Nicholas_of_Cusa.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Niels_Bohr.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Nietzsche.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Nikolaus_Kopernikus.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Paracelsus.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Pierre_de_Fermat.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Platon.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Pythagoras.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Rene_Descartes.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Sofja_Kovalevskaja.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Stephen_Hawking.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Tesla.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Thomas-Aquinas.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Photo\Thomas_Edison.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

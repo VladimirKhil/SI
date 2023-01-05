@@ -160,15 +160,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Your avatar is bigger than 1 MB. Other players will not see it.
-        /// </summary>
-        public static string AvatarTooBig {
-            get {
-                return ResourceManager.GetString("AvatarTooBig", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Bad text in log.
         /// </summary>
         public static string BadTextInLog {
@@ -831,15 +822,6 @@ namespace SICore.Properties {
         public static string InformChooser {
             get {
                 return ResourceManager.GetString("InformChooser", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Invalid avatar data.
-        /// </summary>
-        public static string InvalidAvatarData {
-            get {
-                return ResourceManager.GetString("InvalidAvatarData", resourceCulture);
             }
         }
         

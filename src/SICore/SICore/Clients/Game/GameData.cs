@@ -454,15 +454,11 @@ public sealed class GameData : Data
 
     public int AcceptedReports { get; set; }
 
-    internal HashSet<string> OpenedFiles { get; set; } = new();
-
     public bool AnnounceAnswer { get; set; }
 
     public bool AllowAppellation { get; set; }
 
     internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));
-
-    public IShare Share { get; set; }
 
     /// <summary>
     /// Дочитан ли вопрос

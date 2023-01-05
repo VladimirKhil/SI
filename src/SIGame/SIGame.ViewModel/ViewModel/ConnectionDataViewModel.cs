@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SICore;
 using SICore.BusinessLogic;
+using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Configuration;
@@ -41,7 +42,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected abstract bool IsOnline { get; }
 
-    protected SlaveServer _node;
+    protected SecondaryNode _node;
     protected Client _client;
     protected IViewerClient _host;
     protected Connector _connector;
@@ -172,8 +173,15 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         };
     }
 
-    protected override void OnStartGame(Node server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort)
-        => base.OnStartGame(server, host, networkGame, IsOnline, tempDocFolder, networkGamePort);
+    protected override void OnStartGame(
+        Node node,
+        IViewerClient host,
+        bool networkGame,
+        bool isOnline,
+        string tempDocFolder,
+        IFileShare? fileShare,
+        int networkGamePort)
+        => base.OnStartGame(node, host, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
 
     protected virtual void Prepare(GameSettingsViewModel gameSettings)
     {

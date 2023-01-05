@@ -10,8 +10,7 @@ internal sealed class GameServerConnection : ConnectionBase
     private readonly IGameServerClient _gameServerClient;
     private bool _isDisposed;
 
-    public GameServerConnection(
-        IGameServerClient gameServerClient)
+    public GameServerConnection(IGameServerClient gameServerClient)
     {
         _gameServerClient = gameServerClient;
         _gameServerClient.IncomingMessage += OnMessageReceived;
@@ -19,13 +18,13 @@ internal sealed class GameServerConnection : ConnectionBase
         _gameServerClient.Reconnected += GameServerClient_Reconnected;
     }
 
-    private Task GameServerClient_Reconnecting(Exception arg)
+    private Task GameServerClient_Reconnecting(Exception? arg)
     {
         OnReconnecting();
         return Task.CompletedTask;
     }
 
-    private Task GameServerClient_Reconnected(string arg)
+    private Task GameServerClient_Reconnected(string? arg)
     {
         OnReconnected();
         return Task.CompletedTask;

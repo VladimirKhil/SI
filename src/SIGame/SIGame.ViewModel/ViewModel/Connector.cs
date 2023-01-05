@@ -9,13 +9,13 @@ namespace SIGame.ViewModel;
 
 public sealed class Connector : IDisposable
 {
-    private readonly SlaveServer _server;
+    private readonly SecondaryNode _server;
     private readonly Client _client;
 
     private TaskCompletionSource<string[]> _tcs;
     private TaskCompletionSource<bool> _tcs2;
 
-    public Connector(SlaveServer server, Client client)
+    public Connector(SecondaryNode server, Client client)
     {
         _server = server ?? throw new ArgumentNullException(nameof(server));
         _client = client ?? throw new ArgumentNullException(nameof(client));

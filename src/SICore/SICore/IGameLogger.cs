@@ -1,7 +1,6 @@
-﻿namespace SICore
+﻿namespace SICore;
+
+public interface IGameLogger
 {
-    public interface IGameLogger
-    {
-        void Log(int gameId, string message);
-    }
+    void Log(int gameId, string message);
 }

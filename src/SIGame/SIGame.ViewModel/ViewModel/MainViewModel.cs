@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SI.GameServer.Client;
 using SICore;
+using SICore.Contracts;
 using SICore.Network.Servers;
 using SIGame.ViewModel.Properties;
 using SIStorageService.ViewModel;
@@ -212,11 +213,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         };
 
     private void StartGame(
-        Node server,
+        Node node,
         IViewerClient host,
         bool isNetworkGame,
         bool isOnline,
         string tempDocFolder,
+        IFileShare? fileShare,
         int networkGamePort = -1)
     {
         if (host == null)
@@ -224,9 +226,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             throw new ArgumentNullException(nameof(host));
         }
 
-        var game = new GameViewModel(server, host, _userSettings, _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
+        var game = new GameViewModel(node, host, _userSettings, fileShare, _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
         {
-            NetworkGame = isNetworkGame && server.IsMain,
+            NetworkGame = isNetworkGame && node.IsMain,
             NetworkGamePort = networkGamePort,
             IsOnline = isOnline,
             TempDocFolder = tempDocFolder
@@ -244,7 +246,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         host.MyLogic.PrintGreeting();
     }
 
-    private void JoinGame(Node server, IViewerClient host, bool isOnline) => StartGame(server, host, false, isOnline, null);
+    private void JoinGame(Node server, IViewerClient host, bool isOnline) => StartGame(server, host, false, isOnline, null, null);
 
     private async void EndGame_Executed()
     {

@@ -150,4 +150,6 @@ public sealed class BackLink : BackLinkCore
     public override int MaxAudioSizeKb => int.MaxValue;
 
     public override int MaxVideoSizeKb => int.MaxValue;
+
+    public override bool AreCustomAvatarsSupported => true;
 }

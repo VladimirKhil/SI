@@ -1,11 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
     <Version>7.7.3</Version>
@@ -16,15 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Owin.Hosting" Version="4.2.0" />
-    <PackageReference Include="Nowin" Version="0.26.0" />
-    <PackageReference Include="Owin" Version="1.0.0" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />
   </ItemGroup>
-
 </Project>

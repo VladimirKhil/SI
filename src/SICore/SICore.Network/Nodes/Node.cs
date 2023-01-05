@@ -32,6 +32,7 @@ public abstract class Node : INode
     public event Action<Message, Exception> SerializationError;
 
     public event Action Reconnecting;
+
     public event Action Reconnected;
 
     private bool _wrongUserMessageShown = false;
@@ -192,7 +193,7 @@ public abstract class Node : INode
             if (message.Receiver == client.Name || message.Receiver == NetworkConstants.Everybody || string.IsNullOrEmpty(client.Name) || !message.IsSystem && !message.IsPrivate)
             {
                 Debug.WriteLine($"Message added to client: {client.Name}");
-                client.AddIncomingMessage(message);
+                client.AddIncomingMessage(in message);
             }
             else if (!IsMain && !_wrongUserMessageShown)
             {
@@ -242,7 +243,7 @@ public abstract class Node : INode
             if ((message.Receiver == client.Name || client.Name.Length == 0 || message.Receiver == NetworkConstants.Everybody
                 || !message.IsSystem && !message.IsPrivate) && client.Name != message.Sender)
             {
-                client.AddIncomingMessage(message);
+                client.AddIncomingMessage(in message);
             }
         }
 

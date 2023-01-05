@@ -7,7 +7,7 @@ using R = SICore.Network.Properties.Resources;
 
 namespace SICore.Network.Servers;
 
-public sealed class TcpSlaveServer : SlaveServer
+public sealed class TcpSlaveServer : SecondaryNode
 {
     private readonly string _serverAddress;
     private readonly int _port = -1;

@@ -1,128 +1,80 @@
-﻿using Microsoft.Owin.Hosting;
-using Owin;
-using SICore;
-using SIPackages.Core;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Web.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.FileProviders;
+using SICore.Clients;
+using SICore.Contracts;
+using SIPackages;
 
 namespace SIGame.ViewModel.Web;
 
-public sealed class WebManager : ShareBase
+public sealed class WebManager : IFileShare
 {
-    private const int AddressIsUsedErrorCode = 10048;
+    private readonly int _port;
+    private readonly WebApplication _webApplication;
 
-    internal static WebManager Current;
-
-    private class Startup
+    public WebManager(int port, Dictionary<ResourceKind, string> resourceLocations)
     {
-        public void Configuration(IAppBuilder appBuilder)
+        _port = port;
+
+        var builder = WebApplication.CreateBuilder();
+
+        _webApplication = builder.Build();
+
+        _webApplication.UseStaticFiles(new StaticFileOptions
         {
-            var config = new HttpConfiguration();
+            FileProvider = new PhysicalFileProvider(resourceLocations[ResourceKind.DefaultAvatar]),
+            RequestPath = "/defaultAvatars"
+        });
 
-            config.Routes.MapHttpRoute(
-                name: "Media",
-                routeTemplate: "data/{file}",
-                defaults: new { controller = "Resource", action = "Get" }
-            );
-
-            appBuilder.UseWebApi(config);
-        }
-    }
-
-    private bool _disposed = false;
-
-    private readonly int _multimediaPort = -1;
-    private IDisposable _web = null;
-
-    public WebManager(int multimediaPort)
-    {
-        _multimediaPort = multimediaPort;
-        Init();
-    }
-
-    private bool Init()
-    {
-        lock (_filesSync)
+        _webApplication.UseStaticFiles(new StaticFileOptions
         {
-            if (_disposed)
+            FileProvider = new PhysicalFileProvider(resourceLocations[ResourceKind.Avatar]),
+            RequestPath = "/avatars"
+        });
+
+        var packageFolder = resourceLocations[ResourceKind.Package];
+
+        var imagesFolder = Path.Combine(packageFolder, SIDocument.ImagesStorageName);
+
+        if (Directory.Exists(imagesFolder))
+        {
+            _webApplication.UseStaticFiles(new StaticFileOptions
             {
-                return false;
-            }
-
-            if (_web == null)
-            {
-                var options = new StartOptions
-                {
-                    ServerFactory = "Nowin",
-                    Port = _multimediaPort
-                };
-
-                try
-                {
-                    _web = WebApp.Start<Startup>(options);
-                }
-                catch (TargetInvocationException exc)
-                    when (exc.InnerException is SocketException socketException
-                    && socketException.NativeErrorCode == AddressIsUsedErrorCode)
-                {
-                    throw new PortIsUsedException();
-                }
-
-                Current = this;
-            }
+                FileProvider = new PhysicalFileProvider(imagesFolder),
+                RequestPath = "/package/Images",
+            });
         }
+        var audioFolder = Path.Combine(packageFolder, SIDocument.AudioStorageName);
 
-        return true;
-    }
-
-    internal StreamInfo GetFile(string file)
-    {
-        Func<StreamInfo> response = null;
-
-        lock (_filesSync)
+        if (Directory.Exists(audioFolder))
         {
-            if (!_files.TryGetValue(Uri.UnescapeDataString(file), out response) && !_files.TryGetValue(file, out response))
+            _webApplication.UseStaticFiles(new StaticFileOptions
             {
-                return null;
-            }
+                FileProvider = new PhysicalFileProvider(audioFolder),
+                RequestPath = "/package/Audio",
+            });
         }
 
-        return response();
-    }
+        var videoFolder = Path.Combine(packageFolder, SIDocument.VideoStorageName);
 
-    public override string MakeUri(string file, string category)
-    {
-        var uri = Uri.EscapeDataString(file);
-        return $"http://localhost:{_multimediaPort}/data/{uri}";
-    }
-
-    public override void StopUri(IEnumerable<string> toRemove)
-    {
-        lock (_filesSync)
+        if (Directory.Exists(videoFolder))
         {
-            if (_disposed)
-                return;
-
-            base.StopUri(toRemove);
-        }
-    }
-
-    public override void Dispose()
-    {
-        lock (_filesSync)
-        {
-            StopUri(_files.Keys.ToArray());
-
-            if (_web != null)
+            _webApplication.UseStaticFiles(new StaticFileOptions
             {
-                _web.Dispose();
-                _web = null;
-            }
-
-            _disposed = true;
-
-            Current = null;
+                FileProvider = new PhysicalFileProvider(videoFolder),
+                RequestPath = "/package/Video",
+            });
         }
+
+        _webApplication.RunAsync($"http://+:{port}");
     }
+
+    public Uri CreateResourceUri(ResourceKind resourceKind, Uri relativePath) =>
+        new(resourceKind switch
+        {
+            ResourceKind.DefaultAvatar => $"http://localhost:{_port}/defaultAvatars/{relativePath}",
+            ResourceKind.Avatar => $"http://localhost:{_port}/avatars/{relativePath}",
+            _ => $"http://localhost:{_port}/package/{relativePath}"
+        });
+
+    public ValueTask DisposeAsync() => _webApplication.DisposeAsync();
 }

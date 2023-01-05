@@ -4,7 +4,7 @@ using SICore.Network.Contracts;
 
 namespace SICore.Network.Servers;
 
-public abstract class SlaveServer : Node, ISecondaryNode
+public abstract class SecondaryNode : Node, ISecondaryNode
 {
     public IConnection HostServer { get; set; }
 
@@ -15,17 +15,16 @@ public abstract class SlaveServer : Node, ISecondaryNode
         get
         {
             if (HostServer == null)
+            {
                 yield break;
+            }
 
             yield return HostServer;
         }
     }
 
-    protected SlaveServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer)
-    {
-
-    }
+    protected SecondaryNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
+        : base(serverConfiguration, localizer) { }
 
     public override ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default) =>
         ConnectionsLock.WithLockAsync(

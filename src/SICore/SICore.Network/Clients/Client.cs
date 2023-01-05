@@ -45,7 +45,7 @@ public sealed class Client : IClient
     public Client(string name)
     {
         Name = name;
-        WaitForMessages();
+        StartMessageLoop();
     }
 
     private Client(string name, INode node)
@@ -63,20 +63,20 @@ public sealed class Client : IClient
     {
         var client = new Client(name, node);
         node.AddClient(client);
-        client.WaitForMessages();
+        client.StartMessageLoop();
 
         return client;
     }
 
     /// <summary>
-    /// Получить входящее сообщение
+    /// Adds a new message to incoming messages.
     /// </summary>
-    public void AddIncomingMessage(Message message) => _inMessages.Writer.TryWrite(message);
+    public void AddIncomingMessage(in Message message) => _inMessages.Writer.TryWrite(message);
 
     /// <summary>
-    /// Процедура обработки входящих сообщений
+    /// Begins listening for incoming messages.
     /// </summary>
-    private async void WaitForMessages()
+    private async void StartMessageLoop()
     {
         try
         {

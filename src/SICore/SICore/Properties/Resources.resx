@@ -678,9 +678,6 @@
   <data name="Until" xml:space="preserve">
     <value>until</value>
   </data>
-  <data name="AvatarTooBig" xml:space="preserve">
-    <value>Your avatar is bigger than 1 MB. Other players will not see it</value>
-  </data>
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Message from unknown sender</value>
   </data>
@@ -752,9 +749,6 @@
   </data>
   <data name="DownloadFileError" xml:space="preserve">
     <value>Downloading file error</value>
-  </data>
-  <data name="InvalidAvatarData" xml:space="preserve">
-    <value>Invalid avatar data</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>File</value>

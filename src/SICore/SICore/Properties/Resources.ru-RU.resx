@@ -683,9 +683,6 @@
   <data name="Until" xml:space="preserve">
     <value>до</value>
   </data>
-  <data name="AvatarTooBig" xml:space="preserve">
-    <value>Ваш аватар по размеру превышает 1 Мб и не будет виден другим участникам!</value>
-  </data>
   <data name="UnknownSenderMessage" xml:space="preserve">
     <value>Сообщение от неизвестного отправителя</value>
   </data>
@@ -757,9 +754,6 @@
   </data>
   <data name="DownloadFileError" xml:space="preserve">
     <value>Ошибка загрузки файла</value>
-  </data>
-  <data name="InvalidAvatarData" xml:space="preserve">
-    <value>Неверные данные аватара</value>
   </data>
   <data name="File" xml:space="preserve">
     <value>Файл</value>

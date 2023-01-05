@@ -17,7 +17,7 @@ internal sealed class ReconnectManager : IConnector
 
     public bool IsReconnecting { get; set; }
 
-    private readonly SlaveServer _server;
+    private readonly SecondaryNode _server;
     private readonly Client _client;
     private IViewerClient _host;
     private Connector _connector;
@@ -31,7 +31,7 @@ internal sealed class ReconnectManager : IConnector
     public int GameId { get; set; } = -1;
 
     public ReconnectManager(
-        SlaveServer server,
+        SecondaryNode server,
         Client client,
         IViewerClient host,
         HumanAccount human,

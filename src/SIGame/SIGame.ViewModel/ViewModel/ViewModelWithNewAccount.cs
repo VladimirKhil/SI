@@ -1,4 +1,5 @@
 ﻿using SICore;
+using SICore.Contracts;
 using SICore.Network.Servers;
 using System;
 using System.Windows.Input;
@@ -52,10 +53,17 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
 
     public ICommand ChangeSettings { get; internal set; }
 
-    public event Action<Node, IViewerClient, bool, bool, string, int> StartGame;
+    public event Action<Node, IViewerClient, bool, bool, string, IFileShare?, int> StartGame;
 
-    protected virtual void OnStartGame(Node server, IViewerClient host, bool networkGame, bool isOnline, string tempDocFolder, int networkGamePort) =>
-        StartGame?.Invoke(server, host, networkGame, isOnline, tempDocFolder, networkGamePort);
+    protected virtual void OnStartGame(
+        Node server,
+        IViewerClient host,
+        bool networkGame,
+        bool isOnline,
+        string tempDocFolder,
+        IFileShare? fileShare,
+        int networkGamePort) =>
+        StartGame?.Invoke(server, host, networkGame, isOnline, tempDocFolder, fileShare, networkGamePort);
 
     protected ViewModelWithNewAccount()
     {

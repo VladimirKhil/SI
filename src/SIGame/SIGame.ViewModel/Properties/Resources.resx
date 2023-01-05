@@ -489,4 +489,10 @@
   <data name="MaximumFileSize" xml:space="preserve">
     <value>Maximum file size: {0} MB</value>
   </data>
+  <data name="AvatarTooBig" xml:space="preserve">
+    <value>Your avatar is bigger than 1 MB. Other players will not see it</value>
+  </data>
+  <data name="InvalidAvatarData" xml:space="preserve">
+    <value>Invalid avatar data</value>
+  </data>
 </root>

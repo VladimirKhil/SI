@@ -1,9 +1,12 @@
 ﻿using SICore;
 using SICore.BusinessLogic;
+using SICore.Clients;
+using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SICore.Special;
+using SICore.Utils;
 using SIData;
 using SIGame.ViewModel.Data;
 using SIGame.ViewModel.PackageSources;
@@ -343,7 +346,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private readonly CommonSettings _commonSettings;
 
-    internal event Func<GameSettings, PackageSource, Task<Tuple<SlaveServer, IViewerClient>>> CreateGame;
+    internal event Func<GameSettings, PackageSource, Task<Tuple<SecondaryNode, IViewerClient>>> CreateGame;
 
     public event Action<ContentBox> Navigate;
 
@@ -615,17 +618,13 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                     return;
                 }
 
-                MoveToGame(info.Item1, info.Item2, null);
+                MoveToGame(info.Item1, info.Item2, null, null);
             }
             else
             {
                 var (document, path) = await BeginNewGameAsync();
                 BeginNewGameCompleted(document, path);
             }
-        }
-        catch (PortIsUsedException)
-        {
-            ErrorMessage = string.Format(Resources.PortIsUsedError, _model.AppSettings.MultimediaPort);
         }
         catch (TargetInvocationException exc) when (exc.InnerException != null)
         {
@@ -652,18 +651,22 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
             var tempDir = Path.Combine(Path.GetTempPath(), CommonSettings.AppNameEn, Guid.NewGuid().ToString());
 
+            var packageFolderPath = Path.Combine(tempDir, "package");
+
             await ZipHelper.ExtractToDirectoryAsync(
                 packageFile,
-                tempDir,
+                packageFolderPath,
                 maxAllowedDataLength: long.MaxValue,
                 cancellationToken: cancellationToken);
+
+            Directory.CreateDirectory(Path.Combine(tempDir, "avatars"));
 
             if (isTemp)
             {
                 File.Delete(packageFile);
             }
 
-            return (SIDocument.Load(tempDir), tempDir);
+            return (SIDocument.Load(packageFolderPath), tempDir);
         }
         finally
         {
@@ -676,31 +679,45 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     {
         var localizer = new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name);
 
-        Node server;
+        Node node;
+
         if (NetworkGame)
         {
-            server = new TcpMasterServer(NetworkPort, NodeConfiguration.Default, localizer);
-            ((TcpMasterServer)server).StartListen();
+            node = new TcpMasterServer(NetworkPort, NodeConfiguration.Default, localizer);
+            ((TcpMasterServer)node).StartListen();
         }
         else
         {
-            server = new BasicServer(NodeConfiguration.Default, localizer);
+            node = new LocalNode(NodeConfiguration.Default, localizer);
         }
 
-        server.Error += Server_Error;
+        node.Error += Server_Error;
 
         _model.NetworkGamePassword = "";
         _model.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
         _model.HumanPlayerName = Human.Name;
 
+        var fileShare = new WebManager(
+            _model.AppSettings.MultimediaPort,
+            new Dictionary<ResourceKind, string>
+            {
+                [ResourceKind.Package] = Path.Combine(documentPath, "package"),
+                [ResourceKind.Avatar] = Path.Combine(documentPath, "avatars"),
+                [ResourceKind.DefaultAvatar] = Global.PhotoUri,
+            });
+
+        var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
+
         var (host, _) = new GameRunner(
-            server,
+            node,
             _model,
             document,
             BackLink.Default,
-            new WebManager(_model.AppSettings.MultimediaPort),
+            fileShare,
             _computerPlayers.ToArray(),
-            _computerShowmans.ToArray())
+            _computerShowmans.ToArray(),
+            documentPath,
+            avatarHelper)
             .Run();
 
         if (!NetworkGame)
@@ -709,10 +726,10 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             host.MyData.AutoReady = true;
         }
 
-        MoveToGame(server, host, documentPath);
+        MoveToGame(node, host, documentPath, fileShare);
     }
 
-    private void MoveToGame(Node server, IViewerClient host, string tempDocFolder)
+    private void MoveToGame(Node server, IViewerClient host, string tempDocFolder, IFileShare? fileShare)
     {
         if (host == null)
         {
@@ -722,7 +739,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.ShowmanType = Showman.AccountType;
         _model.PlayersTypes = Players.Select(p => p.AccountType).ToArray();
 
-        OnStartGame(server, host, NetworkGame, false, tempDocFolder, NetworkPort);
+        OnStartGame(server, host, NetworkGame, false, tempDocFolder, fileShare, NetworkPort);
     }
 
     private void Server_Error(Exception exc, bool isWarning) =>

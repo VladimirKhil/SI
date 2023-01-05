@@ -1,4 +1,5 @@
 ﻿using SICore.BusinessLogic;
+using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Servers;
@@ -17,9 +18,11 @@ public sealed class GameRunner
     private readonly IGameSettingsCore<AppSettingsCore> _settings;
     private readonly SIDocument _document;
     private readonly IGameManager _backLink;
-    private readonly IShare _share;
+    private readonly IFileShare _fileShare;
     private readonly ComputerAccount[] _defaultPlayers;
     private readonly ComputerAccount[] _defaultShowmans;
+    private readonly string _documentPath;
+    private readonly IAvatarHelper _avatarHelper;
     private readonly bool _createHost;
 
     public GameRunner(
@@ -27,18 +30,22 @@ public sealed class GameRunner
         IGameSettingsCore<AppSettingsCore> settings,
         SIDocument document,
         IGameManager backLink,
-        IShare share,
+        IFileShare fileShare,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
+        string documentPath,
+        IAvatarHelper avatarHelper,
         bool createHost = true)
     {
         _node = node;
         _settings = settings;
         _document = document;
         _backLink = backLink;
-        _share = share;
+        _fileShare = fileShare;
         _defaultPlayers = defaultPlayers;
         _defaultShowmans = defaultShowmans;
+        _documentPath = documentPath;
+        _avatarHelper = avatarHelper;
         _createHost = createHost;
     }
 
@@ -47,8 +54,7 @@ public sealed class GameRunner
         var gameData = new GameData(_backLink, new GamePersonAccount(_settings.Showman))
         {
             Settings = _settings,
-            HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
-            Share = _share
+            HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName
         };
 
         var localizer = new Localizer(_settings.AppSettings.Culture);
@@ -126,9 +132,20 @@ public sealed class GameRunner
 
         var client = Client.Create(NetworkConstants.GameName, _node);
 
-        var gameActions = new GameActions(client, gameData, localizer);
-        var gameLogic = new GameLogic(gameData, gameActions, engine, localizer);
-        var game = new Game(client, null, localizer, gameData, gameActions, gameLogic, _defaultPlayers, _defaultShowmans);
+        var gameActions = new GameActions(client, gameData, localizer, _fileShare);
+        var gameLogic = new GameLogic(gameData, gameActions, engine, localizer, _fileShare);
+
+        var game = new Game(
+            client,
+            _documentPath,
+            localizer,
+            gameData, 
+            gameActions, 
+            gameLogic,
+            _defaultPlayers,
+            _defaultShowmans,
+            _fileShare,
+            _avatarHelper);
 
         game.Run();
 

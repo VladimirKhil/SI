@@ -1,6 +1,8 @@
 ﻿using Notions;
 using SICore.BusinessLogic;
+using SICore.Clients;
 using SICore.Clients.Game;
+using SICore.Contracts;
 using SICore.Results;
 using SICore.Utils;
 using SIData;
@@ -66,12 +68,15 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnAdShown(int adId) =>
         AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
 
-    public GameLogic(GameData data, GameActions gameActions, SIEngine.EngineBase engine, ILocalizer localizer)
+    private readonly IFileShare _fileShare;
+
+    public GameLogic(GameData data, GameActions gameActions, SIEngine.EngineBase engine, ILocalizer localizer, IFileShare fileShare)
         : base(data)
     {
         _gameActions = gameActions;
         Engine = engine;
         LO = localizer;
+        _fileShare = fileShare;
     }
 
     internal void Run()
@@ -389,9 +394,11 @@ public sealed class GameLogic : Logic<GameData>
                 .Append(atomType)
                 .Append(Message.ArgsSeparatorChar);
 
-            var mediaCategory = atomType == AtomTypes.Image ? SIDocument.ImagesStorageName
-                : (atomType == AtomTypes.Audio ? SIDocument.AudioStorageName
-                : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+            var mediaCategory = atomType == AtomTypes.Image
+                ? SIDocument.ImagesStorageName
+                : (atomType == AtomTypes.Audio
+                    ? SIDocument.AudioStorageName
+                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
 
             if (link.GetStream == null) // External link
             {
@@ -458,7 +465,7 @@ public sealed class GameLogic : Logic<GameData>
                 }
             }
 
-            var uri = _data.Share.CreateUri(filename, link.GetStream, mediaCategory);
+            var uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{filename}", UriKind.Relative));
 
             var localUri = ClientData.DocumentPath != null
                 ? Path.Combine(ClientData.DocumentPath, mediaCategory, Uri.UnescapeDataString(filename))
@@ -469,19 +476,21 @@ public sealed class GameLogic : Logic<GameData>
                 localUri = null;
             }
 
-            _data.OpenedFiles.Add(filename);
-
             foreach (var person in _data.AllPersons.Keys)
             {
                 var msg2 = new StringBuilder(msg.ToString());
 
                 if (_gameActions.Client.CurrentServer.Contains(person))
                 {
-                    msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(localUri ?? uri);
+                    msg2.Append(MessageParams.Atom_Uri)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(localUri ?? uri.AbsoluteUri);
                 }
                 else
                 {
-                    msg2.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(uri.Replace("http://localhost", $"http://{Constants.GameHost}"));
+                    msg2.Append(MessageParams.Atom_Uri)
+                        .Append(Message.ArgsSeparatorChar)
+                        .Append(uri.AbsoluteUri.Replace("http://localhost", $"http://{Constants.GameHost}"));
                 }
 
                 _gameActions.SendMessage(msg2.ToString(), person);
@@ -649,12 +658,6 @@ public sealed class GameLogic : Logic<GameData>
 
     private void Engine_NextQuestion()
     {
-        if (_data.OpenedFiles.Count > 0 && !_data.Settings.AppSettings.PreloadRoundContent)
-        {
-            _data.Share.StopUri(_data.OpenedFiles);
-            _data.OpenedFiles.Clear();
-        }
-
         if (_data.Settings.AppSettings.GameMode == GameModes.Tv)
         {
             var activeQuestionsCount = GetRoundActiveQuestionsCount();
@@ -687,12 +690,6 @@ public sealed class GameLogic : Logic<GameData>
 
     private void FinishRound(bool move = true)
     {
-        if (_data.OpenedFiles.Count > 0)
-        {
-            _data.Share.StopUri(_data.OpenedFiles);
-            _data.OpenedFiles.Clear();
-        }
-
         _data.IsQuestionPlaying = false;
 
         _gameActions.InformSums();
@@ -4089,10 +4086,9 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (logoLink.GetStream != null)
                 {
-                    var uri = _data.Share.CreateUri(
-                        logoLink.Uri,
-                        logoLink.GetStream,
-                        SIDocument.ImagesStorageName);
+                    var uri = _fileShare.CreateResourceUri(
+                        ResourceKind.Package,
+                        new Uri($"{SIDocument.ImagesStorageName}/{logoLink.Uri}", UriKind.Relative));
 
                     foreach (var person in _data.AllPersons.Keys)
                     {
@@ -4104,7 +4100,7 @@ public sealed class GameLogic : Logic<GameData>
                         }
                         else
                         {
-                            msg.Append(uri.Replace("http://localhost", "http://" + Constants.GameHost));
+                            msg.Append(uri.AbsoluteUri.Replace("http://localhost", "http://" + Constants.GameHost));
                         }
 
                         _gameActions.SendMessage(msg.ToString(), person);
@@ -4533,7 +4529,7 @@ public sealed class GameLogic : Logic<GameData>
             _data.CurPriceRight = -1;
             _data.CatInfo = NumberSetTypeConverter.ParseNumberSet(cost);
 
-            if (_data.CatInfo != null)
+            if (_data.CatInfo != null && _data.CatInfo.Maximum > 0)
             {
                 if (_data.CatInfo.Step == 0)
                 {

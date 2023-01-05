@@ -20,7 +20,7 @@ public interface IClient : IDisposable
     /// <summary>
     /// Receives incoming message.
     /// </summary>
-    void AddIncomingMessage(Message message);
+    void AddIncomingMessage(in Message message);
 
     /// <summary>
     /// Message received event.

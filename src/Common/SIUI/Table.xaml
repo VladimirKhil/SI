@@ -82,6 +82,7 @@
 
                     <Style x:Key="SIQuestionText" BasedOn="{StaticResource SIText}" TargetType="{x:Type TextBlock}">
                         <Setter Property="Text" Value="{Binding Price}" />
+                        <Setter Property="Margin" Value="4" />
                         <Setter Property="HorizontalAlignment" Value="Center" />
                         <Setter Property="VerticalAlignment" Value="Center" />
                         <Setter Property="lb:FillManager.Fill" Value="True" />

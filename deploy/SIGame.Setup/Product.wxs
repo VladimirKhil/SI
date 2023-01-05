@@ -7,7 +7,7 @@
   <?define ManufacturerEn="Khil-soft" ?>
   <?define ProductNameEn="SIGame" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
-  <?define DataPath="$(var.SIGame.ProjectDir)GameData\" ?>
+  <?define PhotoPath="$(var.SIGame.ProjectDir)Photo\" ?>
 
 	<?if $(var.Platform) = x64 ?>
 	    <?define PublishFolder = "$(var.SIGame.ProjectDir)bin\Release\net6.0-windows\win-x64\publish\" ?>
@@ -215,121 +215,121 @@
   <Fragment>
     <ComponentGroup Id="Photo" Directory="PhotoFolder">
       <Component Guid="{57610553-951D-4D96-BB2B-B67BD427D352}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Ada_Lovelace.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Ada_Lovelace.jpg" />
       </Component>
       <Component Guid="{DABB6B40-88C4-4F7E-9857-B36D0E353B2B}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Agatha_Christie.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Agatha_Christie.jpg" />
       </Component>
       <Component Guid="{A997AE24-C347-4A5B-9690-CA2B3E7EDF9E}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Albert_Einstein.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Albert_Einstein.jpg" />
       </Component>
       <Component Guid="{FEC06960-101F-4C55-ABF5-39B0D1CDEFF0}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Aristotle.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Aristotle.jpg" />
       </Component>
       <Component Guid="{039C624E-5FCB-4A01-944B-DF33865F7591}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Carl_Gustav_Jung.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Carl_Gustav_Jung.jpg" />
       </Component>
       <Component Guid="{0D14E7D7-9AA3-4DB4-9BAE-7AFB0475BB33}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Dmitriy_Mendeleev.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Dmitriy_Mendeleev.jpg" />
       </Component>
       <Component Guid="{20B86AD8-C20F-4CB8-9A5A-3DB60EF37DE0}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Fedor_Dostoevskiy.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Fedor_Dostoevskiy.jpg" />
       </Component>
       <Component Guid="{E1F7AB32-A2DD-4512-8C9C-B5467ACD4C04}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Francis_Bacon.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Francis_Bacon.jpg" />
       </Component>
       <Component Guid="{9656B804-FC84-45FA-997C-48144E46215A}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Franz_Kafka.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Franz_Kafka.jpg" />
       </Component>
       <Component Guid="{FCE8B57B-60F9-4C52-AF2D-FCF09AC8EB2B}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Galileo.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Galileo.jpg" />
       </Component>
       <Component Guid="{A2A43D07-6832-44E0-A048-D93B49D0C8CF}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Giordano_Bruno.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Giordano_Bruno.jpg" />
       </Component>
       <Component Guid="{077494F5-1BF5-4170-AF93-C822B30603A6}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Goethe.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Goethe.jpg" />
       </Component>
       <Component Guid="{D36A0121-500A-4583-BAEE-93B527EBF8D0}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Heisenberg.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Heisenberg.jpg" />
       </Component>
       <Component Guid="{116B53ED-E24E-4834-8EF1-FD0B85709B03}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Heraclite.JPG" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Heraclite.JPG" />
       </Component>
       <Component Guid="{76875170-DBC2-4467-835A-EDCFA2D00C54}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Hypatia_Alexandria.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Hypatia_Alexandria.jpg" />
       </Component>
       <Component Guid="{6254515D-87BD-4FE5-8E79-699D45128A4F}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\IsaacNewton.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)IsaacNewton.jpg" />
       </Component>
       <Component Guid="{b1bc338e-5e3e-44fc-af86-ac7cb5e9584a}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Johannes_Kepler.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Johannes_Kepler.jpg" />
       </Component>
       <Component Guid="{D873FB66-3BEE-47D3-9DE7-06596A0732F7}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Kant.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Kant.jpg" />
       </Component>
       <Component Guid="{60DBEB11-BCF6-4C4C-B748-766C525FD512}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Konfuzius.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Konfuzius.jpg" />
       </Component>
       <Component Guid="{9A3065CB-D07B-40A2-A103-AEE08E707455}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Lao_Tzu.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Lao_Tzu.jpg" />
       </Component>
       <Component Guid="{B9FAFCEB-7E42-4022-81AF-3D35AC725D97}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Leo_Tolstoy.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Leo_Tolstoy.jpg" />
       </Component>
       <Component Guid="{48819E5B-71DB-46AB-B130-AFBEADC69D09}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Leonardo.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Leonardo.jpg" />
       </Component>
       <Component Guid="{8FA80B29-A084-49B7-A61C-8B3B3E7EF0C7}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Lise_Meitner.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Lise_Meitner.jpg" />
       </Component>
       <Component Guid="{5625CA05-090A-4DD2-A5B2-D84CEEFC40CD}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Marie_Curie.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Marie_Curie.jpg" />
       </Component>
       <Component Guid="{BF6DFEB7-2A83-4ECE-822C-6700A4A41B95}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Mikhail_Lomonosov.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Mikhail_Lomonosov.jpg" />
       </Component>
       <Component Guid="{4FB91D8D-4EEC-4E32-80AE-D1B8FE24711E}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nicholas_of_Cusa.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Nicholas_of_Cusa.jpg" />
       </Component>
       <Component Guid="{EB3A0016-746E-4D16-BDAE-DA56AE0D1180}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Niels_Bohr.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Niels_Bohr.jpg" />
       </Component>
       <Component Guid="{F36C3DCE-2C02-4176-A50D-05E7A7B44509}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nietzsche.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Nietzsche.jpg" />
       </Component>
       <Component Guid="{9CECA5F5-6D54-4B66-8A22-6F276CFF7C58}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Nikolaus_Kopernikus.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Nikolaus_Kopernikus.jpg" />
       </Component>
       <Component Guid="{CC0B9528-1FE9-450E-B14E-E69CB41091CA}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Paracelsus.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Paracelsus.jpg" />
       </Component>
       <Component Guid="{724F15FD-EB63-4B83-A0EE-7F0D6B487C23}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Pierre_de_Fermat.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Pierre_de_Fermat.jpg" />
       </Component>
       <Component Guid="{E18DE7A2-056C-4A92-9E3E-7E036D1BC036}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Platon.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Platon.jpg" />
       </Component>
       <Component Guid="{88CF0D33-8854-4AC7-851B-E0059FE8AB75}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Pythagoras.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Pythagoras.jpg" />
       </Component>
       <Component Guid="{47984D92-0415-405E-A9CB-9953917402CE}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Rene_Descartes.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Rene_Descartes.jpg" />
       </Component>
       <Component Guid="{99b23839-d723-4ead-9c92-a07d14e731d5}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Sofja_Kovalevskaja.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Sofja_Kovalevskaja.jpg" />
       </Component>
       <Component Guid="{9de09681-1222-486a-ba3f-247c3e2f2d49}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Stephen_Hawking.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Stephen_Hawking.jpg" />
       </Component>
       <Component Guid="{f02cf796-6a86-41ab-a0aa-affad26920f3}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Tesla.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Tesla.jpg" />
       </Component>
       <Component Guid="{c8b61361-c65d-4525-b2de-403f7fa4d384}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Thomas-Aquinas.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Thomas-Aquinas.jpg" />
       </Component>
       <Component Guid="{48f921b0-a835-4e9d-ac38-72da6e5ce61c}">
-        <File KeyPath="yes" Source="$(var.DataPath)Photo\Thomas_Edison.jpg" />
+        <File KeyPath="yes" Source="$(var.PhotoPath)Thomas_Edison.jpg" />
       </Component>
       <Component Id="PhotoReg" Guid="{BD55FEB7-998C-4AAE-A511-A2F8DEA4685C}">
         <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="photo" Type="integer" Value="1" KeyPath="yes" />
@@ -345,12 +345,6 @@
         </Component>
         <Component Guid="{417121A7-629F-4FB1-BAD0-EBB15B8535A9}">
             <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Newtonsoft.Json.LICENSE.md" />
-        </Component>
-        <Component Guid="{54CE3171-4382-4E37-827A-C0C5245FA338}">
-            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Nowin.LICENSE.md" />
-        </Component>
-        <Component Guid="{1D473AD1-7BAB-4257-9A62-E561CE233056}">
-            <File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Owin.LICENSE.txt" />
         </Component>
 		<Component Guid="{FCD1B58A-5BA3-4258-8A72-A1423D9A79EF}">
 			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />

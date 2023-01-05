@@ -758,7 +758,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         gameSettings.CreateGame += CreateGameAsync;
     }
 
-    private async Task<Tuple<SlaveServer, IViewerClient>> CreateGameAsync(
+    private async Task<Tuple<SecondaryNode, IViewerClient>> CreateGameAsync(
         GameSettings settings,
         PackageSources.PackageSource packageSource)
     {

@@ -1,76 +1,73 @@
 ﻿using SICore.PlatformSpecific;
 using SIUI.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SICore
+namespace SICore;
+
+public interface IGameManager : IPlatformManager
 {
-    public interface IGameManager : IPlatformManager
-    {
-        void OnFlash(bool flash = true);
+    void OnFlash(bool flash = true);
 
-        void OnError(Exception exc);
+    void OnError(Exception exc);
 
-        void PlaySound(string sound = null, double speed = 1.0);
+    void PlaySound(string sound = null, double speed = 1.0);
 
-        bool MakeLogs { get; }
+    bool MakeLogs { get; }
 
-        string LogsFolder { get; }
+    string LogsFolder { get; }
 
-        bool TranslateGameToChat { get; }
+    bool TranslateGameToChat { get; }
 
-        string GameButtonKey { get; }
+    string GameButtonKey { get; }
 
-        bool SendReport { get; }
+    bool SendReport { get; }
 
-        bool AreAnswersShown { get; set; }
+    bool AreAnswersShown { get; set; }
 
-        string PhotoUri { get; }
+    string PhotoUri { get; }
 
-        bool ShowBorderOnFalseStart { get; }
+    bool ShowBorderOnFalseStart { get; }
 
-        bool LoadExternalMedia { get; }
+    bool LoadExternalMedia { get; }
 
-        /// <summary>
-        /// Maximum recommended image size.
-        /// </summary>
-        int MaxImageSizeKb { get; }
+    /// <summary>
+    /// Maximum recommended image size.
+    /// </summary>
+    int MaxImageSizeKb { get; }
 
-        /// <summary>
-        /// Maximum recommended audio size.
-        /// </summary>
-        int MaxAudioSizeKb { get; }
+    /// <summary>
+    /// Maximum recommended audio size.
+    /// </summary>
+    int MaxAudioSizeKb { get; }
 
-        /// <summary>
-        /// Maximum recommended video size.
-        /// </summary>
-        int MaxVideoSizeKb { get; }
+    /// <summary>
+    /// Maximum recommended video size.
+    /// </summary>
+    int MaxVideoSizeKb { get; }
 
-        int MaximumTableTextLength { get; }
+    int MaximumTableTextLength { get; }
 
-        int MaximumReplicTextLength { get; }
+    int MaximumReplicTextLength { get; }
 
-        string GetPhotoUri(string name);
+    bool AreCustomAvatarsSupported { get; }
 
-        void SendError(Exception exc, bool isWarning = false);
+    string GetPhotoUri(string name);
 
-        Task SaveReportAsync(Results.GameResult result, CancellationToken cancellationToken = default);
+    void SendError(Exception exc, bool isWarning = false);
 
-        void OnPictureError(string remoteUri);
+    Task SaveReportAsync(Results.GameResult result, CancellationToken cancellationToken = default);
 
-        void SaveBestPlayers(IEnumerable<PlayerAccount> players);
+    void OnPictureError(string remoteUri);
 
-        SettingsViewModel GetSettings();
+    void SaveBestPlayers(IEnumerable<PlayerAccount> players);
 
-        void OnGameFinished(string packageId);
+    SettingsViewModel GetSettings();
 
-        /// <summary>
-        /// Получить рекламное сообщение
-        /// </summary>
-        string GetAd(string localization, out int adId);
+    void OnGameFinished(string packageId);
 
-        void LogWarning(string message);
-    }
+    /// <summary>
+    /// Получить рекламное сообщение
+    /// </summary>
+    string GetAd(string localization, out int adId);
+
+    void LogWarning(string message);
 }

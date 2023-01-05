@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SICore;
+using SICore.Contracts;
 using SICore.Network.Servers;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
@@ -94,11 +95,13 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     /// </summary>
     public ICommand EnableExtrenalMediaLoad { get; set; }
 
+    private readonly IFileShare? _fileShare;
     private readonly ILogger<GameViewModel> _logger;
 
-    public GameViewModel(Node server, IViewerClient host, UserSettings userSettings, ILogger<GameViewModel> logger)
+    public GameViewModel(Node server, IViewerClient host, UserSettings userSettings, IFileShare? fileShare, ILogger<GameViewModel> logger)
     {
         _node = server;
+        _fileShare = fileShare;
         _logger = logger;
 
         _node.Reconnecting += Server_Reconnecting;
@@ -146,7 +149,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Server_Reconnecting() => Host.AddLog(Resources.ReconnectingMessage);
 
-    private void Host_Ad(string text)
+    private void Host_Ad(string? text)
     {
         Ad = text;
 
@@ -255,40 +258,14 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void EndGame_Executed(object arg) => GameEnded?.Invoke();
 
-    public async ValueTask DisposeAsync()
-    {
-        // For correct WebView2 disposal (https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136)
-        TInfo.TStage = TableStage.Void;
-
-        await _node.DisposeAsync();
-
-        Timers[1].TimeChanged -= GameViewModel_TimeChanged;
-
-        for (int i = 0; i < Timers.Length; i++)
-        {
-            Timers[i].Dispose();
-        }
-
-        if (TempDocFolder != null && Directory.Exists(TempDocFolder))
-        {
-            try
-            {
-                Directory.Delete(TempDocFolder, true);
-            }
-            catch (IOException exc)
-            {
-                Trace.TraceWarning($"Temp folder delete error: {exc}");
-            }
-        }
-    }
-
     /// <summary>
     /// Изменилось значение свойства
     /// </summary>
     /// <param name="name">Имя свойства</param>
-    private void OnPropertyChanged([CallerMemberName] string name = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     internal void Init()
     {
@@ -348,5 +325,37 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         await Task.Delay(2000, cancellationToken);
 
         Host.AddLog($"IP:\n{string.Join("\n", ips)}");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // For correct WebView2 disposal (https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136)
+        TInfo.TStage = TableStage.Void;
+
+        await _node.DisposeAsync();
+
+        if (_fileShare != null)
+        {
+            await _fileShare.DisposeAsync();
+        }
+
+        Timers[1].TimeChanged -= GameViewModel_TimeChanged;
+
+        for (int i = 0; i < Timers.Length; i++)
+        {
+            Timers[i].Dispose();
+        }
+
+        if (TempDocFolder != null && Directory.Exists(TempDocFolder))
+        {
+            try
+            {
+                Directory.Delete(TempDocFolder, true);
+            }
+            catch (IOException exc)
+            {
+                Trace.TraceWarning($"Temp folder delete error: {exc}");
+            }
+        }
     }
 }
