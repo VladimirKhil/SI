@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Version>7.6.0</Version>
     <Company>Khil-soft</Company>
-    <Copyright>Copyright © Khil-soft 2021-2022</Copyright>
+    <Copyright>Copyright © Khil-soft 2021 - 2023</Copyright>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

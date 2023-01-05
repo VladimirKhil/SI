@@ -308,6 +308,10 @@
                         <DataTrigger Binding="{Binding TInfo.IsEditable}" Value="True">
                             <Setter Property="Background" Value="#AACCCCCC" />
                         </DataTrigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource HoverColor}" />
+                        </Trigger>
                     </Style.Triggers>
                 </Style>
             </Button.Style>

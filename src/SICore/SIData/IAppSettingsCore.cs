@@ -1,9 +1,8 @@
-﻿namespace SIData
+﻿namespace SIData;
+
+/// <summary>
+/// Provides common game settings.
+/// </summary>
+public interface IAppSettingsCore
 {
-    /// <summary>
-    /// Provides common game settings.
-    /// </summary>
-    public interface IAppSettingsCore
-    {
-    }
 }

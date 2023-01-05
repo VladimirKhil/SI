@@ -2,69 +2,66 @@
 using SICore.Connections.Errors;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
-using System;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using R = SICore.Network.Properties.Resources;
 
-namespace SICore.Network.Servers
+namespace SICore.Network.Servers;
+
+public sealed class TcpSlaveServer : SlaveServer
 {
-    public sealed class TcpSlaveServer: SlaveServer
+    private readonly string _serverAddress;
+    private readonly int _port = -1;
+
+    private string _connectionId;
+
+    /// <summary>
+    /// Создание зависимого сервера, подключающегося к главному
+    /// </summary>
+    /// <param name="port">Имя порта для подключения</param>
+    /// <param name="serverAddress">Адрес сервера</param>
+    public TcpSlaveServer(int port, string serverAddress, NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
+        : base(serverConfiguration, localizer)
     {
-        private readonly string _serverAddress;
-        private readonly int _port = -1;
+        _serverAddress = serverAddress;
+        _port = port;
+    }
 
-        private string _connectionId;
-
-        /// <summary>
-        /// Создание зависимого сервера, подключающегося к главному
-        /// </summary>
-        /// <param name="port">Имя порта для подключения</param>
-        /// <param name="serverAddress">Адрес сервера</param>
-        public TcpSlaveServer(int port, string serverAddress, NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-            : base(serverConfiguration, localizer)
+    public async override ValueTask ConnectAsync(bool upgrade)
+    {
+        var tcp = new TcpClient
         {
-            _serverAddress = serverAddress;
-            _port = port;
+            SendTimeout = 5000
+        };
+
+        var task = tcp.ConnectAsync(_serverAddress, _port);
+
+        var result = await Task.WhenAny(task, Task.Delay(15000));
+        if (result != task)
+        {
+            throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
         }
 
-        public async override ValueTask ConnectAsync(bool upgrade)
+        if (result.IsFaulted)
         {
-            var tcp = new TcpClient
-            {
-                SendTimeout = 5000
-            };
-
-            var task = tcp.ConnectAsync(_serverAddress, _port);
-
-            var result = await Task.WhenAny(task, Task.Delay(15000));
-            if (result != task)
-            {
-                throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
-            }
-
-            if (result.IsFaulted)
-            {
-                throw result.Exception;
-            }
-
-            var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
-
-            if (upgrade)
-            {
-                try
-                {
-                    _connectionId = await connection.UpgradeAsync(_serverAddress, _connectionId);
-                }
-                catch (ConnectionException exc)
-                {
-                    throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!", exc);
-                }
-            }
-
-            await AddConnectionAsync(connection);
-
-            connection.StartRead(false);
+            throw result.Exception;
         }
+
+        var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };
+
+        if (upgrade)
+        {
+            try
+            {
+                _connectionId = await connection.UpgradeAsync(_serverAddress, _connectionId);
+            }
+            catch (ConnectionException exc)
+            {
+                throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!!!!!", exc);
+            }
+        }
+
+        await AddConnectionAsync(connection);
+
+        connection.StartRead(false);
     }
 }

@@ -1375,6 +1375,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Media has been loaded.
+        /// </summary>
+        public static string MediaLoaded {
+            get {
+                return ResourceManager.GetString("MediaLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Multimedia port.
         /// </summary>
         public static string MediaPort {

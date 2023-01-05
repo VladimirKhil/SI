@@ -1,4 +1,9 @@
 <Project>
+	<PropertyGroup>
+		<Authors>Vladimir Khil</Authors>
+		<Company>Khil-soft</Company>
+	</PropertyGroup>
+	
   <PropertyGroup>
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)\obj\$(Platform).$(Configuration)\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath>$(MSBuildThisFileDirectory)\bin\$(Platform).$(Configuration)\$(MSBuildProjectName)</OutputPath>

@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Company>Khil-soft</Company>
-    <Copyright>Copyright © Khil-soft 2021-2022</Copyright>
+    <Copyright>Copyright © Khil-soft 2021 - 2023</Copyright>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>

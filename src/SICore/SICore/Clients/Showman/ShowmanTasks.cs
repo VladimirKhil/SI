@@ -1,11 +1,10 @@
-﻿namespace SICore.Clients.Showman
+﻿namespace SICore.Clients.Showman;
+
+internal enum ShowmanTasks
 {
-    internal enum ShowmanTasks
-    {
-        Ready,
-        AnswerFirst,
-        AnswerNextStake,
-        AnswerRight,
-        AnswerNextToDelete
-    }
+    Ready,
+    AnswerFirst,
+    AnswerNextStake,
+    AnswerRight,
+    AnswerNextToDelete
 }

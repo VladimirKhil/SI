@@ -9,7 +9,9 @@ using SIData;
 using SIPackages.Core;
 using SIUI.Model;
 using SIUI.ViewModel;
+using System.Numerics;
 using System.Text;
+using System.Xml.Linq;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -326,7 +328,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         {
                             await _client.Node.ConnectionsLock.WithLockAsync(() =>
                             {
-                                var currentConnection = ((ISlaveServer)_client.Node).HostServer;
+                                var currentConnection = ((ISecondaryNode)_client.Node).HostServer;
 
                                 if (currentConnection != null)
                                 {
@@ -731,42 +733,12 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     break;
 
                 case Messages.ShowTable:
-                    {
-                        _logic.ShowTablo();
-                        break;
-                    }
+                    _logic.ShowTablo();
+                    break;
+
                 case Messages.Choice:
-                    {
-                        #region Choice
-
-                        lock (ClientData.ChoiceLock)
-                        lock (ClientData.TInfoLock)
-                        {
-                            ClientData.ThemeIndex = int.Parse(mparams[1]);
-                            ClientData.QuestionIndex = int.Parse(mparams[2]);
-
-                            if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
-                                && ClientData.QuestionIndex > -1 && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
-                            {
-                                var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
-                                var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
-                                ClientData.CurPriceRight = ClientData.CurPriceWrong = selectedQuestion.Price;
-                                _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
-                            }
-                        }
-
-                        foreach (var player in ClientData.Players.ToArray())
-                        {
-                            player.Pass = false;
-                            player.Stake = 0;
-                            player.SafeStake = false;
-                        }
-
-                        _logic.Choice();
-
-                        #endregion
-                        break;
-                    }
+                    OnChoice(mparams);
+                    break;
 
                 case Messages.QuestionCaption:
                     if (mparams.Length > 1)
@@ -807,6 +779,10 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                 case Messages.Atom_Second:
                     _logic.OnSecondAtom(mparams);
+                    break;
+
+                case Messages.MediaLoaded:
+                    OnMediaLoaded(mparams);
                     break;
 
                 case Messages.RightAnswer:
@@ -1036,6 +1012,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                         break;
                     }
+
                 case Messages.Ads:
                     if (mparams.Length > 1)
                     {
@@ -1048,6 +1025,55 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnChoice(string[] mparams)
+    {
+        lock (ClientData.ChoiceLock)
+        lock (ClientData.TInfoLock)
+        {
+            ClientData.ThemeIndex = int.Parse(mparams[1]);
+            ClientData.QuestionIndex = int.Parse(mparams[2]);
+
+            if (ClientData.ThemeIndex > -1
+                && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count
+                && ClientData.QuestionIndex > -1
+                && ClientData.QuestionIndex < ClientData.TInfo.RoundInfo[ClientData.ThemeIndex].Questions.Count)
+            {
+                var selectedTheme = ClientData.TInfo.RoundInfo[ClientData.ThemeIndex];
+                var selectedQuestion = selectedTheme.Questions[ClientData.QuestionIndex];
+                ClientData.CurPriceRight = ClientData.CurPriceWrong = selectedQuestion.Price;
+                _logic.SetCaption($"{selectedTheme.Name}, {selectedQuestion.Price}");
+            }
+        }
+
+        foreach (var player in ClientData.Players.ToArray())
+        {
+            player.State = PlayerState.None;
+            player.Pass = false;
+            player.Stake = 0;
+            player.SafeStake = false;
+            player.MediaLoaded = false;
+        }
+
+        _logic.Choice();
+    }
+
+    private void OnMediaLoaded(string[] mparams)
+    {
+        if (mparams.Length < 2)
+        {
+            return;
+        }
+
+        var player = ClientData.Players.FirstOrDefault(p => p.Name == mparams[1]);
+
+        if (player == null)
+        {
+            return;
+        }
+
+        player.MediaLoaded = true;
     }
 
     private void OnToggle(string[] mparams)
@@ -1160,7 +1186,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             await _client.Node.ConnectionsLock.WithLockAsync(() =>
             {
-                var currentConnection = ((ISlaveServer)_client.Node).HostServer;
+                var currentConnection = ((ISecondaryNode)_client.Node).HostServer;
 
                 if (currentConnection != null)
                 {
@@ -1215,9 +1241,13 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
     private void OnThemeOrQuestion()
     {
-        foreach (var item in ClientData.Players)
+        foreach (var player in ClientData.Players)
         {
-            item.State = PlayerState.None;
+            player.State = PlayerState.None;
+            player.Pass = false;
+            player.Stake = 0;
+            player.SafeStake = false;
+            player.MediaLoaded = false;
         }
 
         OnAd();
@@ -1964,7 +1994,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 {
                     await _client.Node.ConnectionsLock.WithLockAsync(() =>
                     {
-                        var connection = ((ISlaveServer)_client.Node).HostServer;
+                        var connection = ((ISecondaryNode)_client.Node).HostServer;
 
                         if (connection != null)
                         {

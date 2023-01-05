@@ -47,6 +47,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
+        TInfo.MediaLoad += TInfo_MediaLoad;
         TInfo.MediaLoadError += TInfo_MediaLoadError;
 
         //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
@@ -54,6 +55,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
         _localFileManager.Start(_cancellation.Token);
     }
+
+    private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
 
     private void TInfo_MediaLoadError(Exception exc)
     {

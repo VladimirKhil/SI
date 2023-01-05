@@ -34,7 +34,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private readonly GameActions _gameActions;
 
-    private IMasterNode Master => (IMasterNode)_client.Node;
+    private IPrimaryNode Master => (IPrimaryNode)_client.Node;
 
     private readonly ComputerAccount[] _defaultPlayers;
     private readonly ComputerAccount[] _defaultShowmans;
@@ -611,6 +611,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnAtom();
                         break;
 
+                    case Messages.MediaLoaded:
+                        OnMediaLoaded(message);
+                        break;
+
                     case Messages.Report:
                         #region Report
                         if (ClientData.Decision == DecisionType.Reporting)
@@ -777,13 +781,14 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }, 5000);
 
+    private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaLoaded, message.Sender);
+
     private void OnToggle(Message message, string[] args)
     {
         if (message.Sender != ClientData.ShowMan.Name || args.Length < 3)
         {
             return;
         }
-
 
         if (!int.TryParse(args[1], out int themeIndex) || !int.TryParse(args[2], out int questionIndex))
         {

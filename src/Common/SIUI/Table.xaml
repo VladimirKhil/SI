@@ -397,9 +397,11 @@
                                     HorizontalAlignment="Left"
                                     TextAlignment="Left"
                                     lb:QuestionReading.IsAttachedPartial="True">
+                                    
                                     <TextBlock.CacheMode>
                                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                     </TextBlock.CacheMode>
+                                    
                                     <TextBlock.TextEffects>
                                         <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
                                     </TextBlock.TextEffects>

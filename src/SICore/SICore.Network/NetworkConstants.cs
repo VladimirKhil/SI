@@ -1,17 +1,14 @@
-﻿using System.Text.RegularExpressions;
+﻿namespace SICore.Network;
 
-namespace SICore.Network
+public static class NetworkConstants
 {
-    public static class NetworkConstants
-    {
-        /// <summary>
-        /// Имя игры как отдельного клиента
-        /// </summary>
-        public const string GameName = "@";
+    /// <summary>
+    /// Имя игры как отдельного клиента
+    /// </summary>
+    public const string GameName = "@";
 
-        /// <summary>
-        /// Мильтикаст-адрес
-        /// </summary>
-        public const string Everybody = "*";
-    }
+    /// <summary>
+    /// Мильтикаст-адрес
+    /// </summary>
+    public const string Everybody = "*";
 }

@@ -10,7 +10,6 @@ public static class ImageController
 
     public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
 
-    // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty IsAttachedProperty =
         DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(ImageController), new PropertyMetadata(false, OnIsAttachedChanged));
 
@@ -23,6 +22,11 @@ public static class ImageController
         {
             return;
         }
+
+        image.Loaded += (sender, e2) =>
+        {
+            tableInfo.OnMediaLoad();
+        };
 
         image.ImageFailed += (sender, e2) =>
         {

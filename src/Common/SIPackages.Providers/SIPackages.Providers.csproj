@@ -1,17 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
+	<TargetFramework>net6.0</TargetFramework>
+	<SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Description>SIGame packages helper classes</Description>
     <Company>Khil-soft</Company>
     <Version>7.6.0</Version>
     <Authors>Vladimir Khil</Authors>
-    <Copyright>Copyright © Khil-soft 2007 - 2022</Copyright>
+    <Copyright>Copyright © Khil-soft 2007 - 2023</Copyright>
 	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

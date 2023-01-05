@@ -1,43 +1,40 @@
 ﻿using SIData;
-using System;
-using System.Threading.Tasks;
 
-namespace SICore.Network.Contracts
+namespace SICore.Network.Contracts;
+
+/// <summary>
+/// Represents a node client.
+/// </summary>
+public interface IClient : IDisposable
 {
     /// <summary>
-    /// Represents a node client.
+    /// Client name.
     /// </summary>
-    public interface IClient : IDisposable
-    {
-        /// <summary>
-        /// Client name.
-        /// </summary>
-        string Name { get; }
+    string Name { get; }
 
-        /// <summary>
-        /// Client node.
-        /// </summary>
-        INode CurrentServer { get; }
+    /// <summary>
+    /// Client node.
+    /// </summary>
+    INode CurrentServer { get; }
 
-        /// <summary>
-        /// Receives incoming message.
-        /// </summary>
-        void AddIncomingMessage(Message message);
+    /// <summary>
+    /// Receives incoming message.
+    /// </summary>
+    void AddIncomingMessage(Message message);
 
-        /// <summary>
-        /// Message received event.
-        /// </summary>
-        event Func<Message, ValueTask> MessageReceived;
+    /// <summary>
+    /// Message received event.
+    /// </summary>
+    event Func<Message, ValueTask> MessageReceived;
 
-        /// <summary>
-        /// Отправить сообщение
-        /// </summary>
-        event Action<IClient, Message> SendingMessage;
+    /// <summary>
+    /// Отправить сообщение
+    /// </summary>
+    event Action<IClient, Message> SendingMessage;
 
-        /// <summary>
-        /// Connects to node.
-        /// </summary>
-        /// <param name="s">Node to connect.</param>
-        void ConnectTo(INode s);
-    }
+    /// <summary>
+    /// Connects to node.
+    /// </summary>
+    /// <param name="s">Node to connect.</param>
+    void ConnectTo(INode s);
 }

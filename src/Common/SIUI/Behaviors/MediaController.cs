@@ -43,7 +43,8 @@ public static class MediaController
 
         if (waveOutGetVolume(IntPtr.Zero, out uint dwVolume) == 0)
         {
-            mediaElement.Volume = ((double)Math.Max(dwVolume >> 16, dwVolume & 0x0000FFFF)) / 0xFFFF / 2; // Зададим уровень звука из микшера (делим пополам, т.к. громкость по умолчанию - 0.5)
+            // Setting default volume level from mixer (dividing it by half because default volume is 0.5)
+            mediaElement.Volume = ((double)Math.Max(dwVolume >> 16, dwVolume & 0x0000FFFF)) / 0xFFFF / 2;
         }
 
         void loaded(object? sender, EventArgs e2)
@@ -51,10 +52,11 @@ public static class MediaController
             try
             {
                 mediaElement.Play();
+                tableInfo.OnMediaLoad();
             }
             catch (Exception exc)
             {
-                MessageBox.Show($"Media play error: {exc.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                tableInfo.OnMediaLoadError(exc);
             }
         }
 
@@ -65,7 +67,6 @@ public static class MediaController
         mediaElement.MediaFailed += (sender, e2) =>
         {
             tableInfo.OnMediaLoadError(e2.ErrorException);
-            Trace.TraceError("MediaFailed error: " + e2.ErrorException);
         };
 
         System.Timers.Timer? timer = null;

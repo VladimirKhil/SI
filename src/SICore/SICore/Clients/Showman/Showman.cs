@@ -15,8 +15,17 @@ public sealed class Showman : Viewer<IShowman>
     public Showman(Client client, Account personData, bool isHost, ILocalizer localizer, ViewerData data)
         : base(client, personData, isHost, localizer, data)
     {
-        ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "+"); ClearSelections(); });
-        ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.IsRight, "-"); ClearSelections(); });
+        ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg =>
+        {
+            _viewerActions.SendMessage(Messages.IsRight, "+");
+            ClearSelections();
+        });
+
+        ClientData.PersonDataExtensions.IsWrong = new CustomCommand(arg =>
+        {
+            _viewerActions.SendMessage(Messages.IsRight, "-");
+            ClearSelections();
+        });
 
         ClientData.ShowmanDataExtensions.ChangeSums = new CustomCommand(arg =>
         {

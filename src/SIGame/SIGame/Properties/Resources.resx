@@ -1059,4 +1059,7 @@
   <data name="EditTable" xml:space="preserve">
     <value>Edit game table</value>
   </data>
+  <data name="MediaLoaded" xml:space="preserve">
+    <value>Media has been loaded</value>
+  </data>
 </root>

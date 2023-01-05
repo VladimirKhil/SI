@@ -234,6 +234,11 @@ public static class Messages
     public const string Mark = "MARK";
 
     /// <summary>
+    /// Notifies that the client has loaded the media.
+    /// </summary>
+    public const string MediaLoaded = "MEDIALOADED";
+
+    /// <summary>
     /// Сменить состояние игры
     /// </summary>
     public const string Move = "MOVE";
@@ -363,6 +368,7 @@ public static class Messages
     /// <summary>
     /// Package rounds names. Only rounds with at least one question are taken into account.
     /// </summary>
+    [IdempotencyRequired]
     public const string RoundsNames = "ROUNDSNAMES";
 
     /// <summary>

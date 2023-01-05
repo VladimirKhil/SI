@@ -507,7 +507,7 @@
 
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
+                    <RowDefinition Height="32" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="18*" />
                     <RowDefinition Height="18*" />
@@ -521,14 +521,13 @@
                     Margin="68,0,0,0" />
 
                 <TextBlock
-                    Grid.Row="1"
                     Grid.ColumnSpan="3"
                     Text="{Binding Data.StageName}"
                     TextAlignment="Center"
                     TextTrimming="CharacterEllipsis"
-                    Foreground="White"
-                    FontSize="25"
-                    Margin="73,10,5,0" />
+                    Foreground="Black"
+                    FontSize="24"
+                    Margin="73,0,5,0" />
 
                 <ContentControl Grid.Row="3" Content="{Binding}">
                     <ContentControl.Style>

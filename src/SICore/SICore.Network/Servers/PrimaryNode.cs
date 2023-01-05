@@ -9,7 +9,7 @@ namespace SICore.Network.Servers;
 /// <summary>
 /// Defines a main game server node.
 /// </summary>
-public class MasterNode : Node, IMasterNode
+public class PrimaryNode : Node, IPrimaryNode
 {
     private bool _isDisposed;
 
@@ -31,7 +31,7 @@ public class MasterNode : Node, IMasterNode
 
     public event Action<string>? Unbanned;
 
-    public MasterNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
+    public PrimaryNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
         : base(serverConfiguration, localizer)
     {
 

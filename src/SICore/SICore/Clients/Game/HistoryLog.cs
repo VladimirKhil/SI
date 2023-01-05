@@ -1,23 +1,20 @@
-﻿using System.Collections.Generic;
+﻿namespace SICore.Clients.Game;
 
-namespace SICore.Clients.Game
+internal sealed class HistoryLog
 {
-    internal sealed class HistoryLog
+    internal const int MaxSize = 100;
+
+    private readonly Queue<string> _history = new(MaxSize);
+
+    internal void AddLogEntry(string message)
     {
-        internal const int MaxSize = 100;
-
-        private readonly Queue<string> _history = new Queue<string>(MaxSize);
-
-        internal void AddLogEntry(string message)
+        if (_history.Count > MaxSize)
         {
-            if (_history.Count > MaxSize)
-            {
-                _history.Dequeue();
-            }
-
-            _history.Enqueue(message);
+            _history.Dequeue();
         }
 
-        public override string ToString() => string.Join(", ", _history);
+        _history.Enqueue(message);
     }
+
+    public override string ToString() => string.Join(", ", _history);
 }

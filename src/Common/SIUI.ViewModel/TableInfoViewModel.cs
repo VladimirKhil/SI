@@ -439,6 +439,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public event Action MediaPause;
     public event Action MediaResume;
 
+    public event Action? MediaLoad;
     public event Action<Exception> MediaLoadError;
 
     public void OnMediaStart() => MediaStart?.Invoke();
@@ -454,6 +455,8 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public void OnMediaResume() => MediaResume?.Invoke();
 
     public void OnMediaPause() => MediaPause?.Invoke();
+
+    public void OnMediaLoad() => MediaLoad?.Invoke();
 
     public void OnMediaLoadError(Exception exc) => MediaLoadError?.Invoke(exc);
 }

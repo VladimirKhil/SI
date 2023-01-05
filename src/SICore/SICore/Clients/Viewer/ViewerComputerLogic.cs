@@ -5,7 +5,7 @@ using SIUI.ViewModel;
 namespace SICore;
 
 /// <summary>
-/// Логика зрителя-компьютера
+/// Defines a computer viewer logic.
 /// </summary>
 internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
 {
@@ -20,10 +20,15 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
     protected sealed class TimerInfo
     {
         public bool IsEnabled { get; set; }
+
         public bool IsUserEnabled { get; set; } = true;
+
         public DateTime StartTime { get; set; }
+
         public DateTime EndTime { get; set; }
+
         public int MaxTime { get; set; }
+
         public int PauseTime { get; set; } = -1;
     }
 

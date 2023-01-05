@@ -67,6 +67,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIStorageService.Client", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIStorageService.ViewModel", "src\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj", "{AFF2B73A-0BA3-4152-82D0-9573C05FDC98}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution items", "Solution items", "{0D6E84B6-C90C-4FA8-A932-1DA7179E9F1D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

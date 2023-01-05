@@ -1,88 +1,84 @@
 ﻿using SICore.Connections;
 using SICore.Network.Configuration;
 using SICore.Network.Contracts;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SICore.Network.Servers
+namespace SICore.Network.Servers;
+
+public abstract class SlaveServer : Node, ISecondaryNode
 {
-    public abstract class SlaveServer : Node, ISlaveServer
+    public IConnection HostServer { get; set; }
+
+    public override bool IsMain => false;
+
+    public override IEnumerable<IConnection> Connections
     {
-        public IConnection HostServer { get; set; }
-
-        public override bool IsMain => false;
-
-        public override IEnumerable<IConnection> Connections
+        get
         {
-            get
+            if (HostServer == null)
+                yield break;
+
+            yield return HostServer;
+        }
+    }
+
+    protected SlaveServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
+        : base(serverConfiguration, localizer)
+    {
+
+    }
+
+    public override ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default) =>
+        ConnectionsLock.WithLockAsync(
+            async () =>
             {
-                if (HostServer == null)
-                    yield break;
-
-                yield return HostServer;
-            }
-        }
-
-        protected SlaveServer(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-            : base(serverConfiguration, localizer)
-        {
-
-        }
-
-        public override ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default) =>
-            ConnectionsLock.WithLockAsync(
-                async () =>
+                if (HostServer != null && HostServer != connection)
                 {
-                    if (HostServer != null && HostServer != connection)
-                    {
-                        await RemoveConnectionAsync(HostServer, false, cancellationToken);
-                    }
+                    await RemoveConnectionAsync(HostServer, false, cancellationToken);
+                }
 
-                    HostServer = connection;
+                HostServer = connection;
 
-                    connection.Reconnecting += OnReconnecting;
-                    connection.Reconnected += OnReconnected;
+                connection.Reconnecting += OnReconnecting;
+                connection.Reconnected += OnReconnected;
 
-                    return await base.AddConnectionAsync(connection, cancellationToken);
-                },
-                cancellationToken);
+                return await base.AddConnectionAsync(connection, cancellationToken);
+            },
+            cancellationToken);
 
-        public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
-        {
-            await ConnectionsLock.WithLockAsync(
-                () =>
+    public override async ValueTask RemoveConnectionAsync(IConnection connection, bool withError, CancellationToken cancellationToken = default)
+    {
+        await ConnectionsLock.WithLockAsync(
+            () =>
+            {
+                if (HostServer == connection)
                 {
-                    if (HostServer == connection)
-                    {
-                        connection.Reconnecting -= OnReconnecting;
-                        connection.Reconnected -= OnReconnected;
+                    connection.Reconnecting -= OnReconnecting;
+                    connection.Reconnected -= OnReconnected;
 
-                        HostServer = null;
-                    }
-                },
-                cancellationToken);
+                    HostServer = null;
+                }
+            },
+            cancellationToken);
 
-            await base.RemoveConnectionAsync(connection, withError, cancellationToken);
-        }
+        await base.RemoveConnectionAsync(connection, withError, cancellationToken);
+    }
 
-        public abstract ValueTask ConnectAsync(bool upgrade);
+    public abstract ValueTask ConnectAsync(bool upgrade);
 
-        protected override async ValueTask DisposeAsync(bool disposing)
-        {
-            await ConnectionsLock.TryLockAsync(
-                async () =>
+    protected override async ValueTask DisposeAsync(bool disposing)
+    {
+        await ConnectionsLock.TryLockAsync(
+            async () =>
+            {
+                if (HostServer != null)
                 {
-                    if (HostServer != null)
-                    {
-                        await HostServer.DisposeAsync();
-                        HostServer = null;
-                    }
-                },
-                5000,
-                true);
+                    await HostServer.DisposeAsync();
+                    HostServer = null;
+                }
+            },
+            5000,
+            true);
 
-            await base.DisposeAsync(disposing);
-        }
+        await base.DisposeAsync(disposing);
     }
 }

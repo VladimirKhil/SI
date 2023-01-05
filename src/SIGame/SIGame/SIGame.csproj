@@ -6,7 +6,7 @@
     <Company>Khil-soft</Company>
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
-    <Copyright>Copyright © Khil-soft 2002-2022</Copyright>
+    <Copyright>Copyright © Khil-soft 2002-2023</Copyright>
     <Version>7.7.3</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>

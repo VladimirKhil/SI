@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines a master node.
 /// </summary>
-public interface IMasterNode : INode
+public interface IPrimaryNode : INode
 {
     /// <summary>
     /// Client unbanned event.

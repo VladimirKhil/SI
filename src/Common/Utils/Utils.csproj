@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
-	  <Copyright>Copyright © Khil-soft 2022</Copyright>
+	  <Copyright>Copyright © Khil-soft 2022 - 2023</Copyright>
 	  <Version>7.6.0</Version>
 	  <Company>Khil-soft</Company>
 	  <Product>Utils</Product>
