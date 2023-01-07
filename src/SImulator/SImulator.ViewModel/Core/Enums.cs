@@ -4,18 +4,17 @@ public enum GameMode
 {
     Start,
     Moderator,
-    View
 }
 
 public enum ModeTransition
 {
-    None,
     StartToModerator,
-    StartToView,
     ModeratorToStart,
-    ViewToStart
 }
 
+/// <summary>
+/// Defines supported player key managers.
+/// </summary>
 public enum PlayerKeysModes
 {
     None,
@@ -27,7 +26,7 @@ public enum PlayerKeysModes
 }
 
 /// <summary>
-/// Режим отображения таблицы игроков
+/// Defines players table display mode.
 /// </summary>
 public enum PlayersViewMode
 {
@@ -37,6 +36,6 @@ public enum PlayersViewMode
 }
 
 /// <summary>
-/// Платформенно-независимый аналог перечисления Key
+/// Defines a platform-independent key value.
 /// </summary>
 public enum GameKey { }

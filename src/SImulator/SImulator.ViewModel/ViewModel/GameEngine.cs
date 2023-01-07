@@ -222,6 +222,17 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         set { _activeTheme = value; OnPropertyChanged(); }
     }
 
+    private Atom? _activeAtom;
+
+    /// <summary>
+    /// Current active question atom.
+    /// </summary>
+    public Atom? ActiveAtom
+    {
+        get => _activeAtom;
+        set { if (_activeAtom != value) { _activeAtom = value; OnPropertyChanged(); } }
+    }
+
     private int _mediaProgress;
 
     private bool _mediaProgressBlock = false;
@@ -825,12 +836,14 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         UserInterface.SetText(question.Price.ToString());
         UserInterface.SetStage(TableStage.QuestionPrice);
-        UserInterface.SetCaption($"{ActiveTheme.Name}, {question.Price}");
+        SetCaption($"{ActiveTheme.Name}, {question.Price}");
 
         LocalInfo.Text = question.Price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
         ActiveQuestion = question;
     }
+
+    private void SetCaption(string caption) => UserInterface.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
 
     private void Engine_Theme(Theme theme)
     {
@@ -1320,7 +1333,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveQuestion = question;
 
         UserInterface.SetSound("");
-        UserInterface.SetCaption(theme.Name);
+        SetCaption(theme.Name);
     }
 
     /// <summary>
@@ -1493,10 +1506,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_QuestionOral(string oralText)
     {
-        UserInterface.SetText("");
-        UserInterface.SetQuestionContentType(QuestionContentType.Text);
+        // Show nothing. The text should be read by the showman
         UserInterface.SetQuestionSound(false);
-
         ActiveMediaCommand = null;
     }
 
@@ -1504,6 +1515,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         LocalInfo.TStage = TableStage.Question;
         UserInterface.SetStage(TableStage.Question);
+        ActiveAtom = atom;
     }
 
     private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
@@ -1517,7 +1529,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
 
         Price = question.Price;
-        UserInterface.SetCaption($"{theme.Name}, {question.Price}");
+        SetCaption($"{theme.Name}, {question.Price}");
 
         if (question.Type.Name == QuestionTypes.Simple)
         {
@@ -1542,11 +1554,11 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
                     if (newPriceString != null && int.TryParse(newPriceString, out var newPrice) && newPrice > 0)
                     {
                         Price = newPrice;
-                        UserInterface.SetCaption($"{newTheme}, {newPrice}");
+                        SetCaption($"{newTheme}, {newPrice}");
                     }
                     else
                     {
-                        UserInterface.SetCaption(newTheme);
+                        SetCaption(newTheme);
                     }
                     
                     break;
@@ -1668,7 +1680,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         // Уже нажимал
         if (_selectedPlayers.Contains(player))
+        {
             return false;
+        }
 
         // Не время нажимать
         if (_engine.IsQuestion() && Settings.Model.FalseStart && (_activeMediaCommand == null || Settings.Model.FalseStartMultimedia))

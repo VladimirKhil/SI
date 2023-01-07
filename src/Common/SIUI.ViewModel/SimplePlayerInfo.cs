@@ -5,18 +5,18 @@ using System.Runtime.Serialization;
 namespace SIUI.ViewModel;
 
 /// <summary>
-/// Информация об игроке для табло
+/// Defines player info for showing on game table.
 /// </summary>
 [DataContract]
 public class SimplePlayerInfo : INotifyPropertyChanged
 {
-    private string? _name = null;
+    private string _name = "";
 
     /// <summary>
     /// Имя игрока
     /// </summary>
     [DataMember]
-    public string? Name
+    public string Name
     {
         get => _name;
         set { if (_name != value) { _name = value; OnPropertyChanged(); } }

@@ -7,8 +7,8 @@
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Company>Khil-soft</Company>
-    <Version>2.11.0</Version>
-    <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
+    <Version>2.11.1</Version>
+    <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

@@ -39,7 +39,7 @@ public abstract class PlatformManager
 
     public abstract string AskSelectColor();
 
-    public abstract Task<string> AskSelectFileAsync(string header);
+    public abstract Task<string?> AskSelectFileAsync(string header);
 
     public abstract string? AskSelectLogsFolder();
 

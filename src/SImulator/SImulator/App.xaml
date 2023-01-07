@@ -6,12 +6,12 @@
     xmlns:lb="clr-namespace:SImulator.Behaviors"
     xmlns:lc="clr-namespace:SImulator.Converters"
     xmlns:m="clr-namespace:SImulator.ViewModel.Model;assembly=SImulator.ViewModel"
+    xmlns:lp="clr-namespace:SImulator.Properties"
     DispatcherUnhandledException="Application_DispatcherUnhandledException"
     Startup="Application_Startup"
     Exit="Application_Exit"
     ShutdownMode="OnMainWindowClose">
     <Application.Resources>
-
         <lc:AtomTypeConverter x:Key="AtomTypeConverter" />
 
         <SolidColorBrush x:Key="ImageBrush" Color="#FF232323" />
@@ -25,16 +25,26 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{StaticResource ImageBrush}" />
             <Setter Property="Cursor" Value="Hand" />
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ButtonBase}">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
-                            <ContentPresenter x:Name="body" Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Border
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter
+                                x:Name="body"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="LightGray" />
                             </Trigger>
+                            
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter Property="Background" Value="Gray" />
                             </Trigger>
@@ -42,6 +52,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="{StaticResource InactiveImageBrush}" />
@@ -57,6 +68,7 @@
             <Setter Property="Width" Value="23" />
             <Setter Property="Height" Value="23" />
             <Setter Property="ToolTip" Value="Задать кнопку" />
+            
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
@@ -64,28 +76,39 @@
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="IsChecked" Value="{Binding WaitForRegistration}" />
             <Setter Property="Visibility" Value="Collapsed" />
+            
             <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.Settings.Model.UsePlayersKeys, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="{x:Static vmc:PlayerKeysModes.Web}">
+                <DataTrigger
+                    Binding="{Binding DataContext.Settings.Model.UsePlayersKeys, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                    Value="{x:Static vmc:PlayerKeysModes.Web}">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
+                
                 <Trigger Property="IsChecked" Value="True">
                     <Setter Property="ToolTip" Value="Нажмите кнопку" />
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Ellipse Width="10" Height="10" Stroke="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
+                                <Ellipse
+                                    Width="10"
+                                    Height="10"
+                                    Stroke="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton},Path=Foreground}" />
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
+                
                 <DataTrigger Binding="{Binding IsRegistered}" Value="True">
                     <Setter Property="Background" Value="#FFBFFF80" />
                 </DataTrigger>
+                
                 <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
                     <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
+                
                 <DataTrigger Binding="{Binding Name}" Value="">
                     <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
@@ -100,23 +123,78 @@
                         <Setter Property="Padding" Value="20,2" />
                     </Style>
                 </DockPanel.Resources>
+
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Button Style="{StaticResource ToolButton}" Height="23" Width="23" Padding="3" Margin="1" Command="{Binding AddPlayer}" ToolTip="Добавить игрока">
-                        <Path Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z" Stretch="Fill" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                    <Button
+                        Style="{StaticResource ToolButton}"
+                        Height="23"
+                        Width="23"
+                        Padding="3"
+                        Margin="1"
+                        Command="{Binding AddPlayer}"
+                        ToolTip="Добавить игрока">
+                        <Path
+                            Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
+                            Stretch="Fill"
+                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                     </Button>
-                    <Button Style="{StaticResource ToolButton}" Height="23" Width="23" Padding="3" Margin="1" Command="{Binding ClearPlayers}" ToolTip="Очистить список">
-                        <Path Data="M0,0L1,1M0,1L1,0" Stretch="Fill" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" StrokeThickness="4" />
+                    
+                    <Button
+                        Style="{StaticResource ToolButton}"
+                        Height="23"
+                        Width="23"
+                        Padding="3"
+                        Margin="1"
+                        Command="{Binding ClearPlayers}"
+                        ToolTip="Очистить список">
+                        <Path
+                            Data="M0,0L1,1M0,1L1,0"
+                            Stretch="Fill"
+                            Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
+                            StrokeThickness="4" />
                     </Button>
+                    
                     <TextBlock Margin="5,5,5,5" VerticalAlignment="Center">Сумма</TextBlock>
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Price}" VerticalContentAlignment="Center" Width="50" Height="20" />
+
+                    <Button
+                        Style="{StaticResource ToolButton}"
+                        Height="23"
+                        Width="23"
+                        Padding="3"
+                        Margin="1"
+                        Command="{Binding AddRight}"
+                        ToolTip="{x:Static lp:Resources.AddSumForActivePlayer}">
+                        <Path
+                            Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
+                            Stretch="Fill"
+                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                    </Button>
+
+                    <Button
+                        Style="{StaticResource ToolButton}"
+                        Height="23"
+                        Width="23"
+                        Padding="3"
+                        Margin="1"
+                        Command="{Binding AddWrong}"
+                        ToolTip="{x:Static lp:Resources.SubtractSumForActivePlayer}">
+                        <Path
+                            Data="M0,0L30,0L30,10L0,10z"
+                            Stretch="Uniform"
+                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                    </Button>
                 </StackPanel>
+                
                 <Grid DockPanel.Dock="Top">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*" />
+                        
                         <ColumnDefinition>
                             <ColumnDefinition.Style>
                                 <Style TargetType="ColumnDefinition">
                                     <Setter Property="Width" Value="0" />
+                                    
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Settings.Model.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Web}">
                                             <Setter Property="Width" Value="29" />
@@ -125,21 +203,25 @@
                                 </Style>
                             </ColumnDefinition.Style>
                         </ColumnDefinition>
+                        
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="29" />
                     </Grid.ColumnDefinitions>
+                    
                     <Grid.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="HorizontalAlignment" Value="Center" />
                         </Style>
                     </Grid.Resources>
+                    
                     <TextBlock Text="Имя" />
                     <TextBlock Grid.Column="2" Text="Сумма" />
                     <TextBlock Grid.Column="3" Text="Верных" />
                     <TextBlock Grid.Column="4" Text="Неверных" />
                 </Grid>
+                
                 <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding LocalInfo.Players}">
                         <ItemsControl.Resources>
@@ -150,6 +232,7 @@
                                 <Setter Property="Background" Value="White" />
                             </Style>
                         </ItemsControl.Resources>
+                        
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="m:PlayerInfo">
                                 <Grid>
@@ -161,6 +244,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
+                                    
                                     <Grid.Style>
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
@@ -170,21 +254,99 @@
                                             </Style.Triggers>
                                         </Style>
                                     </Grid.Style>
+                                    
                                     <DockPanel>
-                                        <Button Style="{StaticResource ToolButton}" DockPanel.Dock="Left" Padding="3" Margin="1" ToolTip="Добавить сумму" VerticalContentAlignment="Center" Height="23" Width="23" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.AddRight}" CommandParameter="{Binding}">
-                                            <Path Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z" Stretch="Fill" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                        <Button
+                                            Style="{StaticResource ToolButton}"
+                                            DockPanel.Dock="Left"
+                                            Padding="3"
+                                            Margin="1"
+                                            ToolTip="Добавить сумму"
+                                            VerticalContentAlignment="Center"
+                                            Height="23"
+                                            Width="23"
+                                            Command="{Binding
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                                Path=DataContext.AddRight}"
+                                            CommandParameter="{Binding}">
+                                            <Path
+                                                Data="M10,10L20,10L20,0L30,0L30,10L40,10L40,20L30,20L30,30L20,30L20,20L10,20z"
+                                                Stretch="Fill"
+                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
-                                        <Button Style="{StaticResource ToolButton}" DockPanel.Dock="Right" Padding="3" Margin="1" ToolTip="Вычесть сумму" VerticalContentAlignment="Center" Height="23" Width="23" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.AddWrong}" CommandParameter="{Binding}">
-                                            <Path Data="M0,0L30,0L30,10L0,10z" Stretch="Uniform" Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                        
+                                        <Button
+                                            Style="{StaticResource ToolButton}"
+                                            DockPanel.Dock="Right"
+                                            Padding="3"
+                                            Margin="1"
+                                            ToolTip="Вычесть сумму"
+                                            VerticalContentAlignment="Center"
+                                            Height="23"
+                                            Width="23"
+                                            Command="{Binding
+                                                RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                                Path=DataContext.AddWrong}"
+                                            CommandParameter="{Binding}">
+                                            <Path
+                                                Data="M0,0L30,0L30,10L0,10z"
+                                                Stretch="Uniform"
+                                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
                                         </Button>
-                                        <TextBox FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}" Margin="1" Width="Auto" HorizontalAlignment="Stretch" Height="23" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                                        
+                                        <TextBox
+                                            FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
+                                            Margin="1"
+                                            Width="Auto"
+                                            HorizontalAlignment="Stretch"
+                                            Height="23"
+                                            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                                     </DockPanel>
-                                    <ToggleButton Margin="1" Grid.Column="1" Style="{StaticResource SetPlayerButtonWeb}" Padding="3" VerticalContentAlignment="Center" Height="23" />
-                                    <TextBox lb:NumericBehavior.IsAttached="True" Margin="1" Grid.Column="2" Text="{Binding Sum, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBox lb:NumericBehavior.IsAttached="True" Margin="1" Grid.Column="3" Text="{Binding Right, UpdateSourceTrigger=PropertyChanged}" />
-                                    <TextBox lb:NumericBehavior.IsAttached="True" Margin="1" Grid.Column="4" Text="{Binding Wrong, UpdateSourceTrigger=PropertyChanged}" />
-                                    <Button Grid.Column="5" Style="{StaticResource ToolButton}" Padding="3" Margin="1" ToolTip="Удалить игрока" VerticalContentAlignment="Center" Height="23" Width="23" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1}, Path=DataContext.RemovePlayer}" CommandParameter="{Binding}">
-                                        <Path Data="M0,0L1,1M0,1L1,0" Stretch="Fill" Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" StrokeThickness="4" />
+                                    
+                                    <ToggleButton
+                                        Margin="1"
+                                        Grid.Column="1"
+                                        Style="{StaticResource SetPlayerButtonWeb}"
+                                        Padding="3"
+                                        VerticalContentAlignment="Center"
+                                        Height="23" />
+                                    
+                                    <TextBox
+                                        lb:NumericBehavior.IsAttached="True"
+                                        Margin="1"
+                                        Grid.Column="2"
+                                        Text="{Binding Sum, UpdateSourceTrigger=PropertyChanged}" />
+                                    
+                                    <TextBox
+                                        lb:NumericBehavior.IsAttached="True"
+                                        Margin="1"
+                                        Grid.Column="3"
+                                        Text="{Binding Right, UpdateSourceTrigger=PropertyChanged}" />
+                                    
+                                    <TextBox
+                                        lb:NumericBehavior.IsAttached="True"
+                                        Margin="1"
+                                        Grid.Column="4"
+                                        Text="{Binding Wrong, UpdateSourceTrigger=PropertyChanged}" />
+                                    
+                                    <Button
+                                        Grid.Column="5"
+                                        Style="{StaticResource ToolButton}"
+                                        Padding="3"
+                                        Margin="1"
+                                        ToolTip="Удалить игрока"
+                                        VerticalContentAlignment="Center"
+                                        Height="23"
+                                        Width="23"
+                                        Command="{Binding
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                            Path=DataContext.RemovePlayer}"
+                                        CommandParameter="{Binding}">
+                                        <Path
+                                            Data="M0,0L1,1M0,1L1,0"
+                                            Stretch="Fill"
+                                            Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
+                                            StrokeThickness="4" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -199,26 +361,46 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
                         <Border x:Name="border" Background="Transparent" MinWidth="150">
-                            <ContentPresenter x:Name="header" ContentSource="Header" TextBlock.FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextBlock.TextAlignment="Center" Margin="10,15" RenderTransformOrigin="0.5,0.5">
+                            <ContentPresenter
+                                x:Name="header"
+                                ContentSource="Header"
+                                TextBlock.FontSize="16"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                TextBlock.TextAlignment="Center"
+                                Margin="10,15"
+                                RenderTransformOrigin="0.5,0.5">
                                 <ContentPresenter.RenderTransform>
                                     <ScaleTransform x:Name="tr" ScaleX="1.0" ScaleY="{Binding RelativeSource={RelativeSource Self}, Path=ScaleX}" />
                                 </ContentPresenter.RenderTransform>
                             </ContentPresenter>
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="LightGray" />
                             </Trigger>
+                            
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="Black" />
                                 <Setter TargetName="header" Property="TextBlock.Foreground" Value="White" />
                             </Trigger>
+                            
                             <EventTrigger SourceName="border" RoutedEvent="MouseLeftButtonDown">
                                 <EventTrigger.Actions>
                                     <BeginStoryboard>
                                         <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="tr" Storyboard.TargetProperty="ScaleX" To="0.95" Duration="00:00:00.1" />
-                                            <DoubleAnimation Storyboard.TargetName="tr" Storyboard.TargetProperty="ScaleX" Duration="00:00:00.1" BeginTime="00:00:00.1" />
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="tr"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                To="0.95"
+                                                Duration="00:00:00.1" />
+                                            
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="tr"
+                                                Storyboard.TargetProperty="ScaleX"
+                                                Duration="00:00:00.1"
+                                                BeginTime="00:00:00.1" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger.Actions>
@@ -227,6 +409,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Cursor" Value="Hand" />
         </Style>
 
@@ -234,6 +417,5 @@
             <GradientStop Color="#FFC1C1C1" Offset="0" />
             <GradientStop Color="#FFFCFCFC" Offset="1" />
         </LinearGradientBrush>
-        
     </Application.Resources>
 </Application>

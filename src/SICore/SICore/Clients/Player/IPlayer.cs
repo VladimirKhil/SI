@@ -1,39 +1,38 @@
-﻿namespace SICore
+﻿namespace SICore;
+
+/// <summary>
+/// Defines a player behavior.
+/// </summary>
+public interface IPlayer : IPerson
 {
     /// <summary>
-    /// Игрок
+    /// Окончание размышлений
     /// </summary>
-    public interface IPlayer : IPerson
-    {
-        /// <summary>
-        /// Окончание размышлений
-        /// </summary>
-        void EndThink();
+    void EndThink();
 
-        /// <summary>
-        /// Надо отвечать
-        /// </summary>
-        void Answer();
+    /// <summary>
+    /// Надо отвечать
+    /// </summary>
+    void Answer();
 
-        /// <summary>
-        /// Проверка правильности ответа
-        /// </summary>
-        void IsRight(bool voteForRight);
+    /// <summary>
+    /// Проверка правильности ответа
+    /// </summary>
+    void IsRight(bool voteForRight);
 
-        void Report();
+    void Report();
 
-        void Clear();
+    void Clear();
 
-        /// <summary>
-        /// Игрок получил или потерял деньги
-        /// </summary>
-        void PersonAnswered(int playerIndex, bool isRight);
+    /// <summary>
+    /// Игрок получил или потерял деньги
+    /// </summary>
+    void PersonAnswered(int playerIndex, bool isRight);
 
-        void StartThink();
+    void StartThink();
 
-        /// <summary>
-        /// Получена часть вопроса
-        /// </summary>
-        void OnPlayerAtom(string[] mparams);
-    }
+    /// <summary>
+    /// Получена часть вопроса
+    /// </summary>
+    void OnPlayerAtom(string[] mparams);
 }

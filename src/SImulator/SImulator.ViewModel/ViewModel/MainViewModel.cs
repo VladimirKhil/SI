@@ -12,7 +12,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Utils;
 
 namespace SImulator.ViewModel;
 
@@ -360,7 +359,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Starts the game.
     /// </summary>
-    private async void Start_Executed(object _)
+    private async void Start_Executed(object? _)
     {
         try
         {
@@ -391,7 +390,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             };
 
             remoteGameUI.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-            remoteGameUI.OnError += ShowError;
+            remoteGameUI.Error += ShowError;
 
             var game = new GameEngine(SettingsViewModel, engine, gameHost, remoteGameUI, Players, tempDir);
             Game = game;
@@ -421,10 +420,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             PlatformManager.Instance.ShowMessage(string.Format(Resources.GameStartError, reason.Message), false);
 
-            if (_game != null)
-            {
-                _game.CloseMainView();
-            }
+            _game?.CloseMainView();
 
             await EndGameAsync();
             return;
@@ -435,17 +431,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsStarting = false;
         }
     }
-
-    private void GameEngine_Closed(object sender, EventArgs e) =>
-        Task.Factory.StartNew(
-            async () =>
-            {
-                await EndGameAsync();
-                PlatformManager.Instance.ShowMessage(Resources.GameEndsBecauseOfConnectionLoss, false);
-            },
-            System.Threading.CancellationToken.None,
-            TaskCreationOptions.None,
-            UI.Scheduler);
 
     private async void Game_RequestStop() => await RaiseStop();
 
@@ -497,16 +482,22 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void SelectPackage_Executed(object arg)
+    private async void SelectPackage_Executed(object? arg)
     {
+        if (arg == null)
+        {
+            throw new ArgumentNullException(nameof(arg));
+        }
+
         var packageSource = await PlatformManager.Instance.AskSelectPackageAsync(arg);
+
         if (packageSource != null)
         {
             PackageSource = packageSource;
         }
     }
 
-    private async void SelectLogoFile_Executed(object arg)
+    private async void SelectLogoFile_Executed(object? arg)
     {
         var logoUri = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectLogoImage);
 

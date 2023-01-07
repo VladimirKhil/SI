@@ -122,7 +122,7 @@ public static class FillManager
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private static void MeasureFontSize(object sender, EventArgs e)
+    private static void MeasureFontSize(object? sender, EventArgs e)
     {
         var textBlock = sender as TextBlock;
 

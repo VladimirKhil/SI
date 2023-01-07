@@ -796,7 +796,7 @@
                             <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
+                                        <RowDefinition x:Name="firstRow" Height="*" />
                                         <RowDefinition Height="15*" />
                                     </Grid.RowDefinitions>
 
@@ -879,6 +879,12 @@
                                         </ContentControl.Style>
                                     </ContentControl>
                                 </Grid>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Caption}" Value="">
+                                        <Setter TargetName="firstRow" Property="Height" Value="0" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.Answer}">

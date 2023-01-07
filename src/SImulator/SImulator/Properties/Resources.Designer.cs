@@ -22,7 +22,7 @@ namespace SImulator.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SImulator.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SImulator.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace SImulator.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,9 +61,18 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Добавить активному игроку.
+        /// </summary>
+        public static string AddSumForActivePlayer {
+            get {
+                return ResourceManager.GetString("AddSumForActivePlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ответ.
         /// </summary>
-        internal static string Answer {
+        public static string Answer {
             get {
                 return ResourceManager.GetString("Answer", resourceCulture);
             }
@@ -72,16 +81,25 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Аудио.
         /// </summary>
-        internal static string Audio {
+        public static string Audio {
             get {
                 return ResourceManager.GetString("Audio", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Комментарий.
+        /// </summary>
+        public static string Comment {
+            get {
+                return ResourceManager.GetString("Comment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику..
         /// </summary>
-        internal static string CommonAppError {
+        public static string CommonAppError {
             get {
                 return ResourceManager.GetString("CommonAppError", resourceCulture);
             }
@@ -90,7 +108,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Закончилось место на диске!.
         /// </summary>
-        internal static string DiskFullError {
+        public static string DiskFullError {
             get {
                 return ResourceManager.GetString("DiskFullError", resourceCulture);
             }
@@ -99,16 +117,25 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка удаления файла: {0}.
         /// </summary>
-        internal static string FileDeletionError {
+        public static string FileDeletionError {
             get {
                 return ResourceManager.GetString("FileDeletionError", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Время на размышление в финале (с).
+        /// </summary>
+        public static string FinalThinkingTime {
+            get {
+                return ResourceManager.GetString("FinalThinkingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Завершить игру?.
         /// </summary>
-        internal static string FinishGameQuestion {
+        public static string FinishGameQuestion {
             get {
                 return ResourceManager.GetString("FinishGameQuestion", resourceCulture);
             }
@@ -117,7 +144,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Упрощённая.
         /// </summary>
-        internal static string GameModes_Sport {
+        public static string GameModes_Sport {
             get {
                 return ResourceManager.GetString("GameModes_Sport", resourceCulture);
             }
@@ -126,7 +153,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Классическая.
         /// </summary>
-        internal static string GameModes_Tv {
+        public static string GameModes_Tv {
             get {
                 return ResourceManager.GetString("GameModes_Tv", resourceCulture);
             }
@@ -135,7 +162,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на HTML.
         /// </summary>
-        internal static string Html {
+        public static string Html {
             get {
                 return ResourceManager.GetString("Html", resourceCulture);
             }
@@ -144,7 +171,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Изображение.
         /// </summary>
-        internal static string Image {
+        public static string Image {
             get {
                 return ResourceManager.GetString("Image", resourceCulture);
             }
@@ -153,7 +180,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка завершения прослушивания клавиатуры.
         /// </summary>
-        internal static string KeyboardDetachError {
+        public static string KeyboardDetachError {
             get {
                 return ResourceManager.GetString("KeyboardDetachError", resourceCulture);
             }
@@ -162,7 +189,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка прослушивания клавиатуры.
         /// </summary>
-        internal static string KeyboardListeningError {
+        public static string KeyboardListeningError {
             get {
                 return ResourceManager.GetString("KeyboardListeningError", resourceCulture);
             }
@@ -171,7 +198,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Папка для записи логов &quot;{0}&quot; не найдена.
         /// </summary>
-        internal static string LogsFolderNotFound {
+        public static string LogsFolderNotFound {
             get {
                 return ResourceManager.GetString("LogsFolderNotFound", resourceCulture);
             }
@@ -180,7 +207,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Основной.
         /// </summary>
-        internal static string MainScreen {
+        public static string MainScreen {
             get {
                 return ResourceManager.GetString("MainScreen", resourceCulture);
             }
@@ -189,7 +216,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
         /// </summary>
-        internal static string NavigateToSiteError {
+        public static string NavigateToSiteError {
             get {
                 return ResourceManager.GetString("NavigateToSiteError", resourceCulture);
             }
@@ -198,7 +225,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Устный текст.
         /// </summary>
-        internal static string Oral {
+        public static string Oral {
             get {
                 return ResourceManager.GetString("Oral", resourceCulture);
             }
@@ -207,16 +234,25 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
         /// </summary>
-        internal static string OutOfMemoryError {
+        public static string OutOfMemoryError {
             get {
                 return ResourceManager.GetString("OutOfMemoryError", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос.
+        /// </summary>
+        public static string Question {
+            get {
+                return ResourceManager.GetString("Question", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}.
         /// </summary>
-        internal static string RuntimeBrokenError {
+        public static string RuntimeBrokenError {
             get {
                 return ResourceManager.GetString("RuntimeBrokenError", resourceCulture);
             }
@@ -225,7 +261,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка при сохранении настроек программы.
         /// </summary>
-        internal static string SavingSettingsError {
+        public static string SavingSettingsError {
             get {
                 return ResourceManager.GetString("SavingSettingsError", resourceCulture);
             }
@@ -234,7 +270,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Дополнительный.
         /// </summary>
-        internal static string SecondaryScreen {
+        public static string SecondaryScreen {
             get {
                 return ResourceManager.GetString("SecondaryScreen", resourceCulture);
             }
@@ -243,7 +279,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Выберите папку для записи логов.
         /// </summary>
-        internal static string SelectLogsFolder {
+        public static string SelectLogsFolder {
             get {
                 return ResourceManager.GetString("SelectLogsFolder", resourceCulture);
             }
@@ -252,16 +288,25 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Выберите пакет вопросов.
         /// </summary>
-        internal static string SelectQuestionPackage {
+        public static string SelectQuestionPackage {
             get {
                 return ResourceManager.GetString("SelectQuestionPackage", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Показывать заголовок на игровом табло.
+        /// </summary>
+        public static string ShowTableCaption {
+            get {
+                return ResourceManager.GetString("ShowTableCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопросы СИ.
         /// </summary>
-        internal static string SIQuestions {
+        public static string SIQuestions {
             get {
                 return ResourceManager.GetString("SIQuestions", resourceCulture);
             }
@@ -270,25 +315,61 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка работы с библиотекой вопросов: {0}.
         /// </summary>
-        internal static string SIStorageError {
+        public static string SIStorageError {
             get {
                 return ResourceManager.GetString("SIStorageError", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Источник.
+        /// </summary>
+        public static string Source {
+            get {
+                return ResourceManager.GetString("Source", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Время на размышление над спецвопросом (с).
+        /// </summary>
+        public static string SpecialThinkingTime {
+            get {
+                return ResourceManager.GetString("SpecialThinkingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить у активного игрока.
+        /// </summary>
+        public static string SubtractSumForActivePlayer {
+            get {
+                return ResourceManager.GetString("SubtractSumForActivePlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пакет тест.
         /// </summary>
-        internal static string TestPackage {
+        public static string TestPackage {
             get {
                 return ResourceManager.GetString("TestPackage", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Время на размышление после нажатия кнопки (с).
+        /// </summary>
+        public static string ThinkingTime {
+            get {
+                return ResourceManager.GetString("ThinkingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Неизвестный тип.
         /// </summary>
-        internal static string UnknownType {
+        public static string UnknownType {
             get {
                 return ResourceManager.GetString("UnknownType", resourceCulture);
             }
@@ -297,7 +378,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Видео.
         /// </summary>
-        internal static string Video {
+        public static string Video {
             get {
                 return ResourceManager.GetString("Video", resourceCulture);
             }
@@ -306,7 +387,7 @@ namespace SImulator.Properties {
         /// <summary>
         ///   Ищет локализованную строку, похожую на Окно.
         /// </summary>
-        internal static string Window {
+        public static string Window {
             get {
                 return ResourceManager.GetString("Window", resourceCulture);
             }

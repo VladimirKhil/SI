@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="СИмулятор"
     mc:Ignorable="d"
+    xmlns:lp="clr-namespace:SImulator.Properties"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
@@ -32,7 +33,6 @@
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Window.Resources>
         <ResourceDictionary>
-
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Windows8Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -41,18 +41,16 @@
             <my:SourcesConverter x:Key="SourcesConverter1" />
             <my:GameModeToVisibilityConverter x:Key="StartView" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToVisibilityConverter x:Key="ModeratorView" Mode="{x:Static vmc:GameMode.Moderator}" />
-            <my:GameModeToVisibilityConverter x:Key="ViewView" Mode="{x:Static vmc:GameMode.View}" />
 
             <my:GameModeToNonVisibilityConverter x:Key="DisplayView" Mode="{x:Static vmc:GameMode.Moderator}" />
-            <my:GameModeToNonVisibilityConverter x:Key="BaseView" Mode="{x:Static vmc:GameMode.View}" />
 
             <my:GameModeToBooleanConverter x:Key="IsStart" Mode="{x:Static vmc:GameMode.Start}" />
             <my:GameModeToBooleanConverter x:Key="IsModerator" Mode="{x:Static vmc:GameMode.Moderator}" />
-            <my:GameModeToBooleanConverter x:Key="IsView" Mode="{x:Static vmc:GameMode.View}" />
 
             <my:PlayersConverter x:Key="PlayersConverter" />
             
             <my:EqualityConverter x:Key="Equality" />
+            <my:EqualMultiConverter x:Key="EqualMultiConverter" />
 
             <my:KeyConverter x:Key="KeyConverter" />
 
@@ -163,6 +161,7 @@
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="FontSize" Value="20" />
                 <Setter Property="Foreground" Value="#FF2B2B2B"/>
+                
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
@@ -180,6 +179,7 @@
             <Style x:Key="TimeButton" TargetType="Button" BasedOn="{StaticResource ToolButton}">
                 <Setter Property="Command" Value="{Binding}" />
                 <Setter Property="ToolTip" Value="{Binding Name}" />
+                
                 <Setter Property="ContentTemplate">
                     <Setter.Value>
                         <DataTemplate>
@@ -187,12 +187,15 @@
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
+                
                 <Setter Property="Width" Value="35" />
                 <Setter Property="Padding" Value="3,5" />
+                
                 <Style.Triggers>
                     <Trigger Property="Command" Value="{x:Null}">
                         <Setter Property="IsEnabled" Value="False" />
                     </Trigger>
+                    
                     <DataTrigger Binding="{Binding Name}" Value="Приостановить">
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
@@ -219,7 +222,10 @@
             </Style>
 
             <ControlTemplate x:Key="QuestGrid" TargetType="{x:Type ContentControl}">
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" d:DataContext="{d:DesignInstance vm:GameEngine}">
+                <ScrollViewer
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto"
+                    d:DataContext="{d:DesignInstance vm:GameEngine}">
                     <Grid DataContext="{Binding ActiveQuestion}" Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -234,11 +240,12 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="4*" />
                         </Grid.ColumnDefinitions>
-                        
-                        <TextBlock Text="Вопрос" Foreground="DarkGray" />
+
+                        <TextBlock Text="{x:Static lp:Resources.Question}" Foreground="DarkGray" />
                         
                         <StackPanel
                             DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.Game}"
+                            d:DataContext="{d:DesignInstance vm:GameEngine}"
                             Visibility="{Binding ActiveMediaCommand, Converter={StaticResource NotNull}}"
                             IsEnabled="{Binding IsMediaControlled}"
                             Orientation="Horizontal"
@@ -249,18 +256,36 @@
                             
                             <Button Style="{StaticResource TimeButton}" Margin="5,0,0,0" Height="20" DataContext="{Binding ActiveMediaCommand}" />
                             <Slider Width="300" Margin="10,0,0,0" Value="{Binding MediaProgress}" IsMoveToPointEnabled="True" Maximum="100" />
-                        
                         </StackPanel>
-                        
-                        <TextBlock Grid.Row="3" Text="Ответ" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="4" Text="Источник" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="5" Text="Комментарий" Foreground="DarkGray" />
+
+                        <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.Answer}" Foreground="DarkGray" />
+                        <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Source}" Foreground="DarkGray" />
+                        <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Comment}" Foreground="DarkGray" />
                         
                         <ItemsControl Grid.Column="1" ItemsSource="{Binding Scenario}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="p:Atom">
-                                    <TextBlock TextWrapping="Wrap">
+                                    <TextBlock TextWrapping="Wrap" Margin="3" Padding="3">
                                         <Run Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}" Foreground="Gray" /><Run Text="{Binding Text}" />
+
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <MultiBinding Converter="{StaticResource EqualMultiConverter}">
+                                                                <MultiBinding.Bindings>
+                                                                    <Binding Path="." />
+                                                                    <Binding RelativeSource="{RelativeSource AncestorType=Window}" Path="DataContext.Game.ActiveAtom" />
+                                                                </MultiBinding.Bindings>
+                                                            </MultiBinding>
+                                                        </DataTrigger.Binding>
+
+                                                        <Setter Property="Background" Value="{StaticResource AreaBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
                                     </TextBlock>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -375,8 +400,13 @@
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.Special}">
-                        <StackPanel Orientation="Vertical" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveQuestion.Type}">
-                            <TextBlock Text="{Binding Name,Converter={StaticResource QuestionTypeConverter}}" FontSize="16" FontWeight="Bold" />
+                        <StackPanel
+                            Orientation="Vertical"
+                            DataContext="{Binding
+                                RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
+                                Path=DataContext.Game.ActiveQuestion.Type}"
+                            d:DataContext="{d:DesignInstance p:QuestionType}">
+                            <TextBlock Text="{Binding Name, Converter={StaticResource QuestionTypeConverter}}" FontSize="16" FontWeight="Bold" />
                             
                             <ItemsControl ItemsSource="{Binding Params}" Margin="0,5,0,0">
                                 <ItemsControl.ItemsPanel>
@@ -389,7 +419,11 @@
                                     <DataTemplate DataType="{x:Type p:QuestionTypeParam}">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="{Binding Name,Converter={StaticResource QuestionTypeParamNameConverter}}" Width="250" />
-                                            <TextBlock Text="{Binding Value,Converter={StaticResource QuestionTypeParamValueConverter}}" Margin="5,0,0,0" Width="250" />
+                                            
+                                            <TextBlock
+                                                Text="{Binding Value,Converter={StaticResource QuestionTypeParamValueConverter}}"
+                                                Margin="5,0,0,0"
+                                                Width="250" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -398,7 +432,11 @@
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.Question}">
-                        <ContentControl Template="{StaticResource QuestGrid}" DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game}" />
+                        <ContentControl
+                            Template="{StaticResource QuestGrid}"
+                            DataContext="{Binding
+                                RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
+                                Path=DataContext.Game}" />
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.QuestionPrice}">
@@ -414,7 +452,7 @@
             <CollectionViewSource x:Key="DemonstrationScreens" Source="{Binding Screens}" />
         </ResourceDictionary>        
     </Window.Resources>
-    
+
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="СИмулятор">
             <TaskbarItemInfo.ThumbButtonInfos>
@@ -427,7 +465,7 @@
                         </DrawingImage>
                     </ThumbButtonInfo.ImageSource>
                 </ThumbButtonInfo>
-                
+
                 <ThumbButtonInfo Description="Дальше" Command="{Binding Game.Next}">
                     <ThumbButtonInfo.ImageSource>
                         <DrawingImage>
@@ -437,7 +475,7 @@
                         </DrawingImage>
                     </ThumbButtonInfo.ImageSource>
                 </ThumbButtonInfo>
-                
+
                 <ThumbButtonInfo Description="Завершить" Command="{Binding Game.Stop}">
                     <ThumbButtonInfo.ImageSource>
                         <DrawingImage>
@@ -450,14 +488,7 @@
             </TaskbarItemInfo.ThumbButtonInfos>
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
-    
-    <Window.InputBindings>
-        <KeyBinding Command="{Binding AddRight}" Key="Add" />
-        <KeyBinding Command="{Binding AddRight}" Key="OemPlus" />
-        <KeyBinding Command="{Binding AddWrong}" Key="Subtract" />
-        <KeyBinding Command="{Binding AddWrong}" Key="OemMinus" />
-    </Window.InputBindings>
-    
+
     <TabControl TabStripPlacement="Left" Background="White" BorderThickness="1,0,0,0" Padding="6,4,4,4" Margin="-2,0,0,0">
         <TabItem
             Header="Старт"
@@ -475,7 +506,7 @@
                 <StackPanel Margin="0,0,4,0">
                     <TextBlock Style="{StaticResource Title}">Начать игру</TextBlock>
                     <TextBlock Style="{StaticResource Header}">Игровой пакет</TextBlock>
-                    
+
                     <TextBlock Margin="0,2,0,0" FontSize="14" TextTrimming="CharacterEllipsis">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -709,10 +740,28 @@
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
                         <TextBlock Text="Размышление" VerticalAlignment="Center" Width="100" />
-                        <ProgressBar Foreground="{StaticResource ImageBrush}" Width="120" Margin="5,3,40,3" Minimum="0" Maximum="{Binding ThinkingTimeMax}" Value="{Binding ThinkingTime}" />
+                        
+                        <ProgressBar
+                            Foreground="{StaticResource ImageBrush}"
+                            Width="120"
+                            Margin="5,3,40,3"
+                            Minimum="0"
+                            Maximum="{Binding ThinkingTimeMax}"
+                            Value="{Binding ThinkingTime}" />
                     </StackPanel>
 
-                    <Button Style="{StaticResource ToolButton}" Grid.Column="1" Grid.RowSpan="3" BorderThickness="0" HorizontalAlignment="Center" ToolTip="Завершить игру" Margin="5,0,5,0" Height="30" Width="30" Padding="8" Command="{Binding Stop}">
+                    <Button
+                        Style="{StaticResource ToolButton}"
+                        Grid.Column="1"
+                        Grid.RowSpan="3"
+                        BorderThickness="0"
+                        HorizontalAlignment="Center"
+                        ToolTip="Завершить игру"
+                        Margin="5,0,5,0"
+                        Height="30"
+                        Width="30"
+                        Padding="8"
+                        Command="{Binding Stop}">
                         <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
                     </Button>
                 </Grid>
@@ -844,7 +893,7 @@
             </DockPanel>
         </TabItem>
         
-        <TabItem Header="Внешний вид" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
+        <TabItem Header="Внешний вид">
             <StackPanel Margin="2,2,0,0">
                 <TextBlock Style="{StaticResource Title}">Внешний вид</TextBlock>
                 
@@ -876,10 +925,19 @@
                     <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет сетки" />
                         
-                        <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <Button
+                            Padding="3"
+                            Height="21"
+                            Command="{Binding SelectColor}"
+                            CommandParameter="2"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
-                                    <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.TableGridColorString, TargetNullValue={x:Static Colors.Transparent}}" />
+                                    <SolidColorBrush
+                                        Color="{Binding
+                                            SettingsViewModel.SIUISettings.Model.TableGridColorString,
+                                            TargetNullValue={x:Static Colors.Transparent}}" />
                                 </Rectangle.Fill>
                             </Rectangle>
                         </Button>
@@ -888,7 +946,13 @@
                     <StackPanel Margin="5,0,0,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет фона отвечающего игрока" />
                         
-                        <Button Padding="3" Height="21" Command="{Binding SelectColor}" CommandParameter="3" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <Button
+                            Padding="3"
+                            Height="21"
+                            Command="{Binding SelectColor}"
+                            CommandParameter="3"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch">
                             <Rectangle>
                                 <Rectangle.Fill>
                                     <SolidColorBrush Color="{Binding SettingsViewModel.SIUISettings.Model.AnswererColorString}" />
@@ -899,7 +963,12 @@
                     
                     <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="Шрифт" />
-                        <ComboBox HorizontalAlignment="Stretch" Width="Auto" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SettingsViewModel.SIUISettings.TableFontFamily}">
+                        
+                        <ComboBox
+                            HorizontalAlignment="Stretch"
+                            Width="Auto"
+                            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}"
+                            SelectedItem="{Binding SettingsViewModel.SIUISettings.TableFontFamily}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type sys:String}">
                                     <TextBlock Text="{Binding Converter={StaticResource FontFamilyConverter1}}" />
@@ -910,7 +979,12 @@
                     
                     <StackPanel Margin="5,0,0,0">
                         <TextBlock Style="{StaticResource Header}" Text="Межстрочный интервал в вопросе" />
-                        <ComboBox HorizontalAlignment="Stretch" Width="Auto" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}" SelectedItem="{Binding SettingsViewModel.SIUISettings.QuestionLineSpacing}" />
+                        
+                        <ComboBox
+                            HorizontalAlignment="Stretch"
+                            Width="Auto"
+                            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}"
+                            SelectedItem="{Binding SettingsViewModel.SIUISettings.QuestionLineSpacing}" />
                     </StackPanel>
                     
                     <CheckBox IsChecked="{Binding Settings.ShowRight}" Margin="0,0,5,0">Показывать правильные ответы</CheckBox>
@@ -921,7 +995,8 @@
                             Показывать текст вопросов при игре без фальстартов
                         </TextBlock>
                     </CheckBox>
-                    
+
+                    <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="5,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
                 </UniformGrid>
                 
                 <TextBlock Style="{StaticResource Header}" Text="Изображение-заставка" />
@@ -966,7 +1041,15 @@
                 <TextBlock Style="{StaticResource Header}" Text="Видеофайл-фон" />
                 
                 <DockPanel>
-                    <Button Margin="5,0,4,0" Command="{Binding SelectBackgroundVideoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
+                    <Button
+                        Margin="5,0,4,0"
+                        Command="{Binding SelectBackgroundVideoFile}"
+                        HorizontalAlignment="Right"
+                        Width="120"
+                        Height="25"
+                        DockPanel.Dock="Right">
+                        Выбрать…
+                    </Button>
                     
                     <TextBox
                         Width="Auto"
@@ -975,11 +1058,20 @@
                         HorizontalAlignment="Stretch"
                         Text="{Binding SettingsViewModel.SIUISettings.Model.BackgroundVideoUri}" />
                 </DockPanel>
-                <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="1" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
+                
+                <Button
+                    Command="{Binding SettingsViewModel.Reset}"
+                    CommandParameter="1"
+                    IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                    Content="По умолчанию"
+                    Height="25"
+                    Width="120"
+                    Margin="0,15,4,5"
+                    HorizontalAlignment="Left" />
             </StackPanel>
         </TabItem>
         
-        <TabItem Header="Правила игры" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
+        <TabItem Header="Правила игры">
             <StackPanel Margin="2,2,0,0">
                 <TextBlock Style="{StaticResource Title}">Правила игры</TextBlock>
                 <TextBlock Style="{StaticResource Header}" Text="Тип игры" />
@@ -991,7 +1083,6 @@
                     IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
                     ItemsSource="{Binding SettingsViewModel.Modes}"
                     SelectedItem="{Binding SettingsViewModel.Model.GameMode}">
-                    
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type sys:String}">
                             <TextBlock Text="{Binding Converter={StaticResource EnumConverter}}" />
@@ -1000,14 +1091,59 @@
                 </ComboBox>
                 
                 <UniformGrid Columns="2" Margin="0,0,4,0">
-                    <StackPanel Margin="0,0,5,0">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource Header}" Text="Время раунда (с)" />
-                        <TextBox Width="Auto" HorizontalAlignment="Stretch" lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.RoundTime}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                        
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.RoundTime}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
-                    
-                    <StackPanel Margin="5,0,0,0">
+
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
                         <TextBlock Style="{StaticResource Header}" Text="Время вопроса (c)" />
-                        <TextBox Width="Auto" HorizontalAlignment="Stretch" lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.ThinkingTime}" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.ThinkingTime}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ThinkingTime}" TextWrapping="Wrap" />
+
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.ThinkingTime2}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.SpecialThinkingTime}" TextWrapping="Wrap" />
+
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.SpecialQuestionThinkingTime}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThinkingTime}" />
+
+                        <TextBox
+                            Width="Auto"
+                            HorizontalAlignment="Stretch"
+                            lb:NumericBehavior.IsAttached="True"
+                            Text="{Binding Settings.FinalQuestionThinkingTime}"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
                 </UniformGrid>
                 
@@ -1016,6 +1152,7 @@
                     
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Margin="5,0,0,0" IsChecked="{Binding DropStatsOnBack}">Откатывать статистику при шаге назад</CheckBox>
+                        
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
                                 <TextBlock>Возвращать суммы игроков и число их верных и неверных ответов</TextBlock>
@@ -1028,9 +1165,9 @@
                         <Button Style="{StaticResource HelpButton}">
                             <lb:TipBehavior.Tip>
                                 <TextBlock TextWrapping="Wrap">
-                                        <Run>При игре с фальстартами:</Run><LineBreak/>
-                                        <Run>- на экране отображается текст вопросов;</Run><LineBreak/>
-                                        <Run>- при использовании кнопок для старта таймера вопроса требуется дополнительное нажатие на кнопку &quot;Дальше&quot;, на экране при этом загорается цветная рамка.</Run>
+                                    <Run>При игре с фальстартами:</Run><LineBreak/>
+                                    <Run>- на экране отображается текст вопросов;</Run><LineBreak/>
+                                    <Run>- при использовании кнопок для старта таймера вопроса требуется дополнительное нажатие на кнопку &quot;Дальше&quot;, на экране при этом загорается цветная рамка.</Run>
                                 </TextBlock>
                             </lb:TipBehavior.Tip>
                         </Button>
@@ -1078,7 +1215,7 @@
             </StackPanel>
         </TabItem>
         
-        <TabItem Header="Кнопки" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
+        <TabItem Header="Кнопки">
             <StackPanel Margin="2,2,0,0">
                 <TextBlock Style="{StaticResource Title}">Кнопки</TextBlock>
                 <TextBlock FontStyle="Italic" TextWrapping="Wrap">Горячие клавиши игрового табло:<LineBreak />Пробел (левая кнопка мыши) - перейти дальше<LineBreak />Backspace - перейти назад<LineBreak />Escape (правая кнопка мыши) - завершить игру</TextBlock>
@@ -1088,7 +1225,9 @@
                     
                     <Button Style="{StaticResource HelpButton}">
                         <lb:TipBehavior.Tip>
-                            <TextBlock TextWrapping="Wrap">Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия</TextBlock>
+                            <TextBlock TextWrapping="Wrap">
+                                Позволяет выбирать вопросы на табло при помощи двух последовательных нажатий на цифровые кнопки (номер темы, номер вопроса/Escape для отмены) и убирать темы в финале при помощи одного нажатия
+                            </TextBlock>
                         </lb:TipBehavior.Tip>
                     </Button>
                 </StackPanel>
@@ -1110,6 +1249,7 @@
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed" />
+                            
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Com}">
                                     <Setter Property="Visibility" Value="Visible" />
@@ -1151,6 +1291,7 @@
                                     <Button Style="{StaticResource ToolButton}" Margin="3,0,0,0" Width="25" Height="25" Padding="3" ToolTip="Удалить" DockPanel.Dock="Right" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=ItemsControl,AncestorLevel=1}, Path=DataContext.DeletePlayerKey}" CommandParameter="{Binding}">
                                         <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource ImageBrush}" StrokeThickness="4" Stretch="Fill" />
                                     </Button>
+                                    
                                     <Button IsEnabled="False" Style="{StaticResource FlatButton}" Content="{Binding Converter={StaticResource KeyConverter}}" />
                                 </DockPanel>
                             </DataTemplate>
@@ -1169,10 +1310,15 @@
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.BlockingTime}" />
                 </StackPanel>
                 
-                <TextBlock FontStyle="Italic" Margin="0,5,0,0" TextWrapping="Wrap" Text="В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).">
+                <TextBlock
+                    FontStyle="Italic"
+                    Margin="0,5,0,0"
+                    TextWrapping="Wrap"
+                    Text="В данном режиме используются кнопки, не подключённые к программе (независимые устройства, хлопки и т.д.). Программа показывает рамку в момент, когда можно нажимать (при игре с фальстартами).">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed" />
+                            
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.External}">
                                     <Setter Property="Visibility" Value="Visible" />
@@ -1189,13 +1335,17 @@
                         <LineBreak />
                         <Run>Для игры необходимо организовать локальную сеть.</Run>
                     </TextBlock>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Порт веб-доступа" />
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Settings.WebPort,UpdateSourceTrigger=PropertyChanged}" Margin="0,5" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
+                    
                     <TextBlock>
                         <Run Text="Адрес для подключения к игре: http://" /><Run Text="{Binding Host,Mode=OneTime}" FontWeight="Bold" /><Run Text=":" /><Run Text="{Binding Settings.WebPort}" />
                     </TextBlock>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Время блокировки кнопки (с)" />
                     <TextBox Text="{Binding Settings.BlockingTime}" lb:NumericBehavior.IsAttached="True" />
+                    
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1209,112 +1359,176 @@
                 </StackPanel>
             </StackPanel>
         </TabItem>
-        <TabItem Header="Звуки" Visibility="{Binding Mode, Converter={StaticResource BaseView}}">
+        
+        <TabItem Header="Звуки">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">
                     <TextBlock Style="{StaticResource Header}" Text="Начало игры" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="0" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.BeginGame}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Темы игры" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="1" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.GameThemes}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Начало раунда" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="10" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundBegin}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Темы раунда" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="11" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundThemes}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Выбор вопроса" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="2" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.QuestionSelected}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Нажатие на кнопку" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="3" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.PlayerPressed}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Вопрос с секретом" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="4" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.SecretQuestion}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Вопрос со ставкой" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="5" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.StakeQuestion}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Вопрос без риска" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="6" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoRiskQuestion}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Правильный ответ" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="7" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerRight}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Неверный ответ" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="8" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.AnswerWrong}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Нет ответа" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="9" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.NoAnswer}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Окончание времени раунда" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="12" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.RoundTimeout}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Удаление темы в финале" />
+                    
                     <DockPanel>
                         <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="13" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
                         <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.FinalDelete}" />
                     </DockPanel>
+                    
                     <TextBlock Style="{StaticResource Header}" Text="Размышление в финале" />
+                    
                     <DockPanel>
-                        <Button Margin="5,0,4,0" Command="{Binding SelectAudioFile}" CommandParameter="14" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>
-                        <TextBox Width="Auto" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding SettingsViewModel.Model.Sounds.FinalThink}" />
+                        <Button
+                            Margin="5,0,4,0"
+                            Command="{Binding SelectAudioFile}"
+                            CommandParameter="14"
+                            HorizontalAlignment="Right"
+                            Width="120"
+                            Height="25"
+                            DockPanel.Dock="Right">
+                            Выбрать…
+                        </Button>
+                        
+                        <TextBox
+                            Width="Auto"
+                            IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Stretch"
+                            Text="{Binding SettingsViewModel.Model.Sounds.FinalThink}" />
                     </DockPanel>
-                    <Button Command="{Binding SettingsViewModel.Reset}" CommandParameter="8" IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" Content="По умолчанию" Height="25" Width="120" Margin="0,15,4,5" HorizontalAlignment="Left" />
+                    
+                    <Button
+                        Command="{Binding SettingsViewModel.Reset}"
+                        CommandParameter="8"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
+                        Content="По умолчанию"
+                        Height="25"
+                        Width="120"
+                        Margin="0,15,4,5"
+                        HorizontalAlignment="Left" />
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        
         <TabItem Header="О программе">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">
                     <DockPanel>
                         <Image DockPanel.Dock="Right" Source="Images/logo.png" RenderOptions.BitmapScalingMode="HighQuality" Width="64" Height="64" Margin="0,3,3,0" HorizontalAlignment="Right" VerticalAlignment="Top" />
+                        
                         <StackPanel>
                             <TextBlock Style="{StaticResource Title}">СИмулятор</TextBlock>
                             <TextBlock Style="{StaticResource Header}">Версия</TextBlock>
                             <TextBlock Margin="1,1,5,1" Text="{Binding Version, ElementName=root}"/>
                             <TextBlock Style="{StaticResource Header}">Автор</TextBlock>
-                            <TextBlock Margin="1,1,5,1">Владимир Хиль (<Hyperlink NavigateUri="http://vladimirkhil.com" Command="{Binding NavigateToSite}">Сайт</Hyperlink>)</TextBlock>
+                            
+                            <TextBlock Margin="1,1,5,1">
+                                Владимир Хиль (<Hyperlink NavigateUri="http://vladimirkhil.com" Command="{Binding NavigateToSite}">Сайт</Hyperlink>)
+                            </TextBlock>
+                            
                             <TextBlock Style="{StaticResource Header}">Лицензия</TextBlock>
                         </StackPanel>
                     </DockPanel>
+                    
                     <TextBlock><Hyperlink Command="{Binding OpenLicensesFolder}"><LineBreak />Лицензии используемых компонентов</Hyperlink></TextBlock>
-                    <TextBlock Margin="1,1,5,1" TextWrapping="Wrap"><LineBreak />Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
-                    <LineBreak /><LineBreak />Программа распространяется бесплатно.
-                    <LineBreak /><LineBreak />Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
-                    <LineBreak /><LineBreak />Программа поставляется «как есть». Автор не даёт никаких гарантий, что работа Программы будет соответствовать ожиданиям Пользователя. Автор не обязан исправлять Программу при возникновении данного несоответствия. Автор не несёт ответственности за ущерб, причинённый использованием данной Программы.
-                    <LineBreak /><LineBreak />Устанавливая и используя Программу, вы автоматически принимаете данное Соглашение. Вы можете передать права на использование Программы третьему лицу при условии его согласия с данным Соглашением. Если вы не согласны с каким-либо условием данного Соглашения, вы не имеете права использовать данную Программу.
+                    
+                    <TextBlock Margin="1,1,5,1" TextWrapping="Wrap">
+                        <LineBreak />Все исключительные авторские права на Программный продукт и документацию к нему в печатном и/или электронном виде принадлежат Автору.
+                        <LineBreak /><LineBreak />Программа распространяется бесплатно.
+                        <LineBreak /><LineBreak />Пользователь имеет право свободно использовать и распространять данную Программу, размещать её на сайтах и производить другие не запрещённые законодательством его страны действия с ней в течение сколь угодно длительного времени при условии сохранения авторских прав.
+                        <LineBreak /><LineBreak />Программа поставляется «как есть». Автор не даёт никаких гарантий, что работа Программы будет соответствовать ожиданиям Пользователя. Автор не обязан исправлять Программу при возникновении данного несоответствия. Автор не несёт ответственности за ущерб, причинённый использованием данной Программы.
+                        <LineBreak /><LineBreak />Устанавливая и используя Программу, вы автоматически принимаете данное Соглашение. Вы можете передать права на использование Программы третьему лицу при условии его согласия с данным Соглашением. Если вы не согласны с каким-либо условием данного Соглашения, вы не имеете права использовать данную Программу.
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
+        
         <TabControl.Resources>
             <Style TargetType="TabPanel">
                 <Setter Property="VerticalAlignment" Value="Center" />

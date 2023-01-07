@@ -191,6 +191,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _showTableCaption = true;
+
+    /// <summary>
+    /// Show table caption on the screen.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool ShowTableCaption
+    {
+        get => _showTableCaption;
+        set
+        {
+            if (_showTableCaption != value)
+            {
+                _showTableCaption = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _substractOnWrong = true;
 
     /// <summary>
@@ -473,7 +492,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     [DefaultValue(PlayersViewMode.Hidden)]
     public PlayersViewMode PlayersView
     {
-        get { return _playersView; }
+        get => _playersView;
         set
         {
             if (_playersView != value)
@@ -489,11 +508,11 @@ public sealed class AppSettings : INotifyPropertyChanged
     [DefaultValue(false)]
     public bool SaveLogs
     {
-        get { return _saveLogs; }
+        get => _saveLogs;
         set
         {
             if (_saveLogs != value)
-            { 
+            {
                 _saveLogs = value;
                 OnPropertyChanged();
             }
@@ -504,7 +523,7 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     public string LogsFolder
     {
-        get { return _logsFolder; }
+        get => _logsFolder;
         set
         {
             if (_logsFolder != value)
@@ -520,7 +539,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     [DefaultValue(true)]
     public bool EndQuestionOnRightAnswer
     {
-        get { return _endQuestionOnRightAnswer; }
+        get => _endQuestionOnRightAnswer;
         set
         {
             if (_endQuestionOnRightAnswer != value)

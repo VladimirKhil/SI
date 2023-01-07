@@ -3,147 +3,143 @@ using System.Windows;
 using System.Windows.Controls;
 using System;
 
-namespace SIGame
+namespace SIGame;
+
+/// <summary>
+/// Defines a text editor which accepts only numbers.
+/// </summary>
+public sealed class NumericTextBox : TextBox
 {
     /// <summary>
-    /// Текстовое поле, поддерживающее только ввод цифр
+    /// Максимально возможное вводимое значение
     /// </summary>
-    public sealed class NumericTextBox : TextBox
+    public int Maximum
     {
-        /// <summary>
-        /// Максимально возможное вводимое значение
-        /// </summary>
-        public int Maximum
+        get => (int)GetValue(MaximumProperty);
+        set { SetValue(MaximumProperty, value); }
+    }
+
+    public static readonly DependencyProperty MaximumProperty =
+        DependencyProperty.Register("Maximum", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(int.MaxValue));
+    
+    /// <summary>
+    /// Минимально возможное вводимое значение
+    /// </summary>
+    public int Minimum
+    {
+        get => (int)GetValue(MinimumProperty);
+        set { SetValue(MinimumProperty, value); }
+    }
+
+    public static readonly DependencyProperty MinimumProperty =
+        DependencyProperty.Register("Minimum", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(0));
+    
+    /// <summary>
+    /// Величина шага между значениями
+    /// </summary>
+    public int Step
+    {
+        get => (int)GetValue(StepProperty);
+        set { SetValue(StepProperty, value); }
+    }
+
+    public static readonly DependencyProperty StepProperty =
+        DependencyProperty.Register("Step", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(1));
+
+    public NumericTextBox()
+    {
+        PreviewTextInput += new System.Windows.Input.TextCompositionEventHandler(NumericTextBox_PreviewTextInput);
+        LostFocus += new RoutedEventHandler(NumericTextBox_LostFocus);
+
+        DataObject.AddPastingHandler(this, TextBoxPastingEventHandler);
+    }
+
+    private void NumericTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        var textBox = (TextBox)sender;
+
+        if (!int.TryParse(textBox.Text, out var value))
         {
-            get { return (int)GetValue(MaximumProperty); }
-            set { SetValue(MaximumProperty, value); }
+            textBox.Text = Minimum.ToString();
+            return;
         }
 
-        // Using a DependencyProperty as the backing store for Maximum.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MaximumProperty =
-            DependencyProperty.Register("Maximum", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(int.MaxValue));
-        
-        /// <summary>
-        /// Минимально возможное вводимое значение
-        /// </summary>
-        public int Minimum
+        if (value < Minimum)
         {
-            get { return (int)GetValue(MinimumProperty); }
-            set { SetValue(MinimumProperty, value); }
+            textBox.Text = Minimum.ToString();
         }
-
-        // Using a DependencyProperty as the backing store for Minimum.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register("Minimum", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(0));
-        
-        /// <summary>
-        /// Величина шага между значениями
-        /// </summary>
-        public int Step
+        else if (value > Maximum)
         {
-            get { return (int)GetValue(StepProperty); }
-            set { SetValue(StepProperty, value); }
+            textBox.Text = Maximum.ToString();
         }
-
-        // Using a DependencyProperty as the backing store for Step.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty StepProperty =
-            DependencyProperty.Register("Step", typeof(int), typeof(NumericTextBox), new UIPropertyMetadata(1));
-
-        public NumericTextBox()
+        else
         {
-            PreviewTextInput += new System.Windows.Input.TextCompositionEventHandler(NumericTextBox_PreviewTextInput);
-            LostFocus += new RoutedEventHandler(NumericTextBox_LostFocus);
+            var rem = (value - Minimum) % Step;
 
-            DataObject.AddPastingHandler(this, TextBoxPastingEventHandler);
-        }
-
-        private void NumericTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            var textBox = (TextBox)sender;
-
-            if (!int.TryParse(textBox.Text, out var value))
+            if (rem > 0)
             {
-                textBox.Text = Minimum.ToString();
+                textBox.Text = (value - rem).ToString();
+            }
+        }
+    }
+
+    private void NumericTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+    {
+        try
+        {
+            if (SelectionStart == 0 && e.Text == "-" && (Text.Length == 0 || Text[0] != '-'))
+            {
+                return;
+            }
+            
+            if (!int.TryParse(e.Text, out _))
+            {
+                e.Handled = true;
                 return;
             }
 
-            if (value < Minimum)
+            var futureText = new StringBuilder();
+
+            if (SelectionStart > 0)
             {
-                textBox.Text = Minimum.ToString();
+                futureText.Append(Text.AsSpan(0, SelectionStart));
             }
-            else if (value > Maximum)
+
+            futureText.Append(e.Text);
+
+            if (SelectionStart + SelectionLength < Text.Length)
             {
-                textBox.Text = Maximum.ToString();
+                futureText.Append(Text.AsSpan(SelectionStart + SelectionLength));
             }
-            else
-            {
-                var rem = (value - Minimum) % Step;
 
-                if (rem > 0)
-                {
-                    textBox.Text = (value - rem).ToString();
-                }
-            }
-        }
+            var fText = futureText.ToString();
+            var futureValue = int.Parse(fText);
 
-        private void NumericTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            try
-            {
-                if (SelectionStart == 0 && e.Text == "-" && (Text.Length == 0 || Text[0] != '-'))
-                {
-                    return;
-                }
-                
-                if (!int.TryParse(e.Text, out _))
-                {
-                    e.Handled = true;
-                    return;
-                }
-
-                var futureText = new StringBuilder();
-
-                if (SelectionStart > 0)
-                {
-                    futureText.Append(Text.AsSpan(0, SelectionStart));
-                }
-
-                futureText.Append(e.Text);
-
-                if (SelectionStart + SelectionLength < Text.Length)
-                {
-                    futureText.Append(Text.AsSpan(SelectionStart + SelectionLength));
-                }
-
-                var fText = futureText.ToString();
-                var futureValue = int.Parse(fText);
-
-                if (futureValue > Maximum)
-                {
-                    e.Handled = true;
-                }
-                else if (fText.StartsWith("0"))
-                {
-                    e.Handled = true;
-                    Text = futureValue.ToString();
-                    SelectionStart = Text.Length;
-                }
-            }
-            catch
+            if (futureValue > Maximum)
             {
                 e.Handled = true;
             }
-        }
-
-        private void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
-        {
-            var clipboard = e.DataObject.GetData(typeof(string)) as string;
-
-            if (!int.TryParse(clipboard, out _))
+            else if (fText.StartsWith("0"))
             {
-                e.CancelCommand();
                 e.Handled = true;
+                Text = futureValue.ToString();
+                SelectionStart = Text.Length;
             }
+        }
+        catch
+        {
+            e.Handled = true;
+        }
+    }
+
+    private void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
+    {
+        var clipboard = e.DataObject.GetData(typeof(string)) as string;
+
+        if (!int.TryParse(clipboard, out _))
+        {
+            e.CancelCommand();
+            e.Handled = true;
         }
     }
 }

@@ -6,8 +6,8 @@
     <Company>Khil-soft</Company>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
-    <Copyright>Copyright © Khil-soft 2010 - 2022</Copyright>
-    <Version>2.11.0</Version>
+    <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
+    <Version>2.11.1</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -46,7 +46,7 @@
   <ItemGroup>
     <Resource Include="Images\logo.png" />
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>

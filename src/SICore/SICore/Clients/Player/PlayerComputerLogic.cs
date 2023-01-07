@@ -34,6 +34,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     protected override void ExecuteTask(int taskId, int arg)
     {
         var task = (PlayerTasks)taskId;
+
         switch (task)
         {
             case PlayerTasks.Ready:
@@ -96,6 +97,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         // Раздел модернизирован
         var myIndex2 = _data.Players.IndexOf((PlayerAccount)_data.Me);
         var sums = _data.Players.Select(p => p.Sum).ToArray();
+
         try
         {
             var stake = MakeFinalStake(sums, myIndex2, _account.Style);
@@ -135,17 +137,32 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         // Раздел модернизирован
         var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
         var isCritical = IsCritical();
+
         try
         {
             int stakeSum = -1;
-            var stakeMode = MakeStake(_data.QuestionIndex, _data.Players.Select(p => p.Sum).ToArray(), myIndex,
+
+            var stakeMode = MakeStake(
+                _data.QuestionIndex,
+                _data.Players.Select(p => p.Sum).ToArray(),
+                myIndex,
                 _data.LastStakerIndex,
-                _account.Style, _data.PersonDataExtensions.Var, _account.N1, _account.N5, _account.B1,
-                _account.B5, isCritical, _data.PersonDataExtensions.StakeInfo.Minimum, out stakeSum);
+                _account.Style,
+                _data.PersonDataExtensions.Var,
+                _account.N1,
+                _account.N5,
+                _account.B1,
+                _account.B5,
+                isCritical,
+                _data.PersonDataExtensions.StakeInfo.Minimum,
+                out stakeSum);
 
             var msg = new StringBuilder(Messages.Stake).Append(Message.ArgsSeparatorChar).Append((int)stakeMode);
+            
             if (stakeMode == StakeMode.Sum)
+            {
                 msg.Append(Message.ArgsSeparatorChar).Append(stakeSum);
+            }
 
             _viewerActions.SendMessage(msg.ToString());
         }
@@ -182,6 +199,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         {
             var maxVars = (_data.PersonDataExtensions.StakeInfo.Maximum - _data.PersonDataExtensions.StakeInfo.Minimum) / _data.PersonDataExtensions.StakeInfo.Step + 1;
             var var = 0;
+
             switch (_account.Style)
             {
                 case PlayerStyle.Careful:
@@ -381,6 +399,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             {
                 // Выбор темы
                 var numOfThemes = canSelectTheme.Count(can => can);
+
                 if (numOfThemes == 1)
                 {
                     // Выбор очевиден
@@ -390,10 +409,13 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                 else
                 {
                     var previousTheme = false; // Можно ли выбрать предыдущую тему
+
                     lock (_data.ChoiceLock)
                     {
                         if (_data.ThemeIndex != -1 && canSelectTheme[_data.ThemeIndex])
+                        {
                             previousTheme = true;
+                        }
 
                         if (previousTheme)
                             r = Random.Shared.Next(100);
@@ -401,13 +423,16 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                             r = myInfo.V2 + Random.Shared.Next(100 - myInfo.V2);
 
                         if (r < myInfo.V2)
+                        {
                             theme = _data.ThemeIndex;
+                        }
                         else if (r < myInfo.V2 + myInfo.V3)
                         {
                             // Выбор темы согласно приоритету
                             for (int k = 0; k < myInfo.P1.Length; k++)
                             {
                                 var index = (myInfo.P1[k] - '0') - 1;
+
                                 if (index < canSelectTheme.Length && canSelectTheme[index])
                                 {
                                     theme = index;
@@ -436,6 +461,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             {
                 // Выбор вопроса
                 var numOfQuestions = canSelectQuestion.Count(can => can);
+
                 if (numOfQuestions == 1)
                 {
                     // Выбор очевиден
@@ -446,20 +472,28 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                 {
                     bool b4 = false, b5 = false, b6 = false;
                     int n4 = 0, n5 = 0;
+
                     if (_data.QuestionIndex != -1)
+                    {
                         for (int k = 0; k < canSelectQuestion.Length; k++)
                         {
                             if (canSelectQuestion[k])
+                            {
                                 if (k < _data.QuestionIndex) { b4 = true; n4++; }
                                 else if (k == _data.QuestionIndex) b6 = true;
                                 else { b5 = true; n5++; }
+                            }
                         }
+                    }
 
                     var maxr = 100;
+
                     if (!b4) maxr -= nv4;
                     if (!b5) maxr -= nv5;
                     if (!b6) maxr -= nv6;
+
                     r = Random.Shared.Next(maxr);
+                    
                     if (!b4) r += nv4;
                     if (!b5 && r >= nv4) r += nv5;
                     if (!b6 && r >= nv4 + nv5) r += nv6;
@@ -511,7 +545,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         }
     }
 
-    internal int MakeFinalStake(int[] sums, int myIndex, PlayerStyle style)
+    internal static int MakeFinalStake(int[] sums, int myIndex, PlayerStyle style)
     {
         var res = new List<Interval>();
         var ops = new List<int>();
@@ -519,14 +553,17 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         var otherSums = sums.Where((sum, index) => index != myIndex).ToArray();
         var otherBestSum = otherSums.Max();
         var mySum = sums[myIndex];
+
         if (otherBestSum > 0)
         {
             ops.Add(otherBestSum);
+
             if (sums.Length > 2)
             {
                 var bestIndex = Array.IndexOf(otherSums, otherBestSum);
                 otherSums = otherSums.Where((sum, index) => index != bestIndex).ToArray();
                 var secondSum = otherSums.Max();
+
                 if (secondSum > 0)
                 {
                     ops.Add(secondSum);
@@ -537,12 +574,17 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             ParetoStakes(mySum, ops.ToArray(), ref res);
         }
         else
+        {
             res.Add(new Interval(1, Math.Max(mySum - 1, 1)));
+        }
 
         var stake = 1;
         var numVars = 0;
+
         foreach (var inter in res)
+        {
             numVars += inter.Length;
+        }
 
         if (style != PlayerStyle.Normal && Random.Shared.Next(100) >= 20)
         {
@@ -565,7 +607,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     /// <param name="myIndex">Номер участника</param>
     /// <param name="lastStakerIndex">Индекс последнего ставящего</param>
     /// <param name="style">Стиль участника</param>
-    internal StakeMode MakeStake(
+    internal static StakeMode MakeStake(
         int questNum,
         int[] sums,
         int myIndex,
@@ -592,6 +634,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         int bestSum = sums.Where((sum, index) => index != myIndex).Max();
         var mySum = sums[myIndex];
         int bestNum = -1;
+
         for (i = 0; i < sums.Length; i++)
         {
             if (i != myIndex && sums[i] == bestSum)
@@ -604,12 +647,14 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         var plus100 = new List<Interval>();
         var max = new List<Interval>();
         var result = new List<IntervalProbability>();
+
         // Сначала просчитаем оптимальную реакцию нашего противника на все возможные наши ставки
         StakeDecisions(style, bestSum, mySum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, true /*т.к. он второй, то он всегда может спасовать*/, vars[2] ? sums[lastStakerIndex] : 0, ref result);
         StakeDecisions(style, mySum, bestSum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, vars[2], vars[2] ? sums[lastStakerIndex] : 0, ref result);
 
         int maxL = result[0].Probabilities.Count;
         int li;
+
         for (int ind = 0; ind < maxL; ind++)
         {
             li = style switch
@@ -620,11 +665,13 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             };
 
             i = 0;
+
             while (i < result.Count)
             {
                 var prob = result[i];
                 int k = 0;
                 bool worse = false;
+
                 while (k < result.Count)
                 {
                     if (i != k)
@@ -664,7 +711,9 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         }
 
         if (result.Count == 1 && result[0].Probabilities[0] == 0)
+        {
             result[0].Min = result[0].Max = mySum;
+        }
 
         // Проверка на критическую ситуацию
         if (isCritical)
@@ -706,9 +755,11 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         int pMax = (int)(B1 + questNum / 4.0 * (B5 - B1));
 
         int totalL = 0;
+
         if (pMin < 0)
         {
             totalL = 0;
+
             foreach (IntervalProbability interval in result)
             {
                 totalL += interval.Length;
@@ -728,10 +779,12 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                 {
                     result[i].Min = newVal;
                 }
+
                 i++;
             }
 
             pMin = 0;
+
             if (pMax <= 0)
             {
                 pMax = 50;
@@ -740,6 +793,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         else if (pMax < 0)
         {
             totalL = 0;
+
             foreach (IntervalProbability interval in result)
             {
                 totalL += interval.Length;
@@ -748,6 +802,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             int newVal = -pMax * totalL / (pMin + -pMax);
             newVal = IntervalProbability.Locale(ref result, newVal);
             i = 0;
+
             while (i < result.Count)
             {
                 if (result[i].Min > newVal)
@@ -763,6 +818,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             }
 
             pMax = 0;
+
             if (pMin <= 0)
             {
                 pMin = 50;
@@ -770,6 +826,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         }
 
         totalL = 0;
+
         foreach (var interval in result)
         {
             totalL += interval.Length;
@@ -781,6 +838,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         int d = Math.Abs(pMin - pMax);
         long bb = (long)((pMin + c) / 2.0 * totalL);
         int x = pMin != 0 ? (ran / pMin) : totalL / 2;
+
         if (d > 0)
         {
             x = (int)((Math.Sqrt(bb * bb + 2.0 * ran * totalL * d) - bb) / d);
@@ -832,6 +890,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     private bool IsCritical()
     {
         int numQu;
+
         lock (_data.TInfoLock)
         {
             numQu = _data.TInfo.RoundInfo.Sum(theme => theme.Questions.Count(QuestionHelper.IsActive));
@@ -854,15 +913,27 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         var playerData = _data.PlayerDataExtensions;
 
         if (_data.MySum() < -2000) // Отрицательная сумма -> смелость падает
+        {
             if (playerData.RealBrave >= _account.F + 80)
+            {
                 playerData.RealBrave -= 80;
+            }
             else
+            {
                 playerData.RealBrave = _account.F;
+            }
+        }
         else if (_data.MySum() < 0)
+        {
             if (playerData.RealBrave >= _account.F + 10)
+            {
                 playerData.RealBrave -= 10;
+            }
             else
+            {
                 playerData.RealBrave = _account.F;
+            }
+        }
 
         if (isRight)
         {
@@ -914,6 +985,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         else if (isRight) // Кто-то другой ответил правильно
         {
             playerData.RealBrave += playerData.DeltaBrave;
+
             if (playerData.DeltaBrave < 5)
             {
                 playerData.DeltaBrave++;
@@ -962,8 +1034,12 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         // Ищем сумму лидера
         int bestSum = mySum;
         foreach (int sum in opponentsSums)
+        {
             if (sum > bestSum)
+            {
                 bestSum = sum;
+            }
+        }
 
         // Минимальный результат, который возможен у лидера
         int leaderMinRes = 0;
@@ -1156,7 +1232,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     /// <param name="canPass">Возможен ли пас в качестве варианта ставок</param>
     /// <param name="stakerSum">Сумма на счёте ставящего при возможности паса (иначе 0)</param>
     /// <param name="result">Паретооптимальное множество ставок</param>
-    internal void StakeDecisions(
+    internal static void StakeDecisions(
         PlayerStyle style,
         int mySum,
         int bestSum,
@@ -1201,6 +1277,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             // Цель - сохранение лидерства и отрыв
             lambdas.Add(1);
             lambdas.Add(2);
+
             switch (style)
             {
                 case PlayerStyle.Agressive:
@@ -1217,10 +1294,12 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         }
 
         points.Add(new DirPoint(minStake, true));
+
         for (int i = 0; i < lambdas.Count; i++)
         {
             var l = Math.Pow(lambdas[i], smart ? -1 : 1);
             int sum1 = mySum, sum2 = bestSum;
+
             if (smart)
             {
                 sum1 = bestSum;
@@ -1235,6 +1314,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
 
         points.Add(new DirPoint(maxStake, false));
         points.Add(new DirPoint(maxStake, true));
+
         if (maxStake > mySum)
         {
             points.Add(new DirPoint(mySum, false));
@@ -1245,14 +1325,20 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         int pCount = points.Count;
 
         var intervals = new List<Interval>();
+
         if (canPass)
+        {
             intervals.Add(new Interval(0, 0));
+        }
 
         for (int i = 0; i < pCount - 1; i++)
         {
             int minI = i == 0 ? points[0].Value : intervals[intervals.Count - 1].Max + 100;
+
             if (minI > maxStake)
+            {
                 break;
+            }
 
             int maxI = points[i + 1].Direction || i < points.Count - 2 
                 && points[i + 2].Value == points[i + 1].Value
@@ -1277,30 +1363,40 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             Interval.SplitBy(ref intervals, max);
 
             result.Clear();
-            foreach (Interval interval in intervals)
+
+            foreach (var interval in intervals)
             {
                 int val = interval.Min;
                 int type = 2;
+
                 foreach (Interval part in pass)
+                {
                     if (part.Min <= interval.Min && part.Max >= interval.Max)
                     {
                         type = 0;
                         break;
                     }
+                }
 
                 if (type == 2)
-                    foreach (Interval part in plus100)
+                {
+                    foreach (var part in plus100)
+                    {
                         if (part.Min <= interval.Min && part.Max >= interval.Max)
                         {
                             type = 1;
                             break;
                         }
+                    }
+                }
 
-                IntervalProbability prob = new IntervalProbability(interval.Min, interval.Max);
+                var prob = new IntervalProbability(interval.Min, interval.Max);
                 result.Add(prob);
+
                 for (int j = 0; j < lambdas.Count; j++)
                 {
                     double l = lambdas[j];
+
                     switch (type)
                     {
                         case 0:
@@ -1333,16 +1429,19 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
 
             // Выделяем паретооптимальные решения
             int i = 0;
+
             while (i < result.Count)
             {
                 IntervalProbability prob = result[i];
                 int k = 0;
+
                 while (k < result.Count)
                 {
                     if (i != k)
                     {
                         bool getout = true;
                         bool worse = false;
+
                         for (int l = 0; l < prob.Probabilities.Count; l++)
                         {
                             if (!worse && prob.Probabilities[l] < result[k].Probabilities[l])
@@ -1371,10 +1470,12 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
             {
                 var val = interval.Min;
                 var a = new double[lambdas.Count][];
+
                 for (var j = 0; j < lambdas.Count; j++)
                 {
                     var l = lambdas[j];
                     a[j] = new double[3];
+
                     if (val == 0)
                     {
                         a[j][0] = ((mySum / l >= Math.Max(bestSum, stakerSum + Math.Min(minStake - 100, stakerSum)) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= Math.Max(bestSum, stakerSum - Math.Min(minStake - 100, stakerSum)) + (leader ? 1 : 0)) ? 1 - p : 0);
@@ -1396,21 +1497,26 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                 }
 
                 var candidates = new List<int> { 0 };
+
                 if (val != 0 && val < mySum && val != maxStake || val == 0 && stakerSum != minStake - 100 && minStake - 100 < mySum)
                     candidates.Add(1);
                 if (val != 0 && val <= mySum || val == 0 && minStake - 100 <= mySum && mySum > 0)
                     candidates.Add(2);
 
                 int i = -1;
+
                 while (candidates.Count > 1 && ++i < lambdas.Count)
                 {
                     for (var j = 0; j < candidates.Count; j++)
                     {
                         var getOut = false;
+
                         for (var k = 0; k < candidates.Count; k++)
                         {
                             if (k == j)
+                            {
                                 continue;
+                            }
 
                             if (a[i][candidates[j]] < a[i][candidates[k]])
                             {
@@ -1420,14 +1526,18 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
                         }
 
                         if (getOut)
+                        {
                             candidates.RemoveAt(j--);
+                        }
                     }
                 }
 
                 int decision = 0;
+
                 if (candidates.Count > 1)
                 {
                     int j;
+
                     switch (style)
                     {
                         case PlayerStyle.Agressive:
@@ -1626,6 +1736,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     public void Report()
     {
         var cmd = _data.SystemLog.Length > 0 ? _data.PlayerDataExtensions.Report.SendReport : _data.PlayerDataExtensions.Report.SendNoReport;
+        
         if (cmd != null && cmd.CanExecute(null))
         {
             cmd.Execute(null);
@@ -1637,6 +1748,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
         if (_account == null && _data.Players != null)
         {
             var acc = _data.Players.FirstOrDefault(account => account.Name == _viewerActions.Client.Name);
+
             if (acc != null)
             {
                 _account = new ComputerAccount(_viewerActions.Client.Name, acc.IsMale);
@@ -1653,11 +1765,6 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
     }
 
     private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
-
-    public void ApellateChanged()
-    {
-
-    }
 
     public void Clear()
     {

@@ -4,7 +4,7 @@ using SImulator.ViewModel.Model;
 namespace SImulator.ViewModel.ButtonManagers;
 
 /// <summary>
-/// Listens to button managers events and provide player info to button managers.
+/// Listens to button managers events and provides player info to button managers.
 /// </summary>
 public interface IButtonManagerListener
 {

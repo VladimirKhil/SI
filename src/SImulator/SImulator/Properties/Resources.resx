@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddSumForActivePlayer" xml:space="preserve">
+    <value>Добавить активному игроку</value>
+  </data>
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
   </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
   </data>
   <data name="CommonAppError" xml:space="preserve">
     <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
@@ -131,6 +137,9 @@
   </data>
   <data name="FileDeletionError" xml:space="preserve">
     <value>Ошибка удаления файла: {0}</value>
+  </data>
+  <data name="FinalThinkingTime" xml:space="preserve">
+    <value>Время на размышление в финале (с)</value>
   </data>
   <data name="FinishGameQuestion" xml:space="preserve">
     <value>Завершить игру?</value>
@@ -168,6 +177,9 @@
   <data name="OutOfMemoryError" xml:space="preserve">
     <value>Недостаточно памяти для выполнения программы!</value>
   </data>
+  <data name="Question" xml:space="preserve">
+    <value>Вопрос</value>
+  </data>
   <data name="RuntimeBrokenError" xml:space="preserve">
     <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
   </data>
@@ -183,14 +195,29 @@
   <data name="SelectQuestionPackage" xml:space="preserve">
     <value>Выберите пакет вопросов</value>
   </data>
+  <data name="ShowTableCaption" xml:space="preserve">
+    <value>Показывать заголовок на игровом табло</value>
+  </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>
   </data>
   <data name="SIStorageError" xml:space="preserve">
     <value>Ошибка работы с библиотекой вопросов: {0}</value>
   </data>
+  <data name="Source" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="SpecialThinkingTime" xml:space="preserve">
+    <value>Время на размышление над спецвопросом (с)</value>
+  </data>
+  <data name="SubtractSumForActivePlayer" xml:space="preserve">
+    <value>Удалить у активного игрока</value>
+  </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="ThinkingTime" xml:space="preserve">
+    <value>Время на размышление после нажатия кнопки (с)</value>
   </data>
   <data name="UnknownType" xml:space="preserve">
     <value>Неизвестный тип</value>

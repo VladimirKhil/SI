@@ -407,10 +407,10 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     }
 
     /// <summary>
-    /// Отобразить простой выбор
+    /// Plays simple question selection animation.
     /// </summary>
-    /// <param name="themeIndex"></param>
-    /// <param name="questionIndex"></param>
+    /// <param name="themeIndex">Question theme index.</param>
+    /// <param name="questionIndex">Question index.</param>
     public Task PlaySimpleSelectionAsync(int themeIndex, int questionIndex)
     {
         RoundInfo[themeIndex].Questions[questionIndex].State = QuestionInfoStages.Blinking;
@@ -418,9 +418,12 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     }
 
     /// <summary>
-    /// Отобразить сложный выбор (спецвопроса)
+    /// Plays special question selection animation.
     /// </summary>
-    public Task PlayComplexSelectionAsync(int themeIndex, int questionIndex, bool setActive)
+    /// <param name="themeIndex">Question theme index.</param>
+    /// <param name="questionIndex">Question index.</param>
+    /// <param name="setActive">Should question theme be highlighted.</param>
+    public async Task PlayComplexSelectionAsync(int themeIndex, int questionIndex, bool setActive)
     {
         for (var k = 0; k < RoundInfo.Count; k++)
         {
@@ -428,7 +431,15 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
 
         RoundInfo[themeIndex].Questions[questionIndex].State = QuestionInfoStages.Blinking;
-        return RoundInfo[themeIndex].Questions[questionIndex].SilentFlashOutAsync();
+        await RoundInfo[themeIndex].Questions[questionIndex].SilentFlashOutAsync();
+
+        lock (TStageLock)
+        {
+            if (_tStage == TableStage.RoundTable)
+            {
+                TStage = TableStage.Special;
+            }
+        }
     }
 
     public event Action MediaStart;

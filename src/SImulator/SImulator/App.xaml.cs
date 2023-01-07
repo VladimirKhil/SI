@@ -120,7 +120,10 @@ public partial class App : Application
 
     private async void Application_Exit(object sender, ExitEventArgs e)
     {
-        await _host.StopAsync();
+        if (_host != null)
+        {
+            await _host.StopAsync();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -197,7 +200,7 @@ public partial class App : Application
         using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
         try
         {
-            // Увеличим счётчик запусков программы
+            // Update application launch counter
             await appService.GetProductAsync("SImulator");
 
             var delayedErrors = Settings.DelayedErrors;
@@ -261,8 +264,9 @@ public partial class App : Application
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-        else if (_useAppService &&
-            MessageBox.Show(
+        else if (_useAppService
+            && _host != null
+            && MessageBox.Show(
                 string.Format("Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Отправить информацию разработчику? (просьба также связаться с разработчиком лично, так как ряд ошибок нельзя воспроизвести)", e.Exception.Message),
                 MainViewModel.ProductName,
                 MessageBoxButton.YesNo,

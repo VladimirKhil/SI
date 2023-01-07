@@ -1,9 +1,6 @@
-﻿using System.IO;
+﻿namespace SICore.PlatformSpecific;
 
-namespace SICore.PlatformSpecific
+public interface IPlatformManager
 {
-    public interface IPlatformManager
-    {
-        Stream CreateLog(string userName, out string logUri);
-    }
+    Stream CreateLog(string userName, out string logUri);
 }

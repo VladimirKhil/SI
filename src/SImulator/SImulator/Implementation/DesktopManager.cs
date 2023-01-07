@@ -178,7 +178,9 @@ internal sealed class DesktopManager : PlatformManager
                 Filter = $"{Resources.SIQuestions}|*.siq"
             };
 
-            if (dialog.ShowDialog().Value)
+            var dialogResult = dialog.ShowDialog();
+
+            if (dialogResult.HasValue && dialogResult.Value)
             {
                 return new FilePackageSource(dialog.FileName);
             }
@@ -206,7 +208,9 @@ internal sealed class DesktopManager : PlatformManager
                 await storage.OpenAsync();
 
                 var packageStoreWindow = new PackageStoreWindow { DataContext = storage };
-                var package = packageStoreWindow.ShowDialog().Value ? storage.CurrentPackage : null;
+                var dialogResult = packageStoreWindow.ShowDialog();
+
+                var package = dialogResult.HasValue && dialogResult.Value ? storage.CurrentPackage : null;
 
                 if (package == null)
                 {

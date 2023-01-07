@@ -1,9 +1,8 @@
-﻿namespace SICore
-{
-    internal sealed class AnswerResult
-    {
-        public int PlayerIndex { get; set; }
+﻿namespace SICore;
 
-        public bool IsRight { get; set; }
-    }
+internal sealed class AnswerResult
+{
+    public int PlayerIndex { get; set; }
+
+    public bool IsRight { get; set; }
 }
