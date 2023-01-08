@@ -90,6 +90,7 @@
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
             </DataGrid.Resources>
+            
             <DataGrid.Columns>
                 <DataGridTemplateColumn Width="50">
                     <DataGridTemplateColumn.CellTemplate>
@@ -98,9 +99,11 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                
                 <DataGridTextColumn Binding="{Binding Description}" ElementStyle="{StaticResource CellText}" Header="{x:Static lp:Resources.Package}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="*" />
                 <DataGridTextColumn Binding="{Binding Authors}" ElementStyle="{StaticResource CellText}" Header="{x:Static lp:Resources.Authors}" HeaderTemplate="{StaticResource HeaderTemplate}" Width="250" />
             </DataGrid.Columns>
+            
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="Transparent" />
@@ -110,22 +113,26 @@
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
             </DataGrid.ColumnHeaderStyle>
+            
             <DataGrid.RowStyle>
                 <Style TargetType="DataGridRow">
                     <Setter Property="Margin" Value="0,3,0,0" />
                     <Setter Property="Background" Value="#FF71A2E2" />
                     <Setter Property="Cursor" Value="Hand" />
                     <Setter Property="TextBlock.FontWeight" Value="{Binding Converter={StaticResource PlayedPackageConverter}}" />
+                    
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#FF89B2FF" />
+                            <Setter Property="Background" Value="{StaticResource HoverColor}" />
                         </Trigger>
+                        
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="#FF183CF3" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </DataGrid.RowStyle>
+            
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="Background" Value="Transparent" />

@@ -15,5 +15,5 @@ public interface IAsyncCommand : ICommand
     /// <summary>
     /// Executes the command.
     /// </summary>
-    Task ExecuteAsync(object parameter);
+    Task ExecuteAsync(object? parameter);
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.WinForms;
+using Microsoft.Web.WebView2.Wpf;
 using System.Diagnostics;
 using System.Windows;
 
@@ -24,7 +24,7 @@ internal static class WebView2Behavior
             return;
         }
 
-        var webView2 = (Microsoft.Web.WebView2.Wpf.WebView2)d;
+        var webView2 = (WebView2)d;
 
         UpdateWebView2Environment(webView2);
 
@@ -33,15 +33,25 @@ internal static class WebView2Behavior
 
     private static void WebView2_Unloaded(object sender, RoutedEventArgs e)
     {
-        var webView2 = (Microsoft.Web.WebView2.Wpf.WebView2)sender;
+        var webView2 = (WebView2)sender;
+
+        if (webView2 == null)
+        {
+            return;
+        }
 
         webView2.Unloaded -= WebView2_Unloaded;
 
-        // Prevent WebView for producing sound after unload
-        webView2.CoreWebView2.IsMuted = true;
+        var coreWebView = webView2.CoreWebView2;
+
+        if (coreWebView != null)
+        {
+            // Prevent WebView for producing sound after unload
+            coreWebView.IsMuted = true;
+        }
     }
 
-    private static async void UpdateWebView2Environment(Microsoft.Web.WebView2.Wpf.WebView2 webView2)
+    private static async void UpdateWebView2Environment(WebView2 webView2)
     {
         try
         {

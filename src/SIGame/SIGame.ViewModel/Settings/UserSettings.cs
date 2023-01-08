@@ -23,7 +23,7 @@ public sealed class UserSettings : INotifyPropertyChanged
 
     public GameSettings GameSettings
     {
-        get { return _gameSettings; }
+        get => _gameSettings;
         set 
         {
             _gameSettings = value; 
@@ -36,7 +36,7 @@ public sealed class UserSettings : INotifyPropertyChanged
 
     public StringCollection Packages
     {
-        get { return _packages; }
+        get => _packages;
         set { _packages = value; OnPropertyChanged(); }
     }
 
@@ -49,7 +49,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(true)]
     public bool Sound
     {
-        get { return _sound; }
+        get => _sound;
         set { _sound = value; OnPropertyChanged(); }
     }
 
@@ -60,7 +60,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(false)]
     public bool MainMenuSound
     {
-        get { return _mainMenuSound; }
+        get => _mainMenuSound;
         set { _mainMenuSound = value; OnPropertyChanged(); }
     }
 
@@ -71,7 +71,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     /// </summary>
     public double Volume
     {
-        get { return _volume; }
+        get => _volume;
         set
         {
             if (_volume != value && value > 0 && value <= 100)
@@ -100,7 +100,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(true)]
     public bool FullScreen
     {
-        get { return _fullScreen; }
+        get => _fullScreen;
         set { if (_fullScreen != value) { _fullScreen = value; OnPropertyChanged(); } }
     }
     
@@ -114,7 +114,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(true)]
     public bool SendReport
     {
-        get { return _sendReport; }
+        get => _sendReport;
         set { if (_sendReport != value) { _sendReport = value; OnPropertyChanged(); } }
     }
 
@@ -128,13 +128,13 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(false)]
     public bool LoadExternalMedia
     {
-        get { return _loadExternalMedia; }
+        get => _loadExternalMedia;
         set { if (_loadExternalMedia != value) { _loadExternalMedia = value; OnPropertyChanged(); } }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private bool _searchForUpdates =
-#if DEBUG
+#if !DEBUG
     false;
 #else
     true;
@@ -144,16 +144,16 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(true)]
     public bool SearchForUpdates
     {
-        get { return _searchForUpdates; }
+        get => _searchForUpdates;
         set { if (_searchForUpdates != value) { _searchForUpdates = value; OnPropertyChanged(); } }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private ConnectionData _connectionData = new ConnectionData();
+    private ConnectionData _connectionData = new();
 
     public ConnectionData ConnectionData
     {
-        get { return _connectionData; }
+        get => _connectionData;
         set { _connectionData = value; OnPropertyChanged(); }
     }
 
@@ -167,7 +167,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue("12+")]
     public string Restriction
     {
-        get { return _restriction; }
+        get => _restriction;
         set { _restriction = value; OnPropertyChanged(); }
     }
 
@@ -180,7 +180,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [XmlAttribute]
     public string Publisher
     {
-        get { return _publisher; }
+        get => _publisher;
         set { _publisher = value; OnPropertyChanged(); }
     }
 
@@ -193,7 +193,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [XmlAttribute]
     public string Tag
     {
-        get { return _tag; }
+        get => _tag;
         set { _tag = value; OnPropertyChanged(); }
     }
 
@@ -207,7 +207,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(false)]
     public bool ShowRunning
     {
-        get { return _showRunning; }
+        get => _showRunning;
         set { if (_showRunning != value) { _showRunning = value; OnPropertyChanged(); } }
     }
 
@@ -221,7 +221,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     [DefaultValue(GamesFilter.NoFilter)]
     public GamesFilter GamesFilter
     {
-        get { return _gamesFilter; }
+        get => _gamesFilter;
         set { if (_gamesFilter != value) { _gamesFilter = value; OnPropertyChanged(); } }
     }
 
@@ -232,7 +232,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     /// </summary>
     public string Language
     {
-        get { return _language; }
+        get => _language;
         set
         {
             if (_language != value)

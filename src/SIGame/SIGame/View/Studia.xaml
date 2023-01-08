@@ -606,9 +606,15 @@
             VerticalAlignment="Top"
             Margin="15,63,0,0">
             <local:DropDownButton
-                Style="{StaticResource SIButtonSimple}" BorderThickness="0" FontSize="20" Height="48" Width="48"
-                              ToolTip="{x:Static lp:Resources.VolumeControl}">
+                Style="{StaticResource SIDropDownButton}"
+                BorderThickness="0"
+                FontSize="20"
+                Height="48"
+                Width="48"
+                Foreground="{StaticResource MainColor}"
+                ToolTip="{x:Static lp:Resources.VolumeControl}">
                 <local:DropDownButton.Content>🔊</local:DropDownButton.Content>
+                
                 <local:DropDownButton.DropDown>
                     <ContextMenu Placement="Right">
                         <ContextMenu.Template>
@@ -616,6 +622,7 @@
                                 <Border x:Name="Border" Background="#BC000000" Padding="10">
                                     <Slider Value="{Binding Volume}" Foreground="{StaticResource MainColor}" Maximum="100" Width="180" Height="20" Orientation="Horizontal" IsMoveToPointEnabled="True" />
                                 </Border>
+                                
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="HasDropShadow" Value="true">
                                         <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
@@ -628,11 +635,12 @@
             </local:DropDownButton>
 
             <local:DropDownButton
-                Style="{StaticResource SIButtonSimple}"
+                Style="{StaticResource SIDropDownButton}"
                 BorderThickness="0"
                 FontSize="20"
                 Height="48"
                 Width="48"
+                Foreground="{StaticResource MainColor}"
                 ToolTip="{x:Static lp:Resources.GameManagement}">
                 <local:DropDownButton.Content>⚙</local:DropDownButton.Content>
 

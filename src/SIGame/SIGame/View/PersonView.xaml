@@ -168,33 +168,7 @@
             </Button.Style>
             
             <lb:DropDownBehavior.DropDown>
-                <ContextMenu FontSize="16">
-                    <ContextMenu.Template>
-                        <ControlTemplate TargetType="ContextMenu">
-                            <Border x:Name="Border" Background="{StaticResource WindowBackground}" BorderBrush="Gray" BorderThickness="1">
-                                <StackPanel
-                                    IsItemsHost="True"
-                                    KeyboardNavigation.DirectionalNavigation="Cycle"
-                                    Margin="0"
-                                    HorizontalAlignment="Center" />
-                            </Border>
-                        </ControlTemplate>
-                    </ContextMenu.Template>
-                    
-                    <ContextMenu.Resources>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="Cursor" Value="Hand" />
-                            <Setter Property="Height" Value="40" />
-                            <Setter Property="Foreground" Value="{StaticResource MainColor}" />
-                            
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{StaticResource HoverColor}" />
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContextMenu.Resources>
-                    
+                <ContextMenu Style="{StaticResource SIContextMenuStyle}">
                     <MenuItem
                         Header="{Binding IsHuman, Converter={StaticResource ChangeTypeConverter}}"
                         Command="{Binding ChangeType}"

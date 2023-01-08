@@ -12,6 +12,7 @@
         <Style TargetType="Hyperlink">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             <Setter Property="TextDecorations" Value="None"/>
+            
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Foreground" Value="{StaticResource HoverColor}"/>
@@ -19,6 +20,7 @@
             </Style.Triggers>
         </Style>
     </Page.Resources>
+    
     <StackPanel>
         <TextBlock Style="{StaticResource CommonText}" Margin="40,20,20,20" FontSize="24" LineHeight="70" LineStackingStrategy="BlockLineHeight">
             <Hyperlink NavigateUri="AppSettingsPage.xaml"><Run Text="{x:Static lp:Resources.Application}" /></Hyperlink><LineBreak />

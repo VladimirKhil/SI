@@ -7,20 +7,14 @@
     SnapsToDevicePixels="True"
     WindowState="Maximized"
     xmlns:l="clr-namespace:SIGame"
-    xmlns:conv="clr-namespace:SIWindows.Converters"
     xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
     Title="{x:Static lvmp:Resources.App_Name}" 
     Icon="Resources\game.ico"
     PreviewKeyDown="Window_KeyDown"
     Closed="Window_Closed">
-    <Window.Resources>
-        <conv:BooleanToWindowStyleConverter x:Key="FullScreen" />
-
-        <Pen x:Key="TaskbarPen" Brush="Black" Thickness="2" />
-        <SolidColorBrush x:Key="TaskbarBrush" Color="Black" />
-    </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
     </Window.CommandBindings>
+    
     <l:MainView x:Name="body" />
 </Window>

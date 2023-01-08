@@ -16,8 +16,10 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using Utils;
 using Settings = SImulator.ViewModel.Model.AppSettings;
 
@@ -217,7 +219,7 @@ public partial class App : Application
     }
 #endif
 
-    private async void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    private async void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         var msg = e.Exception.ToString();
 
@@ -248,7 +250,9 @@ public partial class App : Application
             e.Handled = true;
             return;
         }
-        else if (e.Exception is System.Windows.Markup.XamlParseException || e.Exception is NotImplementedException)
+        else if (e.Exception is System.Windows.Markup.XamlParseException
+            || e.Exception is NotImplementedException
+            || e.Exception is COMException comException && (uint)comException.ErrorCode == 0x88980406)
         {
             MessageBox.Show(
                 string.Format(SImulator.Properties.Resources.RuntimeBrokenError, e.Exception),

@@ -71,6 +71,14 @@
                 <Directory Id="PhotoFolder" Name="Photo" />
                 <Directory Id="SoundsFolder" Name="Sounds" />
                 <Directory Id="LicensesFolder" Name="licenses" />
+				<Directory Id="RuntimesFolder" Name="runtimes">
+					<Directory Id="PlatformX86Folder" Name="win-x86">
+						<Directory Id="NativeX86Folder" Name="native" />
+					</Directory>
+					<Directory Id="PlatformX64Folder" Name="win-x64">
+						<Directory Id="NativeX64Folder" Name="native" />
+					</Directory>
+				</Directory>
               </Directory>
             </Directory>
           </Directory>
@@ -356,6 +364,22 @@
     </ComponentGroup>
   </Fragment>
 
+	<Fragment>
+		<ComponentGroup Id="NativeX86" Directory="NativeX86Folder">
+			<Component Guid="{98BDC8B2-A978-435C-B8DB-A0B52B81FE8B}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-x86\native\WebView2Loader.dll" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="NativeX64" Directory="NativeX64Folder">
+			<Component Guid="{49A1F9E9-081E-40B6-8DD4-28CE9BC06FBC}">
+				<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-x64\native\WebView2Loader.dll" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+	
   <Fragment>
     <ComponentGroup Id="Manufacturer" Directory="ManufacturerFolder">
       <Component Guid="{7645299A-FFA6-4673-BEB8-E1D9194622A3}">

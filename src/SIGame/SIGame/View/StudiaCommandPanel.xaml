@@ -20,11 +20,12 @@
             <Setter Property="Background" Value="#AA555555" />
             <Setter Property="Margin" Value="-1,-1,0,0" />
             <Setter Property="Padding" Value="3" />
+            <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
             
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ButtonBase}">
-                        <Border BorderBrush="{StaticResource MainColor}" Background="{TemplateBinding Background}" BorderThickness="1">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" BorderThickness="1">
                             <ContentPresenter VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="{TemplateBinding Padding}" />
                         </Border>
                     </ControlTemplate>
@@ -301,7 +302,8 @@
             Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
             Content="✏️"
             ToolTip="{x:Static lp:Resources.EditTable}"
-            Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}">
+            Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
+            ToolTipService.ShowOnDisabled="True">
             <Button.Style>
                 <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">
                     <Style.Triggers>
@@ -311,6 +313,11 @@
 
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="{StaticResource HoverColor}" />
+                        </Trigger>
+
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="BorderBrush" Value="Gray" />
+                            <Setter Property="Foreground" Value="Gray" />
                         </Trigger>
                     </Style.Triggers>
                 </Style>

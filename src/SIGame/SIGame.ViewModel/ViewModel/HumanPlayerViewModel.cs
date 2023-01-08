@@ -72,9 +72,9 @@ public sealed class HumanPlayerViewModel : ViewModel<GameSettings>
         HumanPlayerChanged?.Invoke();
     }
 
-    private HumanAccountViewModel _newAccount = null;
+    private HumanAccountViewModel? _newAccount = null;
 
-    public HumanAccountViewModel NewAccount
+    public HumanAccountViewModel? NewAccount
     {
         get => _newAccount;
         set

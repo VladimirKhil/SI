@@ -26,9 +26,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public HumanPlayerViewModel Human { get; private set; }
 
-    private object _activeView = new IntroViewModel();
+    private object? _activeView = new IntroViewModel();
 
-    public object ActiveView
+    public object? ActiveView
     {
         get => _activeView;
         set
@@ -74,9 +74,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public AppSettingsViewModel Settings { get; private set; }
 
-    private ICommand _update;
+    private ICommand? _update;
 
-    public ICommand Update
+    public ICommand? Update
     {
         get => _update;
         set
@@ -101,6 +101,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     }
 
     public ICommand ShowSlideMenu { get; private set; }
+
+    public ICommand CloseSlideMenu { get; private set; }    
 
     private string _startMenuPage;
 
@@ -156,32 +158,28 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         Human.AccountEditing += Human_AccountEditing;
 
         ShowSlideMenu = new CustomCommand(ShowSlideMenu_Executed);
+        CloseSlideMenu = new CustomCommand(CloseSlideMenu_Executed);
     }
 
-    private void ShowSlideMenu_Executed(object arg)
+    private void ShowSlideMenu_Executed(object? arg)
     {
         StartMenuPage = ((arg as string) ?? "MainMenuView") + ".xaml";
         IsSlideMenuOpen = true;
     }
 
-    private void SetProfile_Executed(object arg)
-    {
-        Human.HumanPlayer = (HumanAccount)arg;
-    }
+    private void CloseSlideMenu_Executed(object? arg) => IsSlideMenuOpen = false;
 
-    private async void Cancel_Executed(object arg)
+    private void SetProfile_Executed(object? arg) => Human.HumanPlayer = (HumanAccount)arg;
+
+    private async void Cancel_Executed(object? arg)
     {
         await Task.Delay(300);
         ActiveView = _startMenu;
     }
 
-    private void HumanPlayer_NewAccountCreated()
-    {
-        ActiveView = _startMenu;
-    }
+    private void HumanPlayer_NewAccountCreated() => ActiveView = _startMenu;
 
-    private void HumanPlayer_NewAccountCreating()
-    {
+    private void HumanPlayer_NewAccountCreating() =>
         ActiveView = new ContentBox
         {
             Data = Human,
@@ -197,7 +195,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 CanBeExecuted = _commonSettings.Humans2.Any()
             }
         };
-    }
 
     private void Human_AccountEditing() =>
         ActiveView = new ContentBox
@@ -263,7 +260,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         PlayMainMenuSound();
     }
 
-    private async void New_Executed(object arg)
+    private async void New_Executed(object? arg)
     {
         await Task.Delay(500);
 
@@ -290,7 +287,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         ActiveView = navigator;
     }
 
-    private async Task OnlineGame_Executed(object arg)
+    private async Task OnlineGame_Executed(object? arg)
     {
         await Task.Delay(300);
 
@@ -327,7 +324,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         await login.Enter.ExecuteAsync(null);
     }
 
-    private async void NetworkGame_Executed(object arg)
+    private async void NetworkGame_Executed(object? arg)
     {
         var networkConnection = new SINetworkViewModel(
             _userSettings.ConnectionData,

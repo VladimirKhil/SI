@@ -1,0 +1,190 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:l="clr-namespace:SIGame">
+
+    <Color x:Key="Hover">#FF89B2FF</Color>
+    <Color x:Key="ActiveColor">#FF7CD4FD</Color>
+
+    <SolidColorBrush x:Key="WindowBackground" Color="#FF00053C" />
+    <SolidColorBrush x:Key="TransparentSIButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="MainColor" Color="White" />
+    <SolidColorBrush x:Key="HoverColor" Color="{StaticResource Hover}" />
+    <SolidColorBrush x:Key="ActiveColorBrush" Color="{StaticResource ActiveColor}" />
+
+    <DropShadowEffect x:Key="Effect" ShadowDepth="1" BlurRadius="3" Opacity="1" RenderingBias="Performance" />
+
+    <!-- Text -->
+
+    <Style x:Key="ShadowedText" TargetType="{x:Type TextBlock}">
+        <Setter Property="Effect" Value="{StaticResource Effect}" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="SIText" BasedOn="{StaticResource ShadowedText}" />
+
+    <!-- Button -->
+    
+    <Style x:Key="SIButtonBase" TargetType="{x:Type ButtonBase}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
+                        <ContentPresenter
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Margin="{TemplateBinding Padding}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+        <Setter Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
+    </Style>
+    
+    <Style x:Key="SIButtonSimple" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonBase}">
+        <Setter Property="Background" Value="{StaticResource TransparentSIButtonBackground}" />
+
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="MouseEnter">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation
+                            Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)"
+                            To="{StaticResource Hover}"
+                            Duration="0:0:0.3" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)" Duration="0:0:0.3" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SIToolButtonStyle" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style x:Key="SIButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
+        <Setter Property="TextBlock.LineHeight" Value="{Binding FontSize, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ButtonBase}">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}">
+                        <ContentPresenter
+                            Margin="{TemplateBinding Padding}"
+                            Name="text"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock
+                        Text="{Binding}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        LineStackingStrategy="BlockLineHeight" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="Button.Click">
+                <BeginStoryboard>
+                    <Storyboard>
+                        <ColorAnimation
+                            Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)"
+                            Duration="0:0:0.05"
+                            From="Transparent"
+                            To="{StaticResource ActiveColor}"
+                            AutoReverse="True"
+                            RepeatBehavior="4x" />
+                    </Storyboard>
+                </BeginStoryboard>
+            </EventTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Context menu -->
+
+    <ControlTemplate x:Key="SIContextMenuTemplate" TargetType="ContextMenu">
+        <Border x:Name="Border" Background="{StaticResource WindowBackground}" BorderBrush="Gray" BorderThickness="1">
+            <StackPanel
+                IsItemsHost="True"
+                KeyboardNavigation.DirectionalNavigation="Cycle"
+                Margin="0"
+                HorizontalAlignment="Center" />
+        </Border>
+    </ControlTemplate>
+
+    <Style x:Key="SIContextMenuItemStyle" TargetType="{x:Type MenuItem}">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource HoverColor}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SIContextMenuStyle" TargetType="ContextMenu">
+        <Setter Property="Template" Value="{StaticResource SIContextMenuTemplate}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource SIContextMenuItemStyle}" />
+    </Style>
+    
+    <!-- DropDownButton -->
+
+    <Style x:Key="SIDropDownButton" TargetType="{x:Type l:DropDownButton}">
+        <Setter Property="Background" Value="Transparent"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}" Padding="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource HoverColor}"/>
+            </Trigger>
+
+            <DataTrigger Binding="{Binding DropDown.IsOpen, RelativeSource={RelativeSource Self}}" Value="True">
+                <Setter Property="Background" Value="{StaticResource ActiveColorBrush}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

@@ -35,9 +35,9 @@ public abstract class PlatformManager
 
     public abstract int GetKeyNumber(GameKey key);
 
-    public abstract Task<IPackageSource> AskSelectPackageAsync(object arg);
+    public abstract Task<IPackageSource?> AskSelectPackageAsync(object arg);
 
-    public abstract string AskSelectColor();
+    public abstract string? AskSelectColor();
 
     public abstract Task<string?> AskSelectFileAsync(string header);
 

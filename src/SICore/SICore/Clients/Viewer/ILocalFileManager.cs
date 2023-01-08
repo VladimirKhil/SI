@@ -5,7 +5,7 @@
 /// </summary>
 internal interface ILocalFileManager : IDisposable
 {
-    void Start(CancellationToken token);
+    Task StartAsync(CancellationToken token);
 
     bool AddFile(Uri mediaUri, Action<Exception> errorCallback);
 

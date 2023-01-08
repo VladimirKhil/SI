@@ -6,7 +6,7 @@ using R = SICore.Properties.Resources;
 namespace SICore;
 
 /// <summary>
-/// Клиент ведущего
+/// Defines a showman message processor.
 /// </summary>
 public sealed class Showman : Viewer<IShowman>
 {
@@ -62,7 +62,7 @@ public sealed class Showman : Viewer<IShowman>
         });
 
         ClientData.ShowmanDataExtensions.Manage = new CustomCommand(Manage_Executed);
-        ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed);
+        ClientData.ShowmanDataExtensions.ManageTable = new CustomCommand(ManageTable_Executed) { CanBeExecuted = ClientData.TInfo.Pause };
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
@@ -115,7 +115,7 @@ public sealed class Showman : Viewer<IShowman>
         }
     }
 
-    private void Manage_Executed(object arg)
+    private void Manage_Executed(object? arg)
     {
         ClientData.DialogMode = DialogModes.Manage;
     }
@@ -323,11 +323,26 @@ public sealed class Showman : Viewer<IShowman>
 
                     _logic.Stake();
                     break;
+
+                case Messages.Pause:
+                    OnPause(mparams);
+                    break;
             }
         }
         catch (Exception exc)
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
+        }
+    }
+
+    private void OnPause(string[] mparams)
+    {
+        var isPaused = mparams[1] == "+";
+        var manageTableCommand = ClientData.ShowmanDataExtensions.ManageTable;
+
+        if (manageTableCommand != null)
+        {
+            manageTableCommand.CanBeExecuted = isPaused;
         }
     }
 

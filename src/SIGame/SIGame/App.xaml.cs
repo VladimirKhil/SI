@@ -255,7 +255,7 @@ namespace SIGame
         /// Произвести поиск обновлений
         /// </summary>
         /// <returns>Нужно ли завершить приложение для выполнения обновления</returns>
-        private async Task<AppInfo> SearchForUpdatesAsync()
+        private async Task<AppInfo?> SearchForUpdatesAsync()
         {
             using var appService = _host.Services.GetRequiredService<IAppServiceClient>();
 
@@ -355,6 +355,23 @@ namespace SIGame
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
                 
+                return;
+            }
+
+            if (e.Exception is System.Windows.Markup.XamlParseException
+                && inner is BadImageFormatException
+                && inner.Message.Contains("WebView2Behavior"))
+            {
+                e.Handled = true;
+
+                var error = string.Format(SIGame.Properties.Resources.WebViewWrongFormat, Environment.Is64BitProcess);
+
+                MessageBox.Show(
+                    $"{error}: {inner.Message}",
+                    CommonSettings.AppName,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
                 return;
             }
 

@@ -1,16 +1,17 @@
 ﻿using SIGame.ViewModel.Properties;
 using SIPackages;
+using System.Security.Cryptography;
 
 namespace SIGame.ViewModel.PackageSources;
 
 /// <summary>
-/// Следующий источник пакета
+/// Defines a package source for the next package from local storage.
 /// </summary>
-internal sealed class NextPackageSource: PackageSource
+internal sealed class NextPackageSource : PackageSource
 {
     private string _fName;
 
-    public override PackageSourceKey Key => new PackageSourceKey { Type = PackageSourceTypes.Next };
+    public override PackageSourceKey Key => new() { Type = PackageSourceTypes.Next };
 
     public override string Source => Resources.Next;
 
@@ -43,13 +44,17 @@ internal sealed class NextPackageSource: PackageSource
         }
 
         var dir = new DirectoryInfo(Global.PackagesUri);
+
         if (dir.Exists)
         {
-            var files = dir.GetFiles("*.siq");
+            var files = dir.EnumerateFiles("*.siq");
+
             foreach (var file in files)
             {
                 if (!packages.Contains(file.Name))
+                {
                     packages.Insert(0, file.Name);
+                }
             }
         }
     }
@@ -65,7 +70,7 @@ internal sealed class NextPackageSource: PackageSource
             throw new ArgumentException($"{nameof(NextPackageSource)}: no packages!");
         }
 
-        string item = packages[0];
+        var item = packages[0];
         packages.RemoveAt(0);
         _fName = Path.Combine(Global.PackagesUri, item);
         packages.Add(item);
@@ -82,10 +87,12 @@ internal sealed class NextPackageSource: PackageSource
     {
         var buffer = new byte[1024 * 1024];
         int count;
-        using var sha1 = new System.Security.Cryptography.SHA1Managed();
+
+        using var sha1 = SHA1.Create();
+
         using (var stream = File.OpenRead(FileName))
         {
-            while ((count = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((count = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
             {
                 sha1.TransformBlock(buffer, 0, count, buffer, 0);
 
@@ -95,17 +102,14 @@ internal sealed class NextPackageSource: PackageSource
 
         sha1.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
-        return sha1.Hash;
+        return sha1.Hash ?? Array.Empty<byte>();
     }
 
     public override string GetPackageId()
     {
-        using (var stream = File.OpenRead(FileName))
-        {
-            using (var doc = SIDocument.Load(stream))
-            {
-                return doc.Package.ID;
-            }
-        }
+        using var stream = File.OpenRead(FileName);
+        using var doc = SIDocument.Load(stream);
+
+        return doc.Package.ID;
     }
 }

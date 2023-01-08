@@ -8,7 +8,6 @@
     xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
     xmlns:my1="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
-    xmlns:lvmp="clr-namespace:SIGame.ViewModel.Properties;assembly=SIGame.ViewModel"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
@@ -354,45 +353,78 @@
             <GradientStop Color="#8AB1FB" Offset="0"/>
             <GradientStop Color="#002874" Offset="1"/>
         </LinearGradientBrush>
-        
-        <Style x:Key="NavigationWindowBackButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Command" Value="NavigationCommands.BrowseBack"/>
-            <Setter Property="Focusable" Value="false"/>
-            
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Grid Background="Transparent" Height="25" Width="25">
-                            <Path x:Name="Arrow" Data="M0,5 L11,5 M5,0 L0,5 L5,10" Stroke="{StaticResource MainColor}" StrokeThickness="3" Stretch="Uniform" />
-                        </Grid>
-                        
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Visibility" TargetName="Arrow" Value="Collapsed" />
-                            </Trigger>
-                            
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Stroke" TargetName="Arrow" Value="{StaticResource HoverColor}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+
+        <Style x:Key="NavigationWindowBackButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource SIToolButtonStyle}">
+            <Setter Property="Command" Value="NavigationCommands.BrowseBack" />
+            <Setter Property="Focusable" Value="false "/>
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Padding" Value="8" />
+
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
-        
+
+        <DataTemplate x:Key="Hamburger">
+            <Path
+                Margin="8"
+                Data="M0,0L10,0M0,3L10,3M0,6L10,6"
+                Stroke="{StaticResource MainColor}"
+                StrokeThickness="2"
+                UseLayoutRounding="True"
+                Stretch="Uniform" />
+        </DataTemplate>
+
+        <Style x:Key="HamburgerButton" TargetType="Button" BasedOn="{StaticResource SIToolButtonStyle}">
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Width" Value="48" />
+            <Setter Property="ContentTemplate" Value="{StaticResource Hamburger}" />
+        </Style>
+
         <ControlTemplate x:Key="FrameNavChromeTemplateKey" TargetType="{x:Type Frame}">
-            <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+            <Border
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Background="{TemplateBinding Background}"
+                Padding="{TemplateBinding Padding}">
                 <DockPanel>
                     <Border Background="#FF183CF3" DockPanel.Dock="Top">
                         <StackPanel Orientation="Horizontal" Margin="8,8,0,8">
-                            <Button Style="{StaticResource NavigationWindowBackButtonStyle}" HorizontalAlignment="Left" Cursor="Hand" />
-                            <TextBlock Style="{StaticResource CommonText}" FontSize="25" VerticalAlignment="Center" Margin="5,0,0,0" Text="{Binding Content.Title, RelativeSource={RelativeSource TemplatedParent}}" />
+                            <Button
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Style="{StaticResource HamburgerButton}"
+                                Margin="7,7,0,0"
+                                Command="{Binding DataContext.CloseSlideMenu, RelativeSource={RelativeSource Mode=TemplatedParent}}"
+                                ToolTip="{x:Static lp:Resources.Close}" />
+
+                            <Button
+                                Style="{StaticResource NavigationWindowBackButtonStyle}"
+                                HorizontalAlignment="Left"
+                                Cursor="Hand"
+                                Margin="5,7,0,0">
+                                <Path
+                                    x:Name="Arrow"
+                                    Data="M0,5 L11,5 M5,0 L0,5 L5,10"
+                                    Stroke="{StaticResource MainColor}"
+                                    StrokeThickness="3"
+                                    Stretch="Uniform" />
+                            </Button>
+
+                            <TextBlock
+                                Style="{StaticResource CommonText}"
+                                FontSize="25"
+                                VerticalAlignment="Center"
+                                Margin="5,1,0,0"
+                                Text="{Binding Content.Title, RelativeSource={RelativeSource TemplatedParent}}" />
                         </StackPanel>
                     </Border>
                     
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ContentPresenter x:Name="PART_FrameCP"/>
+                        <ContentPresenter x:Name="PART_FrameCP" />
                     </ScrollViewer>
                 </DockPanel>
             </Border>
@@ -406,7 +438,9 @@
     </UserControl.Resources>
     
     <UserControl.Background>
-        <ImageBrush ImageSource="{Binding Settings.ThemeSettings.Model.CustomMainBackgroundUri, Converter={StaticResource MainBackgroundConverter}}" Stretch="UniformToFill" />
+        <ImageBrush
+            ImageSource="{Binding Settings.ThemeSettings.Model.CustomMainBackgroundUri, Converter={StaticResource MainBackgroundConverter}}"
+            Stretch="UniformToFill" />
     </UserControl.Background>
     
     <Grid>
@@ -440,7 +474,7 @@
                                 FontSize="20"
                                 FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
                                 FontWeight="Bold"
-                                Margin="0,0,0,-10" />
+                                Margin="0,0,0,-15" />
 
                             <Viewbox Grid.Column="1" Grid.Row="2">
                                 <ItemsControl ItemsSource="{Binding MainCommands}" Height="400" Width="667" AlternationCount="2" Margin="0,45,0,0">
@@ -453,12 +487,13 @@
                             </Viewbox>
                             
                             <my:DropDownButton
+                                Style="{StaticResource SIDropDownButton}"
                                 Grid.ColumnSpan="3"
                                 Grid.RowSpan="4"
                                 Cursor="Hand"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
-                                Margin="0"
+                                Margin="0,15,15,0"
                                 BorderThickness="0"
                                 ToolTip="{x:Static lp:Resources.Profile}"
                                 FontSize="18"
@@ -466,16 +501,34 @@
                                 <my:DropDownButton.Resources>
                                     <lb:BindingProxy x:Key="Proxy" Data="{Binding}" />
 
+                                    <Style x:Key="DecoratedAvatar" TargetType="ContentControl">
+                                        <Setter Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate>
+                                                    <Border x:Name="border" Margin="5">
+                                                        <Image
+                                                            Source="{Binding Converter={StaticResource ImageConverter}}"
+                                                            Stretch="Uniform" />
+                                                    </Border>
+
+                                                    <DataTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding}" Value="">
+                                                            <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
+                                                        </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                    
                                     <ControlTemplate x:Key="AccountItemTemplate" TargetType="{x:Type MenuItem}">
-                                        <Border x:Name="Border" BorderThickness="1">
+                                        <Border x:Name="Border" BorderThickness="1" Padding="5,0">
                                             <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True" />
                                         </Border>
-                                        
+
                                         <ControlTemplate.Triggers>
-                                            <Trigger Property="ButtonBase.Command" Value="{x:Null}" />
-                                            
                                             <Trigger Property="IsHighlighted" Value="true">
-                                                <Setter Property="Background" TargetName="Border" Value="#FF94B7E7" />
+                                                <Setter Property="Background" TargetName="Border" Value="{StaticResource HoverColor}" />
                                                 <Setter Property="BorderBrush" TargetName="Border">
                                                     <Setter.Value>
                                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -485,105 +538,103 @@
                                                     </Setter.Value>
                                                 </Setter>
                                             </Trigger>
-                                            
-                                            <Trigger Property="IsEnabled" Value="false">
-                                                <Setter Property="Foreground">
-                                                    <Setter.Value>
-                                                        <SolidColorBrush Color="{StaticResource DisabledForegroundColor}" />
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
 
                                     <DataTemplate x:Key="HumanAccountTemplate" DataType="{x:Type lvm:HumanAccount}">
-                                        <DockPanel Height="60" Width="210" Margin="10,0" Background="Transparent">
-                                            <Image Source="{Binding Picture, Converter={StaticResource ImageConverter}}" DockPanel.Dock="Left" Width="50" />
-                                            <Button x:Name="b" Visibility="Hidden" DockPanel.Dock="Right" Height="20" Width="20" ToolTip="{x:Static lp:Resources.Person_Delete}" Command="{Binding Data.Human.RemoveAccount, Source={StaticResource Proxy}}" CommandParameter="{Binding}" Template="{StaticResource DeleteButtonTemplate}" />
-                                            <Button x:Name="e" Visibility="Hidden" DockPanel.Dock="Right" Height="20" Width="20" ToolTip="{x:Static lp:Resources.Person_Change}" Command="{Binding Data.Human.EditAccount, Source={StaticResource Proxy}}" CommandParameter="{Binding}" Template="{StaticResource EditButtonTemplate}" />
-                                            <TextBlock FontSize="16" Margin="10,0,0,0" Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        <DockPanel Height="60" Width="250" Background="Transparent">
+                                            <ContentControl
+                                                Style="{StaticResource DecoratedAvatar}"
+                                                Content="{Binding Picture}"
+                                                DockPanel.Dock="Left"
+                                                Width="100" />
+
+                                            <Button
+                                                x:Name="b"
+                                                Visibility="Hidden"
+                                                DockPanel.Dock="Right"
+                                                Height="20"
+                                                Width="20"
+                                                ToolTip="{x:Static lp:Resources.Person_Delete}"
+                                                Command="{Binding Data.Human.RemoveAccount, Source={StaticResource Proxy}}"
+                                                CommandParameter="{Binding}"
+                                                Template="{StaticResource DeleteButtonTemplate}" />
+                                            
+                                            <Button
+                                                x:Name="e"
+                                                Visibility="Hidden"
+                                                DockPanel.Dock="Right"
+                                                Height="20"
+                                                Width="20"
+                                                ToolTip="{x:Static lp:Resources.Person_Change}"
+                                                Command="{Binding Data.Human.EditAccount, Source={StaticResource Proxy}}"
+                                                CommandParameter="{Binding}"
+                                                Template="{StaticResource EditButtonTemplate}" />
+                                            
+                                            <TextBlock
+                                                FontSize="18"
+                                                Margin="10,0,0,0"
+                                                Text="{Binding Name}"
+                                                VerticalAlignment="Center"
+                                                TextTrimming="CharacterEllipsis" />
                                         </DockPanel>
                                         
                                         <DataTemplate.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="e" Property="Visibility" Value="{Binding CanBeDeleted, Converter={StaticResource BooleanToHiddenConverter}}" />
-                                                <Setter TargetName="b" Property="Visibility" Value="{Binding CanBeDeleted, Converter={StaticResource BooleanToHiddenConverter}}" />
+                                                <Setter
+                                                    TargetName="e"
+                                                    Property="Visibility"
+                                                    Value="{Binding CanBeDeleted, Converter={StaticResource BooleanToHiddenConverter}}" />
+                                                
+                                                <Setter
+                                                    TargetName="b"
+                                                    Property="Visibility"
+                                                    Value="{Binding CanBeDeleted, Converter={StaticResource BooleanToHiddenConverter}}" />
                                             </Trigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>
 
                                     <CollectionViewSource x:Key="HumansMain2" Source="{Binding Human.HumanPlayers}" />
                                 </my:DropDownButton.Resources>
-                                
+
                                 <my:DropDownButton.DropDown>
                                     <ContextMenu
+                                        Style="{StaticResource SIContextMenuStyle}"
                                         Placement="Bottom"
                                         FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
                                         ItemsSource="{Binding Source={StaticResource HumansMain2}}"
                                         ItemTemplate="{StaticResource HumanAccountTemplate}">
-                                        <ContextMenu.Template>
-                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
-                                                <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
-                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="HasDropShadow" Value="true">
-                                                        <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </ContextMenu.Template>
                                         <ContextMenu.ItemContainerStyle>
-                                            <Style TargetType="{x:Type MenuItem}">
+                                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SIContextMenuItemStyle}">
                                                 <Setter
                                                     Property="Command"
                                                     Value="{Binding DataContext.SetProfile, RelativeSource={RelativeSource AncestorType={x:Type my:DropDownButton}}}" />
+
+                                                <Setter Property="Height" Value="70" />
                                                 <Setter Property="CommandParameter" Value="{Binding}" />
-                                                <Setter Property="Cursor" Value="Hand" />
                                                 <Setter Property="Template" Value="{StaticResource AccountItemTemplate}" />
                                             </Style>
                                         </ContextMenu.ItemContainerStyle>
                                     </ContextMenu>
                                 </my:DropDownButton.DropDown>
-                                <my:DropDownButton.Style>
-                                    <Style TargetType="{x:Type my:DropDownButton}">
-                                        <Setter Property="Background" Value="Transparent"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type Button}">
-                                                    <Border Background="{TemplateBinding Background}" Padding="10">
-                                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#FF89B2FF"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </my:DropDownButton.Style>
-                                <StackPanel Orientation="Horizontal" Margin="15,4">
-                                    <Image Source="{Binding Human.HumanPlayer.Picture, Converter={StaticResource ImageConverter}}" Height="50">
-                                        <Image.Style>
-                                            <Style TargetType="{x:Type Image}">
-                                                <Setter Property="Margin" Value="5,5,12,5"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Human.HumanPlayer.Picture}" Value="">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-                                    </Image>
+
+                                <StackPanel Orientation="Vertical" Margin="5,4">
+                                    <ContentControl
+                                        Style="{StaticResource DecoratedAvatar}"
+                                        Margin="0"
+                                        Content="{Binding Human.HumanPlayer.Picture}"
+                                        Height="75"
+                                        Width="100" />
+
                                     <TextBlock
                                         DockPanel.Dock="Right"
                                         Text="{Binding Human.HumanPlayer}"
                                         VerticalAlignment="Center"
                                         Foreground="{StaticResource MainColor}"
+                                        TextAlignment="Center"
                                         TextTrimming="CharacterEllipsis"
-                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
+                                        Margin="0,5,0,0">
                                         <TextBlock.Effect>
                                             <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
                                         </TextBlock.Effect>
@@ -591,21 +642,20 @@
                                 </StackPanel>
                             </my:DropDownButton>
                             
-                            <TextBlock
+                            <Button
+                                Style="{StaticResource SIToolButtonStyle}"
                                 Grid.ColumnSpan="3"
                                 Grid.RowSpan="4"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Bottom"
-                                Margin="0,0,3,3"
-                                Width="45"
-                                Height="45">
-                                <Hyperlink
-                                    NavigateUri="{Binding Source={x:Static lvmp:Resources.GroupLink}, Converter={StaticResource UriConverter}}"
-                                    Command="{Binding NavigateToVK}"
-                                    TextDecorations="{x:Null}">
-                                    <Image Source="{Binding Source={x:Static lp:Resources.LinkLogo}}" />
-                                </Hyperlink>
-                            </TextBlock>
+                                Margin="0,0,15,15"
+                                Padding="5"
+                                Width="48"
+                                Height="48"
+                                Command="{Binding NavigateToVK}"
+                                ToolTip="{x:Static lp:Resources.VKHint}">
+                                <Image Source="{Binding Source={x:Static lp:Resources.LinkLogo}}" />
+                            </Button>
                         </Grid>
                     </DataTemplate>
                     
@@ -674,30 +724,46 @@
                 </ContentControl.Resources>
             </ContentControl>
         </Grid>
-        
-        <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Orientation="Horizontal" Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
-            <Button Style="{StaticResource SIButtonSimple}" Height="48" Width="48" BorderThickness="0" Margin="15,15,0,0" Command="{Binding ShowSlideMenu}">
-                <Border Padding="8" ToolTip="{x:Static lp:Resources.Options}" Background="Transparent">
-                    <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="{StaticResource MainColor}" StrokeThickness="2" UseLayoutRounding="True" Stretch="Uniform" />
-                </Border>
-            </Button>
-        </StackPanel>
-        
-        <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Bottom" Orientation="Horizontal" Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
-            <my:DropDownButton Content="{x:Static lp:Resources.Update}" Padding="15,3" FontSize="24" Cursor="Hand" TextBlock.LineHeight="24" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+
+        <Button
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Style="{StaticResource HamburgerButton}"
+            Margin="15,15,0,0"
+            Command="{Binding ShowSlideMenu}"
+            ToolTip="{x:Static lp:Resources.Options}"
+            Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+
+        <StackPanel
+            HorizontalAlignment="Left"
+            Margin="0,0,0,0"
+            VerticalAlignment="Bottom"
+            Orientation="Horizontal"
+            Visibility="{Binding MainMenu.IsVisible, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            <my:DropDownButton
+                Content="🔔"
+                ToolTip="{x:Static lp:Resources.Update}"
+                Width="48"
+                Height="48"
+                Margin="15,0,0,15"
+                FontSize="24"
+                Padding="0,0,0,4"
+                Cursor="Hand"
+                BorderThickness="0"
+                FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                <my:DropDownButton.ContentTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Text="{Binding}"
+                            Foreground="{StaticResource MainColor}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                    </DataTemplate>
+                </my:DropDownButton.ContentTemplate>
+                
                 <my:DropDownButton.Style>
-                    <Style TargetType="{x:Type my:DropDownButton}">
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="BorderBrush" Value="{x:Null}" />
-                        <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="Foreground" Value="{StaticResource MainColor}" />
-                        
+                    <Style TargetType="{x:Type my:DropDownButton}" BasedOn="{StaticResource SIDropDownButton}">
                         <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
-                                <Setter Property="Background" Value="{StaticResource HoverColor}" />
-                            </Trigger>
-                            
                             <DataTrigger Binding="{Binding Update}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
@@ -707,25 +773,54 @@
                 
                 <my:DropDownButton.Template>
                     <ControlTemplate TargetType="{x:Type my:DropDownButton}">
-                        <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}">
-                            <ContentPresenter Margin="{TemplateBinding Padding}" x:Name="text" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter
+                                Margin="{TemplateBinding Padding}"
+                                x:Name="text"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch" />
                         </Border>
                     </ControlTemplate>
                 </my:DropDownButton.Template>
                 
                 <my:DropDownButton.DropDown>
-                    <ContextMenu Placement="Relative" HorizontalOffset="-20" VerticalOffset="-128" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                    <ContextMenu
+                        Style="{StaticResource SIContextMenuStyle}"
+                        Placement="Relative"
+                        HorizontalOffset="-20"
+                        VerticalOffset="-128"
+                        Background="{StaticResource WindowBackground}"
+                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
                         <ContextMenu.Resources>
                             <ControlTemplate x:Key="MenuTemplate" TargetType="{x:Type MenuItem}">
-                                <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                                    <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                <Border
+                                    x:Name="templateRoot"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Background="{TemplateBinding Background}"
+                                    SnapsToDevicePixels="true"
+                                    Margin="{TemplateBinding Margin}">
+                                    <ContentPresenter
+                                        ContentSource="Header"
+                                        Margin="{TemplateBinding Padding}"
+                                        RecognizesAccessKey="True"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                                 </Border>
                                 
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsHighlighted" Value="True">
-                                        <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Background}"/>
-                                        <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource MenuItem.Highlight.Border}"/>
+                                        <Setter
+                                            Property="Background"
+                                            TargetName="templateRoot"
+                                            Value="{StaticResource MenuItem.Highlight.Background}" />
+                                        
+                                        <Setter
+                                            Property="BorderBrush"
+                                            TargetName="templateRoot"
+                                            Value="{StaticResource MenuItem.Highlight.Border}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -733,23 +828,51 @@
                         
                         <ContextMenu.Template>
                             <ControlTemplate TargetType="{x:Type ContextMenu}">
-                                <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
+                                <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="Gray" BorderThickness="1">
                                     <StackPanel>
-                                        <TextBlock FontSize="24" Text="{Binding UpdateVersionMessage}" Margin="20,20,20,0" HorizontalAlignment="Center" />
-                                        <StackPanel Orientation="Horizontal" IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="10,20,10,20" HorizontalAlignment="Center" />
+                                        <TextBlock
+                                            FontSize="24"
+                                            Foreground="{StaticResource MainColor}"
+                                            Text="{Binding UpdateVersionMessage}"
+                                            Margin="20,25,20,0"
+                                            HorizontalAlignment="Center" />
+
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            IsItemsHost="True"
+                                            KeyboardNavigation.DirectionalNavigation="Cycle"
+                                            Margin="10,25"
+                                            HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
-                                
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="HasDropShadow" Value="true">
-                                        <Setter TargetName="Border" Property="Padding" Value="0,3,0,3" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </ContextMenu.Template>
                         
-                        <MenuItem Header="{x:Static lp:Resources.RunUpdate}" Template="{StaticResource MenuTemplate}" Command="{Binding Update}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
-                        <MenuItem Header="{x:Static lp:Resources.Skip}" Margin="5,0,0,0" Template="{StaticResource MenuTemplate}" Command="{Binding CancelUpdate}" BorderThickness="1" BorderBrush="#FF999999" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" Padding="25,2" FontSize="24" Cursor="Hand" />
+                        <MenuItem
+                            Header="{x:Static lp:Resources.RunUpdate}"
+                            Template="{StaticResource MenuTemplate}"
+                            Command="{Binding Update}"
+                            BorderThickness="1"
+                            BorderBrush="#FF999999"
+                            TextBlock.TextAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Margin="3,0"
+                            Padding="25,2"
+                            FontSize="24"
+                            Cursor="Hand" />
+                        
+                        <MenuItem
+                            Header="{x:Static lp:Resources.Skip}"
+                            Template="{StaticResource MenuTemplate}"
+                            Command="{Binding CancelUpdate}"
+                            BorderThickness="1"
+                            BorderBrush="#FF999999"
+                            TextBlock.TextAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            Margin="3,0"
+                            Padding="25,2"
+                            FontSize="24"
+                            Cursor="Hand" />
                     </ContextMenu>
                 </my:DropDownButton.DropDown>
             </my:DropDownButton>
@@ -769,8 +892,16 @@
                             <Setter Property="ContentTemplate">
                                 <Setter.Value>
                                     <DataTemplate>
-                                        <Border Background="#FF000451" Width="300" HorizontalAlignment="Left" BorderBrush="{StaticResource MainColor}" BorderThickness="0,0,1,0">
-                                            <Frame Source="{Binding StartMenuPage}" lb:FrameBehavior.IsAttached="True" Style="{StaticResource FrameStyle1}" />
+                                        <Border
+                                            Background="{StaticResource WindowBackground}"
+                                            Width="350"
+                                            HorizontalAlignment="Left"
+                                            BorderBrush="{StaticResource MainColor}"
+                                            BorderThickness="0,0,1,0">
+                                            <Frame
+                                                Source="{Binding StartMenuPage}"
+                                                lb:FrameBehavior.IsAttached="True"
+                                                Style="{StaticResource FrameStyle1}" />
                                         </Border>
                                     </DataTemplate>
                                 </Setter.Value>

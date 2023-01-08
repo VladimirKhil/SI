@@ -11,7 +11,7 @@ public class CustomCommand : ICommand
 {
     #region Fields
 
-    private readonly Action<object> _execute = null;
+    private readonly Action<object?>? _execute = null;
 
     private bool _canBeExecuted = true;
 
@@ -47,7 +47,7 @@ public class CustomCommand : ICommand
 
     #region Constructors
 
-    public CustomCommand(Action<object> execute)
+    public CustomCommand(Action<object?> execute)
     {
         _execute = execute ?? throw new ArgumentNullException(nameof(execute));
     }
@@ -59,9 +59,9 @@ public class CustomCommand : ICommand
     /// </summary>
     /// <param name="parameter">Этот параметр игнорируется</param>
     /// <returns></returns>
-    public bool CanExecute(object parameter) => _canBeExecuted;
+    public bool CanExecute(object? parameter) => _canBeExecuted;
 
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 
-    public void Execute(object parameter) => _execute(parameter);
+    public void Execute(object? parameter) => _execute(parameter);
 }

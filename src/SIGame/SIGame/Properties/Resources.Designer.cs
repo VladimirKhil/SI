@@ -574,7 +574,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Edit game table.
+        ///   Ищет локализованную строку, похожую на Edit game table during pause.
         /// </summary>
         public static string EditTable {
             get {
@@ -2824,11 +2824,29 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Go to VKontakte group.
+        /// </summary>
+        public static string VKHint {
+            get {
+                return ResourceManager.GetString("VKHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Volume control.
         /// </summary>
         public static string VolumeControl {
             get {
                 return ResourceManager.GetString("VolumeControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на HTML viewer is broken. Current x64 architecture: {0}.
+        /// </summary>
+        public static string WebViewWrongFormat {
+            get {
+                return ResourceManager.GetString("WebViewWrongFormat", resourceCulture);
             }
         }
         

@@ -25,15 +25,19 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     public LocalFileManager() => _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
 
-    public async void Start(CancellationToken cancellationToken = default)
+    public async Task StartAsync(CancellationToken cancellationToken = default)
     {
-        while (await _processingQueue.Reader.WaitToReadAsync(cancellationToken))
+        try
         {
-            while (_processingQueue.Reader.TryRead(out var fileTask))
+            while (await _processingQueue.Reader.WaitToReadAsync(cancellationToken))
             {
-                await ProcesFileAsync(fileTask, cancellationToken);
+                while (_processingQueue.Reader.TryRead(out var fileTask))
+                {
+                    await ProcesFileAsync(fileTask, cancellationToken);
+                }
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
     public bool AddFile(Uri uri, Action<Exception> onError) =>
@@ -77,6 +81,7 @@ internal sealed class LocalFileManager : ILocalFileManager
             using var fileStream = File.Create(localFile);
             await responseStream.CopyToAsync(fileStream, cancellationToken);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exc)
         {
             fileTask.ErrorHandler(exc);

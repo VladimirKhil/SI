@@ -25,6 +25,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
     private readonly CancellationTokenSource _cancellation = new();
 
     private readonly ILocalFileManager _localFileManager = new LocalFileManager();
+    private readonly Task _localFileManagerTask;
 
     protected readonly ViewerActions _viewerActions;
 
@@ -53,7 +54,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
         //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
         //ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
 
-        _localFileManager.Start(_cancellation.Token);
+        _localFileManagerTask = _localFileManager.StartAsync(_cancellation.Token);
     }
 
     private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
@@ -978,11 +979,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
     public void TimeOut() => _data.Sound = Sounds.RoundTimeout;
 
-    protected override ValueTask DisposeAsync(bool disposing)
+    protected override async ValueTask DisposeAsync(bool disposing)
     {
         if (_disposed)
         {
-            return default;
+            return;
         }
 
         _disposed = true;
@@ -993,12 +994,14 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
             _data.ProtocolWriter = null;
         }
 
-        _localFileManager.Dispose();
-
         _cancellation.Cancel();
+
+        await _localFileManagerTask;
+
+        _localFileManager.Dispose();
         _cancellation.Dispose();
 
-        return base.DisposeAsync(disposing);
+        await base.DisposeAsync(disposing);
     }
 
     public void FinalThink() => _data.BackLink.PlaySound(Sounds.FinalThink);

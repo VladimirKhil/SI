@@ -50,12 +50,12 @@ public sealed class ShowmanData : INotifyPropertyChanged
         }
     }
 
-    private ICommand _manageTable;
+    private CustomCommand? _manageTable;
 
     /// <summary>
     /// Manage game table command.
     /// </summary>
-    public ICommand ManageTable
+    public CustomCommand? ManageTable
     {
         get => _manageTable;
         set

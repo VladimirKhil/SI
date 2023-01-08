@@ -167,7 +167,7 @@ internal sealed class DesktopManager : PlatformManager
         return code;
     }
 
-    public override async Task<IPackageSource> AskSelectPackageAsync(object arg)
+    public override async Task<IPackageSource?> AskSelectPackageAsync(object arg)
     {
         if (arg.ToString() == "0")
         {
@@ -234,7 +234,7 @@ internal sealed class DesktopManager : PlatformManager
         return null;
     }
 
-    public override string AskSelectColor()
+    public override string? AskSelectColor()
     {
         var diag = new System.Windows.Forms.ColorDialog();
 
@@ -248,7 +248,7 @@ internal sealed class DesktopManager : PlatformManager
         return null;
     }
 
-    public override Task<string> AskSelectFileAsync(string header)
+    public override Task<string?> AskSelectFileAsync(string header)
     {
         var dialog = new OpenFileDialog { Title = header };
 
@@ -257,7 +257,7 @@ internal sealed class DesktopManager : PlatformManager
             return Task.FromResult(dialog.FileName);
         }
 
-        return Task.FromResult<string>(null);
+        return Task.FromResult<string?>(null);
     }
 
     public override string? AskSelectLogsFolder()
