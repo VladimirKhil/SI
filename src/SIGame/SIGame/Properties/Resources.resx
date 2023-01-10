@@ -394,7 +394,7 @@
     <value>NEW GAME</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>Next</value>
+    <value>Next package</value>
   </data>
   <data name="NextRound" xml:space="preserve">
     <value>Next round</value>
@@ -460,7 +460,7 @@
     <value>Publisher</value>
   </data>
   <data name="QuestionLibrary" xml:space="preserve">
-    <value>Questions library</value>
+    <value>Online question library</value>
   </data>
   <data name="QuestionPack" xml:space="preserve">
     <value>Questions pack</value>
@@ -1067,5 +1067,17 @@
   </data>
   <data name="VKHint" xml:space="preserve">
     <value>Go to VKontakte group</value>
+  </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Emoji</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Password required</value>
+  </data>
+  <data name="LocalLibrary" xml:space="preserve">
+    <value>Local library</value>
+  </data>
+  <data name="SelectMenu" xml:space="preserve">
+    <value>Select...</value>
   </data>
 </root>

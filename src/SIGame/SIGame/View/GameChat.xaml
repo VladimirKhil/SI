@@ -63,8 +63,8 @@
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2">
                     <Button
-                        Style="{StaticResource SIButton}"
-                        Background="#22000000"
+                        Style="{StaticResource SIButtonSimple}"
+                        Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,0,-1"
                         Padding="20,4"
                         Command="{Binding Kick}"
@@ -74,8 +74,8 @@
                         Content="{x:Static lp:Resources.Kick}" />
                     
                     <Button
-                        Style="{StaticResource SIButton}"
-                        Background="#22000000"
+                        Style="{StaticResource SIButtonSimple}"
+                        Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,-1,-1"
                         Padding="20,4"
                         Command="{Binding Ban}"
@@ -118,8 +118,8 @@
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
                 <Button
                     DockPanel.Dock="Bottom"
-                    Style="{StaticResource SIButton}"
-                    Background="#22000000"
+                    Style="{StaticResource SIButtonSimple}"
+                    Background="{StaticResource WindowBackground}"
                     Margin="-1,-1,-1,-1"
                     Padding="20,4"
                     Command="{Binding Unban}"

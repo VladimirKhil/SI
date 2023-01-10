@@ -17,7 +17,7 @@
 
         <Style TargetType="{x:Type ButtonBase}">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
-            <Setter Property="Background" Value="#AA555555" />
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="Margin" Value="-1,-1,0,0" />
             <Setter Property="Padding" Value="3" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
@@ -353,76 +353,25 @@
 
         <local:DropDownButton
             Grid.Row="5"
-            Cursor="Hand"
             Content="⚙️"
+            FontSize="20"
+            Style="{StaticResource SIDropDownButton}"
+            BorderThickness="1"
+            Padding="0"
+            Margin="-1,-1,0,0"
+            BorderBrush="{StaticResource MainColor}"
             ToolTip="{x:Static lp:Resources.Manage_Hint}"
             Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
             
             <local:DropDownButton.DropDown>
-                <ContextMenu Placement="Relative" VerticalOffset="-52" FontSize="21">
-                    <ContextMenu.Resources>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="BorderThickness" Value="1" />
-                            <Setter Property="BorderBrush" Value="#FF999999" />
-                            <Setter Property="Padding" Value="40,10" />
-                            <Setter Property="Cursor" Value="Hand" />
-                            
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type MenuItem}">
-                                        <Border
-                                            x:Name="templateRoot"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            Background="{TemplateBinding Background}"
-                                            SnapsToDevicePixels="true">
-                                            
-                                            <ContentPresenter
-                                                ContentSource="Header"
-                                                Margin="{TemplateBinding Padding}"
-                                                RecognizesAccessKey="True"
-                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                        
-                                        </Border>
-                                        
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsHighlighted" Value="True">
-                                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource HoverColor}" />
-                                                
-                                                <Setter
-                                                    Property="BorderBrush"
-                                                    TargetName="templateRoot"
-                                                    Value="{StaticResource MenuItem.Highlight.Border}" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ContextMenu.Resources>
-                    
+                <ContextMenu Style="{StaticResource SIContextMenuStyle}" Placement="Top" FontSize="21">
                     <MenuItem
                         Header="{x:Static lp:Resources.PreviousRound}"
                         StaysOpenOnClick="True"
                         Command="{Binding Move}"
                         CommandParameter="-2" />
-                    
+
                     <MenuItem Header="{x:Static lp:Resources.NextRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="2" />
-                    
-                    <ContextMenu.Template>
-                        <ControlTemplate TargetType="ContextMenu">
-                            <Border x:Name="Border" Background="Lavender" BorderBrush="Gray" BorderThickness="1">
-                                
-                                <StackPanel
-                                    IsItemsHost="True"
-                                    Orientation="Horizontal"
-                                    KeyboardNavigation.DirectionalNavigation="Cycle"
-                                    Margin="0"
-                                    HorizontalAlignment="Center" />
-                                
-                            </Border>
-                        </ControlTemplate>
-                    </ContextMenu.Template>
                 </ContextMenu>
             </local:DropDownButton.DropDown>
         </local:DropDownButton>
@@ -442,9 +391,20 @@
             IsChecked="{Binding IsPaused, Mode=OneWay}"
             Command="{Binding ChangePauseInGame}" />
 
-        <local:DropDownButton Grid.Row="6" Grid.Column="1" Cursor="Hand" Content="🚪" ToolTip="{x:Static lp:Resources.Exit}">
+        <local:DropDownButton
+            Style="{StaticResource SIDropDownButton}"
+            Margin="-1,-1,0,0"
+            Padding="0"
+            FontSize="24"
+            BorderThickness="1"
+            BorderBrush="{StaticResource MainColor}"
+            Grid.Row="6"
+            Grid.Column="1"
+            Cursor="Hand"
+            Content="🚪"
+            ToolTip="{x:Static lp:Resources.Exit}">
             <local:DropDownButton.DropDown>
-                <ContextMenu Placement="Relative" HorizontalOffset="100" VerticalOffset="-128">
+                <ContextMenu Placement="Bottom" Style="{StaticResource SIContextMenuStyle}">
                     <MenuItem
                         Header="{x:Static lp:Resources.Exit_Button}"
                         BorderThickness="1"
@@ -489,10 +449,15 @@
                     
                     <ContextMenu.Template>
                         <ControlTemplate TargetType="ContextMenu">
-                            <Border x:Name="Border" Background="#FFC0CFF4" BorderBrush="Gray" BorderThickness="1">
+                            <Border
+                                x:Name="Border"
+                                Background="{StaticResource WindowBackground}"
+                                BorderThickness="1"
+                                BorderBrush="{StaticResource MainColor}">
                                 <StackPanel>
                                     <TextBlock
                                         FontSize="18"
+                                        Foreground="{StaticResource MainColor}"
                                         Text="{x:Static lp:Resources.ExitPrompt}"
                                         Margin="20,20,20,0"
                                         HorizontalAlignment="Center" />

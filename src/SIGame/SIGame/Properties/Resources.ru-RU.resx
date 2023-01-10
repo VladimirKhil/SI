@@ -160,7 +160,7 @@
     <value>Для создания сетевой игры нужно играть по локальной сети, иметь реальный IP или настроить NAT</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>Следующий</value>
+    <value>Следующий пакет</value>
   </data>
   <data name="Options" xml:space="preserve">
     <value>Опции</value>
@@ -175,7 +175,7 @@
     <value>Номер порта</value>
   </data>
   <data name="QuestionLibrary" xml:space="preserve">
-    <value>Библиотека вопросов…</value>
+    <value>Онлайн Библиотека вопросов</value>
   </data>
   <data name="QuestionPack" xml:space="preserve">
     <value>Пакет вопросов</value>
@@ -1067,5 +1067,17 @@
   </data>
   <data name="VKHint" xml:space="preserve">
     <value>Перейти в группу ВКонтакте</value>
+  </data>
+  <data name="Emoji" xml:space="preserve">
+    <value>Эмодзи</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Требуется пароль</value>
+  </data>
+  <data name="LocalLibrary" xml:space="preserve">
+    <value>Локальная библиотека</value>
+  </data>
+  <data name="SelectMenu" xml:space="preserve">
+    <value>Выбрать…</value>
   </data>
 </root>

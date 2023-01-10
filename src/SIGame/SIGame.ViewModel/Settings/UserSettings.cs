@@ -134,7 +134,7 @@ public sealed class UserSettings : INotifyPropertyChanged
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private bool _searchForUpdates =
-#if !DEBUG
+#if DEBUG
     false;
 #else
     true;

@@ -58,7 +58,14 @@
         <DatePicker Grid.Row="2" Grid.Column="1" FontWeight="Medium" SelectedDate="{Binding Model.BirthDate}" Visibility="{Binding Model.IsHuman,Converter={StaticResource BooleanToVisibilityConverter1}}" />
         <Button Style="{StaticResource SIButton}" Grid.Row="3" Padding="20,4" TextBlock.FontSize="22" Name="button1" VerticalAlignment="Center" Command="{Binding SelectPicturePath}" Content="{x:Static lp:Resources.Avatar}" />
         <TextBox Name="tbPicture" Grid.Column="1" Grid.Row="3" FontWeight="Medium" Style="{StaticResource textValueStyle}" Text="{Binding Model.Picture}" />
-        <Image Source="{Binding Model.Picture, Converter={StaticResource ImageConverter}}" Stretch="Uniform" Grid.Row="4" Grid.ColumnSpan="2" Margin="5" />
+
+        <ContentControl
+            Style="{StaticResource DecoratedAvatar}"
+            Content="{Binding Model.Picture}"
+            Grid.Row="4"
+            Grid.ColumnSpan="2"
+            Margin="5" />
+
         <TextBlock Grid.Row="6" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,2,0,0" Name="tbError" Text="{Binding HAErrorMessage}" VerticalAlignment="Center" Foreground="#FFC10000" />
         <Button Style="{StaticResource SIButton}" Grid.Column="1" Grid.Row="6" HorizontalAlignment="Right" Padding="20,6" Name="button2" Command="{Binding AddNewAccount}" Content="{Binding CommitHeader}" TextBlock.FontSize="25" />
     </Grid>

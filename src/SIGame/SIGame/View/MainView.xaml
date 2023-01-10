@@ -490,36 +490,14 @@
                                 Style="{StaticResource SIDropDownButton}"
                                 Grid.ColumnSpan="3"
                                 Grid.RowSpan="4"
-                                Cursor="Hand"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Top"
                                 Margin="0,15,15,0"
-                                BorderThickness="0"
                                 ToolTip="{x:Static lp:Resources.Profile}"
                                 FontSize="18"
                                 FontWeight="Medium">
                                 <my:DropDownButton.Resources>
                                     <lb:BindingProxy x:Key="Proxy" Data="{Binding}" />
-
-                                    <Style x:Key="DecoratedAvatar" TargetType="ContentControl">
-                                        <Setter Property="ContentTemplate">
-                                            <Setter.Value>
-                                                <DataTemplate>
-                                                    <Border x:Name="border" Margin="5">
-                                                        <Image
-                                                            Source="{Binding Converter={StaticResource ImageConverter}}"
-                                                            Stretch="Uniform" />
-                                                    </Border>
-
-                                                    <DataTemplate.Triggers>
-                                                        <DataTrigger Binding="{Binding}" Value="">
-                                                            <Setter TargetName="border" Property="Background" Value="#FFFFFF"/>
-                                                        </DataTrigger>
-                                                    </DataTemplate.Triggers>
-                                                </DataTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
                                     
                                     <ControlTemplate x:Key="AccountItemTemplate" TargetType="{x:Type MenuItem}">
                                         <Border x:Name="Border" BorderThickness="1" Padding="5,0">
@@ -529,14 +507,6 @@
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsHighlighted" Value="true">
                                                 <Setter Property="Background" TargetName="Border" Value="{StaticResource HoverColor}" />
-                                                <Setter Property="BorderBrush" TargetName="Border">
-                                                    <Setter.Value>
-                                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                            <GradientStop Color="{DynamicResource BorderMediumColor}" Offset="0" />
-                                                            <GradientStop Color="Transparent" Offset="1" />
-                                                        </LinearGradientBrush>
-                                                    </Setter.Value>
-                                                </Setter>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>

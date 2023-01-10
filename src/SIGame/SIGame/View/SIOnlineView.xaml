@@ -30,42 +30,78 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Padding" Value="9,3,3,3"/>
             <Setter Property="Height" Value="46" />
-            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
-            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
+           
+            <Setter
+                Property="HorizontalContentAlignment"
+                Value="{Binding
+                    HorizontalContentAlignment,
+                    RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}" />
+            
+            <Setter
+                Property="VerticalContentAlignment"
+                Value="{Binding
+                    VerticalContentAlignment,
+                    RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}" />
+            
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand" />
+            
             <Setter Property="FocusVisualStyle">
                 <Setter.Value>
                     <Style>
                         <Setter Property="Control.Template">
                             <Setter.Value>
                                 <ControlTemplate>
-                                    <Rectangle Margin="2" SnapsToDevicePixels="True" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                                    <Rectangle
+                                        Margin="2"
+                                        SnapsToDevicePixels="True"
+                                        Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                                        StrokeThickness="1"
+                                        StrokeDashArray="1 2"/>
                                 </ControlTemplate>
                             </Setter.Value>
                         </Setter>
                     </Style>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                        <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
-                            <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        <Border
+                            x:Name="Bd"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                            <ContentPresenter
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Content="{TemplateBinding Content}"
+                                ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
+                        
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" TargetName="Bd" Value="#FF98B9FF"/>
                                 <Setter Property="BorderBrush" TargetName="Bd" Value="#FF98B9FF"/>
                             </Trigger>
+                            
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" TargetName="Bd" Value="#FF5A95E2"/>
                                 <Setter Property="BorderBrush" TargetName="Bd" Value="#FF5A95E2"/>
                             </Trigger>
+                            
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                <Setter
+                                    Property="TextElement.Foreground"
+                                    TargetName="Bd"
+                                    Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -78,6 +114,7 @@
             <Setter Property="Height" Value="53" />
             <Setter Property="FontSize" Value="25" />
             <Setter Property="Command" Value="{Binding Join}" />
+            
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CanJoin}" Value="False">
                     <Setter Property="IsEnabled" Value="False" />
@@ -85,6 +122,7 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+    
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -92,24 +130,45 @@
                 <ColumnDefinition Width="6*" />
                 <ColumnDefinition Width="{Binding IsChatShown, Converter={StaticResource ChatColumnWidthConverter}}" />
             </Grid.ColumnDefinitions>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
+            
             <DockPanel Grid.ColumnSpan="2">
-                <Button DockPanel.Dock="Left" Margin="78,15,0,0" Command="{Binding Cancel}" ToolTip="{x:Static lp:Resources.Back}" Style="{StaticResource SIButtonSimple}" Width="48" Height="48" BorderThickness="0" VerticalAlignment="Center" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <Button
+                    DockPanel.Dock="Left"
+                    Margin="78,15,0,0"
+                    Command="{Binding Cancel}"
+                    ToolTip="{x:Static lp:Resources.Back}"
+                    Style="{StaticResource SIButtonSimple}"
+                    Width="48"
+                    Height="48"
+                    BorderThickness="0"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Stretch"
+                    VerticalContentAlignment="Stretch">
                     <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
                 </Button>
-                <TextBlock Margin="15,15,7,2" Text="{x:Static vmp:Resources.MainMenu_OnlineGame}" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontSize="40" FontWeight="Bold" />
+                
+                <TextBlock
+                    Margin="15,15,7,2"
+                    Text="{x:Static vmp:Resources.MainMenu_OnlineGame}"
+                    Effect="{StaticResource Effect}"
+                    Foreground="{StaticResource MainColor}"
+                    FontSize="40"
+                    FontWeight="Bold" />
             </DockPanel>
+            
             <DockPanel
                 Grid.Column="1"
                 Grid.ColumnSpan="2"
                 HorizontalAlignment="Right"
                 Margin="0,10,10,0">
                 <local:DropDownButton
-                    Style="{StaticResource SIButtonSimple}"
+                    Style="{StaticResource SIDropDownButton}"
                     DockPanel.Dock="Right"
                     BorderThickness="0"
                     VerticalAlignment="Center"                    
@@ -128,20 +187,35 @@
                                 Margin="20"
                                 MaxWidth="500"
                                 TextWrapping="Wrap" />
+                            
                             <ContextMenu.Template>
                                 <ControlTemplate TargetType="ContextMenu">
                                     <Border x:Name="Border" Background="#000451" BorderBrush="Gray" BorderThickness="1">
-                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="0" HorizontalAlignment="Center" />
+                                        <StackPanel
+                                            IsItemsHost="True"
+                                            KeyboardNavigation.DirectionalNavigation="Cycle"
+                                            Margin="0"
+                                            HorizontalAlignment="Center" />
                                     </Border>
                                 </ControlTemplate>
                             </ContextMenu.Template>
+                            
                             <ContextMenu.Resources>
                                 <Style TargetType="{x:Type MenuItem}">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                                                    <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                <Border
+                                                    x:Name="templateRoot"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Background="{TemplateBinding Background}"
+                                                    SnapsToDevicePixels="true">
+                                                    <ContentPresenter
+                                                        ContentSource="Header"
+                                                        Margin="{TemplateBinding Padding}"
+                                                        RecognizesAccessKey="True"
+                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                                                 </Border>
                                             </ControlTemplate>
                                         </Setter.Value>
@@ -151,6 +225,7 @@
                         </ContextMenu>
                     </local:DropDownButton.DropDown>
                 </local:DropDownButton>
+                
                 <TextBlock
                     Foreground="{StaticResource MainColor}"
                     FontWeight="Bold"
@@ -161,15 +236,31 @@
                     <Run Text="{x:Static lp:Resources.Server}" /><Run Text=": " /><Run Text="{Binding ServerName, Mode=OneWay}" />
                 </TextBlock>
             </DockPanel>
+            
             <DockPanel Grid.Row="1">
-                <TextBlock DockPanel.Dock="Left" Margin="15,8,15,3" Effect="{StaticResource Effect}" Foreground="{StaticResource MainColor}" FontWeight="Bold" FontSize="22" VerticalAlignment="Center">
-                    <Run Text="{x:Static lp:Resources.Tab_Games}" /><Run Text=" " /><Run Text="{Binding ServerGames.Count, StringFormat=(\{0\}), Mode=OneWay}" />
+                <TextBlock
+                    DockPanel.Dock="Left"
+                    Margin="15,8,15,3"
+                    Effect="{StaticResource Effect}"
+                    Foreground="{StaticResource MainColor}"
+                    FontWeight="Bold"
+                    FontSize="22"
+                    VerticalAlignment="Center">
+                    <Run Text="{x:Static lp:Resources.Tab_Games}" />
+                    <Run Text=" " />
+                    <Run Text="{Binding ServerGames.Count, StringFormat=(\{0\}), Mode=OneWay}" />
                 </TextBlock>
-                <local:DropDownButton Style="{StaticResource SIButton}" BorderThickness="0" FontSize="20" ToolTip="{x:Static lp:Resources.Filter}">
+                
+                <local:DropDownButton Style="{StaticResource SIDropDownButton}" FontSize="20" ToolTip="{x:Static lp:Resources.Filter}">
                     <local:DropDownButton.DropDown>
-                        <ContextMenu Placement="Right"
-                                     VerticalOffset="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.ActualHeight}"
-                                     HorizontalOffset="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource Multiplier}, ConverterParameter='-1'}">
+                        <ContextMenu
+                            Placement="Right"
+                            VerticalOffset="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.ActualHeight}"
+                            HorizontalOffset="{Binding
+                                RelativeSource={RelativeSource Self},
+                                Path=ActualWidth,
+                                Converter={StaticResource Multiplier},
+                                ConverterParameter='-1'}">
                             <ContextMenu.Resources>
                                 <Style TargetType="{x:Type MenuItem}">
                                     <Setter Property="Foreground" Value="{StaticResource MainColor}" />
@@ -181,10 +272,27 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                                <Border
+                                                    x:Name="templateRoot"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    Background="{TemplateBinding Background}"
+                                                    SnapsToDevicePixels="true">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <TextBlock Name="checkmark" Text="✔" Visibility="Hidden" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,5,10,0" FontSize="15" />
-                                                        <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                        <TextBlock
+                                                            Name="checkmark"
+                                                            Text="✔"
+                                                            Visibility="Hidden"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            Margin="10,5,10,0"
+                                                            FontSize="15" />
+                                                        
+                                                        <ContentPresenter
+                                                            ContentSource="Header"
+                                                            Margin="{TemplateBinding Padding}"
+                                                            RecognizesAccessKey="True"
+                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                     </StackPanel>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
@@ -202,17 +310,43 @@
                                     </Style.Triggers>
                                 </Style>
                             </ContextMenu.Resources>
-                            <MenuItem Header="{x:Static vmp:Resources.GamesFilter_New}" StaysOpenOnClick="True" IsCheckable="True" IsChecked="{Binding IsNew}" />
-                            <MenuItem Header="{x:Static vmp:Resources.GamesFilter_Sport}" StaysOpenOnClick="True" IsCheckable="True" IsChecked="{Binding IsSport}" />
-                            <MenuItem Header="{x:Static vmp:Resources.GamesFilter_Tv}" StaysOpenOnClick="True" IsCheckable="True" IsChecked="{Binding IsTv}" />
-                            <MenuItem Header="{x:Static vmp:Resources.GamesFilter_NoPassword}" StaysOpenOnClick="True" IsCheckable="True" IsChecked="{Binding IsNoPassword}" />
+                            
+                            <MenuItem
+                                Header="{x:Static vmp:Resources.GamesFilter_New}"
+                                StaysOpenOnClick="True"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsNew}" />
+                            
+                            <MenuItem
+                                Header="{x:Static vmp:Resources.GamesFilter_Sport}"
+                                StaysOpenOnClick="True"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsSport}" />
+                            
+                            <MenuItem
+                                Header="{x:Static vmp:Resources.GamesFilter_Tv}"
+                                StaysOpenOnClick="True"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsTv}" />
+                            
+                            <MenuItem
+                                Header="{x:Static vmp:Resources.GamesFilter_NoPassword}"
+                                StaysOpenOnClick="True"
+                                IsCheckable="True"
+                                IsChecked="{Binding IsNoPassword}" />
+                            
                             <ContextMenu.Template>
                                 <ControlTemplate TargetType="ContextMenu">
                                     <Border x:Name="Border" Background="#000451" BorderBrush="Gray" BorderThickness="1">
-                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="0" HorizontalAlignment="Center" />
+                                        <StackPanel
+                                            IsItemsHost="True"
+                                            KeyboardNavigation.DirectionalNavigation="Cycle"
+                                            Margin="0"
+                                            HorizontalAlignment="Center" />
                                     </Border>
                                 </ControlTemplate>
                             </ContextMenu.Template>
+                            
                             <ContextMenu.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" Effect="{StaticResource Effect}" />
@@ -222,8 +356,11 @@
                     </local:DropDownButton.DropDown>
                     <local:DropDownButton.Template>
                         <ControlTemplate TargetType="{x:Type ButtonBase}">
-                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}"
-                                    Padding="5,4">
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Padding="5,4">
                                 <TextBlock Effect="{StaticResource Effect}" VerticalAlignment="Center" HorizontalAlignment="Right">
                                     <Run Text="{Binding GamesFilterValue, Mode=OneWay}" /><Run Text=" ▾" FontSize="20" />
                                 </TextBlock>
@@ -232,8 +369,14 @@
                     </local:DropDownButton.Template>
                 </local:DropDownButton>
             </DockPanel>
+            
             <DockPanel Grid.Row="1" Grid.Column="1" Margin="35,-5,35,0">
-                <ProgressBar Height="5" DockPanel.Dock="Top" IsIndeterminate="{Binding IsProgress}" Foreground="#FF0000FF" VerticalAlignment="Center" >
+                <ProgressBar
+                    Height="5"
+                    DockPanel.Dock="Top"
+                    IsIndeterminate="{Binding IsProgress}"
+                    Foreground="#FF0000FF"
+                    VerticalAlignment="Center">
                     <ProgressBar.Style>
                         <Style TargetType="{x:Type ProgressBar}">
                             <Setter Property="Visibility" Value="Hidden" />
@@ -246,41 +389,87 @@
                     </ProgressBar.Style>
                 </ProgressBar>
             </DockPanel>
+            
             <DockPanel Grid.Row="2">
-                <DockPanel DockPanel.Dock="Top" Height="46" Background="{StaticResource WindowBackground}" ToolTip="{x:Static lp:Resources.Search}">
+                <DockPanel
+                    DockPanel.Dock="Top"
+                    Height="46"
+                    Background="{StaticResource WindowBackground}"
+                    ToolTip="{x:Static lp:Resources.Search}">
                     <TextBlock Text="🔎" VerticalAlignment="Center" Foreground="White" Margin="20,0,15,0" />
-                    <TextBox VerticalContentAlignment="Center" Foreground="White"
-                         Padding="2,0,0,0" Background="Transparent" BorderThickness="0"
-                         Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}" behaviors:FocusOnShown.IsAttached="True">
+                    
+                    <TextBox
+                        VerticalContentAlignment="Center"
+                        Foreground="White"
+                        Padding="2,0,0,0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}"
+                        behaviors:FocusOnShown.IsAttached="True">
                         <TextBox.CaretBrush>
                             <SolidColorBrush Color="White" />
                         </TextBox.CaretBrush>
                     </TextBox>
                 </DockPanel>
-                <Button DockPanel.Dock="Bottom" Height="46" Content="{x:Static lp:Resources.NewGame}" Style="{StaticResource SIButton}" Command="{Binding NewGame}" FontSize="28" Padding="0,8" />
-                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0"
-                    Margin="0,0,0,0" x:Name="gamesGrid" ItemsSource="{Binding ServerGames}"
-                    SelectedItem="{Binding CurrentGame}" IsSynchronizedWithCurrentItem="True"
-                    Background="#FFC0CFF4" ItemContainerStyle="{DynamicResource ListBoxItemStyle1}"
+                
+                <Button
+                    DockPanel.Dock="Bottom"
+                    Height="46"
+                    Content="{x:Static lp:Resources.NewGame}"
+                    Style="{StaticResource SIButton}"
+                    Command="{Binding NewGame}"
+                    FontSize="28"
+                    Padding="0,8" />
+                
+                <ListBox
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    BorderThickness="0"
+                    Margin="0,0,0,0"
+                    x:Name="gamesGrid"
+                    ItemsSource="{Binding ServerGames}"
+                    SelectedItem="{Binding CurrentGame}"
+                    IsSynchronizedWithCurrentItem="True"
+                    HorizontalContentAlignment="Stretch"
+                    Background="#FFC0CFF4"
+                    ItemContainerStyle="{DynamicResource ListBoxItemStyle1}"
                     FontFamily="Segoe UI">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Name="tb" Margin="4,0,0,0" Text="{Binding GameName}" FontSize="18" TextWrapping="Wrap"
-                                       TextTrimming="WordEllipsis" />
+                            <DockPanel HorizontalAlignment="Stretch">
+                                <TextBlock
+                                    Name="passwordMark"
+                                    Text="🔓"
+                                    DockPanel.Dock="Right"
+                                    Visibility="Hidden"
+                                    Margin="10,4,10,0"
+                                    FontSize="13"
+                                    Foreground="{StaticResource WindowBackground}"
+                                    ToolTip="{x:Static lp:Resources.PasswordRequired}" />
+
+                                <TextBlock
+                                    Margin="4,0,0,0"
+                                    Text="{Binding GameName}"
+                                    FontSize="18"
+                                    TextWrapping="Wrap"
+                                    TextTrimming="WordEllipsis" />
+                            </DockPanel>
+                            
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding PasswordRequired}" Value="True">
-                                    <Setter TargetName="tb" Property="Foreground" Value="#FF760000" />
+                                    <Setter TargetName="passwordMark" Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </DockPanel>
+            
             <DockPanel Grid.Row="2" Grid.Column="1" Background="#FF5A95E2" Margin="0,-5,0,0">
                 <UniformGrid DockPanel.Dock="Bottom" Grid.Row="3" Columns="3" Height="46">
                     <UniformGrid.Style>
                         <Style TargetType="{x:Type UniformGrid}">
                             <Setter Property="Visibility" Value="Visible" />
+                            
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentGame}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Hidden" />
@@ -288,14 +477,31 @@
                             </Style.Triggers>
                         </Style>
                     </UniformGrid.Style>
-                    <Button Margin="-2,0,0,0" Style="{StaticResource JoinButton}" CommandParameter="{x:Static data:GameRole.Showman}" Content="{x:Static lp:Resources.JoinAsShowman}" />
-                    <Button Margin="-2,0,0,0" Style="{StaticResource JoinButton}" CommandParameter="{x:Static data:GameRole.Player}" Content="{x:Static lp:Resources.JoinAsPlayer}" />
-                    <Button Margin="-2,0,-2,0" Style="{StaticResource JoinButton}" CommandParameter="{x:Static data:GameRole.Viewer}" Content="{x:Static lp:Resources.JoinAsViewer}" />
+                    
+                    <Button
+                        Margin="-2,0,0,0"
+                        Style="{StaticResource JoinButton}"
+                        CommandParameter="{x:Static data:GameRole.Showman}"
+                        Content="{x:Static lp:Resources.JoinAsShowman}" />
+                    
+                    <Button
+                        Margin="-2,0,0,0"
+                        Style="{StaticResource JoinButton}"
+                        CommandParameter="{x:Static data:GameRole.Player}"
+                        Content="{x:Static lp:Resources.JoinAsPlayer}" />
+                    
+                    <Button
+                        Margin="-2,0,-2,0"
+                        Style="{StaticResource JoinButton}"
+                        CommandParameter="{x:Static data:GameRole.Viewer}"
+                        Content="{x:Static lp:Resources.JoinAsViewer}" />
                 </UniformGrid>
+                
                 <Grid DockPanel.Dock="Bottom" Margin="5,0,5,5">
                     <Grid.Style>
                         <Style TargetType="{x:Type FrameworkElement}">
                             <Setter Property="Visibility" Value="Collapsed" />
+                            
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding CurrentGame.PasswordRequired}" Value="True">
                                     <Setter Property="Visibility" Value="Visible" />
@@ -303,24 +509,53 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
+                    
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="2*" />
                     </Grid.ColumnDefinitions>
+                    
                     <TextBlock Text="{x:Static lp:Resources.Password}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" />
-                    <TextBox Name="pwd" Grid.Column="1" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
-                             Visibility="{Binding ElementName=showPassword,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter1}}"
-                             Padding="1,1,0,1" VerticalContentAlignment="Center" Height="40"
-                             Background="{Binding Text.Length, Converter={StaticResource RequiredToColorConverter}, Mode=OneWay, RelativeSource={RelativeSource Self}}" />
-                    <PasswordBox Grid.Column="1"
-                                 Visibility="{Binding ElementName=showPassword,Path=IsChecked,Converter={StaticResource BooleanToCollapsedConverter}}"
-                                 behaviors:PasswordHelper.IsAttached="True"
-                                 behaviors:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
-                             Padding="1,1,0,1" VerticalContentAlignment="Center" Height="40"
-                             Background="{Binding ElementName=pwd, Path=Text.Length, Converter={StaticResource RequiredToColorConverter}, Mode=OneWay}" />
-                    <ToggleButton Name="showPassword" Style="{StaticResource SIButtonSimple}" Foreground="Black" BorderThickness="0" Grid.Column="1"
-                          Width="20" Height="20" HorizontalAlignment="Right" Margin="0,0,8,0" FontSize="10">👁</ToggleButton>
+                    
+                    <TextBox
+                        Name="pwd"
+                        Grid.Column="1"
+                        Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}"
+                        Visibility="{Binding ElementName=showPassword,Path=IsChecked,Converter={StaticResource BooleanToVisibilityConverter1}}"
+                        Padding="1,1,0,1"
+                        VerticalContentAlignment="Center"
+                        Height="40"
+                        Background="{Binding
+                            Text.Length,
+                            Converter={StaticResource RequiredToColorConverter},
+                            Mode=OneWay,
+                            RelativeSource={RelativeSource Self}}" />
+                    
+                    <PasswordBox
+                        Grid.Column="1"
+                        Visibility="{Binding ElementName=showPassword,Path=IsChecked,Converter={StaticResource BooleanToCollapsedConverter}}"
+                        behaviors:PasswordHelper.IsAttached="True"
+                        behaviors:PasswordHelper.Password="{Binding Password, Mode=TwoWay}"
+                        Padding="1,1,0,1"
+                        VerticalContentAlignment="Center"
+                        Height="40"
+                        Background="{Binding ElementName=pwd, Path=Text.Length, Converter={StaticResource RequiredToColorConverter}, Mode=OneWay}" />
+                    
+                    <ToggleButton
+                        Name="showPassword"
+                        Style="{StaticResource SIButtonSimple}"
+                        Foreground="Black"
+                        BorderThickness="0"
+                        Grid.Column="1"
+                        Width="20"
+                        Height="20"
+                        HorizontalAlignment="Right"
+                        Margin="0,0,8,0"
+                        FontSize="10">
+                        👁
+                    </ToggleButton>
                 </Grid>
+                
                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" TextBlock.FontFamily="Segoe UI">
                     <StackPanel>
                         <StackPanel.Resources>
@@ -330,7 +565,9 @@
                                 <Setter Property="Margin" Value="0,16,0,0" />
                             </Style>
                         </StackPanel.Resources>
+                        
                         <TextBlock Text="{Binding CurrentGame.GameName}" TextWrapping="Wrap" FontSize="26" FontWeight="Bold" Margin="18,18,20,0" />
+                        
                         <StackPanel DataContext="{Binding CurrentGame}" Margin="18,0,5,5" TextBlock.FontSize="16">
                             <StackPanel.Style>
                                 <Style TargetType="{x:Type StackPanel}">
@@ -341,6 +578,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
+                            
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Host}" />
                             <TextBlock Text="{Binding Owner}" />
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionPack}" />
@@ -348,11 +586,32 @@
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Rules}" />
                             <TextBlock Text="{Binding Rules}" />
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Showman}" />
-                            <TextBlock Text="{Binding Persons, ConverterParameter={x:Static data:GameRole.Showman}, Converter={StaticResource PersonsConverter}}" TextWrapping="Wrap" />
+                            
+                            <TextBlock
+                                Text="{Binding
+                                    Persons,
+                                    ConverterParameter={x:Static data:GameRole.Showman},
+                                    Converter={StaticResource PersonsConverter}}"
+                                TextWrapping="Wrap" />
+                            
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Players}" />
-                            <TextBlock Text="{Binding Persons, ConverterParameter={x:Static data:GameRole.Player}, Converter={StaticResource PersonsConverter}}" TextWrapping="Wrap" />
+                            
+                            <TextBlock
+                                Text="{Binding
+                                    Persons,
+                                    ConverterParameter={x:Static data:GameRole.Player},
+                                    Converter={StaticResource PersonsConverter}}"
+                                TextWrapping="Wrap" />
+                            
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Viewers}" />
-                            <TextBlock Text="{Binding Persons, ConverterParameter={x:Static data:GameRole.Viewer}, Converter={StaticResource PersonsConverter}}" TextWrapping="Wrap" />
+                            
+                            <TextBlock
+                                Text="{Binding
+                                    Persons,
+                                    ConverterParameter={x:Static data:GameRole.Viewer},
+                                    Converter={StaticResource PersonsConverter}}"
+                                TextWrapping="Wrap" />
+                            
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Status}" />
                             <TextBlock Text="{Binding Stage}" TextWrapping="Wrap" />
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Created}" />
@@ -363,12 +622,32 @@
                     </StackPanel>
                 </ScrollViewer>
             </DockPanel>
-            <TextBlock Grid.Row="0" Grid.Column="1" Margin="5,0,5,0" Foreground="#FFC10000" Text="{Binding Error}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="5,0,5,0"
+                Foreground="#FFC10000"
+                Text="{Binding Error}"
+                TextWrapping="Wrap"
+                TextTrimming="CharacterEllipsis"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" />
+            
             <TabControl Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,-5,0,0" Padding="0" BorderThickness="0" FontSize="23">
                 <TabItem Header="{x:Static lp:Resources.Tab_Chat}" Style="{StaticResource TabItemStyle1}">
                     <DockPanel TextBlock.FontFamily="Segoe UI">
                         <DockPanel DockPanel.Dock="Bottom" Height="46" Background="#FF5A95E2">
-                            <local:DropDownButton Style="{StaticResource SIButtonSimple}" Content="😃" BorderThickness="0" DockPanel.Dock="Right" VerticalAlignment="Top" Width="30" Height="30">
+                            <local:DropDownButton
+                                Style="{StaticResource SIDropDownButton}"
+                                Content="😃"
+                                ToolTip="{x:Static lp:Resources.Emoji}"
+                                BorderThickness="0"
+                                DockPanel.Dock="Right"
+                                VerticalAlignment="Top"
+                                Width="45"
+                                Height="45"
+                                FontSize="20">
                                 <local:DropDownButton.DropDown>
                                     <ContextMenu ItemsSource="{Binding Emoji}" PreviewMouseDown="ContextMenu_MouseDown">
                                         <ContextMenu.ItemsPanel>
@@ -376,24 +655,41 @@
                                                 <WrapPanel />
                                             </ItemsPanelTemplate>
                                         </ContextMenu.ItemsPanel>
+                                        
                                         <ContextMenu.ItemContainerStyle>
                                             <Style TargetType="MenuItem">
-                                                <Setter Property="Command" Value="{Binding DataContext.AddEmoji, RelativeSource={RelativeSource AncestorType=ContextMenu, AncestorLevel=1, Mode=FindAncestor}}" />
+                                                <Setter
+                                                    Property="Command"
+                                                    Value="{Binding
+                                                        DataContext.AddEmoji,
+                                                        RelativeSource={RelativeSource AncestorType=ContextMenu, AncestorLevel=1, Mode=FindAncestor}}" />
+                                                
                                                 <Setter Property="CommandParameter" Value="{Binding}" />
                                                 <Setter Property="FontSize" Value="25" />
                                                 <Setter Property="BorderThickness" Value="0" />
                                                 <Setter Property="Padding" Value="3" />
                                                 <Setter Property="Background" Value="#FF5A95E2" />
                                                 <Setter Property="Cursor" Value="Hand" />
+                                                
                                                 <Setter Property="Template">
                                                     <Setter.Value>
                                                         <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                            <Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                                                                <ContentPresenter ContentSource="Header" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                            <Border
+                                                                x:Name="templateRoot"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                Background="{TemplateBinding Background}"
+                                                                SnapsToDevicePixels="true">
+                                                                <ContentPresenter
+                                                                    ContentSource="Header"
+                                                                    Margin="{TemplateBinding Padding}"
+                                                                    RecognizesAccessKey="True"
+                                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                             </Border>
                                                         </ControlTemplate>
                                                     </Setter.Value>
                                                 </Setter>
+                                                
                                                 <Style.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter Property="Background" Value="#98B9FF" />
@@ -403,32 +699,55 @@
                                         </ContextMenu.ItemContainerStyle>
                                     </ContextMenu>
                                 </local:DropDownButton.DropDown>
+
+                                <local:DropDownButton.ContentTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Text="{Binding}"
+                                            Foreground="{StaticResource MainColor}"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center" />
+                                    </DataTemplate>
+                                </local:DropDownButton.ContentTemplate>
                             </local:DropDownButton>
-                            <TextBox x:Name="message"
-                                     Text="{Binding ChatText, UpdateSourceTrigger=PropertyChanged}"
-                                     Background="#FFC0CFF4"
-                                     Padding="1"
-                                     KeyDown="TextBox_KeyDown"
-                                     TextWrapping="Wrap"
-                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                     MaxLength="250"
-                                     FontSize="18" />
+                            
+                            <TextBox
+                                x:Name="message"
+                                Text="{Binding ChatText, UpdateSourceTrigger=PropertyChanged}"
+                                Background="#FFC0CFF4"
+                                Padding="1"
+                                KeyDown="TextBox_KeyDown"
+                                TextWrapping="Wrap"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                MaxLength="250"
+                                FontSize="18" />
                         </DockPanel>
-                        <RichTextBox x:Name="chat" Background="#FFC0CFF4" IsReadOnly="True" Padding="11,11"
-                                     FontWeight="Light" TextBlock.LineHeight="25" FontSize="18"
-                                     ScrollViewer.VerticalScrollBarVisibility="Visible" />
+                        
+                        <RichTextBox
+                            x:Name="chat"
+                            Background="#FFC0CFF4"
+                            IsReadOnly="True"
+                            Padding="11,11"
+                            FontWeight="Light"
+                            TextBlock.LineHeight="25"
+                            FontSize="18"
+                            ScrollViewer.VerticalScrollBarVisibility="Visible" />
                     </DockPanel>
                 </TabItem>
+                
                 <TabItem Style="{StaticResource TabItemStyle1}" Header="{Binding Users.Count}">
                     <TabItem.HeaderTemplate>
                         <DataTemplate>
                             <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3">
                                 <TextBlock Effect="{StaticResource Effect}" FontWeight="Bold" FontSize="23">
-                                    <Run Text="{x:Static lp:Resources.Tab_Players}" /><Run Text=" " /><Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
+                                    <Run Text="{x:Static lp:Resources.Tab_Players}" />
+                                    <Run Text=" " />
+                                    <Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
                                 </TextBlock>
                             </Border>
                         </DataTemplate>
                     </TabItem.HeaderTemplate>
+                    
                     <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18" TextBlock.FontFamily="Segoe UI">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -445,31 +764,56 @@
                     </ListBox>
                 </TabItem>
             </TabControl>
-            <ToggleButton Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="1" IsChecked="{Binding IsChatShown}" Width="34" Height="34" Margin="0,-2,0,0"
-                          Style="{StaticResource SIButtonSimple}" ToolTip="{Binding IsChatShown, Converter={StaticResource ShowChatToggleConverter}}"
-                          BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="15">👁</ToggleButton>
-            <ContentControl Style="{StaticResource navigatorStyle}" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2"
-                            DataContext="{Binding Content}" Content="{Binding Content.Data}" Tag="{Binding Content.Title}"
-                            Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter1}}">
+            
+            <ToggleButton
+                Grid.Column="1"
+                Grid.ColumnSpan="2"
+                Grid.Row="1"
+                IsChecked="{Binding IsChatShown}"
+                Width="34"
+                Height="34"
+                Margin="0,-2,0,0"
+                Style="{StaticResource SIToolButtonStyle}"
+                ToolTip="{Binding IsChatShown, Converter={StaticResource ShowChatToggleConverter}}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                FontSize="15">
+                👁
+            </ToggleButton>
+            
+            <ContentControl
+                Style="{StaticResource navigatorStyle}"
+                Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                DataContext="{Binding Content}"
+                Content="{Binding Content.Data}"
+                Tag="{Binding Content.Title}"
+                Visibility="{Binding Converter={StaticResource NotNullToVisibilityConverter1}}">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type lvm:GameSettingsViewModel}">
                         <local:NewGameView FontSize="16" />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:ComputerAccountViewModel}">
                         <local:ComputerAccountView FontSize="16" />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:ShowmanViewModel}">
                         <local:AccountView FontSize="16" />
                     </DataTemplate>
+                    
                     <DataTemplate DataType="{x:Type lvm:SIStorageViewModel}">
                         <local:SIStorageView />
                     </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
+            
             <ContentControl Grid.Row="2" Grid.ColumnSpan="2">
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Setter Property="Visibility" Value="Collapsed" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ShowProgress}" Value="True">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -477,10 +821,19 @@
                         </Style.Triggers>
                     </Style>
                 </ContentControl.Style>
+                
                 <Grid Background="#DDC0CFF4" Margin="0,10,0,0">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="{x:Static vmp:Resources.SendingPackageToServer}" TextAlignment="Center" HorizontalAlignment="Center" />
-                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding UploadProgress}" Foreground="Blue" Width="200" Height="10" Margin="0,10,0,0" />
+                        
+                        <ProgressBar
+                            Minimum="0"
+                            Maximum="100"
+                            Value="{Binding UploadProgress}"
+                            Foreground="Blue"
+                            Width="200"
+                            Height="10"
+                            Margin="0,10,0,0" />
                     </StackPanel>
                 </Grid>
             </ContentControl>

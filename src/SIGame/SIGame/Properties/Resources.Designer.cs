@@ -583,6 +583,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Emoji.
+        /// </summary>
+        public static string Emoji {
+            get {
+                return ResourceManager.GetString("Emoji", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Enable external media load.
         /// </summary>
         public static string EnableMediaLoad {
@@ -1222,6 +1231,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Local library.
+        /// </summary>
+        public static string LocalLibrary {
+            get {
+                return ResourceManager.GetString("LocalLibrary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на To play in LAN.
         /// </summary>
         public static string LocalNetworkOnly {
@@ -1474,7 +1492,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Next.
+        ///   Ищет локализованную строку, похожую на Next package.
         /// </summary>
         public static string Next {
             get {
@@ -1614,6 +1632,15 @@ namespace SIGame.Properties {
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Password required.
+        /// </summary>
+        public static string PasswordRequired {
+            get {
+                return ResourceManager.GetString("PasswordRequired", resourceCulture);
             }
         }
         
@@ -1762,7 +1789,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Questions library.
+        ///   Ищет локализованную строку, похожую на Online question library.
         /// </summary>
         public static string QuestionLibrary {
             get {
@@ -2199,6 +2226,15 @@ namespace SIGame.Properties {
         public static string SelectMainBackgroundFIleName {
             get {
                 return ResourceManager.GetString("SelectMainBackgroundFIleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select....
+        /// </summary>
+        public static string SelectMenu {
+            get {
+                return ResourceManager.GetString("SelectMenu", resourceCulture);
             }
         }
         
