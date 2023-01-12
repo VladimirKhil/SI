@@ -1,14 +1,14 @@
 ﻿using SICore;
 using SIData;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
 namespace SIGame.Converters;
 
-public sealed class PersonsConverter : IValueConverter
+public sealed class PersonsFilterConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -20,7 +20,7 @@ public sealed class PersonsConverter : IValueConverter
         var persons = (ConnectionPersonData[])value;
         var type = (GameRole)parameter;
 
-        var result = new StringBuilder();
+        var result = new List<string>();
 
         foreach (var person in persons)
         {
@@ -29,15 +29,10 @@ public sealed class PersonsConverter : IValueConverter
                 continue;
             }
 
-            if (result.Length > 0)
-            {
-                result.Append(", ");
-            }
-
-            result.Append(person.Name);
+            result.Add(person.Name);
         }
 
-        return result.ToString();
+        return result.ToArray();
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();

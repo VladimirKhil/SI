@@ -5,13 +5,13 @@ using SIUI.ViewModel;
 namespace SICore;
 
 /// <summary>
-/// Defines a game viewer.
+/// Defines a viewer behavior.
 /// </summary>
-public interface IViewer : ILogic
+public interface IViewerLogic : ILogic
 {
-    IPlayer PlayerLogic { get; }
+    IPlayerLogic PlayerLogic { get; }
 
-    IShowman ShowmanLogic { get; }
+    IShowmanLogic ShowmanLogic { get; }
 
     TableInfoViewModel TInfo { get; }
 

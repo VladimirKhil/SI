@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 

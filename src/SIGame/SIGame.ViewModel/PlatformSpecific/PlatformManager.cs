@@ -46,7 +46,7 @@ public abstract class PlatformManager : IUIThreadExecutor
 
     public abstract void Activate();
 
-    public abstract void PlaySound(string sound = null, double speed = 1.0, bool loop = false);
+    public abstract void PlaySound(string? sound = null, double speed = 1.0, bool loop = false);
 
     public abstract void SendErrorReport(Exception exc, bool isWarning = false);
 
@@ -57,4 +57,8 @@ public abstract class PlatformManager : IUIThreadExecutor
     public abstract ICommand Close { get; }
 
     public abstract IAnimatableTimer GetAnimatableTimer();
+
+    public abstract void ShowDialogWindow(object dataContext, Action onClose);
+
+    public abstract void CloseDialogWindow();
 }

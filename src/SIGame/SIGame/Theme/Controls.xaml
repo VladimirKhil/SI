@@ -3,6 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:l="clr-namespace:SIGame">
 
+    <FontFamily x:Key="Font">pack://application:,,,/SIGame;component/Fonts/#Montserrat</FontFamily>
+    
     <Color x:Key="Hover">#FF89B2FF</Color>
     <Color x:Key="ActiveColor">#FFCEE0FF</Color>
 
@@ -46,7 +48,6 @@
         <Setter Property="Foreground" Value="{StaticResource MainColor}" />
         <Setter Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Self}, Path=(TextBlock.Foreground)}" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
     </Style>
     
     <Style x:Key="SIButtonSimple" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonBase}">
@@ -267,16 +268,6 @@
 
     <!-- ContextMenu -->
 
-    <ControlTemplate x:Key="SIContextMenuTemplate" TargetType="ContextMenu">
-        <Border x:Name="Border" Background="{StaticResource WindowBackground}" BorderBrush="Gray" BorderThickness="1">
-            <StackPanel
-                IsItemsHost="True"
-                KeyboardNavigation.DirectionalNavigation="Cycle"
-                Margin="0"
-                HorizontalAlignment="Center" />
-        </Border>
-    </ControlTemplate>
-
     <Style x:Key="SIContextMenuItemStyle" TargetType="{x:Type MenuItem}">
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Height" Value="40" />
@@ -289,9 +280,24 @@
         </Style.Triggers>
     </Style>
 
+    <ControlTemplate x:Key="SIContextMenuTemplate" TargetType="ContextMenu">
+        <Border
+            x:Name="Border"
+            Background="{StaticResource WindowBackground}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+            <ItemsPresenter
+                KeyboardNavigation.DirectionalNavigation="Cycle"
+                Margin="0"
+                HorizontalAlignment="Center" />
+        </Border>
+    </ControlTemplate>
+
     <Style x:Key="SIContextMenuStyle" TargetType="ContextMenu">
         <Setter Property="Template" Value="{StaticResource SIContextMenuTemplate}" />
         <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontFamily" Value="{StaticResource Font}" />
+        <Setter Property="BorderBrush" Value="Gray" />
 
         <Style.Resources>
             <Style x:Key="{x:Type MenuItem}" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SIContextMenuItemStyle}" />

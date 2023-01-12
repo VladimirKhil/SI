@@ -495,4 +495,7 @@
   <data name="InvalidAvatarData" xml:space="preserve">
     <value>Invalid avatar data</value>
   </data>
+  <data name="GameRule_Classic" xml:space="preserve">
+    <value>classic</value>
+  </data>
 </root>

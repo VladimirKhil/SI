@@ -13,8 +13,7 @@
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
     Title="{x:Static lp:Resources.AppSettings}"
-    FontSize="20"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+    FontSize="20">
     <StackPanel DataContext="{Binding MainMenu}" Margin="10">
         <StackPanel.Resources>
             <Style TargetType="CheckBox" BasedOn="{StaticResource CheckBoxBase}">
@@ -28,7 +27,7 @@
             <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                 <Setter Property="Foreground" Value="{StaticResource MainColor}" />
                 <Setter Property="Padding" Value="10,6" />
-                <Setter Property="FontSize" Value="25" />
+                <Setter Property="FontSize" Value="23" />
                 <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
             </Style>
             

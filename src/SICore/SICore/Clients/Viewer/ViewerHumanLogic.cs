@@ -16,7 +16,7 @@ namespace SICore;
 /// <summary>
 /// Логика зрителя-человека
 /// </summary>
-public class ViewerHumanLogic : Logic<ViewerData>, IViewer
+public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 {
     private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
 
@@ -35,9 +35,9 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewer
 
     public bool CanSwitchType => true;
 
-    public IPlayer PlayerLogic { get; }
+    public IPlayerLogic PlayerLogic { get; }
 
-    public IShowman ShowmanLogic { get; }
+    public IShowmanLogic ShowmanLogic { get; }
 
     public ViewerHumanLogic(ViewerData data, ViewerActions viewerActions, ILocalizer localizer)
         : base(data)

@@ -403,6 +403,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на classic.
+        /// </summary>
+        public static string GameRule_Classic {
+            get {
+                return ResourceManager.GetString("GameRule_Classic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на ignore wrong.
         /// </summary>
         public static string GameRule_IgnoreWrong {

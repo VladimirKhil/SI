@@ -9,6 +9,7 @@ using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -17,9 +18,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     public const string MainMenuSound = "main_menu";
 
     public ICommand NewGame { get; private set; }
+
     public IAsyncCommand Open { get; private set; }
+
     public ICommand NetworkGame { get; private set; }
+
     public ICommand BestPlayers { get; private set; }
+
     public ICommand About { get; private set; }
 
     public ICommand SetProfile { get; private set; }
@@ -214,7 +219,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         IViewerClient host,
         bool isNetworkGame,
         bool isOnline,
-        string tempDocFolder,
+        string? tempDocFolder,
         IFileShare? fileShare,
         int networkGamePort = -1)
     {

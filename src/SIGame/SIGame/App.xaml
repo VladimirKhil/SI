@@ -9,6 +9,7 @@
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
+    xmlns:sc="clr-namespace:SICore;assembly=SICore"
     DispatcherUnhandledException="Application_DispatcherUnhandledException"
     Startup="Application_Startup"
     Exit="Application_Exit"
@@ -36,7 +37,6 @@
             <DropShadowEffect x:Key="DeepEffect" ShadowDepth="10" />
 
             <Style TargetType="{x:Type TextBlock}" x:Key="CommonText" BasedOn="{StaticResource ShadowedText}">
-                <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
                 <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             </Style>
 
@@ -74,8 +74,6 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
-            <RoutedCommand x:Key="PauseCommand" />
 
             <localc:EqualityConverter x:Key="Equals" />
 
@@ -146,6 +144,38 @@
                 <Setter Property="Margin" Value="0,15,15,0" />
             </Style>
 
+            <Style x:Key="PopupButtonStyle" TargetType="Button" BasedOn="{StaticResource SIToolButtonStyle}">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="Width" Value="30" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Padding" Value="0,1,1,0" />
+                <Setter Property="FontSize" Value="40" />
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Command" Value="{Binding Popup}" />
+                <Setter Property="ToolTip" Value="{x:Static lp:Resources.PopupHint}" />
+
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Path
+                                Data="M0,19L20,0L8,0.2M20,-1.5L20,10"
+                                Stroke="{StaticResource MainColor}"
+                                StrokeThickness="2"
+                                StrokeLineJoin="Bevel"
+                                Stretch="Uniform"
+                                Margin="2" />
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <Trigger Property="Command" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="windowStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="RenderTransform">
                     <Setter.Value>
@@ -175,10 +205,11 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <ProgressBar
-                                        Grid.ColumnSpan="2"
+                                        Grid.ColumnSpan="3"
                                         Foreground="DarkBlue"
                                         IsIndeterminate="True"
                                         Height="4"
@@ -194,8 +225,10 @@
                                         Margin="20,24,10,4"
                                         VerticalAlignment="Center" />
 
+                                    <Button Grid.Column="1" x:Name="bPopup" Style="{StaticResource PopupButtonStyle}" Margin="0,15,15,0" />
+
                                     <Button
-                                        Grid.Column="1"
+                                        Grid.Column="2"
                                         x:Name="bClose"
                                         Style="{StaticResource CloseButton}"
                                         HorizontalContentAlignment="Stretch"
@@ -217,7 +250,7 @@
 
                                     <ContentPresenter
                                         Grid.Row="1"
-                                        Grid.ColumnSpan="2"
+                                        Grid.ColumnSpan="3"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center" />
                                 </Grid>
@@ -241,6 +274,13 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
+
+                                <DataTrigger
+                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}}"
+                                        Value="{x:Null}">
+                                    <Setter TargetName="bPopup" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="bClose" Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -285,10 +325,11 @@
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
                                     <ProgressBar
-                                        Grid.ColumnSpan="2"
+                                        Grid.ColumnSpan="3"
                                         Foreground="DarkBlue"
                                         Height="8"
                                         VerticalAlignment="Top"
@@ -296,11 +337,10 @@
                                         Maximum="100"
                                         Value="{Binding
                                             Mode=OneWay,
-                                            RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor},
-                                            Path=DataContext.Timers[2].Time,
+                                            Path=Timers[2].Time,
                                             Converter={StaticResource ReverseTimeConverter}}" />
 
-                                    <Rectangle Grid.Row="1" Grid.ColumnSpan="2" Fill="#FF183CF3" />
+                                    <Rectangle Grid.Row="1" Grid.ColumnSpan="3" Fill="#FF183CF3" />
 
                                     <TextBlock
                                         Grid.Row="1"
@@ -314,6 +354,13 @@
                                     <Button
                                         Grid.Row="1"
                                         Grid.Column="1"
+                                        x:Name="bPopup"
+                                        Style="{StaticResource PopupButtonStyle}"
+                                        Margin="0,15,0,0" />
+
+                                    <Button
+                                        Grid.Row="1"
+                                        Grid.Column="2"
                                         x:Name="bClose"
                                         Style="{StaticResource CloseButton}"
                                         HorizontalContentAlignment="Stretch"
@@ -333,7 +380,7 @@
                                             Margin="5" />
                                     </Button>
 
-                                    <ContentPresenter Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <ContentPresenter Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Grid>
                             </Border>
 
@@ -355,6 +402,13 @@
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
+
+                                <DataTrigger
+                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}}"
+                                        Value="{x:Null}">
+                                    <Setter TargetName="bPopup" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="bClose" Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -555,84 +609,6 @@
                     </Setter.Value>
                 </Setter>
 
-                <Style.Triggers>
-                    <Trigger Property="Content" Value="{x:Null}">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-
-            <Style x:Key="embeddedStyle" TargetType="{x:Type ContentControl}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ContentControl}">
-                            <Border
-                                Name="Bd"
-                                BorderBrush="{StaticResource WindowBorderColor}"
-                                Background="{StaticResource WindowBackground}"
-                                BorderThickness="3.75"
-                                TextBlock.Foreground="{StaticResource MainColor}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <ProgressBar
-                                        Grid.ColumnSpan="2"
-                                        Foreground="DarkBlue"
-                                        IsIndeterminate="True"
-                                        Height="4"
-                                        VerticalAlignment="Top"
-                                        DataContext="{Binding Data}"
-                                        Style="{StaticResource MainProgress}" />
-
-                                    <TextBlock
-                                        Text="{TemplateBinding Tag}"
-                                        Style="{StaticResource CommonText}"
-                                        FontSize="30"
-                                        FontWeight="Bold"
-                                        Margin="10,4"
-                                        VerticalAlignment="Center" />
-
-                                    <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top">
-                                        <Button
-                                            x:Name="bClose"
-                                            Style="{StaticResource CloseButton}"
-                                            HorizontalContentAlignment="Stretch"
-                                            VerticalContentAlignment="Stretch"
-                                            Width="30"
-                                            Height="30"
-                                            Padding="0,1,1,0"
-                                            Command="{Binding Cancel}"
-                                            IsEnabled="{TemplateBinding IsEnabled}"
-                                            ToolTip="{x:Static lp:Resources.Close}"
-                                            IsCancel="True">
-                                            <Path
-                                                Data="M0,0L1,1M1,0L0,1"
-                                                Stroke="{StaticResource MainColor}"
-                                                StrokeThickness="2"
-                                                Stretch="Uniform"
-                                                Margin="5" />
-                                        </Button>
-                                    </StackPanel>
-
-                                    <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" />
-                                </Grid>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="Effect">
-                    <Setter.Value>
-                        <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
-                    </Setter.Value>
-                </Setter>
                 <Style.Triggers>
                     <Trigger Property="Content" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -921,7 +897,6 @@
             </Style>
 
             <Style x:Key="ComboBoxMainStyle" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-                <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
                 <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             </Style>
 
@@ -1014,7 +989,11 @@
                     <Setter.Value>
                         <DataTemplate>
                             <Border x:Name="border" Width="43" HorizontalAlignment="Center" Padding="7">
-                                <TextBlock Text="{Binding}" Effect="{StaticResource Effect}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                <TextBlock
+                                    Text="{Binding}"
+                                    Effect="{StaticResource Effect}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
                             </Border>
 
                             <DataTemplate.Triggers>
@@ -1043,8 +1022,7 @@
                 <Setter Property="Foreground" Value="White" />
                 <Setter Property="TextAlignment" Value="Center" />
                 <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Resources/#ITC Conduit Cyrillic" />
-                
+
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding IsConnected}" Value="False">
                         <Setter Property="Foreground" Value="Gray" />
@@ -1057,7 +1035,8 @@
                                 <Binding RelativeSource="{RelativeSource AncestorType=l:Studia}" Path="DataContext.Data.Name" />
                             </MultiBinding>
                         </DataTrigger.Binding>
-                        <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+                        
+                        <Setter Property="Foreground" Value="Orange" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -1192,7 +1171,6 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Text" Value="{Binding Replic}" />
                 <Setter Property="Margin" Value="10" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
             </Style>
 
             <Style x:Key="ReplicBorder" TargetType="Border">
@@ -1202,10 +1180,21 @@
             </Style>
 
             <Style x:Key="PlayerReplicBorder" TargetType="Border" BasedOn="{StaticResource ReplicBorder}">
-                <Setter Property="Width" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.96}" />
-                <Setter Property="Height" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.5}" />
-                <Setter Property="Canvas.Left" Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.254}" />
-                <Setter Property="Canvas.Top" Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.08}" />
+                <Setter
+                    Property="Width"
+                    Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.96}" />
+                
+                <Setter
+                    Property="Height"
+                    Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=0.5}" />
+                
+                <Setter
+                    Property="Canvas.Left"
+                    Value="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.254}" />
+                
+                <Setter
+                    Property="Canvas.Top"
+                    Value="{Binding ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}, Converter={StaticResource Multiplier}, ConverterParameter=-0.08}" />
                 
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Replic.Length, Mode=OneWay, Converter={StaticResource GreaterThan}, ConverterParameter=0}" Value="True">
@@ -1255,6 +1244,56 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+
+            <localc:ViewConverter x:Key="DialogSelector">
+                <localc:ViewConverter.DefaultView>
+                    <DataTemplate />
+                </localc:ViewConverter.DefaultView>
+
+                <localc:ViewConverter.Views>
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.AnswerValidation}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.AnswerCheck}">
+                            <l:AnswerValidationView DataContext="{Binding Data.PersonDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.ChangeSum}">
+                        <ContentControl Style="{StaticResource windowStyle}" Tag="{x:Static lp:Resources.SumChange}">
+                            <l:ChangeSumView DataContext="{Binding Data.ShowmanDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.Answer}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.YourAnswer}">
+                            <l:AnswerView DataContext="{Binding Data}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.CatCost}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.CatCost}">
+                            <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.Stake}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
+                            <l:StakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.FinalStake}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
+                            <l:SimpleStakeView DataContext="{Binding Data.PersonDataExtensions}" />
+                        </ContentControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static sc:DialogModes.Report}">
+                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.ReportTitle}">
+                            <l:GameReportView DataContext="{Binding Data.PlayerDataExtensions.Report}" />
+                        </ContentControl>
+                    </DataTemplate>
+                </localc:ViewConverter.Views>
+            </localc:ViewConverter>
         </ResourceDictionary>
     </Application.Resources>
     

@@ -7,15 +7,15 @@ namespace SICore;
 /// <summary>
 /// Defines a computer viewer logic.
 /// </summary>
-internal class ViewerComputerLogic : Logic<ViewerData>, IViewer
+internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 {
     protected readonly ViewerActions _viewerActions;
 
     public bool CanSwitchType => false;
 
-    public IPlayer PlayerLogic { get; }
+    public IPlayerLogic PlayerLogic { get; }
 
-    public IShowman ShowmanLogic { get; }
+    public IShowmanLogic ShowmanLogic { get; }
 
     protected sealed class TimerInfo
     {

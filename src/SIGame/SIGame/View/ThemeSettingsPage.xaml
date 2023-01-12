@@ -16,8 +16,7 @@
     Title="{x:Static lp:Resources.AppTheme}"
     FontSize="20"
     IsEnabled="{Binding Settings.IsEditable}"
-    d:DataContext="{d:DesignInstance vm:MainViewModel}"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+    d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
             <Setter Property="Margin" Value="0,30,0,0" />

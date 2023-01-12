@@ -6,7 +6,7 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-компьютера
 /// </summary>
-internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowman
+internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowmanLogic
 {
     //private readonly ViewerActions _viewerActions;
     //private readonly ViewerData _data;

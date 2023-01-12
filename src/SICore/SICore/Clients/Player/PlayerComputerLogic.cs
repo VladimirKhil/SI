@@ -11,7 +11,7 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-компьютера
 /// </summary>
-internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayer
+internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 {
     private ComputerAccount _account;
     //private readonly ViewerActions _viewerActions;

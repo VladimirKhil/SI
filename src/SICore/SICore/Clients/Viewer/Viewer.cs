@@ -9,9 +9,7 @@ using SIData;
 using SIPackages.Core;
 using SIUI.Model;
 using SIUI.ViewModel;
-using System.Numerics;
 using System.Text;
-using System.Xml.Linq;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -20,11 +18,11 @@ namespace SICore;
 /// Implements a game viewer.
 /// </summary>
 public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
-    where L : class, IViewer
+    where L : class, IViewerLogic
 {
     protected readonly ViewerActions _viewerActions;
 
-    public event Action? OnIsHostChanged;
+    public event Action? IsHostChanged;
 
     private bool _isHost;
 
@@ -40,7 +38,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             if (_isHost != value)
             {
                 _isHost = value;
-                OnIsHostChanged?.Invoke();
+                IsHostChanged?.Invoke();
 
                 if (ClientData.Kick != null)
                 {
@@ -75,20 +73,20 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
     public IConnector Connector { get; set; }
 
-    public IViewer MyLogic => _logic;
+    public IViewerLogic MyLogic => _logic;
 
-    public event Action<IViewerClient> Switch;
-    public event Action StageChanged;
+    public event Action<IViewerClient>? Switch;
+    public event Action<GameStage>? StageChanged;
     public event Action<string?>? Ad;
-    public event Action<bool> IsPausedChanged;
+    public event Action<bool>? IsPausedChanged;
 
     public ViewerData MyData => ClientData;
 
     public string Avatar { get; set; }
 
-    public event Action PersonConnected;
-    public event Action PersonDisconnected;
-    public event Action<int, string, string> Timer;
+    public event Action? PersonConnected;
+    public event Action? PersonDisconnected;
+    public event Action<int, string, string>? Timer;
 
     private void Initialize(bool isHost)
     {
@@ -210,7 +208,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
     public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 
-    private void Kick_Executed(object arg)
+    private void Kick_Executed(object? arg)
     {
         if (arg is not ViewerAccount person)
         {
@@ -232,7 +230,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         _viewerActions.SendMessage(Messages.Kick, person.Name);
     }
 
-    private void Ban_Executed(object arg)
+    private void Ban_Executed(object? arg)
     {
         if (arg is not ViewerAccount person)
         {
@@ -264,11 +262,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         _viewerActions.SendMessage(Messages.Unban, bannedInfo.Ip);
     }
 
-    private void ForceStart_Executed(object arg) => _viewerActions.SendMessage(Messages.Start);
+    private void ForceStart_Executed(object? arg) => _viewerActions.SendMessage(Messages.Start);
 
-    private void AddTable_Executed(object arg) => _viewerActions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
+    private void AddTable_Executed(object? arg) => _viewerActions.SendMessage(Messages.Config, MessageParams.Config_AddTable);
 
-    private void DeleteTable_Executed(object arg)
+    private void DeleteTable_Executed(object? arg)
     {
         for (var i = 0; i < ClientData.Players.Count; i++)
         {
@@ -627,7 +625,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         }
 
                         _logic.Stage();
-                        StageChanged?.Invoke();
+                        StageChanged?.Invoke(ClientData.Stage);
                         OnAd();
 
                         #endregion

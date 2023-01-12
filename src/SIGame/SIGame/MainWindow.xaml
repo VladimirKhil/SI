@@ -11,10 +11,11 @@
     Title="{x:Static lvmp:Resources.App_Name}" 
     Icon="Resources\game.ico"
     PreviewKeyDown="Window_KeyDown"
-    Closed="Window_Closed">
+    Closed="Window_Closed"
+    FontFamily="{StaticResource Font}">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
     </Window.CommandBindings>
     
-    <l:MainView x:Name="body" />
+    <l:MainView />
 </Window>

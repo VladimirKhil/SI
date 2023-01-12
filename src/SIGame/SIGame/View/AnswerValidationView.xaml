@@ -8,8 +8,7 @@
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
     mc:Ignorable="d"
-    Width="544"
-    TextBlock.FontFamily="Segoe UI">
+    Width="544">
     <UserControl.Resources>
         <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
             <Setter Property="Template">

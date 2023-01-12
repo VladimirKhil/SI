@@ -2,6 +2,7 @@
 using SICore;
 using SICore.Contracts;
 using SICore.Network.Servers;
+using SIData;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.ViewModel.Data;
@@ -64,19 +65,22 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         set { if (_isPaused != value) { _isPaused = value; OnPropertyChanged(); } }
     }
 
-    public event Action GameEnded;
+    public event Action? GameEnded;
 
     public CustomCommand Cancel { get; private set; }
 
+    public ICommand Popup { get; private set; }
+
+
     public bool IsOnline { get; set; }
 
-    public string TempDocFolder { get; set; }
+    public string? TempDocFolder { get; set; }
 
     public IAnimatableTimer[] Timers { get; } = new IAnimatableTimer[3];
 
-    private string _ad;
+    private string? _ad;
 
-    public string Ad
+    public string? Ad
     {
         get => _ad;
         set { _ad = value; OnPropertyChanged(); }
@@ -96,11 +100,36 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public ICommand EnableExtrenalMediaLoad { get; set; }
 
     private readonly IFileShare? _fileShare;
+
     private readonly ILogger<GameViewModel> _logger;
 
-    public GameViewModel(Node server, IViewerClient host, UserSettings userSettings, IFileShare? fileShare, ILogger<GameViewModel> logger)
+    private bool _gameStarted;
+
+    private bool _useDialogWindow;
+
+    private void DisableDialogWindow() => UseDialogWindow = false;
+
+    public bool UseDialogWindow
     {
-        _node = server;
+        get => _useDialogWindow;
+        set
+        {
+            if (_useDialogWindow != value)
+            {
+                _useDialogWindow = value;
+                OnPropertyChanged();
+
+                if (_useDialogWindow && _gameStarted)
+                {
+                    PlatformManager.Instance.ShowDialogWindow(this, DisableDialogWindow);
+                }
+            }
+        }
+    }
+
+    public GameViewModel(Node node, IViewerClient host, UserSettings userSettings, IFileShare? fileShare, ILogger<GameViewModel> logger)
+    {
+        _node = node;
         _fileShare = fileShare;
         _logger = logger;
 
@@ -108,10 +137,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _node.Reconnected += Server_Reconnected;
 
         Host = host ?? throw new ArgumentNullException(nameof(host));
+
         Host.Switch += Host_Switch;
-        Host.StageChanged += UpdateMoveCommand;
+        Host.StageChanged += Host_StageChanged;
         Host.PersonConnected += UpdateMoveCommand;
         Host.PersonDisconnected += UpdateMoveCommand;
+        Host.IsHostChanged += UpdateMoveCommand;
         Host.Timer += Host_Timer;
         Host.Ad += Host_Ad;
         Host.IsPausedChanged += Host_IsPausedChanged;
@@ -122,6 +153,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Move = new CustomCommand(Move_Executed) { CanBeExecuted = false };
         EndGame = new CustomCommand(EndGame_Executed);
         Cancel = new CustomCommand(Cancel_Executed);
+        Popup = new CustomCommand(arg => UseDialogWindow = true);
 
         EnableExtrenalMediaLoad = new CustomCommand(EnableExtrenalMediaLoad_Executed);
 
@@ -133,7 +165,22 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
     }
 
-    private void EnableExtrenalMediaLoad_Executed(object arg)
+    private void Host_StageChanged(GameStage gameStage)
+    {
+        if (gameStage == GameStage.Begin)
+        {
+            _gameStarted = true;
+
+            if (UseDialogWindow)
+            {
+                PlatformManager.Instance.ShowDialogWindow(this, DisableDialogWindow);
+            }
+        }
+
+        UpdateMoveCommand();
+    }
+
+    private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
         UserSettings.LoadExternalMedia = true;
         Host.MyLogic.ReloadMedia();
@@ -215,25 +262,24 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     private void Host_Switch(IViewerClient newHost)
     {
         newHost.Connector = Host.Connector;
-
-        if (newHost.Connector != null)
-        {
-            newHost.Connector.SetHost(newHost);
-        }
+        newHost.Connector?.SetHost(newHost);
 
         Host.Switch -= Host_Switch;
-        Host.StageChanged -= UpdateMoveCommand;
+        Host.StageChanged -= Host_StageChanged;
         Host.PersonConnected -= UpdateMoveCommand;
         Host.PersonDisconnected -= UpdateMoveCommand;
+        Host.IsHostChanged -= UpdateMoveCommand;
         Host.Timer -= Host_Timer;
         Host.Ad -= Host_Ad;
         Host.IsPausedChanged -= Host_IsPausedChanged;
+
         Host = newHost;
+
         Host.Switch += Host_Switch;
-        Host.StageChanged += UpdateMoveCommand;
+        Host.StageChanged += Host_StageChanged;
         Host.PersonConnected += UpdateMoveCommand;
         Host.PersonDisconnected += UpdateMoveCommand;
-        Host.OnIsHostChanged += UpdateMoveCommand;
+        Host.IsHostChanged += UpdateMoveCommand;
         Host.Timer += Host_Timer;
         Host.Ad += Host_Ad;
         Host.IsPausedChanged += Host_IsPausedChanged;
@@ -243,25 +289,21 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         OnPropertyChanged(nameof(TInfo));
     }
 
-    private void Move_Executed(object arg) => Host.Move(arg);
+    private void Move_Executed(object? arg) => Host.Move(arg);
 
-    private void Cancel_Executed(object arg)
+    private void Cancel_Executed(object? arg)
     {
-        if (Host.MyLogic is IPerson logic)
+        if (Host.MyLogic is IPersonLogic logic)
         {
             ((ViewerData)logic.Data).DialogMode = DialogModes.None;
             ((ViewerData)logic.Data).Hint = "";
         }
     }
 
-    private void ChangePauseInGame_Executed(object arg) => Host.Pause();
+    private void ChangePauseInGame_Executed(object? arg) => Host.Pause();
 
-    private void EndGame_Executed(object arg) => GameEnded?.Invoke();
+    private void EndGame_Executed(object? arg) => GameEnded?.Invoke();
 
-    /// <summary>
-    /// Изменилось значение свойства
-    /// </summary>
-    /// <param name="name">Имя свойства</param>
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -357,5 +399,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
                 Trace.TraceWarning($"Temp folder delete error: {exc}");
             }
         }
+
+        PlatformManager.Instance.CloseDialogWindow();
     }
 }

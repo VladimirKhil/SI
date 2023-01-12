@@ -16,7 +16,6 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     x:Name="main"
-    FontFamily="Segoe UI, Tahoma"
     d:DataContext="{d:DesignInstance lvm:MainViewModel}">
     <UserControl.Resources>
         <uic:Multiplier x:Key="Mult" />
@@ -37,9 +36,7 @@
             <Setter Property="Padding" Value="0,10,0,0" />
             <Setter Property="Command" Value="{Binding Command}" />
             <Setter Property="Content" Value="{Binding Header}" />
-            <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
-            <Setter Property="FontStretch" Value="Expanded" />
-            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontWeight" Value="Bold" />
             
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -392,8 +389,9 @@
                 Padding="{TemplateBinding Padding}">
                 <DockPanel>
                     <Border Background="#FF183CF3" DockPanel.Dock="Top">
-                        <StackPanel Orientation="Horizontal" Margin="8,8,0,8">
+                        <DockPanel Margin="8,8,0,8">
                             <Button
+                                DockPanel.Dock="Left"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
                                 Style="{StaticResource HamburgerButton}"
@@ -402,6 +400,7 @@
                                 ToolTip="{x:Static lp:Resources.Close}" />
 
                             <Button
+                                DockPanel.Dock="Left"
                                 Style="{StaticResource NavigationWindowBackButtonStyle}"
                                 HorizontalAlignment="Left"
                                 Cursor="Hand"
@@ -416,11 +415,12 @@
 
                             <TextBlock
                                 Style="{StaticResource CommonText}"
-                                FontSize="25"
+                                FontSize="21"
                                 VerticalAlignment="Center"
                                 Margin="5,1,0,0"
-                                Text="{Binding Content.Title, RelativeSource={RelativeSource TemplatedParent}}" />
-                        </StackPanel>
+                                Text="{Binding Content.Title, RelativeSource={RelativeSource TemplatedParent}}"
+                                TextTrimming="CharacterEllipsis" />
+                        </DockPanel>
                     </Border>
                     
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -472,7 +472,6 @@
                                 VerticalAlignment="Bottom"
                                 Foreground="White"
                                 FontSize="20"
-                                FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
                                 FontWeight="Bold"
                                 Margin="0,0,0,-15" />
 
@@ -571,7 +570,6 @@
                                     <ContextMenu
                                         Style="{StaticResource SIContextMenuStyle}"
                                         Placement="Bottom"
-                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
                                         ItemsSource="{Binding Source={StaticResource HumansMain2}}"
                                         ItemTemplate="{StaticResource HumanAccountTemplate}">
                                         <ContextMenu.ItemContainerStyle>
@@ -603,7 +601,6 @@
                                         Foreground="{StaticResource MainColor}"
                                         TextAlignment="Center"
                                         TextTrimming="CharacterEllipsis"
-                                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
                                         Margin="0,5,0,0">
                                         <TextBlock.Effect>
                                             <DropShadowEffect ShadowDepth="2" Color="#FF555555" />
@@ -719,8 +716,7 @@
                 FontSize="24"
                 Padding="0,0,0,4"
                 Cursor="Hand"
-                BorderThickness="0"
-                FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                BorderThickness="0">
                 <my:DropDownButton.ContentTemplate>
                     <DataTemplate>
                         <TextBlock
@@ -762,8 +758,7 @@
                         Placement="Relative"
                         HorizontalOffset="-20"
                         VerticalOffset="-128"
-                        Background="{StaticResource WindowBackground}"
-                        FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+                        Background="{StaticResource WindowBackground}">
                         <ContextMenu.Resources>
                             <ControlTemplate x:Key="MenuTemplate" TargetType="{x:Type MenuItem}">
                                 <Border
@@ -864,7 +859,7 @@
                                     <DataTemplate>
                                         <Border
                                             Background="{StaticResource WindowBackground}"
-                                            Width="350"
+                                            Width="380"
                                             HorizontalAlignment="Left"
                                             BorderBrush="{StaticResource MainColor}"
                                             BorderThickness="0,0,1,0">

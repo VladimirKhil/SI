@@ -7,6 +7,7 @@ using SICore.Network.Clients;
 using SICore.Network.Configuration;
 using SICore.Network.Servers;
 using SIData;
+using SIGame.ViewModel.Models;
 using SIGame.ViewModel.PlatformSpecific;
 using SIGame.ViewModel.Properties;
 using SIStorageService.ViewModel;

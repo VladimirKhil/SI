@@ -8,7 +8,6 @@
     xmlns:vm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     Name="root"
     mc:Ignorable="d"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     FocusManager.FocusedElement="{Binding ElementName=tbName}"
     Loaded="UserControl_Loaded"
     d:DataContext="{d:DesignInstance vm:HumanAccountViewModel}">

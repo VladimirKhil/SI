@@ -556,6 +556,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game dialogs will be displayed here.
+        /// </summary>
+        public static string DialogPlaceholder {
+            get {
+                return ResourceManager.GetString("DialogPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Dialog window.
+        /// </summary>
+        public static string DialogWindow {
+            get {
+                return ResourceManager.GetString("DialogWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Donate....
         /// </summary>
         public static string Donate {
@@ -1722,6 +1740,15 @@ namespace SIGame.Properties {
         public static string PlayerSum {
             get {
                 return ResourceManager.GetString("PlayerSum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Open in a new window.
+        /// </summary>
+        public static string PopupHint {
+            get {
+                return ResourceManager.GetString("PopupHint", resourceCulture);
             }
         }
         

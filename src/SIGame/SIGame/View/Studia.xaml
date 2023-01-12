@@ -12,12 +12,10 @@
     xmlns:localc="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
-    xmlns:sc="clr-namespace:SICore;assembly=SICore"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}"
     d:DesignHeight="5391.093"
     d:DesignWidth="7812.698"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     MouseRightButtonDown="UserControl_MouseRightButtonDown">
     <UserControl.Resources>
         <localc:EqualNumberToVisibilityConverter x:Key="ReplicC" />
@@ -35,10 +33,15 @@
 
         <Style x:Key="HiddenTextBlock" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIText}">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
+            
             <Style.Triggers>
                 <Trigger Property="Text" Value="">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </Trigger>
+                
+                <DataTrigger Binding="{Binding UseDialogWindow}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
             </Style.Triggers>
         </Style>
 
@@ -47,56 +50,6 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Margin" Value="4" />
         </Style>
-
-        <localc:ViewConverter x:Key="DialogSelector">
-            <localc:ViewConverter.DefaultView>
-                <DataTemplate />
-            </localc:ViewConverter.DefaultView>
-
-            <localc:ViewConverter.Views>
-                <DataTemplate x:Key="{x:Static sc:DialogModes.AnswerValidation}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.AnswerCheck}">
-                        <local:AnswerValidationView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.PersonDataExtensions}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.ChangeSum}">
-                    <ContentControl Style="{StaticResource windowStyle}" Tag="{x:Static lp:Resources.SumChange}">
-                        <local:ChangeSumView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.ShowmanDataExtensions}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.Answer}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.YourAnswer}">
-                        <local:AnswerView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.CatCost}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.CatCost}">
-                        <local:SimpleStakeView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.PersonDataExtensions}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.Stake}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
-                        <local:StakeView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.PersonDataExtensions}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.FinalStake}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
-                        <local:SimpleStakeView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.PersonDataExtensions}" />
-                    </ContentControl>
-                </DataTemplate>
-
-                <DataTemplate x:Key="{x:Static sc:DialogModes.Report}">
-                    <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.ReportTitle}">
-                        <local:GameReportView DataContext="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}, AncestorLevel=1}, Path=DataContext.Data.PlayerDataExtensions.Report}" />
-                    </ContentControl>
-                </DataTemplate>
-            </localc:ViewConverter.Views>
-        </localc:ViewConverter>
     </UserControl.Resources>
 
     <UserControl.Background>
@@ -171,8 +124,7 @@
                         Foreground="{StaticResource MainColor}"
                         Text="{x:Static lp:Resources.Pause}"
                         uib:FillManager.Fill="True"
-                        uib:FillManager.MaxFontSize="150"
-                        FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed">
+                        uib:FillManager.MaxFontSize="150">
 
                         <TextBlock.Effect>
                             <DropShadowEffect BlurRadius="2" Opacity="1" ShadowDepth="1" />
@@ -210,8 +162,7 @@
                         Margin="15"
                         lb:NavigationService.Text="{Binding Ad}"
                         uib:FillManager.Fill="True"
-                        uib:FillManager.MaxFontSize="130"
-                        FontFamily="pack://application:,,,/SIUI;component/Fonts/#Futura Condensed">
+                        uib:FillManager.MaxFontSize="130">
                         <TextBlock.Effect>
                             <DropShadowEffect BlurRadius="2" Opacity="1" ShadowDepth="1" />
                         </TextBlock.Effect>
@@ -255,8 +206,9 @@
                     TextAlignment="Center"
                     TextTrimming="CharacterEllipsis"
                     Foreground="Black"
-                    FontSize="24"
-                    Margin="73,24,15,0" />
+                    FontSize="18"
+                    LineHeight="18"
+                    Margin="73,30,15,0" />
 
                 <ContentControl Grid.Row="3" Content="{Binding}">
                     <ContentControl.Style>
@@ -323,8 +275,7 @@
             TextWrapping="Wrap"
             Padding="15,0"
             Background="White"
-            FontWeight="Bold"
-            FontFamily="Segoe UI">
+            FontWeight="Bold">
         </TextBlock>
 
         <StackPanel
@@ -339,9 +290,8 @@
                 FontSize="20"
                 Height="48"
                 Width="48"
+                Content="🔊"
                 ToolTip="{x:Static lp:Resources.VolumeControl}">
-                <local:DropDownButton.Content>🔊</local:DropDownButton.Content>
-                
                 <local:DropDownButton.DropDown>
                     <ContextMenu Placement="Right">
                         <ContextMenu.Template>
@@ -366,9 +316,8 @@
                 FontSize="20"
                 Height="48"
                 Width="48"
+                Content="⚙"
                 ToolTip="{x:Static lp:Resources.GameManagement}">
-                <local:DropDownButton.Content>⚙</local:DropDownButton.Content>
-
                 <local:DropDownButton.DropDown>
                     <ContextMenu Placement="Right">
                         <ContextMenu.Template>
@@ -416,6 +365,16 @@
                     <Binding ElementName="root" Path="ActualHeight" />
                 </MultiBinding>
             </ContentControl.Margin>
+
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding UseDialogWindow}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
         </ContentControl>
     </Grid>
 </UserControl>

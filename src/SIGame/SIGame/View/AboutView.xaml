@@ -9,8 +9,7 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:AboutViewModel}"
     Width="650"
-    FontSize="22"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+    FontSize="18">
     <UserControl.Resources>
         <Style x:Key="{x:Type TextBlock}" TargetType="{x:Type TextBlock}">
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -52,7 +51,7 @@
             </Hyperlink>
         </TextBlock>
         
-        <TextBlock Grid.Column="1" Grid.Row="6" TextWrapping="Wrap" Margin="-2,0,0,5">
+        <TextBlock Grid.Column="1" Grid.Row="6" TextWrapping="Wrap" Margin="0,0,0,5">
             <Run Text="{x:Static lp:Resources.About_Images}" />
             <Run Text=" " />
             

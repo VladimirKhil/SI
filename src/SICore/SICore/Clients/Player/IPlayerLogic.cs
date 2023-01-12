@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines a player behavior.
 /// </summary>
-public interface IPlayer : IPerson
+public interface IPlayerLogic : IPersonLogic
 {
     /// <summary>
     /// Окончание размышлений

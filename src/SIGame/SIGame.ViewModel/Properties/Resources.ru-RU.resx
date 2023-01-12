@@ -382,7 +382,7 @@
     <value>устная</value>
   </data>
   <data name="GameRule_Sport" xml:space="preserve">
-    <value>спортивная</value>
+    <value>упрощённая</value>
   </data>
   <data name="GameStage_Created" xml:space="preserve">
     <value>Создана</value>
@@ -491,5 +491,8 @@
   </data>
   <data name="InvalidAvatarData" xml:space="preserve">
     <value>Неверные данные аватара</value>
+  </data>
+  <data name="GameRule_Classic" xml:space="preserve">
+    <value>классическая</value>
   </data>
 </root>

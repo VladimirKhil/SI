@@ -8,9 +8,7 @@
       Title="{x:Static lp:Resources.Other}"
       xmlns:lp="clr-namespace:SIGame.Properties"
       xmlns:local="clr-namespace:SIGame"
-      FontSize="20"
-      FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
-
+      FontSize="20">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">
             <Setter Property="Margin" Value="0,30,0,0" />

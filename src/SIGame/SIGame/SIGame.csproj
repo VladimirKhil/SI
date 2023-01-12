@@ -45,6 +45,8 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Fonts\Montserrat-Bold.ttf" />
+    <Resource Include="Fonts\Montserrat-Thin.ttf" />
     <Resource Include="Fonts\Phenomena-Bold.otf" />
     <Resource Include="Fonts\Phenomena-Light.otf" />
     <Resource Include="Fonts\Phenomena-Thin.otf" />
@@ -220,10 +222,16 @@
     <None Remove="Fonts\10261.otf" />
     <None Remove="Fonts\10262.otf" />
     <None Remove="Fonts\10265.otf" />
+    <None Remove="Fonts\Montserrat-Bold.ttf" />
+    <None Remove="Fonts\Montserrat-Regular.ttf" />
+    <None Remove="Fonts\Montserrat-Thin.ttf" />
     <None Remove="Fonts\Phenomena-Bold.otf" />
     <None Remove="Fonts\Phenomena-Light.otf" />
     <None Remove="Fonts\Phenomena-Thin.otf" />
     <None Remove="Resources\game_button.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\Montserrat-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -240,6 +248,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Ben.Demystifier.LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="licenses\Montserrat.OFL.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Polly.LICENSE.txt">

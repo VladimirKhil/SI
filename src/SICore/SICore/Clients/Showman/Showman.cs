@@ -8,7 +8,7 @@ namespace SICore;
 /// <summary>
 /// Defines a showman message processor.
 /// </summary>
-public sealed class Showman : Viewer<IShowman>
+public sealed class Showman : Viewer<IShowmanLogic>
 {
     private readonly object _readyLock = new();
 
@@ -100,10 +100,10 @@ public sealed class Showman : Viewer<IShowman>
         });
     }
 
-    protected override IShowman CreateLogic(Account personData)
+    protected override IShowmanLogic CreateLogic(Account personData)
     {
         return personData.IsHuman ?
-            (IShowman)new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
+            (IShowmanLogic)new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
             new ShowmanComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
     }
 
@@ -343,6 +343,11 @@ public sealed class Showman : Viewer<IShowman>
         if (manageTableCommand != null)
         {
             manageTableCommand.CanBeExecuted = isPaused;
+        }
+
+        if (!isPaused)
+        {
+            _logic.ManageTable(false);
         }
     }
 

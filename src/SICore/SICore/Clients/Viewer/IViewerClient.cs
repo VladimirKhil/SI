@@ -1,49 +1,48 @@
-﻿using System;
+﻿using SIData;
 
-namespace SICore
+namespace SICore;
+
+/// <summary>
+/// Defines a common game viewer actor.
+/// </summary>
+public interface IViewerClient : IActor
 {
+    IConnector Connector { get; set; }
+
     /// <summary>
-    /// Defines a common game viewer actor.
+    /// Является ли владельцем сервера
     /// </summary>
-    public interface IViewerClient : IActor
-    {
-        IConnector Connector { get; set; }
+    bool IsHost { get; }
 
-        /// <summary>
-        /// Является ли владельцем сервера
-        /// </summary>
-        bool IsHost { get; }
+    ViewerData MyData { get; }
 
-        ViewerData MyData { get; }
+    IViewerLogic MyLogic { get; }
 
-        IViewer MyLogic { get; }
+    string Avatar { get; set; }
 
-        string Avatar { get; set; }
+    event Action PersonConnected;
 
-        event Action PersonConnected;
+    event Action PersonDisconnected;
 
-        event Action PersonDisconnected;
+    event Action<int, string, string> Timer;
 
-        event Action<int, string, string> Timer;
+    void GetInfo();
 
-        void GetInfo();
+    void Pause();
 
-        void Pause();
+    void Init();
 
-        void Init();
+    event Action<IViewerClient> Switch;
 
-        event Action<IViewerClient> Switch;
+    event Action<GameStage> StageChanged;
 
-        event Action StageChanged;
+    event Action<string?> Ad;
 
-        event Action<string?> Ad;
+    event Action<bool> IsPausedChanged;
 
-        event Action<bool> IsPausedChanged;
+    event Action IsHostChanged;
 
-        event Action OnIsHostChanged;
+    void RecreateCommands();
 
-        void RecreateCommands();
-
-        void Move(object arg);
-    }
+    void Move(object arg);
 }

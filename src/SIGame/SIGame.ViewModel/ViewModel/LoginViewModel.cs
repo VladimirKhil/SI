@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
@@ -51,7 +52,7 @@ public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
 
     public IAsyncCommand Enter { get; set; }
 
-    internal event Func<string, IGameServerClient, Task> Entered;
+    internal event Func<string, IGameServerClient, Task>? Entered;
 
     private readonly IGameServerClientFactory _gameServerClientFactory;
 
@@ -63,10 +64,10 @@ public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
         ShowFullError = new CustomCommand(ShowFullError_Executed);
     }
 
-    private void ShowFullError_Executed(object arg) =>
+    private void ShowFullError_Executed(object? arg) =>
         PlatformSpecific.PlatformManager.Instance.ShowMessage(FullError, PlatformSpecific.MessageType.Warning, true);
 
-    private async Task Enter_ExecutedAsync(object arg)
+    private async Task Enter_ExecutedAsync(object? arg)
     {
         lock (_loginLock)
         {
@@ -132,9 +133,9 @@ public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string name = null) =>
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     public void Dispose()

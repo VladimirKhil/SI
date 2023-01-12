@@ -7,7 +7,6 @@
     xmlns:local="clr-namespace:SIGame"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
-    xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
     mc:Ignorable="d" 
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -39,9 +38,7 @@
                             Text="{Binding}"
                             TextAlignment="Center"
                             VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            uib:FillManager.Fill="True"
-                            FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
+                            HorizontalAlignment="Center" />
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
@@ -94,11 +91,13 @@
         <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
             <Setter Property="Content" Value="⏸️" />
             <Setter Property="ToolTip" Value="{x:Static lp:Resources.Pause}" />
+            <Setter Property="FontSize" Value="20" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsPaused}" Value="True">
                     <Setter Property="Content" Value="▶️" />
                     <Setter Property="ToolTip" Value="{x:Static lp:Resources.Continue}" />
+                    <Setter Property="FontSize" Value="35" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -273,7 +272,8 @@
             Content="▶"
             Command="{Binding Move}"
             CommandParameter="1"
-            MaxWidth="100" />
+            MaxWidth="100"
+            FontSize="35" />
 
         <Button
             Grid.Row="2"
@@ -301,6 +301,7 @@
             Cursor="Hand"
             Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
             Content="✏️"
+            FontSize="20"
             ToolTip="{x:Static lp:Resources.EditTable}"
             Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
             ToolTipService.ShowOnDisabled="True">
@@ -331,7 +332,8 @@
             Command="{Binding Data.PlayerDataExtensions.Apellate}"
             Content="❗"
             CommandParameter="+"
-            Style="{StaticResource ApellateButton}" />
+            Style="{StaticResource ApellateButton}"
+            FontSize="20" />
         
         <Button
             Grid.Row="5"
@@ -341,7 +343,8 @@
             Command="{Binding Data.PlayerDataExtensions.Apellate}"
             Content="🤨"
             CommandParameter="-"
-            Style="{StaticResource ApellateButton}" />
+            Style="{StaticResource ApellateButton}"
+            FontSize="20" />
 
         <Button
             Grid.Row="5"
@@ -349,7 +352,8 @@
             Cursor="Hand"
             Command="{Binding Data.PlayerDataExtensions.Pass}"
             Content="⏩"
-            ToolTip="{x:Static lp:Resources.Pass}" />
+            ToolTip="{x:Static lp:Resources.Pass}"
+            FontSize="20" />
 
         <local:DropDownButton
             Grid.Row="5"
@@ -362,7 +366,6 @@
             BorderBrush="{StaticResource MainColor}"
             ToolTip="{x:Static lp:Resources.Manage_Hint}"
             Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
-            
             <local:DropDownButton.DropDown>
                 <ContextMenu Style="{StaticResource SIContextMenuStyle}" Placement="Top" FontSize="21">
                     <MenuItem
@@ -382,6 +385,7 @@
             Cursor="Hand"
             Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
             Content="💰"
+            FontSize="20"
             ToolTip="{x:Static lp:Resources.Sums_Hint}" />
 
         <ToggleButton

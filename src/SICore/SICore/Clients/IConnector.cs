@@ -1,25 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿namespace SICore;
 
-namespace SICore
+public interface IConnector
 {
-    public interface IConnector
-    {
-        string ServerAddress { get; }
+    string ServerAddress { get; }
 
-        string Error { get; }
+    string Error { get; }
 
-        bool CanRetry { get; }
+    bool CanRetry { get; }
 
-        bool IsReconnecting { get; }
+    bool IsReconnecting { get; }
 
-        int GameId { get; }
+    int GameId { get; }
 
-        Task<bool> ReconnectToServer();
+    Task<bool> ReconnectToServer();
 
-        Task RejoinGame();
+    Task RejoinGame();
 
-        void SetHost(IViewerClient newHost);
+    void SetHost(IViewerClient newHost);
 
-        void SetGameID(int gameID);
-    }
+    void SetGameID(int gameID);
 }

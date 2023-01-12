@@ -1,31 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SIGame.Converters
+namespace SIGame.Converters;
+
+public sealed class ViewConverter : IValueConverter
 {
-    public sealed class ViewConverter: IValueConverter
+    public Dictionary<object, DataTemplate> Views { get; set; } = new();
+
+    public DataTemplate? DefaultView { get; set; }
+
+    public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
-        public Dictionary<object, DataTemplate> Views { get; set; }
-        public DataTemplate DefaultView { get; set; }
-
-        public ViewConverter()
+        if (value != null && Views.TryGetValue(value, out var template))
         {
-            Views = new Dictionary<object, DataTemplate>();
+            return template;
         }
 
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            if (Views.TryGetValue(value, out var result))
-            {
-                return result;
-            }
-
-            return DefaultView;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-            => throw new NotImplementedException();
+        return DefaultView;
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

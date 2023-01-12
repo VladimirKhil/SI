@@ -14,18 +14,130 @@
     d:DesignHeight="300"
     d:DesignWidth="206"
     d:DataContext="{d:DesignInstance sc:PlayerAccount}">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="PersonArea" TargetType="{x:Type Button}">
+            <Border
+                Name="border"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Cursor="{TemplateBinding Cursor}">
+                <Grid>
+                    <Image Name="image" lb:ImageLoader.ImageSource="{Binding}" Stretch="Uniform" />
+
+                    <Rectangle
+                        Width="15"
+                        Height="15"
+                        Fill="{StaticResource MainColor}"
+                        Stroke="Black"
+                        Margin="0,0,-1,-1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Visibility="{Binding IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+
+                    <Rectangle
+                        Width="15"
+                        Height="15"
+                        Fill="LightGreen"
+                        Stroke="Black"
+                        Margin="0,0,-1,-1"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        ToolTip="{x:Static lp:Resources.MediaLoaded}"
+                        Visibility="{Binding MediaLoaded, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+
+                    <ProgressBar
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Stretch"
+                        Margin="-1,-12,-1,0"
+                        Height="10"
+                        Foreground="Blue"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
+                        Visibility="{Binding IsDeciding, Converter={StaticResource BooleanToVisibilityConverter1}, Delay=500}" />
+                </Grid>
+            </Border>
+
+            <ControlTemplate.Triggers>
+                <Trigger SourceName="image" Property="ActualWidth" Value="0">
+                    <Setter TargetName="border" Property="Background" Value="Transparent" />
+                    <Setter TargetName="border" Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter TargetName="border" Property="VerticalAlignment" Value="Stretch" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="PersonAreaStyle" TargetType="Button">
+            <Setter Property="Command" Value="{Binding Select}" />
+            <Setter Property="BorderBrush" Value="#FF111111" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Template" Value="{StaticResource PersonArea}" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding State}" Value="Press">
+                    <Setter Property="BorderBrush" Value="Yellow" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding State}" Value="Lost">
+                    <Setter Property="BorderBrush" Value="#FFF7820C" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding State}" Value="Right">
+                    <Setter Property="BorderBrush" Value="Lime" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding State}" Value="Wrong">
+                    <Setter Property="BorderBrush" Value="DarkRed" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding State}" Value="HasAnswered">
+                    <Setter Property="BorderBrush" Value="DarkViolet" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding State}" Value="Pass">
+                    <Setter Property="BorderBrush" Value="Gray" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding CanBeSelected}" Value="True">
+                    <Setter Property="BorderBrush" Value="Cyan" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding CanBeSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+
+                    <Setter Property="BorderBrush" Value="Orange" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    
     <Grid Style="{StaticResource area}">
         <Grid.RowDefinitions>
             <RowDefinition Height="35*" />
             
             <RowDefinition
-                Height="{Binding RelativeSource={RelativeSource AncestorType=Grid}, Path=ActualHeight, Converter={StaticResource RowHeightConverter}}" />
+                Height="{Binding
+                    RelativeSource={RelativeSource AncestorType=Grid},
+                    Path=ActualHeight,
+                    Converter={StaticResource RowHeightConverter}}" />
             
             <RowDefinition
-                Height="{Binding RelativeSource={RelativeSource AncestorType=Grid}, Path=ActualHeight, Converter={StaticResource RowHeightConverter}}" />
+                Height="{Binding
+                    RelativeSource={RelativeSource AncestorType=Grid},
+                    Path=ActualHeight,
+                    Converter={StaticResource RowHeightConverter}}" />
             
             <RowDefinition
-                Height="{Binding RelativeSource={RelativeSource AncestorType=Grid}, Path=ActualHeight, Converter={StaticResource RowHeightConverter}}" />
+                Height="{Binding
+                    RelativeSource={RelativeSource AncestorType=Grid},
+                    Path=ActualHeight,
+                    Converter={StaticResource RowHeightConverter}}" />
         </Grid.RowDefinitions>
         
         <Grid.ColumnDefinitions>
@@ -33,113 +145,9 @@
             <ColumnDefinition Width="15*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        
-        <Button Grid.Column="1">
-            <Button.Template>
-                <ControlTemplate TargetType="{x:Type Button}">
-                    <Border
-                        Name="border"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Cursor="{TemplateBinding Cursor}">
-                        <Grid>
-                            <Image Name="image" lb:ImageLoader.ImageSource="{Binding}" Stretch="Uniform" />
-                            
-                            <Rectangle
-                                Width="15"
-                                Height="15"
-                                Fill="{StaticResource MainColor}"
-                                Stroke="Black"
-                                Margin="0,0,-1,-1"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Visibility="{Binding IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}" />
 
-                            <Rectangle
-                                Width="15"
-                                Height="15"
-                                Fill="LightGreen"
-                                Stroke="Black"
-                                Margin="0,0,-1,-1"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Bottom"
-                                ToolTip="{x:Static lp:Resources.MediaLoaded}"
-                                Visibility="{Binding MediaLoaded, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+        <Button Grid.Column="1" Style="{StaticResource PersonAreaStyle}" />
 
-                            <ProgressBar
-                                VerticalAlignment="Top"
-                                HorizontalAlignment="Stretch"
-                                Margin="-1,-12,-1,0"
-                                Height="10"
-                                Foreground="Blue"
-                                Minimum="0"
-                                Maximum="100"
-                                Value="{Binding Mode=OneWay, RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}, Path=DataContext.Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
-                                Visibility="{Binding IsDeciding, Converter={StaticResource BooleanToVisibilityConverter1}, Delay=500}" />
-                        </Grid>
-                    </Border>
-                    
-                    <ControlTemplate.Triggers>
-                        <Trigger SourceName="image" Property="ActualWidth" Value="0">
-                            <Setter TargetName="border" Property="Background" Value="Transparent" />
-                            <Setter TargetName="border" Property="HorizontalAlignment" Value="Stretch" />
-                            <Setter TargetName="border" Property="VerticalAlignment" Value="Stretch" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Button.Template>
-            
-            <Button.Style>
-                <Style TargetType="Button">
-                    <Setter Property="Command" Value="{Binding Select}" />
-                    <Setter Property="BorderBrush" Value="#FF111111" />
-                    <Setter Property="BorderThickness" Value="2" />
-                    
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding State}" Value="Press">
-                            <Setter Property="BorderBrush" Value="Yellow" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding State}" Value="Lost">
-                            <Setter Property="BorderBrush" Value="#FFF7820C" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding State}" Value="Right">
-                            <Setter Property="BorderBrush" Value="Lime" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding State}" Value="Wrong">
-                            <Setter Property="BorderBrush" Value="DarkRed" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding State}" Value="HasAnswered">
-                            <Setter Property="BorderBrush" Value="DarkViolet" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding State}" Value="Pass">
-                            <Setter Property="BorderBrush" Value="Gray" />
-                        </DataTrigger>
-                        
-                        <DataTrigger Binding="{Binding CanBeSelected}" Value="True">
-                            <Setter Property="BorderBrush" Value="Cyan" />
-                            <Setter Property="Cursor" Value="Hand" />
-                        </DataTrigger>
-                        
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding CanBeSelected}" Value="True" />
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            
-                            <Setter Property="BorderBrush" Value="Orange" />
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
-        
         <Button
             Grid.Column="1"
             VerticalAlignment="Top"

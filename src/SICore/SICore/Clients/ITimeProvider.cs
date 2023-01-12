@@ -1,11 +1,10 @@
-﻿namespace SICore
+﻿namespace SICore;
+
+public interface ITimeProvider
 {
-    public interface ITimeProvider
-    {
-        int RoundTime { get; set; }
+    int RoundTime { get; set; }
 
-        int PressingTime { get; set; }
+    int PressingTime { get; set; }
 
-        int ThinkingTime { get; set; }
-    }
+    int ThinkingTime { get; set; }
 }

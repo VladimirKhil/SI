@@ -45,7 +45,7 @@ namespace SIGame
                 return;
             }
 
-            if (game.Host.MyLogic is IPlayer logic)
+            if (game.Host.MyLogic is IPlayerLogic logic)
             {
                 ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
             }
@@ -53,7 +53,7 @@ namespace SIGame
 
         public void OnMouseRightButtonDown()
         {
-            if (((GameViewModel)DataContext)?.Host?.MyLogic is IPlayer logic)
+            if (((GameViewModel)DataContext)?.Host?.MyLogic is IPlayerLogic logic)
             {
                 var pressCmd = ((ViewerData)logic.Data).PlayerDataExtensions.PressGameButton;
                 if (pressCmd != null && pressCmd.CanBeExecuted)

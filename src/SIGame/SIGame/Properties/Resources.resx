@@ -1080,4 +1080,13 @@
   <data name="SelectMenu" xml:space="preserve">
     <value>Select...</value>
   </data>
+  <data name="DialogPlaceholder" xml:space="preserve">
+    <value>Game dialogs will be displayed here</value>
+  </data>
+  <data name="DialogWindow" xml:space="preserve">
+    <value>Dialog window</value>
+  </data>
+  <data name="PopupHint" xml:space="preserve">
+    <value>Open in a new window</value>
+  </data>
 </root>

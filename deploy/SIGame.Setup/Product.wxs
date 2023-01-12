@@ -357,6 +357,9 @@
 		<Component Guid="{FCD1B58A-5BA3-4258-8A72-A1423D9A79EF}">
 			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
 		</Component>
+		<Component Guid="{9F4DDFD8-2EF0-44BF-A991-5F0D19A787A9}">
+			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Montserrat.OFL.txt" />
+		</Component>
         <Component Id="LicensesReg" Guid="{4C7D3CA0-40F4-437A-8ED2-9C037D2B607C}">
             <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
             <RemoveFolder Id="LicensesFolder" On="uninstall" />

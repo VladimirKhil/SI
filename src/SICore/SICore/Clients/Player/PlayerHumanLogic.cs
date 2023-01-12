@@ -10,7 +10,7 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-человека
 /// </summary>
-internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayer
+internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 {
     //private readonly ViewerActions _viewerActions;
     //private readonly ViewerData _data;

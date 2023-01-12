@@ -570,7 +570,7 @@ public sealed class ViewerData : Data
         }
     }
 
-    internal event Action AutoReadyChanged;
+    internal event Action? AutoReadyChanged;
 
     private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();
 }

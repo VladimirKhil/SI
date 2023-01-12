@@ -15,15 +15,14 @@
     d:DesignWidth="1960.521"
     Title="{x:Static lp:Resources.GameRules}"
     FontSize="20"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
-    
     <Page.Resources>
         <ObjectDataProvider x:Key="GameModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="data:GameModes"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        
         <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type data:GameModes}" />
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
@@ -64,10 +63,23 @@
     </Page.Resources>
 
     <StackPanel DataContext="{Binding Settings}" Margin="10,5" IsEnabled="{Binding IsEditable}">
-        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}" VerticalAlignment="Center" FontSize="20" Margin="5,10" TextWrapping="Wrap" />
+        <TextBlock
+            Style="{StaticResource CommonText}"
+            Foreground="White"
+            Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}"
+            VerticalAlignment="Center"
+            FontSize="20"
+            Margin="5,10"
+            TextWrapping="Wrap" />
+        
         <TextBlock Text="{x:Static lp:Resources.GameType}" Style="{StaticResource Header}" />
         
-        <ComboBox Style="{StaticResource ComboBoxStyle}" Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={StaticResource GameModes}}" SelectedValue="{Binding GameMode}">
+        <ComboBox
+            Style="{StaticResource ComboBoxStyle}"
+            Foreground="White"
+            FontWeight="Light"
+            ItemsSource="{Binding Source={StaticResource GameModes}}"
+            SelectedValue="{Binding GameMode}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Converter={StaticResource GameModesConverter}}" FontWeight="Light" />
@@ -89,7 +101,10 @@
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.DenyPressWhileReading}" />
         
-        <CheckBox IsChecked="{Binding Model.PartialText}" Style="{StaticResource HeaderBox}" IsEnabled="{Binding Model.FalseStart, Converter={StaticResource NotToCheckedConverter}}">
+        <CheckBox
+            IsChecked="{Binding Model.PartialText}"
+            Style="{StaticResource HeaderBox}"
+            IsEnabled="{Binding Model.FalseStart, Converter={StaticResource NotToCheckedConverter}}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PartialQuestions}" />
         </CheckBox>
         
@@ -130,7 +145,18 @@
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.CharactersPerSecond}" />
         
         <DockPanel>
-            <local:NumericTextBox Style="{StaticResource {x:Type TextBox}}" DockPanel.Dock="Right" VerticalAlignment="Center" FontWeight="Light" Width="60" Margin="5,0,0,0" Padding="1" Text="{Binding Model.ReadingSpeed, UpdateSourceTrigger=PropertyChanged}" Minimum="1" Maximum="100" />
+            <local:NumericTextBox
+                Style="{StaticResource {x:Type TextBox}}"
+                DockPanel.Dock="Right"
+                VerticalAlignment="Center"
+                FontWeight="Light"
+                Width="60"
+                Margin="5,0,0,0"
+                Padding="1"
+                Text="{Binding Model.ReadingSpeed, UpdateSourceTrigger=PropertyChanged}"
+                Minimum="1"
+                Maximum="100" />
+            
             <Slider Value="{Binding Model.ReadingSpeed}" Margin="-5,0,0,0" Maximum="100" Minimum="1" VerticalAlignment="Center" />
         </DockPanel>
 

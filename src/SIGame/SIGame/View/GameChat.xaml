@@ -22,7 +22,7 @@
     
     <TabControl Padding="0" BorderThickness="0" FontSize="19">
         <TabItem Header="💬" ToolTip="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
-            <Grid TextBlock.FontFamily="Segoe UI">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="1" />
@@ -60,7 +60,7 @@
         </TabItem>
 
         <TabItem Header="👤" ToolTip="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
-            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
+            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                 <UniformGrid DockPanel.Dock="Bottom" Columns="2">
                     <Button
                         Style="{StaticResource SIButtonSimple}"
@@ -69,8 +69,8 @@
                         Padding="20,4"
                         Command="{Binding Kick}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
-                        FontSize="24"
-                        TextBlock.LineHeight="24"
+                        FontSize="18"
+                        TextBlock.LineHeight="18"
                         Content="{x:Static lp:Resources.Kick}" />
                     
                     <Button
@@ -80,8 +80,8 @@
                         Padding="20,4"
                         Command="{Binding Ban}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
-                        FontSize="24"
-                        TextBlock.LineHeight="24"
+                        FontSize="18"
+                        TextBlock.LineHeight="18"
                         Content="{x:Static lp:Resources.Ban}" />
                 </UniformGrid>
                 
@@ -92,7 +92,7 @@
                     FontSize="16">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock>
+                            <TextBlock Margin="0,5">
                                 <Run Text="{Binding Key, Mode=OneWay}" />
                                 
                                 <Run>
@@ -115,7 +115,7 @@
         </TabItem>
 
         <TabItem Header="🚫" ToolTip="{x:Static lp:Resources.BannedList}" Style="{StaticResource StudiaTab}">
-            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}" TextBlock.FontFamily="Segoe UI">
+            <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                 <Button
                     DockPanel.Dock="Bottom"
                     Style="{StaticResource SIButtonSimple}"
@@ -124,8 +124,8 @@
                     Padding="20,4"
                     Command="{Binding Unban}"
                     CommandParameter="{Binding Source={StaticResource Banned},Path=CurrentItem}"
-                    FontSize="24"
-                    TextBlock.LineHeight="24"
+                    FontSize="18"
+                    TextBlock.LineHeight="18"
                     Content="{x:Static lp:Resources.Unban}" />
 
                 <ListBox

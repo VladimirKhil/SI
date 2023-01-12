@@ -12,7 +12,6 @@
     xmlns:data="clr-namespace:SIData;assembly=SIData"
     x:Class="SIGame.SIOnlineView"
     FontSize="16"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     mc:Ignorable="d"
     d:DesignWidth="758"
     d:DesignHeight="416.8"
@@ -20,6 +19,7 @@
     <UserControl.Resources>
         <localc:RequiredToColorConverter x:Key="RequiredToColorConverter" ErrorBrush="{StaticResource ErrorColor}" />
         <localc:PersonsConverter x:Key="PersonsConverter" />
+        <localc:PersonsFilterConverter x:Key="PersonsFilterConverter" />
         <localc:DateTimeConverter x:Key="DateTimeConverter" />
         <localc:Multiplier x:Key="Multiplier" />
         <localc:EqualityToWeightConverter x:Key="EqualityToWeightConverter" />
@@ -121,6 +121,30 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="SerializedItemStyle" TargetType="TextBlock">
+            <Setter Property="Background" Value="#22FFFFFF" />
+            <Setter Property="Margin" Value="0,5,5,0" />
+            <Setter Property="Padding" Value="4" />
+        </Style>
+
+        <Style x:Key="SerializedCollectionStyle" TargetType="ItemsControl">
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Style="{StaticResource SerializedItemStyle}" />
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     
     <Grid>
@@ -178,7 +202,7 @@
                     ToolTip="{x:Static lp:Resources.ServerLicense}">
                     ⓘ
                     <local:DropDownButton.DropDown>
-                        <ContextMenu>
+                        <ContextMenu Style="{StaticResource SIContextMenuStyle}">
                             <TextBlock
                                 Text="{Binding ServerLicense}"
                                 Foreground="White"
@@ -268,7 +292,6 @@
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Setter Property="Padding" Value="0,10,40,10" />
                                     <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="FontFamily" Value="pack://application:,,,/SIGame;component/Fonts/#Phenomena" />
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="{x:Type MenuItem}">
@@ -295,6 +318,7 @@
                                                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                                     </StackPanel>
                                                 </Border>
+                                                
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsChecked" Value="True">
                                                         <Setter TargetName="checkmark" Property="Visibility" Value="Visible" />
@@ -303,6 +327,7 @@
                                             </ControlTemplate>
                                         </Setter.Value>
                                     </Setter>
+                                    
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Background" Value="#98B9FF" />
@@ -431,8 +456,7 @@
                     IsSynchronizedWithCurrentItem="True"
                     HorizontalContentAlignment="Stretch"
                     Background="#FFC0CFF4"
-                    ItemContainerStyle="{DynamicResource ListBoxItemStyle1}"
-                    FontFamily="Segoe UI">
+                    ItemContainerStyle="{DynamicResource ListBoxItemStyle1}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel HorizontalAlignment="Stretch">
@@ -556,7 +580,7 @@
                     </ToggleButton>
                 </Grid>
                 
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" TextBlock.FontFamily="Segoe UI">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style x:Key="Header" TargetType="{x:Type TextBlock}">
@@ -584,7 +608,9 @@
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionPack}" />
                             <TextBlock Text="{Binding PackageName}" TextWrapping="Wrap" />
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Rules}" />
-                            <TextBlock Text="{Binding Rules}" />
+
+                            <ItemsControl ItemsSource="{Binding Rules}" Style="{StaticResource SerializedCollectionStyle}" />
+
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Showman}" />
                             
                             <TextBlock
@@ -595,23 +621,21 @@
                                 TextWrapping="Wrap" />
                             
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Players}" />
-                            
-                            <TextBlock
-                                Text="{Binding
-                                    Persons,
+
+                            <ItemsControl
+                                ItemsSource="{Binding Persons,
                                     ConverterParameter={x:Static data:GameRole.Player},
-                                    Converter={StaticResource PersonsConverter}}"
-                                TextWrapping="Wrap" />
-                            
+                                    Converter={StaticResource PersonsFilterConverter}}"
+                                Style="{StaticResource SerializedCollectionStyle}" />
+
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Viewers}" />
-                            
-                            <TextBlock
-                                Text="{Binding
-                                    Persons,
+
+                            <ItemsControl
+                                ItemsSource="{Binding Persons,
                                     ConverterParameter={x:Static data:GameRole.Viewer},
-                                    Converter={StaticResource PersonsConverter}}"
-                                TextWrapping="Wrap" />
-                            
+                                    Converter={StaticResource PersonsFilterConverter}}"
+                                Style="{StaticResource SerializedCollectionStyle}" />
+
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Status}" />
                             <TextBlock Text="{Binding Stage}" TextWrapping="Wrap" />
                             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Created}" />
@@ -636,7 +660,7 @@
             
             <TabControl Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Margin="0,-5,0,0" Padding="0" BorderThickness="0" FontSize="23">
                 <TabItem Header="{x:Static lp:Resources.Tab_Chat}" Style="{StaticResource TabItemStyle1}">
-                    <DockPanel TextBlock.FontFamily="Segoe UI">
+                    <DockPanel>
                         <DockPanel DockPanel.Dock="Bottom" Height="46" Background="#FF5A95E2">
                             <local:DropDownButton
                                 Style="{StaticResource SIDropDownButton}"
@@ -649,7 +673,12 @@
                                 Height="45"
                                 FontSize="20">
                                 <local:DropDownButton.DropDown>
-                                    <ContextMenu ItemsSource="{Binding Emoji}" PreviewMouseDown="ContextMenu_MouseDown">
+                                    <ContextMenu
+                                        Style="{StaticResource SIContextMenuStyle}"
+                                        ItemsSource="{Binding Emoji}"
+                                        PreviewMouseDown="ContextMenu_MouseDown"
+                                        BorderThickness="1"
+                                        BorderBrush="{StaticResource MainColor}">
                                         <ContextMenu.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <WrapPanel />
@@ -748,7 +777,7 @@
                         </DataTemplate>
                     </TabItem.HeaderTemplate>
                     
-                    <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18" TextBlock.FontFamily="Segoe UI">
+                    <ListBox ItemsSource="{Binding Users}" Background="#FFC0CFF4" Padding="0,5" FontSize="18">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" Margin="10,5">

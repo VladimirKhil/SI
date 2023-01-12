@@ -13,7 +13,6 @@
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:data="clr-namespace:SIData;assembly=SIData"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     mc:Ignorable="d">
     <UserControl.Resources>
         <lc:PlusOneConverter x:Key="PlusOneConverter" />
@@ -291,7 +290,7 @@
     </UserControl.Resources>
     
     <Grid Background="#FF71A2E2">
-        <Grid IsEnabled="{Binding Content, Converter={StaticResource NullToBooleanConverter1}, ConverterParameter={x:Null}}" Margin="56,16,56,16">
+        <Grid IsEnabled="{Binding Content, Converter={StaticResource NullToBooleanConverter1}, ConverterParameter={x:Null}}" Margin="53,15,53,15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -418,6 +417,7 @@
             <TextBlock
                 Text="{x:Static lp:Resources.QuestionPack}"
                 Style="{StaticResource Header}"
+                Margin="5,5,5,0"
                 Grid.Row="2"
                 FontWeight="Medium"
                 VerticalAlignment="Center" />
@@ -570,10 +570,11 @@
             
             <Button
                 Style="{StaticResource SIButton}"
+                Margin="0,10,0,0"
                 Padding="30,6"
                 FontSize="19"
                 FontWeight="Medium"
-                Grid.Row="3"
+                Grid.Row="2"
                 Grid.Column="3"
                 Background="{StaticResource WindowBackground}"
                 HorizontalAlignment="Stretch"

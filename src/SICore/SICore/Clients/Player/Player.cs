@@ -13,7 +13,7 @@ namespace SICore
     /// <summary>
     /// Represents a game player.
     /// </summary>
-    public sealed class Player : Viewer<IPlayer>
+    public sealed class Player : Viewer<IPlayerLogic>
     {
         private readonly object _readyLock = new();
 
@@ -99,9 +99,9 @@ namespace SICore
             ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
         }
 
-        protected override IPlayer CreateLogic(Account personData) =>
+        protected override IPlayerLogic CreateLogic(Account personData) =>
             personData.IsHuman ?
-                (IPlayer)new PlayerHumanLogic(ClientData, null, _viewerActions, LO) :
+                (IPlayerLogic)new PlayerHumanLogic(ClientData, null, _viewerActions, LO) :
                 new PlayerComputerLogic(ClientData, (ComputerAccount)personData, _viewerActions);
 
         public override ValueTask DisposeAsync(bool disposing)

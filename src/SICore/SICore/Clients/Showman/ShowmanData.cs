@@ -5,7 +5,7 @@ using System.Windows.Input;
 namespace SICore;
 
 /// <summary>
-/// Данные ведущего
+/// Defines a showman data.
 /// </summary>
 public sealed class ShowmanData : INotifyPropertyChanged
 {

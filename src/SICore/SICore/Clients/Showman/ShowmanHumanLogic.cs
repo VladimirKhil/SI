@@ -7,7 +7,7 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-человека
 /// </summary>
-internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowman
+internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
 {
     //private readonly ViewerActions _viewerActions;
     //private readonly ViewerData _data;
@@ -184,5 +184,5 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowman
         }
     }
 
-    public void ManageTable() => TInfo.IsEditable = !TInfo.IsEditable;
+    public void ManageTable(bool? mode) => TInfo.IsEditable = mode ?? !TInfo.IsEditable;
 }

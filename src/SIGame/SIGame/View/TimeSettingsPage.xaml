@@ -10,7 +10,6 @@
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
-    FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena"
     Title="{x:Static lp:Resources.TimeSettings}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>

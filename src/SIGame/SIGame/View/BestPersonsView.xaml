@@ -1,23 +1,29 @@
-﻿<UserControl x:Class="SIGame.BestPersonsView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
-             xmlns:lp="clr-namespace:SIGame.Properties"
-             mc:Ignorable="d" Width="500" FontSize="18" FontFamily="pack://application:,,,/SIGame;component/Fonts/#Phenomena">
+﻿<UserControl
+    x:Class="SIGame.BestPersonsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    mc:Ignorable="d"
+    Width="500"
+    FontSize="18">
     <UserControl.Resources>
         <DropShadowEffect x:Key="SimpleEffect" ShadowDepth="1" BlurRadius="0" />
+        
         <Style x:Key="basic" TargetType="TextBlock">
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Margin" Value="2,3" />
         </Style>
     </UserControl.Resources>
+    
     <StackPanel Margin="15,10,15,15">
         <UniformGrid Rows="1">
             <TextBlock Text="{x:Static lp:Resources.Name}" Style="{StaticResource basic}" FontWeight="Bold" />
             <TextBlock Text="{x:Static lp:Resources.Result}" Style="{StaticResource basic}" FontWeight="Bold" />
         </UniformGrid>
+        
         <ItemsControl ItemsSource="{Binding}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="lvm:BestPlayer">
