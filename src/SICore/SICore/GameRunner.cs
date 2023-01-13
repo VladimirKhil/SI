@@ -21,7 +21,7 @@ public sealed class GameRunner
     private readonly IFileShare _fileShare;
     private readonly ComputerAccount[] _defaultPlayers;
     private readonly ComputerAccount[] _defaultShowmans;
-    private readonly string _documentPath;
+    private readonly string? _documentPath;
     private readonly IAvatarHelper _avatarHelper;
     private readonly bool _createHost;
 
@@ -33,7 +33,7 @@ public sealed class GameRunner
         IFileShare fileShare,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
-        string documentPath,
+        string? documentPath,
         IAvatarHelper avatarHelper,
         bool createHost = true)
     {

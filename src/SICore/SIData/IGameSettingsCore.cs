@@ -28,7 +28,20 @@ public interface IGameSettingsCore<out T> where T: IAppSettingsCore
     string NetworkGamePassword { get; }
 
     /// <summary>
-    /// Автоматическая игра
+    /// Defines a private game.
     /// </summary>
+    /// <remarks>
+    /// Private games are invisible in lobby game lists. They also do not allow to join for anybody except the host.
+    /// In private games game name and password do not matter.
+    /// </remarks>
+    bool IsPrivate { get; }
+
+    /// <summary>
+    /// Marks an autogame.
+    /// </summary>
+    /// <remarks>
+    /// Auto games starts automatically by timer or when they are full.
+    /// Human players join these games automatically when they decide to play with random opponents.
+    /// </remarks>
     bool IsAutomatic { get; }
 }

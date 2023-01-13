@@ -3219,6 +3219,11 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
+                if (!ClientData.BackLink.AreCustomAvatarsSupported)
+                {
+                    return null;
+                }
+
                 var complexName = $"{(personName != null ? personName + "_" : "")}{Path.GetFileName(avatarUri)}";
 
                 if (!_avatarHelper.FileExists(complexName))

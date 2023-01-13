@@ -39,7 +39,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     [DefaultValue(DefaultMultimediaPort)]
     public int MultimediaPort
     {
-        get { return _multimediaPort; }
+        get => _multimediaPort;
         set { _multimediaPort = value; OnPropertyChanged(); }
     }
 

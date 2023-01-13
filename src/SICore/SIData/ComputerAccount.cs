@@ -25,7 +25,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     [JsonProperty]
     public int V1
     {
-        get { return _v1; }
+        get => _v1;
         set { _v1 = value; OnPropertyChanged(); }
     }
 
@@ -41,7 +41,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     [JsonProperty]
     public int V2
     {
-        get { return _v2; }
+        get => _v2;
         set { _v2 = value; OnPropertyChanged(); OnPropertyChanged(nameof(V3Max)); OnPropertyChanged(nameof(Rest1)); }
     }
 
@@ -57,15 +57,12 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     [JsonProperty]
     public int V3
     {
-        get { return _v3; }
+        get => _v3;
         set { _v3 = value; OnPropertyChanged(); OnPropertyChanged(nameof(V2Max)); OnPropertyChanged(nameof(Rest1)); }
     }
 
     [XmlIgnore]
-    public int V3Max
-    {
-        get { return 100 - V2; }
-    }
+    public int V3Max => 100 - V2;
 
     private char[] _p1 = null;
 
@@ -75,7 +72,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     [JsonProperty]
     public char[] P1
     {
-        get { return _p1; }
+        get => _p1;
         set { _p1 = value; OnPropertyChanged(); }
     }
 

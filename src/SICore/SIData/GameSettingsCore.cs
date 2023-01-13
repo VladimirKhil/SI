@@ -6,11 +6,11 @@ namespace SIData;
 
 /// <inheritdoc cref="IGameSettingsCore{T}" />
 [DataContract]
-public class GameSettingsCore<T>: IGameSettingsCore<T>
+public class GameSettingsCore<T> : IGameSettingsCore<T>
     where T: AppSettingsCore, new()
 {
     /// <summary>
-    /// Имя живого игрока
+    /// Game host name.
     /// </summary>
     [DataMember]
     public string HumanPlayerName { get; set; }
@@ -39,13 +39,10 @@ public class GameSettingsCore<T>: IGameSettingsCore<T>
     [DataMember]
     public string NetworkGamePassword { get; set; }
 
-    /// <summary>
-    /// Разрешить допуск зрителей в сетевую игру
-    /// </summary>
     [XmlAttribute]
     [DefaultValue(false)]
     [DataMember]
-    public bool AllowViewers { get; set; }
+    public bool IsPrivate { get; set; }
 
     /// <summary>
     /// Ведущий игры
@@ -60,6 +57,7 @@ public class GameSettingsCore<T>: IGameSettingsCore<T>
     [XmlIgnore]
     [DataMember]
     public Account[] Players { get; set; }
+
     /// <summary>
     /// Зрители
     /// </summary>
@@ -68,14 +66,11 @@ public class GameSettingsCore<T>: IGameSettingsCore<T>
     public Account[] Viewers { get; set; } = Array.Empty<Account>();
 
     /// <summary>
-    /// Настройки, которые могут быть отредактированы пользователем, а также возвращены в состояние по умолчанию
+    /// User-defines game preferences and rules.
     /// </summary>
     [DataMember]
     public T AppSettings { get; set; } = new T();
 
-    /// <summary>
-    /// Является ли игра автоматической
-    /// </summary>
     [DefaultValue(false)]
     [DataMember]
     public bool IsAutomatic { get; set; }

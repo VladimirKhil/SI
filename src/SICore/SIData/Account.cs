@@ -34,7 +34,7 @@ public class Account : INotifyPropertyChanged
     [DataMember]
     public string Name
     {
-        get { return _name; }
+        get => _name;
         set { _name = value; OnPropertyChanged(); }
     }
 
@@ -85,9 +85,7 @@ public class Account : INotifyPropertyChanged
         set { if (_isHuman != value) { _isHuman = value; OnPropertyChanged(); } }
     }
 
-    public Account()
-    {
-    }
+    public Account() { }
 
     public Account(string name, bool isMale)
     {
