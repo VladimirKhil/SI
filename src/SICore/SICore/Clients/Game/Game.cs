@@ -22,7 +22,7 @@ namespace SICore;
 /// </summary>
 public sealed class Game : Actor<GameData, GameLogic>
 {
-    public event Action<bool, bool>? PersonsChanged;
+    public event Action<Game, bool, bool>? PersonsChanged;
 
     /// <summary>
     /// Informs the hosting environment that a person with provided name should be disconnected.
@@ -3164,7 +3164,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         return true;
     }
 
-    private void OnPersonsChanged(bool joined = true, bool withError = false) => PersonsChanged?.Invoke(joined, withError);
+    private void OnPersonsChanged(bool joined = true, bool withError = false) => PersonsChanged?.Invoke(this, joined, withError);
 
     private void InformAvatar(Account account)
     {
@@ -3231,7 +3231,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     _avatarHelper.AddFile(avatarUri, complexName);
                 }
 
-                path = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(complexName, UriKind.Relative)).AbsoluteUri;
+                path = _fileShare.CreateResourceUri(ResourceKind.Avatar, new Uri(complexName, UriKind.Relative)).ToString();
             }
 
             return local ? path : path.Replace("http://localhost", "http://" + Constants.GameHost);

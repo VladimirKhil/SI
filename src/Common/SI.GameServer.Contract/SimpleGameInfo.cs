@@ -1,9 +1,10 @@
-﻿namespace SI.GameServer.Contract
+﻿namespace SI.GameServer.Contract;
+
+public class SimpleGameInfo
 {
-    public class SimpleGameInfo
-    {
-        public int GameID { get; set; }
-        public string GameName { get; set; }
-        public bool PasswordRequired { get; set; }
-    }
+    public int GameID { get; set; }
+
+    public string GameName { get; set; }
+
+    public bool PasswordRequired { get; set; }
 }

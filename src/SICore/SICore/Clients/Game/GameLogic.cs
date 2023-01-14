@@ -47,6 +47,8 @@ public sealed class GameLogic : Logic<GameData>
     /// </summary>
     private const int PenaltyIncrement = 3;
 
+    public object? UserState { get; set; }
+
     private readonly GameActions _gameActions;
 
     private readonly ILocalizer LO;
@@ -59,11 +61,11 @@ public sealed class GameLogic : Logic<GameData>
 
     public bool IsRunning { get; set; }
 
-    public event Action<GameStages, string> StageChanged;
+    public event Action<GameLogic, GameStages, string> StageChanged;
 
     public event Action<string, int, int> AdShown;
 
-    internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(stage, stageName);
+    internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(this, stage, stageName);
 
     internal void OnAdShown(int adId) =>
         AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
@@ -484,13 +486,13 @@ public sealed class GameLogic : Logic<GameData>
                 {
                     msg2.Append(MessageParams.Atom_Uri)
                         .Append(Message.ArgsSeparatorChar)
-                        .Append(localUri ?? uri.AbsoluteUri);
+                        .Append(localUri ?? uri.ToString());
                 }
                 else
                 {
                     msg2.Append(MessageParams.Atom_Uri)
                         .Append(Message.ArgsSeparatorChar)
-                        .Append(uri.AbsoluteUri.Replace("http://localhost", $"http://{Constants.GameHost}"));
+                        .Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
                 }
 
                 _gameActions.SendMessage(msg2.ToString(), person);
@@ -4100,7 +4102,7 @@ public sealed class GameLogic : Logic<GameData>
                         }
                         else
                         {
-                            msg.Append(uri.AbsoluteUri.Replace("http://localhost", "http://" + Constants.GameHost));
+                            msg.Append(uri.ToString().Replace("http://localhost", "http://" + Constants.GameHost));
                         }
 
                         _gameActions.SendMessage(msg.ToString(), person);

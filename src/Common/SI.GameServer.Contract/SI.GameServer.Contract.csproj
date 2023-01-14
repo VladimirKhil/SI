@@ -7,6 +7,7 @@
     <Company>Khil-soft</Company>
     <Copyright>Copyright © Khil-soft 2018 - 2023</Copyright>
 	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

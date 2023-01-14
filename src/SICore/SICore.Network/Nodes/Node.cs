@@ -27,20 +27,25 @@ public abstract class Node : INode
 
     public abstract bool IsMain { get; }
 
-    public event Action<Exception, bool> Error;
+    public event Action<Exception, bool>? Error;
 
-    public event Action<Message, Exception> SerializationError;
+    public event Action<Message, Exception>? SerializationError;
 
-    public event Action Reconnecting;
+    public event Action? Reconnecting;
 
-    public event Action Reconnected;
+    public event Action? Reconnected;
+
+    public event Action<Node, bool>? ConnectionClosed;
 
     private bool _wrongUserMessageShown = false;
 
     protected void OnReconnecting() => Reconnecting?.Invoke();
+
     protected void OnReconnected() => Reconnected?.Invoke();
 
     public void OnError(Exception exc, bool isWarning) => Error?.Invoke(exc, isWarning);
+
+    public object? UserState { get; set; }
 
     public abstract IEnumerable<IConnection> Connections { get; }
 
@@ -59,7 +64,7 @@ public abstract class Node : INode
         ClearListeners(connection);
         await connection.DisposeAsync();
 
-        ConnectionClosed?.Invoke(withError);
+        ConnectionClosed?.Invoke(this, withError);
     }
 
     protected void ClearListeners(IConnection connection)
@@ -77,8 +82,6 @@ public abstract class Node : INode
         _serverConfiguration = serverConfiguration;
         _localizer = localizer;
     }
-
-    public event Action<bool> ConnectionClosed;
 
     protected async void Connection_ConnectionClosed(IConnection connection, bool withError)
     {

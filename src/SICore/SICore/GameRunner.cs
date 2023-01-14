@@ -23,6 +23,7 @@ public sealed class GameRunner
     private readonly ComputerAccount[] _defaultShowmans;
     private readonly string? _documentPath;
     private readonly IAvatarHelper _avatarHelper;
+    private readonly string? _gameName;
     private readonly bool _createHost;
 
     public GameRunner(
@@ -35,6 +36,7 @@ public sealed class GameRunner
         ComputerAccount[] defaultShowmans,
         string? documentPath,
         IAvatarHelper avatarHelper,
+        string? gameName = null,
         bool createHost = true)
     {
         _node = node;
@@ -46,6 +48,7 @@ public sealed class GameRunner
         _defaultShowmans = defaultShowmans;
         _documentPath = documentPath;
         _avatarHelper = avatarHelper;
+        _gameName = gameName;
         _createHost = createHost;
     }
 
@@ -54,7 +57,8 @@ public sealed class GameRunner
         var gameData = new GameData(_backLink, new GamePersonAccount(_settings.Showman))
         {
             Settings = _settings,
-            HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName
+            HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
+            GameName = _gameName,
         };
 
         var localizer = new Localizer(_settings.AppSettings.Culture);
