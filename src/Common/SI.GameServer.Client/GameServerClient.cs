@@ -172,9 +172,9 @@ namespace SI.GameServer.Client
             {
                 throw new InvalidOperationException("Client has been already opened");
             }
-            
+
             var token = await AuthenticateUserAsync(userName, "", cancellationToken);
-            
+
             _connection = new HubConnectionBuilder()
                 .WithUrl(
                     $"{ServiceUri}sionline?token={token}",
@@ -205,7 +205,7 @@ namespace SI.GameServer.Client
             _connection.Closed += OnConnectionClosedAsync;
 
             _connection.HandshakeTimeout = TimeSpan.FromMinutes(2);
-            
+
             _connection.On<string, string>("Say", (user, text) => OnUI(() => Receieve?.Invoke(user, text)));
             _connection.On<GameInfo>("GameCreated", (gameInfo) => OnUI(() => GameCreated?.Invoke(gameInfo)));
             _connection.On<int>("GameDeleted", (gameId) => OnUI(() => GameDeleted?.Invoke(gameId)));

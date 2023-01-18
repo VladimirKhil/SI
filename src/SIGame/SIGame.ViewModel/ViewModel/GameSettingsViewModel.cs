@@ -148,15 +148,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     }
 
     /// <summary>
-    /// Разрешить допуск зрителей в сетевую игру
-    /// </summary>
-    public bool AllowViewers
-    {
-        get => _model.AllowViewers;
-        set { _model.AllowViewers = value; OnPropertyChanged(); }
-    }
-
-    /// <summary>
     /// Порт сетевой игры
     /// </summary>
     public int NetworkPort
@@ -175,12 +166,16 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             if (_showman != value)
             {
                 if (_showman != null)
+                {
                     _showman.PropertyChanged -= Showman_PropertyChanged;
+                }
 
                 _showman = value;
 
                 if (_showman != null)
+                {
                     _showman.PropertyChanged += Showman_PropertyChanged;
+                }
 
                 OnPropertyChanged();
                 UpdateShowman();
@@ -777,7 +772,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    private void Showman_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Showman_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(GameAccount.AccountType))
         {
@@ -1085,19 +1080,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             FullError = null;
             BeginGame.CanBeExecuted = true;
         }
-    }
-
-    protected override void LoadNewSettings(UserSettings settings)
-    {
-        Set(settings.GameSettings);
-        base.LoadNewSettings(settings);
-    }
-
-    internal void Set(GameSettings gameSettings)
-    {
-        _model.AppSettings.Set(gameSettings.AppSettings);
-        NetworkPort = gameSettings.NetworkPort;
-        AllowViewers = gameSettings.AllowViewers;
     }
 
     internal void PrepareForGame()

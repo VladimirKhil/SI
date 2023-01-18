@@ -111,7 +111,7 @@ namespace SIGame
                 UI.Initialize();
 
                 CommonSettings.Default = LoadCommonSettings();
-                UserSettings.Default = LoadUserSettings();
+                UserSettings.Default = LoadUserSettings() ?? new UserSettings();
 
                 if (UserSettings.Default.Language != null)
                 {
@@ -128,7 +128,6 @@ namespace SIGame
                     switch (e.Args[0])
                     {
                         case "/logs":
-                            UserSettings.Default = LoadUserSettings();
                             GameCommands.OpenLogs.Execute(null);
                             break;
 
@@ -601,7 +600,7 @@ namespace SIGame
         /// Загрузить общие настройки
         /// </summary>
         /// <returns></returns>
-        public static UserSettings LoadUserSettings()
+        public static UserSettings? LoadUserSettings()
         {
             try
             {

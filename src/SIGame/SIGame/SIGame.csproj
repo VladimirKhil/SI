@@ -209,16 +209,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="obj\x86\Debug\App.g.cs" />
-    <Compile Remove="obj\x86\Debug\App.g.i.cs" />
-    <Compile Remove="obj\x86\Debug\MainWindow.g.cs" />
-    <Compile Remove="obj\x86\Debug\MainWindow.g.i.cs" />
-    <Compile Remove="obj\x86\Release\App.g.cs" />
-    <Compile Remove="obj\x86\Release\App.g.i.cs" />
-    <Compile Remove="obj\x86\Release\MainWindow.g.cs" />
-    <Compile Remove="obj\x86\Release\MainWindow.g.i.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Fonts\10261.otf" />
     <None Remove="Fonts\10262.otf" />
     <None Remove="Fonts\10265.otf" />
