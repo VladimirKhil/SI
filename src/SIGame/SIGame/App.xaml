@@ -276,8 +276,8 @@
                                 </EventTrigger>
 
                                 <DataTrigger
-                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=l:Studia, AncestorLevel=1,Mode=FindAncestor}}"
-                                        Value="{x:Null}">
+                                    Binding="{Binding RelativeSource={RelativeSource AncestorType=l:MainWindow, AncestorLevel=1,Mode=FindAncestor}}"
+                                    Value="{x:Null}">
                                     <Setter TargetName="bPopup" Property="Visibility" Value="Collapsed" />
                                     <Setter TargetName="bClose" Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -493,7 +493,7 @@
                                         <TextBlock
                                             Text="{TemplateBinding Tag}"
                                             Style="{StaticResource CommonText}"
-                                            FontSize="30"
+                                            FontSize="25"
                                             FontWeight="Bold"
                                             Margin="10,4"
                                             VerticalAlignment="Center" />
@@ -512,7 +512,12 @@
                                         IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}"
                                         IsCancel="True">
-                                        <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
+                                        <Path
+                                            Data="M0,0L1,1M1,0L0,1"
+                                            Stroke="{StaticResource MainColor}"
+                                            StrokeThickness="2"
+                                            Stretch="Uniform"
+                                            Margin="5" />
                                     </Button>
 
                                     <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
@@ -593,7 +598,12 @@
                                         IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}"
                                         IsCancel="True">
-                                        <Path Data="M0,0L1,1M1,0L0,1" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="5" />
+                                        <Path
+                                            Data="M0,0L1,1M1,0L0,1"
+                                            Stroke="{StaticResource MainColor}"
+                                            StrokeThickness="2"
+                                            Stretch="Uniform"
+                                            Margin="5" />
                                     </Button>
 
                                     <ContentPresenter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -1245,6 +1255,8 @@
                 </Style.Triggers>
             </Style>
 
+            <localc:StakeHeaderConverter x:Key="StakeHeaderConverter" />
+
             <localc:ViewConverter x:Key="DialogSelector">
                 <localc:ViewConverter.DefaultView>
                     <DataTemplate />
@@ -1276,7 +1288,9 @@
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static sc:DialogModes.Stake}">
-                        <ContentControl Style="{StaticResource windowStyleWithProgress}" Tag="{x:Static lp:Resources.Stake}">
+                        <ContentControl
+                            Style="{StaticResource windowStyleWithProgress}"
+                            Tag="{Binding Data.PersonDataExtensions.StakeInfo.PlayerName, Converter={StaticResource StakeHeaderConverter}}">
                             <l:StakeView DataContext="{Binding Data.PersonDataExtensions}" />
                         </ContentControl>
                     </DataTemplate>

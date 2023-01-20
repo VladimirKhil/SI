@@ -171,4 +171,7 @@
   <data name="UploadPackageTimeout" xml:space="preserve">
     <value>The pack sending time is expired. Please, try again, or reduce the size of the file</value>
   </data>
+  <data name="YourWereKicked" xml:space="preserve">
+    <value>Your were kicked from the game</value>
+  </data>
 </root>

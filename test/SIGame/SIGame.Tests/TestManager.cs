@@ -14,7 +14,7 @@ internal sealed class TestManager : PlatformManager
 
 	public override string GetKeyName(int key) => key.ToString();
 
-	public override void PlaySound(string sound = null, double speed = 1, bool loop = false)
+	public override void PlaySound(string? sound = null, double speed = 1, bool loop = false)
 	{
 		
 	}

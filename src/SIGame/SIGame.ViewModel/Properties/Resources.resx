@@ -498,4 +498,7 @@
   <data name="GameRule_Classic" xml:space="preserve">
     <value>classic</value>
   </data>
+  <data name="CannotJoinGame" xml:space="preserve">
+    <value>Cannot join game</value>
+  </data>
 </root>

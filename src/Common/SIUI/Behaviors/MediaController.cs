@@ -49,6 +49,11 @@ public static class MediaController
 
         void loaded(object? sender, EventArgs e2)
         {
+            if (mediaElement.Source == null)
+            {
+                return;
+            }
+
             try
             {
                 mediaElement.Play();
@@ -139,6 +144,8 @@ public static class MediaController
                 timer.Dispose();
                 timer = null;
             }
+
+            ((MediaElement)sender).Loaded -= loaded;
 
             tableInfo.MediaSeek -= seekHandler;
             tableInfo.MediaPause -= pauseHandler;

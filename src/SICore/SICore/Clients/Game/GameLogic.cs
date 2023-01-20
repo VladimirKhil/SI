@@ -3688,37 +3688,38 @@ public sealed class GameLogic : Logic<GameData>
 
             _data.ActivePlayer = activePlayer;
 
-            var stakeMsg = new StringBuilder(_data.ActivePlayer.Name)
+            var stakeReplic = new StringBuilder(_data.ActivePlayer.Name)
                 .Append(", ")
                 .Append(GetRandomString(LO[nameof(R.YourStake)]));
 
-            _gameActions.ShowmanReplic(stakeMsg.ToString());
+            _gameActions.ShowmanReplic(stakeReplic.ToString());
 
             _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
-            stakeMsg = new StringBuilder(Messages.Stake);
+            var stakeMsg = new MessageBuilder(Messages.Stake);
 
             for (var i = 0; i < _data.StakeVariants.Length; i++)
             {
-                stakeMsg.Append(Message.ArgsSeparatorChar).Append(_data.StakeVariants[i] ? '+' : '-');
+                stakeMsg.Add(_data.StakeVariants[i] ? '+' : '-');
             }
 
             var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + 100;
             var minimumStakeByBase = (int)Math.Ceiling((double)minimumStake / 100) * 100; // TODO: возможность настраивать кратность ставки
 
-            stakeMsg.Append(Message.ArgsSeparatorChar).Append(minimumStakeByBase);
+            stakeMsg.Add(minimumStakeByBase);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
             if (_data.IsOralNow)
             {
-                _gameActions.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
-                stakeMsg.Append(Message.ArgsSeparatorChar).Append(_data.ActivePlayer.Sum); // Ведущему укажем максимум
-                _gameActions.SendMessage(stakeMsg.ToString(), _data.ShowMan.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
+                stakeMsg.Add(_data.ActivePlayer.Sum); // Ведущему укажем максимум
+                stakeMsg.Add(_data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
             }
             else
             {
-                _gameActions.SendMessage(stakeMsg.ToString(), _data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
 
                 if (!_data.ActivePlayer.IsConnected)
                 {

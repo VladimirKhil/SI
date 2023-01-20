@@ -495,4 +495,7 @@
   <data name="GameRule_Classic" xml:space="preserve">
     <value>классическая</value>
   </data>
+  <data name="CannotJoinGame" xml:space="preserve">
+    <value>Не удалось войти в игру</value>
+  </data>
 </root>

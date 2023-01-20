@@ -98,12 +98,12 @@ public sealed class PlayerData : INotifyPropertyChanged
     /// </summary>
     public SIReport Report { get; set; } = new SIReport();
 
-    private int _numApps = int.MaxValue;
+    private int _apellationCount = int.MaxValue;
 
-    public int NumApps
+    public int ApellationCount
     {
-        get => _numApps;
-        set { _numApps = value; OnPropertyChanged(); }
+        get => _apellationCount;
+        set { _apellationCount = value; OnPropertyChanged(); }
     }
 
     private bool _myTry;

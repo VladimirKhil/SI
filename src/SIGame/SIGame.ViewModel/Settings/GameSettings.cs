@@ -63,9 +63,8 @@ public sealed class GameSettings : GameSettingsCore<AppSettings>, IHumanPlayerOw
     public int PlayersCount { get; set; } = 3;
 
     public static explicit operator GameSettingsCore<AppSettingsCore>(GameSettings settings) =>
-        new GameSettingsCore<AppSettingsCore>
+        new()
         {
-            AllowViewers = settings.AllowViewers,
             AppSettings = settings.AppSettings.ToAppSettingsCore(),
             HumanPlayerName = settings.HumanPlayerName,
             NetworkGameName = settings.NetworkGameName,

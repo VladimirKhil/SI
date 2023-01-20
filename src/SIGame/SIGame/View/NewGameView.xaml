@@ -13,7 +13,8 @@
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:data="clr-namespace:SIData;assembly=SIData"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=lvm:GameSettingsViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
         <lc:PlusOneConverter x:Key="PlusOneConverter" />
         
@@ -43,7 +44,7 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Margin" Value="4,5,5,5" />
-            <Setter Property="FontSize" Value="19" />
+            <Setter Property="FontSize" Value="17" />
             <Setter Property="Foreground" Value="Black" />
         </Style>
 
@@ -183,7 +184,7 @@
                     FontSize="15"
                     FontWeight="Medium"
                     Margin="11,0"
-                    Width="100"
+                    Width="120"
                     TextWrapping="Wrap" />
             </DockPanel>
 
@@ -488,7 +489,7 @@
                 Grid.Column="1"
                 Margin="5,10,5,5"
                 FontWeight="Light"
-                FontSize="19"
+                FontSize="17"
                 Background="#33FFFFFF"
                 Style="{StaticResource ComboBoxStyle}"
                 ItemsSource="{Binding Source={StaticResource dataFromEnum}, Mode=OneWay}"
@@ -571,8 +572,8 @@
             <Button
                 Style="{StaticResource SIButton}"
                 Margin="0,10,0,0"
-                Padding="30,6"
-                FontSize="19"
+                Padding="30,4"
+                FontSize="17"
                 FontWeight="Medium"
                 Grid.Row="2"
                 Grid.Column="3"
@@ -590,8 +591,8 @@
                 Background="{StaticResource WindowBackground}"
                 Command="{Binding DataContext.ShowSlideMenu, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                 CommandParameter="RulesSettingsPage"
-                Padding="30,6"
-                FontSize="19"
+                Padding="30,4"
+                FontSize="17"
                 Margin="0"
                 ToolTip="{x:Static lp:Resources.RulesHint}"
                 VerticalAlignment="Bottom">

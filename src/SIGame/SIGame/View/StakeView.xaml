@@ -1,11 +1,15 @@
-﻿<UserControl x:Class="SIGame.StakeView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SIGame"
-             xmlns:scp="clr-namespace:SICore.Properties;assembly=SICore"
-             mc:Ignorable="d" Height="94" Width="550" FontSize="25">
+﻿<UserControl
+    x:Class="SIGame.StakeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:SIGame"
+    xmlns:scp="clr-namespace:SICore.Properties;assembly=SICore"
+    mc:Ignorable="d"
+    Height="94"
+    Width="550"
+    FontSize="25">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*" />
@@ -13,15 +17,72 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <Button Style="{StaticResource SIButton}" Content="{x:Static scp:Resources.Nominal}" Grid.Row="1" Name="button1" Command="{Binding SendNominal}" />
-        <Button Style="{StaticResource SIButton}" Margin="-1,0,0,0" Content="{x:Static scp:Resources.Pass}" Grid.Column="1" Grid.Row="1" Name="button2" Grid.ColumnSpan="2" Command="{Binding SendPass}"  />
-        <Button Style="{StaticResource SIButton}" Margin="-1,0,0,0" Content="{x:Static scp:Resources.VaBank}" Grid.Column="3" Grid.Row="1" Name="button3" Command="{Binding SendVabank}" />
-        <Button Style="{StaticResource SIButton}" Margin="0,0,0,-1" Content="{x:Static scp:Resources.Stake}" Grid.Column="3" Name="bStake" Command="{Binding SendStake}" />
-        <Slider DataContext="{Binding StakeInfo}" Name="slider1" Margin="5,0" Grid.ColumnSpan="2" IsSnapToTickEnabled="True" TickFrequency="{Binding Step}" Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" SmallChange="{Binding Step}" LargeChange="{Binding Step}" Value="{Binding Stake}" VerticalAlignment="Center" IsEnabled="{Binding ElementName=bStake, Path=IsEnabled}" IsMoveToPointEnabled="True" />
-        <local:NumericTextBox DataContext="{Binding StakeInfo}" Style="{StaticResource {x:Type TextBox}}" Grid.Column="2" Minimum="{Binding Minimum}" Maximum="{Binding Maximum}" Text="{Binding Path=Stake, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding ElementName=bStake, Path=IsEnabled}" Step="100" VerticalContentAlignment="Center" Padding="1" />
+        
+        <Button
+            Style="{StaticResource SIButton}"
+            Content="{x:Static scp:Resources.Nominal}"
+            Grid.Row="1"
+            Name="button1"
+            Command="{Binding SendNominal}" />
+        
+        <Button
+            Style="{StaticResource SIButton}"
+            Margin="-1,0,0,0"
+            Content="{x:Static scp:Resources.Pass}"
+            Grid.Column="1"
+            Grid.Row="1"
+            Name="button2"
+            Grid.ColumnSpan="2"
+            Command="{Binding SendPass}"  />
+        
+        <Button
+            Style="{StaticResource SIButton}"
+            Margin="-1,0,0,0"
+            Content="{x:Static scp:Resources.VaBank}"
+            Grid.Column="3"
+            Grid.Row="1"
+            Name="button3"
+            Command="{Binding SendVabank}" />
+        
+        <Button
+            Style="{StaticResource SIButton}"
+            Margin="0,0,0,-1"
+            Content="{x:Static scp:Resources.Stake}"
+            Grid.Column="3"
+            Name="bStake"
+            Command="{Binding SendStake}" />
+        
+        <Slider
+            DataContext="{Binding StakeInfo}"
+            Name="slider1"
+            Margin="5,0"
+            Grid.ColumnSpan="2"
+            IsSnapToTickEnabled="True"
+            TickFrequency="{Binding Step}"
+            Minimum="{Binding Minimum}"
+            Maximum="{Binding Maximum}"
+            SmallChange="{Binding Step}"
+            LargeChange="{Binding Step}"
+            Value="{Binding Stake}"
+            VerticalAlignment="Center"
+            IsEnabled="{Binding ElementName=bStake, Path=IsEnabled}"
+            IsMoveToPointEnabled="True" />
+        
+        <local:NumericTextBox
+            DataContext="{Binding StakeInfo}"
+            Style="{StaticResource {x:Type TextBox}}"
+            Grid.Column="2"
+            Minimum="{Binding Minimum}"
+            Maximum="{Binding Maximum}"
+            Text="{Binding Path=Stake, UpdateSourceTrigger=PropertyChanged}"
+            IsEnabled="{Binding ElementName=bStake, Path=IsEnabled}"
+            Step="100"
+            VerticalContentAlignment="Center"
+            Padding="1" />
     </Grid>
 </UserControl>

@@ -1,7 +1,6 @@
 ﻿using SICore;
 using SICore.Contracts;
 using SICore.Network.Servers;
-using System;
 using System.Windows.Input;
 
 namespace SIGame.ViewModel;
@@ -45,11 +44,6 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
     }
 
     public ICommand ShowFullError { get; private set; }
-
-    protected virtual void LoadNewSettings(UserSettings settings)
-    {
-        
-    }
 
     public ICommand ChangeSettings { get; internal set; }
 

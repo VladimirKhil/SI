@@ -284,6 +284,7 @@ public sealed class ViewerData : Data
             {
                 _players = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ApellationWrongEnabled));
             }
         }
     }
@@ -544,6 +545,11 @@ public sealed class ViewerData : Data
             }
         }
     }
+
+    /// <summary>
+    /// Enabled "Wrong" appellation. 4 or more players required to have enough voice for it to work.
+    /// </summary>
+    public bool ApellationWrongEnabled => Players.Count > 3;
 
     /// <summary>
     /// Game host name.

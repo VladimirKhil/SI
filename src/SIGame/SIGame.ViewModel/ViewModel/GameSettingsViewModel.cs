@@ -148,15 +148,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     }
 
     /// <summary>
-    /// Разрешить допуск зрителей в сетевую игру
-    /// </summary>
-    public bool AllowViewers
-    {
-        get => _model.AllowViewers;
-        set { _model.AllowViewers = value; OnPropertyChanged(); }
-    }
-
-    /// <summary>
     /// Порт сетевой игры
     /// </summary>
     public int NetworkPort
@@ -1085,19 +1076,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             FullError = null;
             BeginGame.CanBeExecuted = true;
         }
-    }
-
-    protected override void LoadNewSettings(UserSettings settings)
-    {
-        Set(settings.GameSettings);
-        base.LoadNewSettings(settings);
-    }
-
-    internal void Set(GameSettings gameSettings)
-    {
-        _model.AppSettings.Set(gameSettings.AppSettings);
-        NetworkPort = gameSettings.NetworkPort;
-        AllowViewers = gameSettings.AllowViewers;
     }
 
     internal void PrepareForGame()

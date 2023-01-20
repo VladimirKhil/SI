@@ -400,6 +400,9 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
             }
         }
 
-        PlatformManager.Instance.CloseDialogWindow();
+        if (UseDialogWindow)
+        {
+            PlatformManager.Instance.CloseDialogWindow();
+        }
     }
 }

@@ -57,7 +57,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
             && _data.Players[playerIndex].Name == _viewerActions.Client.Name
             || isRight)
         {
-            _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.NumApps > 0;
+            _data.PlayerDataExtensions.Apellate.CanBeExecuted = _data.PlayerDataExtensions.ApellationCount > 0;
             _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
         }
     }

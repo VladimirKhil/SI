@@ -96,7 +96,8 @@ public abstract class Node : INode
 
         if (IsMain)
         {
-            string clientName = null;
+            string? clientName = null;
+
             lock (connection.ClientsSync)
             {
                 if (connection.Clients.Count > 0)

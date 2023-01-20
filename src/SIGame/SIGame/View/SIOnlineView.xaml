@@ -182,7 +182,7 @@
                     Text="{x:Static vmp:Resources.MainMenu_OnlineGame}"
                     Effect="{StaticResource Effect}"
                     Foreground="{StaticResource MainColor}"
-                    FontSize="40"
+                    FontSize="35"
                     FontWeight="Bold" />
             </DockPanel>
             
@@ -580,7 +580,7 @@
                     </ToggleButton>
                 </Grid>
                 
-                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Margin="0,0,0,5">
                     <StackPanel>
                         <StackPanel.Resources>
                             <Style x:Key="Header" TargetType="{x:Type TextBlock}">

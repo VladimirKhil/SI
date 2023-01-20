@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace SIGame.ViewModel;
 
-public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDisposable
+public sealed class NavigatorViewModel : INotifyPropertyChanged, ICloseable, IDisposable
 {
     private readonly Stack<ContentBox> _history = new();
 
@@ -66,8 +66,9 @@ public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDis
     public ICommand Cancel { get; set; }
     public ICommand CancelBase { get; set; }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    public event Action Closed;
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public event Action? Closed;
 
     public NavigatorViewModel()
     {
@@ -75,15 +76,16 @@ public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDis
         CancelBase = new CustomCommand(CancelBase_Executed);
     }
 
-    private void CancelBase_Executed(object arg)
+    private void CancelBase_Executed(object? arg)
     {
         Closed?.Invoke();
         Cancel.Execute(null);
     }
 
-    private void Back_Executed(object arg)
+    private void Back_Executed(object? arg)
     {
         var currentValue = _content.Data;
+
         if (_content.Data is INavigatable navigatable)
         {
             navigatable.Navigate -= Content_Navigate;
@@ -99,6 +101,7 @@ public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDis
         if (_content.Data is INavigatable navigatable2)
         {
             navigatable2.Navigate += Content_Navigate;
+
             if (arg == null)
             {
                 navigatable2.OnNavigatedFrom(currentValue);
@@ -114,10 +117,8 @@ public sealed class NavigatorViewModel: INotifyPropertyChanged, ICloseable, IDis
         OnPropertyChanged(nameof(Content));
     }
 
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-    {
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
 
     public void Dispose()
     {

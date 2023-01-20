@@ -171,4 +171,7 @@
   <data name="UploadPackageTimeout" xml:space="preserve">
     <value>Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла.</value>
   </data>
+  <data name="YourWereKicked" xml:space="preserve">
+    <value>Вас выкинули из игры</value>
+  </data>
 </root>

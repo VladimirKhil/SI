@@ -98,9 +98,9 @@ public sealed class PersonData : INotifyPropertyChanged
         }
     }
 
-    private ICommand _isRight = null;
+    private ICommand? _isRight = null;
 
-    public ICommand IsRight
+    public ICommand? IsRight
     {
         get => _isRight;
         set { _isRight = value; OnPropertyChanged(); }

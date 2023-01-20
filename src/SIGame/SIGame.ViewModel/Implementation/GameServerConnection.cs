@@ -16,6 +16,13 @@ internal sealed class GameServerConnection : ConnectionBase
         _gameServerClient.IncomingMessage += OnMessageReceived;
         _gameServerClient.Reconnecting += GameServerClient_Reconnecting;
         _gameServerClient.Reconnected += GameServerClient_Reconnected;
+        _gameServerClient.Closed += GameServerClient_Closed;
+    }
+
+    private Task GameServerClient_Closed(Exception? arg)
+    {
+        OnConnectionClose(true);
+        return Task.CompletedTask;
     }
 
     private Task GameServerClient_Reconnecting(Exception? arg)
@@ -65,6 +72,7 @@ internal sealed class GameServerConnection : ConnectionBase
         _gameServerClient.IncomingMessage -= OnMessageReceived;
         _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
         _gameServerClient.Reconnected -= GameServerClient_Reconnected;
+        _gameServerClient.Closed -= GameServerClient_Closed;
 
         _isDisposed = true;
 

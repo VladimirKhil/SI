@@ -307,7 +307,6 @@ public sealed class UserSettings : INotifyPropertyChanged
         GameSettings.AppSettings.Set(settings.GameSettings.AppSettings);
         GameSettings.NetworkPort = settings.GameSettings.NetworkPort;
         GameSettings.RandomSpecials = settings.GameSettings.RandomSpecials;
-        GameSettings.AllowViewers = settings.GameSettings.AllowViewers;
 
         return settings;
     }

@@ -221,5 +221,14 @@ namespace SI.GameServer.Client.Properties {
                 return ResourceManager.GetString("UploadPackageTimeout", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Your were kicked from the game.
+        /// </summary>
+        public static string YourWereKicked {
+            get {
+                return ResourceManager.GetString("YourWereKicked", resourceCulture);
+            }
+        }
     }
 }

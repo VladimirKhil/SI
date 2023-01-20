@@ -7,8 +7,7 @@
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
     <Copyright>Copyright © Khil-soft 2002-2023</Copyright>
-    <Version>7.7.3</Version>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <Version>7.9.0</Version>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<Nullable>enable</Nullable>
@@ -45,11 +44,9 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Fonts\Montserrat-Bold.ttf" />
-    <Resource Include="Fonts\Montserrat-Thin.ttf" />
-    <Resource Include="Fonts\Phenomena-Bold.otf" />
-    <Resource Include="Fonts\Phenomena-Light.otf" />
-    <Resource Include="Fonts\Phenomena-Thin.otf" />
+    <Resource Include="Fonts\Jost-Bold.ttf" />
+    <Resource Include="Fonts\Jost-Regular.ttf" />
+    <Resource Include="Fonts\Jost-Thin.ttf" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -222,16 +219,10 @@
     <None Remove="Fonts\10261.otf" />
     <None Remove="Fonts\10262.otf" />
     <None Remove="Fonts\10265.otf" />
-    <None Remove="Fonts\Montserrat-Bold.ttf" />
-    <None Remove="Fonts\Montserrat-Regular.ttf" />
-    <None Remove="Fonts\Montserrat-Thin.ttf" />
-    <None Remove="Fonts\Phenomena-Bold.otf" />
-    <None Remove="Fonts\Phenomena-Light.otf" />
-    <None Remove="Fonts\Phenomena-Thin.otf" />
+    <None Remove="Fonts\Jost-Bold.ttf" />
+    <None Remove="Fonts\Jost-Regular.ttf" />
+    <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\game_button.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Fonts\Montserrat-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -250,7 +241,7 @@
     <None Update="licenses\Ben.Demystifier.LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="licenses\Montserrat.OFL.txt">
+    <None Update="licenses\Jost.OFL.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="licenses\Polly.LICENSE.txt">

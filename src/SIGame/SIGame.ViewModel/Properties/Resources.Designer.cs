@@ -124,6 +124,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot join game.
+        /// </summary>
+        public static string CannotJoinGame {
+            get {
+                return ResourceManager.GetString("CannotJoinGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Account change.
         /// </summary>
         public static string ChangeAccount {

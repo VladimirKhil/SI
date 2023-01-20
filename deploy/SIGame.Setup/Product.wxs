@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   
   <?define Manufacturer="Khil-soft" ?>
   <?define ProductName="SIGame" ?>
@@ -8,12 +8,9 @@
   <?define ProductNameEn="SIGame" ?>
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define PhotoPath="$(var.SIGame.ProjectDir)Photo\" ?>
-
-	<?if $(var.Platform) = x64 ?>
-	    <?define PublishFolder = "$(var.SIGame.ProjectDir)bin\Release\net6.0-windows\win-x64\publish\" ?>
-	<?else ?>
-	    <?define PublishFolder = "$(var.SIGame.ProjectDir)bin\Release\net6.0-windows\win-x86\publish\" ?>
-	<?endif ?>
+	
+	<?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
+	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
     
     <Product
 		Id="*"
@@ -56,6 +53,9 @@
             <ComponentGroupRef Id="Data" />
             <ComponentGroupRef Id="Photo" />
             <ComponentGroupRef Id="licenses" />
+			<ComponentGroupRef Id="native" />
+			<ComponentGroupRef Id="runtimes" />
+			<ComponentGroupRef Id="platform" />
             <ComponentGroupRef Id="Manufacturer" />
             <ComponentGroupRef Id="ManufacturerProgramMenu" />
             <ComponentGroupRef Id="ApplicationProgramMenu" />
@@ -72,12 +72,9 @@
                 <Directory Id="SoundsFolder" Name="Sounds" />
                 <Directory Id="LicensesFolder" Name="licenses" />
 				<Directory Id="RuntimesFolder" Name="runtimes">
-					<Directory Id="PlatformX86Folder" Name="win-x86">
-						<Directory Id="NativeX86Folder" Name="native" />
-					</Directory>
-					<Directory Id="PlatformX64Folder" Name="win-x64">
-						<Directory Id="NativeX64Folder" Name="native" />
-					</Directory>
+				  <Directory Id="PlatformFolder" Name="win-$(var.Platform)">
+					<Directory Id="NativeFolder" Name="native" />
+				  </Directory>
 				</Directory>
               </Directory>
             </Directory>
@@ -90,12 +87,10 @@
         </Directory>
     </Fragment>
   
-    <Fragment>
-        <ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
-            <Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
-            <File Id="SIGame.exe" Source="$(var.PublishFolder)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes">
-                <netfx:NativeImage Id="ngen_SIGame.exe" Priority="0" AppBaseDirectory="INSTALLLOCATION" />
-            </File>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLLOCATION">
+      <Component Id="SIGame.exe" Guid="87be7534-82f2-498b-a2a7-4a2757534050">
+		<File Id="SIGame.exe" Source="$(var.PublishFolder)SIGame.exe" KeyPath="yes" Checksum="yes" Vital="yes" />
       </Component>
       <Component Guid="{167EE7C2-7628-4983-8E15-C1CFEE780BE7}">
         <File KeyPath="yes" Source="$(var.PublishFolder)D3DCompiler_47_cor3.dll" />
@@ -358,7 +353,7 @@
 			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Polly.LICENSE.txt" />
 		</Component>
 		<Component Guid="{9F4DDFD8-2EF0-44BF-A991-5F0D19A787A9}">
-			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Montserrat.OFL.txt" />
+			<File KeyPath="yes" Source="$(var.SIGame.ProjectDir)licenses\Jost.OFL.txt" />
 		</Component>
         <Component Id="LicensesReg" Guid="{4C7D3CA0-40F4-437A-8ED2-9C037D2B607C}">
             <RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="licenses" Type="integer" Value="1" KeyPath="yes" />
@@ -368,17 +363,31 @@
   </Fragment>
 
 	<Fragment>
-		<ComponentGroup Id="NativeX86" Directory="NativeX86Folder">
-			<Component Guid="{98BDC8B2-A978-435C-B8DB-A0B52B81FE8B}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-x86\native\WebView2Loader.dll" />
+		<ComponentGroup Id="runtimes" Directory="RuntimesFolder">
+			<Component Guid="{AEE6A283-C138-4B72-BB92-776653A1AD9F}">
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="runtimes" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="RuntimesFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
 
 	<Fragment>
-		<ComponentGroup Id="NativeX64" Directory="NativeX64Folder">
-			<Component Guid="{49A1F9E9-081E-40B6-8DD4-28CE9BC06FBC}">
-				<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-x64\native\WebView2Loader.dll" />
+		<ComponentGroup Id="platform" Directory="PlatformFolder">
+			<Component Guid="{B3249DB9-38A1-428B-97A5-D4CD31B53134}">
+				<RemoveFolder Id="PlatformFolder" On="uninstall" />
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="platform" Type="integer" Value="1" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="native" Directory="NativeFolder">
+			<Component Guid="{98BDC8B2-A978-435C-B8DB-A0B52B81FE8B}">
+				<File KeyPath="yes" Id="runtimeLoader" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+			</Component>
+			<Component Id="NativeReg" Guid="{D9606D7C-B608-4A48-9493-B9EA17BC9219}">
+				<RegistryValue Root="HKMU" Key="Software\$(var.ManufacturerEn)\$(var.ProductNameEn)" Name="native" Type="integer" Value="1" KeyPath="yes" />
+				<RemoveFolder Id="NativeFolder" On="uninstall" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>

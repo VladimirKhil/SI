@@ -113,6 +113,17 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="ApellateWrongButton" TargetType="{x:Type Button}" BasedOn="{StaticResource ApellateButton}">
+            <Setter Property="Visibility" Value="{Binding Data.ApellationEnabled, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Data.ApellationWrongEnabled}" Value="False">
+                    <Setter Property="IsEnabled" Value="False" />
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <ControlTemplate x:Key="GameButtonTemplate" TargetType="{x:Type Button}">
             <Border
                 Name="Bd"
@@ -343,7 +354,7 @@
             Command="{Binding Data.PlayerDataExtensions.Apellate}"
             Content="🤨"
             CommandParameter="-"
-            Style="{StaticResource ApellateButton}"
+            Style="{StaticResource ApellateWrongButton}"
             FontSize="20" />
 
         <Button
@@ -416,10 +427,10 @@
                         Cursor="Hand"
                         TextBlock.TextAlignment="Center"
                         HorizontalContentAlignment="Center"
-                        Padding="40,2"
+                        VerticalContentAlignment="Center"
+                        Padding="40,5"
                         FontSize="21"
                         Command="{Binding EndGame}">
-                        
                         <MenuItem.Template>
                             <ControlTemplate TargetType="{x:Type MenuItem}">
                                 <Border
@@ -428,13 +439,11 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     Background="{TemplateBinding Background}"
                                     SnapsToDevicePixels="true">
-                                    
                                     <ContentPresenter
                                         ContentSource="Header"
                                         Margin="{TemplateBinding Padding}"
                                         RecognizesAccessKey="True"
                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                    
                                 </Border>
                                 
                                 <ControlTemplate.Triggers>

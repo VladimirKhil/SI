@@ -29,11 +29,9 @@
 
         <Style x:Key="MenuButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
             <Setter Property="FontSize" Value="45" />
-            <Setter Property="TextBlock.LineHeight" Value="30" />
             <Setter Property="UseLayoutRounding" Value="True" />
             <Setter Property="BorderThickness" Value="1.5" />
             <Setter Property="Margin" Value="0,-1.5,0,0" />
-            <Setter Property="Padding" Value="0,10,0,0" />
             <Setter Property="Command" Value="{Binding Command}" />
             <Setter Property="Content" Value="{Binding Header}" />
             <Setter Property="FontWeight" Value="Bold" />
@@ -674,7 +672,7 @@
                     </DataTemplate>
                     
                     <DataTemplate DataType="{x:Type lvm:HumanPlayerViewModel}">
-                        <my:AccountView DataContext="{Binding NewAccount}" FontSize="18" Height="Auto" Width="470" VerticalAlignment="Center" />
+                        <my:AccountView DataContext="{Binding NewAccount}" FontSize="18" Height="Auto" Width="520" VerticalAlignment="Center" />
                     </DataTemplate>
                     
                     <DataTemplate DataType="{x:Type lvm:BestPlayersViewModel}">

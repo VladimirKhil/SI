@@ -30,4 +30,6 @@ public sealed class MessageBuilder
     }
 
     public string Build() => string.Join(Message.ArgsSeparator, _messageArgs);
+
+    public override string ToString() => Build();
 }

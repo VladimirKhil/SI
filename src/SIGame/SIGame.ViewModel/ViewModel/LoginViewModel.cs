@@ -98,6 +98,7 @@ public sealed class LoginViewModel : INotifyPropertyChanged, IDisposable
             var message = new StringBuilder();
 
             var innerExc = exc.InnerException ?? exc;
+
             while (innerExc != null)
             {
                 if (message.Length > 0)

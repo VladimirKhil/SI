@@ -48,10 +48,7 @@ internal sealed class ReconnectManager : IConnector
         _upgrade = upgrade;
     }
 
-    public void SetGameID(int gameId)
-    {
-        GameId = gameId;
-    }
+    public void SetGameID(int gameId) => GameId = gameId;
 
     public async Task<bool> ReconnectToServer()
     {
@@ -88,6 +85,7 @@ internal sealed class ReconnectManager : IConnector
         await _server.ConnectionsLock.WithLockAsync(() =>
         {
             var externalServer = _server.HostServer;
+
             if (externalServer != null)
             {
                 lock (externalServer.ClientsSync)
@@ -121,6 +119,7 @@ internal sealed class ReconnectManager : IConnector
             if (GameId > -1)
             {
                 var result = await _connector.SetGameIdAsync(GameId);
+
                 if (!result)
                 {
                     Error = Resources.GameClosedCauseEverybodyLeft;
@@ -137,14 +136,15 @@ internal sealed class ReconnectManager : IConnector
             await JoinGameCompletedAsync();
             IsReconnecting = false;
         }
+        catch (TaskCanceledException)
+        {
+            Error = Resources.CannotJoinGame;
+        }
         catch (Exception exc)
         {
             Error = exc.Message;
         }
     }
 
-    public void SetHost(IViewerClient newHost)
-    {
-        _host = newHost;
-    }
+    public void SetHost(IViewerClient newHost) => _host = newHost;
 }

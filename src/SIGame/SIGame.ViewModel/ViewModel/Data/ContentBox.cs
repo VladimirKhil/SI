@@ -5,7 +5,9 @@ namespace SIGame.ViewModel;
 public sealed class ContentBox : IDisposable
 {
     public object Data { get; set; }
+
     public string Title { get; set; }
+
     public ICommand Cancel { get; set; }
 
     public void Dispose()

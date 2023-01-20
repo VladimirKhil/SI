@@ -28,28 +28,32 @@
             <Setter Property="Margin" Value="0,5" />
             <Setter Property="Padding" Value="4,4" />
         </Style>
-        
+
         <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
             <Setter Property="Margin" Value="0,5" />
         </Style>
 
-        <Style x:Key="GameButtonSetter" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource WhiteButton}">
-            <Setter Property="Content" Value="{Binding Model.GameButtonKey2, Converter={StaticResource ToStringConverter}}" />
-            <Style.Triggers>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="Content" Value="{x:Static lp:Resources.PressTheButton}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <localc:FontFamilyConverter x:Key="FontFamilyConverter1" />
-        
     </Page.Resources>
+
     <StackPanel DataContext="{Binding Settings.ThemeSettings}" Margin="10,5">
+        <TextBlock
+            Style="{StaticResource CommonText}"
+            Foreground="White"
+            Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}"
+            VerticalAlignment="Center"
+            FontSize="20"
+            Margin="5,10"
+            TextWrapping="Wrap" />
         
-        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.TheseSettingsAreChangedBeforeGame}" VerticalAlignment="Center" FontSize="20" Margin="5,10" TextWrapping="Wrap" />
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableFont}" />
-        <ComboBox Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}" SelectedItem="{Binding SIUISettings.TableFontFamily}" Style="{StaticResource ComboBoxStyle}">
+        
+        <ComboBox
+            Foreground="White"
+            FontWeight="Light"
+            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.FontFamilies}}"
+            SelectedItem="{Binding SIUISettings.TableFontFamily}"
+            Style="{StaticResource ComboBoxStyle}">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type sys:String}">
                     <TextBlock Text="{Binding Converter={StaticResource FontFamilyConverter1}}" />
@@ -58,7 +62,16 @@
         </ComboBox>
         
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableColor}" />
-        <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="0" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        
+        <Button
+            Margin="0,3"
+            Padding="2"
+            Background="White"
+            Height="35"
+            Command="{Binding SelectColor}"
+            CommandParameter="0"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch">
             <Rectangle>
                 <Rectangle.Fill>
                     <SolidColorBrush Color="{Binding Model.UISettings.TableColorString}" />
@@ -67,7 +80,16 @@
         </Button>
         
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TableBackground}" />
-        <Button Margin="0,3" Padding="2" Background="White" Height="35" Command="{Binding SelectColor}" CommandParameter="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        
+        <Button
+            Margin="0,3"
+            Padding="2"
+            Background="White"
+            Height="35"
+            Command="{Binding SelectColor}"
+            CommandParameter="1"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch">
             <Rectangle>
                 <Rectangle.Fill>
                     <SolidColorBrush Color="{Binding Model.UISettings.TableBackColorString}" />
@@ -76,7 +98,13 @@
         </Button>
         
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.LineHeight}" />
-        <ComboBox Style="{StaticResource ComboBoxStyle}" Foreground="White" FontWeight="Light" ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}" SelectedItem="{Binding SIUISettings.QuestionLineSpacing}" />
+        
+        <ComboBox
+            Style="{StaticResource ComboBoxStyle}"
+            Foreground="White"
+            FontWeight="Light"
+            ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}"
+            SelectedItem="{Binding SIUISettings.QuestionLineSpacing}" />
 
         <TextBlock
             Style="{StaticResource Header}"
@@ -150,9 +178,31 @@
         <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundFinalThinkUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
         <Button Style="{StaticResource WhiteButton}" Margin="0,-1,0,0" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundFinalThinkUri" Content="{x:Static lp:Resources.Clear}"></Button>
 
-        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" TextWrapping="Wrap" Text="{x:Static lp:Resources.Sound_RoundTimeout}" />
+        <TextBlock
+            Style="{StaticResource Header}"
+            VerticalAlignment="Center"
+            TextWrapping="Wrap"
+            Text="{x:Static lp:Resources.Sound_RoundTimeout}" />
+        
         <TextBox Text="{Binding Model.SoundTimeoutUri}" Margin="0,5" Padding="1" />
-        <Button Style="{StaticResource WhiteButton}" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding SelectSound}" CommandParameter="SoundTimeoutUri" Content="{x:Static lp:Resources.SelectBackground}"></Button>
-        <Button Style="{StaticResource WhiteButton}" Margin="0,-1,0,0" Padding="20,6" FontSize="20" TextBlock.LineHeight="20" Command="{Binding ClearSound}" CommandParameter="SoundTimeoutUri" Content="{x:Static lp:Resources.Clear}"></Button>
+        
+        <Button
+            Style="{StaticResource WhiteButton}"
+            Padding="20,6"
+            FontSize="20"
+            TextBlock.LineHeight="20"
+            Command="{Binding SelectSound}"
+            CommandParameter="SoundTimeoutUri"
+            Content="{x:Static lp:Resources.SelectBackground}" />
+
+        <Button
+            Style="{StaticResource WhiteButton}"
+            Margin="0,-1,0,0"
+            Padding="20,6"
+            FontSize="20"
+            TextBlock.LineHeight="20"
+            Command="{Binding ClearSound}"
+            CommandParameter="SoundTimeoutUri"
+            Content="{x:Static lp:Resources.Clear}" />
     </StackPanel>
 </Page>

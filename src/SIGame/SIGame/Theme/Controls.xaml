@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:l="clr-namespace:SIGame">
 
-    <FontFamily x:Key="Font">pack://application:,,,/SIGame;component/Fonts/#Montserrat</FontFamily>
+    <FontFamily x:Key="Font">pack://application:,,,/SIGame;component/Fonts/#Jost</FontFamily>
     
     <Color x:Key="Hover">#FF89B2FF</Color>
     <Color x:Key="ActiveColor">#FFCEE0FF</Color>
@@ -84,7 +84,6 @@
     </Style>
 
     <Style x:Key="SIButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
-        <Setter Property="TextBlock.LineHeight" Value="{Binding FontSize, RelativeSource={RelativeSource Self}}" />
         <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
 
         <Setter Property="Template">

@@ -39,6 +39,7 @@ namespace SICore
             }) { CanBeExecuted = true };
 
             ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
+            
             ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
             {
                 _viewerActions.SendMessageWithArgs(Messages.CatCost, ClientData.PersonDataExtensions.StakeInfo.Stake);
@@ -77,7 +78,7 @@ namespace SICore
 
             ClientData.PlayerDataExtensions.Apellate = new CustomCommand(arg =>
             {
-                ClientData.PlayerDataExtensions.NumApps--;
+                ClientData.PlayerDataExtensions.ApellationCount--;
                 _viewerActions.SendMessage(Messages.Apellate, arg.ToString());
             }) { CanBeExecuted = false };
 
@@ -281,7 +282,7 @@ namespace SICore
                         {
                             _logic.EndThink();
 
-                            ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.NumApps > 0;
+                            ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.ApellationCount > 0;
                             ClientData.PlayerDataExtensions.Pass.CanBeExecuted = false;
                         }
                         break;

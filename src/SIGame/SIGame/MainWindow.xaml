@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Height="450"
     Width="600"
+    MinHeight="450"
+    MinWidth="600"
     SnapsToDevicePixels="True"
     WindowState="Maximized"
     xmlns:l="clr-namespace:SIGame"

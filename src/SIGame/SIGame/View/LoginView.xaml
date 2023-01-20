@@ -52,7 +52,7 @@
             <TextBlock
                 Text="{Binding Error}"
                 FontSize="15"
-                Margin="0,20,10,5"
+                Margin="10,20,10,5"
                 Foreground="#FFC10000"
                 TextWrapping="Wrap"
                 TextTrimming="CharacterEllipsis"

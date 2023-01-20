@@ -100,12 +100,10 @@ public sealed class Showman : Viewer<IShowmanLogic>
         });
     }
 
-    protected override IShowmanLogic CreateLogic(Account personData)
-    {
-        return personData.IsHuman ?
-            (IShowmanLogic)new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
+    protected override IShowmanLogic CreateLogic(Account personData) =>
+        personData.IsHuman ?
+            new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
             new ShowmanComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
-    }
 
     private void ClientData_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -291,7 +289,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                     break;
 
                 case Messages.CatCost:
-                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo()
+                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
                     {
                         Minimum = int.Parse(mparams[1]),
                         Maximum = int.Parse(mparams[2]),
@@ -308,7 +306,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                     ClientData.PersonDataExtensions.SendPass.CanBeExecuted = mparams[3] == "+";
                     ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = mparams[4] == "+";
 
-                    for (int i = 0; i < 4; i++)
+                    for (var i = 0; i < 4; i++)
                     {
                         ClientData.PersonDataExtensions.Var[i] = mparams[i + 1] == "+";
                     }
@@ -318,7 +316,8 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         Minimum = int.Parse(mparams[5]),
                         Maximum = mparams.Length >= 7 ? int.Parse(mparams[6]) : int.Parse(mparams[5]),
                         Step = 100,
-                        Stake = int.Parse(mparams[5])
+                        Stake = int.Parse(mparams[5]),
+                        PlayerName = mparams.Length >= 8 ? mparams[7] : null,
                     };
 
                     _logic.Stake();

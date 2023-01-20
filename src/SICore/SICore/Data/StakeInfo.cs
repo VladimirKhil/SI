@@ -11,4 +11,9 @@ public sealed class StakeInfo : NumberSet
         get => _stake;
         set { _stake = value; OnPropertyChanged(); }
     }
+
+    /// <summary>
+    /// Name of player making stake.
+    /// </summary>
+    public string? PlayerName { get; set; }
 }
