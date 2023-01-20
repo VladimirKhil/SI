@@ -62,9 +62,13 @@ public sealed class GameSettings : GameSettingsCore<AppSettings>, IHumanPlayerOw
     [DefaultValue(3)]
     public int PlayersCount { get; set; } = 3;
 
+    public event Action? Updated;
+
     public static explicit operator GameSettingsCore<AppSettingsCore>(GameSettings settings) =>
         new()
         {
+            IsAutomatic = settings.IsAutomatic,
+            IsPrivate = settings.IsPrivate,
             AppSettings = settings.AppSettings.ToAppSettingsCore(),
             HumanPlayerName = settings.HumanPlayerName,
             NetworkGameName = settings.NetworkGameName,
@@ -72,15 +76,13 @@ public sealed class GameSettings : GameSettingsCore<AppSettings>, IHumanPlayerOw
             Players = Convert(settings.Players),
             RandomSpecials = settings.RandomSpecials,
             Showman = Convert(settings.Showman),
-            Viewers = Convert(settings.Viewers)
+            Viewers = Convert(settings.Viewers),
         };
 
     private static Account Convert(Account account) =>
-        new Account { IsHuman = account.IsHuman, Name = account.Name, Picture = account.Picture, IsMale = account.IsMale };
+        new() { IsHuman = account.IsHuman, Name = account.Name, Picture = account.Picture, IsMale = account.IsMale };
 
     private static Account[] Convert(Account[] accounts) => accounts.Select(acc => Convert(acc)).ToArray();
-
-    public event Action Updated;
 
     public void OnUpdated() => Updated?.Invoke();
 }

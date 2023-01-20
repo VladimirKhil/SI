@@ -248,7 +248,7 @@ public sealed class UserSettings : INotifyPropertyChanged
 
     #endregion
 
-    public void Save(Stream stream, XmlSerializer serializer = null)
+    public void Save(Stream stream, XmlSerializer? serializer = null)
     {
         serializer ??= new XmlSerializer(typeof(UserSettings));
         serializer.Serialize(stream, this);
@@ -258,7 +258,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     /// Загрузить пользовательские настройки
     /// </summary>
     /// <returns></returns>
-    public static UserSettings LoadOld(string configFileName)
+    public static UserSettings? LoadOld(string configFileName)
     {
         using (var file = IsolatedStorageFile.GetUserStoreForAssembly())
         {
@@ -266,11 +266,9 @@ public sealed class UserSettings : INotifyPropertyChanged
             {
                 try
                 {
-                    using (var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
+                    using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
                         return Load(stream);
                     }
-                }
                 catch { }
                 finally
                 {
@@ -282,12 +280,11 @@ public sealed class UserSettings : INotifyPropertyChanged
         return null;
     }
 
-    public static UserSettings Load(Stream stream, XmlSerializer serializer = null)
+    public static UserSettings? Load(Stream stream, XmlSerializer? serializer = null)
     {
-        if (serializer == null)
-            serializer = new XmlSerializer(typeof(UserSettings));
+        serializer ??= new XmlSerializer(typeof(UserSettings));
 
-        var settings = (UserSettings)serializer.Deserialize(stream);
+        var settings = (UserSettings?)serializer.Deserialize(stream);
 
         return settings;
     }
@@ -307,14 +304,14 @@ public sealed class UserSettings : INotifyPropertyChanged
         GameSettings.AppSettings.Set(settings.GameSettings.AppSettings);
         GameSettings.NetworkPort = settings.GameSettings.NetworkPort;
         GameSettings.RandomSpecials = settings.GameSettings.RandomSpecials;
+        GameSettings.IsPrivate = settings.GameSettings.IsPrivate;
+        GameSettings.IsAutomatic = settings.GameSettings.IsAutomatic;
 
         return settings;
     }
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

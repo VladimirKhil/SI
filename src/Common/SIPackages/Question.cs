@@ -1,7 +1,6 @@
 ﻿using SIPackages.Core;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Xml;
 
 namespace SIPackages;

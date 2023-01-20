@@ -166,12 +166,16 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             if (_showman != value)
             {
                 if (_showman != null)
+                {
                     _showman.PropertyChanged -= Showman_PropertyChanged;
+                }
 
                 _showman = value;
 
                 if (_showman != null)
+                {
                     _showman.PropertyChanged += Showman_PropertyChanged;
+                }
 
                 OnPropertyChanged();
                 UpdateShowman();
@@ -768,7 +772,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    private void Showman_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void Showman_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(GameAccount.AccountType))
         {
