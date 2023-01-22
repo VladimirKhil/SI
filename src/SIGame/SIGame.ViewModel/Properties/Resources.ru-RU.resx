@@ -232,34 +232,34 @@
     <value>Ошибка работы с Библиотекой вопросов</value>
   </data>
   <data name="TimeSettings_ChoosingFinalTheme" xml:space="preserve">
-    <value>Время на выбор темы в финальном раунде</value>
+    <value>Выбор темы в финальном раунде</value>
   </data>
   <data name="TimeSettings_ChoosingQuestion" xml:space="preserve">
-    <value>Время для выбора игроком вопроса</value>
+    <value>Выбор вопроса</value>
   </data>
   <data name="TimeSettings_FinalThinking" xml:space="preserve">
-    <value>Время на обдумывание в финале</value>
+    <value>Обдумывание в финале</value>
   </data>
   <data name="TimeSettings_GivingCat" xml:space="preserve">
-    <value>Время на размышление на отдачу Вопроса с секретом</value>
+    <value>Размышление на отдачу "Вопроса с секретом"</value>
   </data>
   <data name="TimeSettings_MakingStake" xml:space="preserve">
-    <value>Время на размышление над ставкой на Вопросе со ставкой и финале</value>
+    <value>Размышление над ставкой в "Вопросе со ставкой" и в финале</value>
   </data>
   <data name="TimeSettings_PrintingAnswer" xml:space="preserve">
-    <value>Время на ввод ответа после нажатия кнопки</value>
+    <value>Ввод ответа после нажатия кнопки</value>
   </data>
   <data name="TimeSettings_Round" xml:space="preserve">
-    <value>Время раунда</value>
+    <value>Раунд</value>
   </data>
   <data name="TimeSettings_ShowmanDecisions" xml:space="preserve">
-    <value>Время на принятие решений ведущим</value>
+    <value>Принятие ответов и решений ведущим</value>
   </data>
   <data name="TimeSettings_ThinkingOnQuestion" xml:space="preserve">
-    <value>Время для размышления над вопросом</value>
+    <value>Размышление над вопросом</value>
   </data>
   <data name="TimeSettings_ThinkingOnSpecial" xml:space="preserve">
-    <value>Время на размышление над спецвопросом</value>
+    <value>Размышление над спецвопросом</value>
   </data>
   <data name="UploadPackageTimeout" xml:space="preserve">
     <value>Истекло время ожидания отправки пакета. Попробуйте ещё раз или уменьшите размер файла.</value>
@@ -442,10 +442,10 @@
     <value>Неверные настройки игры</value>
   </data>
   <data name="TimeSettings_MediaDelay" xml:space="preserve">
-    <value>Время на паузу для медиаконтента</value>
+    <value>Пауза для медиаконтента</value>
   </data>
   <data name="TimeSettings_RightAnswer" xml:space="preserve">
-    <value>Время на вывод правильного ответа</value>
+    <value>Вывод правильного ответа</value>
   </data>
   <data name="ServerConnectionError" xml:space="preserve">
     <value>Соединение с сервером потеряно!</value>

@@ -111,10 +111,12 @@
 
         <Style x:Key="JoinButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
             <Setter Property="Padding" Value="5" />
-            <Setter Property="Height" Value="53" />
+            <Setter Property="Height" Value="46" />
             <Setter Property="FontSize" Value="25" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Command" Value="{Binding Join}" />
-            
+            <Setter Property="Background" Value="{StaticResource WindowBackground}" />
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding CanJoin}" Value="False">
                     <Setter Property="IsEnabled" Value="False" />
@@ -171,19 +173,20 @@
                     Width="48"
                     Height="48"
                     BorderThickness="0"
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Top"
                     HorizontalContentAlignment="Stretch"
                     VerticalContentAlignment="Stretch">
                     <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
                 </Button>
                 
                 <TextBlock
-                    Margin="15,15,7,2"
+                    Margin="15,13,7,2"
                     Text="{x:Static vmp:Resources.MainMenu_OnlineGame}"
                     Effect="{StaticResource Effect}"
                     Foreground="{StaticResource MainColor}"
                     FontSize="35"
-                    FontWeight="Bold" />
+                    FontWeight="SemiBold"
+                    VerticalAlignment="Top" />
             </DockPanel>
             
             <DockPanel
@@ -252,7 +255,7 @@
                 
                 <TextBlock
                     Foreground="{StaticResource MainColor}"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     FontSize="22"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
@@ -267,7 +270,7 @@
                     Margin="15,8,15,3"
                     Effect="{StaticResource Effect}"
                     Foreground="{StaticResource MainColor}"
-                    FontWeight="Bold"
+                    FontWeight="SemiBold"
                     FontSize="22"
                     VerticalAlignment="Center">
                     <Run Text="{x:Static lp:Resources.Tab_Games}" />
@@ -443,7 +446,9 @@
                     Content="{x:Static lp:Resources.NewGame}"
                     Style="{StaticResource SIButton}"
                     Command="{Binding NewGame}"
+                    Background="{StaticResource WindowBackground}"
                     FontSize="28"
+                    FontWeight="SemiBold"
                     Padding="0,8" />
                 
                 <ListBox
@@ -549,6 +554,7 @@
                         Padding="1,1,0,1"
                         VerticalContentAlignment="Center"
                         Height="40"
+                        FontWeight="Medium"
                         Background="{Binding
                             Text.Length,
                             Converter={StaticResource RequiredToColorConverter},
@@ -585,12 +591,12 @@
                         <StackPanel.Resources>
                             <Style x:Key="Header" TargetType="{x:Type TextBlock}">
                                 <Setter Property="FontSize" Value="18" />
-                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
                                 <Setter Property="Margin" Value="0,16,0,0" />
                             </Style>
                         </StackPanel.Resources>
                         
-                        <TextBlock Text="{Binding CurrentGame.GameName}" TextWrapping="Wrap" FontSize="26" FontWeight="Bold" Margin="18,18,20,0" />
+                        <TextBlock Text="{Binding CurrentGame.GameName}" TextWrapping="Wrap" FontSize="26" FontWeight="SemiBold" Margin="18,18,20,0" />
                         
                         <StackPanel DataContext="{Binding CurrentGame}" Margin="18,0,5,5" TextBlock.FontSize="16">
                             <StackPanel.Style>

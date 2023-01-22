@@ -29,12 +29,12 @@
 
         <Style x:Key="MenuButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
             <Setter Property="FontSize" Value="45" />
-            <Setter Property="UseLayoutRounding" Value="True" />
-            <Setter Property="BorderThickness" Value="1.5" />
-            <Setter Property="Margin" Value="0,-1.5,0,0" />
+            <Setter Property="BorderThickness" Value="4" />
+            <Setter Property="BorderBrush" Value="#AAAAAD" />
+            <Setter Property="Margin" Value="0,-4,0,0" />
             <Setter Property="Command" Value="{Binding Command}" />
             <Setter Property="Content" Value="{Binding Header}" />
-            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             
             <Setter Property="RenderTransform">
                 <Setter.Value>
@@ -358,7 +358,7 @@
 
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="false">
-                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Setter Property="Opacity" Value="0.5" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -386,7 +386,7 @@
                 Background="{TemplateBinding Background}"
                 Padding="{TemplateBinding Padding}">
                 <DockPanel>
-                    <Border Background="#FF183CF3" DockPanel.Dock="Top">
+                    <Border Background="#aaaaad" DockPanel.Dock="Top">
                         <DockPanel Margin="8,8,0,8">
                             <Button
                                 DockPanel.Dock="Left"
@@ -753,9 +753,7 @@
                 <my:DropDownButton.DropDown>
                     <ContextMenu
                         Style="{StaticResource SIContextMenuStyle}"
-                        Placement="Relative"
-                        HorizontalOffset="-20"
-                        VerticalOffset="-128"
+                        Placement="Top"
                         Background="{StaticResource WindowBackground}">
                         <ContextMenu.Resources>
                             <ControlTemplate x:Key="MenuTemplate" TargetType="{x:Type MenuItem}">

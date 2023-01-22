@@ -616,7 +616,7 @@
     <value>Is started</value>
   </data>
   <data name="StartGame" xml:space="preserve">
-    <value>Start the game</value>
+    <value>Create room</value>
   </data>
   <data name="Status" xml:space="preserve">
     <value>Status</value>

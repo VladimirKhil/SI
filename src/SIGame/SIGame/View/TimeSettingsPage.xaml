@@ -10,7 +10,8 @@
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
-    Title="{x:Static lp:Resources.TimeSettings}"
+    Title="{x:Static lp:Resources.Time}"
+    FontFamily="{StaticResource Font}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <Style TargetType="{x:Type TextBox}">

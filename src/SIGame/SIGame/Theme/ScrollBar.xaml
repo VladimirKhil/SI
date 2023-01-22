@@ -22,7 +22,7 @@
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="IsTabStop" Value="false" />
         <Setter Property="Focusable" Value="false" />
-        <Setter Property="Background" Value="#a8acfd" />
+        <Setter Property="Background" Value="#7262e5" />
 
         <Setter Property="Template">
             <Setter.Value>
@@ -39,9 +39,9 @@
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                             <LinearGradientBrush.GradientStops>
                                 <GradientStopCollection>
-                                    <GradientStop Color="#a8acfd" Offset="0" />
+                                    <GradientStop Color="#7262e5" Offset="0" />
                                     <GradientStop Color="#FFCEE0FF" Offset="0.5" />
-                                    <GradientStop Color="#a8acfd" Offset="1.0" />
+                                    <GradientStop Color="#7262e5" Offset="1.0" />
                                 </GradientStopCollection>
                             </LinearGradientBrush.GradientStops>
                         </LinearGradientBrush>

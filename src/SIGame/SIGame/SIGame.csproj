@@ -21,6 +21,7 @@
     <DebugType>portable</DebugType>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <Optimize>true</Optimize>
+    <DefineConstants>$(DefineConstants);UPDATE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>game.ico</ApplicationIcon>
@@ -35,7 +36,6 @@
   <PropertyGroup>
     <Win32Resource />
   </PropertyGroup>
-  <PropertyGroup />
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
@@ -45,7 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Fonts\Jost-Bold.ttf" />
+    <Resource Include="Fonts\Jost-Light.ttf" />
+    <Resource Include="Fonts\Jost-Medium.ttf" />
     <Resource Include="Fonts\Jost-Regular.ttf" />
+    <Resource Include="Fonts\Jost-SemiBold.ttf" />
     <Resource Include="Fonts\Jost-Thin.ttf" />
     <Resource Include="Resources\ITC_Conduit_Bold_Cyrillic.ttf" />
     <None Include="licenses\Newtonsoft.Json.LICENSE.md">
@@ -144,9 +147,6 @@
     <None Include="Resources\sigame_logo_no_background.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Theme\main_background.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Theme\logo.png" />
   </ItemGroup>
   <ItemGroup>
@@ -157,12 +157,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\game.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Theme\studia.jpg" />
+    <Resource Include="Theme\main_background.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\fb_logo.png" />
+    <Resource Include="Theme\studia.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sounds\answer_wrong.mp3">
@@ -210,9 +209,14 @@
     <None Remove="Fonts\10262.otf" />
     <None Remove="Fonts\10265.otf" />
     <None Remove="Fonts\Jost-Bold.ttf" />
+    <None Remove="Fonts\Jost-Light.ttf" />
+    <None Remove="Fonts\Jost-Medium.ttf" />
     <None Remove="Fonts\Jost-Regular.ttf" />
+    <None Remove="Fonts\Jost-SemiBold.ttf" />
     <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\game_button.png" />
+    <None Remove="Theme\main_background.png" />
+    <None Remove="Theme\studia.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

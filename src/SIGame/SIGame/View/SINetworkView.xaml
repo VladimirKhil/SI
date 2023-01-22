@@ -48,7 +48,7 @@
                     Width="48"
                     Height="48"
                     BorderThickness="0"
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Top"
                     HorizontalContentAlignment="Stretch"
                     VerticalContentAlignment="Stretch">
                     <Path Data="M5,0L0,5L5,10M0.2,5L10,5" Stroke="{StaticResource MainColor}" StrokeThickness="2" Stretch="Uniform" Margin="12" />
@@ -59,8 +59,9 @@
                     Effect="{StaticResource Effect}"
                     Foreground="{StaticResource MainColor}"
                     FontSize="40"
-                    FontWeight="Bold"
-                    Margin="15,15,7,2" />
+                    FontWeight="SemiBold"
+                    Margin="15,10,7,2"
+                    VerticalAlignment="Top" />
             </DockPanel>
             
             <DockPanel Margin="7,5,5,10" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center">

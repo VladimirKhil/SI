@@ -2590,7 +2590,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Start the game.
+        ///   Ищет локализованную строку, похожую на Create room.
         /// </summary>
         public static string StartGame {
             get {

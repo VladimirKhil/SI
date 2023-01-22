@@ -16,6 +16,7 @@
     Title="{x:Static lp:Resources.AppTheme}"
     FontSize="20"
     IsEnabled="{Binding Settings.IsEditable}"
+    FontFamily="{StaticResource Font}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <Style x:Key="Header" TargetType="TextBlock" BasedOn="{StaticResource CommonText}">

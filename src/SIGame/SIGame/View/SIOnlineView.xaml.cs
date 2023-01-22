@@ -54,7 +54,7 @@ public partial class SIOnlineView : UserControl
             };
 
             tr.ApplyPropertyValue(TextElement.ForegroundProperty, c);
-            tr.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Bold);
+            tr.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.SemiBold);
 
             pos = chat.VerticalOffset;
 

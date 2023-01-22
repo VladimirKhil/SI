@@ -184,12 +184,85 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <StackPanel
+                Orientation="Vertical"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Margin="15,63,0,0">
+                <local:DropDownButton
+                    Style="{StaticResource SIDropDownButton}"
+                    FontSize="20"
+                    Height="48"
+                    Width="48"
+                    Content="🔊"
+                    ToolTip="{x:Static lp:Resources.VolumeControl}">
+                    <local:DropDownButton.DropDown>
+                        <ContextMenu Placement="Right">
+                            <ContextMenu.Template>
+                                <ControlTemplate TargetType="ContextMenu">
+                                    <Border x:Name="Border" Background="#BC000000" Padding="10">
+                                        <Slider Value="{Binding Volume}" Foreground="{StaticResource MainColor}" Maximum="100" Width="180" Height="20" Orientation="Horizontal" IsMoveToPointEnabled="True" />
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasDropShadow" Value="true">
+                                            <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ContextMenu.Template>
+                        </ContextMenu>
+                    </local:DropDownButton.DropDown>
+                </local:DropDownButton>
+
+                <local:DropDownButton
+                    Style="{StaticResource SIDropDownButton}"
+                    FontSize="20"
+                    Height="48"
+                    Width="48"
+                    Content="⚙"
+                    ToolTip="{x:Static lp:Resources.GameManagement}">
+                    <local:DropDownButton.DropDown>
+                        <ContextMenu Placement="Right">
+                            <ContextMenu.Template>
+                                <ControlTemplate TargetType="ContextMenu">
+                                    <Border x:Name="Border" Background="#CC000000" TextBlock.FontSize="22">
+                                        <StackPanel>
+                                            <Button
+                                                Style="{StaticResource SIButton}"
+                                                Padding="20,10"
+                                                Content="{x:Static lp:Resources.AddTable}"
+                                                Command="{Binding Data.AddTable}" />
+
+                                            <Button
+                                                Style="{StaticResource SIButton}"
+                                                Padding="20,10"
+                                                Margin="0,-1,0,0"
+                                                Content="{x:Static lp:Resources.DeleteTable}"
+                                                Command="{Binding Data.DeleteTable}"
+                                                lb:Closeable.IsAttached="True" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="HasDropShadow" Value="true">
+                                            <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ContextMenu.Template>
+                        </ContextMenu>
+                    </local:DropDownButton.DropDown>
+                </local:DropDownButton>
+            </StackPanel>
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="18*" />
-                    <RowDefinition Height="18*" />
+                    <RowDefinition Height="14*" />
+                    <RowDefinition Height="22*" />
                 </Grid.RowDefinitions>
 
                 <ProgressBar
@@ -208,9 +281,9 @@
                     Foreground="Black"
                     FontSize="18"
                     LineHeight="18"
-                    Margin="73,30,15,0" />
+                    Margin="73,27,15,0" />
 
-                <ContentControl Grid.Row="3" Content="{Binding}">
+                <ContentControl Grid.Row="2" Content="{Binding}">
                     <ContentControl.Style>
                         <Style TargetType="ContentControl">
                             <Setter Property="ContentTemplate">
@@ -277,80 +350,6 @@
             Background="White"
             FontWeight="Bold">
         </TextBlock>
-
-        <StackPanel
-            Orientation="Vertical"
-            Grid.RowSpan="2"
-            Grid.ColumnSpan="3"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Margin="15,63,0,0">
-            <local:DropDownButton
-                Style="{StaticResource SIDropDownButton}"
-                FontSize="20"
-                Height="48"
-                Width="48"
-                Content="🔊"
-                ToolTip="{x:Static lp:Resources.VolumeControl}">
-                <local:DropDownButton.DropDown>
-                    <ContextMenu Placement="Right">
-                        <ContextMenu.Template>
-                            <ControlTemplate TargetType="ContextMenu">
-                                <Border x:Name="Border" Background="#BC000000" Padding="10">
-                                    <Slider Value="{Binding Volume}" Foreground="{StaticResource MainColor}" Maximum="100" Width="180" Height="20" Orientation="Horizontal" IsMoveToPointEnabled="True" />
-                                </Border>
-                                
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="HasDropShadow" Value="true">
-                                        <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </ContextMenu.Template>
-                    </ContextMenu>
-                </local:DropDownButton.DropDown>
-            </local:DropDownButton>
-
-            <local:DropDownButton
-                Style="{StaticResource SIDropDownButton}"
-                FontSize="20"
-                Height="48"
-                Width="48"
-                Content="⚙"
-                ToolTip="{x:Static lp:Resources.GameManagement}">
-                <local:DropDownButton.DropDown>
-                    <ContextMenu Placement="Right">
-                        <ContextMenu.Template>
-                            <ControlTemplate TargetType="ContextMenu">
-                                <Border x:Name="Border" Background="#CC000000" TextBlock.FontSize="22">
-                                    <StackPanel>
-                                        <Button
-                                            Style="{StaticResource SIButton}"
-                                            Padding="20,10"
-                                            Content="{x:Static lp:Resources.AddTable}"
-                                            Command="{Binding Data.AddTable}" />
-
-                                        <Button
-                                            Style="{StaticResource SIButton}"
-                                            Padding="20,10"
-                                            Margin="0,-1,0,0"
-                                            Content="{x:Static lp:Resources.DeleteTable}"
-                                            Command="{Binding Data.DeleteTable}"
-                                            lb:Closeable.IsAttached="True" />
-                                    </StackPanel>
-                                </Border>
-
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="HasDropShadow" Value="true">
-                                        <Setter TargetName="Border" Property="Margin" Value="0,3,0,3" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </ContextMenu.Template>
-                    </ContextMenu>
-                </local:DropDownButton.DropDown>
-            </local:DropDownButton>
-        </StackPanel>
 
         <ContentControl
             Grid.Row="1"

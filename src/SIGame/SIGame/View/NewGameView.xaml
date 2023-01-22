@@ -182,7 +182,7 @@
                     Text="{Binding Name}"
                     VerticalAlignment="Center"
                     FontSize="15"
-                    FontWeight="Medium"
+                    FontWeight="Regular"
                     Margin="11,0"
                     Width="120"
                     TextWrapping="Wrap" />
@@ -225,7 +225,7 @@
                     Text="{Binding Name}"
                     VerticalAlignment="Center"
                     FontSize="15"
-                    FontWeight="Medium"
+                    FontWeight="Regular"
                     Margin="11,0"
                     Width="100"
                     TextWrapping="Wrap" />
@@ -350,7 +350,7 @@
                     Visibility="{Binding ElementName=showPassword,Path=IsChecked,Converter={StaticResource BooleanToCollapsedConverter}}"
                     lb:PasswordHelper.IsAttached="True"
                     Background="White"
-                    FontWeight="Medium"
+                    FontWeight="Regular"
                     lb:PasswordHelper.Password="{Binding NetworkGamePassword, Mode=TwoWay}"
                     MaxLength="15"
                     VerticalAlignment="Center"
@@ -420,7 +420,7 @@
                 Style="{StaticResource Header}"
                 Margin="5,5,5,0"
                 Grid.Row="2"
-                FontWeight="Medium"
+                FontWeight="SemiBold"
                 VerticalAlignment="Center" />
 
             <DockPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
@@ -488,7 +488,7 @@
                 Grid.Row="3"
                 Grid.Column="1"
                 Margin="5,10,5,5"
-                FontWeight="Light"
+                FontWeight="Regular"
                 FontSize="17"
                 Background="#33FFFFFF"
                 Style="{StaticResource ComboBoxStyle}"
@@ -499,7 +499,7 @@
                         <TextBlock
                             x:Name="text"
                             Text="{Binding Converter={StaticResource GameRoleConverter1}}"
-                            FontWeight="Medium" />
+                            FontWeight="Regular" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>

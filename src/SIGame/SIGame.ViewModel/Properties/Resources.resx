@@ -331,34 +331,34 @@
     <value>An error occured while following the web-site ({0}). Make sure you have a default browser</value>
   </data>
   <data name="TimeSettings_ChoosingFinalTheme" xml:space="preserve">
-    <value>Time to choose a final round theme</value>
+    <value>Сhoosing a final round theme</value>
   </data>
   <data name="TimeSettings_ChoosingQuestion" xml:space="preserve">
-    <value>Time to choose a question by players</value>
+    <value>Choosing a question</value>
   </data>
   <data name="TimeSettings_FinalThinking" xml:space="preserve">
-    <value>Time to think on a final question</value>
+    <value>Thinking on final question</value>
   </data>
   <data name="TimeSettings_GivingCat" xml:space="preserve">
-    <value>Time to give the "Secret question" away</value>
+    <value>Giving the "Secret question"</value>
   </data>
   <data name="TimeSettings_MakingStake" xml:space="preserve">
-    <value>Time to make a bet in an "Bet question" and in the final question</value>
+    <value>Making a bet in an "Stake question" and in a final question</value>
   </data>
   <data name="TimeSettings_PrintingAnswer" xml:space="preserve">
-    <value>Time to enter the answer after pressing the button</value>
+    <value>Entering the answer after pressing the button</value>
   </data>
   <data name="TimeSettings_Round" xml:space="preserve">
-    <value>Round time</value>
+    <value>Round</value>
   </data>
   <data name="TimeSettings_ShowmanDecisions" xml:space="preserve">
-    <value>Time for making decisions by the showman</value>
+    <value>Making decisions and accepting answers by showman</value>
   </data>
   <data name="TimeSettings_ThinkingOnQuestion" xml:space="preserve">
-    <value>Time to think on a question</value>
+    <value>Thinking on a question</value>
   </data>
   <data name="TimeSettings_ThinkingOnSpecial" xml:space="preserve">
-    <value>Time to think on a special question</value>
+    <value>Thinking on a special question</value>
   </data>
   <data name="UploadPackageTimeout" xml:space="preserve">
     <value>The pack sending time is expired. Please, try again, or reduce the size of the file</value>
@@ -430,10 +430,10 @@
     <value>Wrong game settings</value>
   </data>
   <data name="TimeSettings_MediaDelay" xml:space="preserve">
-    <value>Time to pause while showing media</value>
+    <value>Pause while showing media</value>
   </data>
   <data name="TimeSettings_RightAnswer" xml:space="preserve">
-    <value>Time to show right answer</value>
+    <value>Showing right answer</value>
   </data>
   <data name="ServerConnectionError" xml:space="preserve">
     <value>Server connection lost!</value>

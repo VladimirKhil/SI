@@ -25,7 +25,8 @@
             HorizontalAlignment="Center"
             TextAlignment="Center"
             TextWrapping="Wrap"
-            FontSize="25">
+            FontSize="25"
+            Margin="5">
             <TextBlock.Style>
                 <Style TargetType="TextBlock">
                     <Setter Property="Visibility" Value="Hidden" />

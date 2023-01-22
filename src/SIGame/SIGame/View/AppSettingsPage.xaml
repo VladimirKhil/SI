@@ -12,7 +12,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
-    Title="{x:Static lp:Resources.AppSettings}"
+    Title="{x:Static lp:Resources.Application}"
     FontSize="20">
     <StackPanel DataContext="{Binding MainMenu}" Margin="10">
         <StackPanel.Resources>

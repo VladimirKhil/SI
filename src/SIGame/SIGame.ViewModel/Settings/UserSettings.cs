@@ -133,12 +133,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private bool _searchForUpdates =
-#if DEBUG
-    false;
-#else
-    true;
-#endif
+    private bool _searchForUpdates = true;
 
     [XmlAttribute]
     [DefaultValue(true)]

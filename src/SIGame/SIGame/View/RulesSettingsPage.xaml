@@ -15,6 +15,7 @@
     d:DesignWidth="1960.521"
     Title="{x:Static lp:Resources.GameRules}"
     FontSize="20"
+    FontFamily="{StaticResource Font}"
     d:DataContext="{d:DesignInstance vm:MainViewModel}">
     <Page.Resources>
         <ObjectDataProvider x:Key="GameModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">

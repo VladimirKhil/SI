@@ -9,8 +9,8 @@
   <?define UpgradeCode="0ae8f953-4e32-4209-a006-85490b24ddd3" ?>
   <?define PhotoPath="$(var.SIGame.ProjectDir)Photo\" ?>
 	
-	<?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
-	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
+    <?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
+    <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
     
     <Product
 		Id="*"
@@ -111,7 +111,7 @@
         <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
 		<Component Guid="{4687DB8D-2AA3-46AD-8B85-A8469390E198}">
-			<File KeyPath="yes" Source="$(var.PublishFolder)WebView2Loader.dll" />
+			<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
 		</Component>
 	    <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
 		    <File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />

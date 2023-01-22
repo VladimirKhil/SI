@@ -214,7 +214,7 @@
     <value>Начата</value>
   </data>
   <data name="StartGame" xml:space="preserve">
-    <value>Начать игру</value>
+    <value>Создать комнату</value>
   </data>
   <data name="Status" xml:space="preserve">
     <value>Статус</value>

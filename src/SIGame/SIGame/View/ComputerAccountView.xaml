@@ -1,19 +1,22 @@
-﻿<UserControl x:Class="SIGame.ComputerAccountView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:SIGame"
-             xmlns:localc="clr-namespace:SIGame.Converters"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:lp="clr-namespace:SIGame.Properties"
-             xmlns:data="clr-namespace:SIData;assembly=SIData"
-             mc:Ignorable="d"
-             Loaded="UserControl_Loaded">
+﻿<UserControl
+    x:Class="SIGame.ComputerAccountView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:SIGame"
+    xmlns:localc="clr-namespace:SIGame.Converters"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:lp="clr-namespace:SIGame.Properties"
+    xmlns:data="clr-namespace:SIData;assembly=SIData"
+    mc:Ignorable="d"
+    Loaded="UserControl_Loaded"
+    TextBlock.FontWeight="Medium">
     <UserControl.Resources>
         <Style x:Key="{x:Type local:NumericTextBox}" TargetType="{x:Type local:NumericTextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
+        
         <ControlTemplate x:Key="SliderEditorTemplate" TargetType="{x:Type Slider}">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -21,9 +24,11 @@
                     <ColumnDefinition Width="70" />
                     <ColumnDefinition Width="130" />
                 </Grid.ColumnDefinitions>
+                
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+                
                 <TextBlock Text="{TemplateBinding Tag}" Foreground="{StaticResource MainColor}" VerticalAlignment="Center" Margin="2" TextWrapping="Wrap" />
                 <local:NumericTextBox Grid.Column="1" Text="{Binding Path=Value, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" VerticalAlignment="Center" />
                 <Slider VerticalAlignment="Center" Grid.Column="2" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" TickFrequency="{TemplateBinding TickFrequency}" IsSnapToTickEnabled="{TemplateBinding IsSnapToTickEnabled}" Value="{Binding Path=Value, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" />
@@ -54,14 +59,17 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
+    
     <UserControl.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding AddNewComputerAccount}" />
     </UserControl.InputBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
         <TabControl TabStripPlacement="Left" Background="Transparent" BorderThickness="1,0,0,1">
             <TabItem Header="{x:Static lp:Resources.Common}" Padding="15,10">
                 <Grid Margin="4" TextBlock.Foreground="{StaticResource MainColor}">
@@ -69,6 +77,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -87,13 +96,16 @@
                     <TextBlock Text="{x:Static lp:Resources.Name}" />
                     <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Name="tbName" />
                     <TextBlock Text="{x:Static lp:Resources.Sex}" Grid.Row="1" />
+                    
                     <StackPanel Margin="0,5,0,5" Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                         <RadioButton Foreground="{StaticResource MainColor}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Man}" Name="radioButton1" IsChecked="{Binding Model.IsMale}" GroupName="1" />
                         <RadioButton Foreground="{StaticResource MainColor}" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="5,0,0,0" Content="{x:Static lp:Resources.Woman}" Name="radioButton2" GroupName="1" IsChecked="False" />
                     </StackPanel>
+                    
                     <Button Style="{StaticResource SIButton}" Margin="0,0,5,0" Grid.Row="2" Command="{Binding SelectPicturePath}" Padding="20,6" Content="{x:Static lp:Resources.Avatar}" FontSize="20" />
                     <TextBox Grid.Column="1" Grid.Row="2"  Text="{Binding Model.Picture}" VerticalAlignment="Center" />
                     <TextBlock Text="{x:Static lp:Resources.GameStyle}" Grid.Row="3" />
+                    
                     <ComboBox Margin="0,5,0,0" Grid.Column="1" Grid.Row="3" ItemsSource="{Binding Source={StaticResource dataFromEnum}, Mode=OneTime}" SelectedItem="{Binding Model.Style}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -103,27 +115,33 @@
                     </ComboBox>
                 </Grid>
             </TabItem>
+            
             <TabItem Header="{x:Static lp:Resources.SelectionStyle}" Padding="15,10">
                 <StackPanel Orientation="Vertical" TextBlock.Foreground="{StaticResource MainColor}" Margin="5">
                     <TextBlock Text="{x:Static lp:Resources.Selection_PreferTheme}" Margin="2" />
+                    
                     <StackPanel Orientation="Horizontal">
                         <TextBox Text="{Binding Model.V1,Mode=TwoWay}" Width="70" Margin="5,0,0,0" />
                         <Slider Value="{Binding Model.V1,Mode=TwoWay}" Maximum="100" Width="130" Margin="5,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
+                    
                     <GroupBox Header="{x:Static lp:Resources.Selection_PreferThemeNumber}">
                         <StackPanel Orientation="Vertical">
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_KeepTheme}" Value="{Binding Model.V2,Mode=TwoWay}" Maximum="{Binding Model.V2Max}" Margin="2" />
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_UseThemePriority}" Value="{Binding Model.V3,Mode=TwoWay}" Maximum="{Binding Model.V3Max}" Margin="2" />
+                            
                             <Grid HorizontalAlignment="Left" Margin="2,0,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="70" />
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
+                                
                                 <TextBlock Text="{x:Static lp:Resources.Selection_RandomTheme}" Margin="2,0,0,0" Width="290" />
                                 <TextBox Style="{StaticResource {x:Type TextBox}}" IsEnabled="False" Grid.Column="1" Grid.Row="0" Text="{Binding Model.Rest1,Mode=OneWay}" VerticalAlignment="Center" />
                                 <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Selection_ThemePriority}" Margin="2,5,0,0" Width="290" />
@@ -131,22 +149,26 @@
                             </Grid>
                         </StackPanel>
                     </GroupBox>
+                    
                     <GroupBox Header="{x:Static lp:Resources.Selection_PreferQuestionNumber}">
                         <StackPanel Orientation="Vertical">
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_CheapQuestion}" Value="{Binding Model.V4,Mode=TwoWay}" Maximum="{Binding Model.V4Max}" />
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_ExpensiveQuestion}" Value="{Binding Model.V5,Mode=TwoWay}" Maximum="{Binding Model.V5Max}" />
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_SamePriceQuestion}" Value="{Binding Model.V6,Mode=TwoWay}" Maximum="{Binding Model.V6Max}" />
                             <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Selection_UseQuestionPriority}" Value="{Binding Model.V7,Mode=TwoWay}" Maximum="{Binding Model.V7Max}" />
+                            
                             <Grid Margin="2,0,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="70" />
                                     <ColumnDefinition Width="130" />
                                 </Grid.ColumnDefinitions>
+                                
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
+                                
                                 <TextBlock Grid.Column="0" Grid.Row="0" Text="{x:Static lp:Resources.Selection_RandomQuestion}"  />
                                 <TextBox Style="{StaticResource {x:Type TextBox}}" IsEnabled="False" Grid.Column="1" Grid.Row="0" Text="{Binding Model.Rest2,Mode=OneWay}" VerticalAlignment="Center" />
                                 <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Selection_QuestionPriority}" />
@@ -156,6 +178,7 @@
                     </GroupBox>
                 </StackPanel>
             </TabItem>
+            
             <TabItem Header="{x:Static lp:Resources.Logic}" Padding="15,10" DataContext="{Binding Model}">
                 <UniformGrid Columns="1" VerticalAlignment="Top" Margin="5">
                     <Slider Style="{StaticResource SliderEditorStyle}" Tag="{x:Static lp:Resources.Erudition}" Value="{Binding F,Mode=TwoWay}" Maximum="500" />
@@ -171,6 +194,7 @@
                 </UniformGrid>
             </TabItem>
         </TabControl>
+        
         <TextBlock Grid.Row="4" Height="23" HorizontalAlignment="Left" Margin="8,8,0,0" Name="tbError" Text="{Binding CAErrorMessage}" VerticalAlignment="Top" Foreground="#FFC10000" />
         <Button Style="{StaticResource SIButton}" Grid.Column="1" Grid.Row="4" Padding="20,6" HorizontalAlignment="Right" Name="button2" VerticalAlignment="Bottom" Command="{Binding AddNewComputerAccount}" Content="{Binding AddName}" FontSize="22" />
     </Grid>

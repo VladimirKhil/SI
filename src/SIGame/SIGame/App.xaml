@@ -221,7 +221,7 @@
                                         Text="{TemplateBinding Tag}"
                                         Style="{StaticResource CommonText}"
                                         FontSize="30"
-                                        FontWeight="Bold"
+                                        FontWeight="SemiBold"
                                         Margin="20,24,10,4"
                                         VerticalAlignment="Center" />
 
@@ -494,7 +494,7 @@
                                             Text="{TemplateBinding Tag}"
                                             Style="{StaticResource CommonText}"
                                             FontSize="25"
-                                            FontWeight="Bold"
+                                            FontWeight="SemiBold"
                                             Margin="10,4"
                                             VerticalAlignment="Center" />
                                     </StackPanel>
@@ -984,7 +984,7 @@
                                 Margin="7,0,0,0"
                                 BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}"
                                 BorderThickness="0,0,0,3">
-                                <TextBlock Text="{Binding}" FontWeight="Bold" Effect="{StaticResource Effect}" />
+                                <TextBlock Text="{Binding}" FontWeight="SemiBold" Effect="{StaticResource Effect}" />
                             </Border>
                         </DataTemplate>
                     </Setter.Value>
@@ -1000,8 +1000,8 @@
                         <DataTemplate>
                             <Border x:Name="border" Width="43" HorizontalAlignment="Center" Padding="7">
                                 <TextBlock
+                                    x:Name="text"
                                     Text="{Binding}"
-                                    Effect="{StaticResource Effect}"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center" />
                             </Border>
@@ -1009,6 +1009,7 @@
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=IsSelected}" Value="True">
                                     <Setter TargetName="border" Property="Background" Value="White" />
+                                    <Setter TargetName="text" Property="Foreground" Value="Black" />
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -1028,6 +1029,7 @@
 
             <Style x:Key="PersonTextStyle" TargetType="{x:Type TextBlock}">
                 <Setter Property="Margin" Value="3,1" />
+                <Setter Property="FontWeight" Value="SemiBold" />
                 <Setter Property="uib:FillManager.Fill" Value="True" />
                 <Setter Property="Foreground" Value="White" />
                 <Setter Property="TextAlignment" Value="Center" />
@@ -1180,7 +1182,7 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Text" Value="{Binding Replic}" />
-                <Setter Property="Margin" Value="10" />
+                <Setter Property="Margin" Value="2" />
             </Style>
 
             <Style x:Key="ReplicBorder" TargetType="Border">
