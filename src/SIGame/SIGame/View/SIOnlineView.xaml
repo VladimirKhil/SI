@@ -273,9 +273,7 @@
                     FontWeight="SemiBold"
                     FontSize="22"
                     VerticalAlignment="Center">
-                    <Run Text="{x:Static lp:Resources.Tab_Games}" />
-                    <Run Text=" " />
-                    <Run Text="{Binding ServerGames.Count, StringFormat=(\{0\}), Mode=OneWay}" />
+                    <Run Text="{x:Static lp:Resources.Tab_Games}" /><Run Text=" " /><Run Text="{Binding ServerGames.Count, StringFormat=(\{0\}), Mode=OneWay}" />
                 </TextBlock>
                 
                 <local:DropDownButton Style="{StaticResource SIDropDownButton}" FontSize="20" ToolTip="{x:Static lp:Resources.Filter}">
@@ -465,14 +463,15 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <DockPanel HorizontalAlignment="Stretch">
-                                <TextBlock
+                                <Image
                                     Name="passwordMark"
-                                    Text="🔓"
+                                    Source="/SIGame;component/Resources/protected.png"
                                     DockPanel.Dock="Right"
                                     Visibility="Hidden"
-                                    Margin="10,4,10,0"
-                                    FontSize="13"
-                                    Foreground="{StaticResource WindowBackground}"
+                                    Margin="10,0"
+                                    Stretch="Uniform"
+                                    Height="17"
+                                    Width="17"
                                     ToolTip="{x:Static lp:Resources.PasswordRequired}" />
 
                                 <TextBlock
@@ -775,9 +774,7 @@
                         <DataTemplate>
                             <Border BorderBrush="{Binding (TextBlock.Foreground), RelativeSource={RelativeSource Self}}" BorderThickness="0,0,0,3">
                                 <TextBlock Effect="{StaticResource Effect}" FontWeight="Bold" FontSize="23">
-                                    <Run Text="{x:Static lp:Resources.Tab_Players}" />
-                                    <Run Text=" " />
-                                    <Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
+                                    <Run Text="{x:Static lp:Resources.Tab_Players}" /><Run Text=" " /><Run Text="{Binding StringFormat=(\{0\}), Mode=OneWay}" />
                                 </TextBlock>
                             </Border>
                         </DataTemplate>

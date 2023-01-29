@@ -164,7 +164,7 @@
                                 StrokeThickness="2"
                                 StrokeLineJoin="Bevel"
                                 Stretch="Uniform"
-                                Margin="2" />
+                                Margin="4" />
                         </DataTemplate>
                     </Setter.Value>
                 </Setter>
@@ -225,7 +225,7 @@
                                         Margin="20,24,10,4"
                                         VerticalAlignment="Center" />
 
-                                    <Button Grid.Column="1" x:Name="bPopup" Style="{StaticResource PopupButtonStyle}" Margin="0,15,15,0" />
+                                    <Button Grid.Column="1" x:Name="bPopup" Style="{StaticResource PopupButtonStyle}" Margin="0,0,5,0" />
 
                                     <Button
                                         Grid.Column="2"
@@ -236,6 +236,7 @@
                                         Width="30"
                                         Height="30"
                                         Padding="0,1,1,0"
+                                        Margin="0,0,20,0"
                                         Command="{Binding Cancel}"
                                         IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}"
@@ -330,7 +331,7 @@
 
                                     <ProgressBar
                                         Grid.ColumnSpan="3"
-                                        Foreground="DarkBlue"
+                                        Foreground="{StaticResource ProgressBarColorBrush}"
                                         Height="8"
                                         VerticalAlignment="Top"
                                         Minimum="0"
@@ -356,7 +357,7 @@
                                         Grid.Column="1"
                                         x:Name="bPopup"
                                         Style="{StaticResource PopupButtonStyle}"
-                                        Margin="0,15,0,0" />
+                                        Margin="0,5,0,0" />
 
                                     <Button
                                         Grid.Row="1"
@@ -368,6 +369,7 @@
                                         Width="30"
                                         Height="30"
                                         Padding="0,1,1,0"
+                                        Margin="0,5,10,0"
                                         Command="{Binding Cancel}"
                                         IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}"
@@ -508,6 +510,7 @@
                                         Width="30"
                                         Height="30"
                                         Padding="0,1,1,0"
+                                        Margin="0,0,7,0"
                                         Command="{Binding CancelBase}"
                                         IsEnabled="{TemplateBinding IsEnabled}"
                                         ToolTip="{x:Static lp:Resources.Close}"
@@ -1128,7 +1131,8 @@
 
             <Style x:Key="ReadyButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButton}">
                 <Setter Property="Visibility" Value="{Binding GameStarted, Converter={StaticResource ReadyConverter}, ConverterParameter=True}" />
-                
+                <Setter Property="FontWeight" Value="SemiBold" />
+
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Ready}" Value="True">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -1182,7 +1186,7 @@
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Text" Value="{Binding Replic}" />
-                <Setter Property="Margin" Value="2" />
+                <Setter Property="Margin" Value="6" />
             </Style>
 
             <Style x:Key="ReplicBorder" TargetType="Border">

@@ -20,7 +20,7 @@
         
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="data:GameRole"/>
+                <x:Type TypeName="data:GameRole" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
 
@@ -251,6 +251,8 @@
         </Style>
 
         <Style x:Key="showmanCBStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ButtonBase}">
+            <Setter Property="Background" Value="{StaticResource WindowBackground}" />
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Role,Converter={StaticResource IsShowman}}" Value="True">
                     <Setter Property="Visibility" Value="Hidden" />
@@ -263,6 +265,8 @@
         </Style>
 
         <Style x:Key="playerCBStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource ButtonBase}">
+            <Setter Property="Background" Value="{StaticResource WindowBackground}" />
+            
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsCreator}" Value="True">
                     <Setter Property="Visibility" Value="Hidden" />
@@ -425,12 +429,18 @@
 
             <DockPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
                 <l:DropDownButton
-                    Style="{StaticResource SIDropDownButton}"
-                    Content="📂"
                     ToolTip="{x:Static lp:Resources.Select}"
-                    Foreground="Black">
+                    Width="35"
+                    Height="35">
                     <l:DropDownButton.DropDown>
                         <ContextMenu Placement="Bottom" Style="{StaticResource SIContextMenuStyle}">
+                            <MenuItem
+                                Header="{x:Static lp:Resources.File}"
+                                Command="{Binding SelectPackage}"
+                                CommandParameter="{x:Static ps:PackageSourceTypes.Local}" />
+
+                            <Separator />
+                            
                             <MenuItem Header="{x:Static lp:Resources.LocalLibrary}" Template="{StaticResource CustomMenuItem}">
                                 <MenuItem
                                     Header="{x:Static lp:Resources.Next}"
@@ -458,18 +468,19 @@
                             <Separator />
 
                             <MenuItem
-                                Header="{x:Static lp:Resources.File}"
-                                Command="{Binding SelectPackage}"
-                                CommandParameter="{x:Static ps:PackageSourceTypes.Local}" />
-
-                            <Separator />
-
-                            <MenuItem
                                 Header="{x:Static lp:Resources.UserPackages}"
                                 Command="{Binding SelectPackage}"
                                 CommandParameter="{x:Static ps:PackageSourceTypes.VK}" />
                         </ContextMenu>
                     </l:DropDownButton.DropDown>
+
+                    <Image Source="/SIGame;component/Resources/load.png" Stretch="Uniform" />
+
+                    <l:DropDownButton.Style>
+                        <Style TargetType="{x:Type l:DropDownButton}" BasedOn="{StaticResource SIDropDownButton}">
+                            <Setter Property="Background" Value="{StaticResource WindowBackground}" />
+                        </Style>
+                    </l:DropDownButton.Style>
                 </l:DropDownButton>
 
                 <TextBlock

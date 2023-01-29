@@ -5,4 +5,5 @@
 /// </summary>
 /// <param name="UserName">Player server-defined name.</param>
 /// <param name="Token">Token to identify the player on next presses.</param>
-public readonly record struct PressResponse(string UserName, string Token);
+/// <param name="ButtonBlockTime">Button blocking time in milliseconds.</param>
+public readonly record struct PressResponse(string UserName, string Token, int ButtonBlockTime);

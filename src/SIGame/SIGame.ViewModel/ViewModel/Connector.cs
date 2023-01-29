@@ -46,6 +46,7 @@ public sealed class Connector : IDisposable
         _tcs = new TaskCompletionSource<string[]>();
 
         var m = new Message(command, "", "");
+
         _server.ConnectionsLock.WithLock(async () =>
         {
             if (_server.HostServer == null)
@@ -63,6 +64,7 @@ public sealed class Connector : IDisposable
     private ValueTask ProcessMessageAsync(Message m)
     {
         var text = m.Text?.Split(Message.ArgsSeparatorChar);
+
         if (text?.Length == 0)
         {
             return default;
@@ -104,10 +106,7 @@ public sealed class Connector : IDisposable
         return default;
     }
 
-    public void Dispose()
-    {
-        _client.MessageReceived -= ProcessMessageAsync;
-    }
+    public void Dispose() => _client.MessageReceived -= ProcessMessageAsync;
 
     internal Task<bool> SetGameIdAsync(int gameId)
     {

@@ -29,7 +29,7 @@
         </Style>
         
         <DataTemplate x:Key="ItemTemplate" DataType="{x:Type sys:String}">
-            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" FontSize="15" />
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" TextAlignment="Center" FontSize="15" FontWeight="SemiBold" />
         </DataTemplate>
         
         <lc:TrimConverter x:Key="trim" MaxLength="250" />
@@ -127,6 +127,7 @@
             Grid.Row="2"
             Content="{x:Static lp:Resources.Yes}"
             FontSize="25"
+            FontWeight="SemiBold"
             Padding="30,8" />
         
         <Button
@@ -137,6 +138,7 @@
             Margin="-1,0,0,0"
             Content="{x:Static lp:Resources.No}"
             FontSize="25"
+            FontWeight="SemiBold"
             Padding="30,8"/>
     </Grid>
 </UserControl>

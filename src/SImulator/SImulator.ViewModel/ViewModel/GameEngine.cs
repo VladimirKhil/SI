@@ -276,6 +276,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
     }
 
+    public int ButtonBlockTime => (int)(Settings.Model.BlockingTime * 1000);
+
     private readonly IExtendedGameHost _gameHost;
 
     private readonly string _packageFolder;

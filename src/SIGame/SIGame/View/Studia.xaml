@@ -10,6 +10,7 @@
     xmlns:local="clr-namespace:SIGame"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
     xmlns:localc="clr-namespace:SIGame.Converters"
+    xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lb="clr-namespace:SIGame.Behaviors"
     mc:Ignorable="d"
@@ -22,6 +23,7 @@
         <localc:BackgroundConverter x:Key="BackgroundConverter" />
         <localc:DialogPositionConverter x:Key="DialogPositionConverter" />
         <localc:ReverseTimeConverter x:Key="ReverseTimeConverter" />
+        <uic:FontConverter x:Key="FontConverter" />
 
         <Style x:Key="SIProgressBar" TargetType="{x:Type ProgressBar}" BasedOn="{StaticResource {x:Type ProgressBar}}">
             <Setter Property="Opacity" Value="0.75" />
@@ -97,7 +99,7 @@
             <ProgressBar
                 Grid.Column="2"
                 Height="13"
-                Foreground="#77ffdf00"
+                Foreground="Orange"
                 VerticalAlignment="Top"
                 Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
                 ToolTip="{x:Static lp:Resources.Time_Decide}"
@@ -123,6 +125,7 @@
                         HorizontalAlignment="Center"
                         Foreground="{StaticResource MainColor}"
                         Text="{x:Static lp:Resources.Pause}"
+                        FontFamily="{Binding TInfo.Settings.TableFontFamily, Converter={StaticResource FontConverter}}"
                         uib:FillManager.Fill="True"
                         uib:FillManager.MaxFontSize="150">
 
@@ -160,6 +163,7 @@
                         TextWrapping="Wrap"
                         TextAlignment="Center"
                         Margin="15"
+                        FontFamily="{Binding TInfo.Settings.TableFontFamily, Converter={StaticResource FontConverter}}"
                         lb:NavigationService.Text="{Binding Ad}"
                         uib:FillManager.Fill="True"
                         uib:FillManager.MaxFontSize="130">
@@ -185,7 +189,7 @@
             </ItemsControl>
 
             <StackPanel
-                Orientation="Vertical"
+                Orientation="Horizontal"
                 Grid.RowSpan="2"
                 Grid.ColumnSpan="3"
                 HorizontalAlignment="Left"
@@ -196,7 +200,7 @@
                     FontSize="20"
                     Height="48"
                     Width="48"
-                    Content="🔊"
+                    Padding="13"
                     ToolTip="{x:Static lp:Resources.VolumeControl}">
                     <local:DropDownButton.DropDown>
                         <ContextMenu Placement="Right">
@@ -215,6 +219,8 @@
                             </ContextMenu.Template>
                         </ContextMenu>
                     </local:DropDownButton.DropDown>
+
+                    <Image Source="/SIGame;component/Resources/sound.png" Stretch="Uniform" />
                 </local:DropDownButton>
 
                 <local:DropDownButton
@@ -222,13 +228,15 @@
                     FontSize="20"
                     Height="48"
                     Width="48"
-                    Content="⚙"
+                    Padding="13"
                     ToolTip="{x:Static lp:Resources.GameManagement}">
                     <local:DropDownButton.DropDown>
-                        <ContextMenu Placement="Right">
+                        <ContextMenu
+                            Placement="Right"
+                            Style="{StaticResource SIContextMenuStyle}">
                             <ContextMenu.Template>
                                 <ControlTemplate TargetType="ContextMenu">
-                                    <Border x:Name="Border" Background="#CC000000" TextBlock.FontSize="22">
+                                    <Border x:Name="Border" Background="#CC000000" TextBlock.FontSize="20">
                                         <StackPanel>
                                             <Button
                                                 Style="{StaticResource SIButton}"
@@ -255,14 +263,16 @@
                             </ContextMenu.Template>
                         </ContextMenu>
                     </local:DropDownButton.DropDown>
+
+                    <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" />
                 </local:DropDownButton>
             </StackPanel>
 
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="14*" />
-                    <RowDefinition Height="22*" />
+                    <RowDefinition Height="16*" />
+                    <RowDefinition Height="20*" />
                 </Grid.RowDefinitions>
 
                 <ProgressBar
@@ -316,7 +326,8 @@
                 VerticalAlignment="Bottom"
                 Padding="10,6"
                 Margin="2,0,0,2"
-                FontSize="26">
+                FontSize="26"
+                FontWeight="SemiBold">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource SIButton}">
                         <Style.Triggers>

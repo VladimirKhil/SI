@@ -243,7 +243,7 @@
                 BorderThickness="1"
                 CornerRadius="10"
                 Effect="{StaticResource Effect}">
-                <TextBlock uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="32" Style="{StaticResource ReplicText}" />
+                <TextBlock uib:FillManager.Fill="True" uib:FillManager.MaxFontSize="36" Style="{StaticResource ReplicText}" />
             </Border>
         </Canvas>
     </Grid>

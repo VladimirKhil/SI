@@ -34,7 +34,7 @@ public class AccountViewModel<TAccount>: ViewModel<TAccount>
         SelectPicturePath = new CustomCommand(SelectPicturePath_Executed);
     }
 
-    private void SelectPicturePath_Executed(object arg)
+    private void SelectPicturePath_Executed(object? arg)
     {
         try
         {

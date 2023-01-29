@@ -26,9 +26,9 @@ public sealed class DesktopManager : PlatformManager
 
     private bool _loop;
 
-    private string _recentAvatarDir = null;
+    private string? _recentAvatarDir = null;
 
-    private string _recentPackageDir = null;
+    private string? _recentPackageDir = null;
 
     private bool _isListenerAttached = false;
 
@@ -175,7 +175,9 @@ public sealed class DesktopManager : PlatformManager
                 openDialog.CustomPlaces.Add(new FileDialogCustomPlace(Global.PackagesUri));
             }
 
-            if (openDialog.ShowDialog().Value)
+            var openResult = openDialog.ShowDialog();
+
+            if (openResult.HasValue && openResult.Value)
             {
                 if (maxPackageSize.HasValue && new FileInfo(openDialog.FileName).Length > maxPackageSize.Value * 1024 * 1024)
                 {

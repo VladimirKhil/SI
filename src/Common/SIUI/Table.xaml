@@ -415,10 +415,12 @@
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.None}">
                                 <ContentControl Style="{StaticResource Rotator}">
-                                    <TextBlock
-                                        Text="&amp;"
-                                        Style="{StaticResource RotatingText}"
-                                        FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                    <Border Background="Transparent">
+                                        <TextBlock
+                                            Text="&amp;"
+                                            Style="{StaticResource RotatingText}"
+                                            FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                    </Border>
                                 </ContentControl>
                             </DataTemplate>
                             

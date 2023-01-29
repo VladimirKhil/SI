@@ -2,6 +2,8 @@ SIGame projects set
 
 .NET 6 SDK is required to compile the solutions. Visual Studio 2022 is required to publish SImulator ClickOnce application.
 
+WiX Toolset is required to build app installers.
+
 # Solutions
 
 * *SImulator* - SIGame offline app (allows to host a game with a single computer and projector)
@@ -12,13 +14,19 @@ SIGame projects set
 
 * *src/Common/AppService.Client* - allows to search for the app updates and report app usage and errors;
 * *src/Common/Notions* - provides helper methods for working with strings;
+* *src/Common/SI.GameServer.Client* - provides a client for SIGame server;
+* *src/Common/SI.GameServer.Contract* - defines a SIGame server contract;
 * *src/Common/SIEngine* - provides a low-level SIGame engine, which loads question package and generates game events;
 * *src/Common/SIPackages* - provides a question package model;
+* *src/Common/SIStorageService.Client* - provides a client for SIGame question storage;
 * *src/Common/SIUI* - provides a SIGame table UI;
+* *src/Common/Utils* - provides auxilliary classes;
 
 * *src/SIQuester/QTxtConverter* - supports text files to question packages conversion;
 
 * *src/SICore/SICore* - provides a high-level SIGame engine;
+* *src/SICore/SICore.Connections* - provides base classes for building a SI Nodes network;
+* *src/SICore/SICore.Network* - provides high-level classes for building a SI Nodes network;
 * *src/SICore/SIData* - contains common SIGame models for client and server.
 
 # Build

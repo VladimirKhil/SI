@@ -4,21 +4,20 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SIGame.Converters
+namespace SIGame.Converters;
+
+public sealed class SortDirectionConverter : IValueConverter
 {
-    public sealed class SortDirectionConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        if (value is not bool)
         {
-            if (!(value is bool))
-                return DependencyProperty.UnsetValue;
-
-            return (bool)value ? Resources.Ascending: Resources.Descending;
+            return DependencyProperty.UnsetValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+        return (bool)value ? Resources.Ascending: Resources.Descending;
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

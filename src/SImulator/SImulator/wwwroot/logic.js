@@ -3,6 +3,7 @@ var disabledServer = false;
 
 var token = localStorage.getItem('token') || '';
 var userName = localStorage.getItem('userName') || '';
+var buttonBlockTime = 3000;
 
 var connection = new signalR.HubConnectionBuilder()
     .withUrl('/buttonHost')
@@ -18,7 +19,7 @@ connection.on('stateChanged', (state) => {
 async function start() {
     try {
         await connection.start();
-        console.log("SignalR Connected.");
+        console.log('SignalR Connected');
         document.getElementById('info').innerText = userName;
         updateButtonState();
     } catch (err) {
@@ -31,12 +32,13 @@ function buttonClick() {
     disabledLocal = true;
     updateButtonState();
 
-    window.setTimeout(enableButton, 3000);
+    window.setTimeout(enableButton, buttonBlockTime);
 
     connection.invoke('press', token)
         .then((res) => {
             document.getElementById('info').innerText = res.userName;
             token = res.token;
+            buttonBlockTime = res.buttonBlockTime || buttonBlockTime;
 
             localStorage.setItem('userName', res.userName);
             localStorage.setItem('token', res.token);

@@ -7,12 +7,14 @@
     
     <Color x:Key="Hover">#FF89B2FF</Color>
     <Color x:Key="ActiveColor">#FFCEE0FF</Color>
+    <Color x:Key="ProgressBarColor">DarkBlue</Color>
 
     <SolidColorBrush x:Key="WindowBackground" Color="#FF00053C" />
     <SolidColorBrush x:Key="TransparentSIButtonBackground" Color="Transparent" />
     <SolidColorBrush x:Key="MainColor" Color="White" />
     <SolidColorBrush x:Key="HoverColor" Color="{StaticResource Hover}" />
     <SolidColorBrush x:Key="ActiveColorBrush" Color="{StaticResource ActiveColor}" />
+    <SolidColorBrush x:Key="ProgressBarColorBrush" Color="{StaticResource ProgressBarColor}" />
 
     <DropShadowEffect x:Key="Effect" ShadowDepth="1" BlurRadius="3" Opacity="1" RenderingBias="Performance" />
 
@@ -85,6 +87,7 @@
 
     <Style x:Key="SIButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource SIButtonSimple}">
         <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
 
         <Setter Property="Template">
             <Setter.Value>

@@ -280,8 +280,10 @@ public partial class App : Application
     {
         var updateUri = updateInfo.Uri;
 
-        ((MainViewModel)MainWindow.DataContext).UpdateVersion = updateInfo.Version;
-        ((MainViewModel)MainWindow.DataContext).Update = new CustomCommand(obj => Update_Executed(updateUri));
+        var mainViewModel = (MainViewModel)MainWindow.DataContext;
+
+        mainViewModel.StartMenu.UpdateVersion = updateInfo.Version;
+        mainViewModel.StartMenu.Update = new CustomCommand(obj => Update_Executed(updateUri));
     }
 
     private bool _isUpdating = false;
@@ -337,146 +339,8 @@ public partial class App : Application
         base.OnExit(e);
     }
 
-    private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        var inner = e.Exception;
-
-        while (inner.InnerException != null)
-        {
-            inner = inner.InnerException;
-        }
-
-        if (inner is OutOfMemoryException)
-        {
-            MessageBox.Show(
-                SIGame.Properties.Resources.Error_IncifficientResourcesForExecution,
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            
-            return;
-        }
-
-        if (e.Exception is System.Windows.Markup.XamlParseException
-            && inner is BadImageFormatException
-            && inner.Message.Contains("WebView2Behavior"))
-        {
-            e.Handled = true;
-
-            var error = string.Format(SIGame.Properties.Resources.WebViewWrongFormat, Environment.Is64BitProcess);
-
-            MessageBox.Show(
-                $"{error}: {inner.Message}",
-                CommonSettings.AppName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (inner is System.Windows.Markup.XamlParseException
-            || inner is System.Xaml.XamlParseException
-            || inner is NotImplementedException
-            || inner is TypeInitializationException
-            || inner is FileFormatException
-            || inner is SEHException)
-        {
-            MessageBox.Show(
-                $"{SIGame.Properties.Resources.Error_RuntimeBroken}: {inner.Message}",
-                CommonSettings.AppName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            
-            return;
-        }
-
-        if (inner is FileNotFoundException)
-        {
-            MessageBox.Show(
-                $"{SIGame.Properties.Resources.Error_FilesBroken}: {inner.Message}. {SIGame.Properties.Resources.TryReinstallApp}.",
-                CommonSettings.AppName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (inner is COMException)
-        {
-            MessageBox.Show(
-                $"{SIGame.Properties.Resources.Error_DirectXBroken}: {inner.Message}.",
-                CommonSettings.AppName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (inner is FileLoadException
-            || inner is IOException
-            || inner is ArgumentOutOfRangeException && inner.Message.Contains("capacity"))
-        {
-            MessageBox.Show(inner.Message, CommonSettings.AppName, MessageBoxButton.OK, MessageBoxImage.Error);
-            return;
-        }
-
-        var message = e.Exception.ToString();
-
-        if (message.Contains("System.Windows.Automation")
-            || message.Contains("UIAutomationCore.dll")
-            || message.Contains("UIAutomationTypes"))
-        {
-            MessageBox.Show(
-                SIGame.Properties.Resources.Error_WindowsAutomationBroken,
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (message.Contains("ApplyTaskbarItemInfo")
-            || message.Contains("GetValueFromTemplatedParent")
-            || message.Contains("IsBadSplitPosition")
-            || message.Contains("IKeyboardInputProvider.AcquireFocus")
-            || message.Contains("ReleaseOnChannel")
-            || message.Contains("ManifestSignedXml2.GetIdElement"))
-        {
-            MessageBox.Show(
-                SIGame.Properties.Resources.Error_OSBroken,
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (message.Contains("ComputeTypographyAvailabilities") || message.Contains("FontList.get_Item"))
-        {
-            MessageBox.Show(
-                SIGame.Properties.Resources.Error_Typography,
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        if (message.Contains("WpfXamlLoader.TransformNodes"))
-        {
-            MessageBox.Show(
-                SIGame.Properties.Resources.AppBroken,
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            return;
-        }
-
-        var errorManager = _host.Services.GetRequiredService<IErrorManager>();
-        errorManager.SendErrorReport(e.Exception);
-        e.Handled = true;
-    }
+    private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) =>
+        e.Handled = new ExceptionHandler(_host.Services.GetRequiredService<IErrorManager>()).Handle(e.Exception);
 
     /// <summary>
     /// Имя файла общих настроек
@@ -546,15 +410,6 @@ public partial class App : Application
                 finally
                 {
                     Monitor.Exit(CommonConfigFileName);
-                }
-            }
-            else
-            {
-                var oldSettings = CommonSettings.LoadOld(CommonConfigFileName);
-
-                if (oldSettings != null)
-                {
-                    return oldSettings;
                 }
             }
         }

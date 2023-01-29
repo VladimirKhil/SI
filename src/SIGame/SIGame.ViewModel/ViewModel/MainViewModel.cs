@@ -79,23 +79,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public AppSettingsViewModel Settings { get; private set; }
 
-    private ICommand? _update;
-
-    public ICommand? Update
-    {
-        get => _update;
-        set
-        {
-            _update = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public ICommand CancelUpdate { get; set; }
-
     public CustomCommand Cancel { get; private set; }
 
     private readonly StartMenuViewModel _startMenu = new();
+
+    public StartMenuViewModel StartMenu => _startMenu;
 
     private bool _isSlideMenuOpen;
 
@@ -155,8 +143,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         _startMenu.Human = Human;
         _startMenu.SetProfile = SetProfile;
-
-        CancelUpdate = new CustomCommand(obj => Update = null);
 
         Human.NewAccountCreating += HumanPlayer_NewAccountCreating;
         Human.NewAccountCreated += HumanPlayer_NewAccountCreated;
@@ -360,20 +346,10 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         ActiveView = new ContentBox { Data = new AboutViewModel(), Title = Resources.MainMenu_About, Cancel = Cancel };
     }
 
-    /// <summary>
-    /// Изменилось значение свойства
-    /// </summary>
-    /// <param name="name">Имя свойства</param>
-    private void OnPropertyChanged([CallerMemberName] string name = null)
-    {
+    private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public Version UpdateVersion { get; set; }
-
-    public string UpdateVersionMessage => string.Format(Resources.UpdateVersionMessage, UpdateVersion);
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void ShowMenu()
     {

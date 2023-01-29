@@ -18,8 +18,7 @@
             Foreground="{StaticResource MainColor}" />
         
         <TextBlock FontSize="19" Foreground="{StaticResource MainColor}" Margin="0,23,0,0" HorizontalAlignment="Center">
-            <Run Text="{x:Static lp:Resources.Login}" />
-            <Run Text=":" />
+            <Run Text="{x:Static lp:Resources.Login}" /><Run Text=":" />
         </TextBlock>
         
         <TextBox
@@ -31,7 +30,7 @@
             Height="23"
             FontSize="15"
             HorizontalAlignment="Center"
-            FontWeight="Light">
+            FontWeight="Regular">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding Enter}" />
             </TextBox.InputBindings>

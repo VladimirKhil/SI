@@ -1,42 +1,34 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows.Data;
 
-namespace SIGame.Converters
+namespace SIGame.Converters;
+
+/// <summary>
+/// Преобразует числовые коды в ставку на Аукционе
+/// </summary>
+[ValueConversion(typeof(int), typeof(string))]
+public sealed class AuctionStakesConverter : IValueConverter
 {
-    /// <summary>
-    /// Преобразует числовые коды в ставку на Аукционе
-    /// </summary>
-    [ValueConversion(typeof(int), typeof(string))]
-    public sealed class AuctionStakesConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (value == null)
         {
-            if (value == null)
-                return string.Empty;
-
-            var stake = System.Convert.ToInt32(value);
-            switch (stake)
-            {
-                case -1:
-                    return SICore.Properties.Resources.Nominal;
-
-                case -2:
-                    return string.Empty; // Пас
-
-                case -3:
-                    return SICore.Properties.Resources.VaBank;
-
-                case -4:
-                    return "######";
-
-                default:
-                    return Notions.Notion.FormatNumber(stake);
-            }
+            return string.Empty;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        var stake = System.Convert.ToInt32(value);
+
+        return stake switch
         {
-            throw new NotImplementedException();
-        }
+            -1 => SICore.Properties.Resources.Nominal,
+            -2 => string.Empty,// Pass
+            -3 => SICore.Properties.Resources.VaBank,
+            -4 => "######",
+            _ => Notions.Notion.FormatNumber(stake),
+        };
     }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

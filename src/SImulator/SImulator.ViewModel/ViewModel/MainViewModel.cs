@@ -22,6 +22,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// Максимальное число игровых кнопок, которое можно зарегистрировать в программе
     /// </summary>
     private const int MaxNumberOfButtons = 12;
+
     /// <summary>
     /// Название продукта
     /// </summary>
@@ -186,6 +187,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     public ObservableCollection<SimplePlayerInfo> Players { get; set; }
 
+    public int ButtonBlockTime => (int)(Settings.BlockingTime * 1000);
+
     public MainViewModel(AppSettings settings)
     {
         Settings = settings;
@@ -239,13 +242,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Settings.PropertyChanged += MyDefault_PropertyChanged;
     }
 
-    private void AddPlayer_Executed(object arg)
+    private void AddPlayer_Executed(object? arg)
     {
         var info = new PlayerInfo();
         Players.Add(info);
     }
 
-    private void RemovePlayer_Executed(object arg)
+    private void RemovePlayer_Executed(object? arg)
     {
         if (arg is not SimplePlayerInfo player)
         {
@@ -255,17 +258,17 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Players.Remove(player);
     }
 
-    private void AddRight_Executed(object arg)
+    private void AddRight_Executed(object? arg)
     {
         _game?.AddRight.Execute(null);
     }
 
-    private void AddWrong_Executed(object arg)
+    private void AddWrong_Executed(object? arg)
     {
         _game?.AddWrong.Execute(null);
     }
 
-    private void OpenLicensesFolder_Executed(object arg)
+    private void OpenLicensesFolder_Executed(object? arg)
     {
         var licensesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "licenses");
 
@@ -285,9 +288,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void NavigateToSite_Executed(object arg) => PlatformManager.Instance.NavigateToSite();
+    private void NavigateToSite_Executed(object? arg) => PlatformManager.Instance.NavigateToSite();
 
-    private void SelectColor_Executed(object arg)
+    private void SelectColor_Executed(object? arg)
     {
         if (!int.TryParse(arg?.ToString(), out var colorMode) || colorMode < 0 || colorMode > 3)
         {
@@ -507,7 +510,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void SelectVideo_Executed(object arg)
+    private async void SelectVideo_Executed(object? arg)
     {
         var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectIntroVideo);
 
@@ -517,7 +520,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void SelectBackgroundImageFile_Executed(object arg)
+    private async void SelectBackgroundImageFile_Executed(object? arg)
     {
         var imageUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundImage);
 
@@ -527,7 +530,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void SelectBackgroundVideoFile_Executed(object arg)
+    private async void SelectBackgroundVideoFile_Executed(object? arg)
     {
         var videoUrl = await PlatformManager.Instance.AskSelectFileAsync(Resources.SelectBackgroundVideo);
 
@@ -537,7 +540,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void SelectLogsFolder_Executed(object arg)
+    private void SelectLogsFolder_Executed(object? arg)
     {
         var folder = PlatformManager.Instance.AskSelectLogsFolder();
 
@@ -547,7 +550,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void SelectAudioFile_Executed(object arg)
+    private async void SelectAudioFile_Executed(object? arg)
     {
         if (!int.TryParse(arg?.ToString(), out var fileId))
         {
@@ -625,7 +628,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async void AddPlayerButton_Executed(object arg)
+    private async void AddPlayerButton_Executed(object? arg)
     {
         ActivePlayerButtonCommand = _setPlayerButton;
 
@@ -700,7 +703,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void RemovePlayerButton_Executed(object arg)
+    private void RemovePlayerButton_Executed(object? arg)
     {
         var key = (GameKey)arg;
 
@@ -716,7 +719,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         _addPlayerButton.CanBeExecuted = Settings.PlayerKeys2.Count < MaxNumberOfButtons;
     }
 
-    private void SetPlayerButton_Executed(object arg)
+    private void SetPlayerButton_Executed(object? arg)
     {
         // Do nothing; the command is activated by key press
     }

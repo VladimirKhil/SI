@@ -67,7 +67,7 @@ public sealed class WebManager : ButtonManagerBase, IButtonProcessor
             player = Listener.GetPlayerById(token, false);
         }
 
-        return new PressResponse(player?.Name ?? "", token);
+        return new PressResponse(player?.Name ?? "", token, Listener.ButtonBlockTime);
     }
 
     public override ValueTask DisposeAsync() => _webApplication.DisposeAsync();

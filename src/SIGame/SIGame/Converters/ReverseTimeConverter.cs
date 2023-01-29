@@ -2,18 +2,12 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace SIGame.Converters
-{
-    public sealed class ReverseTimeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return 100.0 - (double)value;
-        }
+namespace SIGame.Converters;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+public sealed class ReverseTimeConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => 100.0 - (double)value;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

@@ -8,6 +8,11 @@ namespace SImulator.ViewModel.ButtonManagers;
 /// </summary>
 public interface IButtonManagerListener
 {
+    /// <summary>
+    /// Button blocking time in milliseconds.
+    /// </summary>
+    int ButtonBlockTime { get; }
+
     bool OnKeyPressed(GameKey key);
 
     bool OnPlayerPressed(PlayerInfo player);

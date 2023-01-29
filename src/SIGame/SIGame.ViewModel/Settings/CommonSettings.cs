@@ -1,7 +1,6 @@
 ﻿using SIData;
 using SIGame.ViewModel;
 using System.Collections.ObjectModel;
-using System.IO.IsolatedStorage;
 using System.Xml.Serialization;
 
 namespace SIGame;
@@ -34,32 +33,21 @@ public sealed class CommonSettings
     /// </summary>
     public static CommonSettings Default { get; set; }
 
-    #region Settings
     /// <summary>
     /// Зарегистрированные учётные записи пользователей
     /// </summary>
     public List<HumanAccount> Humans2 { get; set; }
-    /// <summary>
-    /// Зарегистрированные учётные записи пользователей
-    /// </summary>
-    public ObservableCollection<HumanAccount> Humans { get; set; }
-    /// <summary>
-    /// Зарегистрированные компьютерные игроки
-    /// </summary>
-    public ObservableCollection<ComputerAccount> CompPlayers { get; set; }
+
     /// <summary>
     /// Зарегистрированные компьютерные игроки
     /// </summary>
     public List<ComputerAccount> CompPlayers2 { get; set; }
+
     /// <summary>
     /// Лучшие игроки
     /// </summary>
     public ObservableCollection<BestPlayer> BestPlayers { get; set; }
 
-    /// <summary>
-    /// Компьютерные ведущие
-    /// </summary>
-    public ObservableCollection<ComputerAccount> CompShowmans { get; set; }
     /// <summary>
     /// Компьютерные ведущие
     /// </summary>
@@ -75,15 +63,10 @@ public sealed class CommonSettings
     /// </summary>
     public ErrorInfoList DelayedErrorsNew { get; set; }
 
-    #endregion
-
     public CommonSettings()
     {
-        Humans = new ObservableCollection<HumanAccount>();
         Humans2 = new List<HumanAccount>();
-        CompPlayers = new ObservableCollection<ComputerAccount>();
         CompPlayers2 = new List<ComputerAccount>();
-        CompShowmans = new ObservableCollection<ComputerAccount>();
         CompShowmans2 = new List<ComputerAccount>();
         BestPlayers = new ObservableCollection<BestPlayer>();
         DelayedErrorsNew = new ErrorInfoList();
@@ -96,56 +79,10 @@ public sealed class CommonSettings
         serializer.Serialize(stream, this);
     }
 
-    /// <summary>
-    /// Загрузить общие настройки игры
-    /// </summary>
-    /// <returns>Загруженные общие настройки или настройки по умолчанию (если загрузить сохранённые настройки не удалось)</returns>
-    public static CommonSettings LoadOld(string configFileName)
+    public static CommonSettings Load(Stream stream)
     {
-        using (var file = IsolatedStorageFile.GetMachineStoreForAssembly())
-        {
-            if (file.FileExists(configFileName) && Monitor.TryEnter(configFileName, 2000))
-            {
-                try
-                {
-                    using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return Load(stream);
-                }
-                catch { }
-                finally
-                {
-                    Monitor.Exit(configFileName);
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public static CommonSettings Load(Stream stream, XmlSerializer serializer = null)
-    {
-        serializer ??= new XmlSerializer(typeof(CommonSettings));
-
-        var settings = (CommonSettings)serializer.Deserialize(stream);
-
-        if (settings.CompPlayers.Any())
-        {
-            settings.CompPlayers2.AddRange(settings.CompPlayers.Where(compPlayer => compPlayer.CanBeDeleted));
-            settings.CompPlayers.Clear();
-        }
-
-        if (settings.CompShowmans.Any())
-        {
-            settings.CompShowmans2.AddRange(settings.CompShowmans.Where(compShowman => compShowman.CanBeDeleted));
-            settings.CompShowmans.Clear();
-        }
-
-        if (settings.Humans.Any() && !settings.Humans2.Any())
-        {
-            settings.Humans2.AddRange(settings.Humans.Where(human => human.CanBeDeleted));
-        }
-
-        return settings;
+        var serializer = new XmlSerializer(typeof(CommonSettings));
+        return (CommonSettings?)serializer.Deserialize(stream) ?? new CommonSettings();
     }
 
     internal void LoadFrom(Stream stream)

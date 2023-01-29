@@ -137,6 +137,11 @@
     <ProjectReference Include="..\SIGame.ViewModel\SIGame.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\load.png" />
+    <Resource Include="Resources\protected.png" />
+    <Resource Include="Resources\search.png" />
+    <Resource Include="Resources\settings.png" />
+    <Resource Include="Resources\sound.png" />
     <Resource Include="Resources\vk_logo.png" />
     <Resource Include="Resources\qlogo.png" />
     <Resource Include="Resources\avatar-f.png" />
@@ -215,6 +220,11 @@
     <None Remove="Fonts\Jost-SemiBold.ttf" />
     <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\game_button.png" />
+    <None Remove="Resources\load.png" />
+    <None Remove="Resources\protected.png" />
+    <None Remove="Resources\search.png" />
+    <None Remove="Resources\settings.png" />
+    <None Remove="Resources\sound.png" />
     <None Remove="Theme\main_background.png" />
     <None Remove="Theme\studia.png" />
   </ItemGroup>

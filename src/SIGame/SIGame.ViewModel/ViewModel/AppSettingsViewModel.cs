@@ -28,18 +28,22 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
     /// Принять изменения параметров
     /// </summary>
     public ICommand Apply { get; private set; }
+
     /// <summary>
     /// Установить параметры в значения по умолчанию
     /// </summary>
     public ICommand SetDefault { get; private set; }
+
     /// <summary>
     /// Переместить папку логов
     /// </summary>
     public ICommand MoveLogs { get; private set; }
+
     /// <summary>
     /// Экспорт настроек
     /// </summary>
     public ICommand Export { get; private set; }
+
     /// <summary>
     /// Импорт настроек
     /// </summary>
@@ -94,7 +98,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         TimeSettings = new TimeSettingsViewModel(_model.TimeSettings);
     }
 
-    private async void Import_Executed(object arg)
+    private async void Import_Executed(object? arg)
     {
         var settingsFile = PlatformSpecific.PlatformManager.Instance.SelectSettingsForImport();
 
@@ -157,7 +161,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         }
     }
 
-    private async void Export_Executed(object arg)
+    private async void Export_Executed(object? arg)
     {
         var exportFile = PlatformSpecific.PlatformManager.Instance.SelectSettingsForExport();
 
@@ -214,7 +218,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         }
     }
 
-    private void MoveLogs_Executed(object arg)
+    private void MoveLogs_Executed(object? arg)
     {
         var path = PlatformSpecific.PlatformManager.Instance.SelectLogsFolder(_model.LogsFolder);
 
@@ -224,7 +228,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         }
     }
 
-    private void SetDefault_Executed(object arg)
+    private void SetDefault_Executed(object? arg)
     {
         _model.ReadingSpeed = AppSettingsCore.DefaultReadingSpeed;
         _model.MultimediaPort = AppSettingsCore.DefaultMultimediaPort;
@@ -249,7 +253,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.SettingsReset, PlatformSpecific.MessageType.OK);
     }
 
-    private void Apply_Executed(object arg)
+    private void Apply_Executed(object? arg)
     {
         UserSettings.Default.GameSettings.AppSettings = _model;
 
@@ -295,7 +299,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
             return;
         }
 
-        if (!Uri.TryCreate(account.Picture, UriKind.RelativeOrAbsolute, out Uri uri))
+        if (!Uri.TryCreate(account.Picture, UriKind.RelativeOrAbsolute, out var uri))
         {
             return;
         }
@@ -317,11 +321,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
     {
         if (_model.LogsFolder != newPath)
         {
-            if (_oldLogsFolder == null)
-            {
-                _oldLogsFolder = _model.LogsFolder;
-            }
-
+            _oldLogsFolder ??= _model.LogsFolder;
             _model.LogsFolder = newPath;
         }
     }

@@ -144,7 +144,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         NewGame = new CustomCommand(NewGame_Executed);
     }
 
-    private void NewGame_Executed(object arg)
+    private void NewGame_Executed(object? arg)
     {
         _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
@@ -227,7 +227,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     #region Вход в игру
 
-    private async void Join_Executed(object arg) => await JoinGameAsync(null, (GameRole)arg);
+    private async void Join_Executed(object? arg) => await JoinGameAsync(null, (GameRole)arg);
 
     protected virtual async Task JoinGameAsync(GameInfo gameInfo, GameRole role, bool host = false, CancellationToken cancellationToken = default)
     {
@@ -274,7 +274,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected virtual string GetExtraCredentials() => "";
 
-    protected Task<(string AvatarUrl, FileKey FileKey)> _avatarLoadingTask;
+    protected Task<(string AvatarUrl, FileKey FileKey)>? _avatarLoadingTask;
 
     protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
     {
