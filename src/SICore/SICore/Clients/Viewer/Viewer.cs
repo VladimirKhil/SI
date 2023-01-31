@@ -2253,7 +2253,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             return;
         }
 
-        if (!string.IsNullOrEmpty(ClientData.Picture))
+        if (!string.IsNullOrWhiteSpace(ClientData.Picture))
         {
             if (!Uri.TryCreate(ClientData.Picture, UriKind.RelativeOrAbsolute, out var uri))
             {
@@ -2267,7 +2267,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
             if (uri.Scheme == "file" && !_client.Node.Contains(NetworkConstants.GameName)) // We should send local file over network
             {
-                byte[] data;
+                byte[]? data;
 
                 try
                 {
@@ -2276,6 +2276,12 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 catch (Exception exc)
                 {
                     ClientData.BackLink.SendError(exc, false);
+                    return;
+                }
+
+                if (data == null)
+                {
+                    _logic.OnReplic(ReplicCodes.Special.ToString(), string.Format(LO[nameof(R.AvatarNotFound)], ClientData.Picture));
                     return;
                 }
 

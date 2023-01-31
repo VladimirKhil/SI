@@ -791,4 +791,7 @@
   <data name="QuestionRestored" xml:space="preserve">
     <value>{0} восстановил вопрос {1}, {2}</value>
   </data>
+  <data name="AvatarNotFound" xml:space="preserve">
+    <value>Аватар не найден: {0}</value>
+  </data>
 </root>

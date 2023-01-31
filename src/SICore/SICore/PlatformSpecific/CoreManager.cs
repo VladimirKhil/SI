@@ -12,7 +12,7 @@ public abstract class CoreManager
         Instance = this;
     }
 
-    public abstract byte[] GetData(string filename);
+    public abstract byte[]? GetData(string filename);
 
     public abstract bool FileExists(string filePath);
 

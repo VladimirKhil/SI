@@ -160,6 +160,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Avatar not found: {0}.
+        /// </summary>
+        public static string AvatarNotFound {
+            get {
+                return ResourceManager.GetString("AvatarNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Bad text in log.
         /// </summary>
         public static string BadTextInLog {

@@ -786,4 +786,7 @@
   <data name="QuestionRestored" xml:space="preserve">
     <value>{0} restores question {1}, {2}</value>
   </data>
+  <data name="AvatarNotFound" xml:space="preserve">
+    <value>Avatar not found: {0}</value>
+  </data>
 </root>

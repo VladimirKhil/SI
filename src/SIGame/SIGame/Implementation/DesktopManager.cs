@@ -433,7 +433,7 @@ public sealed class DesktopManager : PlatformManager
     {
         if (isWarning)
         {
-            MessageBox.Show(exc.Message);
+            MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
         else
         {
