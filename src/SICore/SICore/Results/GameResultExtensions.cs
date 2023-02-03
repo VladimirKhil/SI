@@ -42,8 +42,12 @@ public static class GameResultExtensions
         return result.ToString().Replace(Environment.NewLine, "\r");
     }
 
-    private static void PrintCollection(SIDocument doc, IEnumerable<AnswerInfo> collection,
-        StringBuilder result, string answerTitle, ILocalizer localizer)
+    private static void PrintCollection(
+        SIDocument doc,
+        IEnumerable<AnswerInfo> collection,
+        StringBuilder result,
+        string answerTitle,
+        ILocalizer localizer)
     {
         foreach (var answerInfo in collection)
         {

@@ -652,7 +652,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             await ZipHelper.ExtractToDirectoryAsync(
                 packageFile,
                 packageFolderPath,
-                maxAllowedDataLength: long.MaxValue,
+                ExtractedFileNamingModes.Unescape,
+                long.MaxValue,
                 cancellationToken: cancellationToken);
 
             Directory.CreateDirectory(Path.Combine(tempDir, "avatars"));

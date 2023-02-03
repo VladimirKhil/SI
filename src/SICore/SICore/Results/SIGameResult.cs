@@ -53,7 +53,7 @@ public sealed class SIGameResult
         Comments = "";
     }
 
-    public GameResult CreateResult() => new GameResult
+    public GameResult CreateResult() => new()
     {
         PackageName = PackageName,
         Results = PersonResults,

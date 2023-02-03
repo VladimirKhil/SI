@@ -37,8 +37,8 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
     protected int GetTimePercentage(int timerIndex)
     {
         var now = DateTime.UtcNow;
-
         var timer = _timersInfo[timerIndex];
+
         if (!timer.IsEnabled)
         {
             return timer.PauseTime > -1 ? 100 * timer.PauseTime / timer.MaxTime : 0;
