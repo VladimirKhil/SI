@@ -14,4 +14,24 @@ public static class StepTypes
     /// Ask answer.
     /// </summary>
     public const string AskAnswer = "askAnswer";
+
+    /// <summary>
+    /// Set answerer.
+    /// </summary>
+    public const string SetAnswerer = "setAnswerer";
+
+    /// <summary>
+    /// Set price.
+    /// </summary>
+    public const string SetPrice = "setPrice";
+
+    /// <summary>
+    /// Set theme.
+    /// </summary>
+    public const string SetTheme = "setTheme";
+
+    /// <summary>
+    /// Accept.
+    /// </summary>
+    public const string Accept = "accept";
 }

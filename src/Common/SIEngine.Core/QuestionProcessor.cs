@@ -170,7 +170,7 @@ public sealed class QuestionProcessor
 
                 if (_atomIndex < _question.Scenario.Count)
                 {
-                    _useAnswerMarker = true; // Skipping other atoms because they belong to the answer
+                    _useAnswerMarker = true; // Skipping other atoms because they belong to answer
                 }
 
                 return false;

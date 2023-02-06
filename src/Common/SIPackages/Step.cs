@@ -41,6 +41,13 @@ public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>, IX
     /// </summary>
     public StepParameters Parameters { get; } = new("step");
 
+    /// <summary>
+    /// Adds simple parameter to the step.
+    /// </summary>
+    /// <param name="name">Parameter name.</param>
+    /// <param name="value">Parameter value.</param>
+    public void AddSimpleParameter(string name, string value) => Parameters.Add(name, new StepParameter { SimpleValue = value });
+
     /// <inheritdoc />
     public override string ToString() => $"{_type}({string.Join(", ", Parameters)})";
 

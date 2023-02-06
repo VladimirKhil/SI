@@ -26,6 +26,11 @@ public static class AtomTypes
     public const string Audio = "voice";
 
     /// <summary>
+    /// Audio atom type.
+    /// </summary>
+    public const string AudioNew = "audio";
+
+    /// <summary>
     /// Video atom type.
     /// </summary>
     public const string Video = "video";

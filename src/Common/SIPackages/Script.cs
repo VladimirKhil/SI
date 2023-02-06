@@ -11,7 +11,7 @@ namespace SIPackages;
 public sealed class Script : IEquatable<Script>, IXmlSerializable
 {
     /// <summary>
-    /// Script steps executed sequentially.
+    /// Script steps which are executed sequentially.
     /// </summary>
     public List<Step> Steps { get; } = new();
 

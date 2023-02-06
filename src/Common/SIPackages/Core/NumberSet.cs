@@ -10,13 +10,14 @@ namespace SIPackages.Core;
 /// Defines a set of numbers.
 /// </summary>
 [TypeConverter(typeof(NumberSetTypeConverter))]
-public class NumberSet : INotifyPropertyChanged
+public class NumberSet : IEquatable<NumberSet>, INotifyPropertyChanged
 {
     private int _minimum = 0;
 
     /// <summary>
     /// Minimum value.
     /// </summary>
+    [DefaultValue(0)]
     public int Minimum
     {
         get => _minimum;
@@ -28,6 +29,7 @@ public class NumberSet : INotifyPropertyChanged
     /// <summary>
     /// Maximum value.
     /// </summary>
+    [DefaultValue(0)]
     public int Maximum
     {
         get => _maximum;
@@ -39,6 +41,7 @@ public class NumberSet : INotifyPropertyChanged
     /// <summary>
     /// Step (a minimum distance between two possible nubmbers) value.
     /// </summary>
+    [DefaultValue(0)]
     public int Step
     {
         get => _step;
@@ -59,6 +62,19 @@ public class NumberSet : INotifyPropertyChanged
         _minimum = value;
         _maximum = value;
     }
+
+    /// <inheritdoc />
+    public bool Equals(NumberSet? other) =>
+        other is not null
+        && Minimum.Equals(other.Minimum)
+        && Maximum.Equals(other.Maximum)
+        && Step.Equals(other.Step);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => Equals(obj as NumberSet);
+
+    /// <inheritdoc />
+    public override int GetHashCode() => HashCode.Combine(Minimum, Maximum, Step);
 
     /// <summary>
     /// Raises object property change event.

@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using SIPackages;
+using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIStorageService.Client;
@@ -34,8 +36,8 @@ namespace SIQuester;
 /// </summary>
 public partial class App : Application
 {
-    private IHost _host;
-    private IConfiguration _configuration;
+    private IHost? _host;
+    private IConfiguration? _configuration;
     private bool _useAppService;
 
     /// <summary>
@@ -66,7 +68,7 @@ public partial class App : Application
 
     private bool _hasError = false;
 
-    private ILogger<App> _logger;
+    private ILogger<App>? _logger;
 
 
     private DispatcherTimer? _autoSaveTimer;
@@ -121,6 +123,12 @@ public partial class App : Application
                 Backup(folder);
                 return;
             }
+            else if (e.Args[0] == "upgrade" && e.Args.Length > 1)
+            {
+                UpgradePackage(e.Args[1]);
+                App.Current.Shutdown();
+                return;
+            }
         }
 
 #if !DEBUG
@@ -134,6 +142,25 @@ public partial class App : Application
 
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
         _logger.LogInformation("Application started");
+    }
+
+    private static void UpgradePackage(string packagePath)
+    {
+        using var fs = File.Open(packagePath, FileMode.Open);
+        using var doc = SIDocument.Load(fs, false);
+
+        foreach (var round in doc.Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    question.Upgrade(round.Type == RoundTypes.Final);
+                }
+            }
+        }
+
+        doc.Save();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -501,12 +528,15 @@ public partial class App : Application
 
     private async void Application_Exit(object sender, ExitEventArgs e)
     {
-        _logger.LogInformation("Application exited");
+        _logger?.LogInformation("Application exited");
 
         _autoSaveTimer?.Stop();
         _mainViewModel?.Dispose();
 
-        await _host.StopAsync();
+        if (_host != null)
+        {
+            await _host.StopAsync();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)

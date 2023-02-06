@@ -1,4 +1,5 @@
 ﻿using SIPackages.Core;
+using SIPackages.TypeConverters;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
@@ -38,7 +39,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public QuestionType Type { get; } = new();
 
     /// <summary>
-    /// Question base price.
+    /// Question type name.
     /// </summary>
     public string? TypeName
     {
@@ -263,27 +264,30 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             writer.WriteEndElement();
         }
 
-        writer.WriteStartElement("scenario");
-
-        foreach (var atom in Scenario)
+        if (Scenario.Any())
         {
-            writer.WriteStartElement("atom");
+            writer.WriteStartElement("scenario");
 
-            if (atom.AtomTime != 0)
+            foreach (var atom in Scenario)
             {
-                writer.WriteAttributeString("time", atom.AtomTime.ToString());
+                writer.WriteStartElement("atom");
+
+                if (atom.AtomTime != 0)
+                {
+                    writer.WriteAttributeString("time", atom.AtomTime.ToString());
+                }
+
+                if (atom.Type != AtomTypes.Text)
+                {
+                    writer.WriteAttributeString("type", atom.Type);
+                }
+
+                writer.WriteValue(atom.Text);
+                writer.WriteEndElement();
             }
 
-            if (atom.Type != AtomTypes.Text)
-            {
-                writer.WriteAttributeString("type", atom.Type);
-            }
-
-            writer.WriteValue(atom.Text);
             writer.WriteEndElement();
         }
-
-        writer.WriteEndElement();
 
         if (Script != null)
         {
@@ -350,6 +354,244 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
         return question;
     }
+
+    /// <summary>
+    /// Upgrades the question to new format.
+    /// </summary>
+    /// <param name="isFinal">Final round question flag.</param>
+    public void Upgrade(bool isFinal = false)
+    {
+        if (TypeName != null)
+        {
+            return;
+        }
+
+        TypeName = Type.Name;
+        Script = new();
+
+        if (Price == -1)
+        {
+            Scenario.Clear();
+            Type.Params.Clear();
+            Type.Name = QuestionTypes.Simple;
+            return;
+        }
+
+        var askAnswerMode = StepParameterValues.AskAnswerMode_Button;
+
+        switch (TypeName)
+        {
+            case QuestionTypes.Auction:
+                {
+                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
+
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Stake);
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, StepParameterValues.SetAnswererSelect_Highest);
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.StakeVisibity, StepParameterValues.SetAnswererStakeVisibility_Visible);
+
+                    Script.Steps.Add(setAnswererStep);
+
+                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                }
+                break;
+
+            case QuestionTypes.Sponsored:
+                {
+                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Current);
+                    Script.Steps.Add(setAnswererStep);
+
+                    var setPriceStep = new Step { Type = StepTypes.SetPrice };
+                    setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_NoRisk);
+                    Script.Steps.Add(setPriceStep);
+
+                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                }
+                break;
+
+            case QuestionTypes.BagCat:
+            case QuestionTypes.Cat:
+                {
+                    var theme = Type[QuestionTypeParams.Cat_Theme] ?? "";
+                    var price = Type[QuestionTypeParams.Cat_Cost] ?? "";
+
+                    var knows = TypeName == QuestionTypes.BagCat
+                        ? Type[QuestionTypeParams.BagCat_Knows] ?? QuestionTypeParams.BagCat_Knows_Value_After
+                        : QuestionTypeParams.BagCat_Knows_Value_After;
+
+                    var canGiveSelf = TypeName == QuestionTypes.BagCat
+                        ? Type[QuestionTypeParams.BagCat_Self] ?? QuestionTypeParams.BagCat_Self_Value_False
+                        : QuestionTypeParams.BagCat_Self_Value_False;
+
+                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_ByCurrent);
+                    
+                    setAnswererStep.AddSimpleParameter(
+                        StepParameterNames.Select,
+                        canGiveSelf == QuestionTypeParams.BagCat_Self_Value_True
+                            ? StepParameterValues.SetAnswererSelect_Any
+                            : StepParameterValues.SetAnswererSelect_ExceptCurrent);
+
+                    var setThemeStep = new Step { Type = StepTypes.SetTheme };
+                    setThemeStep.AddSimpleParameter(StepParameterNames.Content, theme);
+
+                    var setPriceStep = new Step { Type = StepTypes.SetPrice };
+                    setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_Select);
+
+                    setPriceStep.Parameters.Add(
+                        StepParameterNames.Content,
+                        new StepParameter
+                        {
+                            Type = StepParameterTypes.NumberSet,
+                            NumberSetValue = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price)
+                        });
+
+                    switch (knows)
+                    {
+                        case QuestionTypeParams.BagCat_Knows_Value_Before:
+                            Script.Steps.Add(setThemeStep);
+                            Script.Steps.Add(setPriceStep);
+                            Script.Steps.Add(setAnswererStep);
+                            break;
+
+                        case QuestionTypeParams.BagCat_Knows_Value_Never:
+                            Script.Steps.Add(setAnswererStep);
+                            Script.Steps.Add(setThemeStep);
+                            Script.Steps.Add(setPriceStep);
+                            Script.Steps.Add(new Step { Type = StepTypes.Accept });
+
+                            Scenario.Clear();
+                            Type.Params.Clear();
+                            Type.Name = QuestionTypes.Simple;
+                            return;
+
+                        case QuestionTypeParams.BagCat_Knows_Value_After:
+                        default:
+                            Script.Steps.Add(setAnswererStep);
+                            Script.Steps.Add(setThemeStep);
+                            Script.Steps.Add(setPriceStep);
+                            break;
+                    }
+
+                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                }
+                break;
+
+            case QuestionTypes.Simple:
+                if (isFinal)
+                {
+                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
+
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Stake);
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, StepParameterValues.SetAnswererSelect_AllPossible);
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.StakeVisibity, StepParameterValues.SetAnswererStakeVisibility_Hidden);
+
+                    Script.Steps.Add(setAnswererStep);
+
+                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                }
+                break;
+
+            default:
+                Scenario.Clear();
+                Type.Params.Clear();
+                Type.Name = QuestionTypes.Simple;
+                return;
+        }
+
+        var contentStep = new Step { Type = StepTypes.ShowContent };
+        var content = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
+        contentStep.Parameters.Add(StepParameterNames.Content, content);
+
+        Script.Steps.Add(contentStep);
+
+        var askAnswerStep = new Step { Type = StepTypes.AskAnswer };
+        askAnswerStep.AddSimpleParameter(StepParameterNames.Mode, askAnswerMode);
+
+        var currentContent = content;
+        var useMarker = false;
+
+        foreach (var atom in Scenario)
+        {
+            if (atom.Type == AtomTypes.Marker)
+            {
+                if (useMarker)
+                {
+                    continue;
+                }
+
+                useMarker = true;
+                Script.Steps.Add(askAnswerStep);
+
+                var answerStep = new Step { Type = StepTypes.ShowContent };
+                var answerContent = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
+                answerStep.Parameters.Add(StepParameterNames.Content, answerContent);
+
+                Script.Steps.Add(answerStep);
+
+                currentContent = answerContent;
+                continue;
+            }
+
+            currentContent.ContentValue.Add(
+                new ContentItem
+                {
+                    Type = GetContentType(atom.Type),
+                    Duration = atom.AtomTime != -1 ? TimeSpan.FromSeconds(atom.AtomTime) : TimeSpan.Zero,
+                    Value = atom.IsLink ? atom.Text.ExtractLink() : atom.Text,
+                    Placement = GetPlacement(atom.Type),
+                    WaitForFinish = atom.AtomTime != -1,
+                    IsRef = atom.IsLink
+                });            
+        }
+
+        if (!useMarker)
+        {
+            Script.Steps.Add(askAnswerStep);
+
+            var answerStep = new Step { Type = StepTypes.ShowContent };
+
+            var answerContent = new StepParameter
+            {
+                IsRef = true,
+                Type = StepParameterTypes.Simple,
+                SimpleValue = StepParameterValues.ContentRef_Answer,
+            };
+
+            answerStep.Parameters.Add(StepParameterNames.Content, answerContent);
+
+            answerStep.Parameters.Add(
+                StepParameterNames.FallbackRefId,
+                new StepParameter
+                {
+                    IsRef = true,
+                    Type = StepParameterTypes.Simple,
+                    SimpleValue = StepParameterValues.FallbackStepIdRef_Right,
+                });
+
+            Script.Steps.Add(answerStep);
+        }
+
+        Scenario.Clear();
+        Type.Params.Clear();
+        Type.Name = QuestionTypes.Simple;
+    }
+
+    private static string GetContentType(string type) =>
+        type switch
+        {
+            AtomTypes.Oral => AtomTypes.Text,
+            AtomTypes.Audio => AtomTypes.AudioNew,
+            _ => type,
+        };
+
+    private static string GetPlacement(string type) =>
+        type switch
+        {
+            AtomTypes.Oral => ContentPlacements.Replic,
+            AtomTypes.Audio => ContentPlacements.Background,
+            _ => ContentPlacements.Screen,
+        };
 
     /// <summary>
     /// Gets question right answers.

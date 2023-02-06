@@ -30,6 +30,9 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
     private StepParameters? _groupValue;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private NumberSet? _numberSetValue;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private bool _isRef = DefaultIsRef;
 
     /// <summary>
@@ -105,6 +108,23 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
     }
 
     /// <summary>
+    /// Parameter value for number set type.
+    /// </summary>
+    public NumberSet? NumberSetValue
+    {
+        get => _numberSetValue;
+        set
+        {
+            if (_numberSetValue != value)
+            {
+                var oldValue = _numberSetValue;
+                _numberSetValue = value;
+                OnPropertyChanged(oldValue);
+            }
+        }
+    }
+
+    /// <summary>
     /// Marks that the <see cref="SimpleValue" /> contains a reference to a parameter inside the data section.
     /// </summary>
     [DefaultValue(DefaultIsRef)]
@@ -134,6 +154,7 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         {
             StepParameterTypes.Content => _contentValue == null ? "" : string.Join("; ", _contentValue.Select(item => item.ToString())),
             StepParameterTypes.Group => _groupValue == null ? "" : string.Join("; ", _groupValue.Select(p => $"{p.Key}: {p.Value}")),
+            StepParameterTypes.NumberSet => _numberSetValue == null ? "" : _numberSetValue.ToString(),
             _ => _simpleValue,
         };
 
@@ -147,13 +168,15 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         && SimpleValue.Equals(other.SimpleValue)
         && IsRef.Equals(other.IsRef)
         && Equals(ContentValue, other.ContentValue)
-        && Equals(GroupValue, other.GroupValue);
+        && Equals(GroupValue, other.GroupValue)
+        && Equals(NumberSetValue, other.NumberSetValue);
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => Equals(obj as StepParameter);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Type, SimpleValue, IsRef, ContentValue?.GetCollectionHashCode(), GroupValue);
+    public override int GetHashCode() =>
+        HashCode.Combine(Type, SimpleValue, IsRef, ContentValue?.GetCollectionHashCode(), GroupValue, NumberSetValue);
 
     /// <inheritdoc />
     public XmlSchema? GetSchema() => null;
@@ -186,6 +209,10 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
 
                 case StepParameterTypes.Group:
                     ReadGroup(reader);
+                    break;
+
+                case StepParameterTypes.NumberSet:
+                    ReadNumberSet(reader);
                     break;
 
                 default:
@@ -234,6 +261,42 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
     {
         _groupValue = new("param");
         _groupValue.ReadXml(reader);
+    }
+
+    private void ReadNumberSet(XmlReader reader)
+    {
+        _numberSetValue = new();
+
+        reader.ReadToDescendant("numberSet");
+
+        if (int.TryParse(reader.GetAttribute("minimum"), out var minimum))
+        {
+            _numberSetValue.Minimum = minimum;
+        }
+
+        if (int.TryParse(reader.GetAttribute("maximum"), out var maximum))
+        {
+            _numberSetValue.Maximum = maximum;
+        }
+
+        if (int.TryParse(reader.GetAttribute("step"), out var step))
+        {
+            _numberSetValue.Step = step;
+        }
+
+        while (reader.Read())
+        {
+            switch (reader.NodeType)
+            {
+                case XmlNodeType.EndElement:
+                    if (reader.LocalName == "param")
+                    {
+                        reader.Read();
+                        return;
+                    }
+                    break;
+            }
+        }
     }
 
     private void ReadValue(XmlReader reader)
@@ -292,6 +355,19 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
                     }
 
                     _groupValue.WriteXml(writer);
+                    break;
+
+                case StepParameterTypes.NumberSet:
+                    if (_numberSetValue == null)
+                    {
+                        break;
+                    }
+
+                    writer.WriteStartElement("numberSet");
+                    writer.WriteAttributeString("minimum", _numberSetValue.Minimum.ToString());
+                    writer.WriteAttributeString("maximum", _numberSetValue.Maximum.ToString());
+                    writer.WriteAttributeString("step", _numberSetValue.Step.ToString());
+                    writer.WriteEndElement();
                     break;
 
                 default:
