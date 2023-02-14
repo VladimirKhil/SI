@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Model;
 
 namespace SImulator.ViewModel.Tests;
@@ -37,6 +38,6 @@ public sealed class CommonTests
         game.Next.Execute(null);
 
         Assert.AreEqual("В этой передаче гроссмейстеры «Своей игры» сражались с приглашёнными знаменитостями",
-            ((RemoteGameUI)game.UserInterface).TInfo.Text);
+            ((PresentationController)game.PresentationController).TInfo.Text);
     }
 }

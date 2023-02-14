@@ -1,4 +1,5 @@
-﻿using SImulator.ViewModel.Core;
+﻿using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIUI.ViewModel;
@@ -6,23 +7,21 @@ using SIUI.ViewModel.Core;
 using System.Windows.Input;
 using Utils;
 
-namespace SImulator.ViewModel;
+namespace SImulator.ViewModel.Controllers;
 
-/// <summary>
-/// Implements a game UI.
-/// </summary>
-public sealed class RemoteGameUI : IRemoteGameUI
+/// <inheritdoc cref="IPresentationController" />
+public sealed class PresentationController : IPresentationController
 {
     private int _previousCode = -1;
 
-    private IGameHost? _gameHost;
+    private IPresentationListener? _listener;
 
-    internal IGameHost? GameHost
+    internal IPresentationListener? Listener
     {
-        get => _gameHost;
+        get => _listener;
         set
         {
-            _gameHost = value;
+            _listener = value;
         }
     }
 
@@ -44,7 +43,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
 
     public event Action<Exception>? Error;
 
-    public RemoteGameUI()
+    public PresentationController()
     {
         TInfo = new TableInfoViewModel
         {
@@ -58,14 +57,14 @@ public sealed class RemoteGameUI : IRemoteGameUI
 
         TInfo.MediaStart += () =>
         {
-            _gameHost?.OnMediaStart();
+            _listener?.OnMediaStart();
         };
 
         TInfo.MediaEnd += () =>
         {
             try
             {
-                _gameHost?.OnMediaEnd();
+                _listener?.OnMediaEnd();
             }
             catch (ObjectDisposedException)
             {
@@ -75,19 +74,19 @@ public sealed class RemoteGameUI : IRemoteGameUI
 
         TInfo.MediaProgress += progress =>
         {
-            _gameHost?.OnMediaProgress(progress);
+            _listener?.OnMediaProgress(progress);
         };
 
-        Next = new SimpleCommand(arg => _gameHost?.AskNext());
-        Back = new SimpleCommand(arg => _gameHost?.AskBack());
-        NextRound = new SimpleCommand(arg => _gameHost?.AskNextRound());
-        BackRound = new SimpleCommand(arg => _gameHost?.AskBackRound());
+        Next = new SimpleCommand(arg => _listener?.AskNext());
+        Back = new SimpleCommand(arg => _listener?.AskBack());
+        NextRound = new SimpleCommand(arg => _listener?.AskNextRound());
+        BackRound = new SimpleCommand(arg => _listener?.AskBackRound());
 
-        Stop = new SimpleCommand(arg => 
+        Stop = new SimpleCommand(arg =>
         {
-            if (_gameHost != null)
+            if (_listener != null)
             {
-                UI.Execute(() => _gameHost.AskStop(), exc => Error?.Invoke(exc));
+                UI.Execute(() => _listener.AskStop(), exc => Error?.Invoke(exc));
             }
         });
     }
@@ -100,9 +99,9 @@ public sealed class RemoteGameUI : IRemoteGameUI
             {
                 SetSound();
 
-                if (GameHost != null && !_stageCallbackBlock)
+                if (Listener != null && !_stageCallbackBlock)
                 {
-                    GameHost.OnRoundThemesFinished();
+                    Listener.OnRoundThemesFinished();
                 }
             }
         }
@@ -114,7 +113,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
     {
         if (TInfo.TStage == TableStage.Sign)
         {
-            _gameHost?.OnIntroFinished();
+            _listener?.OnIntroFinished();
         }
     }
 
@@ -136,7 +135,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
         }
 
         SetSound();
-        GameHost = null;
+        Listener = null;
     }
 
     public void SetMedia(MediaSource media, bool background)
@@ -161,7 +160,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
             TInfo.TStage = TableStage.GameThemes;
         }
     }
-    
+
     public void SetStage(TableStage stage)
     {
         if (stage == TableStage.RoundTable)
@@ -240,7 +239,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
             }
         }
 
-        GameHost?.OnThemeSelected(themeIndex);
+        Listener?.OnThemeSelected(themeIndex);
     }
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
@@ -276,7 +275,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
             }
         }
 
-        GameHost?.OnQuestionSelected(themeIndex, questionIndex);
+        Listener?.OnQuestionSelected(themeIndex, questionIndex);
     }
 
     public void PlaySimpleSelection(int theme, int quest) => TInfo.PlaySimpleSelectionAsync(theme, quest);
@@ -321,7 +320,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
                                 && code < TInfo.RoundInfo[_previousCode].Questions.Count
                                 && TInfo.RoundInfo[_previousCode].Questions[code].Price > -1)
                             {
-                                GameHost?.OnQuestionSelected(_previousCode, code);
+                                Listener?.OnQuestionSelected(_previousCode, code);
                                 _previousCode = -1;
                                 return true;
                             }
@@ -344,7 +343,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
 
                         if (code < TInfo.RoundInfo.Count && TInfo.RoundInfo[code].Name != null)
                         {
-                            GameHost?.OnThemeSelected(code);
+                            Listener?.OnThemeSelected(code);
                             return true;
                         }
                     }
@@ -354,7 +353,7 @@ public sealed class RemoteGameUI : IRemoteGameUI
         }
         return false;
     }
-    
+
     public void SetPlayer(int playerIndex)
     {
         TInfo.PlayerIndex = playerIndex;

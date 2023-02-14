@@ -12,8 +12,8 @@ public sealed class SportEngine : EngineBase
 {
     public override int LeftQuestionsCount => throw new NotImplementedException();
 
-    public SportEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
-        : base(document, settingsProvider)
+    public SportEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
+        : base(document, optionsProvider, questionEngineFactory)
     {
 
     }
@@ -76,7 +76,7 @@ public sealed class SportEngine : EngineBase
                 _useAnswerMarker = false;
                 SetActiveQuestion();
                 OnQuestion(_activeQuestion);
-                Stage = GameStage.Question;
+                OnMoveToQuestion();
                 break;
 
             case GameStage.Score:
@@ -180,8 +180,7 @@ public sealed class SportEngine : EngineBase
         _isMedia = false;
         _useAnswerMarker = false;
         SetActiveQuestion();
-
-        _stage = GameStage.Question;
+        OnMoveToQuestion();
 
         return Tuple.Create(_themeIndex, _questionIndex, _activeQuestion.Price);
     }
@@ -202,7 +201,7 @@ public sealed class SportEngine : EngineBase
         return false;
     }
 
-    public override bool AcceptRound(Round round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
+    public override bool AcceptRound(Round? round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
 
     public override bool CanNext() => _stage != GameStage.End;
 

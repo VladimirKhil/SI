@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using SIEngine.Core;
+using SIPackages;
 using SIPackages.Core;
 using System;
 using System.ComponentModel;
@@ -15,7 +16,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 {
     private bool _isDisposed = false;
 
-    protected IEngineSettingsProvider _settingsProvider;
+    protected Func<EngineOptions> OptionsProvider { get; }
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -49,7 +50,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected Theme _activeTheme;
 
-    protected Question _activeQuestion;
+    protected Question? _activeQuestion;
 
     protected bool _inAutoMode;
 
@@ -77,7 +78,11 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     public int QuestionIndex => _questionIndex;
 
-    private Atom ActiveAtom => _atomIndex < _activeQuestion.Scenario.Count ? _activeQuestion.Scenario[_atomIndex] : null;
+    private Atom? ActiveAtom => _atomIndex < _activeQuestion.Scenario.Count ? _activeQuestion.Scenario[_atomIndex] : null;
+
+    private readonly QuestionEngineFactory _questionEngineFactory;
+
+    protected QuestionEngine? QuestionEngine { get; private set; }
 
     public bool CanMoveNext
     {
@@ -214,10 +219,11 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     #endregion
 
-    protected EngineBase(SIDocument document, IEngineSettingsProvider settingsProvider)
+    protected EngineBase(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
-        _settingsProvider = settingsProvider ?? throw new ArgumentNullException(nameof(settingsProvider));
+        OptionsProvider = optionsProvider ?? throw new ArgumentNullException(nameof(optionsProvider));
+        _questionEngineFactory = questionEngineFactory;
     }
 
     public abstract void MoveNext();
@@ -322,7 +328,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
                     nameof(milliseconds));
             }
 
-            if (_settingsProvider.AutomaticGame)
+            if (OptionsProvider().AutomaticGame)
             {
                 lock (_autoLock)
                 {
@@ -503,13 +509,27 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     private void SetAnswerStage()
     {
-        Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.QuestionPostInfo;
+        Stage = OptionsProvider().ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.QuestionPostInfo;
     }
 
     protected void OnQuestion()
     {
+        if (QuestionEngine != null)
+        {
+            if (!QuestionEngine.PlayNext())
+            {
+                OnQuestionFinished();
+                Stage = GameStage.QuestionPostInfo;
+                MoveNext();
+            }
+
+            return;
+        }
+
         var playMode = PlayQuestionAtom();
-        var pressMode = _settingsProvider.IsPressMode(_isMedia);
+        var options = OptionsProvider();
+        var pressMode = _isMedia ? options.IsMultimediaPressMode : options.IsPressMode;
+
         if (playMode == QuestionPlayMode.AlreadyFinished)
         {
             OnQuestionFinished();
@@ -518,7 +538,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             if (pressMode)
             {
                 OnWaitTry(_activeQuestion);
-                AutoNext(1000 * Math.Min(5, _settingsProvider.ThinkingTime));
+                AutoNext(1000 * Math.Min(5, options.ThinkingTime));
             }
             else
             {
@@ -528,7 +548,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         else
         {
             OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, pressMode);
-            AutoNext(1000 * (Math.Min(1, _settingsProvider.ThinkingTime) + _activeQuestion.Scenario.ToString().Length / 20));
+            AutoNext(1000 * (Math.Min(1, options.ThinkingTime) + _activeQuestion.Scenario.ToString().Length / 20));
         }
     }
 
@@ -549,6 +569,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         var activeAtom = ActiveAtom;
         _isMedia = false;
+
         switch (activeAtom.Type)
         {
             case AtomTypes.Text:
@@ -787,7 +808,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void DoFinishRound()
     {
         OnLogScore();
-        if (_settingsProvider.ShowScore)
+
+        if (OptionsProvider().ShowScore)
         {
             Stage = GameStage.Score;
             OnShowScore();
@@ -799,6 +821,15 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
 
         AutoNext(5000);
+    }
+    protected void OnMoveToQuestion(bool isFinal = false)
+    {
+        Stage = isFinal ? GameStage.FinalQuestion : GameStage.Question;
+
+        if (OptionsProvider().UseNewEngine && _activeQuestion != null)
+        {
+            QuestionEngine = _questionEngineFactory.CreateEngine(_activeQuestion, isFinal);
+        }
     }
 
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)

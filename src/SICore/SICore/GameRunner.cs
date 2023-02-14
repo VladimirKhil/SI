@@ -1,4 +1,5 @@
 ﻿using SICore.BusinessLogic;
+using SICore.Clients.Game;
 using SICore.Contracts;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -14,6 +15,18 @@ namespace SICore;
 /// </summary>
 public sealed class GameRunner
 {
+    private static readonly EngineOptions EngineOptions = new()
+    {
+        IsMultimediaPressMode = true,
+        IsPressMode = true,
+        ShowRight = true,
+        ShowScore = false,
+        AutomaticGame = false,
+        PlaySpecials = true,
+        ThinkingTime = 0,
+        UseNewEngine = false
+    };
+
     private readonly Node _node;
     private readonly IGameSettingsCore<AppSettingsCore> _settings;
     private readonly SIDocument _document;
@@ -129,10 +142,13 @@ public sealed class GameRunner
             gameData.EndUpdatePersons();
         }
 
+        var playHandler = new QuestionPlayHandler();
+
         var engine = (EngineBase)EngineFactory.CreateEngine(
             gameData.Settings.AppSettings.GameMode == GameModes.Tv,
             _document,
-            DefaultEngineSettingsProvider.Instance);
+            () => EngineOptions,
+            playHandler);
 
         var client = Client.Create(NetworkConstants.GameName, _node);
 

@@ -1,5 +1,10 @@
 ﻿namespace SIEngine;
 
+// TODO: internal
+
+/// <summary>
+/// Defines SI engine states.
+/// </summary>
 public enum GameStage
 {
     Begin,
@@ -27,11 +32,4 @@ public enum GameStage
     RightFinalAnswer,
     AfterFinalThink,
     End
-}
-
-public enum QuestionPlayMode
-{
-    InProcess,
-    JustFinished,
-    AlreadyFinished
 }

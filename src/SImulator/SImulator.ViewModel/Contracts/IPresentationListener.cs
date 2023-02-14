@@ -1,9 +1,9 @@
-﻿namespace SImulator.ViewModel.Core;
+﻿namespace SImulator.ViewModel.Contracts;
 
 /// <summary>
 /// Provides callback methods for game UI.
 /// </summary>
-public interface IGameHost
+public interface IPresentationListener
 {
     void OnQuestionSelected(int theme, int question);
 

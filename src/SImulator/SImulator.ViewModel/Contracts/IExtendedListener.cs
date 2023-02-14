@@ -1,8 +1,11 @@
 ﻿using System.Windows.Input;
 
-namespace SImulator.ViewModel.Core;
+namespace SImulator.ViewModel.Contracts;
 
-public interface IExtendedGameHost : IGameHost
+/// <summary>
+/// Extends basic presentation listener with extra events and commands.
+/// </summary>
+public interface IExtendedListener : IPresentationListener
 {
     bool IsMediaEnded { get; set; }
 

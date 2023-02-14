@@ -1,4 +1,4 @@
-﻿using SImulator.ViewModel;
+﻿using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using System.Windows;
 
@@ -35,7 +35,7 @@ public static class MainWindowBehavior
     {
         var window = (MainWindow)sender;
 
-        if (window.DataContext is RemoteGameUI remoteGameUI)
+        if (window.DataContext is PresentationController remoteGameUI)
         {
             e.Handled = remoteGameUI.OnKeyPressed((GameKey)e.Key);
         }

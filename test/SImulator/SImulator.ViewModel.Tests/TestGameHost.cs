@@ -1,10 +1,10 @@
 ﻿using SIEngine;
-using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Contracts;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel.Tests;
 
-internal sealed class TestGameHost : IExtendedGameHost
+internal sealed class TestGameHost : IExtendedListener
 {
     private readonly EngineBase _engine;
 

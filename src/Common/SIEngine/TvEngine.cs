@@ -32,8 +32,8 @@ public sealed class TvEngine : EngineBase
 
     public override int LeftQuestionsCount => _questionsTable.Count; // for debugging only
 
-    public TvEngine(SIDocument document, IEngineSettingsProvider settingsProvider)
-        : base(document, settingsProvider) { }
+    public TvEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
+        : base(document, optionsProvider, questionEngineFactory) { }
 
     /// <summary>
     /// Moves to the next game stage.
@@ -237,27 +237,12 @@ public sealed class TvEngine : EngineBase
                 break;
 
             case GameStage.FinalQuestion:
-                #region FinalQuestion
-                {
-                    var playMode = PlayQuestionAtom();
-                    if (playMode == QuestionPlayMode.AlreadyFinished)
-                    {
-                        Stage = GameStage.FinalThink;
-                        MoveNext();
-                    }
-                    else
-                    {
-                        OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, false);                            
-                        AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
-                    }
-
-                    break;
-                }
-                #endregion
+                OnFinalQuestion();
+                break;
 
             case GameStage.FinalThink:
                 OnSound("finalthink.wav");
-                Stage = _settingsProvider.ShowRight || _useAnswerMarker ? GameStage.RightFinalAnswer : GameStage.QuestionPostInfo;
+                Stage = OptionsProvider().ShowRight || _useAnswerMarker ? GameStage.RightFinalAnswer : GameStage.QuestionPostInfo;
                 OnWaitTry(_activeQuestion, true);
                 AutoNext(38000);
                 break;
@@ -292,7 +277,28 @@ public sealed class TvEngine : EngineBase
         }
     }
 
-    public override bool AcceptRound(Round round) => base.AcceptRound(round) &&
+    private void OnFinalQuestion()
+    {
+        if (QuestionEngine != null)
+        {
+            // TODO
+        }
+
+        var playMode = PlayQuestionAtom();
+
+        if (playMode == QuestionPlayMode.AlreadyFinished)
+        {
+            Stage = GameStage.FinalThink;
+            MoveNext();
+        }
+        else
+        {
+            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, false);
+            AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
+        }
+    }
+
+    public override bool AcceptRound(Round? round) => base.AcceptRound(round) &&
         (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null));
 
     public override Tuple<int, int, int> MoveBack()
@@ -372,7 +378,7 @@ public sealed class TvEngine : EngineBase
             UpdateCanNext();
         }
 
-        if (_activeQuestion.Type.Name != QuestionTypes.Simple && !_settingsProvider.PlaySpecials)
+        if (_activeQuestion.Type.Name != QuestionTypes.Simple && !OptionsProvider().PlaySpecials)
         {
             _activeQuestion.Type.Name = QuestionTypes.Simple;
         }
@@ -383,8 +389,8 @@ public sealed class TvEngine : EngineBase
         _atomIndex = 0;
         _isMedia = false;
         _useAnswerMarker = false;
-        Stage = GameStage.Question;
 
+        OnMoveToQuestion();
         UpdateCanNext();
 
         if (_activeQuestion != null && _activeQuestion.Type.Name != QuestionTypes.Simple)
@@ -403,9 +409,10 @@ public sealed class TvEngine : EngineBase
         SetActiveThemeQuestion();
 
         OnPrepareFinalQuestion(_activeTheme, _activeQuestion);
-        Stage = GameStage.FinalQuestion;
         _useAnswerMarker = false;
         UpdateCanNext();
+
+        OnMoveToQuestion(true);
     }
 
     public override int OnReady(out bool more)

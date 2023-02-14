@@ -48,6 +48,18 @@ public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>, IX
     /// <param name="value">Parameter value.</param>
     public void AddSimpleParameter(string name, string value) => Parameters.Add(name, new StepParameter { SimpleValue = value });
 
+    /// <summary>
+    /// Tries to get parameter by name.
+    /// </summary>
+    /// <param name="name">Parameter name.</param>
+    public StepParameter? TryGetParameter(string name) => Parameters.TryGetValue(name, out var value) ? value : null;
+
+    /// <summary>
+    /// Tries to get parameter by name.
+    /// </summary>
+    /// <param name="name">Parameter name.</param>
+    public string? TryGetSimpleParameter(string name) => TryGetParameter(name)?.SimpleValue;
+
     /// <inheritdoc />
     public override string ToString() => $"{_type}({string.Join(", ", Parameters)})";
 

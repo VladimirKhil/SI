@@ -1,6 +1,8 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Listeners;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
@@ -137,9 +139,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private GameEngine _game;
+    private GameViewModel _game;
 
-    public GameEngine Game
+    public GameViewModel Game
     {
         get => _game;
         private set
@@ -359,6 +361,53 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         return tempDir;
     }
 
+    private EngineOptions GetEngineOptions()
+    {
+        var options = SettingsViewModel.Model;
+
+        return new()
+        {
+            IsPressMode = options.FalseStart && options.UsePlayersKeys != PlayerKeysModes.None,
+            IsMultimediaPressMode = options.FalseStart && options.FalseStartMultimedia && options.UsePlayersKeys != PlayerKeysModes.None,
+            ShowRight = options.ShowRight,
+            ShowScore = options.SIUISettings.ShowScore,
+            AutomaticGame = options.AutomaticGame,
+            PlaySpecials = options.PlaySpecials,
+            ThinkingTime = options.ThinkingTime,
+            UseNewEngine = false
+        };
+    }
+
+    private ILogger CreateLogger()
+    {
+        if (Settings.SaveLogs)
+        {
+            var logsFolder = Settings.LogsFolder;
+
+            if (string.IsNullOrWhiteSpace(logsFolder))
+            {
+                PlatformManager.Instance.ShowMessage("Папка для записи логов не задана! Логи вестись не будут.");
+                return PlatformManager.Instance.CreateLogger(null);
+            }
+            else
+            {
+                try
+                {
+                    return PlatformManager.Instance.CreateLogger(logsFolder);
+                }
+                catch (Exception exc)
+                {
+                    PlatformManager.Instance.ShowMessage(string.Format("Ошибка создания файла лога: {0}.\r\n\r\nЛог записываться не будет.", exc.Message), false);
+                    return PlatformManager.Instance.CreateLogger(null);
+                }
+            }
+        }
+        else
+        {
+            return PlatformManager.Instance.CreateLogger(null);
+        }
+    }
+
     /// <summary>
     /// Starts the game.
     /// </summary>
@@ -371,32 +420,42 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             var tempDir = await PreparePackageAsync();
 
-            var engineSettingsProvider = new EngineSettingsProvider(SettingsViewModel.Model);
             ISIEngine engine;
+
+            var gameEngineController = new GameEngineController(tempDir);
 
             try
             {
                 var document = SIDocument.Load(tempDir);
-                engine = EngineFactory.CreateEngine(SettingsViewModel.Model.GameMode == GameModes.Tv, document, engineSettingsProvider);
+
+                engine = EngineFactory.CreateEngine(
+                    SettingsViewModel.Model.GameMode == GameModes.Tv,
+                    document,
+                    GetEngineOptions,
+                    gameEngineController);
             }
             catch (Exception exc)
             {
                 throw new Exception(string.Format(Resources.GamePackageLoadError, exc.Message));
             }
 
-            var gameHost = new GameHost(engine);
+            var presentationListener = new PresentationListener(engine);
 
-            var remoteGameUI = new RemoteGameUI
+            var presentationController = new PresentationController
             {
-                GameHost = gameHost,
+                Listener = presentationListener,
                 ScreenIndex = SettingsViewModel.Model.ScreenNumber
             };
 
-            remoteGameUI.UpdateSettings(SettingsViewModel.SIUISettings.Model);
-            remoteGameUI.Error += ShowError;
+            presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+            presentationController.Error += ShowError;
 
-            var game = new GameEngine(SettingsViewModel, engine, gameHost, remoteGameUI, Players, tempDir);
+            var logger = CreateLogger();
+
+            var game = new GameViewModel(SettingsViewModel, engine, presentationListener, presentationController, Players, tempDir, logger);
             Game = game;
+
+            gameEngineController.GameViewModel = game;
 
             game.Start();
 

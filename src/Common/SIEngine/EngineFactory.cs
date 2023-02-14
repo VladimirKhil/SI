@@ -1,6 +1,10 @@
-﻿using SIPackages;
+﻿using SIEngine.Core;
+using SIPackages;
+using System;
 
 namespace SIEngine;
+
+// TODO: Merge two engines into one and provide different strategies for its logic (question selection, special questions play, finals)
 
 /// <summary>
 /// Provides a method for creating SIGame engine.
@@ -12,10 +16,15 @@ public static class EngineFactory
     /// </summary>
     /// <param name="classical">Should the engine be classical (or simple otherwise).</param>
     /// <param name="document">SIGame package to play.</param>
-    /// <param name="settingsProvider">Settings provider.</param>
+    /// <param name="optionsProvider">Options provider.</param>
+    /// <param name="playHandler">Question engine play handler.</param>
     /// <returns>Created engine.</returns>
-    public static ISIEngine CreateEngine(bool classical, SIDocument document, IEngineSettingsProvider settingsProvider) =>
+    public static ISIEngine CreateEngine(
+        bool classical,
+        SIDocument document,
+        Func<EngineOptions> optionsProvider,
+        IQuestionEnginePlayHandler playHandler) =>
         classical
-            ? new TvEngine(document, settingsProvider)
-            : new SportEngine(document, settingsProvider);
+            ? new TvEngine(document, optionsProvider, new QuestionEngineFactory(playHandler))
+            : new SportEngine(document, optionsProvider, new QuestionEngineFactory(playHandler));
 }

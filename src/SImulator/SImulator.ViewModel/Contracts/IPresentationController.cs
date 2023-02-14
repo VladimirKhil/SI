@@ -2,20 +2,20 @@
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 
-namespace SImulator.ViewModel.Core;
+namespace SImulator.ViewModel.Contracts;
 
 /// <summary>
-/// Represents a game UI.
+/// Represents a game presentation controller.
 /// </summary>
-public interface IRemoteGameUI
+public interface IPresentationController
 {
     /// <summary>
-    /// Начать игру
+    /// Starts new game.
     /// </summary>
     void Start();
 
     /// <summary>
-    /// Остановить игру
+    /// Stops the game.
     /// </summary>
     void StopGame();
 

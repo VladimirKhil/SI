@@ -1,11 +1,12 @@
 ﻿using SIEngine;
-using SImulator.ViewModel.Core;
+using SImulator.ViewModel.Contracts;
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace SImulator.ViewModel;
+namespace SImulator.ViewModel.Listeners;
 
-public sealed class GameHost : IExtendedGameHost
+/// <inheritdoc cref="IExtendedListener" />
+public sealed class PresentationListener : IExtendedListener
 {
     private readonly ISIEngine _engine;
 
@@ -21,17 +22,17 @@ public sealed class GameHost : IExtendedGameHost
 
     public ICommand Stop { get; set; }
 
-    public event Action<int> ThemeDeleted;
+    public event Action<int>? ThemeDeleted;
 
-    public event Action MediaStart;
+    public event Action? MediaStart;
 
-    public event Action MediaEnd;
+    public event Action? MediaEnd;
 
-    public event Action<double> MediaProgress;
+    public event Action<double>? MediaProgress;
 
-    public event Action RoundThemesFinished;
+    public event Action? RoundThemesFinished;
 
-    public GameHost(ISIEngine engine) => _engine = engine;
+    public PresentationListener(ISIEngine engine) => _engine = engine;
 
     public async void OnQuestionSelected(int theme, int question)
     {

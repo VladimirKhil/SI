@@ -1,5 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -19,7 +20,7 @@ namespace SImulator.ViewModel;
 /// <summary>
 /// Controls a single game run.
 /// </summary>
-public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener, IAsyncDisposable
+public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListener, IAsyncDisposable
 {
     #region Fields
 
@@ -31,14 +32,14 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private readonly EngineBase _engine;
 
     /// <summary>
-    /// Менеджер игровых кнопок
+    /// Game buttons manager.
     /// </summary>
     private IButtonManager? _buttonManager;
 
     /// <summary>
-    /// Менеджер записи лога
+    /// Game log writer.
     /// </summary>
-    private ILogger? _logger;
+    private ILogger _logger;
 
     private readonly Timer _roundTimer;
     private readonly Timer _questionTimer;
@@ -123,7 +124,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     /// <summary>
     /// Ссылка на интерфейсную часть. Может находиться в текущем процессе или на удалённом компьютере
     /// </summary>
-    public IRemoteGameUI UserInterface { get; }
+    public IPresentationController PresentationController { get; }
 
     /// <summary>
     /// Список игроков, отображаемых на табло в особом режиме игры
@@ -149,7 +150,15 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     public int Price
     {
         get => _price;
-        set { _price = value; OnPropertyChanged(); }
+        set 
+        {
+            if (_price != value)
+            {
+                _price = value;
+                OnPropertyChanged();
+                UpdateCaption();
+            }
+        }
     }
 
     private int _rountTime = 0;
@@ -206,6 +215,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private Round? _activeRound;
 
+    public Round? ActiveRound => _activeRound;
+
     private Question? _activeQuestion;
 
     public Question? ActiveQuestion
@@ -249,12 +260,12 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
                 if (!_mediaProgressBlock)
                 {
-                    UserInterface?.SeekMedia(_mediaProgress);
+                    PresentationController?.SeekMedia(_mediaProgress);
 
-                    if (_gameHost.IsMediaEnded)
+                    if (_presentationListener.IsMediaEnded)
                     {
                         ActiveMediaCommand = StopMediaTimer;
-                        _gameHost.IsMediaEnded = false;
+                        _presentationListener.IsMediaEnded = false;
                     }
                 }
             }
@@ -278,25 +289,27 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     public int ButtonBlockTime => (int)(Settings.Model.BlockingTime * 1000);
 
-    private readonly IExtendedGameHost _gameHost;
+    private readonly IExtendedListener _presentationListener;
 
     private readonly string _packageFolder;
 
     #endregion
 
-    public GameEngine(
+    public GameViewModel(
         AppSettingsViewModel settings,
         ISIEngine engine,
-        IExtendedGameHost gameHost,
-        IRemoteGameUI ui,
+        IExtendedListener presentationListener,
+        IPresentationController presentationController,
         IList<SimplePlayerInfo> players,
-        string packageFolder)
+        string packageFolder,
+        ILogger logger)
     {
         Settings = settings;
         _engine = (EngineBase)engine;
-        _gameHost = gameHost;
+        _presentationListener = presentationListener;
         _packageFolder = packageFolder;
-        UserInterface = ui;
+        _logger = logger;
+        PresentationController = presentationController;
 
         LocalInfo = new TableInfoViewModel(players);
 
@@ -309,11 +322,9 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
         LocalInfo.ThemeSelected += ThemeInfo_Selected;
 
-        #region Command creation
-
-        _gameHost.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
-        _gameHost.Back = _back = new SimpleCommand(Back_Executed) { CanBeExecuted = false };
-        _gameHost.Stop = _stop = new SimpleCommand(Stop_Executed);
+        _presentationListener.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
+        _presentationListener.Back = _back = new SimpleCommand(Back_Executed) { CanBeExecuted = false };
+        _presentationListener.Stop = _stop = new SimpleCommand(Stop_Executed);
 
         AddPlayer = new SimpleCommand(AddPlayer_Executed);
         RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
@@ -330,10 +341,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         RunMediaTimer = new SimpleUICommand(RunMediaTimer_Executed) { Name = Resources.Run };
         StopMediaTimer = new SimpleUICommand(StopMediaTimer_Executed) { Name = Resources.Pause };
 
-        _gameHost.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
-        _gameHost.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
-
-        #endregion
+        _presentationListener.NextRound = _nextRound = new SimpleCommand(NextRound_Executed) { CanBeExecuted = false };
+        _presentationListener.PreviousRound = _previousRound = new SimpleCommand(PreviousRound_Executed) { CanBeExecuted = false };
 
         UpdateNextCommand();
 
@@ -381,10 +390,10 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         _engine.PropertyChanged += Engine_PropertyChanged;
 
-        _gameHost.MediaStart += GameHost_MediaStart;
-        _gameHost.MediaProgress += GameHost_MediaProgress;
-        _gameHost.MediaEnd += GameHost_MediaEnd;
-        _gameHost.RoundThemesFinished += GameHost_RoundThemesFinished;
+        _presentationListener.MediaStart += GameHost_MediaStart;
+        _presentationListener.MediaProgress += GameHost_MediaProgress;
+        _presentationListener.MediaEnd += GameHost_MediaEnd;
+        _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
     }
 
     private async void Engine_QuestionPostInfo()
@@ -404,7 +413,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private void GameHost_RoundThemesFinished()
     {
         ShowingRoundThemes = false;
-        UserInterface.SetStage(TableStage.RoundTable);
+        PresentationController.SetStage(TableStage.RoundTable);
     }
 
     private void GameHost_MediaEnd()
@@ -460,7 +469,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     #region Event handlers
 
     private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
-        UserInterface?.UpdateSettings(Settings.SIUISettings.Model);
+        PresentationController?.UpdateSettings(Settings.SIUISettings.Model);
 
     private void PlayerInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -492,21 +501,21 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             return;
         }
 
-        UserInterface?.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
+        PresentationController?.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
     }
 
     private void QuestionTimer_Elapsed(object? state) => UI.Execute(
         () =>
         {
             QuestionTime++;
-            UserInterface.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
+            PresentationController.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
 
             if (QuestionTime < QuestionTimeMax)
             {
                 return;
             }
 
-            UserInterface.SetSound(Settings.Model.Sounds.NoAnswer);
+            PresentationController.SetSound(Settings.Model.Sounds.NoAnswer);
             StopQuestionTimer_Executed(null);
             ActiveQuestionCommand = null;
 
@@ -556,7 +565,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             }
         }
 
-        _gameHost.OnThemeSelected(themeIndex);
+        _presentationListener.OnThemeSelected(themeIndex);
     }
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
@@ -588,7 +597,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             }
         }
 
-        _gameHost.OnQuestionSelected(themeIndex, questionIndex);
+        _presentationListener.OnQuestionSelected(themeIndex, questionIndex);
     }
 
     #endregion
@@ -609,7 +618,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
         ActiveRoundCommand = null;
-        UserInterface.SetStage(TableStage.Sign);
+        PresentationController.SetStage(TableStage.Sign);
 
         _engine.MoveBackRound();
     }
@@ -683,13 +692,13 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void RunMediaTimer_Executed(object? arg)
     {
-        UserInterface.RunMedia();
+        PresentationController.RunMedia();
         ActiveMediaCommand = StopMediaTimer;
     }
 
     private void StopMediaTimer_Executed(object? arg)
     {
-        UserInterface.StopMedia();
+        PresentationController.StopMedia();
         ActiveMediaCommand = RunMediaTimer;
     }
 
@@ -699,7 +708,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
 
         LocalInfo.Players.Add(playerInfo);
-        UserInterface.AddPlayer();
+        PresentationController.AddPlayer();
     }
 
     private void RemovePlayer_Executed(object? arg)
@@ -711,13 +720,13 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         player.PropertyChanged -= PlayerInfo_PropertyChanged;
         LocalInfo.Players.Remove(player);
-        UserInterface.RemovePlayer(player.Name);
+        PresentationController.RemovePlayer(player.Name);
     }
 
     private void ClearPlayers_Executed(object? arg)
     {
         LocalInfo.Players.Clear();
-        UserInterface.ClearPlayers();
+        PresentationController.ClearPlayers();
     }
 
     private void AddRight_Executed(object? arg)
@@ -735,7 +744,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         player.Right++;
         player.Sum += Price;
 
-        UserInterface.SetSound(Settings.Model.Sounds.AnswerRight);
+        PresentationController.SetSound(Settings.Model.Sounds.AnswerRight);
 
         _logger.Write("{0} +{1}", player.Name, Price);
 
@@ -768,7 +777,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         var substract = Settings.Model.SubstractOnWrong ? Price : 0;
         player.Sum -= substract;
 
-        UserInterface.SetSound(Settings.Model.Sounds.AnswerWrong);
+        PresentationController.SetSound(Settings.Model.Sounds.AnswerWrong);
 
         _logger.Write("{0} -{1}", player.Name, substract);
 
@@ -781,52 +790,25 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         UpdateNextCommand();
 
-        UserInterface.ClearPlayers();
+        PresentationController.ClearPlayers();
 
         for (int i = 0; i < LocalInfo.Players.Count; i++)
         {
-            UserInterface.AddPlayer();
-            UserInterface.UpdatePlayerInfo(i, (PlayerInfo)LocalInfo.Players[i]);
+            PresentationController.AddPlayer();
+            PresentationController.UpdatePlayerInfo(i, (PlayerInfo)LocalInfo.Players[i]);
         }
 
-        UserInterface.Start();
+        PresentationController.Start();
 
         ShowingRoundThemes = false;
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
-        if (Settings.Model.SaveLogs)
-        {
-            var logsFolder = Settings.Model.LogsFolder;
-
-            if (string.IsNullOrWhiteSpace(logsFolder))
-            {
-                PlatformManager.Instance.ShowMessage("Папка для записи логов не задана! Логи вестись не будут.");
-                _logger = PlatformManager.Instance.CreateLogger(null);
-            }
-            else
-            {
-                try
-                {
-                    _logger = PlatformManager.Instance.CreateLogger(logsFolder);
-                }
-                catch (Exception exc)
-                {
-                    PlatformManager.Instance.ShowMessage(string.Format("Ошибка создания файла лога: {0}.\r\n\r\nЛог записываться не будет.", exc.Message), false);
-                    _logger = PlatformManager.Instance.CreateLogger(null);
-                }
-            }
-        }
-        else
-        {
-            _logger = PlatformManager.Instance.CreateLogger(null);
-        }
-
-        _logger.Write("Игра начата {0}", DateTime.Now);
-        _logger.Write("Пакет: {0}", _engine.PackageName);
+        _logger.Write("Game started {0}", DateTime.Now);
+        _logger.Write("Package: {0}", _engine.PackageName);
 
         _selectedPlayers.Clear();
-        UserInterface.ClearLostButtonPlayers();
+        PresentationController.ClearLostButtonPlayers();
 
         if (Settings.Model.AutomaticGame)
         {
@@ -836,21 +818,23 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_Question(Question question)
     {
-        UserInterface.SetText(question.Price.ToString());
-        UserInterface.SetStage(TableStage.QuestionPrice);
-        SetCaption($"{ActiveTheme.Name}, {question.Price}");
+        PresentationController.SetText(question.Price.ToString());
+        PresentationController.SetStage(TableStage.QuestionPrice);
+
+        CurrentTheme = ActiveTheme?.Name;
+        Price = question.Price;
 
         LocalInfo.Text = question.Price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
         ActiveQuestion = question;
     }
 
-    private void SetCaption(string caption) => UserInterface.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
+    private void SetCaption(string caption) => PresentationController.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
 
     private void Engine_Theme(Theme theme)
     {
-        UserInterface.SetText($"{Resources.Theme}: {theme.Name}");
-        UserInterface.SetStage(TableStage.Theme);
+        PresentationController.SetText($"{Resources.Theme}: {theme.Name}");
+        PresentationController.SetStage(TableStage.Theme);
 
         LocalInfo.Text = $"{Resources.Theme}: {theme.Name}";
         LocalInfo.TStage = TableStage.Theme;
@@ -858,7 +842,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveTheme = theme;
     }
 
-    private void Engine_EndGame() => UserInterface?.SetStage(TableStage.Sign);
+    private void Engine_EndGame() => PresentationController?.SetStage(TableStage.Sign);
 
     private void Stop_Executed(object? arg = null) => RequestStop?.Invoke();
 
@@ -897,7 +881,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         {
             if (_showingRoundThemes)
             {
-                UserInterface?.SetStage(TableStage.RoundTable);
+                PresentationController?.SetStage(TableStage.RoundTable);
                 ShowingRoundThemes = false;
                 return;
             }
@@ -912,7 +896,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_Package(Package package, IMedia packageLogo)
     {
-        if (UserInterface == null)
+        if (PresentationController == null)
         {
             return;
         }
@@ -923,8 +907,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         {
             if (SetMedia(new Media(videoUrl), SIDocument.VideoStorageName))
             {
-                UserInterface.SetStage(TableStage.Question);
-                UserInterface.SetQuestionContentType(QuestionContentType.Video);
+                PresentationController.SetStage(TableStage.Question);
+                PresentationController.SetQuestionContentType(QuestionContentType.Video);
             }
         }
         else
@@ -933,13 +917,13 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             {
                 if (SetMedia(packageLogo, SIDocument.AudioStorageName))
                 {
-                    UserInterface.SetStage(TableStage.Question);
-                    UserInterface.SetQuestionSound(false);
-                    UserInterface.SetQuestionContentType(QuestionContentType.Image);
+                    PresentationController.SetStage(TableStage.Question);
+                    PresentationController.SetQuestionSound(false);
+                    PresentationController.SetQuestionContentType(QuestionContentType.Image);
                 }
             }
 
-            UserInterface.SetSound(Settings.Model.Sounds.BeginGame);
+            PresentationController.SetSound(Settings.Model.Sounds.BeginGame);
         }
 
         LocalInfo.TStage = TableStage.Sign;
@@ -947,24 +931,24 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_GameThemes(string[] themes)
     {
-        UserInterface?.SetGameThemes(themes);
+        PresentationController?.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;
 
-        UserInterface?.SetSound(Settings.Model.Sounds.GameThemes);
+        PresentationController?.SetSound(Settings.Model.Sounds.GameThemes);
     }
 
     private void Engine_Round(Round round)
     {
         _activeRound = round ?? throw new ArgumentNullException(nameof(round));
 
-        if (UserInterface == null)
+        if (PresentationController == null)
         {
             return;
         }
 
-        UserInterface.SetText(round.Name);
-        UserInterface.SetStage(TableStage.Round);
-        UserInterface.SetSound(Settings.Model.Sounds.RoundBegin);
+        PresentationController.SetText(round.Name);
+        PresentationController.SetStage(TableStage.Round);
+        PresentationController.SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
         _logger.Write("\r\n{0} {1}", Resources.Round, round.Name);
@@ -999,8 +983,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             }
         }
 
-        UserInterface.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
-        UserInterface.SetSound(Settings.Model.Sounds.RoundThemes);
+        PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
+        PresentationController.SetSound(Settings.Model.Sounds.RoundThemes);
         ShowingRoundThemes = true;
         LocalInfo.TStage = TableStage.RoundTable;
     }
@@ -1042,7 +1026,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         if (final)
         {
-            UserInterface.SetSound(Settings.Model.Sounds.FinalThink);
+            PresentationController.SetSound(Settings.Model.Sounds.FinalThink);
 
             var time = Settings.Model.FinalQuestionThinkingTime;
 
@@ -1063,7 +1047,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         if (question.Type.Name == QuestionTypes.Simple)
         {
-            UserInterface.SetQuestionStyle(QuestionStyle.WaitingForPress);
+            PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
 
             if (Settings.Model.ThinkingTime > 0)
             {
@@ -1074,14 +1058,48 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         }
     }
 
+    public void AskAnswerButtons()
+    {
+        if (Settings.Model.ThinkingTime > 0)
+        {
+            // Runs timer in game with false starts
+            QuestionTimeMax = Settings.Model.ThinkingTime;
+            RunQuestionTimer_Executed(0);
+        }
+    }
+
+    public void AskAnswerDirect()
+    {
+        if (ActiveRound?.Type == RoundTypes.Final)
+        {
+            PresentationController.SetSound(Settings.Model.Sounds.FinalThink);
+
+            var time = Settings.Model.FinalQuestionThinkingTime;
+
+            if (time > 0)
+            {
+                ThinkingTimeMax = time;
+                RunThinkingTimer_Executed(0);
+            }
+
+            return;
+        }
+    }
+
     private void Engine_RightAnswer()
     {
         StopQuestionTimer.Execute(0);
 
         _buttonManager?.Stop();
 
-        UserInterface.SetQuestionStyle(QuestionStyle.Normal);
-        UserInterface.SetSound();
+        PresentationController.SetQuestionStyle(QuestionStyle.Normal);
+        PresentationController.SetSound();
+    }
+
+    public void OnRightAnswer()
+    {
+        StopQuestionTimer.Execute(0);
+        _buttonManager?.Stop();
     }
 
     private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);
@@ -1090,7 +1108,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         if (Settings.Model.GameMode == GameModes.Tv)
         {
-            UserInterface.SetStage(TableStage.RoundTable);
+            PresentationController.SetStage(TableStage.RoundTable);
             LocalInfo.TStage = TableStage.RoundTable;
         }
         else
@@ -1101,7 +1119,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_RoundTimeout()
     {
-        UserInterface?.SetSound(Settings.Model.Sounds.RoundTimeout);
+        PresentationController?.SetSound(Settings.Model.Sounds.RoundTimeout);
         _logger?.Write(Resources.RoundTimeout);
     }
 
@@ -1123,14 +1141,20 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveQuestionCommand = null;
         ActiveMediaCommand = null;
 
+        PresentationController.SetText("");
+
         if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
         {
             var themeInfo = LocalInfo.RoundInfo[themeIndex];
+
             if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
             {
                 themeInfo.Questions[questionIndex].Price = -1;
             }
         }
+
+        CurrentTheme = null;
+        Price = 0;
     }
 
     private void Engine_FinalThemes(Theme[] finalThemes)
@@ -1148,16 +1172,16 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             LocalInfo.RoundInfo.Add(themeInfo);
         }
 
-        UserInterface?.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
-        UserInterface?.SetSound("");
+        PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
+        PresentationController.SetSound("");
         LocalInfo.TStage = TableStage.Final;
     }
 
     private void Engine_SimpleAnswer(string answer)
     {
-        UserInterface?.SetText(answer);
-        UserInterface?.SetStage(TableStage.Answer);
-        UserInterface?.SetSound("");
+        PresentationController.SetText(answer);
+        PresentationController.SetStage(TableStage.Answer);
+        PresentationController.SetSound();
     }
 
     /// <summary>
@@ -1171,14 +1195,14 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         {
             LocalInfo.RoundInfo[data.Item1].Questions[data.Item2].Price = data.Item3;
 
-            UserInterface?.RestoreQuestion(data.Item1, data.Item2, data.Item3);
-            UserInterface?.SetStage(TableStage.RoundTable);
+            PresentationController.RestoreQuestion(data.Item1, data.Item2, data.Item3);
+            PresentationController.SetStage(TableStage.RoundTable);
             LocalInfo.TStage = TableStage.RoundTable;
         }
         else
         {
-            UserInterface?.SetText(data.Item3.ToString());
-            UserInterface?.SetStage(TableStage.QuestionPrice);
+            PresentationController.SetText(data.Item3.ToString());
+            PresentationController.SetStage(TableStage.QuestionPrice);
         }
 
         StopQuestionTimer_Executed(0);
@@ -1227,8 +1251,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_ThemeSelected(int themeIndex)
     {
-        UserInterface.PlaySelection(themeIndex);
-        UserInterface.SetSound(Settings.Model.Sounds.FinalDelete);
+        PresentationController.PlaySelection(themeIndex);
+        PresentationController.SetSound(Settings.Model.Sounds.FinalDelete);
     }
 
     private void UpdateNextCommand()
@@ -1238,7 +1262,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_ShowScore()
     {
-        UserInterface.SetStage(TableStage.Score);
+        PresentationController.SetStage(TableStage.Score);
         LocalInfo.TStage = TableStage.Score;
     }
 
@@ -1255,11 +1279,11 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
             if (Settings.Model.FalseStart && (_activeMediaCommand == null || Settings.Model.FalseStartMultimedia) && _engine.CanPress())
             {
-                UserInterface?.SetQuestionStyle(QuestionStyle.WaitingForPress);
+                PresentationController?.SetQuestionStyle(QuestionStyle.WaitingForPress);
             }
             else
             {
-                UserInterface?.SetQuestionStyle(QuestionStyle.Normal);
+                PresentationController?.SetQuestionStyle(QuestionStyle.Normal);
 
                 if (_mediaStopped)
                 {
@@ -1318,7 +1342,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
                     _logger = null;
                 }
 
-                UserInterface.SetSound("");
+                PresentationController.SetSound("");
 
                 PlatformManager.Instance.ClearMedia();
             }
@@ -1334,7 +1358,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveTheme = theme;
         ActiveQuestion = question;
 
-        UserInterface.SetSound("");
+        PresentationController.SetSound("");
         SetCaption(theme.Name);
     }
 
@@ -1368,23 +1392,23 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private void Engine_NextRound(bool showSign)
     {
         ActiveRoundCommand = null;
-        UserInterface.SetSound("");
+        PresentationController.SetSound("");
 
         if (showSign)
         {
-            UserInterface.SetStage(TableStage.Sign);
+            PresentationController.SetStage(TableStage.Sign);
         }
     }
 
     private void Engine_QuestionOther(Atom atom)
     {
-        UserInterface?.SetText("");
-        UserInterface?.SetQuestionSound(false);
+        PresentationController?.SetText("");
+        PresentationController?.SetQuestionSound(false);
 
         ActiveMediaCommand = null;
     }
 
-    private void InitMedia()
+    internal void InitMedia()
     {
         ActiveMediaCommand = StopMediaTimer;
         IsMediaControlled = false;
@@ -1395,7 +1419,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         if (media.GetStream == null)
         {
-            UserInterface.SetMedia(new MediaSource(media.Uri), background);
+            PresentationController.SetMedia(new MediaSource(media.Uri), background);
             return true;
         }
 
@@ -1406,18 +1430,18 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             return false;
         }
 
-        UserInterface.SetMedia(new MediaSource(localFile), background);
+        PresentationController.SetMedia(new MediaSource(localFile), background);
         return true;
     }
 
     private void Engine_QuestionSound(IMedia sound)
     {
-        UserInterface.SetQuestionSound(true);
+        PresentationController.SetQuestionSound(true);
 
         var result = SetMedia(sound, SIDocument.AudioStorageName, true);
 
-        UserInterface.SetSound();
-        UserInterface.SetQuestionContentType(QuestionContentType.None);
+        PresentationController.SetSound();
+        PresentationController.SetQuestionContentType(QuestionContentType.None);
 
         if (result)
         {
@@ -1427,33 +1451,33 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     private void Engine_QuestionVideo(IMedia video)
     {
-        UserInterface.SetQuestionSound(false);
+        PresentationController.SetQuestionSound(false);
 
         var result = SetMedia(video, SIDocument.VideoStorageName);
 
         if (result)
         {
-            UserInterface.SetQuestionContentType(QuestionContentType.Video);
-            UserInterface.SetSound();
+            PresentationController.SetQuestionContentType(QuestionContentType.Video);
+            PresentationController.SetSound();
             InitMedia();
         }
         else
         {
-            UserInterface?.SetQuestionContentType(QuestionContentType.None);
+            PresentationController?.SetQuestionContentType(QuestionContentType.None);
         }
     }
 
     private void Engine_QuestionHtml(IMedia html)
     {
-        UserInterface.SetMedia(new MediaSource(html.Uri), false);
-        UserInterface.SetQuestionSound(false);
-        UserInterface.SetSound();
-        UserInterface.SetQuestionContentType(QuestionContentType.Html);
+        PresentationController.SetMedia(new MediaSource(html.Uri), false);
+        PresentationController.SetQuestionSound(false);
+        PresentationController.SetSound();
+        PresentationController.SetQuestionContentType(QuestionContentType.Html);
     }
 
     private void Engine_QuestionImage(IMedia image, IMedia sound)
     {
-        UserInterface.SetQuestionSound(sound != null);
+        PresentationController.SetQuestionSound(sound != null);
 
         var resultImage = SetMedia(image, SIDocument.ImagesStorageName);
 
@@ -1461,7 +1485,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         {
             if (SetMedia(sound, SIDocument.AudioStorageName, true))
             {
-                UserInterface.SetSound();
+                PresentationController.SetSound();
                 InitMedia();
             }
         }
@@ -1472,11 +1496,11 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         if (resultImage)
         {
-            UserInterface.SetQuestionContentType(QuestionContentType.Image);
+            PresentationController.SetQuestionContentType(QuestionContentType.Image);
         }
         else
         {
-            UserInterface.SetQuestionContentType(QuestionContentType.None);
+            PresentationController.SetQuestionContentType(QuestionContentType.None);
         }
     }
 
@@ -1486,18 +1510,18 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         var displayedText = 
             Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart || _activeRound?.Type == RoundTypes.Final
             ? text
-            : $"{ActiveTheme?.Name}\n{ActiveQuestion?.Price}";
+            : $"{CurrentTheme}\n{Price}";
 
-        UserInterface.SetText(displayedText);
-        UserInterface.SetQuestionContentType(QuestionContentType.Text);
+        PresentationController.SetText(displayedText);
+        PresentationController.SetQuestionContentType(QuestionContentType.Text);
 
         var useSound = sound != null && SetMedia(sound, SIDocument.AudioStorageName, true);
 
-        UserInterface.SetQuestionSound(useSound);
+        PresentationController.SetQuestionSound(useSound);
 
         if (useSound)
         {
-            UserInterface.SetSound();
+            PresentationController.SetSound();
             InitMedia();
         }
         else
@@ -1509,15 +1533,38 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     private void Engine_QuestionOral(string oralText)
     {
         // Show nothing. The text should be read by the showman
-        UserInterface.SetQuestionSound(false);
+        PresentationController.SetQuestionSound(false);
         ActiveMediaCommand = null;
     }
 
     private void Engine_QuestionAtom(Atom atom)
     {
         LocalInfo.TStage = TableStage.Question;
-        UserInterface.SetStage(TableStage.Question);
+        PresentationController.SetStage(TableStage.Question);
         ActiveAtom = atom;
+    }
+
+    private string? _currentTheme;
+
+    public string? CurrentTheme
+    {
+        get => _currentTheme;
+        set
+        {
+            _currentTheme = value;
+            UpdateCaption();
+        }
+    }
+
+    private void UpdateCaption()
+    {
+        if (_currentTheme == null)
+        {
+            return;
+        }
+
+        var caption = _price > 0 ? $"{_currentTheme}, {_price}" : _currentTheme;
+        SetCaption(caption);
     }
 
     private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
@@ -1527,16 +1574,16 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         ActiveTheme = theme;
         ActiveQuestion = question;
 
+        CurrentTheme = theme.Name;
+        Price = question.Price;
+
         LogScore();
         _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
 
-        Price = question.Price;
-        SetCaption($"{theme.Name}, {question.Price}");
-
         if (question.Type.Name == QuestionTypes.Simple)
         {
-            UserInterface.SetSound(Settings.Model.Sounds.QuestionSelected);
-            UserInterface.PlaySimpleSelection(themeIndex, questionIndex);
+            PresentationController.SetSound(Settings.Model.Sounds.QuestionSelected);
+            PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
         }
         else
         {
@@ -1546,10 +1593,11 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
             {
                 case QuestionTypes.Cat:
                 case QuestionTypes.BagCat:
-                    UserInterface.SetSound(Settings.Model.Sounds.SecretQuestion);
+                    PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
                     PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                     setActive = false;
 
+                    // TODO: Remove when switching to new engine
                     var newTheme = question.Type[QuestionTypeParams.Cat_Theme];
                     var newPriceString = question.Type[QuestionTypeParams.Cat_Cost];
 
@@ -1562,16 +1610,16 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
                     {
                         SetCaption(newTheme);
                     }
-                    
+                    // TODO: end
                     break;
 
                 case QuestionTypes.Auction:
-                    UserInterface.SetSound(Settings.Model.Sounds.StakeQuestion);
+                    PresentationController.SetSound(Settings.Model.Sounds.StakeQuestion);
                     PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
                     break;
 
                 case QuestionTypes.Sponsored:
-                    UserInterface.SetSound(Settings.Model.Sounds.NoRiskQuestion);
+                    PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
                     PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                     setActive = false;
                     break;
@@ -1580,12 +1628,12 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
                     break;
 
                 default:
-                    UserInterface.SetText(question.Type.Name);
+                    PresentationController.SetText(question.Type.Name);
                     break;
             }
 
             LocalInfo.TStage = TableStage.Special;
-            UserInterface.PlayComplexSelection(themeIndex, questionIndex, setActive);
+            PresentationController.PlayComplexSelection(themeIndex, questionIndex, setActive);
         }
 
         _logger.Write(question.Scenario.ToString());
@@ -1595,7 +1643,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
     {
         var actualName = string.IsNullOrWhiteSpace(aliasName) ? originalTypeName : aliasName;
 
-        UserInterface.SetText(actualName);
+        PresentationController.SetText(actualName);
         _logger.Write(actualName);
     }
 
@@ -1674,7 +1722,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         {
             if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
             {
-                UserInterface.AddLostButtonPlayer(player.Name);
+                PresentationController.AddLostButtonPlayer(player.Name);
             }
 
             return false;
@@ -1704,8 +1752,8 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
         _selectedPlayer = player;
         _selectedPlayers.Add(_selectedPlayer);
 
-        UserInterface.SetSound(Settings.Model.Sounds.PlayerPressed);
-        UserInterface.SetPlayer(index);
+        PresentationController.SetSound(Settings.Model.Sounds.PlayerPressed);
+        PresentationController.SetPlayer(index);
 
         _timerStopped = ActiveQuestionCommand == StopQuestionTimer;
 
@@ -1737,7 +1785,7 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
         if (Settings.Model.ShowLostButtonPlayers)
         {
-            UserInterface.ClearLostButtonPlayers();
+            PresentationController.ClearLostButtonPlayers();
         }            
     }
 
@@ -1746,5 +1794,5 @@ public sealed class GameEngine : INotifyPropertyChanged, IButtonManagerListener,
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    internal void CloseMainView() => UserInterface.StopGame();
+    internal void CloseMainView() => PresentationController.StopGame();
 }

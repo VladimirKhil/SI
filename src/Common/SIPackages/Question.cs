@@ -361,7 +361,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <param name="isFinal">Final round question flag.</param>
     public void Upgrade(bool isFinal = false)
     {
-        if (TypeName != null)
+        if (TypeName != null || Script != null)
         {
             return;
         }
