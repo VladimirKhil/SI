@@ -116,7 +116,7 @@ public sealed class SportEngine : EngineBase
 
             case GameStage.EndQuestion:
                 #region EndQuestion
-                if (_timeout) // Закончилось время раунда
+                if (_timeout) // Round timeout
                 {
                     OnSound("timeout.wav");
                     OnRoundTimeout();
@@ -136,10 +136,9 @@ public sealed class SportEngine : EngineBase
                     OnNextQuestion();
                     AutoNext(3000);
                 }
-                else // Закончились вопросы
+                else // No questions left
                 {
-                    OnRoundEmpty();
-                    DoFinishRound();
+                    EndRound();
                 }
 
                 break;

@@ -802,8 +802,14 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
     }
 
+    public void EndRound()
+    {
+        OnRoundEmpty();
+        DoFinishRound();
+    }
+
     /// <summary>
-    /// Завершить раунд сразу либо сначала показать счёт
+    /// Ends round and optionally shows current score.
     /// </summary>
     protected void DoFinishRound()
     {

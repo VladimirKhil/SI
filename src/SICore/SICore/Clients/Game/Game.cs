@@ -68,7 +68,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         Master.Unbanned += Master_Unbanned;
     }
 
-    private void Master_Unbanned(string clientIp) => _gameActions.SendMessageWithArgs(Messages.Unbanned, clientIp);
+    private void Master_Unbanned(string clientId) => _gameActions.SendMessageWithArgs(Messages.Unbanned, clientId);
 
     public override async ValueTask DisposeAsync(bool disposing)
     {
@@ -818,10 +818,19 @@ public sealed class Game : Actor<GameData, GameLogic>
             _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, Question.InvalidPrice);
 
             _gameActions.SpecialReplic(
-                string.Format(LO[nameof(R.QuestionRemoved)],
-                message.Sender,
-                ClientData.TInfo.RoundInfo[themeIndex].Name,
-                oldPrice));
+                string.Format(
+                    LO[nameof(R.QuestionRemoved)],
+                    message.Sender,
+                    ClientData.TInfo.RoundInfo[themeIndex].Name,
+                    oldPrice));
+
+            var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
+
+            if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose) && _logic.Engine.LeftQuestionsCount == 0)
+            {
+                // Round is empty
+                PlanExecution(Tasks.EndRound, 10);
+            }
         }
         else
         {
@@ -836,13 +845,16 @@ public sealed class Game : Actor<GameData, GameLogic>
             _gameActions.SendMessageWithArgs(Messages.Toggle, themeIndex, questionIndex, restoredPrice.Value);
 
             _gameActions.SpecialReplic(
-                string.Format(LO[nameof(R.QuestionRestored)],
-                message.Sender,
-                ClientData.TInfo.RoundInfo[themeIndex].Name,
-                restoredPrice.Value));
+                string.Format(
+                    LO[nameof(R.QuestionRestored)],
+                    message.Sender,
+                    ClientData.TInfo.RoundInfo[themeIndex].Name,
+                    restoredPrice.Value));
         }
 
-        ClientData.TableInformStageLock.WithLock(() =>
+        // TODO: remove after all clients upgrade to 7.9.5
+        ClientData.TableInformStageLock.WithLock(
+            () =>
             {
                 if (ClientData.TableInformStage > 1)
                 {
@@ -879,11 +891,11 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        var ip = Master.Kick(person);
+        var clientId = Master.Kick(person);
 
-        if (ip.Length > 0)
+        if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, ip, person);
+            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, person);
         }
 
         _gameActions.SpecialReplic(string.Format(LO[nameof(R.Kicked)], message.Sender, person));
@@ -916,11 +928,11 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        var ip = Master.Kick(clientName, true);
+        var clientId = Master.Kick(clientName, true);
 
-        if (ip.Length > 0)
+        if (clientId.Length > 0)
         {
-            _gameActions.SendMessageWithArgs(Messages.Banned, ip, person);
+            _gameActions.SendMessageWithArgs(Messages.Banned, clientId, person);
         }
 
         _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName));
@@ -934,8 +946,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        var clientIp = args[1];
-        Master.Unban(clientIp);
+        var clientId = args[1];
+        Master.Unban(clientId);
     }
 
     private void OnNextDelete(Message message, string[] args)

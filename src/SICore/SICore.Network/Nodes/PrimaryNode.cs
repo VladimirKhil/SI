@@ -21,21 +21,18 @@ public class PrimaryNode : Node, IPrimaryNode
     /// <summary>
     /// A collection of banned persons.
     /// </summary>
-    private readonly Dictionary<string, (string UserName, DateTime BannedUtil)> _banned = new();
+    private readonly Dictionary<string, (string UserName, string Id, DateTime BannedUntil)> _banned = new();
 
     public override bool IsMain => true;
 
     public override IEnumerable<IConnection> Connections => _connections;
 
-    public IReadOnlyDictionary<string, string> Banned => _banned.ToDictionary(entry => entry.Key, entry => entry.Value.UserName);
+    public IReadOnlyDictionary<string, string> Banned => _banned.ToDictionary(entry => entry.Value.Id, entry => entry.Value.UserName);
 
     public event Action<string>? Unbanned;
 
     public PrimaryNode(NodeConfiguration serverConfiguration, INetworkLocalizer localizer)
-        : base(serverConfiguration, localizer)
-    {
-
-    }
+        : base(serverConfiguration, localizer) { }
 
     public override async ValueTask<bool> AddConnectionAsync(IConnection connection, CancellationToken cancellationToken = default)
     {
@@ -48,11 +45,11 @@ public class PrimaryNode : Node, IPrimaryNode
 
         if (_banned.TryGetValue(address, out var bannedEntry))
         {
-            if (bannedEntry.BannedUtil > DateTime.UtcNow)
+            if (bannedEntry.BannedUntil > DateTime.UtcNow)
             {
-                var bannedUntil = bannedEntry.BannedUtil == DateTime.MaxValue
+                var bannedUntil = bannedEntry.BannedUntil == DateTime.MaxValue
                     ? ""
-                    : $" {_localizer[nameof(R.Until)]} {bannedEntry.BannedUtil.ToString(_localizer.Culture)}";
+                    : $" {_localizer[nameof(R.Until)]} {bannedEntry.BannedUntil.ToString(_localizer.Culture)}";
 
                 await connection.SendMessageAsync(
                     new Message(
@@ -122,6 +119,7 @@ public class PrimaryNode : Node, IPrimaryNode
         IConnection? connectionToClose = null;
 
         string? address = null;
+        string? id = null;
 
         ConnectionsLock.WithLock(() =>
         {
@@ -133,7 +131,8 @@ public class PrimaryNode : Node, IPrimaryNode
 
                     if (address.Length > 0)
                     {
-                        _banned[address] = (name, ban ? DateTime.MaxValue : DateTime.UtcNow.AddMinutes(5.0));
+                        id = Guid.NewGuid().ToString();
+                        _banned[address] = (name, id, ban ? DateTime.MaxValue : DateTime.UtcNow.AddMinutes(5.0));
                     }
 
                     connectionToClose = connection;
@@ -147,14 +146,16 @@ public class PrimaryNode : Node, IPrimaryNode
             Connection_ConnectionClosed(connectionToClose, false);
         }
 
-        return address ?? "";
+        return id ?? "";
     }
 
-    public void Unban(string name)
+    public void Unban(string clientId)
     {
-        if (_banned.Remove(name))
+        var bannedEntry = _banned.FirstOrDefault(p => p.Value.Id == clientId);
+
+        if (bannedEntry.Key != null && _banned.Remove(bannedEntry.Key))
         {
-            Unbanned?.Invoke(name);
+            Unbanned?.Invoke(bannedEntry.Value.Id);
         }
     }
 

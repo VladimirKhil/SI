@@ -185,8 +185,7 @@ public sealed class TvEngine : EngineBase
                 }
                 else // No questions left
                 {
-                    OnRoundEmpty();
-                    DoFinishRound();
+                    EndRound();
                 }
 
                 break;

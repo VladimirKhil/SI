@@ -1321,6 +1321,7 @@ public sealed class GameLogic : Logic<GameData>
     private bool IsSpecialQuestion()
     {
         var questTypeName = _data.Question.Type.Name;
+
         return questTypeName == QuestionTypes.Cat
             || questTypeName == QuestionTypes.BagCat
             || questTypeName == QuestionTypes.Auction
@@ -1673,6 +1674,10 @@ public sealed class GameLogic : Logic<GameData>
                         AnnounceStake();
                         break;
 
+                    case Tasks.EndRound:
+                        EndRound();
+                        break;
+
                     case Tasks.WaitReport:
                         WaitReport();
                         break;
@@ -1700,6 +1705,8 @@ public sealed class GameLogic : Logic<GameData>
         },
         5000);
     }
+
+    private void EndRound() => Engine.EndRound();
 
     private void AskAnswerDeferred()
     {
@@ -2628,7 +2635,7 @@ public sealed class GameLogic : Logic<GameData>
             throw new Exception($"numberOfThemes == 0! GetRoundActiveQuestionsCount: {GetRoundActiveQuestionsCount()}");
         }
 
-        // Случайный выбор номера темы
+        // Random theme inex selection
         var k1 = Random.Shared.Next(numberOfThemes);
         var i = -1;
 
@@ -2637,7 +2644,7 @@ public sealed class GameLogic : Logic<GameData>
         var theme = _data.TInfo.RoundInfo[i];
         var numberOfQuestions = theme.Questions.Count(QuestionHelper.IsActive);
 
-        // Случайный выбор номера вопроса
+        // Random question inex selection
         var k2 = Random.Shared.Next(numberOfQuestions);
         var j = -1;
 
