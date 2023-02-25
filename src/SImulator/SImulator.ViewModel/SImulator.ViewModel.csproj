@@ -17,6 +17,9 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="ViewModel\GameViewModel.cs~RF2da1415e.TMP" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.Client\SIStorageService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
