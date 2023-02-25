@@ -413,7 +413,21 @@
 
                     <localc:TemplateConverter x:Key="QuestionContentSelector">
                         <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Void}" />
+
+                            <!-- Deprecated -->
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.None}">
+                                <ContentControl Style="{StaticResource Rotator}">
+                                    <Border Background="Transparent">
+                                        <TextBlock
+                                            Text="&amp;"
+                                            Style="{StaticResource RotatingText}"
+                                            FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                    </Border>
+                                </ContentControl>
+                            </DataTemplate>
+                            
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Clef}">
                                 <ContentControl Style="{StaticResource Rotator}">
                                     <Border Background="Transparent">
                                         <TextBlock

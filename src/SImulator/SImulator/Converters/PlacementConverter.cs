@@ -7,10 +7,10 @@ using System.Windows.Data;
 namespace SImulator.Converters;
 
 /// <summary>
-/// Converts atom type to localized name.
+/// Converts placement to localized name.
 /// </summary>
 [ValueConversion(typeof(string), typeof(string))]
-public sealed class AtomTypeConverter : IValueConverter
+public sealed class PlacementConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -24,14 +24,9 @@ public sealed class AtomTypeConverter : IValueConverter
     private static string GetLocalizedName(string value) =>
         value switch
         {
-            AtomTypes.Text => "",
-            AtomTypes.Image => Resources.Image,
-            AtomTypes.Audio => Resources.Audio,
-            AtomTypes.AudioNew => Resources.Audio,
-            AtomTypes.Video => Resources.Video,
-            AtomTypes.Oral => Resources.Oral,
-            AtomTypes.Html => Resources.Html,
-            AtomTypes.Marker => Resources.Answer,
-            _ => Resources.UnknownType,
+            ContentPlacements.Screen => "",
+            ContentPlacements.Replic => Resources.PlacementOral,
+            ContentPlacements.Background => Resources.PlacementBackground,
+            _ => value,
         };
 }

@@ -6,7 +6,8 @@ using System.Globalization;
 
 namespace SImulator.Converters;
 
-public sealed class SourcesConverter : IValueConverter
+[ValueConversion(typeof(IEnumerable), typeof(string))]
+public sealed class CollectionsConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
@@ -30,5 +31,6 @@ public sealed class SourcesConverter : IValueConverter
         return result;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotImplementedException();
 }

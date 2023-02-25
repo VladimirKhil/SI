@@ -241,6 +241,51 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Фон.
+        /// </summary>
+        public static string PlacementBackground {
+            get {
+                return ResourceManager.GetString("PlacementBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Реплика.
+        /// </summary>
+        public static string PlacementOral {
+            get {
+                return ResourceManager.GetString("PlacementOral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на От {0} до {1} с шагом {2}.
+        /// </summary>
+        public static string PriceFromToStep {
+            get {
+                return ResourceManager.GetString("PriceFromToStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Минимум или максимум в раунде.
+        /// </summary>
+        public static string PriceMinMaxRound {
+            get {
+                return ResourceManager.GetString("PriceMinMaxRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} или {1}.
+        /// </summary>
+        public static string PriceOr {
+            get {
+                return ResourceManager.GetString("PriceOr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопрос.
         /// </summary>
         public static string Question {
@@ -273,6 +318,24 @@ namespace SImulator.Properties {
         public static string SecondaryScreen {
             get {
                 return ResourceManager.GetString("SecondaryScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Кому угодно.
+        /// </summary>
+        public static string SelectAny {
+            get {
+                return ResourceManager.GetString("SelectAny", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Кому угодно, кроме себя.
+        /// </summary>
+        public static string SelectAnyExceptCurrent {
+            get {
+                return ResourceManager.GetString("SelectAnyExceptCurrent", resourceCulture);
             }
         }
         

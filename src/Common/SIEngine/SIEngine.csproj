@@ -11,6 +11,7 @@
     <Version>7.6.0</Version>
     <Copyright>Copyright © Khil-soft 2007 - 2023</Copyright>
 	<Nullable>enable</Nullable>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

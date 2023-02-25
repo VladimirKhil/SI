@@ -34,19 +34,7 @@ public sealed class PresentationListener : IExtendedListener
 
     public PresentationListener(ISIEngine engine) => _engine = engine;
 
-    public async void OnQuestionSelected(int theme, int question)
-    {
-        try
-        {
-            ((TvEngine)_engine).SelectQuestion(theme, question);
-            await Task.Delay(700);
-            ((TvEngine)_engine).OnReady(out _);
-        }
-        catch (Exception exc)
-        {
-            Trace.TraceError("OnQuestionSelected error: " + exc.Message);
-        }
-    }
+    public void OnQuestionSelected(int theme, int question) => _engine.SelectQuestion(theme, question);
 
     public void OnThemeSelected(int themeIndex)
     {

@@ -82,9 +82,22 @@ public enum TableStage
 public enum QuestionContentType
 {
     /// <summary>
+    /// Void content.
+    /// </summary>
+    [EnumMember]
+    Void,
+
+    /// <summary>
+    /// Clef content.
+    /// </summary>
+    [EnumMember]
+    Clef,
+
+    /// <summary>
     /// Empty content.
     /// </summary>
     [EnumMember]
+    [Obsolete]
     None,
 
     /// <summary>
@@ -135,11 +148,13 @@ public enum QuestionStyle
     /// </summary>
     [EnumMember]
     Normal,
+
     /// <summary>
     /// Подсвеченный текст вопроса
     /// </summary>
     [EnumMember]
     WaitingForPress,
+
     /// <summary>
     /// Вопрос + выигравший кнопку игрок
     /// </summary>

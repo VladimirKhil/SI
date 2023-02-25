@@ -366,20 +366,19 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             return;
         }
 
-        TypeName = Type.Name;
         Script = new();
 
         if (Price == -1)
         {
             Scenario.Clear();
             Type.Params.Clear();
-            Type.Name = QuestionTypes.Simple;
+            TypeName = Type.Name = QuestionTypes.Simple;
             return;
         }
 
         var askAnswerMode = StepParameterValues.AskAnswerMode_Button;
 
-        switch (TypeName)
+        switch (Type.Name)
         {
             case QuestionTypes.Auction:
                 {
@@ -392,6 +391,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     Script.Steps.Add(setAnswererStep);
 
                     askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                    TypeName = QuestionTypes.Stake;
                 }
                 break;
 
@@ -406,6 +406,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     Script.Steps.Add(setPriceStep);
 
                     askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                    TypeName = QuestionTypes.NoRisk;
                 }
                 break;
 
@@ -415,7 +416,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     var theme = Type[QuestionTypeParams.Cat_Theme] ?? "";
                     var price = Type[QuestionTypeParams.Cat_Cost] ?? "";
 
-                    var knows = TypeName == QuestionTypes.BagCat
+                    var knows = Type.Name == QuestionTypes.BagCat
                         ? Type[QuestionTypeParams.BagCat_Knows] ?? QuestionTypeParams.BagCat_Knows_Value_After
                         : QuestionTypeParams.BagCat_Knows_Value_After;
 
@@ -425,12 +426,12 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
                     var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
                     setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_ByCurrent);
-                    
-                    setAnswererStep.AddSimpleParameter(
-                        StepParameterNames.Select,
-                        canGiveSelf == QuestionTypeParams.BagCat_Self_Value_True
-                            ? StepParameterValues.SetAnswererSelect_Any
-                            : StepParameterValues.SetAnswererSelect_ExceptCurrent);
+
+                    var selectAnswererMode = canGiveSelf == QuestionTypeParams.BagCat_Self_Value_True
+                        ? StepParameterValues.SetAnswererSelect_Any
+                        : StepParameterValues.SetAnswererSelect_ExceptCurrent;
+
+                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, selectAnswererMode);
 
                     var setThemeStep = new Step { Type = StepTypes.SetTheme };
                     setThemeStep.AddSimpleParameter(StepParameterNames.Content, theme);
@@ -438,12 +439,14 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     var setPriceStep = new Step { Type = StepTypes.SetPrice };
                     setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_Select);
 
+                    var numberSet = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price);
+
                     setPriceStep.Parameters.Add(
                         StepParameterNames.Content,
                         new StepParameter
                         {
                             Type = StepParameterTypes.NumberSet,
-                            NumberSetValue = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price)
+                            NumberSetValue = numberSet
                         });
 
                     switch (knows)
@@ -452,6 +455,18 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             Script.Steps.Add(setThemeStep);
                             Script.Steps.Add(setPriceStep);
                             Script.Steps.Add(setAnswererStep);
+                            TypeName = QuestionTypes.SecretOpenerPrice;
+
+                            Parameters = new StepParameters
+                            {
+                                [QuestionParameterNames.Theme] = new StepParameter { SimpleValue = theme },
+                                [QuestionParameterNames.Price] = new StepParameter
+                                {
+                                    Type = StepParameterTypes.NumberSet,
+                                    NumberSetValue = numberSet
+                                },
+                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
+                            };
                             break;
 
                         case QuestionTypeParams.BagCat_Knows_Value_Never:
@@ -463,6 +478,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             Scenario.Clear();
                             Type.Params.Clear();
                             Type.Name = QuestionTypes.Simple;
+                            TypeName = QuestionTypes.SecretNoQuestion;
                             return;
 
                         case QuestionTypeParams.BagCat_Knows_Value_After:
@@ -470,6 +486,18 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             Script.Steps.Add(setAnswererStep);
                             Script.Steps.Add(setThemeStep);
                             Script.Steps.Add(setPriceStep);
+                            TypeName = QuestionTypes.Secret;
+
+                            Parameters = new StepParameters
+                            {
+                                [QuestionParameterNames.Theme] = new StepParameter { SimpleValue = theme },
+                                [QuestionParameterNames.Price] = new StepParameter
+                                {
+                                    Type = StepParameterTypes.NumberSet,
+                                    NumberSetValue = numberSet
+                                },
+                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
+                            };
                             break;
                     }
 
@@ -490,11 +518,14 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
                     askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
                 }
+
+                TypeName = QuestionTypes.Simple;
                 break;
 
             default:
                 Scenario.Clear();
                 Type.Params.Clear();
+                TypeName = Type.Name;
                 Type.Name = QuestionTypes.Simple;
                 return;
         }

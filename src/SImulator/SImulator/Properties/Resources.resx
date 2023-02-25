@@ -177,6 +177,21 @@
   <data name="OutOfMemoryError" xml:space="preserve">
     <value>Недостаточно памяти для выполнения программы!</value>
   </data>
+  <data name="PlacementBackground" xml:space="preserve">
+    <value>Фон</value>
+  </data>
+  <data name="PlacementOral" xml:space="preserve">
+    <value>Реплика</value>
+  </data>
+  <data name="PriceFromToStep" xml:space="preserve">
+    <value>От {0} до {1} с шагом {2}</value>
+  </data>
+  <data name="PriceMinMaxRound" xml:space="preserve">
+    <value>Минимум или максимум в раунде</value>
+  </data>
+  <data name="PriceOr" xml:space="preserve">
+    <value>{0} или {1}</value>
+  </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
   </data>
@@ -188,6 +203,12 @@
   </data>
   <data name="SecondaryScreen" xml:space="preserve">
     <value>Дополнительный</value>
+  </data>
+  <data name="SelectAny" xml:space="preserve">
+    <value>Кому угодно</value>
+  </data>
+  <data name="SelectAnyExceptCurrent" xml:space="preserve">
+    <value>Кому угодно, кроме себя</value>
   </data>
   <data name="SelectLogsFolder" xml:space="preserve">
     <value>Выберите папку для записи логов</value>

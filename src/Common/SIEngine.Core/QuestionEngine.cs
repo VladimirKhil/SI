@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using System.Globalization;
 
 namespace SIEngine.Core;
 
@@ -9,17 +10,26 @@ namespace SIEngine.Core;
 public sealed class QuestionEngine
 {
     private readonly Question _question;
+    private readonly QuestionEngineOptions _options;
     private readonly IQuestionEnginePlayHandler _playHandler;
     private int _stepIndex = 0;
     private int _contentIndex = 0;
 
     private bool _started = false;
 
-    public QuestionEngine(Question question, bool isFinal, IQuestionEnginePlayHandler playHandler)
-    {
-        question.Upgrade(isFinal);
+    private int? _askAnswerStartIndex = null;
+    private bool _isAskingAnswer = false;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="QuestionEngine" /> class.
+    /// </summary>
+    /// <param name="question">Question to play.</param>
+    /// <param name="options">Engine options.</param>
+    /// <param name="playHandler">Engine events handler.</param>
+    public QuestionEngine(Question question, QuestionEngineOptions options, IQuestionEnginePlayHandler playHandler)
+    {
         _question = question;
+        _options = options;
         _playHandler = playHandler;
     }
 
@@ -32,8 +42,15 @@ public sealed class QuestionEngine
 
         if (!_started)
         {
-            _playHandler.OnQuestionStart();
+            _askAnswerStartIndex = FalseStartHelper.GetAskAnswerStartIndex(_question.Script, _question.Parameters, _options.FalseStarts);
+            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_question.Script));
             _started = true;
+        }
+
+        if (_isAskingAnswer)
+        {
+            _playHandler.OnAskAnswerStop();
+            _isAskingAnswer = false;
         }
 
         while (_stepIndex < _question.Script.Steps.Count)
@@ -101,6 +118,12 @@ public sealed class QuestionEngine
                 // Preambula part end
 
                 case StepTypes.ShowContent:
+                    if (_stepIndex == _askAnswerStartIndex)
+                    {
+                        _playHandler.OnButtonPressStart();
+                        _askAnswerStartIndex = null;
+                    }
+
                     if (!step.Parameters.TryGetValue(StepParameterNames.Content, out var content))
                     {
                         _stepIndex++;
@@ -125,6 +148,12 @@ public sealed class QuestionEngine
                             {
                                 if (fallbackRefId == StepParameterValues.FallbackStepIdRef_Right)
                                 {
+                                    if (!_options.ShowSimpleRightAnswers)
+                                    {
+                                        _stepIndex++;
+                                        continue;
+                                    }
+
                                     content = new StepParameter
                                     {
                                         ContentValue = new List<ContentItem>
@@ -149,7 +178,8 @@ public sealed class QuestionEngine
                             continue;
                         }
                     }
-                    else if (content.ContentValue == null)
+                    
+                    if (content.ContentValue == null)
                     {
                         _stepIndex++;
                         continue;
@@ -157,6 +187,11 @@ public sealed class QuestionEngine
 
                     while (_contentIndex < content.ContentValue.Count)
                     {
+                        if (_contentIndex == 0)
+                        {
+                            _playHandler.OnContentStart();
+                        }
+
                         var contentItem = content.ContentValue[_contentIndex++];
 
                         if (contentItem == null)
@@ -187,6 +222,7 @@ public sealed class QuestionEngine
                         }
 
                         _playHandler.OnAskAnswer(mode);
+                        _isAskingAnswer = true;
                         _stepIndex++;
                     }
 
@@ -199,5 +235,58 @@ public sealed class QuestionEngine
         }
 
         return false;
+    }
+
+    private static bool ScriptHasAskAnswerButtonsStep(Script script)
+    {
+        for (var i = 0; i < script.Steps.Count; i++)
+        {
+            var step = script.Steps[i];
+
+            if (step.Type == StepTypes.AskAnswer)
+            {
+                var mode = step.TryGetSimpleParameter(StepParameterNames.Mode);
+
+                if (mode == StepParameterValues.AskAnswerMode_Button)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Moves to the first step after the last of AskAnswer steps.
+    /// </summary>
+    public void MoveToAnswer()
+    {
+        if (_question.Script == null)
+        {
+            return;
+        }
+
+        var nextStepIndex = _question.Script.Steps.Count - 1;
+        var askAnswerFound = false;
+
+        while (nextStepIndex >= _stepIndex)
+        {
+            var nextStep = _question.Script.Steps[nextStepIndex];
+
+            if (nextStep.Type == StepTypes.AskAnswer)
+            {
+                askAnswerFound = true;
+                break;
+            }
+
+            nextStepIndex--;
+        }
+
+        if (askAnswerFound && nextStepIndex + 1 > _stepIndex)
+        {
+            _stepIndex = nextStepIndex + 1;
+            _contentIndex = 0;
+        }
     }
 }

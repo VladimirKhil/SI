@@ -183,11 +183,29 @@ public sealed class PresentationController : IPresentationController
 
     public void SetText(string text) => TInfo.Text = text;
 
-    public void SetQuestionContentType(QuestionContentType questionContentType) => TInfo.QuestionContentType = questionContentType;
+    public void SetQuestionContentType(QuestionContentType questionContentType)
+    {
+        try
+        {
+            TInfo.QuestionContentType = questionContentType;
+        }
+        catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+        {
+            // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+            return;
+        }
+    }
 
     public void SetQuestionStyle(QuestionStyle questionStyle) => TInfo.QuestionStyle = questionStyle;
 
-    public void SetQuestionSound(bool sound) => TInfo.Sound = sound;
+    public void SetQuestionSound(bool sound)
+    {
+        TInfo.Sound = sound;
+
+        TInfo.QuestionContentType = TInfo.QuestionContentType == QuestionContentType.Void
+            ? QuestionContentType.Clef
+            : TInfo.QuestionContentType;
+    }
 
     public void AddPlayer() => TInfo.Players.Add(new SimplePlayerInfo());
 
@@ -354,11 +372,7 @@ public sealed class PresentationController : IPresentationController
         return false;
     }
 
-    public void SetPlayer(int playerIndex)
-    {
-        TInfo.PlayerIndex = playerIndex;
-        TInfo.QuestionStyle = QuestionStyle.Pressed;
-    }
+    public void SetActivePlayerIndex(int playerIndex) => TInfo.PlayerIndex = playerIndex;
 
     public void AddLostButtonPlayer(string name)
     {

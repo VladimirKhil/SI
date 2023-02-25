@@ -1,7 +1,5 @@
 ﻿using SIPackages;
 using SIPackages.Core;
-using System;
-using System.Linq;
 
 namespace SIEngine;
 
@@ -13,21 +11,12 @@ public sealed class SportEngine : EngineBase
     public override int LeftQuestionsCount => throw new NotImplementedException();
 
     public SportEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
-        : base(document, optionsProvider, questionEngineFactory)
-    {
+        : base(document, optionsProvider, questionEngineFactory) { }
 
-    }
-
-    private void SetActiveTheme()
-    {
-        _activeTheme = _activeRound.Themes[_themeIndex];
-    }
+    private void SetActiveTheme() => _activeTheme = _activeRound.Themes[_themeIndex];
 
     private void SetActiveQuestion() => _activeQuestion = _activeTheme.Questions[_questionIndex];
 
-    /// <summary>
-    /// Перейти к следующему шагу игры
-    /// </summary>
     public override void MoveNext()
     {
         switch (_stage)

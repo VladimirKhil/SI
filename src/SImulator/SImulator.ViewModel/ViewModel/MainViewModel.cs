@@ -374,7 +374,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             AutomaticGame = options.AutomaticGame,
             PlaySpecials = options.PlaySpecials,
             ThinkingTime = options.ThinkingTime,
-            UseNewEngine = false
+            UseNewEngine = true
         };
     }
 

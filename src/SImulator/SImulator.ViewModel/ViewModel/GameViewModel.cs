@@ -10,6 +10,7 @@ using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
@@ -39,7 +40,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Game log writer.
     /// </summary>
-    private ILogger _logger;
+    private readonly ILogger _logger;
 
     private readonly Timer _roundTimer;
     private readonly Timer _questionTimer;
@@ -47,6 +48,22 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private bool _timerStopped;
     private bool _mediaStopped;
+
+    private QuestionState _state = QuestionState.Normal;
+    private QuestionState _previousState;
+
+    internal QuestionState State
+    {
+        get => _state;
+        set
+        {
+            if (_state != value)
+            {
+                _state = value;
+                OnStateChanged();
+            }
+        }
+    }
 
     private PlayerInfo? _selectedPlayer = null;
 
@@ -122,12 +139,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public AppSettingsViewModel Settings { get; }
 
     /// <summary>
-    /// Ссылка на интерфейсную часть. Может находиться в текущем процессе или на удалённом компьютере
+    /// Presentation link.
     /// </summary>
     public IPresentationController PresentationController { get; }
 
     /// <summary>
-    /// Список игроков, отображаемых на табло в особом режиме игры
+    /// Table info view model.
     /// </summary>
     public TableInfoViewModel LocalInfo { get; set; }
 
@@ -242,6 +259,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         get => _activeAtom;
         set { if (_activeAtom != value) { _activeAtom = value; OnPropertyChanged(); } }
+    }
+
+    private ContentItem? _activeContentItem;
+
+    /// <summary>
+    /// Currently active content item.
+    /// </summary>
+    public ContentItem? ActiveContentItem
+    {
+        get => _activeContentItem;
+        set { if (_activeContentItem != value) { _activeContentItem = value; OnPropertyChanged(); } }
     }
 
     private int _mediaProgress;
@@ -419,35 +447,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void GameHost_MediaEnd()
     {
         ActiveMediaCommand = RunMediaTimer;
-
-        if ((!Settings.Model.FalseStart
-            || !Settings.Model.FalseStartMultimedia
-            || Settings.Model.UsePlayersKeys == PlayerKeysModes.None)
-            && _engine.IsQuestionFinished())
-        {
-            if (_activeRound.Type == RoundTypes.Standart && ActiveQuestion.Type.Name == QuestionTypes.Simple)
-            {
-                if (Settings.Model.ThinkingTime > 0)
-                {
-                    // Запуск таймера при игре на мультимедиа без фальстартов
-                    // С фальстартами - по дополнительному нажатию кнопки
-                    QuestionTimeMax = Settings.Model.ThinkingTime;
-                    RunQuestionTimer_Executed(0);
-                }
-            }
-            else
-            {
-                var time = _activeRound.Type == RoundTypes.Standart
-                    ? Settings.Model.SpecialQuestionThinkingTime
-                    : Settings.Model.FinalQuestionThinkingTime;
-
-                if (time > 0)
-                {
-                    ThinkingTimeMax = time;
-                    RunThinkingTimer_Executed(0);
-                }
-            }
-        }
     }
 
     private void GameHost_MediaProgress(double progress)
@@ -469,7 +468,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     #region Event handlers
 
     private void Default_PropertyChanged(object? sender, PropertyChangedEventArgs e) =>
-        PresentationController?.UpdateSettings(Settings.SIUISettings.Model);
+        PresentationController.UpdateSettings(Settings.SIUISettings.Model);
 
     private void PlayerInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -504,27 +503,28 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController?.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
     }
 
-    private void QuestionTimer_Elapsed(object? state) => UI.Execute(
-        () =>
-        {
-            QuestionTime++;
-            PresentationController.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
-
-            if (QuestionTime < QuestionTimeMax)
+    private void QuestionTimer_Elapsed(object? state) =>
+        UI.Execute(
+            () =>
             {
-                return;
-            }
+                QuestionTime++;
+                PresentationController.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
 
-            PresentationController.SetSound(Settings.Model.Sounds.NoAnswer);
-            StopQuestionTimer_Executed(null);
-            ActiveQuestionCommand = null;
+                if (QuestionTime < QuestionTimeMax)
+                {
+                    return;
+                }
 
-            if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
-            {
-                _buttonManager.Stop();
-            }
-        },
-        exc => OnError(exc.ToString()));
+                PresentationController.SetSound(Settings.Model.Sounds.NoAnswer);
+                StopQuestionTimer_Executed(null);
+                ActiveQuestionCommand = null;
+
+                if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
+                {
+                    _buttonManager.Stop();
+                }
+            },
+            exc => OnError(exc.ToString()));
 
     private void RoundTimer_Elapsed(object? state) => UI.Execute(
         () =>
@@ -610,6 +610,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
         _engine.MoveNextRound();
+        _showingRoundThemes = false;
     }
 
     private void PreviousRound_Executed(object? arg)
@@ -652,6 +653,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (arg != null)
         {
             QuestionTime = 0;
+            PresentationController.SetLeftTime(1.0);
         }
 
         _questionTimer.Change(1000, 1000);
@@ -664,6 +666,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (arg != null)
         {
             QuestionTime = 0;
+            PresentationController.SetLeftTime(1.0);
         }
 
         _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -680,7 +683,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _thinkingTimer.Change(1000, 1000);
     }
 
-    private void StopThinkingTimer_Executed(object? arg)
+    public void StopThinkingTimer_Executed(object? arg)
     {
         if (arg != null)
         {
@@ -752,6 +755,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (Settings.Model.EndQuestionOnRightAnswer)
         {
+            _engine.MoveToAnswer();
             Next_Executed();
         }
         else
@@ -818,6 +822,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_Question(Question question)
     {
+        question.Upgrade();
+
         PresentationController.SetText(question.Price.ToString());
         PresentationController.SetStage(TableStage.QuestionPrice);
 
@@ -881,7 +887,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (_showingRoundThemes)
             {
-                PresentationController?.SetStage(TableStage.RoundTable);
+                PresentationController.SetStage(TableStage.RoundTable);
                 ShowingRoundThemes = false;
                 return;
             }
@@ -931,10 +937,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_GameThemes(string[] themes)
     {
-        PresentationController?.SetGameThemes(themes);
+        PresentationController.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;
 
-        PresentationController?.SetSound(Settings.Model.Sounds.GameThemes);
+        PresentationController.SetSound(Settings.Model.Sounds.GameThemes);
     }
 
     private void Engine_Round(Round round)
@@ -1058,14 +1064,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    public void AskAnswerButtons()
+    public void StartQuestionTimer()
     {
-        if (Settings.Model.ThinkingTime > 0)
+        if (Settings.Model.ThinkingTime <= 0)
         {
-            // Runs timer in game with false starts
-            QuestionTimeMax = Settings.Model.ThinkingTime;
-            RunQuestionTimer_Executed(0);
+            return;
         }
+
+        // Runs timer in game with false starts
+        QuestionTimeMax = Settings.Model.ThinkingTime;
+        RunQuestionTimer_Executed(0);
     }
 
     public void AskAnswerDirect()
@@ -1084,6 +1092,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             return;
         }
+        else
+        {
+            var time = Settings.Model.SpecialQuestionThinkingTime;
+
+            if (time > 0)
+            {
+                ThinkingTimeMax = time;
+                RunThinkingTimer_Executed(0);
+            }
+        }
     }
 
     private void Engine_RightAnswer()
@@ -1092,13 +1110,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         _buttonManager?.Stop();
 
-        PresentationController.SetQuestionStyle(QuestionStyle.Normal);
+        State = QuestionState.Normal;
         PresentationController.SetSound();
     }
 
     public void OnRightAnswer()
     {
         StopQuestionTimer.Execute(0);
+        StopThinkingTimer_Executed(0);
         _buttonManager?.Stop();
     }
 
@@ -1141,7 +1160,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveQuestionCommand = null;
         ActiveMediaCommand = null;
 
-        PresentationController.SetText("");
+        PresentationController.SetText();
 
         if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
         {
@@ -1209,6 +1228,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         StopThinkingTimer_Executed(0);
 
         _buttonManager?.Stop();
+        State = QuestionState.Normal;
+        _previousState = QuestionState.Normal;
 
         UnselectPlayer();
         _selectedPlayers.Clear();
@@ -1268,28 +1289,20 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void ReturnToQuestion()
     {
-        if (Settings.Model.UsePlayersKeys != PlayerKeysModes.None && _engine.CanReturnToQuestion())
+        State = _previousState;
+
+        if (_timerStopped)
         {
-            if (_timerStopped)
-            {
-                RunQuestionTimer_Executed(null);
-            }
+            RunQuestionTimer_Executed(null);
+        }
 
-            UnselectPlayer();
+        UnselectPlayer();
 
-            if (Settings.Model.FalseStart && (_activeMediaCommand == null || Settings.Model.FalseStartMultimedia) && _engine.CanPress())
-            {
-                PresentationController?.SetQuestionStyle(QuestionStyle.WaitingForPress);
-            }
-            else
-            {
-                PresentationController?.SetQuestionStyle(QuestionStyle.Normal);
+        StopThinkingTimer_Executed(0);
 
-                if (_mediaStopped)
-                {
-                    RunMediaTimer_Executed(null);
-                }
-            }
+        if (_mediaStopped)
+        {
+            RunMediaTimer_Executed(null);
         }
     }
 
@@ -1327,7 +1340,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
                 catch (IOException exc)
                 {
-                    _logger?.Write($"Temp folder delete error: {exc}");
+                    _logger.Write($"Temp folder delete error: {exc}");
                 }
             }
 
@@ -1336,11 +1349,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _engine.PropertyChanged -= Engine_PropertyChanged;
                 _engine.Dispose();
 
-                if (_logger != null)
-                {
-                    _logger.Dispose();
-                    _logger = null;
-                }
+                _logger.Dispose();
 
                 PresentationController.SetSound("");
 
@@ -1358,12 +1367,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveTheme = theme;
         ActiveQuestion = question;
 
+        question.Upgrade(true);
+
         PresentationController.SetSound("");
         SetCaption(theme.Name);
     }
 
     /// <summary>
-    /// Вывести счёт в лог
+    /// Writes players scores to log.
     /// </summary>
     private void LogScore()
     {
@@ -1402,8 +1413,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_QuestionOther(Atom atom)
     {
-        PresentationController?.SetText("");
-        PresentationController?.SetQuestionSound(false);
+        PresentationController.SetText("");
+        PresentationController.SetQuestionSound(false);
 
         ActiveMediaCommand = null;
     }
@@ -1441,7 +1452,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         var result = SetMedia(sound, SIDocument.AudioStorageName, true);
 
         PresentationController.SetSound();
-        PresentationController.SetQuestionContentType(QuestionContentType.None);
+        PresentationController.SetQuestionContentType(QuestionContentType.Void);
 
         if (result)
         {
@@ -1463,7 +1474,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         else
         {
-            PresentationController?.SetQuestionContentType(QuestionContentType.None);
+            PresentationController.SetQuestionContentType(QuestionContentType.Void);
         }
     }
 
@@ -1500,7 +1511,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         else
         {
-            PresentationController.SetQuestionContentType(QuestionContentType.None);
+            PresentationController.SetQuestionContentType(QuestionContentType.Void);
         }
     }
 
@@ -1567,12 +1578,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         SetCaption(caption);
     }
 
-    private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
+    private async void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
     {
         _answeringHistory.Push(null);
 
         ActiveTheme = theme;
         ActiveQuestion = question;
+
+        question.Upgrade();
 
         CurrentTheme = theme.Name;
         Price = question.Price;
@@ -1580,45 +1593,47 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LogScore();
         _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
 
-        if (question.Type.Name == QuestionTypes.Simple)
+        var typeName = question.TypeName ?? question.Type.Name;
+
+        if (typeName == QuestionTypes.Simple)
         {
             PresentationController.SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
+
+            try
+            {
+                await Task.Delay(700);
+                _engine.MoveNext();
+            }
+            catch (Exception exc)
+            {
+                Trace.TraceError("QuestionSelected error: " + exc.Message);
+            }
         }
         else
         {
             var setActive = true;
 
-            switch (question.Type.Name)
+            switch (typeName)
             {
                 case QuestionTypes.Cat:
                 case QuestionTypes.BagCat:
+                case QuestionTypes.Secret:
+                case QuestionTypes.SecretOpenerPrice:
+                case QuestionTypes.SecretNoQuestion:
                     PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
                     PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                     setActive = false;
-
-                    // TODO: Remove when switching to new engine
-                    var newTheme = question.Type[QuestionTypeParams.Cat_Theme];
-                    var newPriceString = question.Type[QuestionTypeParams.Cat_Cost];
-
-                    if (newPriceString != null && int.TryParse(newPriceString, out var newPrice) && newPrice > 0)
-                    {
-                        Price = newPrice;
-                        SetCaption($"{newTheme}, {newPrice}");
-                    }
-                    else
-                    {
-                        SetCaption(newTheme);
-                    }
-                    // TODO: end
                     break;
 
                 case QuestionTypes.Auction:
+                case QuestionTypes.Stake:
                     PresentationController.SetSound(Settings.Model.Sounds.StakeQuestion);
                     PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
                     break;
 
                 case QuestionTypes.Sponsored:
+                case QuestionTypes.NoRisk:
                     PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
                     PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                     setActive = false;
@@ -1628,7 +1643,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     break;
 
                 default:
-                    PresentationController.SetText(question.Type.Name);
+                    PresentationController.SetText(typeName);
                     break;
             }
 
@@ -1699,7 +1714,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public bool OnPlayerPressed(PlayerInfo player)
     {
-        // Нет такого игрока
         var index = LocalInfo.Players.IndexOf(player);
 
         if (index == -1)
@@ -1712,32 +1726,26 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private bool ProcessPlayerPress(int index, PlayerInfo player)
     {
-        if (!_engine.IsWaitingForPress())
-        {
-            return false;
-        }
-
-        // Уже кто-то отвечает
-        if (_selectedPlayer != null)
-        {
-            if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
-            {
-                PresentationController.AddLostButtonPlayer(player.Name);
-            }
-
-            return false;
-        }
-
-        // Уже нажимал
+        // The player has pressed already
         if (_selectedPlayers.Contains(player))
         {
             return false;
         }
 
-        // Не время нажимать
-        if (_engine.IsQuestion() && Settings.Model.FalseStart && (_activeMediaCommand == null || Settings.Model.FalseStartMultimedia))
+        // It is no pressing time
+        if (_state != QuestionState.Pressing)
         {
             player.BlockedTime = DateTime.Now;
+
+            // Somebody is answering already
+            if (_selectedPlayer != null)
+            {
+                if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
+                {
+                    PresentationController.AddLostButtonPlayer(player.Name);
+                }
+            }
+
             return false;
         }
 
@@ -1753,7 +1761,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _selectedPlayers.Add(_selectedPlayer);
 
         PresentationController.SetSound(Settings.Model.Sounds.PlayerPressed);
-        PresentationController.SetPlayer(index);
+        PresentationController.SetActivePlayerIndex(index);
+
+        _previousState = State;
+        State = QuestionState.Pressed;
 
         _timerStopped = ActiveQuestionCommand == StopQuestionTimer;
 
@@ -1786,7 +1797,32 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (Settings.Model.ShowLostButtonPlayers)
         {
             PresentationController.ClearLostButtonPlayers();
-        }            
+        }        
+    }
+
+    private void OnStateChanged()
+    {
+        switch (_state)
+        {
+            case QuestionState.Normal:
+                PresentationController.SetQuestionStyle(QuestionStyle.Normal);
+                StopThinkingTimer_Executed(0);
+                break;
+
+            case QuestionState.Pressing:
+                PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
+                break;
+
+            case QuestionState.Pressed:
+                PresentationController.SetQuestionStyle(QuestionStyle.Pressed);
+                break;
+
+            case QuestionState.Thinking:
+                break;
+
+            default:
+                throw new InvalidOperationException($"_state has an invalid value of {_state}");
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
@@ -1795,4 +1831,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public event PropertyChangedEventHandler? PropertyChanged;
 
     internal void CloseMainView() => PresentationController.StopGame();
+
+    internal void StartButtons() => _buttonManager?.Start();
+
+    internal void AskAnswerButton() => State = QuestionState.Pressing;
+
+    internal void OnQuestionStart()
+    {
+        State = QuestionState.Normal;
+        _previousState = QuestionState.Normal;
+
+        LocalInfo.TStage = TableStage.Question;
+    }
 }

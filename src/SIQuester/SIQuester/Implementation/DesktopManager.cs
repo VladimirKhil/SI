@@ -261,7 +261,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             return media;
         }
 
-        if (_mediaFiles.TryGetValue(media.Uri, out string fileName))
+        if (_mediaFiles.TryGetValue(media.Uri, out var fileName))
         {
             return new Media(fileName, media.StreamLength);
         }
@@ -281,7 +281,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
         if (stream == null)
         {
-            return null;
+            return new Media(media.Uri);
         }
 
         using (stream.Stream)
