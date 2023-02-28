@@ -6,6 +6,16 @@
 public static class QuestionParameterNames
 {
     /// <summary>
+    /// Question body.
+    /// </summary>
+    public const string Question = "question";
+
+    /// <summary>
+    /// Question answer.
+    /// </summary>
+    public const string Answer = "answer";
+
+    /// <summary>
     /// Question theme.
     /// </summary>
     public const string Theme = "theme";

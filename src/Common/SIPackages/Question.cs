@@ -361,12 +361,10 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <param name="isFinal">Final round question flag.</param>
     public void Upgrade(bool isFinal = false)
     {
-        if (TypeName != null || Script != null)
+        if (TypeName != null)
         {
             return;
         }
-
-        Script = new();
 
         if (Price == -1)
         {
@@ -376,36 +374,18 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             return;
         }
 
-        var askAnswerMode = StepParameterValues.AskAnswerMode_Button;
+        Parameters = new();
 
         switch (Type.Name)
         {
             case QuestionTypes.Auction:
                 {
-                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
-
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Stake);
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, StepParameterValues.SetAnswererSelect_Highest);
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.StakeVisibity, StepParameterValues.SetAnswererStakeVisibility_Visible);
-
-                    Script.Steps.Add(setAnswererStep);
-
-                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
                     TypeName = QuestionTypes.Stake;
                 }
                 break;
 
             case QuestionTypes.Sponsored:
                 {
-                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Current);
-                    Script.Steps.Add(setAnswererStep);
-
-                    var setPriceStep = new Step { Type = StepTypes.SetPrice };
-                    setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_NoRisk);
-                    Script.Steps.Add(setPriceStep);
-
-                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
                     TypeName = QuestionTypes.NoRisk;
                 }
                 break;
@@ -424,69 +404,25 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                         ? Type[QuestionTypeParams.BagCat_Self] ?? QuestionTypeParams.BagCat_Self_Value_False
                         : QuestionTypeParams.BagCat_Self_Value_False;
 
-                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_ByCurrent);
-
                     var selectAnswererMode = canGiveSelf == QuestionTypeParams.BagCat_Self_Value_True
                         ? StepParameterValues.SetAnswererSelect_Any
                         : StepParameterValues.SetAnswererSelect_ExceptCurrent;
 
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, selectAnswererMode);
-
-                    var setThemeStep = new Step { Type = StepTypes.SetTheme };
-                    setThemeStep.AddSimpleParameter(StepParameterNames.Content, theme);
-
-                    var setPriceStep = new Step { Type = StepTypes.SetPrice };
-                    setPriceStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetPriceMode_Select);
-
                     var numberSet = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price);
-
-                    setPriceStep.Parameters.Add(
-                        StepParameterNames.Content,
-                        new StepParameter
-                        {
-                            Type = StepParameterTypes.NumberSet,
-                            NumberSetValue = numberSet
-                        });
 
                     switch (knows)
                     {
-                        case QuestionTypeParams.BagCat_Knows_Value_Before:
-                            Script.Steps.Add(setThemeStep);
-                            Script.Steps.Add(setPriceStep);
-                            Script.Steps.Add(setAnswererStep);
-                            TypeName = QuestionTypes.SecretOpenerPrice;
-
-                            Parameters = new StepParameters
-                            {
-                                [QuestionParameterNames.Theme] = new StepParameter { SimpleValue = theme },
-                                [QuestionParameterNames.Price] = new StepParameter
-                                {
-                                    Type = StepParameterTypes.NumberSet,
-                                    NumberSetValue = numberSet
-                                },
-                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
-                            };
-                            break;
-
                         case QuestionTypeParams.BagCat_Knows_Value_Never:
-                            Script.Steps.Add(setAnswererStep);
-                            Script.Steps.Add(setThemeStep);
-                            Script.Steps.Add(setPriceStep);
-                            Script.Steps.Add(new Step { Type = StepTypes.Accept });
-
                             Scenario.Clear();
                             Type.Params.Clear();
                             Type.Name = QuestionTypes.Simple;
                             TypeName = QuestionTypes.SecretNoQuestion;
                             return;
 
+                        case QuestionTypeParams.BagCat_Knows_Value_Before:
                         case QuestionTypeParams.BagCat_Knows_Value_After:
                         default:
-                            Script.Steps.Add(setAnswererStep);
-                            Script.Steps.Add(setThemeStep);
-                            Script.Steps.Add(setPriceStep);
-                            TypeName = QuestionTypes.Secret;
+                            TypeName = knows == QuestionTypeParams.BagCat_Knows_Value_Before ? QuestionTypes.SecretOpenerPrice : QuestionTypes.Secret;
 
                             Parameters = new StepParameters
                             {
@@ -500,26 +436,18 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             };
                             break;
                     }
-
-                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
                 }
                 break;
 
             case QuestionTypes.Simple:
                 if (isFinal)
                 {
-                    var setAnswererStep = new Step { Type = StepTypes.SetAnswerer };
-
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Mode, StepParameterValues.SetAnswererMode_Stake);
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.Select, StepParameterValues.SetAnswererSelect_AllPossible);
-                    setAnswererStep.AddSimpleParameter(StepParameterNames.StakeVisibity, StepParameterValues.SetAnswererStakeVisibility_Hidden);
-
-                    Script.Steps.Add(setAnswererStep);
-
-                    askAnswerMode = StepParameterValues.AskAnswerMode_Direct;
+                    TypeName = QuestionTypes.StakeAll;
                 }
-
-                TypeName = QuestionTypes.Simple;
+                else
+                {
+                    TypeName = QuestionTypes.Simple;
+                }
                 break;
 
             default:
@@ -530,14 +458,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 return;
         }
 
-        var contentStep = new Step { Type = StepTypes.ShowContent };
         var content = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
-        contentStep.Parameters.Add(StepParameterNames.Content, content);
 
-        Script.Steps.Add(contentStep);
-
-        var askAnswerStep = new Step { Type = StepTypes.AskAnswer };
-        askAnswerStep.AddSimpleParameter(StepParameterNames.Mode, askAnswerMode);
+        Parameters[QuestionParameterNames.Question] = content;
 
         var currentContent = content;
         var useMarker = false;
@@ -552,13 +475,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 }
 
                 useMarker = true;
-                Script.Steps.Add(askAnswerStep);
 
-                var answerStep = new Step { Type = StepTypes.ShowContent };
                 var answerContent = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };
-                answerStep.Parameters.Add(StepParameterNames.Content, answerContent);
-
-                Script.Steps.Add(answerStep);
+                Parameters[QuestionParameterNames.Answer] = answerContent;
 
                 currentContent = answerContent;
                 continue;
@@ -574,33 +493,6 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     WaitForFinish = atom.AtomTime != -1,
                     IsRef = atom.IsLink
                 });            
-        }
-
-        if (!useMarker)
-        {
-            Script.Steps.Add(askAnswerStep);
-
-            var answerStep = new Step { Type = StepTypes.ShowContent };
-
-            var answerContent = new StepParameter
-            {
-                IsRef = true,
-                Type = StepParameterTypes.Simple,
-                SimpleValue = StepParameterValues.ContentRef_Answer,
-            };
-
-            answerStep.Parameters.Add(StepParameterNames.Content, answerContent);
-
-            answerStep.Parameters.Add(
-                StepParameterNames.FallbackRefId,
-                new StepParameter
-                {
-                    IsRef = true,
-                    Type = StepParameterTypes.Simple,
-                    SimpleValue = StepParameterValues.FallbackStepIdRef_Right,
-                });
-
-            Script.Steps.Add(answerStep);
         }
 
         Scenario.Clear();

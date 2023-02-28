@@ -21,6 +21,11 @@ public static class QuestionTypes
     public const string Stake = "stake";
 
     /// <summary>
+    /// Stake for all question type.
+    /// </summary>
+    public const string StakeAll = "stakeAll";
+
+    /// <summary>
     /// Secret question type.
     /// </summary>
     public const string Cat = "cat";

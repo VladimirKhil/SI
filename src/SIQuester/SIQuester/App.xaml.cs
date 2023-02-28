@@ -126,7 +126,7 @@ public partial class App : Application
             else if (e.Args[0] == "upgrade" && e.Args.Length > 1)
             {
                 UpgradePackage(e.Args[1]);
-                App.Current.Shutdown();
+                Current.Shutdown();
                 return;
             }
         }

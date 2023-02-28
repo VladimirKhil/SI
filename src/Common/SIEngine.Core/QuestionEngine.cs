@@ -1,6 +1,5 @@
 ﻿using SIPackages;
 using SIPackages.Core;
-using System.Globalization;
 
 namespace SIEngine.Core;
 
@@ -20,6 +19,8 @@ public sealed class QuestionEngine
     private int? _askAnswerStartIndex = null;
     private bool _isAskingAnswer = false;
 
+    private readonly Script? _script;
+
     /// <summary>
     /// Initializes a new instance of <see cref="QuestionEngine" /> class.
     /// </summary>
@@ -31,19 +32,25 @@ public sealed class QuestionEngine
         _question = question;
         _options = options;
         _playHandler = playHandler;
+        _script = _question.Script;
+
+        if (_script == null && _question.TypeName != null)
+        {
+            ScriptsLibrary.Scripts.TryGetValue(_question.TypeName, out _script);
+        }
     }
 
     public bool PlayNext()
     {
-        if (_question.Script == null)
+        if (_script == null)
         {
             return false;
         }
 
         if (!_started)
         {
-            _askAnswerStartIndex = FalseStartHelper.GetAskAnswerStartIndex(_question.Script, _question.Parameters, _options.FalseStarts);
-            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_question.Script));
+            _askAnswerStartIndex = FalseStartHelper.GetAskAnswerStartIndex(_script, _question.Parameters, _options.FalseStarts);
+            _playHandler.OnQuestionStart(ScriptHasAskAnswerButtonsStep(_script));
             _started = true;
         }
 
@@ -53,9 +60,9 @@ public sealed class QuestionEngine
             _isAskingAnswer = false;
         }
 
-        while (_stepIndex < _question.Script.Steps.Count)
+        while (_stepIndex < _script.Steps.Count)
         {
-            var step = _question.Script.Steps[_stepIndex];
+            var step = _script.Steps[_stepIndex];
 
             switch (step.Type)
             {
@@ -70,7 +77,7 @@ public sealed class QuestionEngine
                             continue;
                         }
 
-                        var select = step.TryGetSimpleParameter(StepParameterNames.Select);
+                        var select = TryGetParameter(step, StepParameterNames.Select)?.SimpleValue;
                         var stakeVisibility = step.TryGetSimpleParameter(StepParameterNames.StakeVisibity);
 
                         _playHandler.OnSetAnswerer(mode, select, stakeVisibility);
@@ -90,7 +97,7 @@ public sealed class QuestionEngine
                         }
 
                         var availableRange = mode == StepParameterValues.SetPriceMode_Select
-                            ? step.TryGetParameter(StepParameterNames.Content)?.NumberSetValue
+                            ? TryGetParameter(step, StepParameterNames.Content)?.NumberSetValue
                             : null;
 
                         _playHandler.OnSetPrice(mode, availableRange);
@@ -99,7 +106,7 @@ public sealed class QuestionEngine
                     break;
 
                 case StepTypes.SetTheme:
-                    var themeName = step.TryGetSimpleParameter(StepParameterNames.Content);
+                    var themeName = TryGetParameter(step, StepParameterNames.Content)?.SimpleValue;
 
                     if (themeName == null)
                     {
@@ -237,6 +244,30 @@ public sealed class QuestionEngine
         return false;
     }
 
+    private StepParameter? TryGetParameter(Step step, string parameter)
+    {
+        var value = step.TryGetParameter(parameter);
+
+        if (value == null)
+        {
+            return null;
+        }
+
+        if (!value.IsRef)
+        {
+            return value;
+        }
+
+        var refId = value.SimpleValue;
+
+        if (refId != null)
+        {
+            _ = _question.Parameters?.TryGetValue(refId, out value);
+        }
+
+        return value;
+    }
+
     private static bool ScriptHasAskAnswerButtonsStep(Script script)
     {
         for (var i = 0; i < script.Steps.Count; i++)
@@ -262,17 +293,17 @@ public sealed class QuestionEngine
     /// </summary>
     public void MoveToAnswer()
     {
-        if (_question.Script == null)
+        if (_script == null)
         {
             return;
         }
 
-        var nextStepIndex = _question.Script.Steps.Count - 1;
+        var nextStepIndex = _script.Steps.Count - 1;
         var askAnswerFound = false;
 
         while (nextStepIndex >= _stepIndex)
         {
-            var nextStep = _question.Script.Steps[nextStepIndex];
+            var nextStep = _script.Steps[nextStepIndex];
 
             if (nextStep.Type == StepTypes.AskAnswer)
             {

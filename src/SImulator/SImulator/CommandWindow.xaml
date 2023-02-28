@@ -389,7 +389,7 @@
                             </ItemsControl>
                         </Grid>
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.Final}">
                         <ItemsControl
                             ItemsSource="{Binding RoundInfo}"
@@ -403,7 +403,7 @@
                                     </ScrollViewer>
                                 </ControlTemplate>
                             </ItemsControl.Template>
-                            
+
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button
@@ -414,7 +414,7 @@
                                         Content="{Binding Name}"
                                         Height="26"
                                         Margin="0,-1,0,0" />
-                                    
+
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
                                             <Setter TargetName="But" Property="IsEnabled" Value="False" />
@@ -425,7 +425,7 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Static uim:TableStage.Special}">
                         <StackPanel
                             Orientation="Vertical"
@@ -433,9 +433,13 @@
                                 RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1},
                                 Path=DataContext.Game.ActiveQuestion}"
                                 d:DataContext="{d:DesignInstance p:Question}">
+                            <StackPanel.Resources>
+                                <CollectionViewSource x:Key="Parameters" Source="{Binding Parameters}" Filter="Parameters_Filter" />
+                            </StackPanel.Resources>
+                            
                             <TextBlock Text="{Binding TypeName, Converter={StaticResource QuestionTypeConverter}}" FontSize="16" FontWeight="Bold" />
 
-                            <ItemsControl ItemsSource="{Binding Parameters}">
+                            <ItemsControl ItemsSource="{Binding Source={StaticResource Parameters}}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
