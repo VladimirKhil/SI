@@ -1,6 +1,7 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -380,6 +381,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         settings.Model.SIUISettings.PropertyChanged += Default_PropertyChanged;
         settings.SIUISettings.PropertyChanged += Default_PropertyChanged;
+        settings.Model.PropertyChanged += Settings_PropertyChanged;
 
         _engine.Package += Engine_Package;
         _engine.GameThemes += Engine_GameThemes;
@@ -422,6 +424,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener.MediaProgress += GameHost_MediaProgress;
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender != null && e.PropertyName == nameof(AppSettings.ShowPlayers))
+        {
+            PresentationController.UpdateShowPlayers(((AppSettings)sender).ShowPlayers);
+        }
     }
 
     private async void Engine_QuestionPostInfo()
@@ -1161,6 +1171,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveMediaCommand = null;
 
         PresentationController.SetText();
+        PresentationController.SetActivePlayerIndex(-1);
 
         if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
         {
@@ -1814,7 +1825,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 break;
 
             case QuestionState.Pressed:
-                PresentationController.SetQuestionStyle(QuestionStyle.Pressed);
+                PresentationController.SetQuestionStyle(Settings.Model.ShowPlayers ? QuestionStyle.Normal : QuestionStyle.Pressed);
                 break;
 
             case QuestionState.Thinking:

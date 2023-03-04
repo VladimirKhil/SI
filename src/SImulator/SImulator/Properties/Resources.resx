@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddPlayer" xml:space="preserve">
+    <value>Добавить игрока</value>
+  </data>
+  <data name="AddSum" xml:space="preserve">
+    <value>Добавить сумму</value>
+  </data>
   <data name="AddSumForActivePlayer" xml:space="preserve">
     <value>Добавить активному игроку</value>
   </data>
@@ -126,11 +132,20 @@
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
   </data>
+  <data name="Back" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="ClearList" xml:space="preserve">
+    <value>Очистить список</value>
+  </data>
   <data name="Comment" xml:space="preserve">
     <value>Комментарий</value>
   </data>
   <data name="CommonAppError" xml:space="preserve">
     <value>Произошла ошибка в приложении: {0}\r\n\r\nПриложение будет закрыто. Обратитесь к разработчику.</value>
+  </data>
+  <data name="Design" xml:space="preserve">
+    <value>Внешний вид</value>
   </data>
   <data name="DiskFullError" xml:space="preserve">
     <value>Закончилось место на диске!</value>
@@ -144,11 +159,20 @@
   <data name="FinishGameQuestion" xml:space="preserve">
     <value>Завершить игру?</value>
   </data>
+  <data name="Game" xml:space="preserve">
+    <value>Игра</value>
+  </data>
   <data name="GameModes_Sport" xml:space="preserve">
     <value>Упрощённая</value>
   </data>
   <data name="GameModes_Tv" xml:space="preserve">
     <value>Классическая</value>
+  </data>
+  <data name="GamePackage" xml:space="preserve">
+    <value>Игровой пакет</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Скрыть</value>
   </data>
   <data name="Html" xml:space="preserve">
     <value>HTML</value>
@@ -171,6 +195,9 @@
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
   </data>
+  <data name="Next" xml:space="preserve">
+    <value>Дальше</value>
+  </data>
   <data name="Oral" xml:space="preserve">
     <value>Устный текст</value>
   </data>
@@ -182,6 +209,27 @@
   </data>
   <data name="PlacementOral" xml:space="preserve">
     <value>Реплика</value>
+  </data>
+  <data name="Players" xml:space="preserve">
+    <value>Игроки</value>
+  </data>
+  <data name="PlayersTable" xml:space="preserve">
+    <value>Таблица игроков</value>
+  </data>
+  <data name="PresentationExitHint" xml:space="preserve">
+    <value>Для выхода нажмите Escape, правую кнопку мыши или немного надавите пальцем</value>
+  </data>
+  <data name="PresentationTitle" xml:space="preserve">
+    <value>Игровое табло</value>
+  </data>
+  <data name="PressButton" xml:space="preserve">
+    <value>Нажмите кнопку</value>
+  </data>
+  <data name="PreviewImage" xml:space="preserve">
+    <value>Изображение-заставка</value>
+  </data>
+  <data name="PreviousRound" xml:space="preserve">
+    <value>Предыдущий раунд</value>
   </data>
   <data name="PriceFromToStep" xml:space="preserve">
     <value>От {0} до {1} с шагом {2}</value>
@@ -195,6 +243,21 @@
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
   </data>
+  <data name="QuestionLineSpacing" xml:space="preserve">
+    <value>Межстрочный интервал в вопросе</value>
+  </data>
+  <data name="RecentFiles" xml:space="preserve">
+    <value>Последние файлы</value>
+  </data>
+  <data name="RemovePlayer" xml:space="preserve">
+    <value>Удалить игрока</value>
+  </data>
+  <data name="RightAnswers" xml:space="preserve">
+    <value>Верных</value>
+  </data>
+  <data name="Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
   <data name="RuntimeBrokenError" xml:space="preserve">
     <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
   </data>
@@ -204,11 +267,20 @@
   <data name="SecondaryScreen" xml:space="preserve">
     <value>Дополнительный</value>
   </data>
+  <data name="Select" xml:space="preserve">
+    <value>Выбрать</value>
+  </data>
   <data name="SelectAny" xml:space="preserve">
     <value>Кому угодно</value>
   </data>
   <data name="SelectAnyExceptCurrent" xml:space="preserve">
     <value>Кому угодно, кроме себя</value>
+  </data>
+  <data name="SelectFile" xml:space="preserve">
+    <value>Файл…</value>
+  </data>
+  <data name="SelectLibrary" xml:space="preserve">
+    <value>Библиотека вопросов…</value>
   </data>
   <data name="SelectLogsFolder" xml:space="preserve">
     <value>Выберите папку для записи логов</value>
@@ -216,8 +288,23 @@
   <data name="SelectQuestionPackage" xml:space="preserve">
     <value>Выберите пакет вопросов</value>
   </data>
+  <data name="SetButton" xml:space="preserve">
+    <value>Задать кнопку</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Показать</value>
+  </data>
+  <data name="ShowPlayersList" xml:space="preserve">
+    <value>Показывать список игроков</value>
+  </data>
+  <data name="ShowRightAnswers" xml:space="preserve">
+    <value>Показывать правильные ответы</value>
+  </data>
   <data name="ShowTableCaption" xml:space="preserve">
     <value>Показывать заголовок на игровом табло</value>
+  </data>
+  <data name="ShowTextNoFalseStartsHint" xml:space="preserve">
+    <value>Показывать текст вопросов при игре без фальстартов</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
     <value>Вопросы СИ</value>
@@ -231,11 +318,29 @@
   <data name="SpecialThinkingTime" xml:space="preserve">
     <value>Время на размышление над спецвопросом (с)</value>
   </data>
+  <data name="Start" xml:space="preserve">
+    <value>Старт</value>
+  </data>
+  <data name="StartGame" xml:space="preserve">
+    <value>Начать игру</value>
+  </data>
+  <data name="StopGame" xml:space="preserve">
+    <value>Завершить игру</value>
+  </data>
+  <data name="SubtractSum" xml:space="preserve">
+    <value>Вычесть сумму</value>
+  </data>
   <data name="SubtractSumForActivePlayer" xml:space="preserve">
     <value>Удалить у активного игрока</value>
   </data>
+  <data name="Sum" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="Thinking" xml:space="preserve">
+    <value>Размышление</value>
   </data>
   <data name="ThinkingTime" xml:space="preserve">
     <value>Время на размышление после нажатия кнопки (с)</value>
@@ -248,5 +353,8 @@
   </data>
   <data name="Window" xml:space="preserve">
     <value>Окно</value>
+  </data>
+  <data name="WrongAnswers" xml:space="preserve">
+    <value>Неверных</value>
   </data>
 </root>

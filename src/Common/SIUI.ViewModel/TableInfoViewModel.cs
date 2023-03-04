@@ -358,8 +358,9 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public object RoundInfoLock { get; } = new object();
 
     /// <summary>
-    /// Список игроков, отображаемых на табло в особом режиме игры
+    /// Game players.
     /// </summary>
+    [Obsolete]
     public IList<SimplePlayerInfo> Players { get; private set; } = new ObservableCollection<SimplePlayerInfo>();
 
     private SettingsViewModel _settings;

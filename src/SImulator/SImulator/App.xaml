@@ -67,7 +67,7 @@
         <Style x:Key="SetPlayerButtonWeb" TargetType="ToggleButton" BasedOn="{StaticResource ToolButton}">
             <Setter Property="Width" Value="23" />
             <Setter Property="Height" Value="23" />
-            <Setter Property="ToolTip" Value="Задать кнопку" />
+            <Setter Property="ToolTip" Value="{x:Static lp:Resources.SetButton}" />
             
             <Setter Property="ContentTemplate">
                 <Setter.Value>
@@ -88,7 +88,7 @@
                 </DataTrigger>
                 
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="ToolTip" Value="Нажмите кнопку" />
+                    <Setter Property="ToolTip" Value="{x:Static lp:Resources.PressButton}" />
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
@@ -132,7 +132,7 @@
                         Padding="3"
                         Margin="1"
                         Command="{Binding AddPlayer}"
-                        ToolTip="Добавить игрока">
+                        ToolTip="{x:Static lp:Resources.AddPlayer}">
                         <Path
                             Data="M0,20L20,20L20,0L30,0L30,20L50,20L50,30L30,30L30,50L20,50L20,30L0,30z"
                             Stretch="Fill"
@@ -146,15 +146,15 @@
                         Padding="3"
                         Margin="1"
                         Command="{Binding ClearPlayers}"
-                        ToolTip="Очистить список">
+                        ToolTip="{x:Static lp:Resources.ClearList}">
                         <Path
                             Data="M0,0L1,1M0,1L1,0"
                             Stretch="Fill"
                             Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
                             StrokeThickness="4" />
                     </Button>
-                    
-                    <TextBlock Margin="5,5,5,5" VerticalAlignment="Center">Сумма</TextBlock>
+
+                    <TextBlock Text="{x:Static lp:Resources.Sum}" Margin="5,5,5,5" VerticalAlignment="Center" />
                     <TextBox lb:NumericBehavior.IsAttached="True" Text="{Binding Price}" VerticalContentAlignment="Center" Width="50" Height="20" />
 
                     <Button
@@ -217,9 +217,9 @@
                     </Grid.Resources>
                     
                     <TextBlock Text="Имя" />
-                    <TextBlock Grid.Column="2" Text="Сумма" />
-                    <TextBlock Grid.Column="3" Text="Верных" />
-                    <TextBlock Grid.Column="4" Text="Неверных" />
+                    <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Sum}" />
+                    <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.RightAnswers}" />
+                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.WrongAnswers}" />
                 </Grid>
                 
                 <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
@@ -261,7 +261,7 @@
                                             DockPanel.Dock="Left"
                                             Padding="3"
                                             Margin="1"
-                                            ToolTip="Добавить сумму"
+                                            ToolTip="{x:Static lp:Resources.AddSum}"
                                             VerticalContentAlignment="Center"
                                             Height="23"
                                             Width="23"
@@ -280,7 +280,7 @@
                                             DockPanel.Dock="Right"
                                             Padding="3"
                                             Margin="1"
-                                            ToolTip="Вычесть сумму"
+                                            ToolTip="{x:Static lp:Resources.SubtractSum}"
                                             VerticalContentAlignment="Center"
                                             Height="23"
                                             Width="23"
@@ -334,7 +334,7 @@
                                         Style="{StaticResource ToolButton}"
                                         Padding="3"
                                         Margin="1"
-                                        ToolTip="Удалить игрока"
+                                        ToolTip="{x:Static lp:Resources.RemovePlayer}"
                                         VerticalContentAlignment="Center"
                                         Height="23"
                                         Width="23"

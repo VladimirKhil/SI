@@ -479,7 +479,7 @@
     </Window.Resources>
 
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="СИмулятор">
+        <TaskbarItemInfo Description="SImulator">
             <TaskbarItemInfo.ThumbButtonInfos>
                 <ThumbButtonInfo Description="Назад" Command="{Binding Game.Back}">
                     <ThumbButtonInfo.ImageSource>
@@ -516,7 +516,7 @@
 
     <TabControl TabStripPlacement="Left" Background="White" BorderThickness="1,0,0,0" Padding="6,4,4,4" Margin="-2,0,0,0">
         <TabItem
-            Header="Старт"
+            Header="{x:Static lp:Resources.Start}"
             IsSelected="{Binding Transition, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:ModeTransition.ModeratorToStart}, Mode=OneWay}"
             Visibility="{Binding Mode, Converter={StaticResource StartView}}">
             
@@ -529,8 +529,8 @@
                 </Grid.RowDefinitions>
                 
                 <StackPanel Margin="0,0,4,0">
-                    <TextBlock Style="{StaticResource Title}">Начать игру</TextBlock>
-                    <TextBlock Style="{StaticResource Header}">Игровой пакет</TextBlock>
+                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.StartGame}" />
+                    <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GamePackage}" />
 
                     <TextBlock Margin="0,2,0,0" FontSize="14" TextTrimming="CharacterEllipsis">
                         <TextBlock.Style>
@@ -550,7 +550,7 @@
                     </TextBlock>
                     
                     <Menu HorizontalAlignment="Left" Height="25" Width="100" Margin="0,7,0,0">
-                        <MenuItem Header="Выбрать" Height="25" Width="100" BorderThickness="1" BorderBrush="Gray">
+                        <MenuItem Header="{x:Static lp:Resources.Select}" Height="25" Width="100" BorderThickness="1" BorderBrush="Gray">
                             <MenuItem.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -559,12 +559,12 @@
                                     </StackPanel>
                                 </DataTemplate>
                             </MenuItem.HeaderTemplate>
-                            
-                            <MenuItem Header="Файл…" Command="{Binding SelectPackage}" CommandParameter="0" />
-                            <MenuItem Header="Библиотека вопросов…" Command="{Binding SelectPackage}" CommandParameter="1" />
+
+                            <MenuItem Header="{x:Static lp:Resources.SelectFile}" Command="{Binding SelectPackage}" CommandParameter="0" />
+                            <MenuItem Header="{x:Static lp:Resources.SelectLibrary}" Command="{Binding SelectPackage}" CommandParameter="1" />
                             <Separator />
-                            
-                            <MenuItem Header="Последние файлы" ItemsSource="{Binding Settings.Recent}">
+
+                            <MenuItem Header="{x:Static lp:Resources.RecentFiles}" ItemsSource="{Binding Settings.Recent}">
                                 <MenuItem.Style>
                                     <Style TargetType="MenuItem">
                                         <Style.Triggers>
@@ -608,8 +608,8 @@
                 
                 <DockPanel Grid.Row="2" Margin="0,10,0,0">
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center">Игроки</TextBlock>
-                        
+                        <TextBlock Style="{StaticResource Header}" VerticalAlignment="Center" Text="{x:Static lp:Resources.Players}" />
+
                         <Button
                             Command="{Binding AddPlayer}"
                             VerticalAlignment="Center"
@@ -649,7 +649,7 @@
                                             Style="{StaticResource ToolButton}"
                                             Padding="3"
                                             Margin="1"
-                                            ToolTip="Удалить игрока"
+                                            ToolTip="{x:Static lp:Resources.RemovePlayer}"
                                             VerticalContentAlignment="Center"
                                             Height="23"
                                             Width="23"
@@ -671,7 +671,7 @@
                 <DockPanel Grid.Row="3" Margin="0,0,4,5">
                     <Button
                         DockPanel.Dock="Right"
-                        ToolTip="Начать игру"
+                        ToolTip="{x:Static lp:Resources.StartGame}"
                         Command="{Binding Start}"
                         BorderThickness="0"
                         Width="40"
@@ -712,7 +712,11 @@
                     </Grid.RowDefinitions>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <Button Style="{StaticResource ToolButton}" Padding="7,5,9,5" ToolTip="Предыдущий раунд" Command="{Binding PreviousRound}">
+                        <Button
+                            Style="{StaticResource ToolButton}"
+                            Padding="7,5,9,5"
+                            ToolTip="{x:Static lp:Resources.PreviousRound}"
+                            Command="{Binding PreviousRound}">
                             <Image Stretch="Uniform">
                                 <Image.Source>
                                     <DrawingImage>
@@ -734,7 +738,7 @@
                             </Image>
                         </Button>
 
-                        <TextBlock Margin="5,0,0,0" Text="Раунд" VerticalAlignment="Center" Width="100" />
+                        <TextBlock Margin="5,0,0,0" Text="{x:Static lp:Resources.Round}" VerticalAlignment="Center" Width="100" />
                         
                         <ProgressBar
                             Foreground="{StaticResource ImageBrush}"
@@ -770,7 +774,7 @@
                     </StackPanel>
                     
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <TextBlock Text="Вопрос" VerticalAlignment="Center" Width="100" />
+                        <TextBlock Text="{x:Static lp:Resources.Question}" VerticalAlignment="Center" Width="100" />
                         
                         <ProgressBar
                             Foreground="{StaticResource ImageBrush}"
@@ -788,7 +792,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <TextBlock Text="Размышление" VerticalAlignment="Center" Width="100" />
+                        <TextBlock Text="{x:Static lp:Resources.Thinking}" VerticalAlignment="Center" Width="100" />
                         
                         <ProgressBar
                             Foreground="{StaticResource ImageBrush}"
@@ -805,7 +809,7 @@
                         Grid.RowSpan="3"
                         BorderThickness="0"
                         HorizontalAlignment="Center"
-                        ToolTip="Завершить игру"
+                        ToolTip="{x:Static lp:Resources.StopGame}"
                         Margin="5,0,5,0"
                         Height="30"
                         Width="30"
@@ -814,16 +818,16 @@
                         <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
                     </Button>
                 </Grid>
-                
-                <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title}">Игра</TextBlock>
+
+                <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
                 <Separator DockPanel.Dock="Top" Width="250" />
                 
                 <DockPanel DockPanel.Dock="Top">
-                    <Button DockPanel.Dock="Left" Style="{StaticResource CommandButton}" ToolTip="Назад" Margin="0,0,8,0" Command="{Binding Back}">
+                    <Button DockPanel.Dock="Left" Style="{StaticResource CommandButton}" ToolTip="{x:Static lp:Resources.Back}" Margin="0,0,8,0" Command="{Binding Back}">
                         <Path Data="M5,0L0,5L5,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
                     </Button>
-                    
-                    <Button DockPanel.Dock="Right" Style="{StaticResource CommandButton}" ToolTip="Дальше" Margin="8,0,0,0" Command="{Binding Next}">
+
+                    <Button DockPanel.Dock="Right" Style="{StaticResource CommandButton}" ToolTip="{x:Static lp:Resources.Next}" Margin="8,0,0,0" Command="{Binding Next}">
                         <Path Data="M0,0L5,5L0,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
                     </Button>
                     
@@ -875,10 +879,10 @@
                             </Setter>
                         </Style>
                     </StackPanel.Resources>
-                    
-                    <TextBlock Text="Игроки" Style="{StaticResource Title}" Margin="0,0,10,0" />
-                    
-                    <RadioButton GroupName="2" ToolTip="Скрыть" IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Hidden}}">
+
+                    <TextBlock Text="{x:Static lp:Resources.Players}" Style="{StaticResource Title}" Margin="0,0,10,0" />
+
+                    <RadioButton GroupName="2" ToolTip="{x:Static lp:Resources.Hide}" IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Hidden}}">
                         <Image>
                             <Image.Source>
                                 <DrawingImage>
@@ -889,8 +893,8 @@
                             </Image.Source>
                         </Image>
                     </RadioButton>
-                    
-                    <RadioButton GroupName="1" ToolTip="Показать" IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}">
+
+                    <RadioButton GroupName="1" ToolTip="{x:Static lp:Resources.Show}" IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}">
                         <Image>
                             <Image.Source>
                                 <DrawingImage>
@@ -941,11 +945,11 @@
                 </Border>
             </DockPanel>
         </TabItem>
-        
-        <TabItem Header="Внешний вид">
+
+        <TabItem Header="{x:Static lp:Resources.Design}">
             <StackPanel Margin="2,2,0,0">
-                <TextBlock Style="{StaticResource Title}">Внешний вид</TextBlock>
-                
+                <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Design}" />
+
                 <UniformGrid Columns="2" Margin="0,0,4,0">
                     <StackPanel Margin="0,0,5,0">
                         <TextBlock Style="{StaticResource Header}" Text="Цвет текста" />
@@ -1027,7 +1031,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="5,0,0,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Межстрочный интервал в вопросе" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionLineSpacing}" />
                         
                         <ComboBox
                             HorizontalAlignment="Stretch"
@@ -1035,20 +1039,22 @@
                             ItemsSource="{Binding Source={x:Static ui:SettingsHelper.LineSpaces}}"
                             SelectedItem="{Binding SettingsViewModel.SIUISettings.QuestionLineSpacing}" />
                     </StackPanel>
-                    
-                    <CheckBox IsChecked="{Binding Settings.ShowRight}" Margin="0,0,5,0">Показывать правильные ответы</CheckBox>
-                    <CheckBox IsChecked="{Binding Settings.SIUISettings.ShowScore}" Margin="5,0,0,0">Показывать счёт на табло</CheckBox>
-                    
+
+                    <CheckBox IsChecked="{Binding Settings.ShowRight}" Margin="0,0,5,0" Content="{x:Static lp:Resources.ShowRightAnswers}" />
+
+                    <CheckBox
+                        IsChecked="{Binding Settings.ShowPlayers}"
+                        Margin="5,0,0,0"
+                        Content="{x:Static lp:Resources.ShowPlayersList}" />
+
                     <CheckBox IsChecked="{Binding Settings.ShowTextNoFalstart}" Margin="0,0,5,0">
-                        <TextBlock TextWrapping="Wrap">
-                            Показывать текст вопросов при игре без фальстартов
-                        </TextBlock>
+                        <TextBlock TextWrapping="Wrap" Text="{x:Static lp:Resources.ShowTextNoFalseStartsHint}" />
                     </CheckBox>
 
                     <CheckBox IsChecked="{Binding Settings.ShowTableCaption}" Margin="5,0,0,0" Content="{x:Static lp:Resources.ShowTableCaption}" />
                 </UniformGrid>
-                
-                <TextBlock Style="{StaticResource Header}" Text="Изображение-заставка" />
+
+                <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.PreviewImage}" />
                 
                 <DockPanel>
                     <Button Margin="5,0,4,0" Command="{Binding SelectLogoFile}" HorizontalAlignment="Right" Width="120" Height="25" DockPanel.Dock="Right">Выбрать…</Button>

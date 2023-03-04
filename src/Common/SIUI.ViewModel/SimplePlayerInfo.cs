@@ -1,21 +1,18 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 
 namespace SIUI.ViewModel;
 
 /// <summary>
 /// Defines player info for showing on game table.
 /// </summary>
-[DataContract]
 public class SimplePlayerInfo : INotifyPropertyChanged
 {
     private string _name = "";
 
     /// <summary>
-    /// Имя игрока
+    /// Player name.
     /// </summary>
-    [DataMember]
     public string Name
     {
         get => _name;
@@ -25,13 +22,23 @@ public class SimplePlayerInfo : INotifyPropertyChanged
     private int _sum = 0;
 
     /// <summary>
-    /// Счёт игрока
+    /// Player score.
     /// </summary>
-    [DataMember]
     public int Sum
     {
         get => _sum;
         set { if (_sum != value) { _sum = value; OnPropertyChanged(); } }
+    }
+
+    private PlayerState _state = PlayerState.None;
+
+    /// <summary>
+    /// Player state.
+    /// </summary>
+    public PlayerState State
+    {
+        get => _state;
+        set { if (_state != value) { _state = value; OnPropertyChanged(); } }
     }
 
     public override string ToString() => $"{_name}: {_sum}";

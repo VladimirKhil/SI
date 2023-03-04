@@ -45,6 +45,8 @@ public interface IPresentationController
 
     void UpdateSettings(Settings settings);
 
+    void UpdateShowPlayers(bool showPlayers);
+
     void SetSound(string sound = "");
 
     void PlaySimpleSelection(int theme, int quest);

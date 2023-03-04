@@ -1,6 +1,5 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.Contracts;
-using System.Diagnostics;
 using System.Windows.Input;
 
 namespace SImulator.ViewModel.Listeners;

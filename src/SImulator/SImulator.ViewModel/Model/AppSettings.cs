@@ -191,6 +191,18 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _showPlayers = false;
+
+    /// <summary>
+    /// Show players and scores.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool ShowPlayers
+    {
+        get => _showPlayers;
+        set { if (_showPlayers != value) { _showPlayers = value; OnPropertyChanged(); } }
+    }
+
     private bool _showTableCaption = true;
 
     /// <summary>
@@ -588,12 +600,12 @@ public sealed class AppSettings : INotifyPropertyChanged
     private bool _showLostButtonPlayers = false;
 
     /// <summary>
-    /// Показывать игроков, проигравших кнопку
+    /// Show names of players who lost the buttons.
     /// </summary>
     [DefaultValue(false)]
     public bool ShowLostButtonPlayers
     {
-        get { return _showLostButtonPlayers; }
+        get => _showLostButtonPlayers;
         set
         {
             if (_showLostButtonPlayers != value)
@@ -633,10 +645,8 @@ public sealed class AppSettings : INotifyPropertyChanged
         return settings;
     }
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

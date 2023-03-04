@@ -138,6 +138,12 @@
   <data name="GameStartError" xml:space="preserve">
     <value>Ошибка старта игры: {0}</value>
   </data>
+  <data name="LoggerCreationWarning" xml:space="preserve">
+    <value>Ошибка создания файла лога: {0}. Лог записываться не будет</value>
+  </data>
+  <data name="LogsFolderNotSetWarning" xml:space="preserve">
+    <value>Папка для записи логов не задана! Логи вестись не будут</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>

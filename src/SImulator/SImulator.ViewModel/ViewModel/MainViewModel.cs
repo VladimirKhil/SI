@@ -139,9 +139,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private GameViewModel _game;
+    private GameViewModel? _game;
 
-    public GameViewModel Game
+    public GameViewModel? Game
     {
         get => _game;
         private set
@@ -174,7 +174,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ModeTransition Transition
     {
-        get { return _transition; }
+        get => _transition;
         set { _transition = value; OnPropertyChanged(); }
     }
 
@@ -340,9 +340,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async Task<string> PreparePackageAsync()
+    private async Task<string> PreparePackageAsync(CancellationToken cancellationToken = default)
     {
-        var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(_cancellationTokenSource.Token);
+        var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(cancellationToken);
 
         var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
 
@@ -351,7 +351,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             tempDir,
             ExtractedFileNamingModes.Unescape,
             long.MaxValue,
-            cancellationToken: _cancellationTokenSource.Token);
+            cancellationToken: cancellationToken);
 
         if (isTemporary)
         {
@@ -386,7 +386,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             if (string.IsNullOrWhiteSpace(logsFolder))
             {
-                PlatformManager.Instance.ShowMessage("Папка для записи логов не задана! Логи вестись не будут.");
+                PlatformManager.Instance.ShowMessage(Resources.LogsFolderNotSetWarning);
                 return PlatformManager.Instance.CreateLogger(null);
             }
             else
@@ -397,7 +397,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
                 catch (Exception exc)
                 {
-                    PlatformManager.Instance.ShowMessage(string.Format("Ошибка создания файла лога: {0}.\r\n\r\nЛог записываться не будет.", exc.Message), false);
+                    PlatformManager.Instance.ShowMessage(string.Format(Resources.LoggerCreationWarning, exc.Message), false);
                     return PlatformManager.Instance.CreateLogger(null);
                 }
             }
@@ -418,7 +418,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             _start.CanBeExecuted = false;
             IsStarting = true;
 
-            var tempDir = await PreparePackageAsync();
+            var tempDir = await PreparePackageAsync(_cancellationTokenSource.Token);
 
             ISIEngine engine;
 
@@ -448,6 +448,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             };
 
             presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+            presentationController.UpdateShowPlayers(SettingsViewModel.Model.ShowPlayers);
             presentationController.Error += ShowError;
 
             var logger = CreateLogger();
@@ -783,19 +784,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         // Do nothing; the command is activated by key press
     }
 
-    private void ShowError(string error)
-    {
-        PlatformManager.Instance.ShowMessage(error);
-    }
+    private void ShowError(string error) => PlatformManager.Instance.ShowMessage(error);
 
     /// <summary>
-    /// Вывести сообщение об ошибке
+    /// Shows error message.
     /// </summary>
-    /// <param name="exc"></param>
-    private void ShowError(Exception exc)
-    {
-        ShowError($"{Resources.Error}: {exc.Message}");
-    }
+    /// <param name="exc">Error to show.</param>
+    private void ShowError(Exception exc) => ShowError($"{Resources.Error}: {exc.Message}");
 
     private void UpdateStartCommand()
     {
@@ -808,7 +803,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         _selectPackage.CanBeExecuted = _selectVideo.CanBeExecuted = _selectLogsFolder.CanBeExecuted = Mode == GameMode.Start;
 
         UpdateStartCommand();
-
         UpdatePlayersView();
     }
 
