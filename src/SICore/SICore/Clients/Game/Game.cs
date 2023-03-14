@@ -2918,7 +2918,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                 for (var i = 0; i < ClientData.Players.Count; i++)
                 {
-                    if (i != index && !ClientData.Players[i].IsHuman)
+                    if (i != index && ClientData.Players[i].IsConnected)
                     {
                         for (var j = 0; j < _defaultPlayers.Length; j++)
                         {
