@@ -1,4 +1,5 @@
 ﻿using SIQuester.ViewModel.Properties;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel.Services;
 
@@ -9,7 +10,7 @@ public sealed class OperationsManager
 {
     private const int MaxUndoListCount = 100;
 
-    // TODO: rewrite undo-redo to a single linked list of changes and a pointer to current state in this list
+    // TODO: rewrite undo-redo to a single linked list of changes and a pointer pointing to the current state in this list
     private readonly Stack<IChange> _undoList = new();
     private readonly Stack<IChange> _redoList = new();
 

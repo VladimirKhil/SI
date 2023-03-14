@@ -752,24 +752,27 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private void NetworkGameOrRoleChanged(bool roleChanged, bool networkGameChanged)
     {
-        if (_showman != null)
+        if (_showman == null)
         {
-            if (Role == GameRole.Showman)
-            {
-                _showman.AccountType = AccountTypes.Human;
-                if (roleChanged)
-                {
-                    UpdateShowman();
-                }
-            }
-            else if (!NetworkGame)
-            {
-                _showman.AccountType = AccountTypes.Computer;
-            }
-            else
+            return;
+        }
+
+        if (Role == GameRole.Showman)
+        {
+            _showman.AccountType = AccountTypes.Human;
+
+            if (roleChanged)
             {
                 UpdateShowman();
             }
+        }
+        else if (!NetworkGame)
+        {
+            _showman.AccountType = AccountTypes.Computer;
+        }
+        else
+        {
+            UpdateShowman();
         }
     }
 

@@ -261,7 +261,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             return media;
         }
 
-        if (_mediaFiles.TryGetValue(media.Uri, out string fileName))
+        if (_mediaFiles.TryGetValue(media.Uri, out var fileName))
         {
             return new Media(fileName, media.StreamLength);
         }
@@ -281,7 +281,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
         if (stream == null)
         {
-            return null;
+            return new Media(media.Uri);
         }
 
         using (stream.Stream)
@@ -299,7 +299,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     {
         foreach (var item in media)
         {
-            if (_mediaFiles.TryGetValue(item, out string path) && File.Exists(path))
+            if (_mediaFiles.TryGetValue(item, out var path) && File.Exists(path))
             {
                 try
                 {
@@ -323,7 +323,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     }
 
     /// <summary>
-    /// Сформировать документ требуемого формата
+    /// Forms a document of required format.
     /// </summary>
     public override IFlowDocumentWrapper BuildDocument(SIDocument doc, ExportFormats format)
     {

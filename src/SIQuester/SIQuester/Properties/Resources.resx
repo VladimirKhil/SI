@@ -123,6 +123,9 @@
   <data name="Accept" xml:space="preserve">
     <value>Зачёт</value>
   </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Действия</value>
+  </data>
   <data name="Add" xml:space="preserve">
     <value>Добавить</value>
   </data>
@@ -149,6 +152,12 @@
   </data>
   <data name="AnswerHeader" xml:space="preserve">
     <value>Ответ:</value>
+  </data>
+  <data name="AttachPackage" xml:space="preserve">
+    <value>Присоединить пакет…</value>
+  </data>
+  <data name="AttachPackageHint" xml:space="preserve">
+    <value>Присоединение другого файла вопросов</value>
   </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
@@ -219,6 +228,12 @@
   <data name="Close" xml:space="preserve">
     <value>Закрыть</value>
   </data>
+  <data name="CollapseAll" xml:space="preserve">
+    <value>Развернуть всё</value>
+  </data>
+  <data name="CollapseAllMedia" xml:space="preserve">
+    <value>Свернуть всё медиа</value>
+  </data>
   <data name="Comment" xml:space="preserve">
     <value>Комментарий</value>
   </data>
@@ -240,6 +255,33 @@
   <data name="ContactUri" xml:space="preserve">
     <value>Адрес для связи</value>
   </data>
+  <data name="ConvertToCompSI" xml:space="preserve">
+    <value>Оформить для Теле- и Комп-SIGame</value>
+  </data>
+  <data name="ConvertToCompSIHint" xml:space="preserve">
+    <value>Разбить по раундам и назначить телевизионные стоимости</value>
+  </data>
+  <data name="ConvertToCompSISimple" xml:space="preserve">
+    <value>Поправить для Теле- и Комп-SIGame</value>
+  </data>
+  <data name="ConvertToCompSISimpleHint" xml:space="preserve">
+    <value>Изменить названия тем, убрать точки в конце вопросов</value>
+  </data>
+  <data name="ConvertToMillionaire" xml:space="preserve">
+    <value>Оформить для "Миллионера"</value>
+  </data>
+  <data name="ConvertToMillionaireHint" xml:space="preserve">
+    <value>Разбить на группы по 15 вопросов</value>
+  </data>
+  <data name="ConvertToSportSI" xml:space="preserve">
+    <value>Оформить для Спорт-SIGame</value>
+  </data>
+  <data name="ConvertToSportSIHint" xml:space="preserve">
+    <value>Назначить стоимости 10, 20, 30 и т.д.</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Копировать</value>
+  </data>
   <data name="Create" xml:space="preserve">
     <value>Создать</value>
   </data>
@@ -248,6 +290,9 @@
   </data>
   <data name="CreationDate" xml:space="preserve">
     <value>Дата создания</value>
+  </data>
+  <data name="Cut" xml:space="preserve">
+    <value>Вырезать</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
@@ -272,6 +317,12 @@
   </data>
   <data name="Encoding" xml:space="preserve">
     <value>Кодировка</value>
+  </data>
+  <data name="ExpandAll" xml:space="preserve">
+    <value>Свернуть всё</value>
+  </data>
+  <data name="ExpandAllMedia" xml:space="preserve">
+    <value>Развернуть всё медиа</value>
   </data>
   <data name="ExportAndPrint" xml:space="preserve">
     <value>Экспорт и печать</value>
@@ -394,6 +445,9 @@
   <data name="PackageType" xml:space="preserve">
     <value>Тип пакета</value>
   </data>
+  <data name="Paste" xml:space="preserve">
+    <value>Вставить</value>
+  </data>
   <data name="PlayQuestion" xml:space="preserve">
     <value>Запустить вопрос</value>
   </data>
@@ -454,6 +508,9 @@
   <data name="SaveAndExport" xml:space="preserve">
     <value>Сохранение и экспорт</value>
   </data>
+  <data name="Scale" xml:space="preserve">
+    <value>Масштаб</value>
+  </data>
   <data name="SearchFolder" xml:space="preserve">
     <value>Папка для поиска...</value>
   </data>
@@ -472,6 +529,9 @@
   <data name="SendErrorHeader" xml:space="preserve">
     <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
   </data>
+  <data name="SendToPCGame" xml:space="preserve">
+    <value>Отправить в компьютерную игру</value>
+  </data>
   <data name="SetLogo" xml:space="preserve">
     <value>Задать логотип</value>
   </data>
@@ -480,6 +540,9 @@
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
+  </data>
+  <data name="ShuffleQuestions" xml:space="preserve">
+    <value>Перемешать вопросы и стоимости</value>
   </data>
   <data name="SkipFragment" xml:space="preserve">
     <value>Пропустить фрагмент</value>
@@ -559,9 +622,6 @@
   <data name="UpdateException" xml:space="preserve">
     <value>При поиске обновления возникла следующая ошибка: {0}</value>
   </data>
-  <data name="UpdatePrices" xml:space="preserve">
-    <value>Задать стоимости</value>
-  </data>
   <data name="UpdatePricesOnDragAndDrop" xml:space="preserve">
     <value>Изменять стоимости вопросов при перетаскивании</value>
   </data>
@@ -570,6 +630,15 @@
   </data>
   <data name="Video" xml:space="preserve">
     <value>Видео</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Представление</value>
+  </data>
+  <data name="Wikify" xml:space="preserve">
+    <value>Викифицировать</value>
+  </data>
+  <data name="WikifyHint" xml:space="preserve">
+    <value>Вставить типографские кавычки, многоточие и тире</value>
   </data>
   <data name="WithStep" xml:space="preserve">
     <value>с шагом</value>

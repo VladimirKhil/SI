@@ -5,6 +5,7 @@ using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -101,7 +102,7 @@ public sealed class SearchFolderViewModel : WorkspaceViewModel
 
     public ObservableCollection<SearchResult> SearchResults { get; } = new();
 
-    private readonly MainViewModel _main = null; // TODO: remove dependency
+    private readonly MainViewModel _main; // TODO: remove dependency
 
     public SearchFolderViewModel(MainViewModel main)
     {

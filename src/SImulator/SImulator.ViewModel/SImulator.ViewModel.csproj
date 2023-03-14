@@ -7,7 +7,7 @@
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
     <Company>Khil-soft</Company>
-    <Version>2.11.3</Version>
+    <Version>2.12.0</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -16,6 +16,9 @@
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="ViewModel\GameViewModel.cs~RF2da1415e.TMP" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.Client\SIStorageService.Client.csproj" />

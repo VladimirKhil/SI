@@ -12,7 +12,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
 {
     public GameViewModel? GameViewModel { get; set; }
 
-    public IPresentationController PresentationController => GameViewModel.PresentationController;
+    public IPresentationController PresentationController => GameViewModel!.PresentationController;
 
     private readonly string _packageFolder;
 
@@ -28,20 +28,31 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
 
     public void OnAskAnswer(string mode)
     {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
-                PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
-                GameViewModel?.AskAnswerButtons();
+                GameViewModel.StartQuestionTimer();
+                GameViewModel.AskAnswerButton();
                 break;
 
             case StepParameterValues.AskAnswerMode_Direct:
-                GameViewModel?.AskAnswerDirect();
+                GameViewModel.AskAnswerDirect();
+                GameViewModel.State = Model.QuestionState.Thinking;
                 break;
 
             default:
                 break;
         }
+    }
+
+    public void OnButtonPressStart()
+    {
+        GameViewModel?.AskAnswerButton();
     }
 
     public void OnQuestionContentItem(ContentItem contentItem)
@@ -78,7 +89,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
                         }
                         else
                         {
-                            PresentationController?.SetQuestionContentType(QuestionContentType.None);
+                            PresentationController?.SetQuestionContentType(QuestionContentType.Void);
                         }
                         break;
 
@@ -93,12 +104,19 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
                         }
                         else
                         {
-                            PresentationController?.SetQuestionContentType(QuestionContentType.None);
+                            PresentationController.SetQuestionContentType(QuestionContentType.Void);
                         }
                         break;
 
+                    case AtomTypes.Html:
+                        PresentationController.SetMedia(new MediaSource(contentItem.Value), false);
+                        PresentationController.SetQuestionSound(false);
+                        PresentationController.SetSound();
+                        PresentationController.SetQuestionContentType(QuestionContentType.Html);
+                        break;
+
                     default:
-                        PresentationController?.SetQuestionContentType(QuestionContentType.None);
+                        PresentationController.SetQuestionContentType(QuestionContentType.Void);
                         break;
                 }
                 break;
@@ -129,6 +147,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
             default:
                 break;
         }
+
+        GameViewModel.ActiveContentItem = contentItem;
     }
 
     public void OnSetAnswerer(string mode, string? select, string? stakeVisibility)
@@ -165,6 +185,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
 
     public void OnSetTheme(string themeName)
     {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
         GameViewModel.CurrentTheme = themeName;
     }
 
@@ -187,15 +212,40 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
         return true;
     }
 
-    public void OnQuestionStart()
+    public void OnQuestionStart(bool buttonsRequired)
     {
         if (GameViewModel == null)
         {
             return;
         }
 
-        GameViewModel.LocalInfo.TStage = TableStage.Question;
+        GameViewModel.OnQuestionStart();
+        PresentationController.SetQuestionSound(false);
+        PresentationController.SetQuestionContentType(QuestionContentType.Void);
         PresentationController.SetStage(TableStage.Question);
+        PresentationController.SetSound();
+
+        if (buttonsRequired)
+        {
+            GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
+        }
+    }
+
+    public void OnAskAnswerStop()
+    {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
+        GameViewModel.State = Model.QuestionState.Normal;
+        PresentationController.SetSound();
+    }
+
+    public void OnContentStart()
+    {
+        // Do nothing for now
+        // It is possible to clear the screen when new content is arriving
     }
 
     public void OnSimpleRightAnswerStart()
@@ -205,8 +255,9 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
             return;
         }
 
+        PresentationController.SetQuestionSound(false);
+        PresentationController.SetQuestionContentType(QuestionContentType.Void);
         PresentationController.SetStage(TableStage.Answer);
-        PresentationController.SetQuestionStyle(QuestionStyle.Normal);
         PresentationController.SetSound();
         GameViewModel.OnRightAnswer();
     }

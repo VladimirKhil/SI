@@ -18,7 +18,6 @@
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.None}" />
 
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.Text}">
-                    
                     <TextBlock
                         Text="{Binding Content}"
                         VerticalAlignment="Center"
@@ -26,7 +25,6 @@
                         FontSize="30"
                         TextWrapping="Wrap"
                         TextAlignment="Center" />
-                    
                 </DataTemplate>
 
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.Image}">
@@ -45,15 +43,17 @@
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.Video}">
                     <MediaElement Source="{Binding Content}" LoadedBehavior="Play" />
                 </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static vmp:ContentTypes.Html}">
+                    <TextBlock Text="{Binding Content}" />
+                </DataTemplate>
             </lc:TemplateConverter.Templates>
         </lc:TemplateConverter>
 
         <lc:NotNullConverter x:Key="NotNullConverter" />
-
     </UserControl.Resources>
     
     <Grid>
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="3*" />
@@ -80,7 +80,6 @@
                 ContentTemplate="{Binding ContentType, Converter={StaticResource AtomContentSelector}}"
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center" />
-
             <Border.Style>
                 <Style TargetType="Border">
                     <Style.Triggers>
@@ -90,7 +89,6 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
-            
         </Border>
 
         <ContentControl Content="{Binding}">
@@ -128,6 +126,5 @@
             Command="{Binding Play}">
             <Image Source="{StaticResource PlayImage}" />
         </Button>
-
     </Grid>
 </UserControl>

@@ -177,44 +177,88 @@
                 <Separator />
                 
                 <siq:DropDownButton
-                    ToolTip="Действия"
+                    ToolTip="{x:Static lp:Resources.Actions}"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch">
                     <Border Padding="5">
                         <Path Data="M0,0L10,0M0,3L10,3M0,6L10,6" Stroke="#FF555555" StrokeThickness="2" Stretch="UniformToFill" />
                     </Border>
+                    
                     <siq:DropDownButton.Resources>
                         <Style TargetType="{x:Type Image}">
                             <Setter Property="Width" Value="16" />
                             <Setter Property="Height" Value="16" />
                         </Style>
                     </siq:DropDownButton.Resources>
+                    
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
-                            <MenuItem Header="Вырезать" Command="ApplicationCommands.Cut" />
-                            <MenuItem Header="Копировать" Command="ApplicationCommands.Copy" />
-                            <MenuItem Header="Вставить" Command="ApplicationCommands.Paste" />
+                            <MenuItem Header="{x:Static lp:Resources.Cut}" Command="ApplicationCommands.Cut" />
+                            <MenuItem Header="{x:Static lp:Resources.Copy}" Command="ApplicationCommands.Copy" />
+                            <MenuItem Header="{x:Static lp:Resources.Paste}" Command="ApplicationCommands.Paste" />
                             <Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Оформить для Теле- и Комп-SIGame" ToolTip="Разбить по раундам и назначить телевизионные стоимости" Command="{Binding ConvertToCompTvSI}" />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Поправить для Теле- и Комп-SIGame" ToolTip="Изменить названия тем, убрать точки в конце вопросов" Command="{Binding ConvertToCompTvSISimple}" />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Оформить для Спорт-SIGame" ToolTip="Назначить стоимости 10, 20, 30 и т.д." Command="{Binding ConvertToSportSI}" />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Оформить для &quot;Миллионера&quot;" ToolTip="Разбить на группы по 15 вопросов" Command="{Binding ConvertToMillionaire}" />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Викифицировать" ToolTip="Вставить типографские кавычки, многоточие и тире" Command="{Binding Wikify}">
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.ConvertToCompSI}"
+                                ToolTip="{x:Static lp:Resources.ConvertToCompSIHint}"
+                                Command="{Binding ConvertToCompTvSI}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.ConvertToCompSISimple}"
+                                ToolTip="{x:Static lp:Resources.ConvertToCompSISimpleHint}"
+                                Command="{Binding ConvertToCompTvSISimple}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.ConvertToSportSI}"
+                                ToolTip="{x:Static lp:Resources.ConvertToSportSIHint}"
+                                Command="{Binding ConvertToSportSI}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.ConvertToMillionaire}"
+                                ToolTip="{x:Static lp:Resources.ConvertToMillionaireHint}"
+                                Command="{Binding ConvertToMillionaire}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.Wikify}"
+                                ToolTip="{x:Static lp:Resources.WikifyHint}"
+                                Command="{Binding Wikify}">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource WikifyImage}"/>
                                 </MenuItem.Icon>
                             </MenuItem>
+                            
                             <Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Присоединить пакет…" ToolTip="Присоединение другого файла вопросов" Command="{Binding ImportSiq}">
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.AttachPackage}"
+                                ToolTip="{x:Static lp:Resources.AttachPackageHint}"
+                                Command="{Binding ImportSiq}">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource SiqImage}" />
                                 </MenuItem.Icon>
                             </MenuItem>
+                            
                             <Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Свернуть всё медиа" Command="{Binding CollapseAllMedia}" />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Развернуть всё медиа" Command="{Binding ExpandAllMedia}" />
-                            <Separator />
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="Отправить в компьютерную игру" Command="{Binding SendToGame}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.CollapseAllMedia}"
+                                Command="{Binding CollapseAllMedia}" />
+                            
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.ExpandAllMedia}"
+                                Command="{Binding ExpandAllMedia}" />
+                            
+                            <!-- Temporary disabled -->
+                            <!--<Separator />
+                            <MenuItem Style="{StaticResource CommandRoutedItem}" Header="{x:Static lp:Resources.SendToPCGame}" Command="{Binding SendToGame}" />-->
                         </ContextMenu>
                     </siq:DropDownButton.DropDown>
                 </siq:DropDownButton>
@@ -224,7 +268,7 @@
                 <ComboBox
                     VerticalAlignment="Stretch"
                     Margin="2,0"
-                    ToolTip="Представление"
+                    ToolTip="{x:Static lp:Resources.View}"
                     Style="{StaticResource ComboBoxCommon}"
                     ItemsSource="{Binding Source={StaticResource ViewModes}}"
                     SelectedItem="{Binding View, Source={x:Static m:AppSettings.Default}}"
@@ -238,11 +282,20 @@
                 
                 <Separator Style="{StaticResource TreeOnly}" />
                 
-                <Button Name="bExpand" ToolTip="Свернуть всё" Command="{Binding ExpandAll}" CommandParameter="False" Style="{StaticResource TreeOnlyButton}">
+                <Button
+                    Name="bExpand"
+                    ToolTip="{x:Static lp:Resources.ExpandAll}"
+                    Command="{Binding ExpandAll}"
+                    CommandParameter="False"
+                    Style="{StaticResource TreeOnlyButton}">
                     <Path Stretch="Uniform" Fill="#FF177E00" Margin="2" Data="{Binding Source={StaticResource app_collapsed},Path=Data}" />
                 </Button>
-                
-                <Button ToolTip="Развернуть всё" Command="{Binding ExpandAll}" CommandParameter="True" Style="{StaticResource TreeOnlyButton}">
+
+                <Button
+                    ToolTip="{x:Static lp:Resources.CollapseAll}"
+                    Command="{Binding ExpandAll}"
+                    CommandParameter="True"
+                    Style="{StaticResource TreeOnlyButton}">
                     <Path Stretch="Uniform" Fill="#FF177E00" Margin="3" Data="{Binding Source={StaticResource app_expanded},Path=Data}" />
                 </Button>
                 
@@ -254,7 +307,7 @@
                     Value="{Binding FlatScale, Source={x:Static m:AppSettings.Default}, Converter={StaticResource EnumToDoubleConverter}}"
                     Width="100"
                     VerticalAlignment="Center"
-                    ToolTip="Масштаб">
+                    ToolTip="{x:Static lp:Resources.Scale}">
                     <Slider.Style>
                         <Style TargetType="Slider">
                             <Style.Triggers>
@@ -429,6 +482,7 @@
                             <DataTemplate />
                         </Setter.Value>
                     </Setter>
+                    
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsChecked, ElementName=bSidebar}" Value="True">
                             <Setter Property="ContentTemplate">

@@ -516,7 +516,7 @@ public sealed class QDocument : WorkspaceViewModel
             };
 
             var changesFileName = System.IO.Path.Combine(path, ChangesFileName);
-            await File.WriteAllTextAsync(changesFileName, System.Text.Json.JsonSerializer.Serialize(changes), cancellationToken);
+            await File.WriteAllTextAsync(changesFileName, JsonSerializer.Serialize(changes), cancellationToken);
 
             _logger.LogInformation("Document has been autosaved to {path}", contentFileName);
 
@@ -525,9 +525,9 @@ public sealed class QDocument : WorkspaceViewModel
         cancellationToken);
     }
 
-    private string _filename = null;
+    private string? _filename = null;
 
-    public string FileName
+    public string? FileName
     {
         get => _filename;
         set
@@ -771,7 +771,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void Object_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (OperationsManager.IsMakingUndo || sender == null)
+        if (sender == null)
         {
             return;
         }
@@ -923,7 +923,10 @@ public sealed class QDocument : WorkspaceViewModel
                 return;
         }
 
-        OperationsManager.AddChange(new CollectionChange((IList)sender, e));            
+        if (!OperationsManager.IsMakingUndo)
+        {
+            OperationsManager.AddChange(new CollectionChange((IList)sender, e));
+        }
     }
 
     public StorageContextViewModel StorageContext { get; set; }
@@ -1000,9 +1003,11 @@ public sealed class QDocument : WorkspaceViewModel
             round.IsExpanded = true;
         }
 
-        Images = new MediaStorageViewModel(this, Document.Images, "Изображения");
-        Audio = new MediaStorageViewModel(this, Document.Audio, "Аудио");
-        Video = new MediaStorageViewModel(this, Document.Video, "Видео");
+        var msvmLogger = loggerFactory.CreateLogger<MediaStorageViewModel>();
+
+        Images = new MediaStorageViewModel(this, Document.Images, Resources.Images, msvmLogger);
+        Audio = new MediaStorageViewModel(this, Document.Audio, SIPackages.Properties.Resources.Audio, msvmLogger);
+        Video = new MediaStorageViewModel(this, Document.Video, SIPackages.Properties.Resources.Video, msvmLogger);
 
         Images.Changed += OperationsManager.AddChange;
         Audio.Changed += OperationsManager.AddChange;
@@ -1019,7 +1024,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void OperationsManager_Changed() => Changed = true; // TODO: delegate all change logic to OperationsManager
 
-    private async void SendToGame_Executed(object arg)
+    private async void SendToGame_Executed(object? arg)
     {
         try
         {
@@ -1822,7 +1827,7 @@ public sealed class QDocument : WorkspaceViewModel
                 }
                 else
                 {
-                    _logger.LogWarning("File {filePath} not exist", filePath);
+                    _logger.LogWarning("ExportMediaCollection: File {filePath} not exist", filePath);
                 }
             }
             else
@@ -1843,7 +1848,7 @@ public sealed class QDocument : WorkspaceViewModel
                 }
                 else
                 {
-                    _logger.LogWarning("Stream for item {name} of category {categoryName} not exist", item.Model.Name, mediaStorageViewModel.Name);
+                    _logger.LogWarning("ExportMediaCollection: Stream for item {name} of category {categoryName} not exist", item.Model.Name, mediaStorageViewModel.Name);
                 }
             }
         }
@@ -1869,7 +1874,7 @@ public sealed class QDocument : WorkspaceViewModel
         var infoOwner = (IItemViewModel)arg;
         var parent = infoOwner.Owner;
 
-        while (parent != null) // Раскрываем донизу
+        while (parent != null) // Expanding to leaf
         {
             parent.IsExpanded = true;
             parent = parent.Owner;
@@ -2172,7 +2177,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private async void Wikify_Executed(object arg)
+    private async void Wikify_Executed(object? arg)
     {
         IsProgress = true;
 
@@ -2553,7 +2558,7 @@ public sealed class QDocument : WorkspaceViewModel
         change.Commit();
     }
 
-    private void ConvertToSportSI_Executed(object arg)
+    private void ConvertToSportSI_Executed(object? arg)
     {
         try
         {
@@ -2578,7 +2583,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private void ConvertToMillionaire_Executed(object arg)
+    private void ConvertToMillionaire_Executed(object? arg)
     {
         using var change = OperationsManager.BeginComplexChange();
         var allq = new List<QuestionViewModel>();
@@ -2664,14 +2669,14 @@ public sealed class QDocument : WorkspaceViewModel
 
     #endregion
 
-    private void SelectThemes_Executed(object arg)
+    private void SelectThemes_Executed(object? arg)
     {
         var selectThemesViewModel = new SelectThemesViewModel(this, _loggerFactory);
         selectThemesViewModel.NewItem += OnNewItem;
         Dialog = selectThemesViewModel;
     }
 
-    private void PlayQuestion_Executed(object arg) => Dialog = new QuestionPlayViewModel((Question)arg, this);
+    private void PlayQuestion_Executed(object? arg) => Dialog = new QuestionPlayViewModel((QuestionViewModel)arg, this);
 
     private async void ExpandAll_Executed(object? arg)
     {
@@ -2691,7 +2696,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private void CollapseAllMedia_Executed(object arg) => ToggleMedia(false);
+    private void CollapseAllMedia_Executed(object? arg) => ToggleMedia(false);
 
     private void ToggleMedia(bool expand)
     {
@@ -2710,9 +2715,9 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private void ExpandAllMedia_Executed(object arg) => ToggleMedia(true);
+    private void ExpandAllMedia_Executed(object? arg) => ToggleMedia(true);
 
-    private void Delete_Executed(object arg) => ActiveNode?.Remove?.Execute(null);
+    private void Delete_Executed(object? arg) => ActiveNode?.Remove?.Execute(null);
 
     /// <summary>
     /// Loads media files from provided folder.
@@ -2838,65 +2843,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                 try
                 {
-                    Package.Rounds.Merge(
-                        package.Rounds,
-                        round => new RoundViewModel(round),
-                        (roundViewModel, round) =>
-                        {
-                            roundViewModel.Info.Authors.Merge(round.Info.Authors);
-                            roundViewModel.Info.Sources.Merge(round.Info.Sources);
-                            roundViewModel.Info.Comments.Text = round.Info.Comments.Text;
-
-                            roundViewModel.Model.Name = round.Name;
-                            roundViewModel.Model.Type = round.Type;
-
-                            roundViewModel.Themes.Merge(
-                                round.Themes,
-                                theme => new ThemeViewModel(theme),
-                                (themeViewModel, theme) =>
-                                {
-                                    themeViewModel.Info.Authors.Merge(theme.Info.Authors);
-                                    themeViewModel.Info.Sources.Merge(theme.Info.Sources);
-                                    themeViewModel.Info.Comments.Text = theme.Info.Comments.Text;
-
-                                    themeViewModel.Model.Name = theme.Name;
-
-                                    themeViewModel.Questions.Merge(
-                                        theme.Questions,
-                                        question => new QuestionViewModel(question),
-                                        (questionViewModel, question) =>
-                                        {
-                                            questionViewModel.Info.Authors.Merge(question.Info.Authors);
-                                            questionViewModel.Info.Sources.Merge(question.Info.Sources);
-                                            questionViewModel.Info.Comments.Text = question.Info.Comments.Text;
-
-                                            questionViewModel.Model.Price = question.Price;
-                                            questionViewModel.Type.Name = question.Type.Name;
-
-                                            questionViewModel.Right.Merge(question.Right);
-                                            questionViewModel.Wrong.Merge(question.Wrong);
-
-                                            questionViewModel.Type.Params.Merge(
-                                                question.Type.Params,
-                                                p => new QuestionTypeParamViewModel(p),
-                                                (vm, p) =>
-                                                {
-                                                    vm.Model.Name = p.Name;
-                                                    vm.Model.Value = p.Value;
-                                                });
-
-                                            questionViewModel.Scenario.Merge(
-                                                question.Scenario,
-                                                atom => new AtomViewModel(atom),
-                                                (atomViewModel, atom) =>
-                                                {
-                                                    atomViewModel.Model.Type = atom.Type;
-                                                    atomViewModel.Model.Text = atom.Text;
-                                                    atomViewModel.Model.AtomTime = atom.AtomTime;
-                                                });
-                                        });
-                                });
-                        });
+                    MergePackage(package);
                 }
                 finally
                 {
@@ -2922,6 +2869,8 @@ public sealed class QDocument : WorkspaceViewModel
                 var changesText = File.ReadAllText(changesFile);
                 var changes = JsonSerializer.Deserialize<MediaChanges>(changesText);
 
+                _logger.LogInformation("Restore changes: {changes}", changesText);
+
                 Images.RestoreChanges(changes.ImagesChanges);
                 Audio.RestoreChanges(changes.AudioChanges);
                 Video.RestoreChanges(changes.VideoChanges);
@@ -2931,5 +2880,68 @@ public sealed class QDocument : WorkspaceViewModel
         }
 
         folder.Delete(true);
+    }
+
+    private void MergePackage(Package package)
+    {
+        Package.Rounds.Merge(
+            package.Rounds,
+            round => new RoundViewModel(round),
+            (roundViewModel, round) =>
+            {
+                roundViewModel.Info.Authors.Merge(round.Info.Authors);
+                roundViewModel.Info.Sources.Merge(round.Info.Sources);
+                roundViewModel.Info.Comments.Text = round.Info.Comments.Text;
+
+                roundViewModel.Model.Name = round.Name;
+                roundViewModel.Model.Type = round.Type;
+
+                roundViewModel.Themes.Merge(
+                    round.Themes,
+                    theme => new ThemeViewModel(theme),
+                    (themeViewModel, theme) =>
+                    {
+                        themeViewModel.Info.Authors.Merge(theme.Info.Authors);
+                        themeViewModel.Info.Sources.Merge(theme.Info.Sources);
+                        themeViewModel.Info.Comments.Text = theme.Info.Comments.Text;
+
+                        themeViewModel.Model.Name = theme.Name;
+
+                        themeViewModel.Questions.Merge(
+                            theme.Questions,
+                            question => new QuestionViewModel(question),
+                            (questionViewModel, question) =>
+                            {
+                                questionViewModel.Info.Authors.Merge(question.Info.Authors);
+                                questionViewModel.Info.Sources.Merge(question.Info.Sources);
+                                questionViewModel.Info.Comments.Text = question.Info.Comments.Text;
+
+                                questionViewModel.Model.Price = question.Price;
+                                questionViewModel.Type.Name = question.Type.Name;
+
+                                questionViewModel.Right.Merge(question.Right);
+                                questionViewModel.Wrong.Merge(question.Wrong);
+
+                                questionViewModel.Type.Params.Merge(
+                                    question.Type.Params,
+                                    p => new QuestionTypeParamViewModel(p),
+                                    (vm, p) =>
+                                    {
+                                        vm.Model.Name = p.Name;
+                                        vm.Model.Value = p.Value;
+                                    });
+
+                                questionViewModel.Scenario.Merge(
+                                    question.Scenario,
+                                    atom => new AtomViewModel(atom),
+                                    (atomViewModel, atom) =>
+                                    {
+                                        atomViewModel.Model.Type = atom.Type;
+                                        atomViewModel.Model.Text = atom.Text;
+                                        atomViewModel.Model.AtomTime = atom.AtomTime;
+                                    });
+                            });
+                    });
+            });
     }
 }

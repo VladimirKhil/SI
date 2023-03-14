@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -81,9 +82,13 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     public SimpleCommand SaveAll { get; private set; }
 
     public ICommand About { get; private set; }
+
     public ICommand Feedback { get; private set; }
+
     public ICommand Donate { get; private set; }
+
     public ICommand SetSettings { get; private set; }
+
     public ICommand SearchFolder { get; private set; }
 
     #endregion

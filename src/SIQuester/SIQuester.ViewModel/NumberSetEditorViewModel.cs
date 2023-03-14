@@ -109,7 +109,7 @@ public sealed class NumberSetEditorViewModel : ModelViewBase
             _ => CoerceIgnoreStep(_model)
         };
 
-        _onValueChanged(NumberSetTypeConverter.SerializeNumberSet(modelToUse));
+        _onValueChanged(modelToUse.ToString());
     }
 
     private static NumberSet CoerceIgnoreStep(NumberSet model) =>

@@ -71,7 +71,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         }
     }
 
-    public IConnector Connector { get; set; }
+    public IConnector? Connector { get; set; }
 
     public IViewerLogic MyLogic => _logic;
 
@@ -1869,20 +1869,12 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
         ClientData.MessageSending = null;
 
-        // Пересоздадим обработчик и логику
-        IViewerClient viewer = null;
-        switch (role)
+        IViewerClient viewer = role switch
         {
-            case GameRole.Viewer:
-                viewer = new SimpleViewer(_client, newAccount, IsHost, LO, ClientData);
-                break;
-            case GameRole.Player:
-                viewer = new Player(_client, newAccount, IsHost, LO, ClientData);
-                break;
-            case GameRole.Showman:
-                viewer = new Showman(_client, newAccount, IsHost, LO, ClientData);
-                break;
-        }
+            GameRole.Viewer => new SimpleViewer(_client, newAccount, IsHost, LO, ClientData),
+            GameRole.Player => new Player(_client, newAccount, IsHost, LO, ClientData),
+            _ => new Showman(_client, newAccount, IsHost, LO, ClientData),
+        };
 
         if (oldAccount is PersonAccount current)
         {
@@ -1890,7 +1882,6 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         }
 
         viewer.Avatar = Avatar;
-        // TODO: Больше ничего не надо переносить в новый IViewerClient?
 
         viewer.Init();
 

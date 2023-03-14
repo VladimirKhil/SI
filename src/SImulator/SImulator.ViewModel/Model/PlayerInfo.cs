@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace SImulator.ViewModel.Model;
 
 /// <summary>
-/// Информация об игроке
+/// Defines extended player info.
 /// </summary>
 [DataContract]
 public sealed class PlayerInfo : SimplePlayerInfo
@@ -36,14 +36,14 @@ public sealed class PlayerInfo : SimplePlayerInfo
     }
 
     /// <summary>
-    /// Момент блокировки кнопки
+    /// Button blocking time.
     /// </summary>
     internal DateTime? BlockedTime { get; set; }
 
     private bool _isRegistered;
 
     /// <summary>
-    /// Зарегистрирован ли игрок (для веб-доступа к кнопкам)
+    /// Is the player registered in web buttons mode.
     /// </summary>
     public bool IsRegistered
     {

@@ -16,12 +16,32 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         throw new NotImplementedException();
     }
 
+    public void OnAskAnswerStop()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnButtonPressStart()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnContentStart()
+    {
+        throw new NotImplementedException();
+    }
+
     public void OnQuestionContentItem(ContentItem contentItem)
     {
         throw new NotImplementedException();
     }
 
     public void OnQuestionStart()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnQuestionStart(bool questionRequiresButtons)
     {
         throw new NotImplementedException();
     }

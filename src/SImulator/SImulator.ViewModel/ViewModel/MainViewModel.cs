@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SImulator.ViewModel;
 
@@ -41,7 +42,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     private IButtonManager? _buttonManager;
 
-    private readonly SimpleUICommand _start;
+    private readonly AsyncCommand _start;
 
     private readonly SimpleCommand _selectPackage;
     private readonly SimpleCommand _selectVideo;
@@ -54,7 +55,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     private readonly SimpleUICommand _setPlayerButton;
     private readonly SimpleCommand _removePlayerButton;
 
-    public ICommand Start => _start;
+    public IAsyncCommand Start => _start;
 
     public ICommand SelectPackage => _selectPackage;
     public ICommand SelectVideoFile => _selectVideo;
@@ -139,9 +140,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private GameViewModel _game;
+    private GameViewModel? _game;
 
-    public GameViewModel Game
+    public GameViewModel? Game
     {
         get => _game;
         private set
@@ -174,7 +175,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ModeTransition Transition
     {
-        get { return _transition; }
+        get => _transition;
         set { _transition = value; OnPropertyChanged(); }
     }
 
@@ -196,7 +197,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Settings = settings;
         SettingsViewModel = new AppSettingsViewModel(Settings);
 
-        _start = new SimpleUICommand(Start_Executed) { Name = Resources.StartGame };
+        _start = new AsyncCommand(Start_Executed);
 
         _selectPackage = new SimpleCommand(SelectPackage_Executed);
         SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
@@ -340,9 +341,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async Task<string> PreparePackageAsync()
+    private async Task<string> PreparePackageAsync(CancellationToken cancellationToken = default)
     {
-        var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(_cancellationTokenSource.Token);
+        var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(cancellationToken);
 
         var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
 
@@ -351,7 +352,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             tempDir,
             ExtractedFileNamingModes.Unescape,
             long.MaxValue,
-            cancellationToken: _cancellationTokenSource.Token);
+            cancellationToken: cancellationToken);
 
         if (isTemporary)
         {
@@ -374,7 +375,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             AutomaticGame = options.AutomaticGame,
             PlaySpecials = options.PlaySpecials,
             ThinkingTime = options.ThinkingTime,
-            UseNewEngine = false
+            UseNewEngine = true
         };
     }
 
@@ -386,7 +387,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             if (string.IsNullOrWhiteSpace(logsFolder))
             {
-                PlatformManager.Instance.ShowMessage("Папка для записи логов не задана! Логи вестись не будут.");
+                PlatformManager.Instance.ShowMessage(Resources.LogsFolderNotSetWarning);
                 return PlatformManager.Instance.CreateLogger(null);
             }
             else
@@ -397,7 +398,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
                 catch (Exception exc)
                 {
-                    PlatformManager.Instance.ShowMessage(string.Format("Ошибка создания файла лога: {0}.\r\n\r\nЛог записываться не будет.", exc.Message), false);
+                    PlatformManager.Instance.ShowMessage(string.Format(Resources.LoggerCreationWarning, exc.Message), false);
                     return PlatformManager.Instance.CreateLogger(null);
                 }
             }
@@ -411,14 +412,14 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Starts the game.
     /// </summary>
-    private async void Start_Executed(object? _)
+    private async Task Start_Executed(object? _)
     {
         try
         {
             _start.CanBeExecuted = false;
             IsStarting = true;
 
-            var tempDir = await PreparePackageAsync();
+            var tempDir = await PreparePackageAsync(_cancellationTokenSource.Token);
 
             ISIEngine engine;
 
@@ -448,6 +449,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             };
 
             presentationController.UpdateSettings(SettingsViewModel.SIUISettings.Model);
+            presentationController.UpdateShowPlayers(SettingsViewModel.Model.ShowPlayers);
             presentationController.Error += ShowError;
 
             var logger = CreateLogger();
@@ -783,19 +785,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         // Do nothing; the command is activated by key press
     }
 
-    private void ShowError(string error)
-    {
-        PlatformManager.Instance.ShowMessage(error);
-    }
+    private void ShowError(string error) => PlatformManager.Instance.ShowMessage(error);
 
     /// <summary>
-    /// Вывести сообщение об ошибке
+    /// Shows error message.
     /// </summary>
-    /// <param name="exc"></param>
-    private void ShowError(Exception exc)
-    {
-        ShowError($"{Resources.Error}: {exc.Message}");
-    }
+    /// <param name="exc">Error to show.</param>
+    private void ShowError(Exception exc) => ShowError($"{Resources.Error}: {exc.Message}");
 
     private void UpdateStartCommand()
     {
@@ -808,7 +804,6 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         _selectPackage.CanBeExecuted = _selectVideo.CanBeExecuted = _selectLogsFolder.CanBeExecuted = Mode == GameMode.Start;
 
         UpdateStartCommand();
-
         UpdatePlayersView();
     }
 

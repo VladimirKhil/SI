@@ -491,4 +491,37 @@ theme - тема Кота</value>
   <data name="Statistic" xml:space="preserve">
     <value>Статистика</value>
   </data>
+  <data name="Images" xml:space="preserve">
+    <value>Изображения</value>
+  </data>
+  <data name="ExportAndPrint" xml:space="preserve">
+    <value>экспорт и печать</value>
+  </data>
+  <data name="GamePackageTooLarge" xml:space="preserve">
+    <value>Размер файла превышает 100 Мб!</value>
+  </data>
+  <data name="NewPackage" xml:space="preserve">
+    <value>Новый пакет</value>
+  </data>
+  <data name="Options" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="PackageServerFull" xml:space="preserve">
+    <value>в настоящий момент на сервере нет места для принятия новых пакетов</value>
+  </data>
+  <data name="SendPackageErrorHeader" xml:space="preserve">
+    <value>Не удалось отправить пакет</value>
+  </data>
+  <data name="SendPackageSuccess" xml:space="preserve">
+    <value>Пакет успешно отправлен!</value>
+  </data>
+  <data name="SendToGame" xml:space="preserve">
+    <value>Отправка пакета в компьютерную игру</value>
+  </data>
+  <data name="SIGameQuestions" xml:space="preserve">
+    <value>Вопросы SIGame</value>
+  </data>
+  <data name="ThemesSelection" xml:space="preserve">
+    <value>выбор тем</value>
+  </data>
 </root>

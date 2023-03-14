@@ -1,26 +1,31 @@
 ﻿using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Diagnostics;
 using System.Text;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Represents a document export view model.
+/// </summary>
 public sealed class ExportViewModel : WorkspaceViewModel
 {
-    private readonly QDocument _source = null;
+    private readonly QDocument _source;
 
-    public override string Header => _source.Document.Package.Name + ": экспорт и печать";
+    public override string Header => $"{_source.Document.Package.Name}: {Resources.ExportAndPrint}";
 
     public ICommand Save { get; private set; }
     public ICommand Print { get; private set; }
 
-    private IFlowDocumentWrapper _documentWrapper = null;
+    private IFlowDocumentWrapper? _documentWrapper = null;
 
-    private object _document = null;
+    private object? _document = null;
 
-    public object Document
+    public object? Document
     {
         get => _document;
         set
@@ -74,7 +79,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
         BuildDocument();
     }
 
-    private async void Save_Executed(object arg)
+    private async void Save_Executed(object? arg)
     {
         try
         {
@@ -219,7 +224,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
             },
             sr => sr.Write("\r\n}\r\n"));
 
-    private void Print_Executed(object arg)
+    private void Print_Executed(object? arg)
     {
         if (_documentWrapper.Print())
         {

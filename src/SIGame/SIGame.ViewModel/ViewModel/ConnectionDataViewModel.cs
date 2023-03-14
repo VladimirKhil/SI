@@ -46,7 +46,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     protected SecondaryNode _node;
     protected Client _client;
     protected IViewerClient _host;
-    protected Connector _connector;
+    protected Connector? _connector;
 
     protected virtual string[] ContentPublicBaseUrls { get; } = null;
 

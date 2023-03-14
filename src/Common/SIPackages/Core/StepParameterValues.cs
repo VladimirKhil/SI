@@ -6,11 +6,6 @@
 public static class StepParameterValues
 {
     /// <summary>
-    /// Answer content reference.
-    /// </summary>
-    public const string ContentRef_Answer = "answer";
-
-    /// <summary>
     /// Defines a fallback right answer to use when a primary answer ref is missing.
     /// </summary>
     /// <remarks>

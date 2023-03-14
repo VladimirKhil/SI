@@ -21,6 +21,11 @@ public interface IQuestionEnginePlayHandler
     void OnAskAnswer(string mode);
 
     /// <summary>
+    /// Allows to press the button.
+    /// </summary>
+    void OnButtonPressStart();
+
+    /// <summary>
     /// Sets question answerer(s).
     /// </summary>
     /// <param name="mode">Set answerer mode.</param>
@@ -50,10 +55,21 @@ public interface IQuestionEnginePlayHandler
     /// <summary>
     /// Handles question start.
     /// </summary>
-    void OnQuestionStart();
+    /// <param name="buttonsRequired">Whether the question requires buttons to play.</param>
+    void OnQuestionStart(bool buttonsRequired);
+
+    /// <summary>
+    /// Handles content start.
+    /// </summary>
+    void OnContentStart();
 
     /// <summary>
     /// Handles simple right answer start.
     /// </summary>
     void OnSimpleRightAnswerStart();
+
+    /// <summary>
+    /// Handles the ending of asking for an answer.
+    /// </summary>
+    void OnAskAnswerStop();
 }

@@ -76,6 +76,14 @@ public class NumberSet : IEquatable<NumberSet>, INotifyPropertyChanged
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(Minimum, Maximum, Step);
 
+    /// <inheritdoc />
+    public override string ToString() =>
+        Minimum == Maximum
+            ? Minimum.ToString()
+            : ((Step == Maximum - Minimum || Step == 0)
+                ? $"[{Minimum};{Maximum}]"
+                : $"[{Minimum};{Maximum}]/{Step}");
+
     /// <summary>
     /// Raises object property change event.
     /// </summary>

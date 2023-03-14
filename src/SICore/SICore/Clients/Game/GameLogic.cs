@@ -4448,7 +4448,7 @@ public sealed class GameLogic : Logic<GameData>
             quest.Type.Name = QuestionTypes.BagCat;
 
             quest.Type[QuestionTypeParams.Cat_Theme] = round.Themes[ti].Name;
-            quest.Type[QuestionTypeParams.Cat_Cost] = NumberSetTypeConverter.SerializeNumberSet(GenerateRandomSecretQuestionCost());
+            quest.Type[QuestionTypeParams.Cat_Cost] = GenerateRandomSecretQuestionCost().ToString();
 
             int var = Random.Shared.Next(2);
 

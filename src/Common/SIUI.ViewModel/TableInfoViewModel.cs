@@ -102,7 +102,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private string _text = "";
 
     /// <summary>
-    /// Текст вопроса (заголовка)
+    /// Displayed text.
     /// </summary>
     public string Text
     {
@@ -158,7 +158,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private int _playerIndex = -1;
 
     /// <summary>
-    /// Номер выигравшего кнопку игрока
+    /// Index of player who wins the button competition.
     /// </summary>
     public int PlayerIndex
     {
@@ -176,7 +176,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private bool _animateText = false;
 
     /// <summary>
-    /// Анимировать ли текст вопроса
+    /// Should the question text be animated as it is reading aloud.
     /// </summary>
     public bool AnimateText
     {
@@ -205,7 +205,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private double _timeLeft = 1.0;
 
     /// <summary>
-    /// Оставшаяся доля времени на нажатие кнопки (от 0.0 до 1.0)
+    /// Left time percentage for pressing game button (from 0.0 to 1.0).
     /// </summary>
     public double TimeLeft
     {
@@ -216,7 +216,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private bool _selectable = false;
 
     /// <summary>
-    /// Можно ли выбирать на табло тему/вопрос
+    /// Can a theme/question be selected right now.
     /// </summary>
     public bool Selectable
     {
@@ -270,7 +270,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private MediaSource? _mediaSource;
 
     /// <summary>
-    /// Мультимедийный источник
+    /// Multimedia source.
     /// </summary>
     public MediaSource? MediaSource
     {
@@ -281,7 +281,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private MediaSource _soundSource;
 
     /// <summary>
-    /// Звуковой источник
+    /// Background sound source.
     /// </summary>
     public MediaSource SoundSource
     {
@@ -290,7 +290,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     }
 
     /// <summary>
-    /// Темы игры
+    /// Game themes collection.
     /// </summary>
     public List<string> GameThemes => _model.GameThemes;
 
@@ -299,7 +299,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public QuestionContentType QuestionContentType
     {
         get => _questionContentType;
-        set { _questionContentType = value; OnPropertyChanged(); }
+        set { if (_questionContentType != value) { _questionContentType = value; OnPropertyChanged(); } }
     }
 
     private QuestionStyle _questionStyle = QuestionStyle.Normal;
@@ -307,7 +307,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public QuestionStyle QuestionStyle
     {
         get => _questionStyle;
-        set { _questionStyle = value; OnPropertyChanged(); }
+        set { if (_questionStyle != value) { _questionStyle = value; OnPropertyChanged(); } }
     }
 
     private bool _sound = false;
@@ -321,7 +321,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private bool _enabled = false;
 
     /// <summary>
-    /// Можно ли выбирать что-то на табло
+    /// Is table interactive.
     /// </summary>
     public bool Enabled
     {
@@ -332,7 +332,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private double _volume = 0.5;
 
     /// <summary>
-    /// Громкость звука
+    /// Sound volume level.
     /// </summary>
     public double Volume
     {
@@ -351,15 +351,16 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public event Action<double> VolumeChanged;
 
     /// <summary>
-    /// Стоимости вопросов в раунде
+    /// Questions prices table.
     /// </summary>
     public IList<ThemeInfoViewModel> RoundInfo { get; } = new ObservableCollection<ThemeInfoViewModel>();
 
     public object RoundInfoLock { get; } = new object();
 
     /// <summary>
-    /// Список игроков, отображаемых на табло в особом режиме игры
+    /// Game players.
     /// </summary>
+    [Obsolete]
     public IList<SimplePlayerInfo> Players { get; private set; } = new ObservableCollection<SimplePlayerInfo>();
 
     private SettingsViewModel _settings;

@@ -1,33 +1,21 @@
 ﻿using SIPackages;
-using SIPackages.Core;
-using System;
-using System.Linq;
 
 namespace SIEngine;
 
 /// <summary>
-/// Defines a simplified SIGame engine. Simplified game omits special questions and final round.
+/// Defines a simplified SIGame engine. Simplified game engine plays questions sequentially.
 /// </summary>
 public sealed class SportEngine : EngineBase
 {
     public override int LeftQuestionsCount => throw new NotImplementedException();
 
     public SportEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
-        : base(document, optionsProvider, questionEngineFactory)
-    {
+        : base(document, optionsProvider, questionEngineFactory) { }
 
-    }
-
-    private void SetActiveTheme()
-    {
-        _activeTheme = _activeRound.Themes[_themeIndex];
-    }
+    private void SetActiveTheme() => _activeTheme = _activeRound.Themes[_themeIndex];
 
     private void SetActiveQuestion() => _activeQuestion = _activeTheme.Questions[_questionIndex];
 
-    /// <summary>
-    /// Перейти к следующему шагу игры
-    /// </summary>
     public override void MoveNext()
     {
         switch (_stage)
@@ -116,6 +104,8 @@ public sealed class SportEngine : EngineBase
 
             case GameStage.EndQuestion:
                 #region EndQuestion
+                OnQuestionFinish();
+
                 if (_timeout) // Round timeout
                 {
                     OnSound("timeout.wav");
@@ -152,6 +142,7 @@ public sealed class SportEngine : EngineBase
     public override Tuple<int, int, int> MoveBack()
     {
         _questionIndex--;
+
         if (_questionIndex < 0)
         {
             do
@@ -199,8 +190,6 @@ public sealed class SportEngine : EngineBase
 
         return false;
     }
-
-    public override bool AcceptRound(Round? round) => base.AcceptRound(round) && round.Type != RoundTypes.Final;
 
     public override bool CanNext() => _stage != GameStage.End;
 

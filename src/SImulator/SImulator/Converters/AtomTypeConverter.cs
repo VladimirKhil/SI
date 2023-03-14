@@ -27,6 +27,7 @@ public sealed class AtomTypeConverter : IValueConverter
             AtomTypes.Text => "",
             AtomTypes.Image => Resources.Image,
             AtomTypes.Audio => Resources.Audio,
+            AtomTypes.AudioNew => Resources.Audio,
             AtomTypes.Video => Resources.Video,
             AtomTypes.Oral => Resources.Oral,
             AtomTypes.Html => Resources.Html,

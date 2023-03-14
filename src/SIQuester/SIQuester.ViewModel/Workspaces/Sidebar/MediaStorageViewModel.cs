@@ -1,9 +1,11 @@
-﻿using SIPackages;
+﻿using Microsoft.Extensions.Logging;
+using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Model;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -80,11 +82,14 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     public event Action? HasChanged;
 
-    public MediaStorageViewModel(QDocument document, DataCollection collection, string header)
+    private readonly ILogger<MediaStorageViewModel> _logger;
+
+    public MediaStorageViewModel(QDocument document, DataCollection collection, string header, ILogger<MediaStorageViewModel> logger)
     {
         _document = document;
         _header = header;
         _name = collection.Name;
+        _logger = logger;
 
         FillFiles(collection);
 
@@ -413,6 +418,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             }
             catch (Exception exc)
             {
+                _logger.LogWarning(exc, "PreviewAdd error: {error}", exc.Message);
                 OnError(exc);
                 return;
             }

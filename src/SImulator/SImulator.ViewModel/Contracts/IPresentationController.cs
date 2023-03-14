@@ -27,7 +27,7 @@ public interface IPresentationController
 
     void SetStage(TableStage stage);
 
-    void SetText(string text);
+    void SetText(string text = "");
 
     void SetQuestionContentType(QuestionContentType questionContentType);
 
@@ -45,6 +45,8 @@ public interface IPresentationController
 
     void UpdateSettings(Settings settings);
 
+    void UpdateShowPlayers(bool showPlayers);
+
     void SetSound(string sound = "");
 
     void PlaySimpleSelection(int theme, int quest);
@@ -53,7 +55,7 @@ public interface IPresentationController
 
     void PlaySelection(int theme);
 
-    void SetPlayer(int playerIndex);
+    void SetActivePlayerIndex(int playerIndex);
 
     void AddLostButtonPlayer(string name);
 

@@ -23,7 +23,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected GameStage _stage = GameStage.Begin;
 
     /// <summary>
-    /// Стадия игры
+    /// Current game state.
     /// </summary>
     public GameStage Stage
     {
@@ -142,7 +142,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         || _stage == GameStage.QuestionPostInfo
         || _stage == GameStage.RightAnswer;
 
-    public bool CanReturnToQuestion() => _activeRound != null
+    public bool CanReturnToQuestion() =>
+        _activeRound != null
         && _activeRound.Type != RoundTypes.Final
         && _activeQuestion != null && _activeQuestion.Type.Name == QuestionTypes.Simple;
 
@@ -174,48 +175,49 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     #region Events
 
-    public event Action<Package, IMedia> Package;
-    public event Action<string[]> GameThemes;
-    public event Action<bool> NextRound;
-    public event Action<Round> Round;
-    public event Action<Theme[]> RoundThemes;
-    public event Action<Theme> Theme;
-    public event Action<Question> Question;
-    public event Action<int, int, Theme, Question> QuestionSelected;
+    public event Action<Package, IMedia>? Package;
+    public event Action<string[]>? GameThemes;
+    public event Action<bool>? NextRound;
+    public event Action<Round>? Round;
+    public event Action<Theme[]>? RoundThemes;
+    public event Action<Theme>? Theme;
+    public event Action<Question>? Question;
+    public event Action<int, int, Theme, Question>? QuestionSelected;
 
-    public event Action<Atom> QuestionAtom;
-    public event Action<string, IMedia> QuestionText;
-    public event Action<string> QuestionOral;
-    public event Action<IMedia, IMedia> QuestionImage;
-    public event Action<IMedia> QuestionSound;
-    public event Action<IMedia> QuestionVideo;
-    public event Action<IMedia> QuestionHtml;
-    public event Action<Atom> QuestionOther;
-    public event Action<Question, bool, bool> QuestionProcessed;
-    public event Action QuestionFinished;
-    public event Action<Question, bool> WaitTry;
-    public event Action<string> SimpleAnswer;
-    public event Action RightAnswer;
-    public event Action QuestionPostInfo;
+    public event Action<Atom>? QuestionAtom;
+    public event Action<string, IMedia>? QuestionText;
+    public event Action<string>? QuestionOral;
+    public event Action<IMedia, IMedia>? QuestionImage;
+    public event Action<IMedia>? QuestionSound;
+    public event Action<IMedia>? QuestionVideo;
+    public event Action<IMedia>? QuestionHtml;
+    public event Action<Atom>? QuestionOther;
+    public event Action<Question, bool, bool>? QuestionProcessed;
+    public event Action? QuestionFinished;
+    public event Action<Question, bool>? WaitTry;
+    public event Action<string>? SimpleAnswer;
+    public event Action? RightAnswer;
+    public event Action? QuestionPostInfo;
 
-    public event Action ShowScore;
-    public event Action LogScore;
-    public event Action<int, int> EndQuestion;
-    public event Action RoundEmpty;
-    public event Action NextQuestion;
-    public event Action RoundTimeout;
+    public event Action? ShowScore;
+    public event Action? LogScore;
+    public event Action<int, int>? EndQuestion;
+    public event Action? QuestionFinish;
+    public event Action? RoundEmpty;
+    public event Action? NextQuestion;
+    public event Action? RoundTimeout;
 
-    public event Action<Theme[]> FinalThemes;
-    public event Action WaitDelete;
-    public event Action<int> ThemeSelected;
-    public event Action<Theme, Question> PrepareFinalQuestion;
+    public event Action<Theme[]>? FinalThemes;
+    public event Action? WaitDelete;
+    public event Action<int>? ThemeSelected;
+    public event Action<Theme, Question>? PrepareFinalQuestion;
 
     [Obsolete]
-    public event Action<string> Sound;
+    public event Action<string>? Sound;
 
-    public event Action<string> Error;
+    public event Action<string>? Error;
 
-    public event Action EndGame;
+    public event Action? EndGame;
 
     #endregion
 
@@ -226,6 +228,9 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         _questionEngineFactory = questionEngineFactory;
     }
 
+    /// <summary>
+    /// Moves engine to the next game state.
+    /// </summary>
     public abstract void MoveNext();
 
     public abstract Tuple<int, int, int> MoveBack();
@@ -280,6 +285,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnShowScore() => ShowScore?.Invoke();
 
     protected void OnLogScore() => LogScore?.Invoke();
+
+    protected void OnQuestionFinish() => QuestionFinish?.Invoke();
 
     protected void OnEndQuestion(int themeIndex, int questionIndex) => EndQuestion?.Invoke(themeIndex, questionIndex);
 
@@ -429,8 +436,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         return true;
     }
 
-    public virtual bool AcceptRound(Round? round) =>
-        round != null && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice));
+    public bool AcceptRound(Round? round) =>
+        round != null
+        && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)
+        && (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null)));
 
     public virtual bool MoveBackRound()
     {
@@ -481,10 +490,16 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     }
 
     /// <summary>
-    /// Skips rest of the question and goes directly to the answer.
+    /// Skips rest of the question and goes directly to answer.
     /// </summary>
     public void MoveToAnswer()
     {
+        if (QuestionEngine != null)
+        {
+            QuestionEngine.MoveToAnswer();
+            return;
+        }
+
         if (Stage == GameStage.Question && _atomIndex < _activeQuestion.Scenario.Count)
         {
             do
@@ -828,22 +843,31 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         AutoNext(5000);
     }
+
     protected void OnMoveToQuestion(bool isFinal = false)
     {
         Stage = isFinal ? GameStage.FinalQuestion : GameStage.Question;
 
-        if (OptionsProvider().UseNewEngine && _activeQuestion != null)
+        var options = OptionsProvider();
+
+        if (options.UseNewEngine && _activeQuestion != null)
         {
-            QuestionEngine = _questionEngineFactory.CreateEngine(_activeQuestion, isFinal);
+            QuestionEngine = _questionEngineFactory.CreateEngine(
+                _activeQuestion,
+                new QuestionEngineOptions
+                {
+                    FalseStarts = options.IsPressMode
+                        ? (options.IsMultimediaPressMode ? FalseStartMode.Enabled : FalseStartMode.TextContentOnly)
+                        : FalseStartMode.Disabled,
+                    ShowSimpleRightAnswers = options.ShowRight
+                });
         }
     }
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public void Dispose()
     {

@@ -92,17 +92,18 @@ namespace SIPackages.Containers
             await stream.CopyToAsync(writeStream, cancellationToken);
         }
 
-        public void DeleteStream(string category, string name)
+        public bool DeleteStream(string category, string name)
         {
             var entryName = $"{category}/{Uri.EscapeUriString(name)}";
             var entry = _zipArchive.GetEntry(entryName);
 
             if (entry == null)
             {
-                throw new Exception($"Entry \"{entryName}\" not found");
+                return false;
             }
 
             entry.Delete();
+            return true;
         }
 
         public ISIPackageContainer CopyTo(Stream stream, bool closeCurrent, out bool isNew)

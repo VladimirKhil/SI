@@ -51,12 +51,12 @@ public sealed class Comments : PropertyChangedNotifier, IEquatable<Comments>
     /// </summary>
     /// <param name="left">Left comment.</param>
     /// <param name="right">Right comment.</param>
-    public static bool operator ==(Comments left, Comments right) => left.Equals(right);
+    public static bool operator ==(Comments? left, Comments? right) => Equals(left, right);
 
     /// <summary>
     /// Checks that two comments are not equal to each other.
     /// </summary>
     /// <param name="left">Left comment.</param>
     /// <param name="right">Right comment.</param>
-    public static bool operator !=(Comments left, Comments right) => !left.Equals(right);
+    public static bool operator !=(Comments? left, Comments? right) => !(left == right);
 }

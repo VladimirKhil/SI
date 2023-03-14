@@ -124,6 +124,24 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка создания файла лога: {0}. Лог записываться не будет.
+        /// </summary>
+        internal static string LoggerCreationWarning {
+            get {
+                return ResourceManager.GetString("LoggerCreationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Папка для записи логов не задана! Логи вестись не будут.
+        /// </summary>
+        internal static string LogsFolderNotSetWarning {
+            get {
+                return ResourceManager.GetString("LogsFolderNotSetWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Дальше.
         /// </summary>
         internal static string Next {

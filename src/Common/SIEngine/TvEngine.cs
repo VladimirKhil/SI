@@ -117,12 +117,11 @@ public sealed class TvEngine : EngineBase
                 {
                     var point = _forward.Pop();
                     UpdateCanNext();
+
                     _themeIndex = point.Item1;
                     _questionIndex = point.Item2;
 
-                    SetActiveThemeQuestion();
-
-                    OnQuestionSelected(false);
+                    OnQuestionSelected();
                 }
 
                 // Do nothing
@@ -167,6 +166,7 @@ public sealed class TvEngine : EngineBase
             case GameStage.EndQuestion:
                 #region EndQuestion
 
+                OnQuestionFinish();
                 OnEndQuestion(_themeIndex, _questionIndex);
 
                 if (_timeout) // Round timeout
@@ -280,7 +280,14 @@ public sealed class TvEngine : EngineBase
     {
         if (QuestionEngine != null)
         {
-            // TODO
+            if (!QuestionEngine.PlayNext())
+            {
+                OnQuestionFinished();
+                Stage = GameStage.QuestionPostInfo;
+                MoveNext();
+            }
+
+            return;
         }
 
         var playMode = PlayQuestionAtom();
@@ -296,9 +303,6 @@ public sealed class TvEngine : EngineBase
             AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
         }
     }
-
-    public override bool AcceptRound(Round? round) => base.AcceptRound(round) &&
-        (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null));
 
     public override Tuple<int, int, int> MoveBack()
     {
@@ -337,7 +341,8 @@ public sealed class TvEngine : EngineBase
         _themeIndex = theme;
         _questionIndex = question;
 
-        SetActiveThemeQuestion();
+        _forward.Clear();
+        UpdateCanNext();
 
         OnQuestionSelected();
     }
@@ -366,16 +371,12 @@ public sealed class TvEngine : EngineBase
         UpdateCanNext();
     }
 
-    private void OnQuestionSelected(bool clearForward = true)
+    private void OnQuestionSelected()
     {
+        SetActiveThemeQuestion();
+
         _history.Push((_themeIndex, _questionIndex));
         CanMoveBack = true;
-
-        if (clearForward)
-        {
-            _forward.Clear();
-            UpdateCanNext();
-        }
 
         if (_activeQuestion.Type.Name != QuestionTypes.Simple && !OptionsProvider().PlaySpecials)
         {
@@ -421,7 +422,8 @@ public sealed class TvEngine : EngineBase
 
         if (_stage == GameStage.Question)
         {
-            if (_activeQuestion.Type.Name == QuestionTypes.Simple)
+            if (_activeQuestion.TypeName == null && _activeQuestion.Type.Name == QuestionTypes.Simple
+                || _activeQuestion.TypeName == QuestionTypes.Simple)
             {
                 MoveNext();
             }

@@ -413,7 +413,21 @@
 
                     <localc:TemplateConverter x:Key="QuestionContentSelector">
                         <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Void}" />
+
+                            <!-- Deprecated -->
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.None}">
+                                <ContentControl Style="{StaticResource Rotator}">
+                                    <Border Background="Transparent">
+                                        <TextBlock
+                                            Text="&amp;"
+                                            Style="{StaticResource RotatingText}"
+                                            FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                    </Border>
+                                </ContentControl>
+                            </DataTemplate>
+                            
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Clef}">
                                 <ContentControl Style="{StaticResource Rotator}">
                                     <Border Background="Transparent">
                                         <TextBlock
@@ -716,45 +730,6 @@
                                     
                                     <ContentControl Name="PART_Bottom" Grid.Row="0" />
                                 </Grid>
-                                
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Settings.Model.ShowScore}" Value="True">
-                                        <Setter TargetName="PART_Table" Property="Grid.RowSpan" Value="1" />
-                                        <Setter TargetName="PART_Table" Property="Grid.Row" Value="1" />
-                                        
-                                        <Setter TargetName="PART_Bottom" Property="Content">
-                                            <Setter.Value>
-                                                <ItemsControl ItemsSource="{Binding Players}">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <UniformGrid Rows="1" />
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                    
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate DataType="local:SimplePlayerInfo">
-                                                            <UniformGrid Rows="2" Columns="1">
-                                                                <ContentControl>
-                                                                    <TextBlock
-                                                                        Text="{Binding Name}"
-                                                                        Style="{StaticResource CenteredText}"
-                                                                        lb:FillManager.Fill="True" />
-                                                                </ContentControl>
-                                                                
-                                                                <ContentControl>
-                                                                    <TextBlock
-                                                                        Text="{Binding Sum}"
-                                                                        Style="{StaticResource CenteredText}"
-                                                                        lb:FillManager.Fill="True" />
-                                                                </ContentControl>
-                                                            </UniformGrid>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.Score}">

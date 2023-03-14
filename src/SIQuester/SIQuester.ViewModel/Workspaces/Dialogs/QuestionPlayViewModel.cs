@@ -2,15 +2,17 @@
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Workspaces.Dialogs.Play;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
 
 /// <summary>
 /// Defines a view model for question player.
 /// </summary>
-public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHandler
+public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEnginePlayHandler
 {
-    private readonly QuestionProcessor _questionProcessor;
+    private readonly QuestionEngine _questionEngine;
+    private readonly QDocument _qDocument;
 
     private bool _isFinished;
 
@@ -34,12 +36,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHan
         }
     }
 
-    private string _content;
+    private string? _content;
 
     /// <summary>
     /// Current question content.
     /// </summary>
-    public string Content
+    public string? Content
     {
         get => _content;
         set
@@ -52,12 +54,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHan
         }
     }
 
-    private string _sound;
+    private string? _sound;
 
     /// <summary>
     /// Current background sound.
     /// </summary>
-    public string Sound
+    public string? Sound
     {
         get => _sound;
         set
@@ -70,12 +72,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHan
         }
     }
 
-    private string _oral;
+    private string? _oral;
 
     /// <summary>
     /// Current oral text.
     /// </summary>
-    public string Oral
+    public string? Oral
     {
         get => _oral;
         set
@@ -116,14 +118,22 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHan
     /// </summary>
     /// <param name="question">Question to play.</param>
     /// <param name="document">Document that holds the question media content.</param>
-    public QuestionPlayViewModel(Question question, QDocument document)
+    public QuestionPlayViewModel(QuestionViewModel question, QDocument document)
     {
-        _questionProcessor = new QuestionProcessor(question, new MediaSource(document), this);
+        var questionClone = question.Model.Clone();
+        questionClone.Upgrade(question.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final);
+
+        _questionEngine = new QuestionEngine(
+            questionClone,
+            new QuestionEngineOptions { FalseStarts = FalseStartMode.Enabled, ShowSimpleRightAnswers = true },
+            this);
+
+        _qDocument = document;
 
         Play = new SimpleCommand(Play_Executed);
     }
 
-    public void Play_Executed(object arg)
+    public void Play_Executed(object? arg)
     {
         if (_isFinished)
         {
@@ -132,68 +142,108 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionPlayHan
 
         IsAnswer = false;
 
-        _isFinished = !_questionProcessor.PlayNext();
+        _isFinished = !_questionEngine.PlayNext();
 
-        if (_isFinished)
+        Play.CanBeExecuted = _questionEngine.CanNext;
+    }
+
+    public void OnQuestionContentItem(ContentItem contentItem)
+    {
+        switch (contentItem.Placement)
         {
-            Play.CanBeExecuted = false;
+            case ContentPlacements.Replic:
+                Oral = contentItem.Value;
+                break;
+
+            case ContentPlacements.Screen:
+                switch (contentItem.Type)
+                {
+                    case AtomTypes.Text:
+                        Content = contentItem.Value;
+                        ContentType = ContentTypes.Text;
+                        break;
+
+                    case AtomTypes.Image:
+                        Content = contentItem.IsRef ? _qDocument.Images.Wrap(contentItem.Value).Uri : contentItem.Value;
+                        ContentType = ContentTypes.Image;
+                        break;
+
+                    case AtomTypes.Video:
+                        Content = contentItem.IsRef ? _qDocument.Video.Wrap(contentItem.Value).Uri : contentItem.Value;
+                        ContentType = ContentTypes.Video;
+                        break;
+
+                    case AtomTypes.Html:
+                        Content = contentItem.Value;
+                        ContentType = ContentTypes.Html;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case ContentPlacements.Background:
+                Sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
+
+                if (ContentType == ContentTypes.None)
+                {
+                    ContentType = ContentTypes.Audio;
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
-    public void OnText(string text, IMedia backgroundSound)
-    {
-        Content = text;
-        Sound = backgroundSound?.Uri;
-        ContentType = ContentTypes.Text;
-    }
-
-    public void OnOral(string oralText)
-    {
-        Oral = oralText;
-    }
-
-    public void OnImage(IMedia image, IMedia backgroundSound)
-    {
-        Content = image.Uri;
-        Sound = backgroundSound?.Uri;
-        ContentType = ContentTypes.Image;
-    }
-
-    public void OnSound(IMedia sound)
-    {
-        Sound = sound.Uri;
-        ContentType = ContentTypes.Audio;
-    }
-
-    public void OnVideo(IMedia video)
-    {
-        Content = video.Uri;
-        ContentType = ContentTypes.Video;
-    }
-
-    public void OnUnsupportedAtom(Atom atom)
-    {
-        Content = string.Format(Properties.Resources.UnsupportedFragment, atom.Text);
-        ContentType = ContentTypes.Text;
-    }
-
-    public void AskAnswer()
+    public void OnAskAnswer(string mode)
     {
         IsAnswer = true;
-        Oral = null;
     }
 
-    /// <inheritdoc cref="IMediaSource" />
-    private class MediaSource : IMediaSource
+    public void OnButtonPressStart()
     {
-        private readonly QDocument _document;
+        
+    }
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="MediaSource" /> class.
-        /// </summary>
-        /// <param name="document"></param>
-        public MediaSource(QDocument document) => _document = document;
+    public void OnSetAnswerer(string mode, string? select, string? stakeVisibility)
+    {
+        
+    }
 
-        public IMedia GetMedia(Atom atom) => _document.Wrap(atom);
+    public void OnSetPrice(string mode, NumberSet? availableRange)
+    {
+        
+    }
+
+    public void OnSetTheme(string themeName)
+    {
+        
+    }
+
+    public void OnAccept()
+    {
+        
+    }
+
+    public void OnQuestionStart(bool buttonsRequired)
+    {
+        
+    }
+
+    public void OnContentStart()
+    {
+        
+    }
+
+    public void OnSimpleRightAnswerStart()
+    {
+        
+    }
+
+    public void OnAskAnswerStop()
+    {
+        
     }
 }

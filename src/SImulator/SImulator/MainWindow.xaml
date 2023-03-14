@@ -2,21 +2,38 @@
     x:Class="SImulator.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Title="Игровое табло"
+    Title="{x:Static lp:Resources.PresentationTitle}"
     mc:Ignorable="d"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:my="clr-namespace:SIUI;assembly=SIUI"
+    xmlns:lp="clr-namespace:SImulator.Properties"
     Closing="Window_Closing"
-    xmlns:lb="clr-namespace:SImulator.Behaviors"
+    xmlns:lb="clr-namespace:SImulator.Behaviors"    
+    xmlns:uib="clr-namespace:SIUI.Behaviors;assembly=SIUI"
+    xmlns:uic="clr-namespace:SIUI.Converters;assembly=SIUI"
+    xmlns:uivm="clr-namespace:SIUI.ViewModel;assembly=SIUI.ViewModel"
     Icon="Images/logo.png"
     WindowState="Normal"
     WindowStyle="None"
     Width="400"
     Height="300"
-    xmlns:lvm="clr-namespace:SImulator.ViewModel;assembly=SImulator.ViewModel"
-    d:DataContext="{d:DesignInstance lvm:RemoteGameUI}"
+    xmlns:lvmc="clr-namespace:SImulator.ViewModel.Controllers;assembly=SImulator.ViewModel"
+    d:DataContext="{d:DesignInstance lvmc:PresentationController}"
     lb:MainWindowBehavior.IsAttached="True">
+    <Window.Resources>
+        <uic:FontConverter x:Key="FontConverter" />
+
+        <DropShadowEffect x:Key="Shadow" ShadowDepth="1" BlurRadius="4" Opacity="1" />
+        
+        <Style x:Key="CenteredText" TargetType="{x:Type TextBlock}">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="Effect" Value="{StaticResource Shadow}" />
+        </Style>
+    </Window.Resources>
+    
     <Window.InputBindings>
         <MouseBinding Gesture="LeftClick" Command="{Binding Next}" />
         <MouseBinding Gesture="RightClick" Command="{Binding Stop}" />
@@ -25,14 +42,83 @@
         <KeyBinding Key="Escape" Command="{Binding Stop}" />
         <KeyBinding Key="F4" Modifiers="Alt" Command="{Binding Stop}" />
     </Window.InputBindings>
-    
+
     <Grid>
-        <my:Table x:Name="table" DataContext="{Binding TInfo}" />
-        
+        <ContentControl Content="{Binding}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="6*" />
+                        </Grid.RowDefinitions>
+
+                        <ContentControl x:Name="players" Content="{Binding}" />
+
+                        <my:Table x:Name="table" DataContext="{Binding TInfo}" Grid.RowSpan="2" />
+                    </Grid>
+
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding ShowPlayers}" Value="True">
+                            <Setter TargetName="table" Property="Grid.RowSpan" Value="1" />
+                            <Setter TargetName="table" Property="Grid.Row" Value="1" />
+
+                            <Setter TargetName="players" Property="ContentTemplate">
+                                <Setter.Value>
+                                    <DataTemplate>
+                                        <ItemsControl
+                                            ItemsSource="{Binding Players}"
+                                            FontFamily="{Binding TInfo.Settings.Model.TableFontFamily, Converter={StaticResource FontConverter}}"
+                                            Background="{Binding TInfo.Settings.Model.TableBackColorString}"
+                                            Foreground="{Binding TInfo.Settings.Model.TableColorString}"
+                                            Margin="0,0,0,1">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <UniformGrid Rows="1" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="local:SimplePlayerInfo">
+                                                    <UniformGrid x:Name="player" Rows="2" Columns="1">
+                                                        <!-- Content controls required for FillManager to work correctly -->
+                                                        
+                                                        <ContentControl Margin="7,7,7,2">
+                                                            <TextBlock
+                                                                Text="{Binding Name}"
+                                                                Style="{StaticResource CenteredText}"
+                                                                uib:FillManager.Fill="True" />
+                                                        </ContentControl>
+
+                                                        <ContentControl Margin="7,2,7,7">
+                                                            <TextBlock
+                                                                Text="{Binding Sum}"
+                                                                Style="{StaticResource CenteredText}"
+                                                                uib:FillManager.Fill="True" />
+                                                        </ContentControl>
+                                                    </UniformGrid>
+
+                                                    <DataTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding State}" Value="{x:Static uivm:PlayerState.Active}">
+                                                            <Setter TargetName="player" Property="Background" Value="LightYellow" />
+                                                        </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </DataTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
+
         <TextBlock
             Name="hint"
             Visibility="Collapsed"
-            Text="Для выхода нажмите Escape, правую кнопку мыши или немного надавите пальцем"
+            Text="{x:Static lp:Resources.PresentationExitHint}"
             FontSize="25"
             Padding="0,10"
             TextWrapping="Wrap"

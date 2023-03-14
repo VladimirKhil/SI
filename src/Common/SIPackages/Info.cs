@@ -1,4 +1,5 @@
-﻿using SIPackages.TypeConverters;
+﻿using SIPackages.Core;
+using SIPackages.TypeConverters;
 using System.ComponentModel;
 
 namespace SIPackages;
@@ -7,7 +8,7 @@ namespace SIPackages;
 /// Contains package item information.
 /// </summary>
 [TypeConverter(typeof(InfoTypeConverter))]
-public sealed class Info : IEquatable<Info>
+public sealed class Info : PropertyChangedNotifier, IEquatable<Info>
 {
     /// <summary>
     /// Item authors.
@@ -25,13 +26,33 @@ public sealed class Info : IEquatable<Info>
     [DefaultValue(typeof(Comments), "")]
     public Comments Comments { get; } = new();
 
+    private Comments? _showmanComments = null;
+
+    /// <summary>
+    /// Item comments for showman.
+    /// </summary>
+    [DefaultValue(typeof(Comments), "")]
+    public Comments? ShowmanComments
+    {
+        get => _showmanComments;
+        set
+        {
+            if (!Equals(_showmanComments, value))
+            {
+                var oldValue = _showmanComments;
+                _showmanComments = value;
+                OnPropertyChanged(oldValue);
+            }
+        }
+    }
+
     /// <summary>
     /// Item extension data.
     /// </summary>
     public string? Extension { get; set; }
 
     /// <inheritdoc />
-    public override string ToString() => string.Format("[{0}, {1}, {2}]", Authors, Sources, Comments);
+    public override string ToString() => string.Format("[{0}, {1}, {2}, {3}]", Authors, Sources, Comments, ShowmanComments);
 
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is Info other && Equals(other);
@@ -41,10 +62,11 @@ public sealed class Info : IEquatable<Info>
         other is not null
         && Authors.Equals(other.Authors)
         && Sources.Equals(other.Sources)
-        && Comments.Equals(other.Comments);
+        && Comments.Equals(other.Comments)
+        && Equals(ShowmanComments, other.ShowmanComments);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Authors, Sources, Comments);
+    public override int GetHashCode() => HashCode.Combine(Authors, Sources, Comments, ShowmanComments);
 
     /// <summary>
     /// Checks that two infos are equal to each other.

@@ -4,13 +4,16 @@ using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
 
 namespace SImulator.ViewModel.Controllers;
 
 /// <inheritdoc cref="IPresentationController" />
-public sealed class PresentationController : IPresentationController
+public sealed class PresentationController : IPresentationController, INotifyPropertyChanged
 {
     private int _previousCode = -1;
 
@@ -27,6 +30,11 @@ public sealed class PresentationController : IPresentationController
 
     public TableInfoViewModel TInfo { get; private set; }
 
+    /// <summary>
+    /// Game players.
+    /// </summary>
+    public IList<SimplePlayerInfo> Players { get; private set; } = new ObservableCollection<SimplePlayerInfo>();
+
     public ICommand Next { get; private set; }
 
     public ICommand Back { get; private set; }
@@ -42,6 +50,18 @@ public sealed class PresentationController : IPresentationController
     public int ScreenIndex { get; set; }
 
     public event Action<Exception>? Error;
+
+    private bool _showPlayers = false;
+
+    /// <summary>
+    /// Show players and scores.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool ShowPlayers
+    {
+        get => _showPlayers;
+        set { if (_showPlayers != value) { _showPlayers = value; OnPropertyChanged(); } }
+    }
 
     public PresentationController()
     {
@@ -91,7 +111,7 @@ public sealed class PresentationController : IPresentationController
         });
     }
 
-    private void TInfo_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void TInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TableInfoViewModel.TStage))
         {
@@ -183,13 +203,35 @@ public sealed class PresentationController : IPresentationController
 
     public void SetText(string text) => TInfo.Text = text;
 
-    public void SetQuestionContentType(QuestionContentType questionContentType) => TInfo.QuestionContentType = questionContentType;
+    public void SetQuestionContentType(QuestionContentType questionContentType)
+    {
+        try
+        {
+            TInfo.QuestionContentType = questionContentType;
+        }
+        catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+        {
+            // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+            return;
+        }
+    }
 
     public void SetQuestionStyle(QuestionStyle questionStyle) => TInfo.QuestionStyle = questionStyle;
 
-    public void SetQuestionSound(bool sound) => TInfo.Sound = sound;
+    public void SetQuestionSound(bool sound)
+    {
+        TInfo.Sound = sound;
 
-    public void AddPlayer() => TInfo.Players.Add(new SimplePlayerInfo());
+        TInfo.QuestionContentType = TInfo.QuestionContentType == QuestionContentType.Void
+            ? QuestionContentType.Clef
+            : TInfo.QuestionContentType;
+    }
+
+    public void AddPlayer()
+    {
+        TInfo.Players.Add(new SimplePlayerInfo()); // deprecated
+        Players.Add(new SimplePlayerInfo());
+    }
 
     public void RemovePlayer(string playerName)
     {
@@ -199,9 +241,20 @@ public sealed class PresentationController : IPresentationController
         {
             TInfo.Players.Remove(player);
         }
+
+        var player2 = Players.FirstOrDefault(p => p.Name == playerName);
+
+        if (player2 != null)
+        {
+            Players.Remove(player2);
+        }
     }
 
-    public void ClearPlayers() => TInfo.Players.Clear();
+    public void ClearPlayers()
+    {
+        TInfo.Players.Clear();
+        Players.Clear();
+    }
 
     public void UpdatePlayerInfo(int index, PlayerInfo player)
     {
@@ -211,11 +264,20 @@ public sealed class PresentationController : IPresentationController
             p.Sum = player.Sum;
             p.Name = player.Name;
         }
+
+        if (index > -1 && index < Players.Count)
+        {
+            var p = Players[index];
+            p.Sum = player.Sum;
+            p.Name = player.Name;
+            p.State = player.State;
+        }
     }
 
     public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
     {
         TInfo.RoundInfo.Clear();
+
         foreach (var theme in themes)
         {
             TInfo.RoundInfo.Add(theme);
@@ -286,6 +348,8 @@ public sealed class PresentationController : IPresentationController
 
     public void UpdateSettings(Settings settings) => TInfo.Settings.Initialize(settings);
 
+    public void UpdateShowPlayers(bool showPlayers) => ShowPlayers = showPlayers;
+
     public bool OnKeyPressed(GameKey key)
     {
         lock (TInfo.TStageLock)
@@ -354,10 +418,17 @@ public sealed class PresentationController : IPresentationController
         return false;
     }
 
-    public void SetPlayer(int playerIndex)
+    public void SetActivePlayerIndex(int playerIndex)
     {
-        TInfo.PlayerIndex = playerIndex;
-        TInfo.QuestionStyle = QuestionStyle.Pressed;
+        if (!ShowPlayers)
+        {
+            TInfo.PlayerIndex = playerIndex;
+        }
+
+        for (var i = 0; i < Players.Count; i++)
+        {
+            Players[i].State = i == playerIndex ? PlayerState.Active : PlayerState.None;
+        }
     }
 
     public void AddLostButtonPlayer(string name)
@@ -390,4 +461,9 @@ public sealed class PresentationController : IPresentationController
     public void SetCaption(string caption) => TInfo.Caption = caption;
 
     public void SetLeftTime(double leftTime) => TInfo.TimeLeft = leftTime;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
