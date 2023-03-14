@@ -4,6 +4,7 @@ using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -13,7 +14,7 @@ namespace SIQuester.ViewModel;
 public sealed class NewViewModel : WorkspaceViewModel
 {
     private PackageType _packageType = PackageType.Classic;
-    private string _packageName = "Вопросы SIGame";
+    private string _packageName = Resources.SIGameQuestions;
     private string _packageAuthor = Environment.UserName;
 
     /// <summary>
@@ -21,7 +22,7 @@ public sealed class NewViewModel : WorkspaceViewModel
     /// </summary>
     public ICommand Create { get; }
 
-    public override string Header => "Новый пакет";
+    public override string Header => Resources.NewPackage;
 
     public PackageType PackageType
     {

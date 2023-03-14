@@ -1,15 +1,19 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
+/// <inheritdoc cref="IItemsViewModel" />
 public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewModel
 {
     public ICommand AddItem { get; private set; }
+
     public new SimpleCommand RemoveItem { get; private set; }
 
     public SimpleCommand MoveLeft { get; private set; }
+
     public SimpleCommand MoveRight { get; private set; }
 
     public abstract QDocument? OwnerDocument { get; }
@@ -24,6 +28,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
             if (_currentPosition != value)
             {
                 _currentPosition = value;
+
                 if (_currentPosition > -1 && _currentPosition < Count)
                 {
                     CurrentItem = this[_currentPosition];
@@ -63,8 +68,7 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
 
     protected ItemsViewModel() => Init();
 
-    protected ItemsViewModel(IEnumerable<T> collection)
-        : base(collection) => Init();
+    protected ItemsViewModel(IEnumerable<T> collection) : base(collection) => Init();
 
     private void Init()
     {
@@ -73,6 +77,17 @@ public abstract class ItemsViewModel<T> : ObservableCollection<T>, IItemsViewMod
 
         MoveLeft = new SimpleCommand(MoveLeft_Executed);
         MoveRight = new SimpleCommand(MoveRight_Executed);
+
+        PropertyChanged += ItemsViewModel_PropertyChanged;
+    }
+
+    private void ItemsViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Count))
+        {
+            CurrentPosition = IndexOf(_currentItem);
+            UpdateCommands();
+        }
     }
 
     public void UpdateCommands()

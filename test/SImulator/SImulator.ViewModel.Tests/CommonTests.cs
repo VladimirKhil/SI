@@ -14,7 +14,7 @@ public sealed class CommonTests
     }
 
     [Test]
-    public void SimpleRun()
+    public async Task SimpleRun()
     {
         var appSettings = new AppSettings();
         var main = new MainViewModel(appSettings)
@@ -22,7 +22,7 @@ public sealed class CommonTests
             PackageSource = new TestPackageSource()
         };
 
-        main.Start.Execute(null);
+        await main.Start.ExecuteAsync(null);
 
         var game = main.Game;
         Assert.NotNull(game);

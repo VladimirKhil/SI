@@ -1,7 +1,6 @@
 ﻿using SIEngine;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Contracts;
-using SImulator.ViewModel.Controllers;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
@@ -162,6 +161,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
         }
     }
+
+    private bool _playingQuestionType = false;
 
     private int _price;
 
@@ -408,6 +409,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _engine.ShowScore += Engine_ShowScore;
         _engine.LogScore += LogScore;
         _engine.QuestionPostInfo += Engine_QuestionPostInfo;
+        _engine.QuestionFinish += Engine_QuestionFinish;
         _engine.EndQuestion += Engine_EndQuestion;
         _engine.RoundTimeout += Engine_RoundTimeout;
         _engine.NextQuestion += Engine_NextQuestion;
@@ -425,6 +427,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
     }
+
+    private void Engine_QuestionFinish() => ClearState();
 
     private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -833,6 +837,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Engine_Question(Question question)
     {
         question.Upgrade();
+        ActiveQuestion = question;
 
         PresentationController.SetText(question.Price.ToString());
         PresentationController.SetStage(TableStage.QuestionPrice);
@@ -842,7 +847,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         LocalInfo.Text = question.Price.ToString();
         LocalInfo.TStage = TableStage.QuestionPrice;
-        ActiveQuestion = question;
+
+        _playingQuestionType = true;
     }
 
     private void SetCaption(string caption) => PresentationController.SetCaption(Settings.Model.ShowTableCaption ? caption : "");
@@ -902,12 +908,71 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 return;
             }
 
+            if (_playingQuestionType)
+            {
+                _playingQuestionType = false;
+
+                if (PlayQuestionType())
+                {
+                    return;
+                }
+            }
+
             _engine.MoveNext();
         }
         catch (Exception exc)
         {
             PlatformManager.Instance.ShowMessage($"{Resources.Error}: {exc.Message}");
         }
+    }
+
+    private bool PlayQuestionType()
+    {
+        if (_activeQuestion == null)
+        {
+            return false;
+        }
+
+        var typeName = _activeQuestion.TypeName ?? _activeQuestion.Type.Name;
+
+        if (typeName == QuestionTypes.Simple)
+        {
+            return false;
+        }
+
+        switch (typeName)
+        {
+            case QuestionTypes.Cat:
+            case QuestionTypes.BagCat:
+            case QuestionTypes.Secret:
+            case QuestionTypes.SecretOpenerPrice:
+            case QuestionTypes.SecretNoQuestion:
+                PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
+                PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
+                break;
+
+            case QuestionTypes.Auction:
+            case QuestionTypes.Stake:
+                PresentationController.SetSound(Settings.Model.Sounds.StakeQuestion);
+                PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
+                break;
+
+            case QuestionTypes.Sponsored:
+            case QuestionTypes.NoRisk:
+                PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
+                PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
+                break;
+
+            case QuestionTypes.Choice:
+                break;
+
+            default:
+                PresentationController.SetText(typeName);
+                break;
+        }
+
+        LocalInfo.TStage = TableStage.Special;
+        return true;
     }
 
     private void Engine_Package(Package package, IMedia packageLogo)
@@ -1154,6 +1219,19 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_EndQuestion(int themeIndex, int questionIndex)
     {
+        if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
+        {
+            var themeInfo = LocalInfo.RoundInfo[themeIndex];
+
+            if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
+            {
+                themeInfo.Questions[questionIndex].Price = -1;
+            }
+        }
+    }
+
+    private void ClearState()
+    {
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
 
@@ -1173,18 +1251,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetText();
         PresentationController.SetActivePlayerIndex(-1);
 
-        if (themeIndex > -1 && themeIndex < LocalInfo.RoundInfo.Count)
-        {
-            var themeInfo = LocalInfo.RoundInfo[themeIndex];
-
-            if (questionIndex > -1 && questionIndex < themeInfo.Questions.Count)
-            {
-                themeInfo.Questions[questionIndex].Price = -1;
-            }
-        }
-
         CurrentTheme = null;
         Price = 0;
+
+        _playingQuestionType = false;
     }
 
     private void Engine_FinalThemes(Theme[] finalThemes)

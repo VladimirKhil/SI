@@ -1,21 +1,26 @@
 ﻿using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Net;
 using System.Text;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
 
+/// <summary>
+/// Represents a package send to game view model.
+/// </summary>
 public sealed class SendToGameDialogViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
 
-    public override string Header => "Отправка пакета в компьютерную игру";
+    public override string Header => Resources.SendToGame;
 
     private string _comment = "";
 
     public string Comment
     {
-        get { return _comment; }
+        get => _comment;
         set { _comment = value; OnPropertyChanged(); }
     }
 
@@ -28,7 +33,7 @@ public sealed class SendToGameDialogViewModel : WorkspaceViewModel
         Send = new SimpleCommand(Send_Executed);
     }
 
-    private async void Send_Executed(object arg)
+    private async void Send_Executed(object? arg)
     {
         try
         {
@@ -42,7 +47,7 @@ public sealed class SendToGameDialogViewModel : WorkspaceViewModel
 
             if (data.Length > 100 * 1024 * 1024)
             {
-                ErrorMessage = "Размер файла превышает 100 Мб!";
+                ErrorMessage = Resources.GamePackageTooLarge;
                 return;
             }
 
@@ -61,13 +66,13 @@ public sealed class SendToGameDialogViewModel : WorkspaceViewModel
             using var response = await client.PostAsync(url, formData);
             if (response.IsSuccessStatusCode)
             {
-                PlatformManager.Instance.Inform("Пакет успешно отправлен!");
+                PlatformManager.Instance.Inform(Resources.SendPackageSuccess);
             }
             else
             {
-                ErrorMessage = "Не удалось отправить пакет: " +
+                ErrorMessage = Resources.SendPackageErrorHeader + ": " +
                     (response.StatusCode == HttpStatusCode.Gone ?
-                    "в настоящий момент на сервере нет места для принятия новых пакетов" :
+                    Resources.PackageServerFull :
                     await response.Content.ReadAsStringAsync());
             }
         }

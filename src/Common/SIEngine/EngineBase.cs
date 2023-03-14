@@ -202,6 +202,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action? ShowScore;
     public event Action? LogScore;
     public event Action<int, int>? EndQuestion;
+    public event Action? QuestionFinish;
     public event Action? RoundEmpty;
     public event Action? NextQuestion;
     public event Action? RoundTimeout;
@@ -284,6 +285,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnShowScore() => ShowScore?.Invoke();
 
     protected void OnLogScore() => LogScore?.Invoke();
+
+    protected void OnQuestionFinish() => QuestionFinish?.Invoke();
 
     protected void OnEndQuestion(int themeIndex, int questionIndex) => EndQuestion?.Invoke(themeIndex, questionIndex);
 
@@ -433,8 +436,10 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         return true;
     }
 
-    public virtual bool AcceptRound(Round? round) =>
-        round != null && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice));
+    public bool AcceptRound(Round? round) =>
+        round != null
+        && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)
+        && (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null)));
 
     public virtual bool MoveBackRound()
     {

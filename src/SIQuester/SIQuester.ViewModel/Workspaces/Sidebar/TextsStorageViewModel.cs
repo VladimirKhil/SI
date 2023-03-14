@@ -6,12 +6,13 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
 public abstract class TextsStorageViewModelBase : WorkspaceViewModel 
 {
-    internal event Action<IChange> Changed;
+    internal event Action<IChange>? Changed;
 
     protected internal void OnChanged(IChange change)
     {
@@ -106,21 +107,21 @@ public abstract class TextsStorageViewModel<T> : TextsStorageViewModelBase
         MoveDown.CanBeExecuted = CurrentIndex > -1 && CurrentIndex + 1 < Collection.Count;
     }
 
-    private void MoveUp_Executed(object arg)
+    private void MoveUp_Executed(object? arg)
     {
         var index = CurrentIndex;
         Collection.Move(index, index - 1);
         CheckCommands();
     }
 
-    private void MoveDown_Executed(object arg)
+    private void MoveDown_Executed(object? arg)
     {
         var index = CurrentIndex;
         Collection.Move(index, index + 1);
         CheckCommands();
     }
 
-    private void Add_Executed(object arg)
+    private void Add_Executed(object? arg)
     {
         var item = new T();
         item.PropertyChanged += Item_PropertyChanged;
@@ -128,7 +129,7 @@ public abstract class TextsStorageViewModel<T> : TextsStorageViewModelBase
         Collection.Add(item);
     }
 
-    private void Remove_Executed(object arg)
+    private void Remove_Executed(object? arg)
     {
         var item = (T)arg;
         item.PropertyChanged -= Item_PropertyChanged;

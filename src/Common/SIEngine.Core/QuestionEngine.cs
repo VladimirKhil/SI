@@ -21,6 +21,8 @@ public sealed class QuestionEngine
 
     private readonly Script? _script;
 
+    public bool CanNext => _script != null && _stepIndex < _script.Steps.Count;
+
     /// <summary>
     /// Initializes a new instance of <see cref="QuestionEngine" /> class.
     /// </summary>
@@ -60,7 +62,7 @@ public sealed class QuestionEngine
             _isAskingAnswer = false;
         }
 
-        while (_stepIndex < _script.Steps.Count)
+        while (CanNext)
         {
             var step = _script.Steps[_stepIndex];
 
@@ -210,6 +212,12 @@ public sealed class QuestionEngine
 
                         if (contentItem.WaitForFinish)
                         {
+                            if (_contentIndex == content.ContentValue.Count)
+                            {
+                                _stepIndex++;
+                                _contentIndex = 0;
+                            }
+
                             return true;
                         }
                     }

@@ -61,23 +61,10 @@ public sealed class DataCollection : IEnumerable<string>
     /// <param name="fileName">File name.</param>
     public long GetFileLength(string fileName) => _packageContainer.GetStreamLength(Name, fileName);
 
-    #region IEnumerable<string> Members
+    /// <inheritdoc />
+    public IEnumerator<string> GetEnumerator() => _files.GetEnumerator();
 
-    public IEnumerator<string> GetEnumerator()
-    {
-        return _files.GetEnumerator();
-    }
-
-    #endregion
-
-    #region IEnumerable Members
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    #endregion
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// Adds file to the collection.

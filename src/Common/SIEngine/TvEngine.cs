@@ -166,6 +166,7 @@ public sealed class TvEngine : EngineBase
             case GameStage.EndQuestion:
                 #region EndQuestion
 
+                OnQuestionFinish();
                 OnEndQuestion(_themeIndex, _questionIndex);
 
                 if (_timeout) // Round timeout
@@ -302,9 +303,6 @@ public sealed class TvEngine : EngineBase
             AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
         }
     }
-
-    public override bool AcceptRound(Round? round) => base.AcceptRound(round) &&
-        (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null));
 
     public override Tuple<int, int, int> MoveBack()
     {

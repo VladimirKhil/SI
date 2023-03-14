@@ -1,17 +1,16 @@
 ﻿using System.Windows.Input;
-using Utils;
 
-namespace SIQuester.ViewModel;
+namespace Utils.Commands;
 
 /// <summary>
-/// Упрощённая реализация команды
+/// Represents a simple command.
 /// </summary>
 public sealed class SimpleCommand : ICommand
 {
     private bool _canBeExecuted = true;
 
     /// <summary>
-    /// Можно ли выполнить команду в настоящий момент
+    /// Can the command be executed now.
     /// </summary>
     public bool CanBeExecuted
     {
@@ -45,9 +44,6 @@ public sealed class SimpleCommand : ICommand
 
     public bool CanExecute(object? parameter) => _canBeExecuted;
 
-    /// <summary>
-    /// Возможность выполнения команды изменилась
-    /// </summary>
     public event EventHandler? CanExecuteChanged;
 
     public void Execute(object? parameter) => _action?.Invoke(parameter);

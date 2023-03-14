@@ -79,6 +79,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Действия.
+        /// </summary>
+        public static string Actions {
+            get {
+                return ResourceManager.GetString("Actions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Добавить.
         /// </summary>
         public static string Add {
@@ -156,6 +165,24 @@ namespace SIQuester.Properties {
         public static string AnswerHeader {
             get {
                 return ResourceManager.GetString("AnswerHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Присоединить пакет….
+        /// </summary>
+        public static string AttachPackage {
+            get {
+                return ResourceManager.GetString("AttachPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Присоединение другого файла вопросов.
+        /// </summary>
+        public static string AttachPackageHint {
+            get {
+                return ResourceManager.GetString("AttachPackageHint", resourceCulture);
             }
         }
         
@@ -367,6 +394,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Развернуть всё.
+        /// </summary>
+        public static string CollapseAll {
+            get {
+                return ResourceManager.GetString("CollapseAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Свернуть всё медиа.
+        /// </summary>
+        public static string CollapseAllMedia {
+            get {
+                return ResourceManager.GetString("CollapseAllMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Комментарий.
         /// </summary>
         public static string Comment {
@@ -430,6 +475,87 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Оформить для Теле- и Комп-SIGame.
+        /// </summary>
+        public static string ConvertToCompSI {
+            get {
+                return ResourceManager.GetString("ConvertToCompSI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Разбить по раундам и назначить телевизионные стоимости.
+        /// </summary>
+        public static string ConvertToCompSIHint {
+            get {
+                return ResourceManager.GetString("ConvertToCompSIHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Поправить для Теле- и Комп-SIGame.
+        /// </summary>
+        public static string ConvertToCompSISimple {
+            get {
+                return ResourceManager.GetString("ConvertToCompSISimple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Изменить названия тем, убрать точки в конце вопросов.
+        /// </summary>
+        public static string ConvertToCompSISimpleHint {
+            get {
+                return ResourceManager.GetString("ConvertToCompSISimpleHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Оформить для &quot;Миллионера&quot;.
+        /// </summary>
+        public static string ConvertToMillionaire {
+            get {
+                return ResourceManager.GetString("ConvertToMillionaire", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Разбить на группы по 15 вопросов.
+        /// </summary>
+        public static string ConvertToMillionaireHint {
+            get {
+                return ResourceManager.GetString("ConvertToMillionaireHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Оформить для Спорт-SIGame.
+        /// </summary>
+        public static string ConvertToSportSI {
+            get {
+                return ResourceManager.GetString("ConvertToSportSI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Назначить стоимости 10, 20, 30 и т.д..
+        /// </summary>
+        public static string ConvertToSportSIHint {
+            get {
+                return ResourceManager.GetString("ConvertToSportSIHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Копировать.
+        /// </summary>
+        public static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Создать.
         /// </summary>
         public static string Create {
@@ -453,6 +579,15 @@ namespace SIQuester.Properties {
         public static string CreationDate {
             get {
                 return ResourceManager.GetString("CreationDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вырезать.
+        /// </summary>
+        public static string Cut {
+            get {
+                return ResourceManager.GetString("Cut", resourceCulture);
             }
         }
         
@@ -525,6 +660,24 @@ namespace SIQuester.Properties {
         public static string Encoding {
             get {
                 return ResourceManager.GetString("Encoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Свернуть всё.
+        /// </summary>
+        public static string ExpandAll {
+            get {
+                return ResourceManager.GetString("ExpandAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Развернуть всё медиа.
+        /// </summary>
+        public static string ExpandAllMedia {
+            get {
+                return ResourceManager.GetString("ExpandAllMedia", resourceCulture);
             }
         }
         
@@ -890,6 +1043,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вставить.
+        /// </summary>
+        public static string Paste {
+            get {
+                return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Запустить вопрос.
         /// </summary>
         public static string PlayQuestion {
@@ -1070,6 +1232,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Масштаб.
+        /// </summary>
+        public static string Scale {
+            get {
+                return ResourceManager.GetString("Scale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Папка для поиска....
         /// </summary>
         public static string SearchFolder {
@@ -1124,6 +1295,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Отправить в компьютерную игру.
+        /// </summary>
+        public static string SendToPCGame {
+            get {
+                return ResourceManager.GetString("SendToPCGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Задать логотип.
         /// </summary>
         public static string SetLogo {
@@ -1147,6 +1327,15 @@ namespace SIQuester.Properties {
         public static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Перемешать вопросы и стоимости.
+        /// </summary>
+        public static string ShuffleQuestions {
+            get {
+                return ResourceManager.GetString("ShuffleQuestions", resourceCulture);
             }
         }
         
@@ -1385,15 +1574,6 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Задать стоимости.
-        /// </summary>
-        public static string UpdatePrices {
-            get {
-                return ResourceManager.GetString("UpdatePrices", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Изменять стоимости вопросов при перетаскивании.
         /// </summary>
         public static string UpdatePricesOnDragAndDrop {
@@ -1417,6 +1597,33 @@ namespace SIQuester.Properties {
         public static string Video {
             get {
                 return ResourceManager.GetString("Video", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Представление.
+        /// </summary>
+        public static string View {
+            get {
+                return ResourceManager.GetString("View", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Викифицировать.
+        /// </summary>
+        public static string Wikify {
+            get {
+                return ResourceManager.GetString("Wikify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вставить типографские кавычки, многоточие и тире.
+        /// </summary>
+        public static string WikifyHint {
+            get {
+                return ResourceManager.GetString("WikifyHint", resourceCulture);
             }
         }
         

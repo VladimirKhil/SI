@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SImulator.ViewModel;
 
@@ -41,7 +42,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     private IButtonManager? _buttonManager;
 
-    private readonly SimpleUICommand _start;
+    private readonly AsyncCommand _start;
 
     private readonly SimpleCommand _selectPackage;
     private readonly SimpleCommand _selectVideo;
@@ -54,7 +55,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     private readonly SimpleUICommand _setPlayerButton;
     private readonly SimpleCommand _removePlayerButton;
 
-    public ICommand Start => _start;
+    public IAsyncCommand Start => _start;
 
     public ICommand SelectPackage => _selectPackage;
     public ICommand SelectVideoFile => _selectVideo;
@@ -196,7 +197,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Settings = settings;
         SettingsViewModel = new AppSettingsViewModel(Settings);
 
-        _start = new SimpleUICommand(Start_Executed) { Name = Resources.StartGame };
+        _start = new AsyncCommand(Start_Executed);
 
         _selectPackage = new SimpleCommand(SelectPackage_Executed);
         SelectLogoFile = new SimpleCommand(SelectLogoFile_Executed);
@@ -411,7 +412,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// <summary>
     /// Starts the game.
     /// </summary>
-    private async void Start_Executed(object? _)
+    private async Task Start_Executed(object? _)
     {
         try
         {

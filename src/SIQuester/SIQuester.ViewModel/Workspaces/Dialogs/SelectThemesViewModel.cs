@@ -3,6 +3,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -13,7 +14,7 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
 
-    public override string Header => string.Format("{0}: выбор тем", _document.Document.Package.Name);
+    public override string Header => $"{_document.Document.Package.Name}: {Resources.ThemesSelection}";
 
     public int Total => _document.Document.Package.Rounds.Sum(round => round.Themes.Count);
 
@@ -86,7 +87,7 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
                 var newTheme = allthemes[index - 1].Clone();
                 mainRound.Themes.Add(newTheme);
 
-                // Выгрузим с собой необходимые коллекции
+                // Export neccessary collections
                 await _document.Document.CopyCollectionsAsync(newDocument, allthemes[index - 1]);
             }
 
@@ -113,7 +114,7 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
                 var newTheme = theme.Clone();
                 mainRound.Themes.Add(newTheme);
 
-                // Выгрузим с собой необходимые коллекции
+                // Export neccessary collections
                 await _document.Document.CopyCollectionsAsync(newDocument, theme);
             }
 

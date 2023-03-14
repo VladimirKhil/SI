@@ -192,6 +192,11 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     public List<string> Tags { get; } = new List<string>();
 
     /// <summary>
+    /// Global package data.
+    /// </summary>
+    public GlobalData? Global { get; set; }
+
+    /// <summary>
     /// Package rounds.
     /// </summary>
     public List<Round> Rounds { get; } = new List<Round>();
@@ -303,6 +308,11 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                             read = false;
                             break;
 
+                        case "global":
+                            Global = new GlobalData();
+                            Global.ReadXml(reader);
+                            break;
+
                         case "round":
                             var round = new Round();
                             round.ReadXml(reader);
@@ -375,6 +385,13 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                 writer.WriteElementString("tag", item);
             }
 
+            writer.WriteEndElement();
+        }
+
+        if (Global != null)
+        {
+            writer.WriteStartElement("global");
+            Global.WriteXml(writer);
             writer.WriteEndElement();
         }
 

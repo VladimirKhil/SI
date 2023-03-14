@@ -136,7 +136,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         _node.Reconnecting += Server_Reconnecting;
         _node.Reconnected += Server_Reconnected;
 
-        Host = host ?? throw new ArgumentNullException(nameof(host));
+        Host = host;
 
         Host.Switch += Host_Switch;
         Host.StageChanged += Host_StageChanged;
@@ -325,7 +325,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         await Task.Delay(4000);
 
-        Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector.GameId}&invite=true");
+        Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector?.GameId}&invite=true");
     }
 
     private async void PrintNetworkInformation(CancellationToken cancellationToken = default)

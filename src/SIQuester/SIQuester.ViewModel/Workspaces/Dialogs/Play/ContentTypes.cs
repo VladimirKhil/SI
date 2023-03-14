@@ -29,4 +29,9 @@ public enum ContentTypes
     /// Video content.
     /// </summary>
     Video,
+
+    /// <summary>
+    /// Html content.
+    /// </summary>
+    Html,
 }

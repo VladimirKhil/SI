@@ -3,6 +3,7 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
 using System.Collections.Specialized;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 

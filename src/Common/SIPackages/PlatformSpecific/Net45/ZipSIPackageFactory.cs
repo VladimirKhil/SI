@@ -3,6 +3,7 @@
 namespace SIPackages.PlatformSpecific.Net45;
 
 /// <inheritdoc cref="SIPackageFactory" />
+[Obsolete("Use PackageContainerFactory")]
 internal sealed class ZipSIPackageFactory : SIPackageFactory
 {
     public override ISIPackageContainer CreatePackage(Stream stream, bool leaveOpen = false) =>

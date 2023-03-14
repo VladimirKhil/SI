@@ -1,10 +1,9 @@
 ﻿using SIEngine.Core;
 using SIPackages;
-using System;
 
 namespace SIEngine;
 
-// TODO: Merge two engines into one and provide different strategies for its logic (question selection, special questions play, finals)
+// TODO: Merge two engines into one and provide different strategies for its question selection logic
 
 /// <summary>
 /// Provides a method for creating SIGame engine.

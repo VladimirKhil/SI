@@ -6,6 +6,7 @@ using SIQuester.ViewModel.Properties;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
@@ -19,7 +20,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     /// </summary>
     public RoundViewModel? OwnerRound { get; set; }
 
-    public override IItemViewModel Owner => OwnerRound;
+    public override IItemViewModel? Owner => OwnerRound;
 
     /// <summary>
     /// Theme questions.
@@ -46,6 +47,11 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
     public ICommand SortQuestions { get; private set; }
 
+    /// <summary>
+    /// Shuffles questions and prices.
+    /// </summary>
+    public ICommand ShuffleQuestions { get; private set; }
+
     public ThemeViewModel(Theme theme)
         : base(theme)
     {
@@ -61,6 +67,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         Add = AddQuestion = new SimpleCommand(AddQuestion_Executed);
         AddEmptyQuestion = new SimpleCommand(AddEmptyQuestion_Executed);
         SortQuestions = new SimpleCommand(SortQuestions_Executed);
+        ShuffleQuestions = new SimpleCommand(ShuffleQuestions_Executed);
     }
 
     private void Questions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -71,7 +78,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             case NotifyCollectionChangedAction.Replace:
                 for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                 {
-                    if (Questions[i].OwnerTheme != null)
+                    if (Questions[i].OwnerTheme != null && Questions[i].OwnerTheme != this)
                     {
                         throw new Exception(Resources.ErrorInsertingBindedQuestion);
                     }
@@ -108,15 +115,20 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         }
     }
 
-    private void CloneTheme_Executed(object arg)
+    private void CloneTheme_Executed(object? arg)
     {
-        var newTheme = Model.Clone() as Theme;
+        if (OwnerRound == null)
+        {
+            throw new InvalidOperationException("OwnerRound == null");
+        }
+
+        var newTheme = Model.Clone();
         var newThemeViewModel = new ThemeViewModel(newTheme);
         OwnerRound.Themes.Add(newThemeViewModel);
         OwnerRound.OwnerPackage.Document.Navigate.Execute(newThemeViewModel);
     }
 
-    private void RemoveTheme_Executed(object arg)
+    private void RemoveTheme_Executed(object? arg)
     {
         if (OwnerRound == null)
         {
@@ -126,7 +138,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         OwnerRound.Themes.Remove(this);
     }
 
-    private void AddQuestion_Executed(object arg)
+    private void AddQuestion_Executed(object? arg)
     {
         try
         {
@@ -166,14 +178,14 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         return OwnerRound.Model.Type == RoundTypes.Final ? 0 : AppSettings.Default.QuestionBase;
     }
 
-    private void AddEmptyQuestion_Executed(object arg)
+    private void AddEmptyQuestion_Executed(object? arg)
     {
         var question = new Question { Price = -1 };
         var questionViewModel = new QuestionViewModel(question);
         Questions.Add(questionViewModel);
     }
 
-    private void SortQuestions_Executed(object arg)
+    private void SortQuestions_Executed(object? arg)
     {
         try
         {
@@ -190,6 +202,40 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
                         break;
                     }
                 }
+            }
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
+    }
+
+    private void ShuffleQuestions_Executed(object? arg)
+    {
+        try
+        {
+            var document = OwnerRound?.OwnerPackage?.Document;
+
+            if (document == null)
+            {
+                throw new InvalidOperationException("document not found");
+            }
+
+            using var change = document.OperationsManager.BeginComplexChange();
+
+            for (int i = 0; i < Questions.Count - 1; i++)
+            {
+                var j = i + Random.Shared.Next(Questions.Count - i);
+
+                if (i == j)
+                {
+                    continue;
+                }
+
+                (Questions[j].Model.Price, Questions[i].Model.Price) = (Questions[i].Model.Price, Questions[j].Model.Price);
+                (Questions[i], Questions[j]) = (Questions[j], Questions[i]);
             }
 
             change.Commit();

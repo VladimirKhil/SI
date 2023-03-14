@@ -4,6 +4,11 @@ namespace SIQuester.ViewModel.Helpers;
 
 internal static class CollectionHelper
 {
+    /// <summary>
+    /// Clears list by deleting items one by one allowing to capture changes and redo clearing later.
+    /// </summary>
+    /// <typeparam name="T">List item type.</typeparam>
+    /// <param name="list">List object.</param>
     internal static void ClearOneByOne<T>(this IList<T> list)
     {
         while (list.Count > 0)

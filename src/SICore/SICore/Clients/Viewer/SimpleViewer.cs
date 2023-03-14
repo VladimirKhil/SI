@@ -23,7 +23,7 @@ public sealed class SimpleViewer : Viewer<IViewerLogic>
         }
 
         return personData.IsHuman ?
-            (IViewerLogic)new ViewerHumanLogic(ClientData, _viewerActions, LO) :
+            new ViewerHumanLogic(ClientData, _viewerActions, LO) :
             new ViewerComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
     }
 }

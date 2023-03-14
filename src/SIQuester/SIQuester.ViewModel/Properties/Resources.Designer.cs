@@ -295,6 +295,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на экспорт и печать.
+        /// </summary>
+        public static string ExportAndPrint {
+            get {
+                return ResourceManager.GetString("ExportAndPrint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Экспорт медиа.
         /// </summary>
         public static string ExportMedia {
@@ -412,6 +421,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Размер файла превышает 100 Мб!.
+        /// </summary>
+        public static string GamePackageTooLarge {
+            get {
+                return ResourceManager.GetString("GamePackageTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Обнаружены обновления программы от {0}. Загрузить их сейчас?.
         /// </summary>
         public static string HasUpdates {
@@ -426,6 +444,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string HowToUseApp {
             get {
                 return ResourceManager.GetString("HowToUseApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Изображения.
+        /// </summary>
+        public static string Images {
+            get {
+                return ResourceManager.GetString("Images", resourceCulture);
             }
         }
         
@@ -525,6 +552,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string NewLine {
             get {
                 return ResourceManager.GetString("NewLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Новый пакет.
+        /// </summary>
+        public static string NewPackage {
+            get {
+                return ResourceManager.GetString("NewPackage", resourceCulture);
             }
         }
         
@@ -664,11 +700,29 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Настройки.
+        /// </summary>
+        public static string Options {
+            get {
+                return ResourceManager.GetString("Options", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Другой.
         /// </summary>
         public static string OtherTypeQuestion {
             get {
                 return ResourceManager.GetString("OtherTypeQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на в настоящий момент на сервере нет места для принятия новых пакетов.
+        /// </summary>
+        public static string PackageServerFull {
+            get {
+                return ResourceManager.GetString("PackageServerFull", resourceCulture);
             }
         }
         
@@ -777,6 +831,42 @@ namespace SIQuester.ViewModel.Properties {
         public static string SecretQuestion {
             get {
                 return ResourceManager.GetString("SecretQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не удалось отправить пакет.
+        /// </summary>
+        public static string SendPackageErrorHeader {
+            get {
+                return ResourceManager.GetString("SendPackageErrorHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет успешно отправлен!.
+        /// </summary>
+        public static string SendPackageSuccess {
+            get {
+                return ResourceManager.GetString("SendPackageSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Отправка пакета в компьютерную игру.
+        /// </summary>
+        public static string SendToGame {
+            get {
+                return ResourceManager.GetString("SendToGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопросы SIGame.
+        /// </summary>
+        public static string SIGameQuestions {
+            get {
+                return ResourceManager.GetString("SIGameQuestions", resourceCulture);
             }
         }
         
@@ -948,6 +1038,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string ThemesCollection {
             get {
                 return ResourceManager.GetString("ThemesCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на выбор тем.
+        /// </summary>
+        public static string ThemesSelection {
+            get {
+                return ResourceManager.GetString("ThemesSelection", resourceCulture);
             }
         }
         

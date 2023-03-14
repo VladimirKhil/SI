@@ -11,6 +11,8 @@ namespace SIPackages;
 /// </summary>
 public abstract class InfoOwner : Named, IXmlSerializable
 {
+    private const string ShowmanCommentsTag = "showmanComments";
+
     /// <summary>
     /// Object information.
     /// </summary>
@@ -34,6 +36,13 @@ public abstract class InfoOwner : Named, IXmlSerializable
         }
 
         Info.Comments.Text = infoOwner.Info.Comments.Text;
+
+        if (infoOwner.Info.ShowmanComments != null)
+        {
+            Info.ShowmanComments ??= new Comments();
+            Info.ShowmanComments.Text = infoOwner.Info.ShowmanComments.Text;
+        }
+
         Info.Extension = infoOwner.Info.Extension;
     }
 
@@ -42,7 +51,8 @@ public abstract class InfoOwner : Named, IXmlSerializable
         base.Contains(value) ||
         Info.Authors.ContainsQuery(value) ||
         Info.Sources.ContainsQuery(value) ||
-        Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
+        Info.Comments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1 ||
+        Info.ShowmanComments != null && Info.ShowmanComments.Text.IndexOf(value, StringComparison.CurrentCultureIgnoreCase) > -1;
 
     /// <inheritdoc />
     public override IEnumerable<SearchData> Search(string value)
@@ -67,6 +77,14 @@ public abstract class InfoOwner : Named, IXmlSerializable
         foreach (var item in SearchExtensions.Search(ResultKind.Comment, Info.Comments.Text, value))
         {
             yield return item;
+        }
+
+        if (Info.ShowmanComments != null)
+        {
+            foreach (var item in SearchExtensions.Search(ResultKind.Comment, Info.ShowmanComments.Text, value))
+            {
+                yield return item;
+            }
         }
     }
 
@@ -99,6 +117,14 @@ public abstract class InfoOwner : Named, IXmlSerializable
                             Info.Comments.Text = reader.ReadElementContentAsString();
                             read = false;
                             break;
+
+                        case ShowmanCommentsTag:
+                            Info.ShowmanComments = new Comments
+                            {
+                                Text = reader.ReadElementContentAsString()
+                            };
+                            read = false;
+                            break;
                     }
 
                     break;
@@ -120,8 +146,9 @@ public abstract class InfoOwner : Named, IXmlSerializable
         var anyAuthors = Info.Authors.Any();
         var anySources = Info.Sources.Any();
         var anyComments = Info.Comments.Text.Length > 0;
+        var anyShowmanComments = Info.ShowmanComments != null && Info.ShowmanComments.Text.Length > 0;
 
-        if (anyAuthors || anySources || anyComments)
+        if (anyAuthors || anySources || anyComments || anyShowmanComments)
         {
             writer.WriteStartElement("info");
 
@@ -152,6 +179,11 @@ public abstract class InfoOwner : Named, IXmlSerializable
             if (anyComments)
             {
                 writer.WriteElementString("comments", Info.Comments.Text);
+            }
+
+            if (anyShowmanComments)
+            {
+                writer.WriteElementString(ShowmanCommentsTag, Info.ShowmanComments!.Text);
             }
 
             writer.WriteEndElement();

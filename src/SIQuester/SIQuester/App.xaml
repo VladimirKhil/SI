@@ -1063,7 +1063,7 @@
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
-                                                            ToolTip="{x:Static lp:Resources.UpdatePrices}"
+                                                            ToolTip="{x:Static lp:Resources.FillPrices}"
                                                             ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
@@ -1152,7 +1152,7 @@
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
-                                                            ToolTip="{x:Static lp:Resources.UpdatePrices}"
+                                                            ToolTip="{x:Static lp:Resources.FillPrices}"
                                                             ItemsSource="{Binding Source={x:Static m:AppSettings.Default}, Path=CostSetters}"
                                                             Style="{StaticResource MenuMenuHeader}"
                                                             ItemContainerStyle="{StaticResource SubMenuItem}" />
@@ -1199,7 +1199,13 @@
                                                         Content="{StaticResource SortImage}"
                                                         Command="{Binding SortQuestions}"
                                                         Style="{StaticResource MenuButton}" />
-                                                    
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.ShuffleQuestions}"
+                                                        Content="{StaticResource ShuffleImage}"
+                                                        Command="{Binding ShuffleQuestions}"
+                                                        Style="{StaticResource MenuButton}" />
+
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
                                                             Header="{StaticResource SumImage}"
@@ -1268,7 +1274,7 @@
                                                         ToolTip="{x:Static lp:Resources.PlayQuestion}"
                                                         Content="{StaticResource PlayImage}"
                                                         Command="{Binding OwnerTheme.OwnerRound.OwnerPackage.Document.PlayQuestion}"
-                                                        CommandParameter="{Binding Model}"
+                                                        CommandParameter="{Binding}"
                                                         Style="{StaticResource MenuButton}" />
 
                                                     <Separator x:Name="separator2" Style="{StaticResource MenuSeparator}" />

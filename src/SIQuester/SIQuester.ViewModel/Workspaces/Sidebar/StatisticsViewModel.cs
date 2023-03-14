@@ -2,6 +2,7 @@
 using SIQuester.ViewModel.Properties;
 using System.Text;
 using System.Windows.Input;
+using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
