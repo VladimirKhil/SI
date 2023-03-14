@@ -5,7 +5,7 @@ namespace Utils.Commands;
 /// <summary>
 /// Represents a simple command.
 /// </summary>
-public sealed class SimpleCommand : ICommand
+public class SimpleCommand : ICommand
 {
     private bool _canBeExecuted = true;
 

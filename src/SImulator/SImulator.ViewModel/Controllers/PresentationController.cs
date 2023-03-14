@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SImulator.ViewModel.Controllers;
 

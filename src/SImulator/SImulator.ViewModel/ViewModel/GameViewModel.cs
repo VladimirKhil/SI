@@ -15,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Input;
 using Utils;
+using Utils.Commands;
 
 namespace SImulator.ViewModel;
 

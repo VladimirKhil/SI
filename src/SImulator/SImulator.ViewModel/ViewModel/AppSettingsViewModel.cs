@@ -4,6 +4,7 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Windows.Input;
 using System.Xml.Serialization;
+using Utils.Commands;
 
 namespace SImulator.ViewModel;
 
