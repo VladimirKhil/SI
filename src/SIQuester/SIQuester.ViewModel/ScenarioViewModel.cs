@@ -200,7 +200,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
 
     internal void SelectAtomObject_AsAnswer(object arg) => SelectAtomObjectCore(arg, true);
 
-    private void AddText_Executed(object? arg) => QDocument.ActivatedObject = Add(AtomTypes.Text, "");
+    internal void AddText_Executed(object? arg) => QDocument.ActivatedObject = Add(AtomTypes.Text, "");
 
     private void AddVoice_Executed(object? arg)
     {
@@ -214,7 +214,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
         QDocument.ActivatedObject = Add(AtomTypes.Oral, "");
     }
 
-    private void AddMarker_Executed(object? arg)
+    internal void AddMarker_Executed(object? arg)
     {
         Add(AtomTypes.Marker, "");
         IsComplex = true;

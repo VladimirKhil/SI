@@ -12,9 +12,9 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class QuestionViewModel : ItemViewModel<Question>
 {
-    public ThemeViewModel OwnerTheme { get; set; }
+    public ThemeViewModel? OwnerTheme { get; set; }
 
-    public override IItemViewModel Owner => OwnerTheme;
+    public override IItemViewModel? Owner => OwnerTheme;
 
     public AnswersViewModel Right { get; private set; }
 
@@ -23,6 +23,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public ScenarioViewModel Scenario { get; private set; }
 
     public QuestionTypeViewModel Type { get; private set; }
+
+    public ICommand AddComplexAnswer { get; private set; }
 
     public SimpleCommand AddWrongAnswers { get; private set; }
 
@@ -52,6 +54,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         BindHelper.Bind(Right, question.Right);
         BindHelper.Bind(Wrong, question.Wrong);
 
+        AddComplexAnswer = new SimpleCommand(AddComplexAnswer_Executed);
+
         AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
 
         Clone = new SimpleCommand(CloneQuestion_Executed);
@@ -63,8 +67,14 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         Wrong.CollectionChanged += Wrong_CollectionChanged;
     }
 
-    private void Wrong_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) =>
+    private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
+
+    private void AddComplexAnswer_Executed(object? arg)
+    {
+        Scenario.AddMarker_Executed(arg);
+        Scenario.AddText_Executed(arg);
+    }
 
     private void AddWrongAnswers_Executed(object? arg)
     {

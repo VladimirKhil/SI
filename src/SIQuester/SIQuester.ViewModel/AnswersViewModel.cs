@@ -1,11 +1,15 @@
 ﻿using Notions;
 using SIQuester.ViewModel.PlatformSpecific;
+using SIQuester.ViewModel.Properties;
 using System.Text;
 using System.Windows.Input;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Represents a right/wrong simple answers view model.
+/// </summary>
 public sealed class AnswersViewModel : ItemsViewModel<string>
 {
     public QuestionViewModel Owner { get; private set; }
@@ -68,7 +72,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
     {
         var text = CurrentItem;
         var words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-        var s = words[words.Length - 1];
+        var s = words[^1];
         Add(s.GrowFirstLetter());
     }
 
@@ -117,30 +121,39 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
     private void AnswerSpecial3_Executed(object? arg)
     {
         var text = CurrentItem;
-        int i = text.IndexOf(" и ");
+        var andIndex = text.IndexOf($" {Resources.And} ");
 
-        if (i > -1)
+        if (andIndex > -1)
         {
-            Add(string.Format("{0} и {1}", text.Substring(i + 3).GrowFirstLetter(), text.Substring(0, i)));
+            Add($"{text[(andIndex + 3)..].GrowFirstLetter()} {Resources.And} {text[..andIndex]}");
         }
     }
 
     private string? ProcessSelection()
     {
         var selection = PlatformManager.Instance.GetCurrentItemSelectionArea();
+
         if (selection == null || selection.Item3 == 0)
+        {
             return null;
+        }
 
         if (selection.Item1 < 0 || selection.Item1 >= Count)
-            throw new Exception("ProcessSelection error Item1: " + selection.Item1 + " " + Count);
+        {
+            throw new Exception($"ProcessSelection error Item1: {selection.Item1} {Count}");
+        }
 
         var item = this[selection.Item1];
 
         if (selection.Item2 < 0 || selection.Item2 > item.Length)
-            throw new Exception("ProcessSelection error Item2: " + selection.Item2 + " " + item.Length);
+        {
+            throw new Exception($"ProcessSelection error Item2: {selection.Item2} {item.Length}");
+        }
 
         if (selection.Item3 < 0 || selection.Item2 + selection.Item3 > item.Length)
-            throw new Exception("ProcessSelection error Item3: " + selection.Item3 + " " + item.Length);
+        {
+            throw new Exception($"ProcessSelection error Item3: {selection.Item3} {item.Length}");
+        }
 
         var text = item.Substring(selection.Item2, selection.Item3).Trim().GrowFirstLetter();
 
@@ -148,16 +161,20 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
         var end = selection.Item2 + selection.Item3;
 
         var emptyLeft = new char[] { ' ', '/', '(', ',', '\\', '—' };
+        
         while (start > 0 && emptyLeft.Contains(item[start - 1]))
+        {
             start--;
+        }
 
         var emptyRight = new char[] { ' ', ')' };
-        while (end < item.Length && emptyRight.Contains(item[end]))
-            end++;
 
-        this[selection.Item1] =
-            (start > 0 ? item.Substring(0, start) : "")
-            + (end < item.Length ? item.Substring(end) : "");
+        while (end < item.Length && emptyRight.Contains(item[end]))
+        {
+            end++;
+        }
+
+        this[selection.Item1] = (start > 0 ? item[..start] : "") + (end < item.Length ? item[end..] : "");
 
         return text;
     }
@@ -165,6 +182,7 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
     private void ToNewAnswer_Executed(object? arg)
     {
         var text = ProcessSelection();
+
         if (text == null)
         {
             return;

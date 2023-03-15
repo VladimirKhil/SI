@@ -524,4 +524,10 @@ theme - тема Кота</value>
   <data name="ThemesSelection" xml:space="preserve">
     <value>выбор тем</value>
   </data>
+  <data name="And" xml:space="preserve">
+    <value>и</value>
+  </data>
+  <data name="ConversionError" xml:space="preserve">
+    <value>Ошибка конвертации</value>
+  </data>
 </root>

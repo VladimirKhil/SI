@@ -370,7 +370,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// Викификация строки (появляются тире и кавычки русского языка)
+    /// Formats the string for better reading (fixes quotes, removes whitespaces etc.).
     /// </summary>
     public static string Wikify(this string s)
     {
@@ -380,7 +380,9 @@ public static class StringExtensions
         for (var i = 0; i < length; i++)
         {
             if (s[i] == '-' && i > 0 && char.IsWhiteSpace(s[i - 1]) && i < length - 1 && char.IsWhiteSpace(s[i + 1]))
+            {
                 res.Append('—');
+            }
             else if (s[i] == '.')
             {
                 if (i <= length - 3 && s.Substring(i, 3) == "...")
@@ -389,11 +391,16 @@ public static class StringExtensions
                     i += 2;
                 }
                 else
+                {
                     res.Append('.');
+                }
             }
             else if (s[i] == '"')
+            {
                 if (i == 0 || char.IsWhiteSpace(s[i - 1]) || i < length - 1 && (char.IsLetter(s[i + 1]) || char.IsDigit(s[i + 1])))
+                {
                     res.Append('«');
+                }
                 else if (i == length - 1 ||
                     !char.IsLetter(s[i + 1]) && !char.IsDigit(s[i + 1]) ||
                     i > 0 && (char.IsLetter(s[i - 1]) ||
@@ -402,12 +409,17 @@ public static class StringExtensions
                     res.Append('»');
                 }
                 else
+                {
                     res.Append(s[i]);
+                }
+            }
             else
+            {
                 res.Append(s[i]);
+            }
         }
 
-        return res.ToString();
+        return res.ToString().Trim();
     }
 
     /// <summary>

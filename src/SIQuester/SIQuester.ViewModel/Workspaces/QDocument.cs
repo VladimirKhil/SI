@@ -2289,37 +2289,90 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void ConvertToCompTvSI_Executed(object? arg)
     {
-        var allthemes = new List<ThemeViewModel>();
-        using var change = OperationsManager.BeginComplexChange();
-
-        foreach (var round in Package.Rounds)
+        try
         {
-            foreach (var theme in round.Themes)
+            var allthemes = new List<ThemeViewModel>();
+            using var change = OperationsManager.BeginComplexChange();
+
+            foreach (var round in Package.Rounds)
             {
-                allthemes.Add(theme);
+                foreach (var theme in round.Themes)
+                {
+                    allthemes.Add(theme);
+                }
             }
-        }
 
-        while (Package.Rounds.Count > 0)
-        {
-            Package.Rounds.RemoveAt(0);
-        }
+            while (Package.Rounds.Count > 0)
+            {
+                Package.Rounds.RemoveAt(0);
+            }
 
-        int ind = 0;
+            int ind = 0;
 
-        allthemes.ForEach(theme =>
-        {
-            theme.Model.Name = theme.Model.Name?.ToUpper().ClearPoints();
-            theme.OwnerRound = null;
-        });
+            allthemes.ForEach(theme =>
+            {
+                theme.Model.Name = theme.Model.Name?.ToUpper().ClearPoints();
+                theme.OwnerRound = null;
+            });
 
-        for (var i = 0; i < 3; i++)
-        {
-            var round = new Round { Name = (Package.Rounds.Count + 1).ToString() + Resources.EndingRound, Type = RoundTypes.Standart };
-            var roundViewModel = new RoundViewModel(round) { IsExpanded = true };
-            Package.Rounds.Add(roundViewModel);
+            for (var i = 0; i < 3; i++)
+            {
+                var round = new Round { Name = (Package.Rounds.Count + 1).ToString() + Resources.EndingRound, Type = RoundTypes.Standart };
+                var roundViewModel = new RoundViewModel(round) { IsExpanded = true };
+                Package.Rounds.Add(roundViewModel);
 
-            for (int j = 0; j < 6; j++)
+                for (int j = 0; j < 6; j++)
+                {
+                    ThemeViewModel themeViewModel;
+
+                    if (allthemes.Count == ind)
+                    {
+                        themeViewModel = new ThemeViewModel(new Theme());
+                    }
+                    else
+                    {
+                        themeViewModel = allthemes[ind++];
+                    }
+
+                    roundViewModel.Themes.Add(themeViewModel);
+
+                    for (var k = 0; k < 5; k++)
+                    {
+                        QuestionViewModel questionViewModel;
+
+                        if (themeViewModel.Questions.Count <= k)
+                        {
+                            var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1));
+
+                            questionViewModel = new QuestionViewModel(question);
+                            themeViewModel.Questions.Add(questionViewModel);
+                        }
+                        else
+                        {
+                            questionViewModel = themeViewModel.Questions[k];
+                            questionViewModel.Model.Price = (100 * (i + 1) * (k + 1));
+                        }
+
+                        foreach (var atom in questionViewModel.Scenario)
+                        {
+                            if (atom.Model.Type == AtomTypes.Text)
+                            {
+                                atom.Model.Text = atom.Model.Text.ClearPoints().GrowFirstLetter();
+                            }
+                        }
+
+                        if (questionViewModel.Right.Count > 0)
+                        {
+                            questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+                        }
+                    }
+                }
+            }
+
+            var finalViewModel = new RoundViewModel(new Round { Type = RoundTypes.Final, Name = Resources.Final }) { IsExpanded = true };
+            Package.Rounds.Add(finalViewModel);
+
+            for (var j = 0; j < 7; j++)
             {
                 ThemeViewModel themeViewModel;
 
@@ -2332,91 +2385,48 @@ public sealed class QDocument : WorkspaceViewModel
                     themeViewModel = allthemes[ind++];
                 }
 
-                roundViewModel.Themes.Add(themeViewModel);
+                finalViewModel.Themes.Add(themeViewModel);
 
-                for (var k = 0; k < 5; k++)
+                QuestionViewModel questionViewModel;
+
+                if (themeViewModel.Questions.Count == 0)
                 {
-                    QuestionViewModel questionViewModel;
+                    var question = PackageItemsHelper.CreateQuestion(0);
 
-                    if (themeViewModel.Questions.Count <= k)
-                    {
-                        var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1));
+                    questionViewModel = new QuestionViewModel(question);
+                    themeViewModel.Questions.Add(questionViewModel);
+                }
+                else
+                {
+                    questionViewModel = themeViewModel.Questions[0];
+                    questionViewModel.Model.Price = 0;
+                }
 
-                        questionViewModel = new QuestionViewModel(question);
-                        themeViewModel.Questions.Add(questionViewModel);
-                    }
-                    else
-                    {
-                        questionViewModel = themeViewModel.Questions[k];
-                        questionViewModel.Model.Price = (100 * (i + 1) * (k + 1));
-                    }
+                foreach (var atom in questionViewModel.Scenario)
+                {
+                    atom.Model.Text = atom.Model.Text.ClearPoints();
+                }
 
-                    foreach (var atom in questionViewModel.Scenario)
-                    {
-                        if (atom.Model.Type == AtomTypes.Text)
-                        {
-                            atom.Model.Text = atom.Model.Text.ClearPoints().GrowFirstLetter();
-                        }
-                    }
+                questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+            }
 
-                    questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+            if (ind < allthemes.Count)
+            {
+                var otherViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.Rest });
+                Package.Rounds.Add(otherViewModel);
+
+                while (ind < allthemes.Count)
+                {
+                    otherViewModel.Themes.Add(allthemes[ind++]);
                 }
             }
+
+            change.Commit();
         }
-
-        var finalViewModel = new RoundViewModel(new Round { Type = RoundTypes.Final, Name = Resources.Final }) { IsExpanded = true };
-        Package.Rounds.Add(finalViewModel);
-
-        for (var j = 0; j < 7; j++)
+        catch (Exception ex)
         {
-            ThemeViewModel themeViewModel;
-
-            if (allthemes.Count == ind)
-            {
-                themeViewModel = new ThemeViewModel(new Theme());
-            }
-            else
-            {
-                themeViewModel = allthemes[ind++];
-            }
-
-            finalViewModel.Themes.Add(themeViewModel);
-
-            QuestionViewModel questionViewModel;
-
-            if (themeViewModel.Questions.Count == 0)
-            {
-                var question = PackageItemsHelper.CreateQuestion(0);
-
-                questionViewModel = new QuestionViewModel(question);
-                themeViewModel.Questions.Add(questionViewModel);
-            }
-            else
-            {
-                questionViewModel = themeViewModel.Questions[0];
-                questionViewModel.Model.Price = 0;
-            }
-
-            foreach (var atom in questionViewModel.Scenario)
-            {
-                atom.Model.Text = atom.Model.Text.ClearPoints();
-            }
-
-            questionViewModel.Right[0] = questionViewModel.Right[0].ClearPoints().GrowFirstLetter();
+            OnError(ex, Resources.ConversionError);
         }
-
-        if (ind < allthemes.Count)
-        {
-            var otherViewModel = new RoundViewModel(new Round { Type = RoundTypes.Standart, Name = Resources.Rest });
-            Package.Rounds.Add(otherViewModel);
-
-            while (ind < allthemes.Count)
-            {
-                otherViewModel.Themes.Add(allthemes[ind++]);
-            }
-        }
-
-        change.Commit();
     }
 
     private void ConvertToCompTvSISimple_Executed(object? arg)

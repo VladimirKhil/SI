@@ -12,7 +12,7 @@ using System.Windows.Markup;
 namespace SIQuester;
 
 /// <summary>
-/// Текстовый редактор, позволяющий редактировать списки
+/// Represents text editor that allows to modify collections.
 /// </summary>
 [ContentProperty("Items")]
 public sealed class TextList : TextBox
@@ -26,10 +26,12 @@ public sealed class TextList : TextBox
         /// Отображаемая длина
         /// </summary>
         internal int _length;
+
         /// <summary>
         /// Длина нередактируемой части у ссылки
         /// </summary>
         internal int _readOnlyLength;
+
         /// <summary>
         /// Может ли ссылка быть уточнена
         /// </summary>
@@ -62,7 +64,7 @@ public sealed class TextList : TextBox
     /// <summary>
     /// Набор элементов редактора
     /// </summary>
-    public ICollectionView Items { get; private set; }
+    public ICollectionView? Items { get; private set; }
 
     /// <summary>
     /// Источник элементов редактора
@@ -422,7 +424,7 @@ public sealed class TextList : TextBox
             {
                 if (_infos[index]._readOnlyLength > -1 && _infos[index]._canBeSpecified)
                 {
-                    var delta = offset - _infos[index]._readOnlyLength; // Смещение в уточнении
+                    var delta = offset - _infos[index]._readOnlyLength; // Offset in link clarification
                     var hashIndex = origin.IndexOf('#');
                     string newText = Text.Substring(change.Offset, change.AddedLength);
 
@@ -447,9 +449,6 @@ public sealed class TextList : TextBox
             }
             catch (Exception exc)
             {
-#if !DEBUG
-                MessageBox.Show("Сейчас возникнет редкая и трудноуловимая ошибка. Большая просьба отправить информацию о ней, а также лично связаться с автором и сообщить ему, как вам удалось её получить. Спасибо!");
-#endif
                 throw new Exception(string.Format("origin: {0}, offset: {1}, cOffset: {2}, cAdded: {3}, cRemoved: {4}, text: {5}", origin, offset, change.Offset, change.AddedLength, change.RemovedLength, Text), exc);
             }
             finally
@@ -462,11 +461,11 @@ public sealed class TextList : TextBox
     }
 
     /// <summary>
-    /// Преобразовать смещение в редакторе в смещение в конкретном элементе
+    /// Converts global offset in text editor into local offset in current item.
     /// </summary>
-    /// <param name="offset">Смещение в тексте</param>
-    /// <param name="index">Индекс активного элемента</param>
-    /// <returns>Смещение в активном элементе</returns>
+    /// <param name="offset">Global offset value.</param>
+    /// <param name="index">Current item index.</param>
+    /// <returns>Current item offset.</returns>
     private int ConvertGlobalOffsetToLocalOffset(int offset, out int index)
     {
         if (ItemsSeparator == null)

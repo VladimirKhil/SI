@@ -129,11 +129,29 @@
   <data name="Add" xml:space="preserve">
     <value>Добавить</value>
   </data>
+  <data name="AddAnswer" xml:space="preserve">
+    <value>Добавить ответ</value>
+  </data>
+  <data name="AddAudio" xml:space="preserve">
+    <value>Добавить аудио</value>
+  </data>
+  <data name="AddComplexAnswer" xml:space="preserve">
+    <value>Добавить сложный ответ</value>
+  </data>
   <data name="AddEmptyQuestion" xml:space="preserve">
     <value>Добавить пустой вопрос</value>
   </data>
   <data name="AddHtml" xml:space="preserve">
     <value>Добавить HTML</value>
+  </data>
+  <data name="AddImage" xml:space="preserve">
+    <value>Добавить изображение</value>
+  </data>
+  <data name="AddOral" xml:space="preserve">
+    <value>Добавить устный текст</value>
+  </data>
+  <data name="AddParameter" xml:space="preserve">
+    <value>Добавить параметр</value>
   </data>
   <data name="AddQuestion" xml:space="preserve">
     <value>Добавить вопрос (Insert)</value>
@@ -141,8 +159,14 @@
   <data name="AddRound" xml:space="preserve">
     <value>Добавить раунд (Insert)</value>
   </data>
+  <data name="AddText" xml:space="preserve">
+    <value>Добавить текст</value>
+  </data>
   <data name="AddTheme" xml:space="preserve">
     <value>Добавить тему (Insert)</value>
+  </data>
+  <data name="AddVideo" xml:space="preserve">
+    <value>Добавить видео</value>
   </data>
   <data name="AllFiles" xml:space="preserve">
     <value>Все файлы</value>
@@ -234,6 +258,9 @@
   <data name="CollapseAllMedia" xml:space="preserve">
     <value>Свернуть всё медиа</value>
   </data>
+  <data name="CollapseMedia" xml:space="preserve">
+    <value>Свернуть медиа</value>
+  </data>
   <data name="Comment" xml:space="preserve">
     <value>Комментарий</value>
   </data>
@@ -324,6 +351,9 @@
   <data name="ExpandAllMedia" xml:space="preserve">
     <value>Развернуть всё медиа</value>
   </data>
+  <data name="ExpandMedia" xml:space="preserve">
+    <value>Развернуть медиа</value>
+  </data>
   <data name="ExportAndPrint" xml:space="preserve">
     <value>Экспорт и печать</value>
   </data>
@@ -403,11 +433,17 @@
   <data name="MakeNonEmpty" xml:space="preserve">
     <value>Сделать непустым</value>
   </data>
+  <data name="MoveDown" xml:space="preserve">
+    <value>Переместить ниже</value>
+  </data>
   <data name="MoveLeft" xml:space="preserve">
     <value>Переместить левее</value>
   </data>
   <data name="MoveRight" xml:space="preserve">
     <value>Переместить правее</value>
+  </data>
+  <data name="MoveUp" xml:space="preserve">
+    <value>Переместить выше</value>
   </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
@@ -478,11 +514,17 @@
   <data name="Refresh" xml:space="preserve">
     <value>Обновить</value>
   </data>
+  <data name="RemoveAnswer" xml:space="preserve">
+    <value>Удалить ответ</value>
+  </data>
   <data name="RemoveLink" xml:space="preserve">
     <value>Удалить ссылку</value>
   </data>
   <data name="RemoveLogo" xml:space="preserve">
     <value>Удалить логотип</value>
+  </data>
+  <data name="RemoveParameter" xml:space="preserve">
+    <value>Удалить параметр</value>
   </data>
   <data name="RemoveQuestion" xml:space="preserve">
     <value>Удалить вопрос</value>
@@ -537,6 +579,9 @@
   </data>
   <data name="SetTags" xml:space="preserve">
     <value>Задать теги</value>
+  </data>
+  <data name="SetTime" xml:space="preserve">
+    <value>Указать временной интервал</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
@@ -606,6 +651,9 @@
   </data>
   <data name="To" xml:space="preserve">
     <value>до</value>
+  </data>
+  <data name="ToggleToOralAndBack" xml:space="preserve">
+    <value>Поменять тип (на устный или обратно)</value>
   </data>
   <data name="ToolTipFileSearch" xml:space="preserve">
     <value>Поиск файлов</value>

@@ -106,6 +106,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на и.
+        /// </summary>
+        public static string And {
+            get {
+                return ResourceManager.GetString("And", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ответ.
         /// </summary>
         public static string Answer {
@@ -183,6 +192,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Comments {
             get {
                 return ResourceManager.GetString("Comments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка конвертации.
+        /// </summary>
+        public static string ConversionError {
+            get {
+                return ResourceManager.GetString("ConversionError", resourceCulture);
             }
         }
         

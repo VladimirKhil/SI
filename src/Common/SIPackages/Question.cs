@@ -233,6 +233,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     break;
             }
         }
+
+        if (Right.Count == 0)
+        {
+            Right.Add("");
+        }
     }
 
     /// <inheritdoc />

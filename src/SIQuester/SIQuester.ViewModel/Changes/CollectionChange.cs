@@ -66,6 +66,7 @@ public sealed class CollectionChange : IChange
                     break;
 
                 case NotifyCollectionChangedAction.Move:
+                    // TODO: this seems to be incorrect. Write unit test to check this logic
                     var newIndex = Args.NewStartingIndex - (Args.OldStartingIndex < Args.NewStartingIndex ? 1 : 0);
                     var tmp = Collection[newIndex];
                     Collection.RemoveAt(newIndex);
