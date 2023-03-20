@@ -280,9 +280,20 @@
                         <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Source}" Foreground="DarkGray" />
                         <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Comment}" Foreground="DarkGray" />
 
-                        <TextBlock Grid.Column="1" DataContext="{Binding ActiveContentItem}" TextWrapping="Wrap">
-                            <Run Text="{Binding Placement, Converter={StaticResource PlacementConverter}}" Foreground="Gray" /><Run Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}" Foreground="Gray" /><Run Text="{Binding Value}" />
-                        </TextBlock>
+                        <ListBox Grid.Column="1" ItemsSource="{Binding ContentItems}" SelectedItem="{Binding ActiveContentItem}" IsEnabled="False" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
+                                        <Run Text="{Binding Placement, Converter={StaticResource PlacementConverter}}" Foreground="Gray" /><Run Text="{Binding Type, Converter={StaticResource AtomTypeConverter}}" Foreground="Gray" /><Run Text="{Binding Value}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
 
                         <TextBlock
                             Grid.Row="3"

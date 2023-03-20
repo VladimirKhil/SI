@@ -214,6 +214,12 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <DrawingImage x:Key="RemoveMarkerImage">
+        <DrawingImage.Drawing>
+            <GeometryDrawing Brush="DarkRed" Geometry="{Binding Source={StaticResource app_mark},Path=Data}" />
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <DrawingImage x:Key="AddVoiceImage">
         <DrawingImage.Drawing>
             <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_message},Path=Data}" />

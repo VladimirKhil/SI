@@ -33,6 +33,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
             return;
         }
 
+        GameViewModel.ActiveMediaCommand = null;
+
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
@@ -242,10 +244,15 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
         PresentationController.SetSound();
     }
 
-    public void OnContentStart()
+    public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {
-        // Do nothing for now
-        // It is possible to clear the screen when new content is arriving
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
+        GameViewModel.ContentItems = contentItems;
+        GameViewModel.ActiveMediaCommand = null;
     }
 
     public void OnSimpleRightAnswerStart()

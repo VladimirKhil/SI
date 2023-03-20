@@ -28,6 +28,7 @@
                 <DataTrigger Binding="{Binding Variants}" Value="{x:Null}">
                     <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
+                
                 <DataTrigger Binding="{Binding Variants.Count}" Value="1">
                     <Setter Property="IsEnabled" Value="False" />
                 </DataTrigger>
@@ -296,33 +297,65 @@
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.ColumnSpan="3"
+                            Text="{x:Static lp:Resources.QuestionParsing}"
+                            TextAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="20"
+                            Padding="5" />
+
+                        <Grid Grid.Column="0" Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="5*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="1.5*"/>
+                                <RowDefinition Height="*"/>
                                 <RowDefinition Height="4" />
-                                <RowDefinition Height="2*" />
-                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="1.5*" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock
-                                Text="{x:Static lp:Resources.SourceFile}"
-                                TextAlignment="Center"
-                                Height="25"
-                                VerticalAlignment="Center"
-                                FontSize="15" />
+                            <ProgressBar Height="25" Margin="0,6" Value="{Binding Progress}" />
 
-                            <RichTextBox
+                            <TextBox
                                 Grid.Row="1"
                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                 IsReadOnly="True"
                                 FontSize="14"
-                                lb:TextImportManager.TextSource="{Binding}" />
-
-                            <GridSplitter Background="Transparent" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                                Text="{Binding PreviousFragment}"
+                                ToolTip="{x:Static lp:Resources.PreviousFragment}"
+                                TextWrapping="Wrap"
+                                Background="LightGray"
+                                Padding="5" />
 
                             <RichTextBox
+                                Grid.Row="2"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                FontSize="14"
+                                lb:TextImportManager.TextSource="{Binding}"
+                                ToolTip="{x:Static lp:Resources.SourceFragment}" />
+
+                            <TextBox
                                 Grid.Row="3"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                IsReadOnly="True"
+                                FontSize="14"
+                                Text="{Binding NextFragment}"
+                                ToolTip="{x:Static lp:Resources.NextFragment}"
+                                TextWrapping="Wrap"
+                                Background="LightGray"
+                                Padding="5" />
+
+                            <GridSplitter Background="Transparent" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+
+                            <RichTextBox
+                                Grid.Row="5"
                                 Style="{StaticResource Editor}"
                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                 FontSize="14"
@@ -333,13 +366,16 @@
                                     </Paragraph>
                                 </FlowDocument>
                             </RichTextBox>
-
-                            <ProgressBar Grid.Row="4" Height="20" Margin="0,4,0,0" Value="{Binding Progress}" />
                         </Grid>
 
-                        <GridSplitter Background="Transparent" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+                        <GridSplitter
+                            Grid.Row="1"
+                            Background="Transparent"
+                            Grid.Column="1"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch" />
 
-                        <Grid Grid.Column="2">
+                        <Grid Grid.Column="2" Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
@@ -347,15 +383,25 @@
 
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="80" />
+                                <RowDefinition Height="120" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.ColumnSpan="2" Text="{Binding Info}" TextWrapping="Wrap" />
-                            <Label Grid.ColumnSpan="2" Grid.Row="1" BorderThickness="1" BorderBrush="Black" Margin="0,4,0,0" Content="{Binding Problem}" />
+                            <TextBlock Grid.ColumnSpan="2" Text="{Binding Info}" TextWrapping="Wrap" Padding="4" FontSize="14" />
+                            
+                            <TextBox
+                                Grid.ColumnSpan="2"
+                                Grid.Row="1"
+                                Margin="0,4,0,0"
+                                Text="{Binding Problem}"
+                                FontSize="15"
+                                Padding="4"
+                                IsReadOnly="True"
+                                VerticalScrollBarVisibility="Auto"
+                                Background="LightPink" />
 
                             <CheckBox
                                 Grid.Row="2"
@@ -449,7 +495,7 @@
                                 </ItemsControl>
                             </DockPanel>
 
-                            <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+                            <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,4">
                                 <Button Command="{Binding Go}" Width="166" Padding="0,4">
                                     <StackPanel Orientation="Horizontal">
                                         <Path
@@ -463,7 +509,7 @@
                                     </StackPanel>
                                 </Button>
 
-                                <Button Command="{Binding Skip}" Width="166" Margin="4,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
+                                <Button Command="{Binding Skip}" Width="166" Margin="8,0,0,0" ToolTip="{Binding SkipToolTip}" Padding="0,4">
                                     <StackPanel Orientation="Horizontal">
                                         <Path
                                             Stretch="Uniform"

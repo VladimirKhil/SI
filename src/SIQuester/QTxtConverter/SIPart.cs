@@ -8,6 +8,7 @@ public sealed class SIPart
     /// <summary>
     /// Позиция вопроса в тексте
     /// </summary>
+    [Obsolete]
     public int Index { get; set; }
 
     /// <summary>

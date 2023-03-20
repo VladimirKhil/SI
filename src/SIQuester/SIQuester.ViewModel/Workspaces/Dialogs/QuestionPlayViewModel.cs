@@ -232,7 +232,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         
     }
 
-    public void OnContentStart()
+    public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {
         
     }

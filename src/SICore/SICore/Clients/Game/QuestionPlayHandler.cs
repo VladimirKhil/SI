@@ -26,7 +26,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         throw new NotImplementedException();
     }
 
-    public void OnContentStart()
+    public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {
         throw new NotImplementedException();
     }

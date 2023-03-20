@@ -1,4 +1,5 @@
-﻿using SIQuester.ViewModel;
+﻿using ControlzEx.Standard;
+using SIQuester.ViewModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,6 +8,9 @@ using System.Windows.Media;
 
 namespace SIQuester.Behaviors;
 
+/// <summary>
+/// Supports display of input text and coloring its parts.
+/// </summary>
 public static class TextImportManager
 {
     public static ImportTextViewModel GetTextSource(DependencyObject obj) => (ImportTextViewModel)obj.GetValue(TextSourceProperty);
@@ -25,9 +29,16 @@ public static class TextImportManager
         var textBox = (RichTextBox)d;
         var model = (ImportTextViewModel)e.NewValue;
 
-        void propertyChangedHandler(object? sender, PropertyChangedEventArgs e2)
+        void updateText(object? sender, PropertyChangedEventArgs e2)
         {
-            if (e2.PropertyName == nameof(ImportTextViewModel.Text))
+            if (sender == null || e2.PropertyName != nameof(ImportTextViewModel.CurrentFragment))
+            {
+                return;
+            }
+
+            var source = (ImportTextViewModel)sender;
+
+            textBox.Dispatcher.BeginInvoke(new Action(() =>
             {
                 var par = (Paragraph)textBox.Document.Blocks.LastBlock;
 
@@ -36,22 +47,24 @@ public static class TextImportManager
                     par.Inlines.Remove(par.Inlines.LastInline);
                 }
 
-                ((Run)par.Inlines.LastInline).Text = model?.Text;
-            }
+                ((Run)par.Inlines.LastInline).Text = source.CurrentFragment;
+            }));
         }
 
-        void selectTextHandler(int start, int length, Color? color, bool scroll)
+        void highlightText(int start, int length, Color? color, bool scroll)
         {
             textBox.Dispatcher.BeginInvoke(new Action(() =>
             {
                 var position = textBox.Document.ContentStart;
                 var offset = 0;
-                TextPointer startPos = null, endPos = null;
+                TextPointer? startPos = null, endPos = null;
+
                 while (position != null)
                 {
                     if (position.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
                     {
                         var len = position.GetTextRunLength(LogicalDirection.Forward);
+
                         if (startPos == null)
                         {
                             if (start > offset + len)
@@ -74,13 +87,11 @@ public static class TextImportManager
                             }
 
                             endPos = position.GetPositionAtOffset(start + length - offset);
-                            if (endPos == null)
-                            {
-                                endPos = textBox.Document.ContentEnd;
-                            }
+                            endPos ??= textBox.Document.ContentEnd;
                         }
 
                         var range = new TextRange(startPos, endPos);
+
                         if (color.HasValue)
                         {
                             range.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(color.Value));
@@ -113,17 +124,17 @@ public static class TextImportManager
         {
             var oldModel = (ImportTextViewModel)e.OldValue;
 
-            oldModel.PropertyChanged -= propertyChangedHandler;
-            oldModel.SelectText -= selectTextHandler;
+            oldModel.PropertyChanged -= updateText;
+            oldModel.HighlightText -= highlightText;
 
             return;
         }
 
         var blocks = textBox.Document.Blocks;
         blocks.Clear();
-        blocks.Add(new Paragraph(new Run(model.Text)));
+        blocks.Add(new Paragraph(new Run(model.CurrentFragment)));
 
-        model.PropertyChanged += propertyChangedHandler;
-        model.SelectText += selectTextHandler;
+        model.PropertyChanged += updateText;
+        model.HighlightText += highlightText;
     }
 }

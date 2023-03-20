@@ -2,11 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SIQuester.ViewModel</AssemblyTitle>
-    <Company>Khil-soft</Company>
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
-    <Copyright>Copyright © Khil-soft 2014 - 2022</Copyright>
-    <Version>5.9.0</Version>
+    <Copyright>Copyright © Khil-soft 2014 - 2023</Copyright>
+    <Version>5.9.2</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

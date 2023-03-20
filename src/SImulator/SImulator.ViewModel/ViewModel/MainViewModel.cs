@@ -371,7 +371,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             IsPressMode = options.FalseStart && options.UsePlayersKeys != PlayerKeysModes.None,
             IsMultimediaPressMode = options.FalseStart && options.FalseStartMultimedia && options.UsePlayersKeys != PlayerKeysModes.None,
             ShowRight = options.ShowRight,
-            ShowScore = options.SIUISettings.ShowScore,
+            ShowScore = false,
             AutomaticGame = options.AutomaticGame,
             PlaySpecials = options.PlaySpecials,
             ThinkingTime = options.ThinkingTime,

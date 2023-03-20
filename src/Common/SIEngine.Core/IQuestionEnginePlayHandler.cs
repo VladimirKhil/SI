@@ -61,7 +61,8 @@ public interface IQuestionEnginePlayHandler
     /// <summary>
     /// Handles content start.
     /// </summary>
-    void OnContentStart();
+    /// <param name="contentItems">Content items that would be played.</param>
+    void OnContentStart(IEnumerable<ContentItem> contentItems);
 
     /// <summary>
     /// Handles simple right answer start.

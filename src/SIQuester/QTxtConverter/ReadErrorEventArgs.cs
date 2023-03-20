@@ -3,6 +3,9 @@ using Lingware.Spard.Expressions;
 
 namespace QTxtConverter;
 
+/// <summary>
+/// Represents read error event arguments.
+/// </summary>
 public sealed class ReadErrorEventArgs : EventArgs
 {
     public bool Cancel { get; set; }

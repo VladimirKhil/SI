@@ -5,6 +5,8 @@ using Notions;
 using QTxtConverter.Properties;
 using SIPackages;
 using SIPackages.Core;
+using Spard.Data;
+using Spard.Exceptions;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,7 +18,7 @@ namespace QTxtConverter;
 /// </summary>
 public sealed class QConverter
 {
-    public event EventHandler<ParseErrorEventArgs>? ParseError;
+    public event EventHandler<SplitErrorEventArgs>? ParseError;
     public event EventHandler<ReadErrorEventArgs>? ReadError;
     public event Action<int>? Progress;
 
@@ -56,38 +58,82 @@ public sealed class QConverter
     }
 
     /// <summary>
-    /// Split text into array of themes and questions.
+    /// Splits text into array of themes and questions.
     /// </summary>
     /// <param name="source">Text containing questions.</param>
     /// <returns>Array of splitted themes and questions.</returns>
-    public SIPart[][] ExtractQuestions(string source)
+    public SIPart[][]? ExtractQuestions(string source)
     {
         var list = new List<SIPart[]>();
         int progress = 0, progressBase = 0;
 
-        var expressionTree = TextMatchTreeTransformer.Create(Resources.QuestsExtractorRules2);
-        expressionTree.Mode = TransformMode.Function;
+        var expressionTree = Spard.TreeTransformer.Create(Resources.QuestsExtractorRules3);
+        expressionTree.Mode = Spard.Core.TransformMode.Function;
         expressionTree.ProgressChanged += (pos) => progress = pos;
 
-        var skipTree = TextTreeTransformer.Create(Resources.ExtractorRules);
-        skipTree.Mode = TransformMode.Function;
+        var skipTree = Spard.TreeTransformer.Create(Resources.ExtractorRules2);
+        skipTree.Mode = Spard.Core.TransformMode.Function;
         skipTree.ProgressChanged += (pos) => progress = pos;
 
         int previousPosition = -1;
-        Match<char>? match = null;
         var matchEnumerator = expressionTree.Transform(source).GetEnumerator();
-        bool next;
+        object? match = null;
+        var next = false;
 
-        while (!(next = matchEnumerator.MoveNext()) && expressionTree.Error || next && (match = matchEnumerator.Current) != null)
+        do
         {
-            if (expressionTree.Error)
+            try
+            {
+                while ((next = matchEnumerator.MoveNext()) && (match = matchEnumerator.Current) != null)
+                {
+                    if (match is not TupleValue tupleValue) // Head
+                    {
+                        list.Add(new SIPart[] { new SIPart() { Value = match.ToString() ?? "" } });
+                    }
+                    else
+                    {
+                        var siParts = new List<SIPart>();
+                        var tupleValues = new Queue<TupleValue>(new[] { tupleValue });
+
+                        while (tupleValues.Any())
+                        {
+                            var value = tupleValues.Dequeue();
+
+                            foreach (var namedValue in value.Items.Cast<NamedValue>())
+                            {
+                                if (namedValue.Name == "Quest")
+                                {
+                                    siParts.Add(new SIPart { Value = namedValue.Value.ToString() ?? "" });
+                                }
+                                else if (namedValue.Name == "Tail")
+                                {
+                                    if (namedValue.Value is TupleValue tv)
+                                    {
+                                        tupleValues.Enqueue(tv);
+                                    }
+                                    else if (namedValue.Value is NamedValue nv && nv.Name == "Quest")
+                                    {
+                                        siParts.Add(new SIPart { Value = nv.Value.ToString() ?? "" });
+                                    }
+                                }
+                            }
+                        }
+
+                        list.Add(siParts.ToArray());
+                    }
+
+                    previousPosition = progress;
+                    Progress?.Invoke(progressBase + progress);
+                }
+            }
+            catch (TransformException)
             {
                 if (ParseError == null)
                 {
                     return null;
                 }
 
-                var args = new ParseErrorEventArgs(source) { Cancel = false, SourcePosition = progressBase + progress };
+                var args = new SplitErrorEventArgs(source) { Cancel = false, SourcePosition = progressBase + progress };
                 ParseError(null, args);
 
                 if (args.Cancel)
@@ -103,10 +149,10 @@ public sealed class QConverter
                     var last = list[^1];
                     var skipReader = skipTree.StepTransform(source).GetEnumerator();
                     skipReader.MoveNext();
-                    var add = skipReader.Current.ToString();
+                    var add = new string(skipReader.Current.Cast<char>().ToArray()) ?? "";
                     last[^1].Value += add; // Здесь также должна быть вычитанная строка
 
-                    source = source.Substring(add.Length);
+                    source = source[(add.Length)..];
                     progressBase += add.Length;
 
                     // Попробуем подцепить "хвост" к предыдущей теме
@@ -114,14 +160,14 @@ public sealed class QConverter
                     var first = last[0].Value.TrimStart();
                     var num = new StringBuilder();
                     int index = 0;
-                    
+
                     while (index < first.Length && char.IsDigit(first[index]))
                     {
                         num.Append(first[index++]);
                     }
 
                     var price = num.ToString();
-                    
+
                     if (int.TryParse(price, out int number))
                     {
                         var counter = last.Length + 1;
@@ -131,7 +177,7 @@ public sealed class QConverter
 
                         var matchesEnumerator = appendTree.Transform(source).GetEnumerator();
                         Match<char>? matches = null;
-                        
+
                         if (matchesEnumerator.MoveNext() && (matches = matchesEnumerator.Current) != null && matches.Matches.Count > 0)
                         {
                             var newLast = new List<SIPart>(last);
@@ -165,15 +211,7 @@ public sealed class QConverter
                 progress = 0;
                 continue;
             }
-
-            if (match.Matches.Count > 0)
-                list.Add(match.Matches["Quest"].Matches.Values.Select(pair => new SIPart() { Index = pair.Index, Value = pair.Value.ToString() }).ToArray());
-            else
-                list.Add(new SIPart[] { new SIPart() { Value = match.Value.ToString() } }); // Здесь явно должна быть вычитанная строка, а не единственный символ
-
-            previousPosition = progress;
-            Progress?.Invoke(progressBase + progress);
-        }
+        } while (next);
 
         return list.ToArray();
     }
@@ -194,10 +232,12 @@ public sealed class QConverter
         if (useStandardLogic)
         {
             BuildQuestionListInStandardLogic(list, questionsList, questionIndiciesList);
+            return CreateQuestionTemplateNew(useStandardLogic, questionsList);
         }
         else
         {
             BuildQuestionListInNonStandardLogic(list, questionsList, answersList, questionIndiciesList, numListAns);
+            // TODO: create new template builing code for non-standard logic and remove all the code below
         }
 
         var questions = questionsList.ToArray();
@@ -211,7 +251,9 @@ public sealed class QConverter
             oper.Add(
                 new CombinedString(
                     questions[i].Value.Length > MaximumQuestionLength
-                    ? string.Concat(questions[i].Value.AsSpan(0, 5), questions[i].Value.AsSpan(questions[i].Value.Length - MaximumQuestionLength + 5, MaximumQuestionLength - 5))
+                    ? string.Concat(
+                        questions[i].Value.AsSpan(0, 5),
+                        questions[i].Value.AsSpan(questions[i].Value.Length - MaximumQuestionLength + 5, MaximumQuestionLength - 5))
                     : questions[i].Value,
                 i));
         }
@@ -502,13 +544,153 @@ public sealed class QConverter
             QuestionTemplate = new List<string>(new string[] { qTemplate.ToString().Replace(Environment.NewLine, LineTemplate).Replace("\r", LineTemplate).Replace("\n", LineTemplate) }),
             AnswerTemplate = new List<string>(new string[] { aTemplate.ToString().Replace(Environment.NewLine, LineTemplate).Replace("\r", LineTemplate).Replace("\n", LineTemplate) })
         };
+
         return template;
+    }
+
+    private enum TemplateState { Start, Number, Text };
+
+    private static SITemplate CreateQuestionTemplateNew(bool useStandardLogic, List<SIPart> questionsList)
+    {
+        var commonSubstring = StringAnalyzer.LongestCommonSubstring(questionsList.Select(p => p.Value).ToArray());
+
+        var qTemplate = new StringBuilder();
+        var multiplier = 1;
+
+        if (commonSubstring != null)
+        {
+            var positions = commonSubstring.Value.PositionsHistory;
+            var substring = commonSubstring.Value.Substring;
+
+            var (averageDistances, questionIndex, answerIndex, bestDistanceIndices) = CalculateDistancesAndIndicies(positions);
+            multiplier = BuildQuestionTemplate(qTemplate, multiplier, substring, averageDistances, questionIndex, answerIndex, bestDistanceIndices);
+        }
+
+        var template = new SITemplate()
+        {
+            StandartLogic = useStandardLogic,
+            Multiplier = multiplier,
+            QuestionTemplate = new List<string>(
+                new string[] {
+                    qTemplate.ToString().Replace(Environment.NewLine, LineTemplate).Replace("\r", LineTemplate).Replace("\n", LineTemplate)
+                }),
+            AnswerTemplate = new List<string>(new string[1] { "" })
+        };
+
+        return template;
+    }
+
+    private static int BuildQuestionTemplate(
+        StringBuilder qTemplate,
+        int multiplier,
+        string substring,
+        double[] averageDistances,
+        int questionIndex,
+        int answerIndex,
+        int[] bestDistanceIndices)
+    {
+        // TODO: replace Question Template with separate templates between Number, QText, Answer and "after answer"
+
+        var state = TemplateState.Start;
+
+        var convertText = new StringBuilder();
+
+        convertText.AppendLine("[X=](' |'\t|'.|':|'=|',|'||'&|'@|'^|'$|'!|'?|'*|'+|'-|'(|')|'[|']|'<|'>|'{|'}|'\"|'') => ''[X]");
+        var converter = TextTreeTransformer.Create(convertText.ToString()); // Allows to escape SPARD symbols
+        converter.Mode = TransformMode.Modification;
+
+        var someItemsCounter = 0;
+        const int SomeItemsMaxCount = 2;
+
+        for (var i = 0; i < substring.Length; i++)
+        {
+            if (state == TemplateState.Start)
+            {
+                if (substring[i] == '\r' || substring[i] == '\n')
+                {
+                    qTemplate.Append(substring[i]);
+                    continue;
+                }
+
+                qTemplate.Append("<Number>"); // Question price
+                state = TemplateState.Number;
+            }
+
+            if (state == TemplateState.Number)
+            {
+                if (substring[i] == '0')
+                {
+                    qTemplate.Append(substring[i]);
+                    multiplier *= 10;
+                    continue;
+                }
+
+                state = TemplateState.Text;
+            }
+
+            if (i == questionIndex)
+            {
+                qTemplate.Append("<QText>");
+            }
+            else if (i == answerIndex)
+            {
+                qTemplate.Append("<Answer>");
+            }
+            else if (i < substring.Length - 1 && averageDistances[i] > 5.0 && someItemsCounter < SomeItemsMaxCount && bestDistanceIndices.Contains(i))
+            {
+                qTemplate.Append("<Some>");
+                someItemsCounter++;
+            }
+
+            qTemplate.Append(converter.TransformToText(substring[i].ToString()));
+        }
+
+        return multiplier;
+    }
+
+    private static (double[] averageDistances, int questionIndex, int answerIndex, int[] bestDistanceIndices) CalculateDistancesAndIndicies(int[][] positions)
+    {
+        var bestDistance = new double[4];
+        var bestDistanceIndices = new int[4];
+
+        var averageDistances = new double[positions.Length - 1];
+        for (int i = 0; i < positions.Length - 1; i++)
+        {
+            var distanceSum = 0;
+
+            for (int j = 0; j < positions[i].Length; j++)
+            {
+                distanceSum += positions[i + 1][j] - positions[i][j];
+            }
+
+            var averageDistance = (double)distanceSum / positions[i].Length;
+            averageDistances[i] = averageDistance;
+
+            for (int k = 0; k < bestDistance.Length; k++)
+            {
+                if (averageDistance > bestDistance[k])
+                {
+                    for (int l = bestDistance.Length - 1; l > k; l--)
+                    {
+                        bestDistance[l] = bestDistance[l - 1];
+                        bestDistanceIndices[l] = bestDistanceIndices[l - 1];
+                    }
+
+                    bestDistance[k] = averageDistance;
+                    bestDistanceIndices[k] = i;
+                    break;
+                }
+            }
+        }
+
+        var questionIndex = Math.Min(bestDistanceIndices[0], bestDistanceIndices[1]);
+        var answerIndex = Math.Max(bestDistanceIndices[0], bestDistanceIndices[1]); // The answer always follows the question
+
+        return (averageDistances, questionIndex, answerIndex, bestDistanceIndices.Skip(2).Take(2).ToArray());
     }
 
     private static void BuildQuestionListInNonStandardLogic(SIPart[][] list, List<SIPart> questsList, List<SIPart> answersList, List<int> numList, List<int> numListAns)
     {
-        var top = Math.Min(11, list.Length);
-
         var numberOfQuests = 0; // Потенциально возможное количество вопросов
         var j = 1;
 
@@ -710,7 +892,6 @@ public sealed class QConverter
             .AppendLine("<Some> := [lazy]<Text>")
             .AppendLine("<Some2> := [lazy]<Text>")
             .AppendLine(string.Format("{0} := {1}", LineTemplate, LineDefinition))
-            //.Append("[on,m]<Body>(<TName><BR><SP>*<BR><TAuthor><BR>|<BR><TName><BR><TAuthor><BR>|<TName><BR><TAuthor><BR>|<TName><BR><SP>*<BR>|<BR><TName><BR>|<TName><BR>|<TName>) => 0");
             .Append("[m]<Body><BR><TName><BR>(<TAuthor><BR>)?|[m]<Body><TName>(<BR><SP>*|<BR><TAuthor>|)<BR>? => [matches, Body]");
 
         var parser = TextMatchTreeTransformer.Create(themeTemplateBuilder.ToString().Replace("<Some3>", ""));
@@ -731,9 +912,9 @@ public sealed class QConverter
 
                 if (body.Length > 0)
                 {
-                    var themeName = themes[i].Value.Substring(body.Length);
+                    var themeName = themes[i].Value[body.Length..];
 
-                    if (themeName.Length < 150) // Если такая длинная тема, то, возможно, имеет место ошибка разбора
+                    if (themeName.Length < 150) // If theme name is so long that means we are having an error
                     {
                         resultList.Add(new SIPart { Value = themeName.Replace("\r\n", "\n") });
                         themeNumsList.Add(n++);
@@ -902,41 +1083,64 @@ public sealed class QConverter
     }
 
     /// <summary>
-    /// Подготовить шаблоны к работе
+    /// Prepares templates for transformation.
     /// </summary>
-    /// <param name="qTemplate">Шаблон вопроса (и ответа)</param>
-    /// <param name="tTemplate">Шаблон темы (и разделителя)</param>
-    /// <param name="standartLogic">Применять ли стандартную логику распознавания</param>
-    /// <returns>Подготовленные шаблоны</returns>
+    /// <param name="qTemplate">All used templates.</param>
     private static void PrepareTemplates(SITemplate qTemplate)
     {
         var temp = qTemplate.StandartLogic ? qTemplate.QuestionTemplate[0] : qTemplate.AnswerTemplate[0];
         int S = temp.Length - LineTemplate.Length;
-        while (S > 0 && temp.Substring(S, LineTemplate.Length) == LineTemplate)
+
+        while (S > 0 && temp.AsSpan(S, LineTemplate.Length) == LineTemplate)
+        {
             S -= LineTemplate.Length;
-        var newTemp = new StringBuilder(temp.Substring(0, S + LineTemplate.Length))
-        .Append("([ignoresp]Комментарий':' [m]<QComment>)?")
-        .Append("([ignoresp]Источник':' [m]<QSource>)?")
-        .Append("([ignoresp]Автор' вопроса':' [m]<QAuthor>)?")
-        .Append(temp.Substring(S + LineTemplate.Length));
+        }
+
+        var newTemp = new StringBuilder(temp[..(S + LineTemplate.Length)])
+            .Append("([ignoresp]Комментарий':' [m]<QComment>)?")
+            .Append("([ignoresp]Источник':' [m]<QSource>)?")
+            .Append("([ignoresp]Автор' вопроса':' [m]<QAuthor>)?")
+            .Append(temp.AsSpan(S + LineTemplate.Length));
+
         if (qTemplate.StandartLogic)
-            qTemplate.QuestionTemplate[0] = AddIgnore(newTemp.ToString().Replace("<Number><Some2>", "[m]<Number>").Replace("<QText>", "[m]<QText>").Replace("<Answer>", "[m]<Answer>"));
+            qTemplate.QuestionTemplate[0] = AddIgnore(
+                newTemp.ToString()
+                .Replace("<Number><Some2>", "[m]<Number>")
+                .Replace("<Number>", "[m]<Number>")
+                .Replace("<QText>", "[m]<QText>")
+                .Replace("<Answer>", "[m]<Answer>"));
         else
         {
-            qTemplate.QuestionTemplate[0] = AddIgnore(qTemplate.QuestionTemplate[0].Replace("<Number><Some2>", "[m]<Number>").Replace("<QText>", "[m]<QText>"));
-            qTemplate.AnswerTemplate[0] = AddIgnore(newTemp.ToString().Replace("<Number><Some2>", "[m]<Number>").Replace("<Answer>", "[m]<Answer>"));
+            qTemplate.QuestionTemplate[0] = AddIgnore(
+                qTemplate.QuestionTemplate[0]
+                .Replace("<Number><Some2>", "[m]<Number>")
+                .Replace("<Number>", "[m]<Number>")
+                .Replace("<QText>", "[m]<QText>"));
+
+            qTemplate.AnswerTemplate[0] = AddIgnore(
+                newTemp.ToString()
+                .Replace("<Number><Some2>", "[m]<Number>")
+                .Replace("<Number>", "[m]<Number>")
+                .Replace("<Answer>", "[m]<Answer>"));
         }
 
         var tTemp = qTemplate.ThemeTemplate[0];
         int S1 = tTemp.Length - LineTemplate.Length;
-        while (S1 > 0 && tTemp.Substring(S1, LineTemplate.Length) == LineTemplate)
+
+        while (S1 > 0 && tTemp.AsSpan(S1, LineTemplate.Length) == LineTemplate)
+        {
             S1 -= LineTemplate.Length;
-        var newTTemp = new StringBuilder(tTemp.Substring(0, S1 + LineTemplate.Length));
+        }
+
+        var newTTemp = new StringBuilder(tTemp[..(S1 + LineTemplate.Length)]);
         newTTemp.Append("('([m]<TComment>'))?");
-        newTTemp.Append(tTemp.Substring(S1 + LineTemplate.Length));
+        newTTemp.Append(tTemp.AsSpan(S1 + LineTemplate.Length));
         qTemplate.ThemeTemplate[0] = AddIgnore(newTTemp.ToString());
+
         if (!qTemplate.StandartLogic)
+        {
             qTemplate.SeparatorTemplate[0] = AddIgnore(qTemplate.SeparatorTemplate[0]);
+        }
 
         qTemplate.RoundTemplate = new List<string>(new string[] { "<Line><Line>[m]<RName>" });
         qTemplate.PackageTemplate = new List<string>(new string[] { "[m]<PName>" });
@@ -991,11 +1195,11 @@ public sealed class QConverter
     /// Автоматически создать шаблоны пакета, раунда, темы, вопроса
     /// </summary>
     /// <param name="list">Список тем с разбивкой по вопросам входного файла</param>
-    /// <param name="standartLogic">Применять ли стандартную логику распознавания</param>
+    /// <param name="standardLogic">Применять ли стандартную логику распознавания</param>
     /// <returns>Сформированные шаблоны</returns>
-    public SITemplate GetGeneratedTemplates(SIPart[][] list, bool standartLogic)
+    public SITemplate GetGeneratedTemplates(SIPart[][] list, bool standardLogic)
     {
-        var siTemplate = CreateQuestionTemplate(list, standartLogic);
+        var siTemplate = CreateQuestionTemplate(list, standardLogic);
         Progress?.Invoke(40);
         CreateThemeTemplate(list, siTemplate);
         Progress?.Invoke(80);
@@ -1047,24 +1251,25 @@ public sealed class QConverter
     {
         // Title reading
         var titleTemplate = new StringBuilder("<Body> := (<P>?<R>)?<T><SP>*$")
-        .AppendLine()
-        .AppendLine("<P> := <P0>")
-        .Append("<P0> := [log, p, 0]")
-        .AppendLine(templates.PackageTemplate[0])
-        .AppendLine("<R> := <R0>")
-        .Append("<R0> := [log, r, 0]")
-        .AppendLine(templates.RoundTemplate[0])
-        .AppendLine("<T> := <T0>")
-        .Append("<T0> := [log, t, 0]")
-        .AppendLine(templates.ThemeTemplate[0])
-        .AppendLine("<PName> := .<Text>")
-        .AppendLine("<RName> := .<Text>")
-        .AppendLine("<TName> := .[lazy]<Text>")
-        .AppendLine("<TAuthor> := .[lazy]<String>")
-        .AppendLine("<TComment> := .[lazy]<Text>")
-        .AppendLine("<Some> := [lazy]<String>")
-        .AppendLine(string.Format("{0} := {1}", LineTemplate, LineDefinition))
-        .Append("<Body> => @(linearize, [matches, Body])");
+            .AppendLine()
+            .AppendLine("<P> := <P0>")
+            .Append("<P0> := [log, p, 0]")
+            .AppendLine(templates.PackageTemplate[0])
+            .AppendLine("<R> := <R0>")
+            .Append("<R0> := [log, r, 0]")
+            .AppendLine(templates.RoundTemplate[0])
+            .AppendLine("<T> := <T0>")
+            .Append("<T0> := [log, t, 0]")
+            .AppendLine(templates.ThemeTemplate[0])
+            .AppendLine("<PName> := .<Text>")
+            .AppendLine("<RName> := .<Text>")
+            .AppendLine("<TName> := .[lazy]<Text>")
+            .AppendLine("<TAuthor> := .[lazy]<String>")
+            .AppendLine("<TComment> := .[lazy]<Text>")
+            .AppendLine("<Some> := [lazy]<String>")
+            .AppendLine(string.Format("{0} := {1}", LineTemplate, LineDefinition))
+            .Append("<Body> => @(linearize, [matches, Body])");
+
         int progress = 0;
 
         var titleParser = TextMatchTreeTransformer.Create(titleTemplate.ToString());
@@ -1110,7 +1315,7 @@ public sealed class QConverter
             newTitle.AppendLine();
         }
 
-        var matches = Analyze(titleParser, templates, list, 0, 0, newTitle.ToString(), new Follow[] { roundFollow, themeFollow, packageFollow }, out Decision decision);
+        var matches = Analyze(titleParser, list, 0, 0, newTitle.ToString(), new Follow[] { roundFollow, themeFollow, packageFollow }, out Decision decision);
 
         switch (decision)
         {
@@ -1296,7 +1501,7 @@ public sealed class QConverter
                 else
                     use = new Follow[] { questFollow };
 
-                matches = Analyze(parser, templates, list, i, j, null, use, out decision);
+                matches = Analyze(parser, list, i, j, null, use, out decision);
 
                 switch (decision)
                 {
@@ -1313,7 +1518,7 @@ public sealed class QConverter
                                 parser.ReplaceSetDefinition(nsAnswerWithoutTheme);
                                 use = new Follow[] { answerFollow };
                             }
-                            var matches2 = Analyze(parser, templates, list, i + 1, j, null, use, out decision);
+                            var matches2 = Analyze(parser, list, i + 1, j, null, use, out decision);
 
                             switch (decision)
                             {
@@ -1473,7 +1678,14 @@ public sealed class QConverter
         internal char SetLetter { get; set; }
     }
 
-    private Dictionary<string, Match<char>> Analyze(TreeTransformer<char, Match<char>> parser, SITemplate templates, SIPart[][] list, int i, int j, string top, Follow[] follow, out Decision decision)
+    private Dictionary<string, Match<char>>? Analyze(
+        TreeTransformer<char, Match<char>> parser,
+        SIPart[][] list,
+        int i,
+        int j,
+        string top,
+        Follow[] follow,
+        out Decision decision)
     {
         var input = (top ?? string.Empty) + list[i][j].Value;
 

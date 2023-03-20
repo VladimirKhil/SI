@@ -1052,6 +1052,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Следующий фрагмент.
+        /// </summary>
+        public static string NextFragment {
+            get {
+                return ResourceManager.GetString("NextFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Нет.
         /// </summary>
         public static string No {
@@ -1169,6 +1178,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Предыдущий фрагмент.
+        /// </summary>
+        public static string PreviousFragment {
+            get {
+                return ResourceManager.GetString("PreviousFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Издатель.
         /// </summary>
         public static string Publisher {
@@ -1201,6 +1219,15 @@ namespace SIQuester.Properties {
         public static string Question {
             get {
                 return ResourceManager.GetString("Question", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Импорт вопросов.
+        /// </summary>
+        public static string QuestionParsing {
+            get {
+                return ResourceManager.GetString("QuestionParsing", resourceCulture);
             }
         }
         
@@ -1255,6 +1282,15 @@ namespace SIQuester.Properties {
         public static string RemoveAnswer {
             get {
                 return ResourceManager.GetString("RemoveAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить сложный ответ.
+        /// </summary>
+        public static string RemoveComplexAnswer {
+            get {
+                return ResourceManager.GetString("RemoveComplexAnswer", resourceCulture);
             }
         }
         
@@ -1516,6 +1552,15 @@ namespace SIQuester.Properties {
         public static string SourceFile {
             get {
                 return ResourceManager.GetString("SourceFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Исходный фрагмент.
+        /// </summary>
+        public static string SourceFragment {
+            get {
+                return ResourceManager.GetString("SourceFragment", resourceCulture);
             }
         }
         

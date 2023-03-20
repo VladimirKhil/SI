@@ -7,11 +7,10 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
-    <Company>Khil-soft</Company>
-    <Version>5.9.0</Version>
-    <Copyright>Copyright © Khil-soft 2009 - 2022</Copyright>
+    <Version>5.9.2</Version>
+    <Copyright>Copyright © Khil-soft 2009 - 2023</Copyright>
     <Nullable>enable</Nullable>
-     <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
     <None Include="key.snk" />
@@ -27,10 +26,31 @@
   <ItemGroup>
     <Content Include="dlls\Lingware.Spard.dll" />
   </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<SubType>Designer</SubType>
+		</EmbeddedResource>
+		<None Include="key.snk" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Spard" Version="2.0.0" />
+	</ItemGroup>
   <ItemGroup>
     <Reference Include="Lingware.Spard, Version=1.4.0.0, Culture=neutral, PublicKeyToken=4be120a55c5e67bd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>dlls\Lingware.Spard.dll</HintPath>
     </Reference>
+    <Reference Include="Spard">
+      <HintPath>dlls\Spard.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

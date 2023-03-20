@@ -264,6 +264,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { if (_activeAtom != value) { _activeAtom = value; OnPropertyChanged(); } }
     }
 
+    private IEnumerable<ContentItem>? _contentItems = null;
+
+    /// <summary>
+    /// Currently played content items.
+    /// </summary>
+    public IEnumerable<ContentItem>? ContentItems
+    {
+        get => _contentItems;
+        set { _contentItems = value; OnPropertyChanged(); }
+    }
+
     private ContentItem? _activeContentItem;
 
     /// <summary>
@@ -461,7 +472,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void GameHost_MediaEnd()
     {
-        ActiveMediaCommand = RunMediaTimer;
+        if (ActiveMediaCommand == StopMediaTimer)
+        {
+            ActiveMediaCommand = RunMediaTimer;
+        }
     }
 
     private void GameHost_MediaProgress(double progress)
@@ -1195,6 +1209,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         StopQuestionTimer.Execute(0);
         StopThinkingTimer_Executed(0);
         _buttonManager?.Stop();
+        ActiveMediaCommand = null;
     }
 
     private void Engine_RoundEmpty() => StopRoundTimer_Executed(0);

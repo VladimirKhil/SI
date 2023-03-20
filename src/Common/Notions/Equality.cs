@@ -97,15 +97,17 @@ internal sealed class Equality
         foreach (var item in all)
         {
             int curr = norm(string1, string2, item);
+
             if (curr < best)
             {
                 best = curr;
                 bestpos = pos;
             }
+
             pos++;
         }
 
-        return bestpos > -1 ? all[bestpos] : System.Array.Empty<Point>();
+        return bestpos > -1 ? all[bestpos] : Array.Empty<Point>();
     }
 
     internal string Best(string string1, string string2, StringManager.StringNorm norm)
@@ -118,10 +120,12 @@ internal sealed class Equality
     private static string SubString(string str, Point[] equals)
     {
         var result = new StringBuilder();
+
         foreach (var item in equals)
         {
             result.Append(str[item.X]);
         }
+
         return result.ToString();
     }
 
@@ -146,17 +150,22 @@ internal sealed class Equality
         all.AddRange(_equalsInheriredTop);
 
         if (all.Count < 2)
+        {
             return;
+        }
+
         int best = int.MaxValue, pos = 0, bestpos = -1;
 
         foreach (var item in all)
         {
             int curr = norm(string1, string2, item);
+
             if (curr < best)
             {
                 best = curr;
                 bestpos = pos;
             }
+
             pos++;
         }
 

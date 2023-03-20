@@ -448,6 +448,9 @@
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>
+  <data name="NextFragment" xml:space="preserve">
+    <value>Следующий фрагмент</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>Нет</value>
   </data>
@@ -487,6 +490,9 @@
   <data name="PlayQuestion" xml:space="preserve">
     <value>Запустить вопрос</value>
   </data>
+  <data name="PreviousFragment" xml:space="preserve">
+    <value>Предыдущий фрагмент</value>
+  </data>
   <data name="Publisher" xml:space="preserve">
     <value>Издатель</value>
   </data>
@@ -498,6 +504,9 @@
   </data>
   <data name="Question" xml:space="preserve">
     <value>Вопрос</value>
+  </data>
+  <data name="QuestionParsing" xml:space="preserve">
+    <value>Импорт вопросов</value>
   </data>
   <data name="QuestionSplitting" xml:space="preserve">
     <value>Разделение текста на вопросы</value>
@@ -516,6 +525,9 @@
   </data>
   <data name="RemoveAnswer" xml:space="preserve">
     <value>Удалить ответ</value>
+  </data>
+  <data name="RemoveComplexAnswer" xml:space="preserve">
+    <value>Удалить сложный ответ</value>
   </data>
   <data name="RemoveLink" xml:space="preserve">
     <value>Удалить ссылку</value>
@@ -603,6 +615,9 @@
   </data>
   <data name="SourceFile" xml:space="preserve">
     <value>Исходный файл</value>
+  </data>
+  <data name="SourceFragment" xml:space="preserve">
+    <value>Исходный фрагмент</value>
   </data>
   <data name="Sources" xml:space="preserve">
     <value>Источники</value>

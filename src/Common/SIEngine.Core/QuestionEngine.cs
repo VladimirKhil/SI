@@ -198,7 +198,7 @@ public sealed class QuestionEngine
                     {
                         if (_contentIndex == 0)
                         {
-                            _playHandler.OnContentStart();
+                            _playHandler.OnContentStart(content.ContentValue);
                         }
 
                         var contentItem = content.ContentValue[_contentIndex++];

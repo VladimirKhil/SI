@@ -91,6 +91,7 @@ public sealed class Settings : INotifyPropertyChanged
     [DefaultValue(false)]
     [XmlAttribute]
     [DataMember]
+    [Obsolete]
     public bool ShowScore
     {
         get => _showScore;

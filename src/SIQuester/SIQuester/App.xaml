@@ -1263,12 +1263,25 @@
                                                             ItemContainerStyle="{StaticResource SubMenuItemQuestionType}" />
                                                     </Menu>
 
-                                                    <Button
-                                                        ToolTip="{x:Static lp:Resources.AddComplexAnswer}"
-                                                        Content="{StaticResource AddMarkerImage}"
-                                                        Command="{Binding AddComplexAnswer}"
-                                                        Style="{StaticResource MenuButton}"
-                                                        Visibility="{Binding Scenario.IsComplex, Converter={StaticResource FalseToVisiblityConverter}}" />
+                                                    <Button>
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource MenuButton}">
+                                                                <Setter Property="Command" Value="{Binding AddComplexAnswer}" />
+                                                                <Setter Property="ToolTip" Value="{x:Static lp:Resources.AddComplexAnswer}" />
+                                                                <Setter Property="Content" Value="{StaticResource AddMarkerImage}" />
+
+                                                                <Style.Triggers>
+                                                                    <DataTrigger
+                                                                        Binding="{Binding Scenario.IsComplex}"
+                                                                        Value="True">
+                                                                        <Setter Property="Command" Value="{Binding RemoveComplexAnswer}" />
+                                                                        <Setter Property="ToolTip" Value="{x:Static lp:Resources.RemoveComplexAnswer}" />
+                                                                        <Setter Property="Content" Value="{StaticResource RemoveMarkerImage}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
 
                                                     <Button
                                                         x:Name="wrong"

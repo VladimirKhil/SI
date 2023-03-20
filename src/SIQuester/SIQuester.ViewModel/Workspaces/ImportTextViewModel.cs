@@ -78,6 +78,39 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         set { _text = value; OnPropertyChanged(); }
     }
 
+    private string _previousFragment = "";
+
+    /// <summary>
+    /// Previous parsed fragment.
+    /// </summary>
+    public string PreviousFragment
+    {
+        get => _previousFragment;
+        set { _previousFragment = value; OnPropertyChanged(); }
+    }
+
+    private string _currentFragment = "";
+
+    /// <summary>
+    /// Current fragment being parsed.
+    /// </summary>
+    public string CurrentFragment
+    {
+        get => _currentFragment;
+        set { _currentFragment = value; OnPropertyChanged(); }
+    }
+
+    private string _nextFragment = "";
+
+    /// <summary>
+    /// Next fragment to parse.
+    /// </summary>
+    public string NextFragment
+    {
+        get => _nextFragment;
+        set { _nextFragment = value; OnPropertyChanged(); }
+    }
+
     private string _goodText = "";
 
     public string GoodText
@@ -272,7 +305,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private Stage _stage = Stage.Review;
 
-    private ParseErrorEventArgs _parseError = null;
+    private SplitErrorEventArgs _parseError = null;
     private ReadErrorEventArgs _readError = null;
 
     private int _badLength = 0;
@@ -321,7 +354,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         set { _skipToolTip = value; OnPropertyChanged(); }
     }
 
-    public event Action<int, int, Color?, bool> SelectText;
+    public event Action<int, int, Color?, bool> HighlightText;
 
     private readonly ILoggerFactory _loggerFactory;
 
@@ -600,7 +633,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 _skip.CanBeExecuted = false;                
                 _stage = Stage.Reading;
 
-                OnSelectText(0, _text.Length, null, false);
+                OnHighlightText(0, _text.Length, null, false);
 
                 if (_badTextCopy != _badText)
                 {
@@ -690,7 +723,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 IsEditorOpened = false;
                 _stage = Stage.Splitting;
 
-                OnSelectText(0, _text.Length, null, false);
+                OnHighlightText(0, _text.Length, null, false);
 
                 _parseError.Skip = true;
                 Free = false;
@@ -706,7 +739,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 IsEditorOpened = false;
                 _stage = Stage.Reading;
 
-                OnSelectText(0, _text.Length, null, false);
+                OnHighlightText(0, _text.Length, null, false);
 
                 _readError.Skip = true;
                 Free = false;
@@ -806,7 +839,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnReadyChanged();
 
-    private void QTxtConverter_ParseError(object? sender, ParseErrorEventArgs e)
+    private void QTxtConverter_ParseError(object? sender, SplitErrorEventArgs e)
     {
         _parseError = e;
         PrepareUI();
@@ -845,7 +878,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private void OnSelectText(int start, int length, Color? color, bool scroll) => SelectText?.Invoke(start, length, color, scroll);
+    private void OnHighlightText(int start, int length, Color? color, bool scroll) => HighlightText?.Invoke(start, length, color, scroll);
 
     private void PrepareUI()
     {
@@ -862,7 +895,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         GoodText = _text[0.._parseError.SourcePosition];
         BadText = _text[_parseError.SourcePosition..];
         IsEditorOpened = true;
-        OnSelectText(_parseError.SourcePosition, _text.Length - _parseError.SourcePosition, BadSourceBackColor, true);
+        OnHighlightText(_parseError.SourcePosition, _text.Length - _parseError.SourcePosition, BadSourceBackColor, true);
     }
 
     private string GetNormalView(Expression expression)
@@ -922,25 +955,44 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         _skip.CanBeExecuted = true;
         CanGo = true;
-        BadText = _parts[_readError.Index.Item1][_readError.Index.Item2].Value;
 
-        int position = _position;
+        var themeIndex = _readError.Index.Item1;
+        var questionIndex = _readError.Index.Item2;
 
-        if (!_template.StandartLogic && _readError.Index.Item1 != 0 && _readError.Index.Item1 % 2 == 0)
+        BadText = _parts[themeIndex][questionIndex].Value;
+
+        int previousThemeIndex, previousQuestionIndex;
+
+        if (questionIndex == 0)
         {
-            for (int j = _readError.Index.Item2; j < _parts[_readError.Index.Item1 - 1].Length; j++)
-            {
-                position += _parts[_readError.Index.Item1 - 1][j].Value.Length;
-            }
-
-            for (int j = 0; j < _readError.Index.Item2; j++)
-            {
-                position += _parts[_readError.Index.Item1][j].Value.Length;
-            }
+            previousThemeIndex = themeIndex - 1;
+            previousQuestionIndex = previousThemeIndex == -1 ? -1 : _parts[previousThemeIndex].Length - 1;
+        }
+        else
+        {
+            previousThemeIndex = themeIndex;
+            previousQuestionIndex = questionIndex - 1;
         }
 
+        int nextThemeIndex, nextQuestionIndex;
+
+        if (questionIndex < _parts[themeIndex].Length - 1)
+        {
+            nextThemeIndex = themeIndex;
+            nextQuestionIndex = questionIndex + 1;
+        }
+        else
+        {
+            nextThemeIndex = themeIndex + 1;
+            nextQuestionIndex = 0;
+        }
+
+        PreviousFragment = previousThemeIndex > -1 ? _parts[previousThemeIndex][previousQuestionIndex].Value : "";
+        CurrentFragment = _parts[themeIndex][questionIndex].Value;
+        NextFragment = nextThemeIndex < _parts.Length ? _parts[nextThemeIndex][nextQuestionIndex].Value : "";
+
         _badLength = BadText.Length;
-        OnSelectText(position, _readError.BestTry.Index - _readError.Move, BadSourceBackColor, false);
+        OnHighlightText(0, _readError.BestTry.Index - _readError.Move, BadSourceBackColor, false);
 
         Info = Resources.PhraseTemplates;
 
@@ -952,11 +1004,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             {
                 if (item.Value.Index == 0)
                 {
-                    OnSelectText(position + item.Value.Index, item.Value.ToString().Length - _readError.Move, alias.Color, true);
+                    OnHighlightText(item.Value.Index, item.Value.ToString().Length - _readError.Move, alias.Color, true);
                 }
                 else
                 {
-                    OnSelectText(position + item.Value.Index - _readError.Move, item.Value.ToString().Length, alias.Color, true);
+                    OnHighlightText(item.Value.Index - _readError.Move, item.Value.ToString().Length, alias.Color, true);
                 }
             }
             else if (int.TryParse(item.Value.ToString(), out int num))
@@ -1042,7 +1094,9 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             return;
         }
 
-        Problem = string.Format(Resources.FragmentNotFound, _readError.Missing.ToString().Replace(" ", Resources.Space))
+        Problem = string.Format(
+            Resources.FragmentNotFound,
+            _readError.Missing.ToString().Replace(" ", Resources.Space))
             + Environment.NewLine + problem + Environment.NewLine + Resources.SourceFail;
     }
 
@@ -1073,8 +1127,10 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             Problem = "";
             Info = Resources.Notice;
             State = UIState.Parse;
+            CurrentFragment = Text;
+            BadText = "";
 
-            OnSelectText(0, _text.Length, null, true);
+            OnHighlightText(0, _text.Length, null, true);
 
             if (_automaticTextImport)
             {

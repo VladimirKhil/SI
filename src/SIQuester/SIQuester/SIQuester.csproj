@@ -6,11 +6,10 @@
     <StartupObject>SIQuester.App</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyTitle>SIQuester</AssemblyTitle>
-    <Company>Khil-soft</Company>
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2023</Copyright>
-    <Version>5.9.0</Version>
+    <Version>5.9.2</Version>
     <UseWPF>true</UseWPF>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>

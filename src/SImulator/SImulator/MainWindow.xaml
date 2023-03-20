@@ -50,7 +50,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="6*" />
+                            <RowDefinition x:Name="tableRow" Height="6*" />
                         </Grid.RowDefinitions>
 
                         <ContentControl x:Name="players" Content="{Binding}" />
@@ -110,6 +110,15 @@
                                 </Setter.Value>
                             </Setter>
                         </DataTrigger>
+
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ShowPlayers}" Value="True" />
+                                <Condition Binding="{Binding TInfo.TStage}" Value="{x:Static uivm:TableStage.Sign}" />
+                            </MultiDataTrigger.Conditions>
+
+                            <Setter TargetName="tableRow" Property="Height" Value="*" />
+                        </MultiDataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ContentControl.ContentTemplate>

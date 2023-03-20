@@ -1,4 +1,5 @@
 ﻿using SIPackages;
+using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Helpers;
 using System.Collections.Specialized;
@@ -25,6 +26,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     public QuestionTypeViewModel Type { get; private set; }
 
     public ICommand AddComplexAnswer { get; private set; }
+
+    public ICommand RemoveComplexAnswer { get; private set; }
 
     public SimpleCommand AddWrongAnswers { get; private set; }
 
@@ -55,7 +58,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         BindHelper.Bind(Wrong, question.Wrong);
 
         AddComplexAnswer = new SimpleCommand(AddComplexAnswer_Executed);
-
+        RemoveComplexAnswer = new SimpleCommand(RemoveComplexAnswer_Executed);
         AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
 
         Clone = new SimpleCommand(CloneQuestion_Executed);
@@ -72,8 +75,65 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void AddComplexAnswer_Executed(object? arg)
     {
-        Scenario.AddMarker_Executed(arg);
-        Scenario.AddText_Executed(arg);
+        if (Scenario.IsComplex)
+        {
+            return;
+        }
+
+        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
+
+        try
+        {
+            using var change = document.OperationsManager.BeginComplexChange();
+
+            Scenario.AddMarker_Executed(arg);
+            Scenario.AddText_Executed(arg);
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
+    }
+
+    private void RemoveComplexAnswer_Executed(object? arg)
+    {
+        if (!Scenario.IsComplex)
+        {
+            return;
+        }
+
+        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
+
+        try
+        {
+            using var change = document.OperationsManager.BeginComplexChange();
+
+            for (var i = 0; i < Scenario.Count; i++)
+            {
+                if (Scenario[i].Model.Type == AtomTypes.Marker)
+                {
+                    while (i < Scenario.Count)
+                    {
+                        Scenario.RemoveAt(i);
+                    }
+
+                    break;
+                }
+            }
+
+            if (Scenario.Count == 0)
+            {
+                Scenario.AddText_Executed(null);
+            }
+
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            PlatformSpecific.PlatformManager.Instance.Inform(exc.Message, true);
+        }
     }
 
     private void AddWrongAnswers_Executed(object? arg)

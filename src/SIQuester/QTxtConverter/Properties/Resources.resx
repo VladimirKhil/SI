@@ -123,18 +123,20 @@
 &lt;Tail, [N], [M]&gt; := [X = N * M][m][Quest=]&lt;Quest, [X]&gt;([M1 = M + 1]&lt;Tail, [N], [M1]&gt;|)
 &lt;Tail,{0},{1}&gt;      =&gt; [matches, Tail]</value>
   </data>
-  <data name="ExtractorRules" xml:space="preserve">
-    <value>&lt;Number&gt;         := &lt;Digit&gt;+0
-&lt;Quest, [N]&gt;     := &lt;BR&gt;&lt;SP&gt;*[N=]&lt;Number&gt;([line].|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
-[Q=]&lt;Quest, [X]&gt;      =&gt; [Q]</value>
+  <data name="ExtractorRules2" xml:space="preserve">
+    <value>&lt;Number&gt; := &lt;d&gt;+0
+&lt;Quest $n&gt; := &lt;BR&gt;&lt;SP&gt;*($n :: &lt;Number&gt;)([one]&lt;s&gt;|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
+$q :: &lt;Quest $x&gt; =&gt; $q
+$x :: &lt;s&gt; =&gt; $x
+$x =&gt; $x</value>
   </data>
-  <data name="QuestsExtractorRules2" xml:space="preserve">
-    <value>&lt;Number&gt;         := &lt;Digit&gt;+0
-&lt;Quest, [N]&gt;     := &lt;BR&gt;&lt;SP&gt;*[N=]&lt;Number&gt;([line].|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
-&lt;Tail, [N], [M]&gt; := [X = N * M][m]&lt;Quest, [X]&gt;([M1 = M + 1]&lt;Tail, [N], [M1]&gt;|[M &gt; 2])
-&lt;Theme&gt;          := [m]&lt;Quest, [N]&gt;&lt;Tail, [N], 2&gt;
-&lt;Head&gt;           := ([line].|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
-&lt;Theme&gt;      =&gt; @(linearize, [matches, Theme])
-[m]&lt;Head&gt; =&gt; [matches, Head]</value>
+  <data name="QuestsExtractorRules3" xml:space="preserve">
+    <value>&lt;Number&gt;         := &lt;d&gt;+0
+&lt;Quest $n&gt;     := &lt;BR&gt;&lt;SP&gt;*($n :: &lt;Number&gt;)([one]&lt;s&gt;|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
+&lt;Tail $n $m&gt; := [$x = $n * $m][m]&lt;Quest $x&gt;([$m1 = $m + 1]&lt;Tail $n $m1&gt;|[$m &gt; 2])
+&lt;Theme&gt;          := [m]&lt;Quest $n&gt;&lt;Tail $n 2&gt;
+&lt;Head&gt;           := ([one]&lt;s&gt;|&lt;BR&gt;&amp;!(&lt;BR&gt;&lt;SP&gt;*&lt;Number&gt;))*
+[m]&lt;Theme&gt;      =&gt; $(match Theme)
+[m]&lt;Head&gt; =&gt; $(match Head)</value>
   </data>
 </root>
