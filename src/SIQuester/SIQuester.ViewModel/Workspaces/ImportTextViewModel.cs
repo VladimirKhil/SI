@@ -78,38 +78,33 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         set { _text = value; OnPropertyChanged(); }
     }
 
-    private string _previousFragment = "";
+    private string[] _fragments = Array.Empty<string>();
 
     /// <summary>
-    /// Previous parsed fragment.
+    /// Input fragments.
     /// </summary>
-    public string PreviousFragment
+    public string[] Fragments
     {
-        get => _previousFragment;
-        set { _previousFragment = value; OnPropertyChanged(); }
+        get => _fragments;
+        set
+        {
+            _fragments = value;
+            OnPropertyChanged();
+        }
     }
 
-    private string _currentFragment = "";
+    private int _currentFragmentIndex;
 
     /// <summary>
-    /// Current fragment being parsed.
+    /// Current input fragment index.
     /// </summary>
-    public string CurrentFragment
+    public int CurrentFragmentIndex
     {
-        get => _currentFragment;
-        set { _currentFragment = value; OnPropertyChanged(); }
+        get => _currentFragmentIndex;
+        set { _currentFragmentIndex = value; OnPropertyChanged(); }
     }
 
-    private string _nextFragment = "";
-
-    /// <summary>
-    /// Next fragment to parse.
-    /// </summary>
-    public string NextFragment
-    {
-        get => _nextFragment;
-        set { _nextFragment = value; OnPropertyChanged(); }
-    }
+    public string CurrentFragmentText => _currentFragmentIndex > -1 && _currentFragmentIndex < _fragments.Length ? _fragments[_currentFragmentIndex] : "";
 
     private string _goodText = "";
 
@@ -273,7 +268,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private SIDocument _existing = null;
     private bool _automaticTextImport = false;
 
-    private SIPart[][] _parts = null;
+    private SIPart[][]? _parts = null;
     private SITemplate _template = null;
 
     private readonly object _sync = new();
@@ -961,35 +956,14 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
         BadText = _parts[themeIndex][questionIndex].Value;
 
-        int previousThemeIndex, previousQuestionIndex;
+        var fragmentIndex = questionIndex;
 
-        if (questionIndex == 0)
+        for (int i = 0; i < themeIndex; i++)
         {
-            previousThemeIndex = themeIndex - 1;
-            previousQuestionIndex = previousThemeIndex == -1 ? -1 : _parts[previousThemeIndex].Length - 1;
+            fragmentIndex += _parts[i].Length;
         }
-        else
-        {
-            previousThemeIndex = themeIndex;
-            previousQuestionIndex = questionIndex - 1;
-        }
-
-        int nextThemeIndex, nextQuestionIndex;
-
-        if (questionIndex < _parts[themeIndex].Length - 1)
-        {
-            nextThemeIndex = themeIndex;
-            nextQuestionIndex = questionIndex + 1;
-        }
-        else
-        {
-            nextThemeIndex = themeIndex + 1;
-            nextQuestionIndex = 0;
-        }
-
-        PreviousFragment = previousThemeIndex > -1 ? _parts[previousThemeIndex][previousQuestionIndex].Value : "";
-        CurrentFragment = _parts[themeIndex][questionIndex].Value;
-        NextFragment = nextThemeIndex < _parts.Length ? _parts[nextThemeIndex][nextQuestionIndex].Value : "";
+        
+        CurrentFragmentIndex = fragmentIndex;
 
         _badLength = BadText.Length;
         OnHighlightText(0, _readError.BestTry.Index - _readError.Move, BadSourceBackColor, false);
@@ -1107,7 +1081,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             _parts = _converter.ExtractQuestions(_text);
             Progress = 0;
             
-            if (_parts != null && _parts.Length == 1)
+            if (_parts == null || _parts.Length == 1)
             {
                 if (!_tokenSource.IsCancellationRequested)
                 {
@@ -1127,7 +1101,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             Problem = "";
             Info = Resources.Notice;
             State = UIState.Parse;
-            CurrentFragment = Text;
+            Fragments = _parts.SelectMany(p => p).Select(p => p.Value).ToArray();
             BadText = "";
 
             OnHighlightText(0, _text.Length, null, true);

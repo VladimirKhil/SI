@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:viewmodel="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     d:DataContext="{d:DesignInstance Type=viewmodel:AboutViewModel}"
     mc:Ignorable="d" 
     d:DesignHeight="351"
@@ -27,18 +28,29 @@
                 
                 <Image Source="/SIQuester;component/Resources/logo.jpg" Width="64" Margin="5,5,0,5" Grid.RowSpan="3" />
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" FontWeight="Bold">SIQuester</TextBlock>
-                <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">2005 - 2022 гг.</TextBlock>
+                
+                <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="1">
+                    <Run Text="2005 - 2023" />
+                    <Run Text="{x:Static lp:Resources.Years}" />
+                </TextBlock>
+                
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="2" Text="{Binding Version, StringFormat=Версия \{0\}}" />
             </Grid>
-            
-            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap"><Bold>Автор:</Bold> Владимир Хиль</TextBlock>
+
+            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">
+                <Run FontWeight="Bold" Text="{x:Static lp:Resources.Author}" /><Bold>:</Bold>
+                <Run Text="{x:Static lp:Resources.AppAuthor}" />
+            </TextBlock>
             
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">
-                <Run>Официальный сайт: </Run>
+                <Run FontWeight="Bold" Text="{x:Static lp:Resources.OfficialSite}" /><Bold>:</Bold>
                 <Hyperlink Command="{Binding OpenSite}">https://vladimirkhil.com/si/siquester</Hyperlink>
             </TextBlock>
             
-            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap"><Bold>Лицензии:</Bold></TextBlock>
+            <TextBlock Margin="5,5,0,0" TextWrapping="Wrap">
+                <Run FontWeight="Bold" Text="{x:Static lp:Resources.Licences}" /><Bold>:</Bold>
+            </TextBlock>
+            
             <TextBlock Margin="5,5,0,0" TextWrapping="Wrap" Text="{Binding Licenses}" />
         </StackPanel>
     </ScrollViewer>

@@ -144,7 +144,11 @@
                             <Separator />
                             <MenuItem Header="HTML" Command="{Binding ExportHtml}" />
                             <MenuItem Header="HTML для печати" Command="{Binding ExportPrintHtml}" />
-                            <MenuItem Header="Настраиваемый HTML" Command="{Binding ExportFormattedHtml}" ToolTip="Возможность настройки специфического представления пакета"/>
+                            
+                            <MenuItem
+                                Header="Настраиваемый HTML"
+                                Command="{Binding ExportFormattedHtml}"
+                                ToolTip="Возможность настройки специфического представления пакета"/>
                             
                             <MenuItem Header="Скрипт mIRC" Command="{Binding ExportMirc}" ToolTip="Проведение игры в IRC">
                                 <MenuItem.Icon>

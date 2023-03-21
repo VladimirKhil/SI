@@ -241,6 +241,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Владимир Хиль.
+        /// </summary>
+        public static string AppAuthor {
+            get {
+                return ResourceManager.GetString("AppAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Присоединить пакет….
         /// </summary>
         public static string AttachPackage {
@@ -980,6 +989,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Лицензии.
+        /// </summary>
+        public static string Licences {
+            get {
+                return ResourceManager.GetString("Licences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Список.
         /// </summary>
         public static string List {
@@ -1084,6 +1102,15 @@ namespace SIQuester.Properties {
         public static string Object {
             get {
                 return ResourceManager.GetString("Object", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Официальный сайт.
+        /// </summary>
+        public static string OfficialSite {
+            get {
+                return ResourceManager.GetString("OfficialSite", resourceCulture);
             }
         }
         
@@ -1831,6 +1858,15 @@ namespace SIQuester.Properties {
         public static string WrongAnswers {
             get {
                 return ResourceManager.GetString("WrongAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на гг..
+        /// </summary>
+        public static string Years {
+            get {
+                return ResourceManager.GetString("Years", resourceCulture);
             }
         }
         

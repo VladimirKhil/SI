@@ -29,27 +29,6 @@ public static class TextImportManager
         var textBox = (RichTextBox)d;
         var model = (ImportTextViewModel)e.NewValue;
 
-        void updateText(object? sender, PropertyChangedEventArgs e2)
-        {
-            if (sender == null || e2.PropertyName != nameof(ImportTextViewModel.CurrentFragment))
-            {
-                return;
-            }
-
-            var source = (ImportTextViewModel)sender;
-
-            textBox.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var par = (Paragraph)textBox.Document.Blocks.LastBlock;
-
-                while (par.Inlines.Count > 1)
-                {
-                    par.Inlines.Remove(par.Inlines.LastInline);
-                }
-
-                ((Run)par.Inlines.LastInline).Text = source.CurrentFragment;
-            }));
-        }
 
         void highlightText(int start, int length, Color? color, bool scroll)
         {
@@ -124,7 +103,6 @@ public static class TextImportManager
         {
             var oldModel = (ImportTextViewModel)e.OldValue;
 
-            oldModel.PropertyChanged -= updateText;
             oldModel.HighlightText -= highlightText;
 
             return;
@@ -132,9 +110,8 @@ public static class TextImportManager
 
         var blocks = textBox.Document.Blocks;
         blocks.Clear();
-        blocks.Add(new Paragraph(new Run(model.CurrentFragment)));
+        blocks.Add(new Paragraph(new Run(model.CurrentFragmentText)));
 
-        model.PropertyChanged += updateText;
         model.HighlightText += highlightText;
     }
 }

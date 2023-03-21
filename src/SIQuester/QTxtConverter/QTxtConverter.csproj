@@ -7,7 +7,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Product>QTxtConverter</Product>
     <Description>Text to questions converter</Description>
-    <Version>5.9.2</Version>
+    <Version>5.9.3</Version>
     <Copyright>Copyright © Khil-soft 2009 - 2023</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

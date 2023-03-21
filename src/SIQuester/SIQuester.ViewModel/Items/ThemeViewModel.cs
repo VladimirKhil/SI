@@ -75,7 +75,29 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
         switch (e.Action)
         {
             case NotifyCollectionChangedAction.Add:
+                if (e.NewItems == null)
+                {
+                    break;
+                }
+
+                for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
+                {
+                    if (Questions[i].OwnerTheme != null)
+                    {
+                        throw new Exception(Resources.ErrorInsertingBindedQuestion);
+                    }
+
+                    Questions[i].OwnerTheme = this;
+                    Model.Questions.Insert(i, Questions[i].Model);
+                }
+                break;
+
             case NotifyCollectionChangedAction.Replace:
+                if (e.NewItems == null)
+                {
+                    break;
+                }
+
                 for (int i = e.NewStartingIndex; i < e.NewStartingIndex + e.NewItems.Count; i++)
                 {
                     if (Questions[i].OwnerTheme != null && Questions[i].OwnerTheme != this)
@@ -84,7 +106,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
                     }
 
                     Questions[i].OwnerTheme = this;
-                    Model.Questions.Insert(i, Questions[i].Model);
+                    Model.Questions[i] = Questions[i].Model;
                 }
                 break;
 
@@ -95,6 +117,11 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
                 break;
 
             case NotifyCollectionChangedAction.Remove:
+                if (e.OldItems == null)
+                {
+                    break;
+                }
+
                 foreach (QuestionViewModel question in e.OldItems)
                 {
                     question.OwnerTheme = null;
@@ -106,7 +133,8 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
 
             case NotifyCollectionChangedAction.Reset:
                 Model.Questions.Clear();
-                foreach (QuestionViewModel question in Questions)
+
+                foreach (var question in Questions)
                 {
                     question.OwnerTheme = this;
                     Model.Questions.Add(question.Model);

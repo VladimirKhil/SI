@@ -9,7 +9,7 @@
     <Product>SIQuester</Product>
     <Description>Questions editor for SIGame</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2023</Copyright>
-    <Version>5.9.2</Version>
+    <Version>5.9.3</Version>
     <UseWPF>true</UseWPF>
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>

@@ -5,7 +5,7 @@
     <Product>SIQuester.ViewModel</Product>
     <Description>SIQuester business logic</Description>
     <Copyright>Copyright © Khil-soft 2014 - 2023</Copyright>
-    <Version>5.9.2</Version>
+    <Version>5.9.3</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>

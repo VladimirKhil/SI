@@ -24,7 +24,7 @@ public sealed class AboutViewModel : WorkspaceViewModel
         get
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            return $"{version.Major}.{version.Minor}.{version.Build}";
+            return version != null ? $"{version.Major}.{version.Minor}.{version.Build}" : "1.0.0";
         }
     }
 

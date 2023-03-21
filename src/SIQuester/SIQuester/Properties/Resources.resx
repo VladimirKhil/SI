@@ -177,6 +177,9 @@
   <data name="AnswerHeader" xml:space="preserve">
     <value>Ответ:</value>
   </data>
+  <data name="AppAuthor" xml:space="preserve">
+    <value>Владимир Хиль</value>
+  </data>
   <data name="AttachPackage" xml:space="preserve">
     <value>Присоединить пакет…</value>
   </data>
@@ -424,6 +427,9 @@
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
   </data>
+  <data name="Licences" xml:space="preserve">
+    <value>Лицензии</value>
+  </data>
   <data name="List" xml:space="preserve">
     <value>Список</value>
   </data>
@@ -459,6 +465,9 @@
   </data>
   <data name="Object" xml:space="preserve">
     <value>Объект</value>
+  </data>
+  <data name="OfficialSite" xml:space="preserve">
+    <value>Официальный сайт</value>
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
@@ -708,6 +717,9 @@
   </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неправильные ответы</value>
+  </data>
+  <data name="Years" xml:space="preserve">
+    <value>гг.</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
     <value>Ваши темы:</value>

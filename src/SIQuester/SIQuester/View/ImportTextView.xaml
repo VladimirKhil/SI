@@ -313,49 +313,62 @@
                         <Grid Grid.Column="0" Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="1.5*"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="3*"/>
                                 <RowDefinition Height="4" />
                                 <RowDefinition Height="1.5*" />
                             </Grid.RowDefinitions>
 
                             <ProgressBar Height="25" Margin="0,6" Value="{Binding Progress}" />
 
-                            <TextBox
+                            <ListBox
                                 Grid.Row="1"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                IsReadOnly="True"
                                 FontSize="14"
-                                Text="{Binding PreviousFragment}"
-                                ToolTip="{x:Static lp:Resources.PreviousFragment}"
-                                TextWrapping="Wrap"
-                                Background="LightGray"
-                                Padding="5" />
+                                ItemsSource="{Binding Fragments}"
+                                SelectedIndex="{Binding CurrentFragmentIndex}"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                lb:ScrollIntoSelectedItemBehavior.IsAttached="True">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Focusable" Value="False" />
+                                        <Setter Property="Padding" Value="1" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        
+                                        <Setter Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate>
+                                                    <TextBlock
+                                                        Text="{Binding}"
+                                                        TextWrapping="Wrap"
+                                                        Background="#FFEEEEEE"
+                                                        Padding="7"
+                                                        HorizontalAlignment="Stretch" />
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+
+                                        <Style.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="ContentTemplate">
+                                                    <Setter.Value>
+                                                        <DataTemplate>
+                                                            <RichTextBox
+                                                                IsReadOnly="True"
+                                                                lb:TextImportManager.TextSource="{Binding DataContext,RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                                ToolTip="{x:Static lp:Resources.SourceFragment}"
+                                                                HorizontalAlignment="Stretch" />
+                                                        </DataTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+
+                            <GridSplitter Background="Transparent" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
 
                             <RichTextBox
-                                Grid.Row="2"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                IsReadOnly="True"
-                                FontSize="14"
-                                lb:TextImportManager.TextSource="{Binding}"
-                                ToolTip="{x:Static lp:Resources.SourceFragment}" />
-
-                            <TextBox
                                 Grid.Row="3"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                IsReadOnly="True"
-                                FontSize="14"
-                                Text="{Binding NextFragment}"
-                                ToolTip="{x:Static lp:Resources.NextFragment}"
-                                TextWrapping="Wrap"
-                                Background="LightGray"
-                                Padding="5" />
-
-                            <GridSplitter Background="Transparent" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
-
-                            <RichTextBox
-                                Grid.Row="5"
                                 Style="{StaticResource Editor}"
                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                                 FontSize="14"
