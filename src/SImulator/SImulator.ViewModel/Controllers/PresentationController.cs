@@ -6,6 +6,7 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
@@ -432,22 +433,49 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void AddLostButtonPlayer(string name)
+    public void AddLostButtonPlayerIndex(int playerIndex)
     {
-        lock (TInfo.LostButtonPlayers)
+        if (playerIndex < 0 || playerIndex >= Players.Count)
         {
-            if (!TInfo.LostButtonPlayers.Contains(name))
+            return;
+        }
+
+        if (!ShowPlayers)
+        {
+            var playerName = Players[playerIndex].Name;
+
+            lock (TInfo.LostButtonPlayers)
             {
-                TInfo.LostButtonPlayers.Add(name);
+                if (!TInfo.LostButtonPlayers.Contains(playerName))
+                {
+                    TInfo.LostButtonPlayers.Add(playerName);
+                }
             }
+        }
+
+        var currentCountedPlayers = Players.Where(p => p.State == PlayerState.Active || p.LostButtonIndex > -1).Count();
+
+        if (Players[playerIndex].LostButtonIndex == -1)
+        {
+            Players[playerIndex].LostButtonIndex = currentCountedPlayers + 1;
+            Players[playerIndex].State = PlayerState.LostButton;
         }
     }
 
-    public void ClearLostButtonPlayers()
+    public void ClearPlayersState()
     {
-        lock (TInfo.LostButtonPlayers)
+        if (!ShowPlayers)
         {
-            TInfo.LostButtonPlayers.Clear();
+            lock (TInfo.LostButtonPlayers)
+            {
+                TInfo.LostButtonPlayers.Clear();
+            }
+        }
+
+        for (var i = 0; i < Players.Count; i++)
+        {
+            Players[i].LostButtonIndex = -1;
+            Players[i].State = PlayerState.None;
         }
     }
 

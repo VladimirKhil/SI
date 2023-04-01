@@ -841,7 +841,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _logger.Write("Package: {0}", _engine.PackageName);
 
         _selectedPlayers.Clear();
-        PresentationController.ClearLostButtonPlayers();
+        PresentationController.ClearPlayersState();
 
         if (Settings.Model.AutomaticGame)
         {
@@ -1800,7 +1800,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         var player = (PlayerInfo)LocalInfo.Players[index];
-
         return ProcessPlayerPress(index, player);
     }
 
@@ -1834,7 +1833,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             {
                 if (Settings.Model.ShowLostButtonPlayers && _selectedPlayer != player && !_selectedPlayers.Contains(player))
                 {
-                    PresentationController.AddLostButtonPlayer(player.Name);
+                    PresentationController.AddLostButtonPlayerIndex(index);
                 }
             }
 
@@ -1886,10 +1885,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             _selectedPlayer = null;
         }
 
-        if (Settings.Model.ShowLostButtonPlayers)
-        {
-            PresentationController.ClearLostButtonPlayers();
-        }        
+        PresentationController.ClearPlayersState();
     }
 
     private void OnStateChanged()
@@ -1902,7 +1898,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 break;
 
             case QuestionState.Pressing:
-                PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
+                if (Settings.Model.ShowQuestionBorder)
+                {
+                    PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
+                }
                 break;
 
             case QuestionState.Pressed:

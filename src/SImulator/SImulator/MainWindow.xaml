@@ -80,27 +80,46 @@
 
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="local:SimplePlayerInfo">
-                                                    <UniformGrid x:Name="player" Rows="2" Columns="1">
-                                                        <!-- Content controls required for FillManager to work correctly -->
-                                                        
-                                                        <ContentControl Margin="7,7,7,2">
-                                                            <TextBlock
-                                                                Text="{Binding Name}"
-                                                                Style="{StaticResource CenteredText}"
-                                                                uib:FillManager.Fill="True" />
-                                                        </ContentControl>
+                                                    <Grid x:Name="player" Margin="0.5,0">
+                                                        <UniformGrid Rows="2" Columns="1">
+                                                            <!-- Content controls required for FillManager to work correctly -->
 
-                                                        <ContentControl Margin="7,2,7,7">
-                                                            <TextBlock
-                                                                Text="{Binding Sum}"
-                                                                Style="{StaticResource CenteredText}"
-                                                                uib:FillManager.Fill="True" />
-                                                        </ContentControl>
-                                                    </UniformGrid>
+                                                            <ContentControl Margin="7,7,7,2">
+                                                                <TextBlock
+                                                                    Text="{Binding Name}"
+                                                                    Style="{StaticResource CenteredText}"
+                                                                    uib:FillManager.Fill="True" />
+                                                            </ContentControl>
+
+                                                            <ContentControl Margin="7,2,7,7">
+                                                                <TextBlock
+                                                                    Text="{Binding Sum}"
+                                                                    Style="{StaticResource CenteredText}"
+                                                                    uib:FillManager.Fill="True" />
+                                                            </ContentControl>
+                                                        </UniformGrid>
+
+                                                        <TextBlock
+                                                            x:Name="lostButtonIndex"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Bottom"
+                                                            Margin="0,0,10,10"
+                                                            FontSize="40"
+                                                            Padding="5,0"
+                                                            Background="#22000000"
+                                                            Style="{StaticResource CenteredText}"
+                                                            Visibility="Collapsed"
+                                                            Text="{Binding LostButtonIndex}" />
+                                                    </Grid>
 
                                                     <DataTemplate.Triggers>
                                                         <DataTrigger Binding="{Binding State}" Value="{x:Static uivm:PlayerState.Active}">
                                                             <Setter TargetName="player" Property="Background" Value="LightYellow" />
+                                                        </DataTrigger>
+
+                                                        <DataTrigger Binding="{Binding State}" Value="{x:Static uivm:PlayerState.LostButton}">
+                                                            <Setter TargetName="player" Property="Background" Value="Orange" />
+                                                            <Setter TargetName="lostButtonIndex" Property="Visibility" Value="Visible" />
                                                         </DataTrigger>
                                                     </DataTemplate.Triggers>
                                                 </DataTemplate>

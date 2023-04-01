@@ -222,6 +222,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _showQuestionBorder = true;
+
+    /// <summary>
+    /// Show border around question when the players could press the button.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool ShowQuestionBorder
+    {
+        get => _showQuestionBorder;
+        set
+        {
+            if (_showQuestionBorder != value)
+            {
+                _showQuestionBorder = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _substractOnWrong = true;
 
     /// <summary>

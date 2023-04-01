@@ -135,6 +135,15 @@
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
   </data>
+  <data name="BackgroundImage" xml:space="preserve">
+    <value>Изображение-фон</value>
+  </data>
+  <data name="BackgroundVideo" xml:space="preserve">
+    <value>Видеофайл-фон</value>
+  </data>
+  <data name="ByDefault" xml:space="preserve">
+    <value>По умолчанию</value>
+  </data>
   <data name="ClearList" xml:space="preserve">
     <value>Очистить список</value>
   </data>
@@ -171,6 +180,12 @@
   <data name="GamePackage" xml:space="preserve">
     <value>Игровой пакет</value>
   </data>
+  <data name="GameRules" xml:space="preserve">
+    <value>Правила игры</value>
+  </data>
+  <data name="GameType" xml:space="preserve">
+    <value>Тип игры</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Скрыть</value>
   </data>
@@ -179,6 +194,9 @@
   </data>
   <data name="Image" xml:space="preserve">
     <value>Изображение</value>
+  </data>
+  <data name="IntroVideo" xml:space="preserve">
+    <value>Заставочный видеофайл</value>
   </data>
   <data name="KeyboardDetachError" xml:space="preserve">
     <value>Ошибка завершения прослушивания клавиатуры</value>
@@ -246,6 +264,9 @@
   <data name="QuestionLineSpacing" xml:space="preserve">
     <value>Межстрочный интервал в вопросе</value>
   </data>
+  <data name="QuestionTime" xml:space="preserve">
+    <value>Время вопроса (c)</value>
+  </data>
   <data name="RecentFiles" xml:space="preserve">
     <value>Последние файлы</value>
   </data>
@@ -257,6 +278,9 @@
   </data>
   <data name="Round" xml:space="preserve">
     <value>Раунд</value>
+  </data>
+  <data name="RoundTime" xml:space="preserve">
+    <value>Время раунда (с)</value>
   </data>
   <data name="RuntimeBrokenError" xml:space="preserve">
     <value>Не удалось создать главное окно программы! Похоже, на вашем компьютере повреждена среда выполнения программ: {0}</value>
@@ -279,6 +303,9 @@
   <data name="SelectFile" xml:space="preserve">
     <value>Файл…</value>
   </data>
+  <data name="SelectHeader" xml:space="preserve">
+    <value>Выбрать…</value>
+  </data>
   <data name="SelectLibrary" xml:space="preserve">
     <value>Библиотека вопросов…</value>
   </data>
@@ -296,6 +323,9 @@
   </data>
   <data name="ShowPlayersList" xml:space="preserve">
     <value>Показывать список игроков</value>
+  </data>
+  <data name="ShowQuestionBorder" xml:space="preserve">
+    <value>Показывать рамку в момент, когда можно нажимать на кнопку</value>
   </data>
   <data name="ShowRightAnswers" xml:space="preserve">
     <value>Показывать правильные ответы</value>
@@ -338,6 +368,9 @@
   </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="ThemeComments" xml:space="preserve">
+    <value>Комментарии темы</value>
   </data>
   <data name="Thinking" xml:space="preserve">
     <value>Размышление</value>

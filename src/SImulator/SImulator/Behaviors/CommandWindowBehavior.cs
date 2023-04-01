@@ -4,15 +4,21 @@ using System.Windows;
 
 namespace SImulator.Behaviors;
 
+/// <summary>
+/// Provides pressed keys from View to corresponding View Model.
+/// </summary>
 public static class CommandWindowBehavior
 {
     public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
 
     public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
 
-    // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty IsAttachedProperty =
-        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(CommandWindowBehavior), new UIPropertyMetadata(false, IsAttachedChanged));
+        DependencyProperty.RegisterAttached(
+            "IsAttached",
+            typeof(bool),
+            typeof(CommandWindowBehavior),
+            new UIPropertyMetadata(false, IsAttachedChanged));
 
     private static void IsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {

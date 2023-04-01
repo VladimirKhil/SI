@@ -57,9 +57,9 @@ public interface IPresentationController
 
     void SetActivePlayerIndex(int playerIndex);
 
-    void AddLostButtonPlayer(string name);
+    void AddLostButtonPlayerIndex(int playerIndex);
 
-    void ClearLostButtonPlayers();
+    void ClearPlayersState();
 
     void SeekMedia(int position);
 

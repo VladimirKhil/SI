@@ -6,13 +6,13 @@ using System.Windows.Data;
 namespace SImulator.Converters;
 
 /// <summary>
-/// Makes object visible when target value is not null.
+/// Makes object visible when target value is not null or empty.
 /// </summary>
-[ValueConversion(typeof(object), typeof(Visibility))]
-public sealed class NotNullToVisibilityConverter : IValueConverter
+[ValueConversion(typeof(string), typeof(Visibility))]
+public sealed class NotNullOrEmptyToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
-        value != null ? Visibility.Visible : Visibility.Collapsed;
+        string.IsNullOrEmpty((string)value) ? Visibility.Collapsed : Visibility.Visible;
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 }

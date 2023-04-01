@@ -115,6 +115,33 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Изображение-фон.
+        /// </summary>
+        public static string BackgroundImage {
+            get {
+                return ResourceManager.GetString("BackgroundImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Видеофайл-фон.
+        /// </summary>
+        public static string BackgroundVideo {
+            get {
+                return ResourceManager.GetString("BackgroundVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на По умолчанию.
+        /// </summary>
+        public static string ByDefault {
+            get {
+                return ResourceManager.GetString("ByDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Очистить список.
         /// </summary>
         public static string ClearList {
@@ -223,6 +250,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Правила игры.
+        /// </summary>
+        public static string GameRules {
+            get {
+                return ResourceManager.GetString("GameRules", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Тип игры.
+        /// </summary>
+        public static string GameType {
+            get {
+                return ResourceManager.GetString("GameType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Скрыть.
         /// </summary>
         public static string Hide {
@@ -246,6 +291,15 @@ namespace SImulator.Properties {
         public static string Image {
             get {
                 return ResourceManager.GetString("Image", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Заставочный видеофайл.
+        /// </summary>
+        public static string IntroVideo {
+            get {
+                return ResourceManager.GetString("IntroVideo", resourceCulture);
             }
         }
         
@@ -448,6 +502,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Время вопроса (c).
+        /// </summary>
+        public static string QuestionTime {
+            get {
+                return ResourceManager.GetString("QuestionTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Последние файлы.
         /// </summary>
         public static string RecentFiles {
@@ -480,6 +543,15 @@ namespace SImulator.Properties {
         public static string Round {
             get {
                 return ResourceManager.GetString("Round", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Время раунда (с).
+        /// </summary>
+        public static string RoundTime {
+            get {
+                return ResourceManager.GetString("RoundTime", resourceCulture);
             }
         }
         
@@ -547,6 +619,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбрать….
+        /// </summary>
+        public static string SelectHeader {
+            get {
+                return ResourceManager.GetString("SelectHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Библиотека вопросов….
         /// </summary>
         public static string SelectLibrary {
@@ -597,6 +678,15 @@ namespace SImulator.Properties {
         public static string ShowPlayersList {
             get {
                 return ResourceManager.GetString("ShowPlayersList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Показывать рамку в момент, когда можно нажимать на кнопку.
+        /// </summary>
+        public static string ShowQuestionBorder {
+            get {
+                return ResourceManager.GetString("ShowQuestionBorder", resourceCulture);
             }
         }
         
@@ -723,6 +813,15 @@ namespace SImulator.Properties {
         public static string TestPackage {
             get {
                 return ResourceManager.GetString("TestPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Комментарии темы.
+        /// </summary>
+        public static string ThemeComments {
+            get {
+                return ResourceManager.GetString("ThemeComments", resourceCulture);
             }
         }
         

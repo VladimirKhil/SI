@@ -41,6 +41,18 @@ public class SimplePlayerInfo : INotifyPropertyChanged
         set { if (_state != value) { _state = value; OnPropertyChanged(); } }
     }
 
+    private int _lostButtonIndex = -1;
+
+    /// <summary>
+    /// Player index in fighting for button press to answer.
+    /// It starts from 2 (index of 1 got the player who wins the button).
+    /// </summary>
+    public int LostButtonIndex
+    {
+        get => _lostButtonIndex;
+        set { if (_lostButtonIndex != value) { _lostButtonIndex = value; OnPropertyChanged(); } }
+    }
+
     public override string ToString() => $"{_name}: {_sum}";
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -32,7 +32,7 @@ public sealed class QuestionParameterValueConverter : IValueConverter
         };
     }
 
-    private string? PrintNumberSet(NumberSet? numberSet)
+    private static string? PrintNumberSet(NumberSet? numberSet)
     {
         if (numberSet == null)
         {

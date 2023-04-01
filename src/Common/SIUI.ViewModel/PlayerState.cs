@@ -9,8 +9,14 @@ public enum PlayerState
     /// No state.
     /// </summary>
     None,
+
     /// <summary>
     /// Active state.
     /// </summary>
     Active,
+
+    /// <summary>
+    /// Load button state.
+    /// </summary>
+    LostButton
 }
