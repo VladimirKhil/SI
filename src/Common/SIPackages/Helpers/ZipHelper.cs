@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace SIPackages.Helpers;
 
@@ -185,7 +186,8 @@ public static class ZipHelper
 
         if (extIndex > -1)
         {
-            result += value[extIndex..];
+            var extLength = Math.Min(4, value.Length - extIndex - 1);
+            result += '.' + Regex.Replace(value.Substring(extIndex + 1, extLength), "[^a-zA-Z]+", "");
         }
 
         return result;

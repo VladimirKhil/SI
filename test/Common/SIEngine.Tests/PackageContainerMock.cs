@@ -38,7 +38,7 @@ namespace SIEngine.Tests
             CancellationToken cancellationToken = default) =>
             throw new NotImplementedException();
 
-        public void DeleteStream(string category, string name) => throw new NotImplementedException();
+        public bool DeleteStream(string category, string name) => throw new NotImplementedException();
 
         public void Dispose() => throw new NotImplementedException();
 

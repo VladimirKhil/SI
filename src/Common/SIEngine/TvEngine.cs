@@ -145,6 +145,7 @@ public sealed class TvEngine : EngineBase
                 #region RightAnswerProceed
                 {
                     var mode = PlayQuestionAtom();
+
                     if (mode == QuestionPlayMode.AlreadyFinished)
                     {
                         OnQuestionFinished();

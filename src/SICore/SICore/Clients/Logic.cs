@@ -27,7 +27,7 @@ public abstract class Logic<D> : ILogic
 
     private bool _disposed;
 
-    private Timer _taskTimer;
+    private readonly Timer _taskTimer;
 
     private int _taskArgument = -1;
 
@@ -62,7 +62,10 @@ public abstract class Logic<D> : ILogic
 
         try
         {
-            ExecuteTask(CurrentTask, _taskArgument);
+            _taskTimerLock.WithLock(() =>
+            {
+                ExecuteTask(CurrentTask, _taskArgument);
+            });
         }
         catch (Exception exc)
         {
@@ -197,11 +200,13 @@ public abstract class Logic<D> : ILogic
     protected void RunTaskTimer(double taskTime) =>
         _taskTimerLock.WithLock(() =>
         {
-            if (!_disposed && taskTime > 0 && taskTime < 10 * 60 * 10) // 10 min
+            if (_disposed || taskTime <= 0 || taskTime >= 10 * 60 * 10) // 10 min
             {
-                _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
-                _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
+                return;
             }
+
+            _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
+            _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
         });
 
     protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>

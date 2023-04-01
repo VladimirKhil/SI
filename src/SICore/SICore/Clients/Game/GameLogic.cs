@@ -47,6 +47,11 @@ public sealed class GameLogic : Logic<GameData>
     /// </summary>
     private const int PenaltyIncrement = 3;
 
+    /// <summary>
+    /// Frequency of partial prints per second.
+    /// </summary>
+    private const double PartialPrintFrequencyPerSecond = 0.5;
+
     public object? UserState { get; set; }
 
     private readonly GameActions _gameActions;
@@ -1765,6 +1770,7 @@ public sealed class GameLogic : Logic<GameData>
         _tasksHistory.AddLogEntry($"Scheduled ({(Tasks)CurrentTask}): {task} {arg} {taskTime / 10}");
 
         SetTask((int)task, arg);
+
         if (_data.Settings.AppSettings.Managed && !force && _data.HostName != null && _data.AllPersons.ContainsKey(_data.HostName))
         {
             IsRunning = false;
@@ -2983,7 +2989,7 @@ public sealed class GameLogic : Logic<GameData>
             throw new Exception($"numberOfThemes == 0! GetRoundActiveQuestionsCount: {GetRoundActiveQuestionsCount()}");
         }
 
-        // Random theme inex selection
+        // Random theme index selection
         var k1 = Random.Shared.Next(numberOfThemes);
         var i = -1;
 
@@ -2992,7 +2998,7 @@ public sealed class GameLogic : Logic<GameData>
         var theme = _data.TInfo.RoundInfo[i];
         var numberOfQuestions = theme.Questions.Count(QuestionHelper.IsActive);
 
-        // Random question inex selection
+        // Random question index selection
         var k2 = Random.Shared.Next(numberOfQuestions);
         var j = -1;
 
@@ -3198,7 +3204,12 @@ public sealed class GameLogic : Logic<GameData>
     {
         var text = _data.Text;
 
-        var printingLength = Math.Min(text.Length - _data.TextLength, _data.Settings.AppSettings.ReadingSpeed / 2); // Число символов в секунду
+        var printingLength = Math.Max(
+            1,
+            Math.Min(
+                text.Length - _data.TextLength,
+                (int)(_data.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond)));
+
         var subText = text.Substring(_data.TextLength, printingLength);
 
         _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
@@ -3208,12 +3219,12 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.TextLength < text.Length)
         {
-            ScheduleExecution(Tasks.PrintPartial, 5, force: true);
+            ScheduleExecution(Tasks.PrintPartial, 10 * PartialPrintFrequencyPerSecond, force: true);
         }
         else
         {
-            ScheduleExecution(Tasks.MoveNext, 10, force: true);
             _data.TimeThinking = 0.0;
+            ScheduleExecution(Tasks.MoveNext, 10, force: true);
         }
     }
 
