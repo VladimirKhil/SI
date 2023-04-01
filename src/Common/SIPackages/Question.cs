@@ -422,12 +422,22 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             Type.Params.Clear();
                             Type.Name = QuestionTypes.Simple;
                             TypeName = QuestionTypes.SecretNoQuestion;
+
+                            Parameters = new StepParameters
+                            {
+                                [QuestionParameterNames.Price] = new StepParameter
+                                {
+                                    Type = StepParameterTypes.NumberSet,
+                                    NumberSetValue = numberSet
+                                },
+                                [QuestionParameterNames.SelectionMode] = new StepParameter { SimpleValue = selectAnswererMode },
+                            };
                             return;
 
                         case QuestionTypeParams.BagCat_Knows_Value_Before:
                         case QuestionTypeParams.BagCat_Knows_Value_After:
                         default:
-                            TypeName = knows == QuestionTypeParams.BagCat_Knows_Value_Before ? QuestionTypes.SecretOpenerPrice : QuestionTypes.Secret;
+                            TypeName = knows == QuestionTypeParams.BagCat_Knows_Value_Before ? QuestionTypes.SecretPublicPrice : QuestionTypes.Secret;
 
                             Parameters = new StepParameters
                             {

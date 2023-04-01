@@ -237,6 +237,11 @@ public sealed class GameData : Data
     internal bool CanMarkQuestion { get; set; }
 
     /// <summary>
+    /// Number of media content completions that are awaited.
+    /// </summary>
+    internal int InitialMediaContentCompletionCount { get; set; }
+
+    /// <summary>
     /// Count of players which have viewed media atom already.
     /// </summary>
     internal int HaveViewedAtom { get; set; }
@@ -560,6 +565,16 @@ public sealed class GameData : Data
     /// Game name.
     /// </summary>
     public string GameName { get; set; } = "";
+
+    /// <summary>
+    /// Marks simple (text-only) answer.
+    /// </summary>
+    public bool IsAnswerSimple { get; internal set; }
+
+    /// <summary>
+    /// Should audio content be played along with on-screen content in background.
+    /// </summary>
+    public bool UseBackgroundAudio { get; internal set; }
 
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {

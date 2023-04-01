@@ -794,4 +794,7 @@
   <data name="AvatarNotFound" xml:space="preserve">
     <value>Аватар не найден: {0}</value>
   </data>
+  <data name="Cost2" xml:space="preserve">
+    <value>Стоимость</value>
+  </data>
 </root>

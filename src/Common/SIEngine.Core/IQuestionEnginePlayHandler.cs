@@ -31,7 +31,13 @@ public interface IQuestionEnginePlayHandler
     /// <param name="mode">Set answerer mode.</param>
     /// <param name="select">Selection rule.</param>
     /// <param name="stakeVisibility">Stake visibility for stakes mode.</param>
-    void OnSetAnswerer(string mode, string? select, string? stakeVisibility);
+    bool OnSetAnswerer(string mode, string? select, string? stakeVisibility);
+
+    /// <summary>
+    /// Announces question price.
+    /// </summary>
+    /// <param name="availableRange">Alavilable prices to select.</param>
+    bool OnAnnouncePrice(NumberSet? availableRange);
 
     /// <summary>
     /// Sets price for the answerers. Positive and negative prices could be set separately.
@@ -39,18 +45,18 @@ public interface IQuestionEnginePlayHandler
     /// </summary>
     /// <param name="mode">Set price mode.</param>
     /// <param name="availableRange">Alavilable prices to select.</param>
-    void OnSetPrice(string mode, NumberSet? availableRange);
+    bool OnSetPrice(string mode, NumberSet? availableRange);
 
     /// <summary>
     /// Sets theme name.
     /// </summary>
     /// <param name="themeName">Theme name to set.</param>
-    void OnSetTheme(string themeName);
+    bool OnSetTheme(string themeName);
 
     /// <summary>
     /// Accepts the question as answered right even if no answer has been provided.
     /// </summary>
-    void OnAccept();
+    bool OnAccept();
 
     /// <summary>
     /// Handles question start.

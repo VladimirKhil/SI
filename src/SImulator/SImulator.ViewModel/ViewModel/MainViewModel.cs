@@ -429,6 +429,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             {
                 var document = SIDocument.Load(tempDir);
 
+                document.Upgrade();
+
                 engine = EngineFactory.CreateEngine(
                     SettingsViewModel.Model.GameMode == GameModes.Tv,
                     document,

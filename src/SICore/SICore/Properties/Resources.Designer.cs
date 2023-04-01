@@ -358,6 +358,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cost.
+        /// </summary>
+        public static string Cost2 {
+            get {
+                return ResourceManager.GetString("Cost2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Date of creation.
         /// </summary>
         public static string CreationDate {

@@ -31,7 +31,7 @@ public sealed class Info : PropertyChangedNotifier, IEquatable<Info>
     /// <summary>
     /// Item comments for showman.
     /// </summary>
-    [DefaultValue(typeof(Comments), "")]
+    [DefaultValue(null)]
     public Comments? ShowmanComments
     {
         get => _showmanComments;

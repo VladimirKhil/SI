@@ -82,10 +82,31 @@ public sealed class QuestionEngine
                         var select = TryGetParameter(step, StepParameterNames.Select)?.SimpleValue;
                         var stakeVisibility = step.TryGetSimpleParameter(StepParameterNames.StakeVisibity);
 
-                        _playHandler.OnSetAnswerer(mode, select, stakeVisibility);
+                        var setAnswererResult = _playHandler.OnSetAnswerer(mode, select, stakeVisibility);
 
                         _stepIndex++;
+
+                        if (setAnswererResult)
+                        {
+                            return true;
+                        }
                     }
+
+                    break;
+
+                case StepTypes.AnnouncePrice:
+                    {
+                        var availableRange = TryGetParameter(step, StepParameterNames.Content)?.NumberSetValue;
+
+                        var announcePriceResult = _playHandler.OnAnnouncePrice(availableRange);
+                        _stepIndex++;
+
+                        if (announcePriceResult)
+                        {
+                            return true;
+                        }
+                    }
+
                     break;
 
                 case StepTypes.SetPrice:
@@ -102,9 +123,15 @@ public sealed class QuestionEngine
                             ? TryGetParameter(step, StepParameterNames.Content)?.NumberSetValue
                             : null;
 
-                        _playHandler.OnSetPrice(mode, availableRange);
+                        var setPriceResult = _playHandler.OnSetPrice(mode, availableRange);
                         _stepIndex++;
+
+                        if (setPriceResult)
+                        {
+                            return true;
+                        }
                     }
+
                     break;
 
                 case StepTypes.SetTheme:
@@ -116,13 +143,25 @@ public sealed class QuestionEngine
                         continue;
                     }
 
-                    _playHandler.OnSetTheme(themeName);
+                    var setThemeResult = _playHandler.OnSetTheme(themeName);
                     _stepIndex++;
+
+                    if (setThemeResult)
+                    {
+                        return true;
+                    }
+
                     break;
 
                 case StepTypes.Accept:
-                    _playHandler.OnAccept();
+                    var acceptResult = _playHandler.OnAccept();
                     _stepIndex++;
+
+                    if (acceptResult)
+                    {
+                        return true;
+                    }
+
                     break;
                 // Preambula part end
 

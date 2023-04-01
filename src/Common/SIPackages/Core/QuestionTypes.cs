@@ -36,9 +36,9 @@ public static class QuestionTypes
     public const string Secret = "secret";
 
     /// <summary>
-    /// Secret question type with price selection by opener.
+    /// Secret question type with price known before question given.
     /// </summary>
-    public const string SecretOpenerPrice = "secretOpenerPrice";
+    public const string SecretPublicPrice = "secretPublicPrice";
 
     /// <summary>
     /// Secret question type with no question (gives money immediately).

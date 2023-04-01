@@ -90,12 +90,12 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    virtual public void OnAtom(string[] mparams)
+    virtual public void OnScreenContent(string[] mparams)
     {
         // Do nothing
     }
 
-    virtual public void OnSecondAtom(string[] mparams)
+    virtual public void OnBackgroundContent(string[] mparams)
     {
 
     }
@@ -124,7 +124,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void QType()
+    public void OnQuestionType()
     {
 
     }

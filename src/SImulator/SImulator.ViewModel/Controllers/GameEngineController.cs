@@ -21,10 +21,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
         _packageFolder = packageFolder;
     }
 
-    public void OnAccept()
-    {
-
-    }
+    public bool OnAccept() => false;
 
     public void OnAskAnswer(string mode)
     {
@@ -153,16 +150,15 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
         GameViewModel.ActiveContentItem = contentItem;
     }
 
-    public void OnSetAnswerer(string mode, string? select, string? stakeVisibility)
-    {
-        // Do nothing
-    }
+    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
 
-    public void OnSetPrice(string mode, NumberSet? availableRange)
+    public bool OnAnnouncePrice(NumberSet? availableRange) => false;
+
+    public bool OnSetPrice(string mode, NumberSet? availableRange)
     {
         if (GameViewModel == null)
         {
-            return;
+            return false;
         }
 
         switch (mode)
@@ -177,22 +173,25 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
                 break;
 
             case StepParameterValues.SetPriceMode_NoRisk:
+                // Do nothing
                 break;
 
             default:
+                // Do nothing
                 break;
         }
 
+        return false;
     }
 
-    public void OnSetTheme(string themeName)
+    public bool OnSetTheme(string themeName)
     {
-        if (GameViewModel == null)
+        if (GameViewModel != null)
         {
-            return;
+            GameViewModel.CurrentTheme = themeName;
         }
-
-        GameViewModel.CurrentTheme = themeName;
+        
+        return false;
     }
 
     private bool SetMedia(ContentItem contentItem, string category, bool background = false)

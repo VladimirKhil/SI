@@ -789,4 +789,7 @@
   <data name="AvatarNotFound" xml:space="preserve">
     <value>Avatar not found: {0}</value>
   </data>
+  <data name="Cost2" xml:space="preserve">
+    <value>Cost</value>
+  </data>
 </root>

@@ -851,7 +851,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_Question(Question question)
     {
-        question.Upgrade();
         ActiveQuestion = question;
 
         PresentationController.SetText(question.Price.ToString());
@@ -960,7 +959,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             case QuestionTypes.Cat:
             case QuestionTypes.BagCat:
             case QuestionTypes.Secret:
-            case QuestionTypes.SecretOpenerPrice:
+            case QuestionTypes.SecretPublicPrice:
             case QuestionTypes.SecretNoQuestion:
                 PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
                 PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
@@ -1464,8 +1463,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveTheme = theme;
         ActiveQuestion = question;
 
-        question.Upgrade(true);
-
         PresentationController.SetSound("");
         SetCaption(theme.Name);
     }
@@ -1682,8 +1679,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveTheme = theme;
         ActiveQuestion = question;
 
-        question.Upgrade();
-
         CurrentTheme = theme.Name;
         Price = question.Price;
 
@@ -1716,7 +1711,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 case QuestionTypes.Cat:
                 case QuestionTypes.BagCat:
                 case QuestionTypes.Secret:
-                case QuestionTypes.SecretOpenerPrice:
+                case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
                     PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
                     PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);

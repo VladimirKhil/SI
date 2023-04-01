@@ -84,6 +84,35 @@
                 SnapsToDevicePixels="True"
                 DataContext="{Binding TInfo}" />
 
+            <Grid
+                Grid.Column="2"
+                Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="15*" />
+                </Grid.RowDefinitions>
+
+                <ProgressBar
+                    Height="13"
+                    Foreground="Orange"
+                    VerticalAlignment="Top"
+                    Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
+                    ToolTip="{x:Static lp:Resources.Time_Decide}"
+                    Opacity="1">
+                    <ProgressBar.Style>
+                        <Style TargetType="ProgressBar" BasedOn="{StaticResource SIProgressBar}">
+                            <Setter Property="Grid.Row" Value="0" />
+
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding TInfo.TStage}" Value="{x:Static uivm:TableStage.Question}">
+                                    <Setter Property="Grid.Row" Value="1" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ProgressBar.Style>
+                </ProgressBar>
+            </Grid>
+
             <Button
                 Grid.Column="2"
                 Style="{StaticResource SIButtonSimple}"
@@ -95,28 +124,6 @@
                 Margin="20"
                 Padding="30,5"
                 FontSize="20" />
-
-            <ProgressBar
-                Grid.Column="2"
-                Height="13"
-                Foreground="Orange"
-                VerticalAlignment="Top"
-                Value="{Binding Timers[2].Time, Converter={StaticResource ReverseTimeConverter}}"
-                ToolTip="{x:Static lp:Resources.Time_Decide}"
-                Opacity="1"
-                Visibility="{Binding Data.ShowMainTimer, Converter={StaticResource BooleanToVisibilityConverter1}}">
-                <ProgressBar.Style>
-                    <Style TargetType="ProgressBar" BasedOn="{StaticResource SIProgressBar}">
-                        <Setter Property="Margin" Value="0" />
-
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding TInfo.TStage}" Value="{x:Static uivm:TableStage.Question}">
-                                <Setter Property="Margin" Value="0,35,0,0" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ProgressBar.Style>
-            </ProgressBar>
 
             <ContentControl Grid.Column="2" Margin="0,0,0,0">
                 <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#88000000">

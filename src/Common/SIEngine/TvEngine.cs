@@ -212,6 +212,7 @@ public sealed class TvEngine : EngineBase
                 OnFinalThemes(selectedThemes.ToArray());
 
                 var count = selectedThemes.Count;
+
                 if (count > 1)
                 {
                     Stage = GameStage.WaitDelete;

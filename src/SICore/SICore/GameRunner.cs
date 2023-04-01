@@ -15,16 +15,20 @@ namespace SICore;
 /// </summary>
 public sealed class GameRunner
 {
-    private static readonly EngineOptions EngineOptions = new()
+    private static EngineOptions CreateEngineOptions(bool falseStarts) => new()
     {
-        IsMultimediaPressMode = true,
-        IsPressMode = true,
+        IsMultimediaPressMode = falseStarts,
+        IsPressMode = falseStarts,
         ShowRight = true,
         ShowScore = false,
         AutomaticGame = false,
         PlaySpecials = true,
         ThinkingTime = 0,
+#if OLD_ENGINE
         UseNewEngine = false
+#else
+        UseNewEngine = true
+#endif
     };
 
     private readonly Node _node;
@@ -67,6 +71,10 @@ public sealed class GameRunner
 
     public (IViewerClient?, Game) Run()
     {
+#if !OLD_ENGINE
+        _document.Upgrade();
+#endif
+
         var gameData = new GameData(_backLink, new GamePersonAccount(_settings.Showman))
         {
             Settings = _settings,
@@ -147,13 +155,15 @@ public sealed class GameRunner
         var engine = (EngineBase)EngineFactory.CreateEngine(
             gameData.Settings.AppSettings.GameMode == GameModes.Tv,
             _document,
-            () => EngineOptions,
+            () => CreateEngineOptions(gameData.Settings.AppSettings.FalseStart),
             playHandler);
 
         var client = Client.Create(NetworkConstants.GameName, _node);
 
         var gameActions = new GameActions(client, gameData, localizer, _fileShare);
         var gameLogic = new GameLogic(gameData, gameActions, engine, localizer, _fileShare);
+
+        playHandler.GameLogic = gameLogic;
 
         var game = new Game(
             client,

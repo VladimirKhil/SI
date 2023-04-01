@@ -1727,12 +1727,12 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private void OnAtom()
     {
+        ClientData.HaveViewedAtom--;
+
         if (!ClientData.IsPlayingMedia || ClientData.TInfo.Pause)
         {
             return;
         }
-
-        ClientData.HaveViewedAtom--;
 
         if (ClientData.HaveViewedAtom <= 0)
         {
@@ -2292,7 +2292,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             DropCurrentStaker();
         }
 
-        if (ClientData.Type?.Name == QuestionTypes.Auction)
+        if ((ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Auction || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake)
         {
             DropPlayerFromStakes(playerIndex);
         }

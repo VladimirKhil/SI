@@ -379,7 +379,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
                 // Loads in read only mode to keep file LastUpdate time unmodified
                 var doc = SIDocument.Load(stream);
-
+                
                 _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
 
                 var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)

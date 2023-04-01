@@ -51,12 +51,12 @@ public interface IViewerLogic : ILogic
     /// <summary>
     /// Question fragment received.
     /// </summary>
-    void OnAtom(string[] mparams);
+    void OnScreenContent(string[] mparams);
 
     /// <summary>
     /// Question background fragment received.
     /// </summary>
-    void OnSecondAtom(string[] mparams);
+    void OnBackgroundContent(string[] mparams);
 
     void SetRight(string answer);
 
@@ -85,7 +85,7 @@ public interface IViewerLogic : ILogic
     /// <summary>
     /// Известен тип вопроса
     /// </summary>
-    void QType();
+    void OnQuestionType();
 
     /// <summary>
     /// Завершение раунда

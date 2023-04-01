@@ -202,7 +202,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="stream">Source stream.</param>
     /// <param name="read">Should the document be read-only.</param>
     public static SIDocument Load(Stream stream, bool read = true) =>
-        LoadInternal(SIPackageFactory.Instance.GetPackage(stream, read));
+        LoadInternal(PackageContainerFactory.GetPackageContainer(stream, read));
 
     /// <summary>
     /// loads document from folder.
@@ -210,7 +210,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="folder">Source folder.</param>
     /// <param name="read">Should the document be read-only.</param>
     public static SIDocument Load(string folder, bool read = true) =>
-        LoadInternal(SIPackageFactory.Instance.GetPackage(folder, read));
+        LoadInternal(PackageContainerFactory.GetPackageContainer(folder));
 
     /// <summary>
     /// Loads document from stream as XML.
@@ -285,6 +285,23 @@ public sealed class SIDocument : IDisposable
             {
                 using var reader = XmlReader.Create(streamInfo.Stream);
                 _sources.ReadXml(reader);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Upgrades the document to new format.
+    /// </summary>
+    public void Upgrade()
+    {
+        foreach (var round in Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    question.Upgrade(round.Type == RoundTypes.Final);
+                }
             }
         }
     }

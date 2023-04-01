@@ -207,25 +207,13 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         
     }
 
-    public void OnSetAnswerer(string mode, string? select, string? stakeVisibility)
-    {
-        
-    }
+    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
 
-    public void OnSetPrice(string mode, NumberSet? availableRange)
-    {
-        
-    }
+    public bool OnSetPrice(string mode, NumberSet? availableRange) => false;
 
-    public void OnSetTheme(string themeName)
-    {
-        
-    }
+    public bool OnSetTheme(string themeName) => false;
 
-    public void OnAccept()
-    {
-        
-    }
+    public bool OnAccept() => false;
 
     public void OnQuestionStart(bool buttonsRequired)
     {
@@ -246,4 +234,6 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     {
         
     }
+
+    public bool OnAnnouncePrice(NumberSet? availableRange) => false;
 }

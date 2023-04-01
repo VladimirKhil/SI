@@ -746,26 +746,15 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     break;
 
                 case Messages.QType:
-                    {
-                        #region QType
-
-                        ClientData.AtomType = AtomTypes.Text;
-                        ClientData.AtomIndex = -1;
-                        ClientData.IsPartial = false;
-                        ClientData.QuestionType = mparams[1];
-
-                        _logic.QType();
-
-                        #endregion
-                        break;
-                    }
+                    OnQType(mparams);
+                    break;
 
                 case Messages.TextShape:
                     _logic.TextShape(mparams);
                     break;
 
                 case Messages.Atom:
-                    _logic.OnAtom(mparams);
+                    _logic.OnScreenContent(mparams);
                     break;
 
                 case Messages.Atom_Hint:
@@ -776,7 +765,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     break;
 
                 case Messages.Atom_Second:
-                    _logic.OnSecondAtom(mparams);
+                    _logic.OnBackgroundContent(mparams);
                     break;
 
                 case Messages.MediaLoaded:
@@ -1023,6 +1012,16 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnQType(string[] mparams)
+    {
+        ClientData.AtomType = AtomTypes.Text;
+        ClientData.AtomIndex = -1;
+        ClientData.IsPartial = false;
+        ClientData.QuestionType = mparams[1];
+
+        _logic.OnQuestionType();
     }
 
     private void OnChoice(string[] mparams)

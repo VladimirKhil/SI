@@ -536,7 +536,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.TStage = TableStage.Question;
     }
 
-    virtual public void OnAtom(string[] mparams)
+    virtual public void OnScreenContent(string[] mparams)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
         {
@@ -669,7 +669,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 else if (_data.AtomType == AtomTypes.Audio)
                 {
                     TInfo.SoundSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.None;
+                    TInfo.QuestionContentType = QuestionContentType.Clef;
                     TInfo.Sound = true;
                 }
                 else if (_data.AtomType == AtomTypes.Video)
@@ -703,7 +703,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
             case AtomTypes.Audio:
                 TInfo.SoundSource = new MediaSource(_data.ExternalUri);
-                TInfo.QuestionContentType = QuestionContentType.None;
+                TInfo.QuestionContentType = QuestionContentType.Clef;
                 TInfo.Sound = true;
                 break;
 
@@ -718,8 +718,14 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     private bool ExternalUrlOk(string uri) =>
         ClientData.ContentPublicUrls != null && ClientData.ContentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
-    virtual public void OnSecondAtom(string[] mparams)
+    virtual public void OnBackgroundContent(string[] mparams)
     {
+        if (TInfo.TStage != TableStage.Question)
+        {
+            TInfo.TStage = TableStage.Question;
+            TInfo.QuestionContentType = QuestionContentType.Clef;
+        }
+
         var atomType = mparams[1];
 
         switch (atomType)
@@ -764,7 +770,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         return;
                 }
 
-                Uri mediaUri;
+                Uri? mediaUri;
 
                 if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out mediaUri))
                 {
@@ -775,6 +781,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                 TInfo.SoundSource = new MediaSource(uri);
                 TInfo.Sound = true;
+
+                if (TInfo.QuestionContentType == QuestionContentType.Void)
+                {
+                    TInfo.QuestionContentType = QuestionContentType.Clef;
+                }
 
                 break;
         }
@@ -893,66 +904,80 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.Players[playerIndex].State = PlayerState.HasAnswered;
     }
 
-    public void QType()
+    public void OnQuestionType()
     {
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
 
-        if (_data.QuestionType == QuestionTypes.Auction)
+        switch (_data.QuestionType)
         {
-            TInfo.Text = _localizer[nameof(R.Label_Auction)];
-
-            lock (TInfo.RoundInfoLock)
-            {
-                for (int i = 0; i < TInfo.RoundInfo.Count; i++)
+            case QuestionTypes.Auction:
+            case QuestionTypes.Stake:
                 {
-                    TInfo.RoundInfo[i].Active = i == _data.ThemeIndex;
+                    TInfo.Text = _localizer[nameof(R.Label_Auction)];
+
+                    lock (TInfo.RoundInfoLock)
+                    {
+                        for (int i = 0; i < TInfo.RoundInfo.Count; i++)
+                        {
+                            TInfo.RoundInfo[i].Active = i == _data.ThemeIndex;
+                        }
+                    }
+
+                    TInfo.TStage = TableStage.Special;
+                    _data.Sound = Sounds.QuestionStake;
+                    break;
                 }
-            }
 
-            TInfo.TStage = TableStage.Special;
-            _data.Sound = Sounds.QuestionStake;
-        }
-        else if (_data.QuestionType == QuestionTypes.Cat || _data.QuestionType == QuestionTypes.BagCat)
-        {
-            TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
+            case QuestionTypes.Cat:
+            case QuestionTypes.BagCat:
+            case QuestionTypes.Secret:
+            case QuestionTypes.SecretNoQuestion:
+            case QuestionTypes.SecretPublicPrice:
+                {
+                    TInfo.Text = _localizer[nameof(R.Label_CatInBag)];
 
-            lock (TInfo.RoundInfoLock)
-            {
+                    lock (TInfo.RoundInfoLock)
+                    {
+                        foreach (var item in TInfo.RoundInfo)
+                        {
+                            item.Active = false;
+                        }
+                    }
+
+                    TInfo.TStage = TableStage.Special;
+                    _data.Sound = Sounds.QuestionSecret;
+                    break;
+                }
+
+            case QuestionTypes.Sponsored:
+            case QuestionTypes.NoRisk:
+                {
+                    TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
+
+                    lock (TInfo.RoundInfoLock)
+                    {
+                        foreach (var item in TInfo.RoundInfo)
+                        {
+                            item.Active = false;
+                        }
+                    }
+
+                    TInfo.TStage = TableStage.Special;
+                    _data.Sound = Sounds.QuestionNoRisk;
+                    break;
+                }
+
+            case QuestionTypes.Simple:
+                TInfo.TimeLeft = 1.0;
+                break;
+
+            default:
                 foreach (var item in TInfo.RoundInfo)
                 {
                     item.Active = false;
                 }
-            }
-
-            TInfo.TStage = TableStage.Special;
-            _data.Sound = Sounds.QuestionSecret;
-        }
-        else if (_data.QuestionType == QuestionTypes.Sponsored)
-        {
-            TInfo.Text = _localizer[nameof(R.Label_Sponsored)];
-
-            lock (TInfo.RoundInfoLock)
-            {
-                foreach (var item in TInfo.RoundInfo)
-                {
-                    item.Active = false;
-                }
-            }
-
-            TInfo.TStage = TableStage.Special;
-            _data.Sound = Sounds.QuestionNoRisk;
-        }
-        else if (_data.QuestionType != QuestionTypes.Simple)
-        {
-            foreach (var item in TInfo.RoundInfo)
-            {
-                item.Active = false;
-            }
-        }
-        else
-        {
-            TInfo.TimeLeft = 1.0;
+                break;
         }
     }
 

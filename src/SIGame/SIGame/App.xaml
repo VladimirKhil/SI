@@ -1164,7 +1164,7 @@
                         <DataTrigger.EnterActions>
                             <BeginStoryboard>
                                 <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:2" />
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" To="0.5" Duration="0:0:2" />
                                 </Storyboard>
                             </BeginStoryboard>
                         </DataTrigger.EnterActions>

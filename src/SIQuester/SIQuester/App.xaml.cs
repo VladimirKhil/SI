@@ -148,18 +148,7 @@ public partial class App : Application
     {
         using var fs = File.Open(packagePath, FileMode.Open);
         using var doc = SIDocument.Load(fs, false);
-
-        foreach (var round in doc.Package.Rounds)
-        {
-            foreach (var theme in round.Themes)
-            {
-                foreach (var question in theme.Questions)
-                {
-                    question.Upgrade(round.Type == RoundTypes.Final);
-                }
-            }
-        }
-
+        doc.Upgrade();
         doc.Save();
     }
 

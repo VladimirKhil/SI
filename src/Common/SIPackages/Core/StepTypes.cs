@@ -21,6 +21,11 @@ public static class StepTypes
     public const string SetAnswerer = "setAnswerer";
 
     /// <summary>
+    /// Announce price.
+    /// </summary>
+    public const string AnnouncePrice = "announcePrice";
+
+    /// <summary>
     /// Set price.
     /// </summary>
     public const string SetPrice = "setPrice";
