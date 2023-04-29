@@ -57,7 +57,23 @@ public sealed class SportEngine : EngineBase
                 #endregion
 
             case GameStage.NextQuestion:
-                _questionIndex++;
+                if (!MoveNextQuestion())
+                {
+                    if (MoveNextTheme())
+                    {
+                        Stage = GameStage.Theme;
+                        UpdateCanNext();
+                        OnNextQuestion();
+                        AutoNext(500);
+                    }
+                    else
+                    {
+                        EndRound();
+                    }
+
+                    break;
+                }
+
                 CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
                 _atomIndex = 0;
                 _isMedia = false;
@@ -112,23 +128,12 @@ public sealed class SportEngine : EngineBase
                     OnRoundTimeout();
                     DoFinishRound();
                 }
-                else if (_questionIndex + 1 < _activeTheme.Questions.Count)
+                else
                 {
                     Stage = GameStage.NextQuestion;
                     UpdateCanNext();
                     OnNextQuestion();
                     AutoNext(3000);
-                }
-                else if (MoveNextTheme())
-                {
-                    Stage = GameStage.Theme;
-                    UpdateCanNext();
-                    OnNextQuestion();
-                    AutoNext(3000);
-                }
-                else // No questions left
-                {
-                    EndRound();
                 }
 
                 break;
@@ -137,6 +142,22 @@ public sealed class SportEngine : EngineBase
             case GameStage.End:
                 break;
         }
+    }
+
+    private bool MoveNextQuestion()
+    {
+        while (_questionIndex + 1 < _activeTheme.Questions.Count)
+        {
+            _questionIndex++;
+            SetActiveQuestion();
+
+            if (_activeQuestion.Price != SIPackages.Question.InvalidPrice)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public override Tuple<int, int, int> MoveBack()
@@ -182,7 +203,7 @@ public sealed class SportEngine : EngineBase
             _themeIndex++;
             SetActiveTheme();
 
-            if (_activeTheme.Questions.Any())
+            if (_activeTheme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice))
             {
                 return true;
             }

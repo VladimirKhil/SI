@@ -576,6 +576,11 @@ public sealed class GameData : Data
     /// </summary>
     public bool UseBackgroundAudio { get; internal set; }
 
+    /// <summary>
+    /// Package files names.
+    /// </summary>
+    public string[] Files { get; internal set; }
+
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {
         _showMan = showman;

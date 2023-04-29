@@ -8,6 +8,7 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.Providers;
 using SIPackages.TypeConverters;
 using SIUI.Model;
@@ -556,9 +557,26 @@ public sealed class GameLogic : Logic<GameData>
                 }
             }
 
+            if (ClientData.Files.Length > 0)
+            {
+                var targetName = FindFile(mediaCategory, filename);
+
+                if (targetName == null)
+                {
+                    _gameActions.SendMessageWithArgs(
+                        isBackground ? Messages.Atom_Second : Messages.Atom,
+                        AtomTypes.Text,
+                        string.Format(LO[nameof(R.MediaNotFound)], $"{mediaCategory}/{filename}"));
+
+                    return false;
+                }
+
+                filename = targetName;
+            }
+
             var uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{filename}", UriKind.Relative));
 
-            var localUri = ClientData.DocumentPath != null
+            var localUri = ClientData.Files.Length == 0 && !string.IsNullOrEmpty(ClientData.DocumentPath)
                 ? Path.Combine(ClientData.DocumentPath, mediaCategory, Uri.UnescapeDataString(filename))
                 : null;
 
@@ -594,6 +612,39 @@ public sealed class GameLogic : Logic<GameData>
             ClientData.BackLink.OnError(exc);
             return false;
         }
+    }
+
+    private bool FileExists(string mediaCategory, string filename) => ClientData.Files.Contains($"{mediaCategory}/{filename}");
+
+    private string? FindFile(string mediaCategory, string filename)
+    {
+        if (FileExists(mediaCategory, filename))
+        {
+            return filename;
+        }
+
+        var escapedFileName = Uri.EscapeUriString(filename);
+
+        if (FileExists(mediaCategory, escapedFileName))
+        {
+            return escapedFileName;
+        }
+
+        var hashedFileName = ZipHelper.CalculateHash(filename);
+
+        if (FileExists(mediaCategory, hashedFileName))
+        {
+            return hashedFileName;
+        }
+
+        var hashedEscapedFileName = ZipHelper.CalculateHash(escapedFileName);
+
+        if (FileExists(mediaCategory, hashedEscapedFileName))
+        {
+            return hashedEscapedFileName;
+        }
+
+        return null;
     }
 
     [Obsolete]

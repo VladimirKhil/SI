@@ -170,7 +170,7 @@ public static class ZipHelper
     /// </summary>
     /// <param name="value">Value to hash.</param>
     /// <returns>Hashed value.</returns>
-    internal static string CalculateHash(string value)
+    public static string CalculateHash(string value)
     {
         var hashedValue = 3074457345618258791ul;
 
