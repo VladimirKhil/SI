@@ -127,7 +127,7 @@ public sealed class GameData : Data
     /// <summary>
     /// Currently playing question.
     /// </summary>
-    internal Question Question { get; set; }
+    internal Question? Question { get; set; }
 
     /// <summary>
     /// Currently playing question type.

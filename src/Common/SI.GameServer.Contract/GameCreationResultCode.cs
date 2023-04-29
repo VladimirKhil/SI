@@ -1,5 +1,8 @@
 ﻿namespace SI.GameServer.Contract;
 
+/// <summary>
+/// Defines game creation result codes.
+/// </summary>
 public enum GameCreationResultCode
 {
     Ok,
@@ -14,5 +17,7 @@ public enum GameCreationResultCode
     UnknownError,
     JoinError,
     WrongGameSettings,
-    TooManyGamesByAddress
+    TooManyGamesByAddress,
+    UnsupportedPackageType,
+    UnsupportedContentUri,
 }

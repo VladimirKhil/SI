@@ -187,7 +187,7 @@ public static class ZipHelper
         if (extIndex > -1)
         {
             var extLength = Math.Min(4, value.Length - extIndex - 1);
-            result += '.' + Regex.Replace(value.Substring(extIndex + 1, extLength), "[^a-zA-Z]+", "");
+            result += '.' + Regex.Replace(value.Substring(extIndex + 1, extLength), "[^a-zA-Z0-9]+", "");
         }
 
         return result;

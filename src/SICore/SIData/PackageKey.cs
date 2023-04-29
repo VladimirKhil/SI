@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SIData;
+﻿namespace SIData;
 
 /// <summary>
 /// Represents a unique package key.

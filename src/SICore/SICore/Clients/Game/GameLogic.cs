@@ -522,7 +522,8 @@ public sealed class GameLogic : Logic<GameData>
                 return false;
             }
 
-            var media = _data.PackageDoc.GetLink(new Atom { Text = contentItem.Value, Type = atomType });
+            // TODO: rewrite without creating Atom
+            var media = _data.PackageDoc.GetLink(new Atom { Text = "@" + contentItem.Value, Type = atomType });
 
             var filename = media.Uri;
             var fileLength = media.StreamLength;
@@ -1745,7 +1746,7 @@ public sealed class GameLogic : Logic<GameData>
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
 
-        _data.ThemeDeleters.Reset(false);
+        _data.ThemeDeleters?.Reset(false);
         ScheduleExecution(Tasks.Announce, 15);
 
         return true;
@@ -2686,6 +2687,13 @@ public sealed class GameLogic : Logic<GameData>
 
     private void AskFinalStake()
     {
+        // TODO: replace with custom players enumerator
+        if (_data.ThemeDeleters == null)
+        {
+            _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, 1);
+            _data.ThemeDeleters.Reset(true);
+        }
+
         var s = GetRandomString(LO[nameof(R.MakeStake)]);
         _gameActions.ShowmanReplic(s);
 
@@ -3088,7 +3096,7 @@ public sealed class GameLogic : Logic<GameData>
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
 #endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
-                    delay = 8;
+                    delay = 16;
                     break;
 
                 case QuestionTypes.Cat:
@@ -3109,7 +3117,7 @@ public sealed class GameLogic : Logic<GameData>
                     _gameActions.ShowmanReplic(replic.ToString());
 #endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
-                    delay = 8;
+                    delay = 16;
                     break;
 
                 case QuestionTypes.Sponsored:
@@ -3118,7 +3126,7 @@ public sealed class GameLogic : Logic<GameData>
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
 #endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
-                    delay = 8;
+                    delay = 16;
                     break;
 
                 case QuestionTypes.Simple:
@@ -3126,7 +3134,7 @@ public sealed class GameLogic : Logic<GameData>
                     break;
 
                 case QuestionTypes.StakeAll:
-                    delay = 8;
+                    delay = 16;
                     break;
 
                 default:
@@ -3203,6 +3211,14 @@ public sealed class GameLogic : Logic<GameData>
     private void PrintPartial()
     {
         var text = _data.Text;
+
+        // TODO: try to avoid getting here when such condition is met
+        if (_data.TextLength >= text.Length)
+        {
+            _data.TimeThinking = 0.0;
+            ScheduleExecution(Tasks.MoveNext, 1, force: true);
+            return;
+        }
 
         var printingLength = Math.Max(
             1,
@@ -4147,7 +4163,7 @@ public sealed class GameLogic : Logic<GameData>
             }
 
             var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + 100;
-            var minimumStakeByBase = (int)Math.Ceiling((double)minimumStake / 100) * 100; // TODO: возможность настраивать кратность ставки
+            var minimumStakeByBase = (int)Math.Ceiling((double)minimumStake / 100) * 100; // TODO: support the ability to configure stake base
 
             stakeMsg.Add(minimumStakeByBase);
 
@@ -4156,7 +4172,7 @@ public sealed class GameLogic : Logic<GameData>
             if (_data.IsOralNow)
             {
                 _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
-                stakeMsg.Add(_data.ActivePlayer.Sum); // Ведущему укажем максимум
+                stakeMsg.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
                 stakeMsg.Add(_data.ActivePlayer.Name);
                 _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
             }
@@ -4951,6 +4967,11 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void SetAnswererByActive(bool canGiveThemselves)
     {
+        if (_data.ChooserIndex == -1)
+        {
+            _data.ChooserIndex = DetectPlayerIndexWithLowestSum();
+        }
+
         if (_data.Chooser == null)
         {
             throw new InvalidOperationException("_data.Chooser == null");
@@ -5236,6 +5257,11 @@ public sealed class GameLogic : Logic<GameData>
     {
         var nominal = _data.Question.Price;
 
+        if (_data.ChooserIndex == -1)
+        {
+            _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
+        }
+
         _data.Order = new int[_data.Players.Count];
 
         for (var i = 0; i < _data.Players.Count; i++)
@@ -5245,6 +5271,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _data.Stake = _data.StakerIndex = -1;
+
         _data.Order[0] = _data.ChooserIndex;
 
         _data.OrderHistory.Clear();
@@ -5261,6 +5288,12 @@ public sealed class GameLogic : Logic<GameData>
         _data.AllIn = false;
         _data.OrderIndex = -1;
         ScheduleExecution(Tasks.AskStake, 10);
+    }
+
+    private int DetectPlayerIndexWithLowestSum()
+    {
+        var minSum = _data.Players.Min(p => p.Sum);
+        return ClientData.Players.TakeWhile(p => p.Sum != minSum).Count();
     }
 
     internal void SetAnswerersByAllHiddenStakes() => AskFinalStake();

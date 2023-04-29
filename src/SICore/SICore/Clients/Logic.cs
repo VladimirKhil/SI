@@ -62,10 +62,7 @@ public abstract class Logic<D> : ILogic
 
         try
         {
-            _taskTimerLock.WithLock(() =>
-            {
-                ExecuteTask(CurrentTask, _taskArgument);
-            });
+            ExecuteTask(CurrentTask, _taskArgument);
         }
         catch (Exception exc)
         {

@@ -1950,7 +1950,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
         }
 
-        if (canPressChanged && ClientData.Players.All(p => !p.CanPress) && !ClientData.TInfo.Pause)
+        if (canPressChanged && ClientData.Players.All(p => !p.CanPress) && ClientData.Decision == DecisionType.Pressing && !ClientData.TInfo.Pause)
         {
             if (!ClientData.IsAnswer)
             {
@@ -2292,7 +2292,9 @@ public sealed class Game : Actor<GameData, GameLogic>
             DropCurrentStaker();
         }
 
-        if ((ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Auction || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake)
+        if (ClientData.Question != null &&
+            ((ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Auction
+            || (ClientData.Question.TypeName ?? ClientData.Type?.Name) == QuestionTypes.Stake))
         {
             DropPlayerFromStakes(playerIndex);
         }

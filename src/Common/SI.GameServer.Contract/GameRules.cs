@@ -1,7 +1,8 @@
-﻿using System;
+﻿namespace SI.GameServer.Contract;
 
-namespace SI.GameServer.Contract;
-
+/// <summary>
+/// Defines game rules filter.
+/// </summary>
 [Flags]
 public enum GameRules
 {
