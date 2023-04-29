@@ -30,15 +30,15 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         switch (mode)
         {
             case StepParameterValues.AskAnswerMode_Button:
-                GameLogic?.AskToPress();
+                GameLogic.AskToPress();
                 break;
 
             case StepParameterValues.AskAnswerMode_Direct:
-                GameLogic?.AskDirectAnswer();
+                GameLogic.AskDirectAnswer();
                 break;
 
             default:
-                GameLogic?.ScheduleExecution(Tasks.MoveNext, 1);
+                GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
                 break;
         }
     }

@@ -9,7 +9,7 @@ public sealed class HowToViewModel : WorkspaceViewModel
 
     private readonly IXpsDocumentWrapper _documentWrapper;
 
-    public object Document => _documentWrapper.GetDocument();
+    public object Document => _documentWrapper.TryGetDocument();
 
     public HowToViewModel() => _documentWrapper = PlatformManager.Instance.GetHelp();
 

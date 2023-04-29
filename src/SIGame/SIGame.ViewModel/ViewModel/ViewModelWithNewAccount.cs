@@ -70,7 +70,7 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
         ShowFullError = new CustomCommand(ShowFullError_Executed);
     }
 
-    private void ShowFullError_Executed(object arg)
+    private void ShowFullError_Executed(object? arg)
     {
         PlatformSpecific.PlatformManager.Instance.ShowMessage(FullError, PlatformSpecific.MessageType.Warning, true);
     }
@@ -82,7 +82,7 @@ public abstract class ViewModelWithNewAccount<TModel> : ViewModel<TModel>
         _closeContent = new CustomCommand(CloseContent_Executed);
     }
 
-    protected virtual void CloseContent_Executed(object arg)
+    protected virtual void CloseContent_Executed(object? arg)
     {
         Content = null;
     }

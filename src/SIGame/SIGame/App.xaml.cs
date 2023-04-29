@@ -19,7 +19,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -35,13 +34,13 @@ using System.Threading.Tasks;
 namespace SIGame;
 
 /// <summary>
-/// Логика взаимодействия для App.xaml
+/// Provides interaction logic for App.xaml.
 /// </summary>
 public partial class App : Application
 {
-    private IHost _host;
-    private IConfiguration _configuration;
-    private ILogger<App> _logger;
+    private IHost? _host;
+    private IConfiguration? _configuration;
+    private ILogger<App>? _logger;
 
 #pragma warning disable IDE0052
     private readonly DesktopCoreManager _coreManager = new();
@@ -52,7 +51,7 @@ public partial class App : Application
     private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
 
     /// <summary>
-    /// Имя приложения
+    /// Application name.
     /// </summary>
     public static string ProductName => "SIGame";
 

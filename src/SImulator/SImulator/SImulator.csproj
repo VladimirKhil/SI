@@ -7,7 +7,7 @@
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
-    <Version>2.12.0</Version>
+    <Version>2.13.0</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>

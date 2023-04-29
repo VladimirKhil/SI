@@ -342,7 +342,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
     private readonly CommonSettings _commonSettings;
 
-    internal event Func<GameSettings, PackageSource, Task<Tuple<SecondaryNode, IViewerClient>>> CreateGame;
+    internal event Func<GameSettings, PackageSource, Task<(SecondaryNode, IViewerClient)?>> CreateGame;
 
     public event Action<ContentBox> Navigate;
 
@@ -469,13 +469,13 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         SetErrorMessage();
     }
 
-    private void CloseNewShowman_Executed(object arg)
+    private void CloseNewShowman_Executed(object? arg)
     {
         _showman.SelectedAccount = _computerShowmans[0];
         _closeContent.Execute(arg);
     }
 
-    private void CloseNewPlayer_Executed(object arg)
+    private void CloseNewPlayer_Executed(object? arg)
     {
         for (int i = 0; i < Players.Count; i++)
         {
@@ -488,7 +488,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _closeContent.Execute(arg);
     }
 
-    private async void SelectPackage_Executed(object arg)
+    private async void SelectPackage_Executed(object? arg)
     {
         var code = (PackageSourceTypes)arg;
 
@@ -554,7 +554,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    private void RemoveShowmanAccount_Executed(object account)
+    private void RemoveShowmanAccount_Executed(object? account)
     {
         var computerAccount = account as ComputerAccount;
         if (!PlatformManager.Instance.Ask(string.Format(Resources.ShowmanDeleteConfirm, computerAccount.Name)))
@@ -566,7 +566,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         Showman.SelectedAccount = _computerShowmans.FirstOrDefault();
     }
 
-    private void RemoveComputerAccount_Executed(object account)
+    private void RemoveComputerAccount_Executed(object? account)
     {
         var computerAccount = account as ComputerAccount;
         if (!PlatformManager.Instance.Ask(string.Format(Resources.PlayerDeleteConfirm, computerAccount.Name)))
@@ -585,7 +585,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    private void EditComputerAccount_Executed(object arg)
+    private void EditComputerAccount_Executed(object? arg)
     {
         var computerAccount = (ComputerAccount)arg;
         var newComputerAccount = new ComputerAccountViewModel(computerAccount.Clone(), computerAccount);
@@ -594,7 +594,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         Navigate?.Invoke(contentBox);
     }
 
-    private async Task BeginGame_ExecutedAsync(object arg)
+    private async Task BeginGame_ExecutedAsync(object? arg)
     {
         IsProgress = true;
         BeginGame.CanBeExecuted = false;
@@ -609,12 +609,13 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             if (CreateGame != null)
             {
                 var info = await CreateGame(_model, _package);
-                if (info == null)
+
+                if (!info.HasValue)
                 {
                     return;
                 }
 
-                MoveToGame(info.Item1, info.Item2, null, null);
+                MoveToGame(info.Value.Item1, info.Value.Item2, null, null);
             }
             else
             {
@@ -709,6 +710,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             node,
             _model,
             document,
+            Array.Empty<string>(),
             BackLink.Default,
             fileShare,
             _computerPlayers.ToArray(),
@@ -802,7 +804,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    void Players_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    void Players_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
@@ -856,7 +858,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
-    private void Viewers_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void Viewers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
         {
@@ -878,7 +880,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.Viewers = Viewers.Select(acc => acc.SelectedAccount).ToArray();
     }
 
-    void Viewer_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    void Viewer_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SimpleAccount<HumanAccount>.SelectedAccount))
         {

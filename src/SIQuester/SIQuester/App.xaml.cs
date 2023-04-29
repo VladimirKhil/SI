@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SIPackages;
-using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIStorageService.Client;

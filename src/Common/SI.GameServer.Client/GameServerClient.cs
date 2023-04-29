@@ -35,6 +35,19 @@ public sealed class GameServerClient : IGameServerClient
 
     private HubConnection? _connection;
 
+    private HubConnection Connection
+    {
+        get
+        {
+            if (_connection == null)
+            {
+                throw new InvalidOperationException("Not connected");
+            }
+
+            return _connection;
+        }
+    }
+
     public string ServiceUri => _options.ServiceUri!;
 
     public event Action<GameInfo>? GameCreated;
@@ -87,6 +100,22 @@ public sealed class GameServerClient : IGameServerClient
             cancellationToken);
     }
 
+    public Task<GameCreationResult> CreateGame2Async(
+        GameSettingsCore<AppSettingsCore> gameSettings,
+        PackageInfo packageInfo,
+        ComputerAccountInfo[] computerAccounts,
+        CancellationToken cancellationToken = default)
+    {
+        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
+
+        return Connection.InvokeAsync<GameCreationResult>(
+            "CreateGame2",
+            gameSettings,
+            packageInfo,
+            computerAccounts.Select(ca => ca.Account).ToArray(),
+            cancellationToken);
+    }
+
     public Task<GameCreationResult> CreateAndJoinGameAsync(
         GameSettingsCore<AppSettingsCore> gameSettings,
         PackageKey packageKey,
@@ -100,6 +129,24 @@ public sealed class GameServerClient : IGameServerClient
             "CreateAndJoinGameNew",
             gameSettings,
             packageKey,
+            computerAccounts.Select(ca => ca.Account).ToArray(),
+            isMale,
+            cancellationToken);
+    }
+
+    public Task<GameCreationResult> CreateAndJoinGame2Async(
+        GameSettingsCore<AppSettingsCore> gameSettings,
+        PackageInfo packageInfo,
+        ComputerAccountInfo[] computerAccounts,
+        bool isMale,
+        CancellationToken cancellationToken = default)
+    {
+        gameSettings.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
+
+        return Connection.InvokeAsync<GameCreationResult>(
+            "CreateAndJoinGame2",
+            gameSettings,
+            packageInfo,
             computerAccounts.Select(ca => ca.Account).ToArray(),
             isMale,
             cancellationToken);
