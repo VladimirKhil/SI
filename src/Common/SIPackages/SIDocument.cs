@@ -227,6 +227,7 @@ public sealed class SIDocument : IDisposable
             {
                 if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                 {
+                    document.Package.Info.Authors.Clear();
                     document.Package.ReadXml(reader);
                     break;
                 }

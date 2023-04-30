@@ -501,8 +501,8 @@ public sealed class GameLogic : Logic<GameData>
 
                 var checkedFileName = Path.Combine(mediaCategory, link).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
 
-                if (_data.PackageDoc.GetFilteredFiles().Any(f =>
-                    f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
+                if (_data.PackageDoc.GetFilteredFiles().Any(
+                    f => f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
                 {
                     _gameActions.SendMessageWithArgs(
                         isBackground ? Messages.Atom_Second : Messages.Atom,
@@ -4626,6 +4626,12 @@ public sealed class GameLogic : Logic<GameData>
 
                         _gameActions.SendMessage(msg.ToString(), person);
                     }
+                }
+                else if (logoLink.Uri != null)
+                {
+                    ShareMedia(
+                        new ContentItem { IsRef = true, Value = logoLink.Uri },
+                        AtomTypes.Image);
                 }
             }
             else

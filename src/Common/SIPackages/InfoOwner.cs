@@ -95,9 +95,11 @@ public abstract class InfoOwner : Named, IXmlSerializable
     public virtual void ReadXml(XmlReader reader)
     {
         var read = true;
+
         while (!read || reader.Read())
         {
             read = true;
+
             switch (reader.NodeType)
             {
                 case XmlNodeType.Element:
