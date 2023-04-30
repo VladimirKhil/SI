@@ -54,6 +54,12 @@ public interface IGameServerClient : IAsyncDisposable
         ComputerAccountInfo[] computerAccounts,
         CancellationToken cancellationToken = default);
 
+    Task<GameCreationResult> CreateGame2Async(
+        GameSettingsCore<AppSettingsCore> gameSettings,
+        PackageInfo packageInfo,
+        ComputerAccountInfo[] computerAccounts,
+        CancellationToken cancellationToken = default);
+
     Task<string> HasImageAsync(FileKey imageKey, CancellationToken cancellationToken = default);
 
     Task<string> UploadImageAsync(FileKey imageKey, Stream data, CancellationToken cancellationToken = default);
@@ -72,6 +78,21 @@ public interface IGameServerClient : IAsyncDisposable
     Task<GameCreationResult> CreateAndJoinGameAsync(
         GameSettingsCore<AppSettingsCore> gameSettings,
         PackageKey packageKey,
+        ComputerAccountInfo[] computerAccounts,
+        bool isMale,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Creates a new game and joins its.
+    /// </summary>
+    /// <param name="gameSettings">Game settings.</param>
+    /// <param name="packageInfo">Package info.</param>
+    /// <param name="computerAccounts">Custom computer accounts info.</param>
+    /// <param name="isMale">Male flag.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<GameCreationResult> CreateAndJoinGame2Async(
+        GameSettingsCore<AppSettingsCore> gameSettings,
+        PackageInfo packageInfo,
         ComputerAccountInfo[] computerAccounts,
         bool isMale,
         CancellationToken cancellationToken = default);

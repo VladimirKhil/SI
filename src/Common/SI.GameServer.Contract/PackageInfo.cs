@@ -11,7 +11,7 @@ public sealed class PackageInfo
     public PackageType Type {  get; set; }
 
     /// <summary>
-    /// Package uri.
+    /// Package relative or absolute uri.
     /// </summary>
     public Uri? Uri { get; set; }
 

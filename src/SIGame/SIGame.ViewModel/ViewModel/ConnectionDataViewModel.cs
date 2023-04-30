@@ -39,7 +39,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     /// </summary>
     public ICommand Join => _join;
 
-    public ICommand NewGame { get; private set; }
+    public CustomCommand NewGame { get; private set; }
 
     protected abstract bool IsOnline { get; }
 

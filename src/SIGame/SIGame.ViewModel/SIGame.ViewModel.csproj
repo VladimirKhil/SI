@@ -12,6 +12,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="VKhil.SIContentService.Client" Version="1.0.9" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
     <ProjectReference Include="..\..\Common\SI.GameServer.Client\SI.GameServer.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />

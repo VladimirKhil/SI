@@ -2,5 +2,5 @@
 
 public interface IXpsDocumentWrapper : IDisposable
 {
-    object GetDocument();
+    object? TryGetDocument();
 }
