@@ -672,10 +672,14 @@ public sealed class Game : Actor<GameData, GameLogic>
                                 if (int.TryParse(args[1], out int index) && index > -1 && index < ClientData.Players.Count && ClientData.Players[index].Flag)
                                 {
                                     ClientData.AnswererIndex = index;
+                                    ClientData.QuestionPlayState.SetSingleAnswerer(index);
 
                                     if (ClientData.IsOralNow)
-                                        _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
-                                            ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                                    {
+                                        _gameActions.SendMessage(
+                                            Messages.Cancel,
+                                            message.Sender == ClientData.ShowMan.Name ? ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                                    }
 
                                     _logic.Stop(StopReason.Decision);
                                 }
@@ -1386,6 +1390,12 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         if (!ClientData.AllowAppellation)
         {
+            if (ClientData.AppellationOpened)
+            {
+                // TODO: save appellation request and return to it after question finish
+                // Merge AppellationOpened and AllowAppellation properties into triple-state property
+            }
+
             return;
         }
 
@@ -2265,6 +2275,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             DropCurrentChooser();
         }
 
+        ClientData.QuestionPlayState.RemovePlayer(playerIndex);
+
         if (ClientData.AnswererIndex > playerIndex)
         {
             ClientData.AnswererIndex--;
@@ -2531,7 +2543,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             // Игрока удалил после того, как он дал ответ. Но ещё не обратились к ведущему
             PlanExecution(Tasks.ContinueQuestion, 1);
         }
-        else if (nextTask == Tasks.CatInfo || nextTask == Tasks.AskCatCost || nextTask == Tasks.WaitCatCost)
+        else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0
+            && ClientData.Question?.TypeName != QuestionTypes.Simple)
         {
             Logic.Engine.SkipQuestion();
             PlanExecution(Tasks.MoveNext, 20, 1);

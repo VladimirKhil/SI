@@ -48,9 +48,9 @@ public sealed class GameData : Data
     /// <summary>
     /// Current answerer info.
     /// </summary>
-    internal GamePlayerAccount Answerer { get; private set; }
+    internal GamePlayerAccount? Answerer { get; private set; }
 
-    private int _answererIndex;
+    private int _answererIndex = -1;
 
     /// <summary>
     /// Current answerer index.
@@ -76,6 +76,16 @@ public sealed class GameData : Data
             }
         }
     }
+
+    /// <summary>
+    /// Global game state.
+    /// </summary>
+    internal GameState GameState { get; } = new();
+
+    /// <summary>
+    /// Question play state.
+    /// </summary>
+    internal QuestionPlayState QuestionPlayState { get; set; } = new();
 
     /// <summary>
     /// Index of possible answerer.
@@ -461,6 +471,14 @@ public sealed class GameData : Data
 
     public bool AnnounceAnswer { get; set; }
 
+    /// <summary>
+    /// Could appellation messages be collected.
+    /// </summary>
+    public bool AppellationOpened { get; set; }
+
+    /// <summary>
+    /// Could appellation be started now.
+    /// </summary>
     public bool AllowAppellation { get; set; }
 
     internal Lock TaskLock { get; } = new Lock(nameof(TaskLock));

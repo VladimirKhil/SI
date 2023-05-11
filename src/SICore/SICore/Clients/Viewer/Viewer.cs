@@ -2103,7 +2103,6 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             switch (role)
             {
                 case Constants.Showman:
-
                     ClientData.ShowMan = new PersonAccount(account)
                     {
                         IsHuman = true,
@@ -2118,7 +2117,6 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     break;
 
                 case Constants.Player:
-
                     var playersWereUpdated = false;
 
                     while (index >= ClientData.Players.Count)
@@ -2145,6 +2143,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     }
 
                     var player = ClientData.Players[index];
+
+                    if (player.Name == ClientData.Name)
+                    {
+                        break;
+                    }
 
                     player.Name = account.Name;
                     player.Picture = account.Picture;

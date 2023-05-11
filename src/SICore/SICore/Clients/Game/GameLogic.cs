@@ -111,6 +111,7 @@ public sealed class GameLogic : Logic<GameData>
         Engine.SimpleAnswer += Engine_SimpleAnswer;
         Engine.RightAnswer += Engine_RightAnswer;
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
+        Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
         Engine.RoundEmpty += Engine_RoundEmpty;
         Engine.RoundTimeout += Engine_RoundTimeout;
@@ -133,6 +134,26 @@ public sealed class GameLogic : Logic<GameData>
             _data.TimerStartTime[2] = DateTime.UtcNow;
 
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
+        }
+    }
+
+    private void Engine_QuestionFinish()
+    {
+        if (_data.IsRoundEnding)
+        {
+            return;
+        }
+
+        var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
+
+        if (_data.Stage == GameStage.Round &&
+            _data.Round.Type != RoundTypes.Final &&
+            roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
+        {
+            // Завершение раунда по времени
+            _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
+
+            Engine.SetTimeout();
         }
     }
 
@@ -168,13 +189,10 @@ public sealed class GameLogic : Logic<GameData>
 
     private void Engine_QuestionPostInfo()
     {
-        if (!_data.AllowAppellation) // Simple answer has already activated it
-        {
-            _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
+        _tasksHistory.AddLogEntry("Engine_QuestionPostInfo: Appellation activated");
 
-            _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
-            _data.IsPlayingMedia = false;
-        }
+        _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
+        _data.IsPlayingMedia = false;
 
         ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
     }
@@ -214,10 +232,12 @@ public sealed class GameLogic : Logic<GameData>
 
     private void Engine_Round(Round round)
     {
+        _data.AppellationOpened = false;
         _data.AllowAppellation = false;
         _data.Round = round;
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
+        _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
         _data.Type = null;
 
@@ -1057,6 +1077,7 @@ public sealed class GameLogic : Logic<GameData>
 
         _data.CanMarkQuestion = false;
         _data.AnswererIndex = -1;
+        _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
         _data.Type = null;
     }
@@ -1239,6 +1260,7 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (_data.ThemeIndex != -1 && _data.QuestionIndex != -1)
                 {
+                    _data.AppellationOpened = false;
                     _data.AllowAppellation = false;
                     StopWaiting();
                     Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
@@ -1939,7 +1961,7 @@ public sealed class GameLogic : Logic<GameData>
                         break;
 
                     case Tasks.PrintAuctPlayer:
-                        PrintAuctPlayer();
+                        PrintStakeQuestionPlayer();
                         break;
 
                     case Tasks.PrintSecretQuestion:
@@ -2389,15 +2411,16 @@ public sealed class GameLogic : Logic<GameData>
         _tasksHistory.AddLogEntry($"Moved -> {Engine?.Stage}");
     }
 
-    private void PrintAuctPlayer()
+    private void PrintStakeQuestionPlayer()
     {
         if (_data.StakerIndex == -1)
         {
-            throw new ArgumentException($"{nameof(PrintAuctPlayer)}: {nameof(_data.StakerIndex)} == -1 {_data.OrderHistory}", nameof(_data.StakerIndex));
+            throw new ArgumentException($"{nameof(PrintStakeQuestionPlayer)}: {nameof(_data.StakerIndex)} == -1 {_data.OrderHistory}", nameof(_data.StakerIndex));
         }
 
         _data.ChooserIndex = _data.StakerIndex;
         _data.AnswererIndex = _data.StakerIndex;
+        _data.QuestionPlayState.SetSingleAnswerer(_data.StakerIndex);
         _data.CurPriceRight = _data.Stake;
         _data.CurPriceWrong = _data.Stake;
 
@@ -2603,7 +2626,10 @@ public sealed class GameLogic : Logic<GameData>
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);
         }
 
-        _data.AnswererIndex = SelectRandomOnIndex(_data.Players, index => index != _data.ChooserIndex);
+        var index = SelectRandomOnIndex(_data.Players, index => index != _data.ChooserIndex);
+
+        _data.AnswererIndex = index;
+        _data.QuestionPlayState.SetSingleAnswerer(index);
 
         OnDecision();
     }
@@ -3108,6 +3134,13 @@ public sealed class GameLogic : Logic<GameData>
             _data.Type = _data.Question.Type;
             var typeName = _data.Question.TypeName ?? _data.Question.Type.Name;
 
+            // Only StakeAll type is supported in final for now
+            // This will be removed when full question type support will have been implemented
+            if (IsFinalRound())
+            {
+                typeName = QuestionTypes.StakeAll;
+            }
+
 #if OLD_ENGINE
             if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
             {
@@ -3413,6 +3446,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         ClientData.AnswererIndex = ClientData.PendingAnswererIndex;
+        ClientData.QuestionPlayState.SetSingleAnswerer(ClientData.PendingAnswererIndex);
 
         if (ClientData.Settings.AppSettings.UsePingPenalty)
         {
@@ -3999,6 +4033,7 @@ public sealed class GameLogic : Logic<GameData>
 
                         _data.ChooserIndex = _data.StakerIndex;
                         _data.AnswererIndex = _data.StakerIndex;
+                        _data.QuestionPlayState.SetSingleAnswerer(_data.StakerIndex);
                         _data.CurPriceRight = _data.Stake;
                         _data.CurPriceWrong = _data.Stake;
 
@@ -4547,7 +4582,7 @@ public sealed class GameLogic : Logic<GameData>
             }
             else if (_data.Round.Type != RoundTypes.Final)
             {
-                ScheduleExecution(Tasks.QuestionType, 1, 1);
+                ScheduleExecution(Tasks.QuestionType, 20, 1);
             }
             else
             {
@@ -4627,7 +4662,7 @@ public sealed class GameLogic : Logic<GameData>
                         _gameActions.SendMessage(msg.ToString(), person);
                     }
                 }
-                else if (logoLink.Uri != null)
+                else if (!string.IsNullOrEmpty(logoLink.Uri))
                 {
                     ShareMedia(
                         new ContentItem { IsRef = true, Value = logoLink.Uri },
@@ -5016,6 +5051,7 @@ public sealed class GameLogic : Logic<GameData>
     internal void SetAnswererAsActive()
     {
         _data.AnswererIndex = _data.ChooserIndex;
+        _data.QuestionPlayState.SetSingleAnswerer(_data.ChooserIndex);
 
         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, '+');
 
@@ -5053,6 +5089,7 @@ public sealed class GameLogic : Logic<GameData>
                 if (_data.Players[i].Flag)
                 {
                     _data.ChooserIndex = _data.AnswererIndex = i;
+                    _data.QuestionPlayState.SetSingleAnswerer(i);
                     _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                 }
             }
@@ -5229,7 +5266,8 @@ public sealed class GameLogic : Logic<GameData>
             {
                 if (availableRange.Step < availableRange.Maximum - availableRange.Minimum)
                 {
-                    s.Append($"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
+                    s.Append(
+                        $"{LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(availableRange.Maximum)} " +
                         $"{LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(availableRange.Step)} ({LO[nameof(R.YourChoice)]})");
                 }
                 else
@@ -5353,15 +5391,35 @@ public sealed class GameLogic : Logic<GameData>
         return ClientData.Players.TakeWhile(p => p.Sum != minSum).Count();
     }
 
-    internal void SetAnswerersByAllHiddenStakes() => AskFinalStake();
+    internal void SetAnswerersByAllHiddenStakes()
+    {
+        var answerers = new List<int>();
+
+        for (int i = 0; i < ClientData.Players.Count; i++)
+        {
+            if (ClientData.Players[i].Sum > 0)
+            {
+                answerers.Add(i);
+            }
+        }
+
+        ClientData.QuestionPlayState.SetMultipleAnswerers(answerers);
+
+        AskFinalStake();
+    }
 
     internal void OnSetNoRiskPrice()
     {
+        if (_data.ChooserIndex == -1)
+        {
+            _data.ChooserIndex = DetectPlayerIndexWithLowestSum(); // TODO: set chooser index at the beginning of round
+        }
+
         _data.CurPriceRight *= 2;
         _data.CurPriceWrong = 0;
 
         _gameActions.ShowmanReplic(
-            $"{_data.Chooser.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
+            $"{_data.Chooser!.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
         
         _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
 
@@ -5380,5 +5438,18 @@ public sealed class GameLogic : Logic<GameData>
 
         Engine.SkipQuestion();
         ScheduleExecution(Tasks.MoveNext, 20, 1);
+    }
+
+    internal void OnComplexAnswer()
+    {
+        var last = _data.QuestionHistory.LastOrDefault();
+
+        if (last == null || !last.IsRight) // There has been no right answer
+        {
+            var answer = _data.Question.Right.FirstOrDefault();
+            var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
+
+            _gameActions.ShowmanReplic(printedAnswer);
+        }
     }
 }

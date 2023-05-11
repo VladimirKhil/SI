@@ -50,10 +50,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             return;
         }
 
-        GameLogic.AddHistory("Appellation activated");
+        GameLogic.AddHistory("Appellation opened");
 
         GameData.IsAnswer = true;
-        GameData.AllowAppellation = GameData.Settings.AppSettings.UseApellations;
+        GameData.AppellationOpened = GameData.Settings.AppSettings.UseApellations;
         GameData.IsPlayingMedia = false;
     }
 
@@ -64,7 +64,16 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {
-        
+        if (GameLogic == null || GameData == null)
+        {
+            return;
+        }
+
+        if (GameData.IsAnswer && !GameData.IsAnswerSimple)
+        {
+            GameLogic?.OnComplexAnswer();
+            GameData.IsAnswer = false;
+        }
     }
 
     public void OnQuestionContentItem(ContentItem contentItem)

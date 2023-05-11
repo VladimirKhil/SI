@@ -405,7 +405,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                         ? Type[QuestionTypeParams.BagCat_Knows] ?? QuestionTypeParams.BagCat_Knows_Value_After
                         : QuestionTypeParams.BagCat_Knows_Value_After;
 
-                    var canGiveSelf = TypeName == QuestionTypes.BagCat
+                    var canGiveSelf = Type.Name == QuestionTypes.BagCat
                         ? Type[QuestionTypeParams.BagCat_Self] ?? QuestionTypeParams.BagCat_Self_Value_False
                         : QuestionTypeParams.BagCat_Self_Value_False;
 
@@ -413,7 +413,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                         ? StepParameterValues.SetAnswererSelect_Any
                         : StepParameterValues.SetAnswererSelect_ExceptCurrent;
 
-                    var numberSet = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price);
+                    var numberSet = (NumberSet?)new NumberSetTypeConverter().ConvertFromString(price) ?? new NumberSet();
 
                     switch (knows)
                     {
