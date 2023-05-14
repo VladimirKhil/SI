@@ -301,7 +301,7 @@ public sealed class SIDocument : IDisposable
             {
                 foreach (var question in theme.Questions)
                 {
-                    question.Upgrade(round.Type == RoundTypes.Final);
+                    question.Upgrade();
                 }
             }
         }

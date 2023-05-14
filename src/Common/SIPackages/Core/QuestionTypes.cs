@@ -6,6 +6,11 @@
 public static class QuestionTypes
 {
     /// <summary>
+    /// Default (for current round) question type.
+    /// </summary>
+    public const string Default = "";
+
+    /// <summary>
     /// Simple question type.
     /// </summary>
     public const string Simple = "simple";

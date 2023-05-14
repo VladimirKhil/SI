@@ -20,6 +20,7 @@ public sealed class GamePlayerAccount : GamePersonAccount
         set { _sum = value; OnPropertyChanged(); }
     }
 
+    // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection
     /// <summary>
     /// Has the player right to press the button.
     /// </summary>
@@ -29,6 +30,7 @@ public sealed class GamePlayerAccount : GamePersonAccount
         set { _pass = value; OnPropertyChanged(); }
     }
 
+    // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection
     /// <summary>
     /// Is the player currently being able to play (by game rules, not by connection).
     /// </summary>
@@ -38,21 +40,25 @@ public sealed class GamePlayerAccount : GamePersonAccount
         set { _inGame = value; OnPropertyChanged(); }
     }
 
+    // TODO: Will be moved to QuestionPlayState
     /// <summary>
     /// Ответ игрока
     /// </summary>
-    internal string Answer { get; set; }
+    internal string? Answer { get; set; }
 
+    // TODO: Will be moved to QuestionPlayState
     /// <summary>
     /// Ответ верен
     /// </summary>
     internal bool AnswerIsRight { get; set; }
 
+    // TODO: Will be moved to QuestionPlayState
     /// <summary>
     /// Ответ заведомо неверен
     /// </summary>
     internal bool AnswerIsWrong { get; set; }
 
+    // TODO: Will be moved to QuestionPlayState
     /// <summary>
     /// Ставка в финале
     /// </summary>
@@ -63,6 +69,7 @@ public sealed class GamePlayerAccount : GamePersonAccount
     /// </summary>
     internal bool Flag { get; set; }
 
+    // TODO: Will be moved to Stake strategy implementation
     /// <summary>
     /// Участвует ли конкретный игрок в торгах на аукционе
     /// </summary>

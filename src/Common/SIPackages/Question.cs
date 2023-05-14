@@ -363,8 +363,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Upgrades the question to new format.
     /// </summary>
-    /// <param name="isFinal">Final round question flag.</param>
-    public void Upgrade(bool isFinal = false)
+    public void Upgrade()
     {
         if (TypeName != null)
         {
@@ -455,14 +454,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 break;
 
             case QuestionTypes.Simple:
-                if (isFinal)
-                {
-                    TypeName = QuestionTypes.StakeAll;
-                }
-                else
-                {
-                    TypeName = QuestionTypes.Simple;
-                }
+                TypeName = QuestionTypes.Default;
                 break;
 
             default:

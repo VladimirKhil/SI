@@ -8,13 +8,13 @@ namespace SIData;
 public enum GameModes
 {
     /// <summary>
-    /// Classic mode (with final round and special questions support).
+    /// Classic mode (with question selection).
     /// </summary>
     [Display(Description = "GameModes_Tv")]
     Tv,
 
     /// <summary>
-    /// Simplified mode (without final round and special questions).
+    /// Simplified mode (with question sequential play).
     /// </summary>
     [Display(Description = "GameModes_Sport")]
     Sport

@@ -38,7 +38,13 @@ public sealed class QuestionEngine
 
         if (_script == null && _question.TypeName != null)
         {
-            ScriptsLibrary.Scripts.TryGetValue(_question.TypeName, out _script);
+            var typeName = options.ForceDefaultTypeName || _question.TypeName == QuestionTypes.Default
+                ? options.DefaultTypeName
+                : _question.TypeName;
+
+            question.TypeName = typeName;
+
+            ScriptsLibrary.Scripts.TryGetValue(typeName, out _script);
         }
     }
 

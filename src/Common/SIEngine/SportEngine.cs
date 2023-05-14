@@ -1,4 +1,5 @@
-﻿using SIPackages;
+﻿using SIEngine.Rules;
+using SIPackages;
 
 namespace SIEngine;
 
@@ -8,6 +9,8 @@ namespace SIEngine;
 public sealed class SportEngine : EngineBase
 {
     public override int LeftQuestionsCount => throw new NotImplementedException();
+
+    protected override GameRules GameRules => WellKnownGameRules.Simple;
 
     public SportEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
         : base(document, optionsProvider, questionEngineFactory) { }

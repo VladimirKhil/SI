@@ -17,6 +17,13 @@ using R = SICore.Properties.Resources;
 
 namespace SICore;
 
+// TODO: Global refactoring plan:
+// extract different script steps implementations (stake making, question selecting and giving etc.)
+// to separate classes (strategies)
+// Extract corresponging state from GameData class
+
+// Remove Final round logic; use only StakeAll question type which can also appear in standard round
+
 /// <summary>
 /// Defines a game actor. Responds to all game-related messages.
 /// </summary>
@@ -2384,7 +2391,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                // TODO: it is better to provide a correct command to the game engine
+                // TODO: it is better to provide a correct command to game engine
                 PlanExecution(Tasks.Winner, 10); // This is the last round. Finishing game
             }
         }
@@ -2731,7 +2738,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         OnPersonsChanged();
     }
 
-    internal GamePersonAccount ReplaceComputerShowman(string oldName, string replacer)
+    internal GamePersonAccount? ReplaceComputerShowman(string oldName, string replacer)
     {
         for (var j = 0; j < _defaultShowmans.Length; j++)
         {
@@ -2747,7 +2754,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         return null;
     }
 
-    internal GamePlayerAccount ReplaceComputerPlayer(int index, string oldName, string replacer)
+    internal GamePlayerAccount? ReplaceComputerPlayer(int index, string oldName, string replacer)
     {
         for (var j = 0; j < _defaultPlayers.Length; j++)
         {

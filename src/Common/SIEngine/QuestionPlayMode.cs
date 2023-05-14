@@ -5,6 +5,7 @@
 /// <summary>
 /// Defines current question play state.
 /// </summary>
+[Obsolete]
 public enum QuestionPlayMode
 {
     InProcess,

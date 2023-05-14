@@ -121,11 +121,16 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     public QuestionPlayViewModel(QuestionViewModel question, QDocument document)
     {
         var questionClone = question.Model.Clone();
-        questionClone.Upgrade(question.OwnerTheme?.OwnerRound?.Model.Type == RoundTypes.Final);
+        questionClone.Upgrade();
 
         _questionEngine = new QuestionEngine(
             questionClone,
-            new QuestionEngineOptions { FalseStarts = FalseStartMode.Enabled, ShowSimpleRightAnswers = true },
+            new QuestionEngineOptions
+            {
+                FalseStarts = FalseStartMode.Enabled,
+                ShowSimpleRightAnswers = true,
+                DefaultTypeName = QuestionTypes.Simple
+            },
             this);
 
         _qDocument = document;

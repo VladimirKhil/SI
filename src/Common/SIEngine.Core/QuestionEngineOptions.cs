@@ -1,4 +1,6 @@
-﻿namespace SIEngine.Core;
+﻿using SIPackages.Core;
+
+namespace SIEngine.Core;
 
 /// <summary>
 /// Defines question engine options.
@@ -14,4 +16,14 @@ public sealed class QuestionEngineOptions
     /// Show simple right answers.
     /// </summary>
     public bool ShowSimpleRightAnswers { get; set; }
+
+    /// <summary>
+    /// Default type name.
+    /// </summary>
+    public string DefaultTypeName { get; set; } = QuestionTypes.Simple;
+
+    /// <summary>
+    /// Show all the type names be treated as default.
+    /// </summary>
+    public bool ForceDefaultTypeName { get; set; }
 }

@@ -33,6 +33,7 @@ public sealed class ThemeDeletersEnumerator
             }
 
             PlayerIndex = index;
+            PossibleIndicies = new HashSet<int>();
         }
 
         public IndexInfo(HashSet<int> indicies)
@@ -216,14 +217,14 @@ public sealed class ThemeDeletersEnumerator
         {
             var newOrder = new IndexInfo[_order.Length - 1];
             var possibleVariantsCount = -1;
-            HashSet<int> variantWithIndex = null;
+            HashSet<int>? variantWithIndex = null;
 
             for (int i = 0, j = 0; i < _order.Length; i++)
             {
                 if (_order[i].PlayerIndex == index ||
-                        _order[i].PlayerIndex == -1 &&
-                        _order[i].PossibleIndicies.Count == 1 &&
-                        _order[i].PossibleIndicies.Contains(index))
+                    _order[i].PlayerIndex == -1 &&
+                    _order[i].PossibleIndicies.Count == 1 &&
+                    _order[i].PossibleIndicies.Contains(index))
                 {
                     continue;
                 }

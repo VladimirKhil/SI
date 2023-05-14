@@ -1,10 +1,12 @@
-﻿using SIPackages;
+﻿using SIEngine.Rules;
+using SIPackages;
 using SIPackages.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SIEngine;
+
+// TODO: support simple SIGame mode here too
+// (allow to provide different GameRules instances here)
+// After that, remove SportEngine class
 
 /// <summary>
 /// Handles classic SIGame rules.
@@ -17,6 +19,8 @@ public sealed class TvEngine : EngineBase
     private readonly HashSet<(int, int)> _questionsTable = new();
     private readonly HashSet<int> _themesTable = new();
     private readonly List<int> _finalMap = new();
+
+    protected override GameRules GameRules => WellKnownGameRules.Classic;
 
     private void SetActiveThemeQuestion()
     {

@@ -1,13 +1,10 @@
 ﻿using SIEngine.Core;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
-using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SIEngine;
 
@@ -37,6 +34,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             }
         }
     }
+
+    protected abstract GameRules GameRules { get; }
 
     protected readonly SIDocument _document;
 
@@ -859,7 +858,11 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
                     FalseStarts = options.IsPressMode
                         ? (options.IsMultimediaPressMode ? FalseStartMode.Enabled : FalseStartMode.TextContentOnly)
                         : FalseStartMode.Disabled,
-                    ShowSimpleRightAnswers = options.ShowRight
+
+                    ShowSimpleRightAnswers = options.ShowRight,
+
+                    DefaultTypeName = GameRules.GetRulesForRoundType(_activeRound!.Type).DefaultQuestionType,
+                    ForceDefaultTypeName = isFinal
                 });
         }
     }
