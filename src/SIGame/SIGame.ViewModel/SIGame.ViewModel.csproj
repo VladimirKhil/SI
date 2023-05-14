@@ -12,7 +12,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="VKhil.SIContentService.Client" Version="1.0.9" />
+    <PackageReference Include="VKhil.SIContentService.Client" Version="1.0.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />

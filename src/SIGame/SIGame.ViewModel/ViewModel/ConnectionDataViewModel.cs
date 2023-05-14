@@ -181,8 +181,8 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         bool isOnline,
         string tempDocFolder,
         IFileShare? fileShare,
-        int networkGamePort)
-        => base.OnStartGame(node, host, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
+        int networkGamePort) =>
+        base.OnStartGame(node, host, networkGame, IsOnline, tempDocFolder, fileShare, networkGamePort);
 
     protected virtual void Prepare(GameSettingsViewModel gameSettings)
     {
@@ -274,7 +274,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
 
     protected virtual string GetExtraCredentials() => "";
 
-    protected Task<(string AvatarUrl, FileKey FileKey)>? _avatarLoadingTask;
+    protected Task<(string? AvatarUrl, FileKey? FileKey)>? _avatarLoadingTask;
 
     protected async Task JoinGameCompletedAsync(GameRole role, bool isHost, CancellationToken cancellationToken = default)
     {

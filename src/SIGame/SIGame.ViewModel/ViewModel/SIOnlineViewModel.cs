@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SI.GameServer.Client;
 using SIContentService.Client;
+using SIContentService.Contract;
 using SICore;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -328,9 +329,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     protected override string[] ContentPublicBaseUrls => _gamesHostInfo.ContentPublicBaseUrls;
 
-    /// <summary>
-    /// Подключение к игровому серверу
-    /// </summary>
     private readonly IGameServerClient _gameServerClient;
 
     public ObservableCollection<string> Users { get; } = new();
@@ -593,7 +591,14 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             await ReloadGamesAsync(_cancellationTokenSource.Token);
             await ReloadUsersAsync(_cancellationTokenSource.Token);
 
-            _avatarLoadingTask = UploadAvatarAsync(Human, _cancellationTokenSource.Token);
+            if (_gamesHostInfo.ContentInfos?.Length > 0)
+            {
+                _avatarLoadingTask = UploadAvatarNewAsync(Human, _cancellationTokenSource.Token);
+            }
+            else
+            {
+                _avatarLoadingTask = UploadAvatarAsync(null, null, Human, _cancellationTokenSource.Token);
+            }
 
             NewGame.CanBeExecuted = true;
         }
@@ -614,6 +619,21 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         {
             IsProgress = false;
         }
+    }
+
+    private async Task<(string? AvatarUrl, FileKey? FileKey)>? UploadAvatarNewAsync(Account account, CancellationToken token)
+    {
+        var randomIndex = Random.Shared.Next(_gamesHostInfo.ContentInfos.Length);
+        var contentInfo = _gamesHostInfo.ContentInfos[randomIndex];
+
+        using var contentServiceClient = SIContentClientExtensions.CreateSIContentServiceClient(
+            new SIContentClientOptions
+            {
+                ServiceUri = contentInfo.ServiceUri,
+            },
+            progress => UploadProgress = progress);
+
+        return await UploadAvatarAsync(contentServiceClient, contentInfo.ServiceUri, account, token);
     }
 
     public async void Load()
@@ -723,21 +743,29 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     private void RecountGames()
     {
         var serverGames = ServerGames.ToArray();
+
         for (var i = 0; i < serverGames.Length; i++)
         {
             var item = serverGames[i];
             var game = ServerGamesCache.FirstOrDefault(sg => sg.GameID == item.GameID);
+
             if (game == null || !FilterGame(game))
+            {
                 ServerGames.Remove(item);
+            }
         }
 
         serverGames = ServerGames.ToArray();
+
         for (var i = 0; i < serverGames.Length; i++)
         {
             var item = serverGames[i];
             var game = ServerGamesCache.FirstOrDefault(sg => sg.GameID == item.GameID);
+
             if (game != null && game != item)
+            {
                 ServerGames[i] = game;
+            }
         }
 
         for (int i = 0; i < ServerGamesCache.Count; i++)
@@ -745,8 +773,11 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             var item = ServerGamesCache[i];
 
             var game = ServerGames.FirstOrDefault(sg => sg.GameID == item.GameID);
+
             if (game == null && FilterGame(item))
+            {
                 InsertGame(item);
+            }
         }
 
         if (CurrentGame != null && !ServerGames.Contains(CurrentGame))
@@ -785,7 +816,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             return await CreateGameWithContentServiceAsync(settings, packageKey, packageSource, cancellationTokenSource.Token);
         }
 #endif
-
+        // This execution branch will sooner or later be deleted
         var hasPackage = await _gameServerClient.HasPackageAsync(packageKey, cancellationTokenSource.Token);
 
         if (!hasPackage)
@@ -798,7 +829,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Preparing;
 
-        var computerAccounts = await ProcessCustomPersonsAsync(settings, cancellationTokenSource.Token);
+        var computerAccounts = await ProcessCustomPersonsAsync(null, null, settings, cancellationTokenSource.Token);
 
         GameSettings.Message = Resources.Creating;
 
@@ -859,7 +890,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         PackageSource packageSource,
         CancellationToken cancellationToken)
     {
-        var contentInfo = _gamesHostInfo.ContentInfos[0];
+        var randomIndex = Random.Shared.Next(_gamesHostInfo.ContentInfos.Length);
+        var contentInfo = _gamesHostInfo.ContentInfos[randomIndex];
 
         using var contentServiceClient = SIContentClientExtensions.CreateSIContentServiceClient(
             new SIContentClientOptions
@@ -909,14 +941,14 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Preparing;
 
-        var computerAccounts = await ProcessCustomPersonsAsync(settings, cancellationToken);
+        var computerAccounts = await ProcessCustomPersonsAsync(contentServiceClient, contentInfo.ServiceUri, settings, cancellationToken);
 
         GameSettings.Message = Resources.Creating;
 
         var packageInfo = new SI.GameServer.Contract.PackageInfo
         {
             Type = SI.GameServer.Contract.PackageType.Content,
-            Uri = new Uri(packageUri, UriKind.RelativeOrAbsolute),
+            Uri = packageUri,
             ContentServiceUri = contentInfo.ServiceUri
         };
 
@@ -1041,53 +1073,64 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             _ => Resources.GameCreationError_UnknownReason,
         };
 
-    private async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(GameSettings settings, CancellationToken cancellationToken)
+    private async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(
+        ISIContentServiceClient? contentServiceClient,
+        Uri? contentUri,
+        GameSettings settings,
+        CancellationToken cancellationToken)
     {
         var computerAccounts = new List<ComputerAccountInfo>();
+
         foreach (var player in settings.Players)
         {
-            await ProcessCustomPersonAsync(computerAccounts, player, cancellationToken);
+            await ProcessCustomPersonAsync(contentServiceClient, contentUri, computerAccounts, player, cancellationToken);
         }
 
-        await ProcessCustomPersonAsync(computerAccounts, settings.Showman, cancellationToken);
+        await ProcessCustomPersonAsync(contentServiceClient, contentUri, computerAccounts, settings.Showman, cancellationToken);
 
         return computerAccounts;
     }
 
-    private async Task ProcessCustomPersonAsync(List<ComputerAccountInfo> computerAccounts, Account account, CancellationToken cancellationToken)
+    private async Task ProcessCustomPersonAsync(
+        ISIContentServiceClient? contentServiceClient,
+        Uri? contentUri,
+        List<ComputerAccountInfo> computerAccounts,
+        Account account,
+        CancellationToken cancellationToken)
     {
         if (!account.IsHuman && account.CanBeDeleted) // This is a non standard player; we need to send its data to server
         {
-            var avatar = (await UploadAvatarAsync(account, cancellationToken)).AvatarUrl;
-
+            var avatar = (await UploadAvatarAsync(contentServiceClient, contentUri, account, cancellationToken)).AvatarUrl;
             var computerAccount = new ComputerAccount((ComputerAccount)account) { Picture = avatar };
-
             computerAccounts.Add(new ComputerAccountInfo { Account = computerAccount });
         }
     }
 
-    private async Task<(string AvatarUrl, FileKey FileKey)> UploadAvatarAsync(
+    private async Task<(string? AvatarUrl, FileKey? FileKey)> UploadAvatarAsync(
+        ISIContentServiceClient? contentServiceClient,
+        Uri? contentUri,
         Account account,
         CancellationToken cancellationToken = default)
     {
         var avatarUri = account.Picture;
 
-        if (!Uri.TryCreate(avatarUri, UriKind.Absolute, out Uri pictureUri))
+        if (!Uri.TryCreate(avatarUri, UriKind.Absolute, out var pictureUri))
         {
             return (null, null);
         }
 
-        if (pictureUri.Scheme != "file" || !File.Exists(avatarUri)) // Это локальный файл, и его нужно отправить на сервер
+        if (pictureUri.Scheme != "file" || !File.Exists(avatarUri))
         {
             return (null, null);
         }
 
+        // This is a local file and it should be sent to server
         if (new FileInfo(avatarUri).Length > MaxAvatarSizeMb * 1024 * 1024)
         {
             return (null, null);
         }
 
-        byte[] fileHash = null;
+        byte[] fileHash;
 
         using (var stream = File.OpenRead(avatarUri))
         {
@@ -1097,7 +1140,32 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         var avatarKey = new FileKey { Name = Path.GetFileName(avatarUri), Hash = fileHash };
 
-        // Если файла на сервере нет, загрузим его
+        if (contentServiceClient != null && contentUri != null)
+        {
+            var key = new SIContentService.Contract.Models.FileKey
+            {
+                Name = Path.GetFileName(avatarUri),
+                Hash = fileHash,
+            };
+
+            var avatarServerUri = await contentServiceClient.TryGetAvatarUriAsync(key, cancellationToken);
+
+            if (avatarServerUri == null)
+            {
+                using var stream = File.OpenRead(avatarUri);
+                avatarServerUri = await contentServiceClient.UploadAvatarAsync(key, stream, cancellationToken);
+            }
+
+            if (avatarServerUri != null && !avatarServerUri.IsAbsoluteUri)
+            {
+                // Prepend avatarServerUri with service content root uri
+                avatarServerUri = new Uri(contentUri, avatarServerUri.ToString().TrimStart('/'));
+            }
+
+            return (avatarServerUri?.ToString(), avatarKey);
+        }
+
+        // Upload file if it does not exist on server
         var avatarPath = await _gameServerClient.HasImageAsync(avatarKey, cancellationToken);
 
         if (avatarPath == null)
