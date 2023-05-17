@@ -10,7 +10,6 @@ using SIPackages;
 using SIPackages.Core;
 using SIPackages.Helpers;
 using SIPackages.Providers;
-using SIPackages.TypeConverters;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -97,19 +96,6 @@ public sealed class GameLogic : Logic<GameData>
         Engine.Question += Engine_Question; // Simple game mode question
         Engine.QuestionSelected += Engine_QuestionSelected; // Classic game mode question
 
-        Engine.QuestionText += Engine_QuestionText;
-        Engine.QuestionOral += Engine_QuestionOral;
-        Engine.QuestionImage += Engine_QuestionImage;
-        Engine.QuestionSound += Engine_QuestionSound;
-        Engine.QuestionVideo += Engine_QuestionVideo;
-        Engine.QuestionHtml += Engine_QuestionHtml;
-        Engine.QuestionOther += Engine_QuestionOther;
-        Engine.QuestionAtom += Engine_QuestionAtom;
-        Engine.QuestionFinished += Engine_QuestionFinished;
-        Engine.WaitTry += Engine_WaitTry;
-
-        Engine.SimpleAnswer += Engine_SimpleAnswer;
-        Engine.RightAnswer += Engine_RightAnswer;
         Engine.QuestionPostInfo += Engine_QuestionPostInfo;
         Engine.QuestionFinish += Engine_QuestionFinish;
         Engine.NextQuestion += Engine_NextQuestion;
@@ -170,21 +156,6 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.MoveNext, atomTime);
 
         _data.TimeThinking = 0.0;
-    }
-
-    [Obsolete]
-    private void Engine_QuestionHtml(IMedia html)
-    {
-        _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(html, AtomTypes.Html);
-    }
-
-    [Obsolete]
-    private void Engine_QuestionFinished()
-    {
-        _data.IsQuestionFinished = true;
-        _data.IsPlayingMedia = false;
-        _data.IsPlayingMediaPaused = false;
     }
 
     private void Engine_QuestionPostInfo()
@@ -420,37 +391,6 @@ public sealed class GameLogic : Logic<GameData>
         _data.TimeThinking = 0.0;
     }
 
-    [Obsolete]
-    private void Engine_QuestionText(string text, IMedia sound)
-    {
-        _data.QLength = text.Length;
-        _data.IsPartial = IsPartial();
-
-        if (_data.IsPartial)
-        {
-            // "и" symbol is used as an arbitrary symbol with medium width to define the question text shape
-            // It does not need to be localized
-            // Real question text is sent later and it sequentially replaces test shape
-            // Text shape is required to display partial question on the screen correctly
-            // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
-            _gameActions.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
-
-            _data.Text = text;
-            _data.TextLength = 0;
-            ScheduleExecution(Tasks.PrintPartial, 1);
-        }
-        else
-        {
-            _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
-            _gameActions.SystemReplic(text);
-        }
-
-        if (sound != null)
-        {
-            _data.MediaOk = ShareMedia(sound, AtomTypes.Audio, true);
-        }
-    }
-
     /// <summary>
     /// Should the question be displayed partially.
     /// </summary>
@@ -479,15 +419,6 @@ public sealed class GameLogic : Logic<GameData>
 
         _data.TimeThinking = 0.0;
         _data.UseBackgroundAudio = !waitForFinish;
-    }
-
-    [Obsolete]
-    private void Engine_QuestionOral(string oralText)
-    {
-        _data.IsPartial = false;
-        _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, oralText);
-        _gameActions.ShowmanReplic(oralText);
-        _data.QLength = oralText.Length;
     }
 
     private bool ShareMedia(ContentItem contentItem, string atomType, bool isBackground = false)
@@ -667,129 +598,6 @@ public sealed class GameLogic : Logic<GameData>
         return null;
     }
 
-    [Obsolete]
-    private bool ShareMedia(IMedia link, string atomType, bool isBackground = false)
-    {
-        try
-        {
-            var msg = new StringBuilder();
-
-            msg.Append(isBackground ? Messages.Atom_Second : Messages.Atom)
-                .Append(Message.ArgsSeparatorChar)
-                .Append(atomType)
-                .Append(Message.ArgsSeparatorChar);
-
-            var mediaCategory = atomType == AtomTypes.Image
-                ? SIDocument.ImagesStorageName
-                : (atomType == AtomTypes.Audio
-                    ? SIDocument.AudioStorageName
-                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
-
-            if (link.GetStream == null) // External link
-            {
-                if (Uri.TryCreate(link.Uri, UriKind.Absolute, out _))
-                {
-                    msg.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(link.Uri);
-                    _gameActions.SendMessage(msg.ToString());
-
-                    return true;
-                }
-
-                var checkedFileName = Path.Combine(mediaCategory, link.Uri).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
-
-                if (_data.PackageDoc.GetFilteredFiles().Any(f =>
-                    f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
-                {
-                    _gameActions.SendMessageWithArgs(
-                        isBackground ? Messages.Atom_Second : Messages.Atom,
-                        AtomTypes.Text,
-                        string.Format(LO[nameof(R.MediaFiltered)], link.Uri));
-
-                    return false;
-                }
-
-                // There is no file in the package and it's name is not a valid absolute uri.
-                // So, considering that the file is missing
-
-                _gameActions.SendMessageWithArgs(
-                    isBackground ? Messages.Atom_Second : Messages.Atom,
-                    AtomTypes.Text,
-                    string.Format(LO[nameof(R.MediaNotFound)], link.Uri));
-
-                return false;
-            }
-
-            var filename = link.Uri;
-            var fileLength = link.StreamLength;
-
-            int? maxRecommendedFileLength = atomType == AtomTypes.Image ? _data.BackLink.MaxImageSizeKb
-                : (atomType == AtomTypes.Audio ? _data.BackLink.MaxAudioSizeKb
-                : (atomType == AtomTypes.Video ? _data.BackLink.MaxVideoSizeKb : null));
-
-            if (maxRecommendedFileLength.HasValue && fileLength > (long)maxRecommendedFileLength * 1024)
-            {
-                // Notify users that the media file is too large and could be downloaded slowly
-
-                var contentName = atomType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
-                    (atomType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
-                    (atomType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
-
-                var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
-                var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
-
-                _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
-
-                if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
-                {
-                    _data.OversizedMediaNotificationsCount++;
-
-                    // Show message on table
-
-                    _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, errorMessage); // Will be removed in the future
-                    _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
-                }
-            }
-
-            var uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{filename}", UriKind.Relative));
-
-            var localUri = ClientData.DocumentPath != null
-                ? Path.Combine(ClientData.DocumentPath, mediaCategory, Uri.UnescapeDataString(filename))
-                : null;
-
-            if (localUri != null && !File.Exists(localUri))
-            {
-                localUri = null;
-            }
-
-            foreach (var person in _data.AllPersons.Keys)
-            {
-                var msg2 = new StringBuilder(msg.ToString());
-
-                if (_gameActions.Client.CurrentServer.Contains(person))
-                {
-                    msg2.Append(MessageParams.Atom_Uri)
-                        .Append(Message.ArgsSeparatorChar)
-                        .Append(localUri ?? uri.ToString());
-                }
-                else
-                {
-                    msg2.Append(MessageParams.Atom_Uri)
-                        .Append(Message.ArgsSeparatorChar)
-                        .Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
-                }
-
-                _gameActions.SendMessage(msg2.ToString(), person);
-            }
-
-            return true;
-        }
-        catch (Exception exc)
-        {
-            ClientData.BackLink.OnError(exc);
-            return false;
-        }
-    }
-
     internal void OnContentScreenImage(ContentItem contentItem)
     {
         _data.IsPartial = false;
@@ -810,18 +618,6 @@ public sealed class GameLogic : Logic<GameData>
         contentItem.WaitForFinish
             ? (contentItem.Duration > TimeSpan.Zero ? (int)(contentItem.Duration.TotalMilliseconds / 100) : defaultValue)
             : 1;
-
-    [Obsolete]
-    private void Engine_QuestionImage(IMedia image, IMedia sound)
-    {
-        _data.IsPartial = false;
-        ShareMedia(image, AtomTypes.Image);
-
-        if (sound != null)
-        {
-            _data.MediaOk = ShareMedia(sound, AtomTypes.Audio, true);
-        }
-    }
 
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
@@ -849,13 +645,6 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.MoveNext, atomTime);
 
         _data.TimeThinking = 0.0;
-    }
-
-    [Obsolete]
-    private void Engine_QuestionSound(IMedia sound)
-    {
-        _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(sound, AtomTypes.Audio);
     }
 
     internal void OnContentScreenVideo(ContentItem contentItem)
@@ -886,83 +675,6 @@ public sealed class GameLogic : Logic<GameData>
         _data.TimeThinking = 0.0;
     }
 
-    [Obsolete]
-    private void Engine_QuestionVideo(IMedia video)
-    {
-        _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(video, AtomTypes.Video);
-    }
-
-    [Obsolete]
-    private void Engine_QuestionOther(Atom atom)
-    {
-        // Не поддерживается
-    }
-
-    [Obsolete]
-    private void Engine_QuestionAtom(Atom atom)
-    {
-        if (_data.IsAnswer)
-        {
-            var last = _data.QuestionHistory.LastOrDefault();
-
-            if (last == null || !last.IsRight) // There has been no right answer
-            {
-                var answer = _data.Question.Right.FirstOrDefault();
-                var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
-
-                _gameActions.ShowmanReplic(printedAnswer);
-            }
-
-            _data.IsAnswer = false;
-        }
-
-        var atomTime = DetectAtomTime(atom);
-
-        _data.AtomTime = atomTime;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.AtomType = atom.Type;
-        _data.CanMarkQuestion = true;
-
-        _data.IsPlayingMedia = atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio;
-        _data.IsPlayingMediaPaused = false;
-
-        var isPartial = _data.IsPartial && atom.Type == AtomTypes.Text;
-
-        if (isPartial)
-        {
-            return;
-        }
-
-        ScheduleExecution(Tasks.MoveNext, atomTime);
-
-        _data.TimeThinking = 0.0;
-    }
-
-    private int DetectAtomTime(Atom atom)
-    {
-        if (atom.AtomTime > 0)
-        {
-            return atom.AtomTime * 10;
-        }
-
-        if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
-        {
-            return GetReadingDurationForTextLength(_data.QLength);
-        }
-
-        if ((atom.Type == AtomTypes.Video || atom.Type == AtomTypes.Audio) && _data.MediaOk)
-        {
-            _data.InitialMediaContentCompletionCount = _data.HaveViewedAtom = _data.Viewers.Count
-                + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
-                + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
-
-            return DefaultAudioVideoTime;
-        }
-        
-        return DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
-    }
-
     internal void AskToPress()
     {
         if (_data.Settings.AppSettings.FalseStart)
@@ -985,68 +697,6 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-    }
-
-    [Obsolete]
-    private void Engine_WaitTry(Question question, bool final)
-    {
-        if (!final)
-        {
-            if (!_data.IsQuestionPlaying)
-            {
-                ScheduleExecution(Tasks.MoveNext, 1, force: true);
-            }
-            else if (_data.Type != null && _data.Type.Name != QuestionTypes.Simple)
-            {
-                ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-            }
-            else
-            {
-                AskToPress();
-            }
-        }
-        else
-        {
-            ScheduleExecution(Tasks.AskAnswer, 1, force: true);
-            _gameActions.SendMessageWithArgs(Messages.FinalThink, _data.Settings.AppSettings.TimeSettings.TimeForFinalThinking);
-        }
-    }
-
-    [Obsolete]
-    private void Engine_SimpleAnswer(string answer)
-    {
-        var normalizedAnswer = (answer ?? LO[nameof(R.AnswerNotSet)]).LeaveFirst(MaxAnswerLength);
-
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, AtomTypes.Text, normalizedAnswer);
-
-        _tasksHistory.AddLogEntry("Engine_SimpleAnswer: Appellation activated");
-
-        _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
-        _data.IsPlayingMedia = false;
-
-        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-        ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
-    }
-
-    [Obsolete]
-    private void Engine_RightAnswer()
-    {
-        _data.IsAnswer = true;
-
-        if (!_data.IsRoundEnding)
-        {
-            var roundDuration = DateTime.UtcNow.Subtract(_data.TimerStartTime[0]).TotalMilliseconds / 100;
-
-            if (_data.Stage == GameStage.Round &&
-                _data.Round.Type != RoundTypes.Final &&
-                roundDuration >= _data.Settings.AppSettings.TimeSettings.TimeOfRound * 10)
-            {
-                // Завершение раунда по времени
-                _gameActions.SendMessageWithArgs(Messages.Timer, 0, MessageParams.Timer_Stop);
-
-                Engine.SetTimeout();
-            }
-        }
     }
 
     private void Engine_NextQuestion()
@@ -1290,17 +940,13 @@ public sealed class GameLogic : Logic<GameData>
 
                     _data.ChooserIndex = _data.AnswererIndex;
                     _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-#if OLD_ENGINE
-                    ScheduleExecution(Tasks.CatInfo, 10);
-#else
                     ScheduleExecution(Tasks.MoveNext, 10);
-#endif
                     return true;
                 }
 
                 break;
 
-#endregion
+                #endregion
 
             case DecisionType.CatCostSetting:
 
@@ -1312,15 +958,11 @@ public sealed class GameLogic : Logic<GameData>
 
                     _data.CurPriceWrong = _data.CurPriceRight;
                     _gameActions.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
-#if OLD_ENGINE
-                    ScheduleExecution(Tasks.AskCatCost, 20);
-#else
+
                     _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
                     _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
                     ScheduleExecution(Tasks.MoveNext, 20);
-#endif
-
                     return true;
                 }
 
@@ -1943,10 +1585,6 @@ public sealed class GameLogic : Logic<GameData>
                         OnQuestionType(arg);
                         break;
 
-                    case Tasks.PrintStakeQuestion:
-                        PrintStakeQuestion();
-                        break;
-
                     case Tasks.AskStake:
                         AskStake(true);
                         break;
@@ -1964,10 +1602,6 @@ public sealed class GameLogic : Logic<GameData>
                         PrintStakeQuestionPlayer();
                         break;
 
-                    case Tasks.PrintSecretQuestion:
-                        PrintSecretQuestion(arg);
-                        break;
-
                     case Tasks.AskCat:
                         AskCat();
                         break;
@@ -1976,24 +1610,12 @@ public sealed class GameLogic : Logic<GameData>
                         WaitCat();
                         break;
 
-                    case Tasks.CatInfo:
-                        CatInfo();
-                        break;
-
                     case Tasks.AskCatCost:
                         AskCatCost();
                         break;
 
                     case Tasks.WaitCatCost:
                         WaitCatCost();
-                        break;
-
-                    case Tasks.PrintSponsored:
-                        PrintNoRiskQuestion(arg);
-                        break;
-
-                    case Tasks.PrintQue:
-                        PrintQuestion();
                         break;
 
                     case Tasks.PrintPartial:
@@ -2429,11 +2051,7 @@ public sealed class GameLogic : Logic<GameData>
         var msg = $"{Notion.RandomString(LO[nameof(R.NowPlays)])} {_data.Players[_data.StakerIndex].Name} {LO[nameof(R.With)]} {Notion.FormatNumber(_data.Stake)}";
 
         _gameActions.ShowmanReplic(msg.ToString());
-#if OLD_ENGINE
-        ScheduleExecution(Tasks.PrintQue, 15 + Random.Shared.Next(10));
-#else
         ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10));
-#endif
     }
 
     private void WaitNext(Tasks task)
@@ -2511,59 +2129,29 @@ public sealed class GameLogic : Logic<GameData>
             throw new ArgumentException($"{nameof(_data.AnswererIndex)} == -1", nameof(_data.AnswererIndex));
         }
 
-        // Always true for new engine
-        if (_data.CurPriceRight == -1)
+        _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.PleaseChooseCatCost)]}");
+        var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
+
+        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+
+        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
+
+        if (_data.IsOralNow)
         {
-            _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.PleaseChooseCatCost)]}");
-            var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
-
-            var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
-
-            _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
-
-            if (_data.IsOralNow)
-            {
-                _gameActions.SendMessage(s, _data.ShowMan.Name);
-            }
-            else
-            {
-                _gameActions.SendMessage(s, _data.Answerer.Name);
-
-                if (!_data.Answerer.IsConnected)
-                {
-                    waitTime = 20;
-                }
-            }
-
-            ScheduleExecution(Tasks.WaitCatCost, waitTime);
-            WaitFor(DecisionType.CatCostSetting, waitTime, _data.AnswererIndex);
+            _gameActions.SendMessage(s, _data.ShowMan.Name);
         }
-        // Obsolete:
-        else if (_data.Type[QuestionTypeParams.BagCat_Knows] == QuestionTypeParams.BagCat_Knows_Value_Never)
-        {
-            _gameActions.ShowmanReplic(LO[nameof(R.EasyCat)]);
-            _gameActions.SendMessageWithArgs(Messages.Person, '+', _data.AnswererIndex, _data.CurPriceRight);
-
-            _data.Answerer.Sum += _data.CurPriceRight;
-            _data.ChooserIndex = _data.AnswererIndex;
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-            _gameActions.InformSums();
-
-            Engine.SkipQuestion();
-            ScheduleExecution(Tasks.MoveNext, 20, 1);
-        }
-        // Obsolete:
         else
         {
-            _data.CurPriceWrong = _data.CurPriceRight;
-            _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-#if OLD_ENGINE
-            ScheduleExecution(Tasks.PrintQue, 2);
-#else
-            ScheduleExecution(Tasks.MoveNext, 2);
-#endif
+            _gameActions.SendMessage(s, _data.Answerer.Name);
+
+            if (!_data.Answerer.IsConnected)
+            {
+                waitTime = 20;
+            }
         }
+
+        ScheduleExecution(Tasks.WaitCatCost, waitTime);
+        WaitFor(DecisionType.CatCostSetting, waitTime, _data.AnswererIndex);
     }
 
     private void WaitFirst()
@@ -2632,40 +2220,6 @@ public sealed class GameLogic : Logic<GameData>
         _data.QuestionPlayState.SetSingleAnswerer(index);
 
         OnDecision();
-    }
-
-    [Obsolete]
-    private void PrintQuestion()
-    {
-        if (!IsFinalRound())
-        {
-            var isSpecial = IsSpecialQuestion();
-
-            foreach (var player in _data.Players)
-            {
-                player.CanPress = !isSpecial;
-            }
-
-            _data.IsDeferringAnswer = false;
-            _data.IsQuestionFinished = false;
-
-            if (!_data.Settings.AppSettings.FalseStart)
-            {
-                var type = _data.Question.TypeName ?? _data.Question.Type.Name;
-
-                if (type == QuestionTypes.Simple)
-                {
-                    _data.Decision = DecisionType.Pressing;
-                    _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
-
-                    SendTryToPlayers();
-                }
-            }
-        }
-
-        _data.IsAnswer = false;
-
-        ScheduleExecution(Tasks.MoveNext, 1, 1, true);
     }
 
     private void WaitTry()
@@ -2922,105 +2476,6 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.GoodLuck, 20 + Random.Shared.Next(10));
     }
 
-    [Obsolete]
-    private void PrintNoRiskQuestion(int arg)
-    {
-        if (arg == 1)
-        {
-            _data.CurPriceRight *= 2;
-            _data.CurPriceWrong = 0;
-            _data.AnswererIndex = _data.ChooserIndex;
-            _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-        }
-
-        if (arg < 2)
-        {
-            ScheduleExecution(Tasks.PrintSponsored, 10, arg + 1);
-        }
-        else
-        {
-            _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {string.Format(LO[nameof(R.SponsoredQuestionInfo)], Notion.FormatNumber(_data.CurPriceRight))}");
-            _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight, _data.CurPriceWrong);
-            _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, '+');
-#if OLD_ENGINE
-            ScheduleExecution(Tasks.PrintQue, 10);
-#else
-            ScheduleExecution(Tasks.MoveNext, 10);
-#endif
-        }
-    }
-
-    [Obsolete]
-    private void CatInfo()
-    {
-        var isCat = _data.Type.Name == QuestionTypes.Cat;
-        var isBagCat = _data.Type.Name == QuestionTypes.BagCat;
-
-        var taskTime = 5;
-
-        if (isBagCat)
-        {
-            var knows = _data.Type[QuestionTypeParams.BagCat_Knows];
-            if (knows != QuestionTypeParams.BagCat_Knows_Value_Before)
-            {
-                isCat = true;
-            }
-        }
-
-        if (isCat)
-        {
-            PrintSecretQuestionInfo();
-            taskTime += 25;
-        }
-
-        if (isBagCat)
-        {
-            ScheduleExecution(Tasks.AskCatCost, taskTime, force: !isCat);
-        }
-        else
-        {
-            _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-#if OLD_ENGINE
-            ScheduleExecution(Tasks.PrintQue, taskTime);
-#else
-            ScheduleExecution(Tasks.MoveNext, taskTime);
-#endif
-        }
-    }
-
-    private void PrintStakeQuestion()
-    {
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
-
-        var nominal = _data.Question.Price;
-
-        _data.Order = new int[_data.Players.Count];
-
-        for (var i = 0; i < _data.Players.Count; i++)
-        {
-            _data.Players[i].StakeMaking = i == _data.ChooserIndex || _data.Players[i].Sum > nominal;
-            _data.Order[i] = -1;
-        }
-
-        _data.Stake = _data.StakerIndex = -1;
-        _data.Order[0] = _data.ChooserIndex;
-
-        _data.OrderHistory.Clear();
-
-        _data.OrderHistory.Append("Stake making. Initial state. ")
-            .Append("Sums: ")
-            .Append(string.Join(",", _data.Players.Select(p => p.Sum)))
-            .Append(" Order: ")
-            .Append(string.Join(",", _data.Order))
-            .Append(" Nominal: ")
-            .Append(_data.CurPriceRight)
-            .AppendLine();
-
-        _data.AllIn = false;
-        _data.OrderIndex = -1;
-        ScheduleExecution(Tasks.AskStake, 10);
-    }
-
     private void AskToTry()
     {
         if (ClientData.Players.All(p => !p.CanPress))
@@ -3123,14 +2578,6 @@ public sealed class GameLogic : Logic<GameData>
 
         if (arg == 2)
         {
-#if OLD_ENGINE
-            if (IsFinalRound())
-            {
-                ScheduleExecution(Tasks.PrintQue, 1, force: true);
-                return;
-            }
-#endif
-
             _data.Type = _data.Question.Type;
             var typeName = _data.Question.TypeName ?? _data.Question.Type.Name;
 
@@ -3141,34 +2588,6 @@ public sealed class GameLogic : Logic<GameData>
                 typeName = QuestionTypes.StakeAll;
             }
 
-#if OLD_ENGINE
-            if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
-            {
-                var themeChanged = false;
-                string catTheme = null;
-
-                var isCat = _data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat;
-
-                if (isCat)
-                {
-                    var currentTheme = _data.Theme.Name;
-                    catTheme = _data.Type[QuestionTypeParams.Cat_Theme];
-
-                    themeChanged = currentTheme != catTheme;
-                }
-
-                _data.Type.Name = QuestionTypes.Simple;
-
-                if (themeChanged)
-                {
-                    // Нужно сказать, что тема будет другой
-                    _gameActions.ShowmanReplic(LO[nameof(R.QuestionWithSpecialTheme)] + ": " + catTheme);
-                    ScheduleExecution(Tasks.PrintQue, 20, force: true);
-                    return;
-                }
-            }
-#endif
-
             var s = new StringBuilder(Messages.QType).Append(Message.ArgsSeparatorChar);
             var delay = 1;
 
@@ -3176,9 +2595,7 @@ public sealed class GameLogic : Logic<GameData>
             {
                 case QuestionTypes.Auction:
                 case QuestionTypes.Stake:
-#if !OLD_ENGINE
                     _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.YouGetAuction)]));
-#endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
                     delay = 16;
                     break;
@@ -3188,7 +2605,6 @@ public sealed class GameLogic : Logic<GameData>
                 case QuestionTypes.Secret:
                 case QuestionTypes.SecretPublicPrice:
                 case QuestionTypes.SecretNoQuestion:
-#if !OLD_ENGINE
                     var replic = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
 
                     var selectionMode = _data.Question.Parameters?.FirstOrDefault(p => p.Key == QuestionParameterNames.SelectionMode);
@@ -3199,16 +2615,13 @@ public sealed class GameLogic : Logic<GameData>
                     }
 
                     _gameActions.ShowmanReplic(replic.ToString());
-#endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
                     delay = 16;
                     break;
 
                 case QuestionTypes.Sponsored:
                 case QuestionTypes.NoRisk:
-#if !OLD_ENGINE
                     _gameActions.ShowmanReplic(LO[nameof(R.SponsoredQuestion)]);
-#endif
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
                     delay = 16;
                     break;
@@ -3228,33 +2641,7 @@ public sealed class GameLogic : Logic<GameData>
 
             _gameActions.SendMessage(s.ToString());
 
-#if OLD_ENGINE
-            // Реакция согласно типу вопроса
-            if (_data.Type.Name == QuestionTypes.Auction)
-            {
-                ScheduleExecution(Tasks.PrintStakeQuestion, 8 + Random.Shared.Next(10), force: true);
-            }
-            else if (_data.Type.Name == QuestionTypes.Cat || _data.Type.Name == QuestionTypes.BagCat)
-            {
-                ScheduleExecution(Tasks.PrintSecretQuestion, 8 + Random.Shared.Next(10), 1, force: true);
-            }
-            else if (_data.Type.Name == QuestionTypes.Sponsored)
-            {
-                // Вопрос без риска
-                ScheduleExecution(Tasks.PrintSponsored, 8 + Random.Shared.Next(10), 1, force: true);
-            }
-            else if (_data.Type.Name == QuestionTypes.Simple)
-            {
-                ScheduleExecution(Tasks.PrintQue, 1, force: true);
-            }
-            else // Unsupported question type
-            {
-                OnUnsupportedQuestionType();
-            }
-#else
             ScheduleExecution(Tasks.MoveNext, delay, force: true);
-#endif
-
             return;
         }
 
@@ -3654,78 +3041,6 @@ public sealed class GameLogic : Logic<GameData>
         WaitFor(DecisionType.CatGiving, waitTime, _data.ChooserIndex);
     }
 
-    [Obsolete]
-    private void PrintSecretQuestion(int arg)
-    {
-        if (arg == 1)
-        {
-            var s = new StringBuilder(LO[nameof(R.YouReceiveCat)]);
-
-            if (_data.Type[QuestionTypeParams.BagCat_Self] == QuestionTypeParams.BagCat_Self_Value_True)
-            {
-                s.Append($". {LO[nameof(R.YouCanKeepCat)]}");
-            }
-
-            _gameActions.ShowmanReplic(s.ToString());
-
-            if (_data.Type.Name == QuestionTypes.Cat)
-            {
-                arg++;
-            }
-            else
-            {
-                arg++;
-
-                if (_data.Type[QuestionTypeParams.BagCat_Knows] == QuestionTypeParams.BagCat_Knows_Value_Before)
-                {
-                    arg++;
-                }
-            }
-
-            ScheduleExecution(Tasks.PrintSecretQuestion, 15 + Random.Shared.Next(10), arg);
-        }
-        else if (arg == 2)
-        {
-            // Если имеется один вариант, спрашивать не надо
-            for (var i = 0; i < _data.Players.Count; i++)
-            {
-                _data.Players[i].Flag = true;
-            }
-
-            if (_data.Type[QuestionTypeParams.BagCat_Self] != QuestionTypeParams.BagCat_Self_Value_True)
-            {
-                _data.Chooser.Flag = false;
-            }
-
-            var variantsCount = _data.Players.Count(player => player.Flag);
-
-            if (variantsCount == 1)
-            {
-                for (var i = 0; i < _data.Players.Count; i++)
-                {
-                    if (_data.Players[i].Flag)
-                    {
-                        _data.ChooserIndex = _data.AnswererIndex = i;
-                        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
-                    }
-                }
-
-                _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.CatIsYours)]}!");
-                ScheduleExecution(Tasks.CatInfo, 10);
-            }
-            else
-            {
-                _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}");
-                ScheduleExecution(Tasks.AskCat, 10 + Random.Shared.Next(10), force: true);
-            }
-        }
-        else if (arg == 3)
-        {
-            PrintSecretQuestionInfo();
-            ScheduleExecution(Tasks.PrintSecretQuestion, 20 + Random.Shared.Next(10), 2);
-        }
-    }
-
     private void AskFirst()
     {
         var min = _data.Players.Min(player => player.Sum);
@@ -4044,11 +3359,7 @@ public sealed class GameLogic : Logic<GameData>
 
                         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
 
-#if OLD_ENGINE
-                        ScheduleExecution(Tasks.PrintQue, 10, 1);
-#else
                         ScheduleExecution(Tasks.MoveNext, 10, 1);
-#endif
                         return false;
                     }
 
@@ -4586,11 +3897,7 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-#if OLD_ENGINE
-                ScheduleExecution(Tasks.AskFinalStake, 20);
-#else
                 ScheduleExecution(Tasks.MoveNext, 20);
-#endif
             }
         }
         else
@@ -4605,11 +3912,7 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-#if OLD_ENGINE
-                ScheduleExecution(Tasks.AskFinalStake, 1, 0);
-#else
                 ScheduleExecution(Tasks.MoveNext, 1);
-#endif
             }
         }
     }
@@ -5102,112 +4405,6 @@ public sealed class GameLogic : Logic<GameData>
             _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}");
             ScheduleExecution(Tasks.AskCat, 10 + Random.Shared.Next(10), force: true);
         }
-    }
-
-    /// <summary>
-    /// Вывести информацию о Вопросе с секретом
-    /// </summary>
-    [Obsolete]
-    private void PrintSecretQuestionInfo()
-    {
-        var questionTheme = _data.Type[QuestionTypeParams.Cat_Theme];
-        var actualTheme = string.IsNullOrEmpty(questionTheme) ? _data.Theme.Name : questionTheme;
-
-        var s = new StringBuilder(LO[nameof(R.Theme)])
-            .Append(": ")
-            .Append(actualTheme)
-            .AppendFormat(", {0}: ", LO[nameof(R.Cost)]);
-
-        _gameActions.SendMessageWithArgs(Messages.QuestionCaption, actualTheme);
-
-        var cost = _data.Type[QuestionTypeParams.Cat_Cost];
-
-        string add;
-
-        if (int.TryParse(cost, out var questionPrice) && questionPrice > 0)
-        {
-            _data.CurPriceWrong = _data.CurPriceRight = questionPrice;
-
-            _data.CatInfo = new NumberSet
-            {
-                Minimum = _data.CurPriceRight,
-                Maximum = _data.CurPriceRight
-            };
-
-            add = _data.CurPriceRight.ToString();
-        }
-        else if (_data.Type.Name == QuestionTypes.Cat)
-        {
-            _data.CatInfo = new NumberSet();
-            add = _data.Question.Price.ToString();
-            _data.CurPriceRight = _data.Question.Price;
-            _data.CurPriceWrong = _data.CurPriceRight;
-        }
-        else
-        {
-            _data.CurPriceRight = -1;
-            _data.CatInfo = NumberSetTypeConverter.ParseNumberSet(cost);
-
-            if (_data.CatInfo != null && _data.CatInfo.Maximum > 0)
-            {
-                if (_data.CatInfo.Step == 0)
-                {
-                    add = _data.CatInfo.Maximum.ToString();
-                    _data.CurPriceRight = _data.CatInfo.Maximum;
-                    _data.CurPriceWrong = _data.CurPriceRight;
-                }
-                else if (_data.CatInfo.Step < _data.CatInfo.Maximum - _data.CatInfo.Minimum)
-                {
-                    add = $"{LO[nameof(R.From)]} {Notion.FormatNumber(_data.CatInfo.Minimum)} {LO[nameof(R.From)]} {Notion.FormatNumber(_data.CatInfo.Maximum)} {LO[nameof(R.WithStepOf)]} {Notion.FormatNumber(_data.CatInfo.Step)} ({LO[nameof(R.YourChoice)]})";
-                }
-                else
-                {
-                    add = $"{Notion.FormatNumber(_data.CatInfo.Minimum)} {LO[nameof(R.Or)]} {Notion.FormatNumber(_data.CatInfo.Maximum)} ({LO[nameof(R.YourChoice)]})";
-                }
-            }
-            else
-            {
-                var catInfo = _data.CatInfo = new NumberSet();
-
-                catInfo.Minimum = -1;
-                catInfo.Maximum = 0;
-
-                foreach (var theme in _data.Round.Themes)
-                {
-                    foreach (var quest in theme.Questions)
-                    {
-                        var price = quest.Price;
-
-                        if (price < catInfo.Minimum || catInfo.Minimum == -1)
-                        {
-                            catInfo.Minimum = price;
-                        }
-
-                        if (price > catInfo.Maximum)
-                        {
-                            catInfo.Maximum = price;
-                        }
-                    }
-                }
-
-                catInfo.Step = catInfo.Maximum - catInfo.Minimum;
-
-                if (catInfo.Step == 0)
-                {
-                    add = catInfo.Maximum.ToString();
-                    _data.CurPriceRight = catInfo.Maximum;
-                    _data.CurPriceWrong = _data.CurPriceRight;
-                }
-                else
-                {
-                    add = LO[nameof(R.MinMaxChoice)];
-                }
-            }
-        }
-
-        s.Append(add);
-
-        _gameActions.ShowmanReplic(s.ToString());
     }
 
     internal void OnButtonPressStart()

@@ -236,7 +236,7 @@ public sealed class Lock : IDisposable
         return lockAquired;
     }
 
-    public async ValueTask<(T, bool)> TryLockAsync<T>(
+    public async ValueTask<(T?, bool)> TryLockAsync<T>(
         Func<T> func,
         int millisecondsTimeout,
         bool force = false,
@@ -281,6 +281,7 @@ public sealed class Lock : IDisposable
         CancellationToken cancellationToken = default)
     {
         var lockAquired = false;
+
         try
         {
             lockAquired = await _semaphore.WaitAsync(millisecondsTimeout, cancellationToken);

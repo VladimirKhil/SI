@@ -41,7 +41,7 @@ internal static class WellKnownGameRules
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.RemoveOtherThemes
         };
 
-        Classic.RoundRules[RoundTypes.Final] = new()
+        Simple.RoundRules[RoundTypes.Final] = new()
         {
             DefaultQuestionType = QuestionTypes.StakeAll,
             QuestionSelectionStrategyType = QuestionSelectionStrategyType.Sequential

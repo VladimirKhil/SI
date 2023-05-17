@@ -79,10 +79,6 @@ public enum Tasks
     /// </summary>
     WaitRight,
     /// <summary>
-    /// Вывод вопроса
-    /// </summary>
-    PrintQue,
-    /// <summary>
     /// Вывод частичного текста вопроса
     /// </summary>
     PrintPartial,
@@ -90,10 +86,6 @@ public enum Tasks
     /// Продолжить отыгрыш вопроса
     /// </summary>
     ContinueQuestion,
-    /// <summary>
-    /// Объявление Вопроса с секретом
-    /// </summary>
-    PrintSecretQuestion,
     /// <summary>
     /// Выяснение, кому будет отдан Вопрос с секретом
     /// </summary>
@@ -110,14 +102,6 @@ public enum Tasks
     /// Ожидание решения игрока о стоимости Вопросе с секретом
     /// </summary>
     WaitCatCost,
-    /// <summary>
-    /// Объявление информации о Вопросе с секретом
-    /// </summary>
-    CatInfo,
-    /// <summary>
-    /// Объявление Вопроса со ставкой
-    /// </summary>
-    PrintStakeQuestion,
     /// <summary>
     /// Ожидание решения ведущего о том, кто будет следующим делать ставку
     /// </summary>
@@ -186,10 +170,6 @@ public enum Tasks
     /// Прощание с игроками
     /// </summary>
     GoodLuck,
-    /// <summary>
-    /// Вопрос без риска
-    /// </summary>
-    PrintSponsored,
     /// <summary>
     /// Сообщить об апелляции
     /// </summary>

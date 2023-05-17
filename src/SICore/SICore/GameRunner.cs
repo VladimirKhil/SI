@@ -24,11 +24,7 @@ public sealed class GameRunner
         AutomaticGame = false,
         PlaySpecials = true,
         ThinkingTime = 0,
-#if OLD_ENGINE
-        UseNewEngine = false
-#else
         UseNewEngine = true
-#endif
     };
 
     private readonly Node _node;
@@ -74,9 +70,7 @@ public sealed class GameRunner
 
     public (IViewerClient?, Game) Run()
     {
-#if !OLD_ENGINE
         _document.Upgrade();
-#endif
 
         var gameData = new GameData(_backLink, new GamePersonAccount(_settings.Showman))
         {

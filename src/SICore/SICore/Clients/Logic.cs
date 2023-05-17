@@ -194,10 +194,16 @@ public abstract class Logic<D> : ILogic
         RunTaskTimer(taskTime);
     }
 
-    protected void RunTaskTimer(double taskTime) =>
+    protected void RunTaskTimer(double taskTime)
+    {
+        if (_disposed || taskTime <= 0 || taskTime >= 10 * 60 * 10) // 10 min
+        {
+            return;
+        }
+
         _taskTimerLock.WithLock(() =>
         {
-            if (_disposed || taskTime <= 0 || taskTime >= 10 * 60 * 10) // 10 min
+            if (_disposed)
             {
                 return;
             }
@@ -205,6 +211,7 @@ public abstract class Logic<D> : ILogic
             _taskTimer.Change((int)taskTime * 100, Timeout.Infinite);
             _finishingTime = DateTime.UtcNow + TimeSpan.FromMilliseconds(taskTime * 100);
         });
+    }
 
     protected int SelectRandom<T>(IEnumerable<T> list, Predicate<T> condition) =>
         list.SelectRandom(condition, Random.Shared);
