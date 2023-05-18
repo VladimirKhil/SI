@@ -114,14 +114,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
     public void Report()
     {
-        if (_data.BackLink.SendReport)
-            _data.BackLink.OnFlash();
-        else
-        {
-            var cmd = _data.SystemLog.Length > 0 ? _data.PlayerDataExtensions.Report.SendReport : _data.PlayerDataExtensions.Report.SendNoReport;
-            if (cmd != null && cmd.CanExecute(null))
-                cmd.Execute(null);
-        }
+        _data.BackLink.OnFlash();
     }
 
     private async void Greet()

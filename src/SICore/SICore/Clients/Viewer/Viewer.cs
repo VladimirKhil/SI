@@ -57,7 +57,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                 if (ClientData.ForceStart != null)
                 {
-                    ClientData.ForceStart.CanBeExecuted = IsHost;
+                    ClientData.ForceStart.CanBeExecuted = IsHost && ClientData.Stage == GameStage.Before;
                 }
 
                 foreach (var account in MyData.MainPersons)

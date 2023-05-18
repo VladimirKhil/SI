@@ -103,8 +103,6 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private readonly ILogger<GameViewModel> _logger;
 
-    private bool _gameStarted;
-
     private bool _useDialogWindow;
 
     private void DisableDialogWindow() => UseDialogWindow = false;
@@ -119,7 +117,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
                 _useDialogWindow = value;
                 OnPropertyChanged();
 
-                if (_useDialogWindow && _gameStarted)
+                if (_useDialogWindow)
                 {
                     PlatformManager.Instance.ShowDialogWindow(this, DisableDialogWindow);
                 }
@@ -165,20 +163,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
     }
 
-    private void Host_StageChanged(GameStage gameStage)
-    {
-        if (gameStage == GameStage.Begin)
-        {
-            _gameStarted = true;
-
-            if (UseDialogWindow)
-            {
-                PlatformManager.Instance.ShowDialogWindow(this, DisableDialogWindow);
-            }
-        }
-
-        UpdateMoveCommand();
-    }
+    private void Host_StageChanged(GameStage gameStage) => UpdateMoveCommand();
 
     private void EnableExtrenalMediaLoad_Executed(object? arg)
     {
