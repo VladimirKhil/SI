@@ -843,8 +843,9 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         AutoNext(5000);
     }
 
-    protected void OnMoveToQuestion(bool isFinal = false)
+    protected void OnMoveToQuestion()
     {
+        var isFinal = _activeRound!.Type == RoundTypes.Final;
         Stage = isFinal ? GameStage.FinalQuestion : GameStage.Question;
 
         var options = OptionsProvider();

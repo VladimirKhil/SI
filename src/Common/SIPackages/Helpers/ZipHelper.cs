@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 
 namespace SIPackages.Helpers;
 
+// TODO: Remove and replace with ZipUtils.ZipExtractor
+
 /// <summary>
 /// Provides helper methods for working with zip archives.
 /// </summary>

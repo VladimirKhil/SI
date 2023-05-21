@@ -1461,12 +1461,14 @@ public sealed class GameLogic : Logic<GameData>
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
 
+        // TODO: Use _data.QuestionPlayState.AnswererIndicies to enumerate and check answerers with ascending score instead
         _data.ThemeDeleters?.Reset(false);
         ScheduleExecution(Tasks.Announce, 15);
 
         return true;
     }
 
+    // TODO: remove dependency on round type entirely
     public bool IsFinalRound() => _data.Round?.Type == RoundTypes.Final;
 
     public void StopWaiting()
@@ -1684,10 +1686,6 @@ public sealed class GameLogic : Logic<GameData>
 
                     case Tasks.AnnounceFinalTheme:
                         AnnounceFinalTheme();
-                        break;
-
-                    case Tasks.AskFinalStake:
-                        AskFinalStake();
                         break;
 
                     case Tasks.WaitFinalStake:
@@ -2776,6 +2774,8 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void Announce()
     {
+        // TODO: use custom enumerator without ThemeDeleters
+
         if (!_data.ThemeDeleters.MoveNext())
         {
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);

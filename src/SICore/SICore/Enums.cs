@@ -139,10 +139,6 @@ public enum Tasks
     /// </summary>
     AnnounceFinalTheme,
     /// <summary>
-    /// Выяснение ставки игроков в финале
-    /// </summary>
-    AskFinalStake,
-    /// <summary>
     /// Ожидание ставки игроков в финале
     /// </summary>
     WaitFinalStake,

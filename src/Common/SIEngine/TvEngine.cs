@@ -418,7 +418,7 @@ public sealed class TvEngine : EngineBase
         _useAnswerMarker = false;
         UpdateCanNext();
 
-        OnMoveToQuestion(true);
+        OnMoveToQuestion();
     }
 
     public override int OnReady(out bool more)

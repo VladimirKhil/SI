@@ -15,7 +15,7 @@ internal static class HashHelper
     /// </summary>
     /// <param name="value">Value to hash.</param>
     /// <returns>Hashed value.</returns>
-    /// <remarks>I do not remember where did these constants come from. So </remarks>
+    /// <remarks>I do not remember where did these constants come from. So it has some historical logic.</remarks>
     internal static string CalculateHash(string value)
     {
         var hashedValue = 3074457345618258791ul;

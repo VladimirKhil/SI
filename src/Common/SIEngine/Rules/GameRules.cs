@@ -24,13 +24,5 @@ public sealed class GameRules
     /// Gets rules for round type.
     /// </summary>
     /// <param name="roundType">Round type.</param>
-    public RoundRules GetRulesForRoundType(string roundType)
-    {
-        if (RoundRules.TryGetValue(roundType, out var result))
-        {
-            return result;
-        }
-
-        return DefaultRoundRules;
-    }
+    public RoundRules GetRulesForRoundType(string roundType) => RoundRules.GetValueOrDefault(roundType, DefaultRoundRules);
 }
