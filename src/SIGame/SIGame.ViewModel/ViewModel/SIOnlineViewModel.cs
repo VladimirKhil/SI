@@ -810,12 +810,11 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             ID = packageSource.GetPackageId()
         };
 
-#if USE_CONTENT_SERVICE
         if (!string.IsNullOrEmpty(packageKey.Name) && _gamesHostInfo.ContentInfos?.Length > 0)
         {
             return await CreateGameWithContentServiceAsync(settings, packageKey, packageSource, cancellationTokenSource.Token);
         }
-#endif
+
         // This execution branch will sooner or later be deleted
         var hasPackage = await _gameServerClient.HasPackageAsync(packageKey, cancellationTokenSource.Token);
 
