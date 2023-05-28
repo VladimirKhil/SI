@@ -1272,17 +1272,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
     }
 
-    protected override void CloseContent_Executed(object arg)
+    protected override void CloseContent_Executed(object? arg)
     {
-        if (GameSettings != null)
-        {
-            GameSettings.CancellationTokenSource?.Cancel();
-        }
-
+        GameSettings?.CancellationTokenSource?.Cancel();
         base.CloseContent_Executed(arg);
     }
     private static GameInfo ToSICoreGame(SI.GameServer.Contract.GameInfo gameInfo) =>
-        new GameInfo
+        new()
         {
             GameID = gameInfo.GameID,
             GameName = gameInfo.GameName,

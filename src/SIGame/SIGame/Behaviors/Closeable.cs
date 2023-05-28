@@ -2,47 +2,38 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SIGame.Behaviors
+namespace SIGame.Behaviors;
+
+public static class Closeable
 {
-    public static class Closeable
+    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
+
+    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
+
+    // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty IsAttachedProperty =
+        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(Closeable), new PropertyMetadata(false, OnIsAttachedChanged));
+
+    private static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) =>
+        ((Button)d).PreviewMouseUp += Closeable_PreviewMouseUp;
+
+    private static void Closeable_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        public static bool GetIsAttached(DependencyObject obj)
+        var parent = (FrameworkElement)(Button)sender;
+
+        while (true)
         {
-            return (bool)obj.GetValue(IsAttachedProperty);
-        }
+            parent = (FrameworkElement)VisualTreeHelper.GetParent(parent);
 
-        public static void SetIsAttached(DependencyObject obj, bool value)
-        {
-            obj.SetValue(IsAttachedProperty, value);
-        }
-
-        // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IsAttachedProperty =
-            DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(Closeable), new PropertyMetadata(false, OnIsAttachedChanged));
-
-        private static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((Button)d).PreviewMouseUp += Closeable_PreviewMouseUp;
-        }
-
-        private static void Closeable_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            var parent = (FrameworkElement)(Button)sender;
-
-            while (true)
+            if (parent == null)
             {
-                parent = (FrameworkElement)VisualTreeHelper.GetParent(parent);
+                return;
+            }
 
-                if (parent == null)
-                {
-                    return;
-                }
-
-                if (parent is ContextMenu contextMenu)
-                {
-                    contextMenu.IsOpen = false;
-                    return;
-                }
+            if (parent is ContextMenu contextMenu)
+            {
+                contextMenu.IsOpen = false;
+                return;
             }
         }
     }

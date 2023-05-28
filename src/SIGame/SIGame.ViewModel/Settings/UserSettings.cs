@@ -19,7 +19,7 @@ public sealed class UserSettings : INotifyPropertyChanged
     #region Settings
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private GameSettings _gameSettings = new GameSettings();
+    private GameSettings _gameSettings = new();
 
     public GameSettings GameSettings
     {
@@ -83,7 +83,7 @@ public sealed class UserSettings : INotifyPropertyChanged
         }
     }
 
-    public event Action<double> VolumeChanged;
+    public event Action<double>? VolumeChanged;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private bool _fullScreen = 
@@ -262,8 +262,8 @@ public sealed class UserSettings : INotifyPropertyChanged
                 try
                 {
                     using var stream = file.OpenFile(configFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        return Load(stream);
-                    }
+                    return Load(stream);
+                }
                 catch { }
                 finally
                 {

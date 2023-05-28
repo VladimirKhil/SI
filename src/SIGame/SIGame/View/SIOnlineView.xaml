@@ -279,6 +279,7 @@
                 <local:DropDownButton Style="{StaticResource SIDropDownButton}" FontSize="20" ToolTip="{x:Static lp:Resources.Filter}">
                     <local:DropDownButton.DropDown>
                         <ContextMenu
+                            Style="{StaticResource SIContextMenuStyle}"
                             Placement="Right"
                             VerticalOffset="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.ActualHeight}"
                             HorizontalOffset="{Binding

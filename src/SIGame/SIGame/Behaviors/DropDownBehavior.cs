@@ -1,45 +1,36 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace SIGame.Behaviors
+namespace SIGame.Behaviors;
+
+public static class DropDownBehavior
 {
-    public static class DropDownBehavior
+    public static ContextMenu GetDropDown(DependencyObject obj) => (ContextMenu)obj.GetValue(DropDownProperty);
+
+    public static void SetDropDown(DependencyObject obj, ContextMenu value) => obj.SetValue(DropDownProperty, value);
+
+    // Using a DependencyProperty as the backing store for DropDown.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty DropDownProperty =
+        DependencyProperty.RegisterAttached("DropDown", typeof(ContextMenu), typeof(DropDownBehavior), new PropertyMetadata(null, OnDropDownChanged));
+
+    private static void OnDropDownChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        public static ContextMenu GetDropDown(DependencyObject obj)
+        var btn = (Button)d;
+
+        if (e.NewValue is ContextMenu ctx)
         {
-            return (ContextMenu)obj.GetValue(DropDownProperty);
-        }
-
-        public static void SetDropDown(DependencyObject obj, ContextMenu value)
-        {
-            obj.SetValue(DropDownProperty, value);
-        }
-
-        // Using a DependencyProperty as the backing store for DropDown.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DropDownProperty =
-            DependencyProperty.RegisterAttached("DropDown", typeof(ContextMenu), typeof(DropDownBehavior), new PropertyMetadata(null, OnDropDownChanged));
-
-        private static void OnDropDownChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var btn = (Button)d;
-            var ctx = e.NewValue as ContextMenu;
-
-            if (ctx != null)
+            RoutedEventHandler onClick = (sender, e2) =>
             {
-                RoutedEventHandler onClick = (sender, e2) =>
-                {
-                    ctx.PlacementTarget = btn;
-                    ctx.IsOpen = true;
-                };
+                ctx.PlacementTarget = btn;
+                ctx.IsOpen = true;
+            };
 
-                btn.Click += onClick;
-                ctx.Tag = onClick;
-            }
-            else
-            {
-                ctx = e.OldValue as ContextMenu;
-                btn.Click -= (RoutedEventHandler)ctx.Tag;
-            }
+            btn.Click += onClick;
+            ctx.Tag = onClick;
+        }
+        else if (e.OldValue is ContextMenu oldCtx)
+        {
+            btn.Click -= (RoutedEventHandler)oldCtx.Tag;
         }
     }
 }

@@ -16,13 +16,10 @@ public sealed class ConnectionData : IHumanPlayerOwner
     [XmlIgnore]
     public string HumanPlayerName
     {
-        get { return UserSettings.Default.GameSettings.HumanPlayerName; }
-        set { UserSettings.Default.GameSettings.HumanPlayerName = value; }
+        get => UserSettings.Default.GameSettings.HumanPlayerName;
+        set => UserSettings.Default.GameSettings.HumanPlayerName = value;
     }
 
     [XmlIgnore]
-    public AppSettings AppSettings
-    {
-        get { return UserSettings.Default.GameSettings.AppSettings; }
-    }
+    public AppSettings AppSettings => UserSettings.Default.GameSettings.AppSettings;
 }

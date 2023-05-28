@@ -38,6 +38,7 @@ public static class GameCommands
     private static void OpenLogs_Executed(object? arg)
     {
         var logsFolder = UserSettings.Default.GameSettings.AppSettings.LogsFolder;
+
         if (!Directory.Exists(logsFolder))
         {
             PlatformManager.Instance.ShowMessage(Resources.NoLogsFolder, MessageType.Warning);
@@ -59,6 +60,7 @@ public static class GameCommands
     private static void Comment_Executed(object? arg)
     {
         var commentUri = Uri.EscapeDataString(Resources.FeedbackLink);
+
         try
         {
             Browser.Open(commentUri);
@@ -73,7 +75,8 @@ public static class GameCommands
 
     private static void Donate_Executed(object? arg)
     {
-        var donateUri = "https://yoomoney.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
+        var donateUri = "https://yoomoney.ru/to/410012283941753";
+
         try
         {
             Browser.Open(donateUri);

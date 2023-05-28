@@ -102,11 +102,12 @@ public sealed class DesktopManager : PlatformManager
         }
     }
 
-    public override string SelectColor()
+    public override string? SelectColor()
     {
         // TODO: Remove Windows Forms dependency
 
         var diag = new System.Windows.Forms.ColorDialog();
+
         if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
             var color = diag.Color;
@@ -117,9 +118,10 @@ public sealed class DesktopManager : PlatformManager
         return null;
     }
 
-    public override string SelectLogsFolder(string initialFolder)
+    public override string? SelectLogsFolder(string initialFolder)
     {
         var dialog = new FolderBrowser { Description = Resources.SelectLogsFolder, InitialFolder = initialFolder };
+
         if (dialog.ShowDialog() == true)
         {
             return dialog.SelectedPath;
@@ -128,9 +130,10 @@ public sealed class DesktopManager : PlatformManager
         return null;
     }
 
-    public override string SelectHumanAvatar()
+    public override string? SelectHumanAvatar()
     {
         var openDialog = new OpenFileDialog { Title = Resources.SelectAvatar, Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff" };
+        
         if (_recentAvatarDir != null)
         {
             openDialog.InitialDirectory = _recentAvatarDir;
@@ -220,7 +223,12 @@ public sealed class DesktopManager : PlatformManager
 
     public override string SelectMainBackground()
     {
-        var dialog = new OpenFileDialog { Title = Resources.SelectMainBackgroundFIleName, Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff" };
+        var dialog = new OpenFileDialog
+        {
+            Title = Resources.SelectMainBackgroundFIleName,
+            Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff"
+        };
+        
         if (dialog.ShowDialog() != true)
         {
             return null;
@@ -231,7 +239,12 @@ public sealed class DesktopManager : PlatformManager
 
     public override string SelectLogo()
     {
-        var dialog = new OpenFileDialog { Title = Resources.SelectGameLogoFileName, Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff" };
+        var dialog = new OpenFileDialog
+        {
+            Title = Resources.SelectGameLogoFileName,
+            Filter = Resources.Images + " (*.bmp, *.jpg, *.png, *.gif, *.tiff)|*.bmp;*.jpg;*.png;*.gif;*.tiff"
+        };
+        
         if (dialog.ShowDialog() != true)
         {
             return null;
@@ -253,7 +266,13 @@ public sealed class DesktopManager : PlatformManager
 
     public override string SelectSettingsForExport()
     {
-        var dialog = new SaveFileDialog { DefaultExt = ".sisettings", Title = Resources.SelectExportFileName, Filter = Resources.SISettings + "|*.sisettings" };
+        var dialog = new SaveFileDialog
+        {
+            DefaultExt = ".sisettings",
+            Title = Resources.SelectExportFileName,
+            Filter = Resources.SISettings + "|*.sisettings"
+        };
+        
         if (dialog.ShowDialog() != true)
         {
             return null;
@@ -264,7 +283,13 @@ public sealed class DesktopManager : PlatformManager
 
     public override string SelectSettingsForImport()
     {
-        var dialog = new OpenFileDialog { DefaultExt = ".sisettings", Title = Resources.SelectImportFileName, Filter = Resources.SISettings + "|*.sisettings" };
+        var dialog = new OpenFileDialog
+        {
+            DefaultExt = ".sisettings",
+            Title = Resources.SelectImportFileName,
+            Filter = Resources.SISettings + "|*.sisettings"
+        };
+        
         if (dialog.ShowDialog() != true)
         {
             return null;
@@ -274,16 +299,13 @@ public sealed class DesktopManager : PlatformManager
     }
 
     public override void Activate() => Application.Current.Dispatcher.BeginInvoke(
-        (Action)(() =>
+        () =>
         {
             var main = (MainWindow)Application.Current.MainWindow;
-            if (main != null)
-            {
-                main.FlashIfNeeded(true);
-            }
-        }));
+            main?.FlashIfNeeded(true);
+        });
 
-    public override void PlaySound(string sound = null, double speed = 1, bool loop = false)
+    public override void PlaySound(string? sound = null, double speed = 1, bool loop = false)
     {
         if (string.IsNullOrEmpty(sound))
         {
@@ -326,7 +348,7 @@ public sealed class DesktopManager : PlatformManager
         PlaySoundInternal(source, speed, loop);
     }
 
-    private static string GetSoundUri(ThemeSettings themeSettings, string source) => source switch
+    private static string? GetSoundUri(ThemeSettings themeSettings, string source) => source switch
     {
         MainViewModel.MainMenuSound => themeSettings.SoundMainMenuUri,
         Sounds.RoundBegin => themeSettings.SoundBeginRoundUri,
@@ -340,11 +362,11 @@ public sealed class DesktopManager : PlatformManager
         _ => null,
     };
 
-    internal void PlaySoundInternal(string source = null, double speed = 1.0, bool loop = false)
+    internal void PlaySoundInternal(string? source = null, double speed = 1.0, bool loop = false)
     {
         if (System.Windows.Threading.Dispatcher.CurrentDispatcher != _element.Dispatcher)
         {
-            _element.Dispatcher.BeginInvoke((Action<string, double, bool>)PlaySoundInternal, source, speed, loop);
+            _element.Dispatcher.BeginInvoke((Action<string?, double, bool>)PlaySoundInternal, source, speed, loop);
             return;
         }
 

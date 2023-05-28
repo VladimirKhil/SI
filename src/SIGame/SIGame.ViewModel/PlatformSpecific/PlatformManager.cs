@@ -7,7 +7,7 @@ public abstract class PlatformManager : IUIThreadExecutor
 {
     public static PlatformManager Instance;
 
-    public IServiceProvider ServiceProvider { get; set; }
+    public IServiceProvider? ServiceProvider { get; set; }
 
     protected PlatformManager()
     {
@@ -20,11 +20,11 @@ public abstract class PlatformManager : IUIThreadExecutor
 
     public abstract void ShowHelp(bool asDialog);
 
-    public abstract string SelectColor();
+    public abstract string? SelectColor();
 
-    public abstract string SelectLogsFolder(string initialFolder);
+    public abstract string? SelectLogsFolder(string initialFolder);
 
-    public abstract string SelectHumanAvatar();
+    public abstract string? SelectHumanAvatar();
 
     /// <summary>
     /// Selects local game package.

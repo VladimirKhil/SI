@@ -82,7 +82,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
     public ViewerData MyData => ClientData;
 
-    public string Avatar { get; set; }
+    public string? Avatar { get; set; }
 
     public event Action? PersonConnected;
     public event Action? PersonDisconnected;
@@ -354,6 +354,9 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 case SystemMessages.Disconnect:
                     #region Disconnect
                     {
+                        // TODO: Viewer should do nothing for reconnection; that should be handled by underlying connection
+                        // For SignalR the reconnection logic is automatic
+
                         _logic.Print(ReplicManager.Special(LO[nameof(R.DisconnectMessage)]));
 
                         if (Connector != null && !Connector.IsReconnecting)
@@ -1459,6 +1462,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
         PersonAccount account;
         var isPlayer = personType == Constants.Player;
+
         if (isPlayer)
         {
             if (!int.TryParse(indexString, out var index) || index < 0 || index >= ClientData.Players.Count)
@@ -1503,7 +1507,8 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         else
         {
             ClientData.BeginUpdatePersons($"Config_ChangeType {string.Join(" ", mparams)}");
-            ViewerAccount newAccount = null;
+            ViewerAccount? newAccount = null;
+
             try
             {
                 if (account.IsConnected)
@@ -1532,7 +1537,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 ClientData.EndUpdatePersons();
             }
 
-            if (account == me)
+            if (account == me && newAccount != null)
             {
                 // Необходимо самого себя перевести в зрители
                 await SwitchToNewTypeAsync(GameRole.Viewer, newAccount, me);
@@ -1561,8 +1566,8 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             return;
         }
 
-        PlayerAccount account = null;
-        ViewerAccount newAccount = null;
+        PlayerAccount account;
+        ViewerAccount? newAccount = null;
 
         ClientData.BeginUpdatePersons($"Config_DeleteTable {string.Join(" ", mparams)}");
 

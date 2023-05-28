@@ -17,9 +17,8 @@
         <Style TargetType="{x:Type ButtonBase}">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />
             <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Margin" Value="-2,-2,0,0" />
             <Setter Property="Padding" Value="3" />
-            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
             
             <Setter Property="Template">
@@ -93,15 +92,14 @@
         </Style>
         
         <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-            <Setter Property="Content" Value="⏸️" />
+            <Setter Property="Content" Value="⏸" />
             <Setter Property="ToolTip" Value="{x:Static lp:Resources.Pause}" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="23" />
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsPaused}" Value="True">
-                    <Setter Property="Content" Value="▶️" />
+                    <Setter Property="Background" Value="{StaticResource ActiveColorBrush}" />
                     <Setter Property="ToolTip" Value="{x:Static lp:Resources.Continue}" />
-                    <Setter Property="FontSize" Value="35" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -263,12 +261,7 @@
         </Storyboard>
     </UserControl.Resources>
     
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        
+    <Grid>        
         <Grid.RowDefinitions>
             <RowDefinition Height="16*" />
             <RowDefinition Height="0*" />
@@ -278,15 +271,6 @@
             <RowDefinition Height="8*" />
             <RowDefinition Height="8*" />
         </Grid.RowDefinitions>
-
-        <Button
-            Grid.Row="4"
-            Cursor="Hand"
-            ToolTip="{x:Static lp:Resources.Forward}"
-            Content="▶"
-            Command="{Binding Move}"
-            CommandParameter="1"
-            FontSize="35" />
 
         <Button
             Grid.Row="2"
@@ -308,116 +292,145 @@
             </Border.Background>
         </Border>
 
-        <Button
-            Grid.Row="4"
-            Grid.Column="1"
-            Cursor="Hand"
-            Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
-            Content="✏️"
-            FontSize="20"
-            ToolTip="{x:Static lp:Resources.EditTable}"
-            Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
-            ToolTipService.ShowOnDisabled="True">
-            <Button.Style>
-                <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding TInfo.IsEditable}" Value="True">
-                            <Setter Property="Background" Value="#AACCCCCC" />
-                        </DataTrigger>
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <local:DropDownButton
+                Style="{StaticResource SIDropDownButton}"
+                BorderThickness="0"
+                Margin="-2,-2,0,0"
+                Padding="0"
+                Width="70"
+                BorderBrush="{StaticResource MainColor}"
+                ToolTip="{x:Static lp:Resources.Manage_Hint}"
+                Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
+                <local:DropDownButton.DropDown>
+                    <ContextMenu Style="{StaticResource SIContextMenuStyle}" Placement="Top" FontSize="21">
+                        <MenuItem
+                            Header="{x:Static lp:Resources.PreviousRound}"
+                            StaysOpenOnClick="True"
+                            Command="{Binding Move}"
+                            CommandParameter="-2" />
 
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource HoverColor}" />
-                        </Trigger>
+                        <MenuItem Header="{x:Static lp:Resources.NextRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="2" />
+                    </ContextMenu>
+                </local:DropDownButton.DropDown>
 
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="BorderBrush" Value="Gray" />
-                            <Setter Property="Foreground" Value="Gray" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </Button.Style>
-        </Button>
+                <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" Height="26" />
+            </local:DropDownButton>
 
-        <Button
-            Grid.Row="5"
-            Cursor="Hand"
-            ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}"
-            Command="{Binding Data.PlayerDataExtensions.Apellate}"
-            Content="❗"
-            CommandParameter="+"
-            Style="{StaticResource ApellateButton}"
-            FontSize="20" />
-        
-        <Button
-            Grid.Row="5"
-            Grid.Column="1"
-            Cursor="Hand"
-            ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}"
-            Command="{Binding Data.PlayerDataExtensions.Apellate}"
-            Content="🤨"
-            CommandParameter="-"
-            Style="{StaticResource ApellateWrongButton}"
-            FontSize="20" />
+            <ToggleButton
+                Grid.Column="1"
+                Cursor="Hand"
+                Width="70"
+                Style="{StaticResource PauseButton}"
+                IsChecked="{Binding IsPaused, Mode=OneWay}"
+                Command="{Binding ChangePauseInGame}" />
 
-        <Button
-            Grid.Row="5"
-            Grid.ColumnSpan="2"
-            Cursor="Hand"
-            Command="{Binding Data.PlayerDataExtensions.Pass}"
-            Content="⏩"
-            ToolTip="{x:Static lp:Resources.Pass}"
-            FontSize="20" />
+            <Button
+                Grid.Column="2"
+                Cursor="Hand"
+                Width="70"
+                ToolTip="{x:Static lp:Resources.Forward}"
+                Content="▶"
+                Command="{Binding Move}"
+                CommandParameter="1"
+                FontSize="35" />
+
+            <Button
+                Grid.Column="2"
+                Cursor="Hand"
+                Width="70"
+                ToolTip="{x:Static lp:Resources.ForceStartGame_Hint}"
+                Content="▶"
+                Command="{Binding Data.ForceStart}"
+                FontSize="35"
+                Foreground="Orange">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button
+                Width="70"
+                Cursor="Hand"
+                Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
+                Content="✏️"
+                FontSize="20"
+                ToolTip="{x:Static lp:Resources.EditTable}"
+                Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
+                ToolTipService.ShowOnDisabled="True">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TInfo.IsEditable}" Value="True">
+                                <Setter Property="Background" Value="#AACCCCCC" />
+                            </DataTrigger>
+
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource HoverColor}" />
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="BorderBrush" Value="Gray" />
+                                <Setter Property="Foreground" Value="Gray" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button
+                Width="70"
+                Cursor="Hand"
+                ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}"
+                Command="{Binding Data.PlayerDataExtensions.Apellate}"
+                Content="❗"
+                CommandParameter="+"
+                Style="{StaticResource ApellateButton}"
+                FontSize="20" />
+
+            <Button
+                Width="70"
+                Cursor="Hand"
+                ToolTip="{x:Static lp:Resources.Apellate_Wrong_Hint}"
+                Command="{Binding Data.PlayerDataExtensions.Apellate}"
+                Content="🤨"
+                CommandParameter="-"
+                Style="{StaticResource ApellateWrongButton}"
+                FontSize="20" />
+
+            <Button
+                Width="70"
+                Cursor="Hand"
+                Command="{Binding Data.PlayerDataExtensions.Pass}"
+                Content="⏩"
+                ToolTip="{x:Static lp:Resources.Pass}"
+                FontSize="20" />
+
+            <Button
+                Width="70"
+                Cursor="Hand"
+                Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
+                Content="💰"
+                FontSize="20"
+                ToolTip="{x:Static lp:Resources.Sums_Hint}" />
+        </StackPanel>        
 
         <local:DropDownButton
-            Grid.Row="5"
-            FontSize="20"
             Style="{StaticResource SIDropDownButton}"
-            BorderThickness="2"
-            Margin="-2,-2,0,0"
-            Padding="0"
-            BorderBrush="{StaticResource MainColor}"
-            ToolTip="{x:Static lp:Resources.Manage_Hint}"
-            Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
-            <local:DropDownButton.DropDown>
-                <ContextMenu Style="{StaticResource SIContextMenuStyle}" Placement="Top" FontSize="21">
-                    <MenuItem
-                        Header="{x:Static lp:Resources.PreviousRound}"
-                        StaysOpenOnClick="True"
-                        Command="{Binding Move}"
-                        CommandParameter="-2" />
-
-                    <MenuItem Header="{x:Static lp:Resources.NextRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="2" />
-                </ContextMenu>
-            </local:DropDownButton.DropDown>
-
-            <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" Height="23" />
-        </local:DropDownButton>
-        
-        <Button
-            Grid.Row="5"
-            Grid.Column="1"
-            Cursor="Hand"
-            Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
-            Content="💰"
-            FontSize="20"
-            ToolTip="{x:Static lp:Resources.Sums_Hint}" />
-
-        <ToggleButton
-            Grid.Row="6"
-            Cursor="Hand"
-            Style="{StaticResource PauseButton}"
-            IsChecked="{Binding IsPaused, Mode=OneWay}"
-            Command="{Binding ChangePauseInGame}" />
-
-        <local:DropDownButton
-            Style="{StaticResource SIDropDownButton}"
-            Margin="-2,-2,0,0"
             Padding="0"
             FontSize="24"
-            BorderThickness="2"
             BorderBrush="{StaticResource MainColor}"
             Grid.Row="6"
-            Grid.Column="1"
+            Width="70"
+            HorizontalAlignment="Right"
             Cursor="Hand"
             Content="🚪"
             ToolTip="{x:Static lp:Resources.Exit}">

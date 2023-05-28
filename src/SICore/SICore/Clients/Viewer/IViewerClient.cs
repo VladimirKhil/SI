@@ -18,7 +18,7 @@ public interface IViewerClient : IActor
 
     IViewerLogic MyLogic { get; }
 
-    string Avatar { get; set; }
+    string? Avatar { get; set; }
 
     event Action PersonConnected;
 

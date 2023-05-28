@@ -73,7 +73,7 @@ public sealed class CommonSettings
         DelayedResultsNew = new List<SI.GameResultService.Client.GameResult>();
     }
 
-    public void Save(Stream stream, XmlSerializer serializer = null)
+    public void Save(Stream stream, XmlSerializer? serializer = null)
     {
         serializer ??= new XmlSerializer(typeof(CommonSettings));
         serializer.Serialize(stream, this);

@@ -4,18 +4,6 @@
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!-- Параметры манифеста UAC
-          При необходимости изменить уровень управления учетными записями Windows замените 
-          узел requestedExecutionLevel одним из следующих значений.
-
-        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
-        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
-        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
-
-            Задание узла requestedExecutionLevel отключит виртуализацию файла и реестра.
-            Если виртуализацию файла и реестра нужно использовать для обратной 
-            совместимости, удалите узел requestedExecutionLevel.
-        -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
@@ -23,15 +11,10 @@
   
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
-      <!-- Список всех версий Windows, с которыми это приложение предназначено работать. Windows автоматически выберет наиболее совместимую среду.-->
 
-      <!-- Если приложение предназначено для работы с Windows 7, раскомментируйте следующий узел supportedOS-->
-      <!--<supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"/>-->
-      
     </application>
   </compatibility>
   
-  <!-- Включите темы для общих элементов управления и диалоговых окон Windows (Windows XP и более поздние версии) -->
   <dependency>
     <dependentAssembly>
       <assemblyIdentity

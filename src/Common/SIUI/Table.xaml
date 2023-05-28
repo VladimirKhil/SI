@@ -748,7 +748,7 @@
                                         </ItemsControl.ItemsPanel>
                                         
                                         <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="local:SimplePlayerInfo">
+                                            <DataTemplate DataType="vm:SimplePlayerInfo">
                                                 <UniformGrid Rows="2" Columns="1">
                                                     <ContentControl>
                                                         <TextBlock
