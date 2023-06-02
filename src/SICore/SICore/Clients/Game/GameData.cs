@@ -160,9 +160,9 @@ public sealed class GameData : Data
     }
 
     /// <summary>
-    /// Организатор игры
+    /// Game host name.
     /// </summary>
-    internal string HostName { get; set; }
+    internal string? HostName { get; set; }
 
     /// <summary>
     /// Timer start time.

@@ -71,6 +71,21 @@ public sealed class ViewerData : Data
         }
     }
 
+    private CustomCommand _setHost;
+
+    public CustomCommand SetHost
+    {
+        get => _setHost;
+        set
+        {
+            if (_setHost != value)
+            {
+                _setHost = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
 
     private CustomCommand _unban;
 
@@ -551,10 +566,23 @@ public sealed class ViewerData : Data
     /// </summary>
     public bool ApellationWrongEnabled => Players.Count > 3;
 
+    private string _hostName;
+
     /// <summary>
     /// Game host name.
     /// </summary>
-    public string HostName { get; internal set; }
+    public string HostName
+    {
+        get => _hostName;
+        set
+        {
+            if (_hostName != value)
+            {
+                _hostName = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     /// <summary>
     /// External media uri.

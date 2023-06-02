@@ -797,4 +797,10 @@
   <data name="Cost2" xml:space="preserve">
     <value>Стоимость</value>
   </data>
+  <data name="CannotSetHostToBot" xml:space="preserve">
+    <value>Ботов нельзя сделать хостом</value>
+  </data>
+  <data name="CannotSetHostToYourself" xml:space="preserve">
+    <value>Вы уже хост!</value>
+  </data>
 </root>

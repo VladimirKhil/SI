@@ -769,6 +769,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnUnban(message, args);
                         break;
 
+                    case Messages.SetHost:
+                        OnSetHost(message, args);
+                        break;
+
                     case Messages.Mark:
                         if (!ClientData.CanMarkQuestion)
                         {
@@ -948,6 +952,35 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         _gameActions.SpecialReplic(string.Format(LO[nameof(R.Banned)], message.Sender, clientName));
         OnDisconnectRequested(clientName);
+    }
+
+    private void OnSetHost(Message message, string[] args)
+    {
+        if (message.Sender != ClientData.HostName || args.Length <= 1)
+        {
+            return;
+        }
+
+        var clientName = args[1];
+
+        if (!ClientData.AllPersons.TryGetValue(clientName, out var person))
+        {
+            return;
+        }
+
+        if (person.Name == message.Sender)
+        {
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotSetHostToYourself)]);
+            return;
+        }
+
+        if (!person.IsHuman)
+        {
+            _gameActions.SendMessageToWithArgs(message.Sender, Messages.Replic, ReplicCodes.Special.ToString(), LO[nameof(R.CannotSetHostToBot)]);
+            return;
+        }
+
+        UpdateHostName(person.Name, message.Sender);
     }
 
     private void OnUnban(Message message, string[] args)
@@ -1386,11 +1419,10 @@ public sealed class Game : Actor<GameData, GameLogic>
         UpdateHostName(newHostName);
     }
 
-    private void UpdateHostName(string newHostName)
+    private void UpdateHostName(string? newHostName, string source = "")
     {
         ClientData.HostName = newHostName;
-
-        _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", "" /* by game */);
+        _gameActions.SendMessageWithArgs(Messages.Hostname, newHostName ?? "", source);
     }
 
     private void OnApellation(Message message, string[] args)

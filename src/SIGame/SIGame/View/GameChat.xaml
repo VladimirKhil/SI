@@ -84,7 +84,19 @@
                         TextBlock.LineHeight="18"
                         Content="{x:Static lp:Resources.Ban}" />
                 </UniformGrid>
-                
+
+                <Button
+                    DockPanel.Dock="Bottom"
+                    Style="{StaticResource SIButtonSimple}"
+                    Background="{StaticResource WindowBackground}"
+                    Margin="-1,-1,-1,-1"
+                    Padding="20,4"
+                    Command="{Binding SetHost}"
+                    CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                    FontSize="18"
+                    TextBlock.LineHeight="18"
+                    Content="{x:Static lp:Resources.SetHost}" />
+
                 <ListBox
                     IsSynchronizedWithCurrentItem="True"
                     ItemsSource="{Binding Source={StaticResource Persons}}"

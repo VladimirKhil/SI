@@ -50,6 +50,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                     ClientData.Ban.CanBeExecuted = IsHost;
                 }
 
+                if (ClientData.SetHost != null)
+                {
+                    ClientData.SetHost.CanBeExecuted = IsHost;
+                }
+
                 if (ClientData.Unban != null)
                 {
                     ClientData.Unban.CanBeExecuted = IsHost;
@@ -100,6 +105,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
         ClientData.Kick = new CustomCommand(Kick_Executed) { CanBeExecuted = IsHost };
         ClientData.Ban = new CustomCommand(Ban_Executed) { CanBeExecuted = IsHost };
+        ClientData.SetHost = new CustomCommand(SetHost_Executed) { CanBeExecuted = IsHost };
         ClientData.Unban = new CustomCommand(Unban_Executed) { CanBeExecuted = IsHost };
 
         ClientData.ForceStart = new CustomCommand(ForceStart_Executed) { CanBeExecuted = IsHost };
@@ -250,6 +256,28 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         }
 
         _viewerActions.SendMessage(Messages.Ban, person.Name);
+    }
+
+    private void SetHost_Executed(object? arg)
+    {
+        if (arg is not ViewerAccount person)
+        {
+            return;
+        }
+
+        if (person == ClientData.Me)
+        {
+            AddLog(LO[nameof(R.CannotSetHostToYourself)] + Environment.NewLine);
+            return;
+        }
+
+        if (!person.IsHuman)
+        {
+            AddLog(LO[nameof(R.CannotSetHostToBot)] + Environment.NewLine);
+            return;
+        }
+
+        _viewerActions.SendMessage(Messages.SetHost, person.Name);
     }
 
     private void Unban_Executed(object? arg)
@@ -1869,7 +1897,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
         ClientData.PlayerDataExtensions.Report.SendReport = ClientData.PlayerDataExtensions.Report.SendNoReport = null;
 
-        ClientData.Kick = ClientData.AtomViewed = ClientData.Ban = ClientData.ForceStart = ClientData.AddTable = null;
+        ClientData.Kick = ClientData.AtomViewed = ClientData.Ban = ClientData.SetHost = ClientData.Unban = ClientData.ForceStart = ClientData.AddTable = null;
 
         ClientData.MessageSending = null;
 

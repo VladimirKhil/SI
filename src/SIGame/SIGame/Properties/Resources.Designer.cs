@@ -2338,6 +2338,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Set host.
+        /// </summary>
+        public static string SetHost {
+            get {
+                return ResourceManager.GetString("SetHost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Reset to default.
         /// </summary>
         public static string Settings_Default {

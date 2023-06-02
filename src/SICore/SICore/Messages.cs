@@ -383,6 +383,11 @@ public static class Messages
     public const string SetChooser = "SETCHOOSER";
 
     /// <summary>
+    /// Set person as host.
+    /// </summary>
+    public const string SetHost = "SETHOST";
+
+    /// <summary>
     /// Показать табло
     /// </summary>
     public const string ShowTable = "SHOWTABLO";

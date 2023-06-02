@@ -250,6 +250,24 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cannot set bot as host.
+        /// </summary>
+        public static string CannotSetHostToBot {
+            get {
+                return ResourceManager.GetString("CannotSetHostToBot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Your are host already!.
+        /// </summary>
+        public static string CannotSetHostToYourself {
+            get {
+                return ResourceManager.GetString("CannotSetHostToYourself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на You are getting this question.
         /// </summary>
         public static string CatIsYours {

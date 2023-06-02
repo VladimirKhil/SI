@@ -1089,4 +1089,7 @@
   <data name="PopupHint" xml:space="preserve">
     <value>Открыть в новом окне</value>
   </data>
+  <data name="SetHost" xml:space="preserve">
+    <value>Сделать хостом</value>
+  </data>
 </root>

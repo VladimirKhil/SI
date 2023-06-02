@@ -792,4 +792,10 @@
   <data name="Cost2" xml:space="preserve">
     <value>Cost</value>
   </data>
+  <data name="CannotSetHostToBot" xml:space="preserve">
+    <value>Cannot set bot as host</value>
+  </data>
+  <data name="CannotSetHostToYourself" xml:space="preserve">
+    <value>Your are host already!</value>
+  </data>
 </root>
