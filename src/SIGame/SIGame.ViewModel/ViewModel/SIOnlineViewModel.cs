@@ -26,7 +26,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 {
     public const int MaxAvatarSizeMb = 2;
 
-    private SI.GameServer.Contract.HostInfo _gamesHostInfo;
+    private SI.GameServer.Contract.HostInfo? _gamesHostInfo;
 
     public string ServerName => _gamesHostInfo?.Name ?? "SIGame";
 
@@ -247,13 +247,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
                 if (!_showSearchBox)
                 {
-                    SearchFilter = null;
+                    SearchFilter = "";
                 }
             }
         }
     }
 
-    private string _searchFilter;
+    private string _searchFilter = "";
 
     public string SearchFilter
     {
@@ -327,7 +327,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         set { _userSettings.GameSettings.AppSettings.IsChatShown = value; OnPropertyChanged(); }
     }
 
-    protected override string[] ContentPublicBaseUrls => _gamesHostInfo.ContentPublicBaseUrls;
+    protected override string[] ContentPublicBaseUrls => _gamesHostInfo?.ContentPublicBaseUrls ?? Array.Empty<string>();
 
     private readonly IGameServerClient _gameServerClient;
 
@@ -335,6 +335,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private readonly object _usersLock = new();
 
+    private readonly SIContentClientOptions? _defaultSIContentClientOptions;
     private readonly ILogger<SIOnlineViewModel> _logger;
 
     public SIOnlineViewModel(
@@ -342,6 +343,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         IGameServerClient gameServerClient,
         CommonSettings commonSettings,
         UserSettings userSettings,
+        SIContentClientOptions siContentClientOptions,
         ILogger<SIOnlineViewModel> logger)
         : base(connectionData, commonSettings, userSettings)
     {
@@ -365,6 +367,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         AddEmoji = new CustomCommand(AddEmoji_Executed);
 
+        _defaultSIContentClientOptions = siContentClientOptions.ServiceUri != null ? siContentClientOptions : null;
         _logger = logger;
 
         NewGame.CanBeExecuted = false;
@@ -591,14 +594,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             await ReloadGamesAsync(_cancellationTokenSource.Token);
             await ReloadUsersAsync(_cancellationTokenSource.Token);
 
-            if (_gamesHostInfo.ContentInfos?.Length > 0)
-            {
-                _avatarLoadingTask = UploadAvatarNewAsync(Human, _cancellationTokenSource.Token);
-            }
-            else
-            {
-                _avatarLoadingTask = UploadAvatarAsync(null, null, Human, _cancellationTokenSource.Token);
-            }
+            _avatarLoadingTask = UploadUserAvatarAsync();
 
             NewGame.CanBeExecuted = true;
         }
@@ -621,19 +617,10 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
     }
 
-    private async Task<(string? AvatarUrl, FileKey? FileKey)>? UploadAvatarNewAsync(Account account, CancellationToken token)
+    private async Task<(string? AvatarUrl, FileKey? FileKey)> UploadUserAvatarAsync()
     {
-        var randomIndex = Random.Shared.Next(_gamesHostInfo.ContentInfos.Length);
-        var contentInfo = _gamesHostInfo.ContentInfos[randomIndex];
-
-        using var contentServiceClient = SIContentClientExtensions.CreateSIContentServiceClient(
-            new SIContentClientOptions
-            {
-                ServiceUri = contentInfo.ServiceUri,
-            },
-            progress => UploadProgress = progress);
-
-        return await UploadAvatarAsync(contentServiceClient, contentInfo.ServiceUri, account, token);
+        using var contentServiceClient = _gamesHostInfo?.ContentInfos?.Length > 0 ? GetContentClient() : null;
+        return await UploadAvatarAsync(contentServiceClient, Human, _cancellationTokenSource.Token);
     }
 
     public async void Load()
@@ -810,7 +797,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             ID = packageSource.GetPackageId()
         };
 
-        if (!string.IsNullOrEmpty(packageKey.Name) && _gamesHostInfo.ContentInfos?.Length > 0)
+        if (!string.IsNullOrEmpty(packageKey.Name) && _gamesHostInfo?.ContentInfos?.Length > 0)
         {
             return await CreateGameWithContentServiceAsync(settings, packageKey, packageSource, cancellationTokenSource.Token);
         }
@@ -828,7 +815,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Preparing;
 
-        var computerAccounts = await ProcessCustomPersonsAsync(null, null, settings, cancellationTokenSource.Token);
+        var computerAccounts = await ProcessCustomPersonsAsync(null, settings, cancellationTokenSource.Token);
 
         GameSettings.Message = Resources.Creating;
 
@@ -889,15 +876,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         PackageSource packageSource,
         CancellationToken cancellationToken)
     {
-        var randomIndex = Random.Shared.Next(_gamesHostInfo.ContentInfos.Length);
-        var contentInfo = _gamesHostInfo.ContentInfos[randomIndex];
-
-        using var contentServiceClient = SIContentClientExtensions.CreateSIContentServiceClient(
-            new SIContentClientOptions
-            {
-                ServiceUri = contentInfo.ServiceUri,
-            },
-            progress => UploadProgress = progress);
+        using var contentServiceClient = GetContentClient();
 
         var key = new SIContentService.Contract.Models.FileKey
         {
@@ -910,7 +889,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         if (packageUri == null)
         {
             var packageStream = await packageSource.GetPackageDataAsync(cancellationToken) ?? throw new Exception(Resources.BadPackage);
-            
+
             using (packageStream)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -918,7 +897,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                     return null;
                 }
 
-                if (packageStream.Length > _gamesHostInfo.MaxPackageSizeMb * 1024 * 1024)
+                if (packageStream.Length > _gamesHostInfo?.MaxPackageSizeMb * 1024 * 1024)
                 {
                     throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
                 }
@@ -940,7 +919,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         GameSettings.Message = Resources.Preparing;
 
-        var computerAccounts = await ProcessCustomPersonsAsync(contentServiceClient, contentInfo.ServiceUri, settings, cancellationToken);
+        var computerAccounts = await ProcessCustomPersonsAsync(contentServiceClient, settings, cancellationToken);
 
         GameSettings.Message = Resources.Creating;
 
@@ -948,7 +927,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         {
             Type = SI.GameServer.Contract.PackageType.Content,
             Uri = packageUri,
-            ContentServiceUri = contentInfo.ServiceUri
+            ContentServiceUri = contentServiceClient.ServiceUri,
+            Secret = _defaultSIContentClientOptions?.ClientSecret,
         };
 
         if (_userSettings.UseSignalRConnection)
@@ -1000,6 +980,20 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
 
         return (_node, _host);
+    }
+
+    private ISIContentServiceClient GetContentClient() =>
+        SIContentClientExtensions.CreateSIContentServiceClient(
+            _defaultSIContentClientOptions ?? new SIContentClientOptions
+            {
+                ServiceUri = GetContentInfo().ServiceUri,
+            },
+            progress => UploadProgress = progress);
+
+    private SI.GameServer.Contract.SIContentInfo GetContentInfo()
+    {
+        var randomIndex = Random.Shared.Next(_gamesHostInfo!.ContentInfos.Length);
+        return _gamesHostInfo.ContentInfos[randomIndex];
     }
 
     private async Task<bool> UploadPackageAsync(
@@ -1074,7 +1068,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
     private async Task<List<ComputerAccountInfo>> ProcessCustomPersonsAsync(
         ISIContentServiceClient? contentServiceClient,
-        Uri? contentUri,
         GameSettings settings,
         CancellationToken cancellationToken)
     {
@@ -1082,32 +1075,30 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         foreach (var player in settings.Players)
         {
-            await ProcessCustomPersonAsync(contentServiceClient, contentUri, computerAccounts, player, cancellationToken);
+            await ProcessCustomPersonAsync(contentServiceClient, computerAccounts, player, cancellationToken);
         }
 
-        await ProcessCustomPersonAsync(contentServiceClient, contentUri, computerAccounts, settings.Showman, cancellationToken);
+        await ProcessCustomPersonAsync(contentServiceClient, computerAccounts, settings.Showman, cancellationToken);
 
         return computerAccounts;
     }
 
     private async Task ProcessCustomPersonAsync(
         ISIContentServiceClient? contentServiceClient,
-        Uri? contentUri,
         List<ComputerAccountInfo> computerAccounts,
         Account account,
         CancellationToken cancellationToken)
     {
         if (!account.IsHuman && account.CanBeDeleted) // This is a non standard player; we need to send its data to server
         {
-            var avatar = (await UploadAvatarAsync(contentServiceClient, contentUri, account, cancellationToken)).AvatarUrl;
-            var computerAccount = new ComputerAccount((ComputerAccount)account) { Picture = avatar };
+            var avatar = (await UploadAvatarAsync(contentServiceClient, account, cancellationToken)).AvatarUrl;
+            var computerAccount = new ComputerAccount((ComputerAccount)account) { Picture = avatar ?? "" };
             computerAccounts.Add(new ComputerAccountInfo { Account = computerAccount });
         }
     }
 
     private async Task<(string? AvatarUrl, FileKey? FileKey)> UploadAvatarAsync(
         ISIContentServiceClient? contentServiceClient,
-        Uri? contentUri,
         Account account,
         CancellationToken cancellationToken = default)
     {
@@ -1139,7 +1130,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
         var avatarKey = new FileKey { Name = Path.GetFileName(avatarUri), Hash = fileHash };
 
-        if (contentServiceClient != null && contentUri != null)
+        if (contentServiceClient?.ServiceUri != null)
         {
             var key = new SIContentService.Contract.Models.FileKey
             {
@@ -1158,7 +1149,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             if (avatarServerUri != null && !avatarServerUri.IsAbsoluteUri)
             {
                 // Prepend avatarServerUri with service content root uri
-                avatarServerUri = new Uri(contentUri, avatarServerUri.ToString().TrimStart('/'));
+                avatarServerUri = new Uri(contentServiceClient.ServiceUri, avatarServerUri.ToString().TrimStart('/'));
             }
 
             return (avatarServerUri?.ToString(), avatarKey);
@@ -1176,7 +1167,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         if (avatarPath != null && !Uri.IsWellFormedUriString(avatarPath, UriKind.Absolute))
         {
             // Prepend avatarPath with service content root uri
-            var rootAddress = _gamesHostInfo.ContentPublicBaseUrls.FirstOrDefault() ?? _gameServerClient.ServiceUri;
+            var rootAddress = _gamesHostInfo?.ContentPublicBaseUrls.FirstOrDefault() ?? _gameServerClient.ServiceUri;
             avatarPath = rootAddress + avatarPath;
         }
 

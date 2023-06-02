@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SI.GameServer.Client;
+using SIContentService.Client;
 using SICore;
 using SICore.Contracts;
 using SICore.Network.Servers;
@@ -296,6 +298,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
                 client,
                 _commonSettings,
                 _userSettings,
+                _serviceProvider.GetRequiredService<IOptions<SIContentClientOptions>>().Value,
                 _serviceProvider.GetRequiredService<ILogger<SIOnlineViewModel>>())
             {
                 Human = humanAccount,

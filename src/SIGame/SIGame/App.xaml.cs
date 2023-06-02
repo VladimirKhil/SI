@@ -7,6 +7,7 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SI.GameResultService.Client;
 using SI.GameServer.Client;
+using SIContentService.Client;
 using SICore.PlatformSpecific;
 using SIGame.Contracts;
 using SIGame.Implementation;
@@ -88,10 +89,16 @@ public partial class App : Application
 
     private void ConfigureServices(IServiceCollection services)
     {
+        if (_configuration == null)
+        {
+            throw new InvalidOperationException("_configuration == null");
+        }
+
         services.AddAppServiceClient(_configuration);
         services.AddSIGameServerClient(_configuration);
         services.AddGameResultServiceClient(_configuration);
         services.AddSIStorageServiceClient(_configuration);
+        services.AddSIContentServiceClient(_configuration);
 
         services.AddTransient(typeof(SIStorage));
 
@@ -320,7 +327,10 @@ public partial class App : Application
 
     private async void Application_Exit(object sender, ExitEventArgs e)
     {
-        await _host.StopAsync();
+        if (_host != null)
+        {
+            await _host.StopAsync();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
