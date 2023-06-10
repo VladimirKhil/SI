@@ -13,6 +13,7 @@
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
     Title="{x:Static lp:Resources.Application}"
+    FontFamily="{StaticResource Font}"
     FontSize="20">
     <StackPanel DataContext="{Binding MainMenu}" Margin="10">
         <StackPanel.Resources>

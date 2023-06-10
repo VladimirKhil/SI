@@ -3,7 +3,10 @@ using Notions;
 using SICore;
 using SICore.PlatformSpecific;
 using SICore.Results;
+using SIGame.ViewModel.Helpers;
 using SIGame.ViewModel.Properties;
+using SIGame.ViewModel.Settings;
+using SIStatisticsService.Contract;
 using SIUI.ViewModel;
 using System.Diagnostics;
 
@@ -14,15 +17,16 @@ public sealed class BackLink : BackLinkCore
     internal static BackLink Default { get; set; }
 
     private readonly AppSettingsViewModel _settings;
-
     private readonly UserSettings _userSettings;
+    private readonly AppState _appState;
 
     private readonly IServiceProvider _serviceProvider;
 
-    internal BackLink(AppSettingsViewModel settings, UserSettings userSettings, IServiceProvider serviceProvider)
+    internal BackLink(AppSettingsViewModel settings, UserSettings userSettings, AppState appState, IServiceProvider serviceProvider)
     {
         _settings = settings;
         _userSettings = userSettings;
+        _appState = appState;
         _serviceProvider = serviceProvider;
     }
 
@@ -53,38 +57,23 @@ public sealed class BackLink : BackLinkCore
     /// </summary>
     public override async Task SaveReportAsync(GameResult gameResult, CancellationToken cancellationToken = default)
     {
-        SI.GameResultService.Client.AnswerInfo answerConverter(AnswerInfo q) =>
-            new() { Answer = q.Answer, Question = q.Question, Theme = q.Theme, Round = q.Round };
-
-        SI.GameResultService.Client.PersonResult personResultConverter(PersonResult p) =>
-            new() { Name = p.Name, Sum = p.Sum };
-
-        var result = new SI.GameResultService.Client.GameResult
+        if (gameResult.Reviews.Count == 0)
         {
-            ApellatedQuestions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.ApellatedQuestions.Select(answerConverter)),
-            Comments = gameResult.Comments,
-            ErrorLog = gameResult.ErrorLog,
-            MarkedQuestions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.MarkedQuestions.Select(answerConverter)),
-            PackageID = gameResult.PackageID,
-            PackageName = gameResult.PackageName,
-            Results = new List<SI.GameResultService.Client.PersonResult>(gameResult.Results.Select(personResultConverter)),
-            WrongVersions = new List<SI.GameResultService.Client.AnswerInfo>(gameResult.WrongVersions.Select(answerConverter))
-        };
+            return;
+        }
 
-        var gameResultService = _serviceProvider.GetRequiredService<SI.GameResultService.Client.IGameResultServiceClient>();
+        var gameReport = gameResult.ToGameReport();
+
+        var statisticsService = _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>();
         
         try
         {
-            await gameResultService.SendGameReportAsync(result, cancellationToken);
+            await statisticsService.SendGameReportAsync(gameReport, cancellationToken);
         }
         catch (Exception)
         {
             PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.Error_SendingReport, PlatformSpecific.MessageType.Warning, true);
-
-            if (CommonSettings.Default.DelayedResultsNew.Count < 10)
-            {
-                CommonSettings.Default.DelayedResultsNew.Add(result);
-            }
+            _appState.TryAddDelayedReport(gameReport);
         }
     }
 
@@ -96,7 +85,7 @@ public sealed class BackLink : BackLinkCore
 
     public override string PhotoUri => Global.PhotoUri;
 
-    public override string GetPhotoUri(string name) => System.IO.Path.Combine(Global.PhotoUri, name.Translit() + ".jpg");
+    public override string GetPhotoUri(string name) => Path.Combine(Global.PhotoUri, name.Translit() + ".jpg");
 
     public override bool SendReport => _userSettings.SendReport;
 

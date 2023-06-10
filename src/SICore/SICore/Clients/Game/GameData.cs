@@ -242,6 +242,11 @@ public sealed class GameData : Data
     internal GameResult GameResultInfo { get; } = new();
 
     /// <summary>
+    /// Has the game report been sent.
+    /// </summary>
+    internal bool ReportSent { get; set; }
+
+    /// <summary>
     /// Can a question be marked (maybe it contains an error).
     /// </summary>
     internal bool CanMarkQuestion { get; set; }
@@ -466,8 +471,6 @@ public sealed class GameData : Data
     }
 
     public int ReportsCount { get; set; }
-
-    public int AcceptedReports { get; set; }
 
     public bool AnnounceAnswer { get; set; }
 

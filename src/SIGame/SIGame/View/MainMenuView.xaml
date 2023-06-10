@@ -7,7 +7,8 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     mc:Ignorable="d"
     FontSize="20"
-    Title="{x:Static lp:Resources.Options}">
+    Title="{x:Static lp:Resources.Options}"
+    FontFamily="{StaticResource Font}">
     <Page.Resources>
         <Style TargetType="Hyperlink">
             <Setter Property="Foreground" Value="{StaticResource MainColor}" />

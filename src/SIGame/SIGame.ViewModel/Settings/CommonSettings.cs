@@ -1,12 +1,13 @@
 ﻿using SIData;
 using SIGame.ViewModel;
+using SIStatisticsService.Contract.Models;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 
 namespace SIGame;
 
 /// <summary>
-/// Общие настройки для всех пользователей
+/// Defines persistent application state.
 /// </summary>
 public sealed class CommonSettings
 {
@@ -54,11 +55,6 @@ public sealed class CommonSettings
     public List<ComputerAccount> CompShowmans2 { get; set; }
 
     /// <summary>
-    /// Delayed game results.
-    /// </summary>
-    public List<SI.GameResultService.Client.GameResult> DelayedResultsNew { get; set; }
-
-    /// <summary>
     /// Отложенные отчёты об ошибках
     /// </summary>
     public ErrorInfoList DelayedErrorsNew { get; set; }
@@ -70,7 +66,6 @@ public sealed class CommonSettings
         CompShowmans2 = new List<ComputerAccount>();
         BestPlayers = new ObservableCollection<BestPlayer>();
         DelayedErrorsNew = new ErrorInfoList();
-        DelayedResultsNew = new List<SI.GameResultService.Client.GameResult>();
     }
 
     public void Save(Stream stream, XmlSerializer? serializer = null)

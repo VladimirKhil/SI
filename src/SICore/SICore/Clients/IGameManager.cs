@@ -9,7 +9,7 @@ public interface IGameManager : IPlatformManager
 
     void OnError(Exception exc);
 
-    void PlaySound(string sound = null, double speed = 1.0);
+    void PlaySound(string? sound = null, double speed = 1.0);
 
     bool MakeLogs { get; }
 
@@ -67,7 +67,7 @@ public interface IGameManager : IPlatformManager
     /// <summary>
     /// Получить рекламное сообщение
     /// </summary>
-    string GetAd(string localization, out int adId);
+    string? GetAd(string localization, out int adId);
 
     void LogWarning(string message);
 }

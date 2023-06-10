@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using SIGame.Helpers;
+using System.Security;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -57,7 +58,7 @@ public static class PasswordHelper
             }
             catch (SecurityException exc)
             {
-                MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(exc.Message, AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }

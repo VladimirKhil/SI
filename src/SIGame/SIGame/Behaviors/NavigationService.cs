@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SIGame.Helpers;
+using System;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -73,7 +74,7 @@ public static class NavigationService
         }
         catch (Exception exc)
         {
-            MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBox.Show(exc.Message, AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
     }
 }

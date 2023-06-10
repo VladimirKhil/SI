@@ -9,7 +9,7 @@ public abstract class BackLinkCore : IGameManager
 
     public abstract void OnError(Exception exc);
 
-    public abstract void PlaySound(string sound = null, double speed = 1.0);
+    public abstract void PlaySound(string? sound = null, double speed = 1.0);
 
     public abstract bool MakeLogs { get; }
 
@@ -53,7 +53,7 @@ public abstract class BackLinkCore : IGameManager
         return File.Create(logUri);
     }
 
-    public virtual string GetAd(string localization, out int adId)
+    public virtual string? GetAd(string localization, out int adId)
     {
         adId = -1;
         return null;

@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using SICore.Clients.Viewer;
 using SIGame.Contracts;
+using SIGame.Helpers;
 using SIGame.Properties;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PlatformSpecific;
@@ -152,7 +153,7 @@ public sealed class DesktopManager : PlatformManager
 
             if (new FileInfo(openDialog.FileName).Length > 1000000)
             {
-                MessageBox.Show(Resources.FileLarger1Mb, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(Resources.FileLarger1Mb, AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return null;
             }
 
@@ -186,7 +187,7 @@ public sealed class DesktopManager : PlatformManager
                 {
                     MessageBox.Show(
                         $"{ViewModel.Properties.Resources.FileTooLarge} {string.Format(ViewModel.Properties.Resources.MaximumFileSize, maxPackageSize.Value)}",
-                        App.ProductName,
+                        AppConstants.ProductName,
                         MessageBoxButton.OK,
                         MessageBoxImage.Exclamation);
 
@@ -455,7 +456,7 @@ public sealed class DesktopManager : PlatformManager
     {
         if (isWarning)
         {
-            MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBox.Show(exc.Message, AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
         else
         {

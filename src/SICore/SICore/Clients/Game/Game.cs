@@ -622,24 +622,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                         break;
 
                     case Messages.Report:
-                        #region Report
-                        if (ClientData.Decision == DecisionType.Reporting)
-                        {
-                            ClientData.ReportsCount--;
-                            if (args.Length > 2)
-                            {
-                                if (ClientData.GameResultInfo.Comments.Length > 0)
-                                    ClientData.GameResultInfo.Comments += Environment.NewLine;
-
-                                ClientData.GameResultInfo.Comments += args[2];
-                                ClientData.AcceptedReports++;
-                            }
-
-                            if (ClientData.ReportsCount == 0)
-                                _logic.ExecuteImmediate();
-                        }
+                        OnReport(message, args);
                         break;
-                    #endregion
 
                     case Messages.IsRight:
                         OnIsRight(message, args);
@@ -779,12 +763,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                             break;
                         }
 
-                        ClientData.GameResultInfo.MarkedQuestions.Add(new AnswerInfo
+                        ClientData.GameResultInfo.ComplainedQuestions.Add(new QuestionReport
                         {
-                            Round = _logic.Engine.RoundIndex,
-                            Theme = _logic.Engine.ThemeIndex,
-                            Question = _logic.Engine.QuestionIndex,
-                            Answer = ""
+                            ThemeName = ClientData.Theme.Name,
+                            QuestionText = ClientData.Question?.GetText(),
+                            ReportText = args.Length > 1 ? args[1] : ""
                         });
                         break;
                 }
@@ -794,6 +777,25 @@ public sealed class Game : Actor<GameData, GameLogic>
                 _client.Node.OnError(new Exception(message.Text, exc), true);
             }
         }, 5000);
+
+    private void OnReport(Message message, string[] args)
+    {
+        if (ClientData.Decision != DecisionType.Reporting
+            || !ClientData.Players.Any(player => player.Name == message.Sender)
+            || ClientData.GameResultInfo.Reviews.ContainsKey(message.Sender))
+        {
+            return;
+        }
+
+        ClientData.ReportsCount--;
+
+        ClientData.GameResultInfo.Reviews[message.Sender] = args.Length > 2 ? args[2] : "";
+
+        if (ClientData.ReportsCount == 0)
+        {
+            _logic.ExecuteImmediate();
+        }
+    }
 
     private void OnMediaLoaded(Message message) => _gameActions.SendMessageToWithArgs(ClientData.ShowMan.Name, Messages.MediaLoaded, message.Sender);
 
@@ -839,7 +841,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     ClientData.TInfo.RoundInfo[themeIndex].Name,
                     oldPrice));
 
-            var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
+            var nextTask = (Tasks)Logic.PendingTask;
 
             if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose) && _logic.Engine.LeftQuestionsCount == 0)
             {
@@ -2289,7 +2291,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     {
         Logic.AddHistory($"PlanExecution {task} {taskTime} {arg} ({ClientData.TInfo.Pause})");
 
-        if (ClientData.TInfo.Pause)
+        if (Logic.IsExecutionPaused)
         {
             Logic.UpdatePausedTask((int)task, arg, (int)taskTime);
         }
@@ -2558,7 +2560,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         // Drop answerer index
         ClientData.AnswererIndex = -1;
 
-        var nextTask = (Tasks)(ClientData.TInfo.Pause ? Logic.NextTask : Logic.CurrentTask);
+        var nextTask = (Tasks)Logic.PendingTask;
 
         Logic.AddHistory(
             $"AnswererIndex dropped; nextTask = {nextTask};" +
@@ -3093,6 +3095,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     internal void StartGame()
     {
         ClientData.Stage = GameStage.Begin;
+        ClientData.GameResultInfo.StartTime = DateTimeOffset.UtcNow;
 
         _logic.OnStageChanged(GameStages.Started, LO[nameof(R.GameBeginning)]);
         _gameActions.InformStage();

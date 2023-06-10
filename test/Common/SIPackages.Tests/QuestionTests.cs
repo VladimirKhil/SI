@@ -50,6 +50,7 @@ internal sealed class QuestionTests
         };
 
         var sb = new StringBuilder();
+
         using (var writer = XmlWriter.Create(sb))
         {
             question.WriteXml(writer);
@@ -76,14 +77,93 @@ internal sealed class QuestionTests
 
         var newStep = newQuestion.Script?.Steps[0];
 
-        Assert.That(newStep?.Type, Is.EqualTo(StepTypes.ShowContent));
-        Assert.That(newStep?.Parameters[StepParameterNames.Content].Type, Is.EqualTo(StepParameterTypes.Content));
-        Assert.That(newStep?.Parameters[StepParameterNames.Content].ContentValue?[0].Value, Is.EqualTo("item text"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(newStep?.Type, Is.EqualTo(StepTypes.ShowContent));
+            Assert.That(newStep?.Parameters[StepParameterNames.Content].Type, Is.EqualTo(StepParameterTypes.Content));
+            Assert.That(newStep?.Parameters[StepParameterNames.Content].ContentValue?[0].Value, Is.EqualTo("item text"));
+        });
 
         var newParam = newQuestion.Parameters?["test"];
 
-        Assert.That(newParam?.Type, Is.EqualTo(StepParameterTypes.Group));
-        Assert.That(newParam?.GroupValue?["inner"].Type, Is.EqualTo(StepParameterTypes.Simple));
-        Assert.That(newParam?.GroupValue?["inner"].SimpleValue, Is.EqualTo("value"));
+        Assert.Multiple(() =>
+        {
+            Assert.That(newParam?.Type, Is.EqualTo(StepParameterTypes.Group));
+            Assert.That(newParam?.GroupValue?["inner"].Type, Is.EqualTo(StepParameterTypes.Simple));
+            Assert.That(newParam?.GroupValue?["inner"].SimpleValue, Is.EqualTo("value"));
+        });
+    }
+
+    [Test]
+    public void GetText_Scenario_Ok()
+    {
+        var question = new Question();
+
+        question.Scenario.Add("first part");
+        question.Scenario.Add("second part");
+
+        var text = question.GetText();
+
+        Assert.That(text, Is.EqualTo("first part\nsecond part"));
+    }
+
+    [Test]
+    public void GetText_Script_Ok()
+    {
+        var question = new Question
+        {
+            Script = new Script
+            {
+                Steps =
+                {
+                    new Step
+                    {
+                        Type = StepTypes.ShowContent,
+                        Parameters =
+                        {
+                            [StepParameterNames.Content] = new StepParameter
+                            {
+                                Type = StepParameterTypes.Content,
+                                ContentValue = new List<ContentItem>
+                                {
+                                    new ContentItem { Type = AtomTypes.Text, Value = "item text" },
+                                     new ContentItem { Type = AtomTypes.Text, Value = "item text 2" }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            TypeName = "test"
+        };
+
+        var text = question.GetText();
+
+        Assert.That(text, Is.EqualTo("item text\nitem text 2"));
+    }
+
+    [Test]
+    public void GetText_Parameters_Ok()
+    {
+        var question = new Question
+        {
+            Parameters = new StepParameters
+            {
+                [QuestionParameterNames.Question] = new StepParameter
+                {
+                    Type = StepParameterTypes.Content,
+                    ContentValue = new List<ContentItem>
+                    {
+                        new ContentItem { Type = AtomTypes.Text, Value = "item text" },
+                            new ContentItem { Type = AtomTypes.Text, Value = "item text 2" }
+                    }
+                }
+            },
+            TypeName = "test"
+        };
+
+        var text = question.GetText();
+
+        Assert.That(text, Is.EqualTo("item text\nitem text 2"));
     }
 }

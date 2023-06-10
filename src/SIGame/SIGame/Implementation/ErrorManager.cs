@@ -1,10 +1,11 @@
 ﻿using AppService.Client;
 using AppService.Client.Models;
 using Microsoft.Extensions.Options;
-using SI.GameResultService.Client;
 using SICore;
 using SIGame.Contracts;
 using SIGame.Properties;
+using SIGame.ViewModel.Settings;
+using SIStatisticsService.Contract;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -23,22 +24,24 @@ internal sealed class ErrorManager : IErrorManager
     private static readonly object ErrorSync = new();
 
     private readonly IAppServiceClient _appServiceClient;
-    private readonly IGameResultServiceClient _gameResultServiceClient;
+    private readonly ISIStatisticsServiceClient _siStatisticsServiceClient;
+
+    private readonly AppState _appState;
 
     private readonly bool _useAppService;
-    private readonly bool _useGameResultService;
 
     public ErrorManager(
         IAppServiceClient appServiceClient,
-        IGameResultServiceClient gameResultServiceClient,
-        IOptions<AppServiceClientOptions> appServiceClientOptions,
-        IOptions<GameResultServiceClientOptions> gameResultServiceClientOptions)
+        ISIStatisticsServiceClient gameResultServiceClient,
+        AppState appState,
+        IOptions<AppServiceClientOptions> appServiceClientOptions)
     {
         _appServiceClient = appServiceClient;
-        _gameResultServiceClient = gameResultServiceClient;
+        _siStatisticsServiceClient = gameResultServiceClient;
+
+        _appState = appState;
 
         _useAppService = appServiceClientOptions.Value.ServiceUri != null;
-        _useGameResultService = gameResultServiceClientOptions.Value.ServiceUri != null;
     }
 
     public bool SendErrorReport(Exception e)
@@ -212,7 +215,7 @@ internal sealed class ErrorManager : IErrorManager
     {
         try
         {
-            if (CommonSettings.Default.DelayedErrorsNew.Count == 0 && CommonSettings.Default.DelayedResultsNew.Count == 0)
+            if (CommonSettings.Default.DelayedErrorsNew.Count == 0 && _appState.DelayedReports.Count == 0)
             {
                 return;
             }
@@ -228,13 +231,10 @@ internal sealed class ErrorManager : IErrorManager
                 }
             }
 
-            if (_useGameResultService)
+            while (_appState.DelayedReports.Count > 0)
             {
-                while (CommonSettings.Default.DelayedResultsNew.Count > 0)
-                {
-                    await _gameResultServiceClient.SendGameReportAsync(CommonSettings.Default.DelayedResultsNew[0]);
-                    CommonSettings.Default.DelayedResultsNew.RemoveAt(0);
-                }
+                await _siStatisticsServiceClient.SendGameReportAsync(_appState.DelayedReports[0]);
+                _appState.DelayedReports.RemoveAt(0);
             }
         }
         catch (Exception exc)

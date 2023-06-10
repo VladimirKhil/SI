@@ -1,5 +1,4 @@
-﻿using SIUI.ViewModel.Core;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -14,12 +13,12 @@ public sealed class ThemeSettings : INotifyPropertyChanged
     internal const int DefaultMaximumReplicTextLength = 400;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private Settings _uiSettings = new();
+    private SIUI.ViewModel.Core.Settings _uiSettings = new();
 
     /// <summary>
     /// Настройки отображения табло
     /// </summary>
-    public Settings UISettings
+    public SIUI.ViewModel.Core.Settings UISettings
     {
         get => _uiSettings;
         set { _uiSettings = value; OnPropertyChanged(); }

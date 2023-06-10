@@ -76,7 +76,7 @@ public sealed class GameRunner
         {
             Settings = _settings,
             HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
-            GameName = _gameName,
+            GameName = _gameName ?? "",
             Files = _files,
         };
 

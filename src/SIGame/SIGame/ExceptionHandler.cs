@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System;
+using SIGame.Helpers;
 
 namespace SIGame;
 
@@ -37,7 +38,7 @@ internal sealed class ExceptionHandler
             {
                 MessageBox.Show(
                     Properties.Resources.Error_IncifficientResourcesForExecution,
-                    App.ProductName,
+                    AppConstants.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
@@ -113,7 +114,7 @@ internal sealed class ExceptionHandler
             {
                 MessageBox.Show(
                     Properties.Resources.Error_WindowsAutomationBroken,
-                    App.ProductName,
+                    AppConstants.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
@@ -129,7 +130,7 @@ internal sealed class ExceptionHandler
             {
                 MessageBox.Show(
                     Properties.Resources.Error_OSBroken,
-                    App.ProductName,
+                    AppConstants.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
@@ -140,7 +141,7 @@ internal sealed class ExceptionHandler
             {
                 MessageBox.Show(
                     Properties.Resources.Error_Typography,
-                    App.ProductName,
+                    AppConstants.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
@@ -151,7 +152,7 @@ internal sealed class ExceptionHandler
             {
                 MessageBox.Show(
                     Properties.Resources.AppBroken,
-                    App.ProductName,
+                    AppConstants.ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
@@ -166,7 +167,7 @@ internal sealed class ExceptionHandler
         {
             MessageBox.Show(
                 exc.ToString(),
-                App.ProductName,
+                AppConstants.ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
 

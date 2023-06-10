@@ -5,20 +5,20 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NLog.Web;
-using SI.GameResultService.Client;
 using SI.GameServer.Client;
 using SIContentService.Client;
 using SICore.PlatformSpecific;
 using SIGame.Contracts;
+using SIGame.Helpers;
 using SIGame.Implementation;
 using SIGame.ViewModel;
+using SIGame.ViewModel.Settings;
+using SIStatisticsService.Client;
 using SIStorageService.Client;
 using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.IO.IsolatedStorage;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -40,7 +40,6 @@ namespace SIGame;
 public partial class App : Application
 {
     private IHost? _host;
-    private IConfiguration? _configuration;
     private ILogger<App>? _logger;
 
 #pragma warning disable IDE0052
@@ -48,6 +47,8 @@ public partial class App : Application
 #pragma warning restore IDE0052
 
     private readonly DesktopManager _manager = new();
+
+    private AppState _appState = new();
 
     private static readonly bool UseSignalRConnection = Environment.OSVersion.Version >= new Version(6, 2);
 
@@ -70,8 +71,6 @@ public partial class App : Application
                     .SetBasePath(context.HostingEnvironment.ContentRootPath)
                     .AddJsonFile("appsettings.json", optional: true)
                     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-                _configuration = configurationBuilder.Build();
             })
             .ConfigureServices(ConfigureServices)
             .ConfigureLogging((hostingContext, logging) =>
@@ -87,20 +86,19 @@ public partial class App : Application
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
-        if (_configuration == null)
-        {
-            throw new InvalidOperationException("_configuration == null");
-        }
+        var configuration = ctx.Configuration;
 
-        services.AddAppServiceClient(_configuration);
-        services.AddSIGameServerClient(_configuration);
-        services.AddGameResultServiceClient(_configuration);
-        services.AddSIStorageServiceClient(_configuration);
-        services.AddSIContentServiceClient(_configuration);
+        services.AddAppServiceClient(configuration);
+        services.AddSIGameServerClient(configuration);
+        services.AddSIStatisticsServiceClient(configuration);
+        services.AddSIStorageServiceClient(configuration);
+        services.AddSIContentServiceClient(configuration);
 
         services.AddTransient(typeof(SIStorage));
+
+        services.AddSingleton(_appState);
 
         services.AddSingleton<IUIThreadExecutor>(_manager);
         services.AddTransient<IErrorManager, ErrorManager>();
@@ -116,8 +114,9 @@ public partial class App : Application
         {
             UI.Initialize();
 
-            CommonSettings.Default = LoadCommonSettings();
-            UserSettings.Default = LoadUserSettings() ?? new UserSettings();
+            CommonSettings.Default = SettingsManager.LoadCommonSettings();
+            UserSettings.Default = SettingsManager.LoadUserSettings() ?? new UserSettings();
+            _appState = SettingsManager.LoadAppState();
 
             if (UserSettings.Default.Language != null)
             {
@@ -171,7 +170,7 @@ public partial class App : Application
 
             MainWindow = new MainWindow
             {
-                DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default, _host.Services)
+                DataContext = new MainViewModel(CommonSettings.Default, UserSettings.Default, _appState, _host.Services)
             };
 
 #if UPDATE
@@ -337,13 +336,15 @@ public partial class App : Application
     {
         if (CommonSettings.Default != null)
         {
-            SaveCommonSettings(CommonSettings.Default);
+            SettingsManager.SaveCommonSettings(CommonSettings.Default);
         }
 
         if (UserSettings.Default != null)
         {
-            SaveUserSettings(UserSettings.Default);
+            SettingsManager.SaveUserSettings(UserSettings.Default);
         }
+
+        SettingsManager.SaveAppState(_appState);
 
         base.OnExit(e);
     }
@@ -351,214 +352,5 @@ public partial class App : Application
     private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) =>
         e.Handled = new ExceptionHandler(_host.Services.GetRequiredService<IErrorManager>()).Handle(e.Exception);
 
-    /// <summary>
-    /// Имя файла общих настроек
-    /// </summary>
-    internal const string CommonConfigFileName = "app.config";
-
-    /// <summary>
-    /// Имя файла персональных настроек
-    /// </summary>
-    internal static string UserConfigFileName = "user.config";
-
-    public const string SettingsFolderName = "Settings";
-
-    private static readonly string SettingsFolder = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        CommonSettings.ManufacturerEn,
-        CommonSettings.AppNameEn,
-        SettingsFolderName);
-
-    /// <summary>
-    /// Загрузить общие настройки
-    /// </summary>
-    public static CommonSettings LoadCommonSettings()
-    {
-        try
-        {
-            var commonSettingsFile = Path.Combine(SettingsFolder, CommonConfigFileName);
-
-            if (File.Exists(commonSettingsFile) && Monitor.TryEnter(CommonConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Open(commonSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return CommonSettings.Load(stream);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(
-                        $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
-                        ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
-                }
-                finally
-                {
-                    Monitor.Exit(CommonConfigFileName);
-                }
-            }
-
-            using var file = IsolatedStorageFile.GetMachineStoreForAssembly();
-
-            if (file.FileExists(CommonConfigFileName) && Monitor.TryEnter(CommonConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = file.OpenFile(CommonConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return CommonSettings.Load(stream);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(
-                        $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
-                        ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
-                }
-                finally
-                {
-                    Monitor.Exit(CommonConfigFileName);
-                }
-            }
-        }
-        catch { }
-
-        return new CommonSettings();
-    }
-
-    /// <summary>
-    /// Сохранить общие настройки
-    /// </summary>
-    private static void SaveCommonSettings(CommonSettings settings)
-    {
-        try
-        {
-            Directory.CreateDirectory(SettingsFolder);
-            var commonSettingsFile = Path.Combine(SettingsFolder, CommonConfigFileName);
-
-            if (Monitor.TryEnter(CommonConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Create(commonSettingsFile);
-                    settings.Save(stream);
-                }
-                finally
-                {
-                    Monitor.Exit(CommonConfigFileName);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            MessageBox.Show(
-                $"{SIGame.Properties.Resources.Error_SettingsSaving}: {exc.Message}",
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Exclamation);
-        }
-    }
-
-    /// <summary>
-    /// Загрузить общие настройки
-    /// </summary>
-    /// <returns></returns>
-    public static UserSettings? LoadUserSettings()
-    {
-        try
-        {
-            var userSettingsFile = Path.Combine(SettingsFolder, UserConfigFileName);
-
-            if (File.Exists(userSettingsFile) && Monitor.TryEnter(UserConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Open(userSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return UserSettings.Load(stream);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(
-                        $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
-                        ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
-                }
-                finally
-                {
-                    Monitor.Exit(UserConfigFileName);
-                }
-            }
-
-            using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-
-            if (file.FileExists(UserConfigFileName) && Monitor.TryEnter(UserConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = file.OpenFile(UserConfigFileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    return UserSettings.Load(stream);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(
-                        $"{SIGame.Properties.Resources.Error_SettingsLoading}: {exc.Message}. {SIGame.Properties.Resources.DefaultSettingsWillBeUsed}",
-                        ProductName,
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Exclamation);
-
-                }
-                finally
-                {
-                    Monitor.Exit(UserConfigFileName);
-                }
-            }
-            else
-            {
-                var oldSettings = UserSettings.LoadOld(UserConfigFileName);
-
-                if (oldSettings != null)
-                {
-                    return oldSettings;
-                }
-            }
-        }
-        catch { }
-
-        return new UserSettings();
-    }
-
-    /// <summary>
-    /// Сохранить общие настройки
-    /// </summary>
-    private static void SaveUserSettings(UserSettings settings)
-    {
-        try
-        {
-            Directory.CreateDirectory(SettingsFolder);
-            var userSettingsFile = Path.Combine(SettingsFolder, UserConfigFileName);
-
-            if (Monitor.TryEnter(UserConfigFileName, 2000))
-            {
-                try
-                {
-                    using var stream = File.Create(userSettingsFile);
-                    settings.Save(stream);
-                }
-                finally
-                {
-                    Monitor.Exit(UserConfigFileName);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            MessageBox.Show(
-                $"{SIGame.Properties.Resources.Error_SettingsSaving}: {exc.Message}",
-                ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Exclamation);
-        }
-    }
+    
 }

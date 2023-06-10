@@ -13,6 +13,7 @@ using SIPackages.Providers;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
@@ -66,9 +67,9 @@ public sealed class GameLogic : Logic<GameData>
 
     public bool IsRunning { get; set; }
 
-    public event Action<GameLogic, GameStages, string> StageChanged;
+    public event Action<GameLogic, GameStages, string>? StageChanged;
 
-    public event Action<string, int, int> AdShown;
+    public event Action<string, int, int>? AdShown;
 
     internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(this, stage, stageName);
 
@@ -110,8 +111,11 @@ public sealed class GameLogic : Logic<GameData>
         Engine.EndGame += Engine_EndGame;
 
         _data.PackageDoc = Engine.Document;
+
+        _data.GameResultInfo.Name = _data.GameName;
         _data.GameResultInfo.PackageName = Engine.PackageName;
-        _data.GameResultInfo.PackageID = Engine.Document.Package.ID;
+        _data.GameResultInfo.PackageHash = ""; // Will not use hash for now
+        _data.GameResultInfo.PackageAuthors = Engine.Document.Package.Info.Authors.ToArray();
 
         if (_data.Settings.IsAutomatic)
         {
@@ -181,7 +185,7 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator))
         {
-            _data.GameResultInfo.PackageName += string.Concat(Environment.NewLine, _data.Package.Info.Comments.Text.AsSpan(8));
+            _data.GameResultInfo.PackageName += string.Concat("\n", _data.Package.Info.Comments.Text.AsSpan(8));
         }
 
         _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
@@ -833,15 +837,17 @@ public sealed class GameLogic : Logic<GameData>
 
     private void Engine_EndGame()
     {
-        // Очищаем табло
+        // Clearing the table
         _gameActions.SendMessage(Messages.Stop);
         _gameActions.SystemReplic($"{LO[nameof(R.GameResults)]}: ");
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
             _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}");
-            _data.GameResultInfo.Results.Add(new PersonResult { Name = _data.Players[i].Name, Sum = _data.Players[i].Sum });
+            _data.GameResultInfo.Results[_data.Players[i].Name] = _data.Players[i].Sum;
         }
+
+        _data.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_data.GameResultInfo.StartTime);
 
         ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10));
     }
@@ -850,11 +856,7 @@ public sealed class GameLogic : Logic<GameData>
         await ClientData.TaskLock.TryLockAsync(
             async () =>
             {
-                if (_data.AcceptedReports > 0)
-                {
-                    _data.AcceptedReports = 0;
-                    await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
-                }
+                await TrySendReportAsync();
 
                 Engine.Dispose();
 
@@ -862,6 +864,27 @@ public sealed class GameLogic : Logic<GameData>
             },
             5000,
             true);
+
+    private async Task TrySendReportAsync()
+    {
+        if (_data.ReportSent)
+        {
+            return;
+        }
+
+        var reviewers = _data.GameResultInfo.Reviews.Keys;
+
+        foreach (var reviewer in reviewers)
+        {
+            if (string.IsNullOrEmpty(_data.GameResultInfo.Reviews[reviewer]))
+            {
+                _data.GameResultInfo.Reviews.Remove(reviewer);
+            }
+        }
+
+        await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
+        _data.ReportSent = true;
+    }
 
     internal override bool Stop(StopReason reason)
     {
@@ -1208,6 +1231,13 @@ public sealed class GameLogic : Logic<GameData>
                 if (canonicalAnswer != null && !isAnswerCanonical)
                 {
                     s.AppendFormat(" [{0}]", canonicalAnswer);
+
+                    _data.GameResultInfo.AcceptedAnswers.Add(new QuestionReport
+                    {
+                        ThemeName = _data.Theme.Name,
+                        QuestionText = _data.Question?.GetText(),
+                        ReportText = _data.Answerer.Answer
+                    });
                 }
 
                 s.AppendFormat(" (+{0})", _data.CurPriceRight.ToString().FormatNumber());
@@ -1257,6 +1287,7 @@ public sealed class GameLogic : Logic<GameData>
         else
         {
             var s = new StringBuilder();
+
             if (_data.Answerer.Answer != LO[nameof(R.IDontKnow)])
             {
                 s.Append(GetRandomString(LO[nameof(R.Wrong)]));
@@ -1288,12 +1319,11 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (_data.Answerer.IsHuman)
                 {
-                    _data.GameResultInfo.WrongVersions.Add(new AnswerInfo
+                    _data.GameResultInfo.RejectedAnswers.Add(new QuestionReport
                     {
-                        Round = Engine.RoundIndex,
-                        Theme = _data.ThemeIndex,
-                        Question = _data.QuestionIndex,
-                        Answer = _data.Answerer.Answer
+                        ThemeName = _data.Theme.Name,
+                        QuestionText = _data.Question?.GetText(),
+                        ReportText = _data.Answerer.Answer
                     });
                 }
 
@@ -1942,17 +1972,22 @@ public sealed class GameLogic : Logic<GameData>
         OnStageChanged(GameStages.Finished, LO[nameof(R.StageFinished)]);
         _gameActions.InformStage();
 
+        AskForPlayerReviews();
+    }
+
+    private void AskForPlayerReviews()
+    {
         _data.ReportsCount = _data.Players.Count;
+        _data.GameResultInfo.Reviews.Clear();
+
         ScheduleExecution(Tasks.WaitReport, 10 * 60 * 2); // 2 minutes
-        WaitFor(DecisionType.Reporting, 10 * 60 * 5, -3);
+        WaitFor(DecisionType.Reporting, 10 * 60 * 2, -3);
 
-        _data.AcceptedReports = 0;
-
-        var reportString = _data.GameResultInfo.ToString(_data.PackageDoc, LO);
+        var reportString = _data.GameResultInfo.ToString(LO);
 
         foreach (var item in _data.Players)
         {
-            _gameActions.SendMessage(Messages.Report + Message.ArgsSeparatorChar + reportString, item.Name);
+            _gameActions.SendMessageToWithArgs(item.Name, Messages.Report, reportString);
         }
     }
 
@@ -2265,11 +2300,7 @@ public sealed class GameLogic : Logic<GameData>
                 _gameActions.SendMessage(Messages.Cancel, item.Name);
             }
 
-            if (_data.AcceptedReports > 0)
-            {
-                _data.AcceptedReports = 0;
-                await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
-            }
+            await TrySendReportAsync();
 
             StopWaiting();
         }
@@ -3742,25 +3773,26 @@ public sealed class GameLogic : Logic<GameData>
             quest = _data.QuestionIndex > -1 ? _data.QuestionIndex : _data.PreviousQuest;
         }
 
+        var themeName = _data.Theme.Name;
+        var questionText = _data.Question?.GetText();
+
         // Add appellated answer to game report
-        var answerInfo = _data.GameResultInfo.WrongVersions.FirstOrDefault(
+        var answerInfo = _data.GameResultInfo.RejectedAnswers.FirstOrDefault(
             answer =>
-                answer.Round == Engine.RoundIndex &&
-                answer.Theme == theme &&
-                answer.Question == quest &&
-                answer.Answer == appelaer.Answer);
+                answer.ThemeName == themeName
+                && answer.QuestionText == questionText
+                && answer.ReportText == appelaer.Answer);
 
         if (answerInfo != null)
         {
-            _data.GameResultInfo.WrongVersions.Remove(answerInfo);
+            _data.GameResultInfo.RejectedAnswers.Remove(answerInfo);
         }
 
-        _data.GameResultInfo.ApellatedQuestions.Add(new AnswerInfo
+        _data.GameResultInfo.ApellatedAnswers.Add(new QuestionReport
         {
-            Round = Engine.RoundIndex,
-            Theme = theme,
-            Question = quest,
-            Answer = appelaer.Answer
+            ThemeName = themeName,
+            QuestionText = questionText,
+            ReportText = appelaer.Answer
         });
     }
 

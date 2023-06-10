@@ -1,4 +1,5 @@
-﻿using SIGame.ViewModel;
+﻿using SIGame.Helpers;
+using SIGame.ViewModel;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -73,7 +74,7 @@ public partial class SIOnlineView : UserControl
         }
         catch (Exception exc)
         {
-            MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBox.Show(exc.Message, AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
     }
 

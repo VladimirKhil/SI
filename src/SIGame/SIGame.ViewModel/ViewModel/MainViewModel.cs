@@ -7,6 +7,7 @@ using SICore;
 using SICore.Contracts;
 using SICore.Network.Servers;
 using SIGame.ViewModel.Properties;
+using SIGame.ViewModel.Settings;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -111,7 +112,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     private readonly UserSettings _userSettings;
     private readonly IServiceProvider _serviceProvider;
 
-    public MainViewModel(CommonSettings commonSettings, UserSettings userSettings, IServiceProvider serviceProvider)
+    public MainViewModel(CommonSettings commonSettings, UserSettings userSettings, AppState appState, IServiceProvider serviceProvider)
     {
         _commonSettings = commonSettings;
         _userSettings = userSettings;
@@ -122,7 +123,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
 
         MainMenu = new MainMenuViewModel(userSettings) { IsVisible = false };
 
-        BackLink.Default = new BackLink(Settings, userSettings, serviceProvider);
+        BackLink.Default = new BackLink(Settings, userSettings, appState, serviceProvider);
 
         Cancel = new CustomCommand(Cancel_Executed);
 
@@ -337,13 +338,13 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
         ActiveView = networkConnection;
     }
 
-    private async void Best_Executed(object arg)
+    private async void Best_Executed(object? arg)
     {
         await Task.Delay(500);
         ActiveView = new ContentBox { Data = new BestPlayersViewModel(), Title = Resources.MainMenu_BestPlayers, Cancel = Cancel };
     }
 
-    private async void About_Executed(object arg)
+    private async void About_Executed(object? arg)
     {
         await Task.Delay(500);
         ActiveView = new ContentBox { Data = new AboutViewModel(), Title = Resources.MainMenu_About, Cancel = Cancel };

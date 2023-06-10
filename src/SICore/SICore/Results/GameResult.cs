@@ -6,42 +6,62 @@
 public sealed class GameResult
 {
     /// <summary>
+    /// Game name.
+    /// </summary>
+    public string Name { get; set; } = "";
+
+    /// <summary>
+    /// Game start time.
+    /// </summary>
+    public DateTimeOffset StartTime { get; set; }
+
+    /// <summary>
+    /// Game duration.
+    /// </summary>
+    public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+
+    /// <summary>
     /// Имя пакета
     /// </summary>
-    public string PackageName { get; set; }
+    public string? PackageName { get; set; }
 
     /// <summary>
-    /// Уникальный идентификатор пакета
+    /// Game package hash.
     /// </summary>
-    public string PackageID { get; set; }
+    public string? PackageHash { get; set; }
 
     /// <summary>
-    /// Выигрыши участников
+    /// Game package authors.
     /// </summary>
-    public List<PersonResult> Results { get; set; } = new List<PersonResult>();
+    public string[] PackageAuthors { get; set; } = Array.Empty<string>();
 
     /// <summary>
-    /// Апеллированные верные ответы
+    /// Players results.
     /// </summary>
-    public List<AnswerInfo> ApellatedQuestions { get; set; } = new List<AnswerInfo>();
+    public Dictionary<string, int> Results { get; } = new();
 
     /// <summary>
-    /// Полученные неверные ответы
+    /// Persons reviews.
     /// </summary>
-    public List<AnswerInfo> WrongVersions { get; set; } = new List<AnswerInfo>();
+    public Dictionary<string, string> Reviews { get; } = new();
 
     /// <summary>
-    /// Помеченные вопросы
+    /// Automatically accepted answers.
     /// </summary>
-    public List<AnswerInfo> MarkedQuestions { get; set; } = new List<AnswerInfo>();
+    public List<QuestionReport> AcceptedAnswers { get; } = new();
 
     /// <summary>
-    /// Лог ошибок
+    /// Appellated right answers.
     /// </summary>
-    public string ErrorLog { get; set; } = "";
+    public List<QuestionReport> ApellatedAnswers { get; } = new();
 
     /// <summary>
-    /// Комментарии участника
+    /// Wrong answers.
     /// </summary>
-    public string Comments { get; set; } = "";
+    public List<QuestionReport> RejectedAnswers { get; } = new();
+
+    /// <summary>
+    /// Complained by users questions.
+    /// </summary>
+    public List<QuestionReport> ComplainedQuestions { get; } = new();
 }

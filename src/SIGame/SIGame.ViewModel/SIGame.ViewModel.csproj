@@ -13,6 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="VKhil.SIContentService.Client" Version="1.0.10" />
+    <PackageReference Include="VKhil.SIStatisticsService.Client" Version="1.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\Notions\Notions.csproj" />
@@ -20,7 +21,6 @@
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
     <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
-    <ProjectReference Include="..\SI.GameResultService.Client\SI.GameResultService.Client.csproj" />
     <ProjectReference Include="..\SIGame.ViewModel.Web\SIGame.ViewModel.Web.csproj" />
   </ItemGroup>
   <ItemGroup>

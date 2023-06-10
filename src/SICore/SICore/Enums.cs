@@ -224,7 +224,7 @@ public enum DialogModes
 }
 
 /// <summary>
-/// Типы решений
+/// Defines game decision types.
 /// </summary>
 public enum DecisionType
 {
@@ -288,8 +288,9 @@ public enum DecisionType
     /// Решение игроков о правильности ответа
     /// </summary>
     AppellationDecision,
+
     /// <summary>
-    /// Отправка отчёта
+    /// Waiting for the players reviews.
     /// </summary>
     Reporting
 }

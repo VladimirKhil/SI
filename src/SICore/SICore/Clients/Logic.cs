@@ -42,7 +42,9 @@ public abstract class Logic<D> : ILogic
 
     internal int CurrentTask { get; private set; } = -1;
 
-    internal int NextTask => _oldTasks.Any() ? _oldTasks.Peek().Item1 : -1;
+    public bool IsExecutionPaused => _oldTasks.Any() && CurrentTask == -1;
+
+    internal int PendingTask => IsExecutionPaused ? _oldTasks.Peek().Item1 : CurrentTask;
 
     protected IEnumerable<Tuple<int, int, int>> OldTasks => _oldTasks;
 

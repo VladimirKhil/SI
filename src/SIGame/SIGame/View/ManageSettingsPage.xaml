@@ -10,7 +10,6 @@
     d:DesignWidth="300"
     FontFamily="{StaticResource Font}"
     Title="{x:Static lp:Resources.SettingsManagement}">
-
     <StackPanel DataContext="{Binding Settings}" TextBlock.FontSize="25" Margin="10">
         <Button Style="{StaticResource SIButton}" IsEnabled="{Binding IsEditable}" Padding="18,6" Command="{Binding SetDefault}" Content="{x:Static lp:Resources.Settings_Default}" />
         <Button Style="{StaticResource SIButton}" IsEnabled="{Binding IsEditable}" Margin="0,-1,0,0" Padding="18,6" Command="{Binding Export}" Content="{x:Static lp:Resources.Settings_Export}" />

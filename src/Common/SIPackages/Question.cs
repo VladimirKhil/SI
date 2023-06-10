@@ -2,6 +2,7 @@
 using SIPackages.TypeConverters;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Text;
 using System.Xml;
 
 namespace SIPackages;
@@ -15,6 +16,8 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// Question price that means empty question.
     /// </summary>
     public const int InvalidPrice = -1;
+
+    private const char UniversalLineSeparatorChar = '\n';
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private int _price;
@@ -41,6 +44,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question type name.
     /// </summary>
+    /// <remarks>
+    /// Replaces deprecated <see cref="Type" /> property.
+    /// </remarks>
     public string? TypeName
     {
         get => _typeName;
@@ -55,6 +61,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question script.
     /// </summary>
+    /// <remarks>
+    /// Replaces deprecated <see cref="Scenario" /> property.
+    /// </remarks>
     public Script? Script { get; set; }
 
     /// <summary>
@@ -545,4 +554,106 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(base.GetHashCode(), Price, Type, Scenario, Script, Parameters, Right, Wrong);
+
+    /// <summary>
+    /// Gets question text part.
+    /// </summary>
+    public string GetText()
+    {
+        if (TypeName == null)
+        {
+            return GetTextFromScenario();
+        }
+
+        if (Script == null)
+        {
+            if (Parameters == null)
+            {
+                return "";
+            }
+
+            if (Parameters.TryGetValue(QuestionParameterNames.Question, out var question))
+            {
+                return GetTextFromContent(question);
+            }
+
+            return "";
+        }
+
+        var result = new StringBuilder();
+
+        for (int i = 0; i < Script.Steps.Count; i++)
+        {
+            if (Script.Steps[i].Type == StepTypes.AskAnswer)
+            {
+                break;
+            }
+
+            if (Script.Steps[i].Type != StepTypes.ShowContent)
+            {
+                continue;
+            }
+
+            if (!Script.Steps[i].Parameters.TryGetValue(StepParameterNames.Content, out var content))
+            {
+                continue;
+            }
+
+            if (result.Length > 0)
+            {
+                result.Append(UniversalLineSeparatorChar);
+            }
+
+            result.Append(GetTextFromContent(content));
+        }
+
+        return result.ToString();
+    }
+
+    private static string GetTextFromContent(StepParameter content)
+    {
+        if (content.ContentValue == null)
+        {
+            return "";
+        }
+
+        var result = new StringBuilder();
+
+        foreach (var contentItem in content.ContentValue)
+        {
+            if (contentItem.Type != AtomTypes.Text)
+            {
+                continue;
+            }
+
+            if (result.Length > 0)
+            {
+                result.Append(UniversalLineSeparatorChar);
+            }
+
+            result.Append(contentItem.Value);
+        }
+
+        return result.ToString();
+    }
+
+    private string GetTextFromScenario()
+    {
+        var questionText = new StringBuilder();
+
+        foreach (var atom in Scenario)
+        {
+            if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
+            {
+                if (questionText.Length > 0)
+                {
+                    questionText.Append(UniversalLineSeparatorChar);
+                }
+
+                questionText.Append(atom.Text);
+            }
+        }
+
+        return questionText.ToString();
+    }
 }

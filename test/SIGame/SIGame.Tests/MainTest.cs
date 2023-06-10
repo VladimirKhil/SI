@@ -7,6 +7,7 @@ using SICore.PlatformSpecific;
 using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
+using SIGame.ViewModel.Settings;
 using SIStorageService.Client;
 using SIStorageService.ViewModel;
 using SIUI.ViewModel;
@@ -43,6 +44,8 @@ public class MainTest
             UseSignalRConnection = useSignalRConnection
         };
 
+        var appState = new AppState();
+
         var configurationBuilder = new ConfigurationBuilder();
 
         configurationBuilder.AddJsonFile("appsettings.json");
@@ -59,7 +62,7 @@ public class MainTest
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
 
-        var mainViewModel = new MainViewModel(commonSettings, userSettings, serviceProvider);
+        var mainViewModel = new MainViewModel(commonSettings, userSettings, appState, serviceProvider);
 
         await mainViewModel.Open.ExecuteAsync(null);
 

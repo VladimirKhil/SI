@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SIGame.Helpers;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -36,7 +37,7 @@ public sealed class DropDownButton : Button
         }
         catch (DivideByZeroException) // at void System.Windows.Vector.Normalize()
         {
-            MessageBox.Show("DropDownButton Error. Contact game author", App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            MessageBox.Show("DropDownButton Error. Contact game author", AppConstants.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
     }
 }
