@@ -13,10 +13,12 @@ using SIPackages.Providers;
 using SIUI.Model;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using R = SICore.Properties.Resources;
 
 namespace SICore;
+
+// TODO: all logic based on RoundTypes.Final or GameModes.Tv/Sport must be eliminated
+// All rules must be handled by game engine
 
 /// <summary>
 /// Executes SIGame logic implemented as a state machine.
@@ -253,7 +255,7 @@ public sealed class GameLogic : Logic<GameData>
         InitThemes(themes);
 
         // Filling initial questions table
-        _data.ThemeInfo = new bool[themes.Length];
+        _data.ThemeInfoShown = new bool[themes.Length];
 
         var maxQuestionsInTheme = themes.Max(t => t.Questions.Count);
 
@@ -291,7 +293,7 @@ public sealed class GameLogic : Logic<GameData>
     private void Engine_Theme(Theme theme)
     {
         _data.Theme = theme;
-        ProcessTheme(theme, -1);
+        ScheduleExecution(Tasks.Theme, 1);
     }
 
     private void Engine_Question(Question question)
@@ -342,9 +344,9 @@ public sealed class GameLogic : Logic<GameData>
         _data.QuestionHistory.Clear();
 
         // Если информация о теме ещё не выводилась
-        if (_data.Settings.AppSettings.GameMode == GameModes.Tv && !_data.ThemeInfo[themeIndex])
+        if (_data.Settings.AppSettings.GameMode == GameModes.Tv && !_data.ThemeInfoShown[themeIndex])
         {
-            _data.ThemeInfo[themeIndex] = true;
+            _data.ThemeInfoShown[themeIndex] = true;
             ScheduleExecution(Tasks.Theme, 10, 1, true);
         }
         else
@@ -1610,7 +1612,7 @@ public sealed class GameLogic : Logic<GameData>
                         break;
 
                     case Tasks.Theme:
-                        ProcessTheme(_data.Theme, arg);
+                        OnTheme(_data.Theme, arg);
                         break;
 
                     case Tasks.QuestionType:
@@ -2606,6 +2608,20 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         if (arg == 2)
+        {
+            var themeComments = _data.Theme.Info.Comments.Text;
+
+            if (themeComments.Length > 0)
+            {
+                _gameActions.ShowmanReplic(themeComments);
+                ScheduleExecution(Tasks.QuestionType, 20, arg + 1);
+                return;
+            }
+
+            arg++;
+        }
+
+        if (arg == 3)
         {
             _data.Type = _data.Question.Type;
             var typeName = _data.Question.TypeName ?? _data.Question.Type.Name;
@@ -3858,11 +3874,11 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
-    private void ProcessTheme(Theme theme, int arg)
+    private void OnTheme(Theme theme, int arg)
     {
         var informed = false;
 
-        if (arg == -1)
+        if (arg == 0)
         {
             _gameActions.SendMessageWithArgs(Messages.Theme, theme.Name);
             arg++;
@@ -3902,49 +3918,25 @@ public sealed class GameLogic : Logic<GameData>
             }
         }
 
-        if (arg == 3)
-        {
-            if (theme.Info.Comments.Text.Length > 0)
-            {
-                informed = true;
-                var res = new StringBuilder();
-                res.AppendFormat(OfObjectPropertyFormat, LO[nameof(R.PComments)], LO[nameof(R.OfTheme)], theme.Info.Comments.Text);
-                _gameActions.ShowmanReplic(res.ToString());
-            }
-        }
-
-        if (arg < 3)
+        if (arg < 2)
         {
             ScheduleExecution(Tasks.Theme, 20, arg + 1);
         }
-        else if (informed)
-        {
-            if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
-            {
-                ScheduleExecution(Tasks.MoveNext, 20);
-            }
-            else if (_data.Round.Type != RoundTypes.Final)
-            {
-                ScheduleExecution(Tasks.QuestionType, 20, 1);
-            }
-            else
-            {
-                ScheduleExecution(Tasks.MoveNext, 20);
-            }
-        }
         else
         {
+            var delay = informed ? 20 : 1;
+
             if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
             {
-                ScheduleExecution(Tasks.MoveNext, 1, 0);
+                ScheduleExecution(Tasks.MoveNext, delay);
             }
             else if (_data.Round.Type != RoundTypes.Final)
             {
-                ScheduleExecution(Tasks.QuestionType, 1, 1, force: !informed);
+                ScheduleExecution(Tasks.QuestionType, delay, 1, force: !informed);
             }
             else
             {
-                ScheduleExecution(Tasks.MoveNext, 1);
+                ScheduleExecution(Tasks.MoveNext, delay);
             }
         }
     }

@@ -25,12 +25,12 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
     public int PreviousQuest { get; set; } = -1;
 
     /// <summary>
-    /// Выбранная тема
+    /// Currently played theme index.
     /// </summary>
     public int ThemeIndex { get; set; } = -1;
-    
+
     /// <summary>
-    /// Выбранный вопрос
+    /// Currently played question index.
     /// </summary>
     public int QuestionIndex { get; set; } = -1;
 
