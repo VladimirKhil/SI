@@ -29,7 +29,7 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     [XmlAttribute]
     [DefaultValue("")]
     [DataMember]
-    public string NetworkGameName { get; set; }
+    public string NetworkGameName { get; set; } = "";
 
     /// <summary>
     /// Пароль сетевой игры
@@ -37,7 +37,12 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     [XmlAttribute]
     [DefaultValue("")]
     [DataMember]
-    public string NetworkGamePassword { get; set; }
+    public string NetworkGamePassword { get; set; } = "";
+
+    /// <summary>
+    /// Network voice chat link.
+    /// </summary>
+    public string NetworkVoiceChat { get; set; } = "";
 
     [XmlAttribute]
     [DefaultValue(false)]

@@ -1359,7 +1359,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
 
-    public void OnGameMetadata(string gameName, string packageName, string contactUri)
+    public void OnGameMetadata(string gameName, string packageName, string contactUri, string voiceChatUri)
     {
         var gameInfo = new StringBuilder();
 
@@ -1368,6 +1368,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         gameInfo.AppendFormat(R.GameName).Append(": ").Append(coersedGameName).AppendLine();
         gameInfo.AppendFormat(R.PackageName).Append(": ").Append(packageName).AppendLine();
         gameInfo.AppendFormat(R.ContactUri).Append(": ").Append(contactUri).AppendLine();
+        gameInfo.AppendFormat(R.VoiceChatLink).Append(": ").Append(voiceChatUri).AppendLine();
 
         ClientData.GameMetadata = gameInfo.ToString();
     }

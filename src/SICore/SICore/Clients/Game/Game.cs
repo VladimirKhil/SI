@@ -155,7 +155,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             Messages.GameMetadata,
             ClientData.GameName,
             _logic.Engine.PackageName,
-            _logic.Engine.ContactUri);
+            _logic.Engine.ContactUri,
+            ClientData.Settings.NetworkVoiceChat);
 
         _gameActions.SendMessageToWithArgs(person, Messages.Hostname, ClientData.HostName ?? "");
     }
@@ -465,7 +466,6 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             try
             {
-                var res = new StringBuilder();
                 // Action according to protocol
                 switch (args[0])
                 {
@@ -473,6 +473,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                         #region GameInfo
 
                         // Информация о текущей игре для подключающихся по сети
+                        var res = new StringBuilder();
+                        
                         res.Append(Messages.GameInfo);
                         res.Append(Message.ArgsSeparatorChar).Append(ClientData.Settings.NetworkGameName);
                         res.Append(Message.ArgsSeparatorChar).Append(ClientData.HostName);

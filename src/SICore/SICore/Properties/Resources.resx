@@ -798,4 +798,7 @@
   <data name="CannotSetHostToYourself" xml:space="preserve">
     <value>Your are host already!</value>
   </data>
+  <data name="VoiceChatLink" xml:space="preserve">
+    <value>Voice chat (Discord)</value>
+  </data>
 </root>

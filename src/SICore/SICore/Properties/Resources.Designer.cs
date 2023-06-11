@@ -1933,6 +1933,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Voice chat link.
+        /// </summary>
+        public static string VoiceChatLink {
+            get {
+                return ResourceManager.GetString("VoiceChatLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Here we go!; We&apos;re starting!.
         /// </summary>
         public static string WeBeginRound {

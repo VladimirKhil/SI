@@ -803,4 +803,7 @@
   <data name="CannotSetHostToYourself" xml:space="preserve">
     <value>Вы уже хост!</value>
   </data>
+  <data name="VoiceChatLink" xml:space="preserve">
+    <value>Голосовой чат (Discord)</value>
+  </data>
 </root>

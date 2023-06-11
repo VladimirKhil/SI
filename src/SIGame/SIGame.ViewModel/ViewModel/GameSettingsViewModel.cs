@@ -115,6 +115,19 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         }
     }
 
+    /// <summary>
+    /// Network voice chat link.
+    /// </summary>
+    public string NetworkVoiceChat
+    {
+        get => _model.NetworkVoiceChat;
+        set
+        {
+            _model.NetworkVoiceChat = value;
+            OnPropertyChanged();
+        }
+    }
+
     public int PlayersCount
     {
         get => _model.PlayersCount;

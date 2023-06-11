@@ -166,5 +166,5 @@ public interface IViewerLogic : ILogic
 
     void SetCaption(string caption) { }
 
-    void OnGameMetadata(string gameName, string packageName, string contactUri) { }
+    void OnGameMetadata(string gameName, string packageName, string contactUri, string voiceChatUri) { }
 }

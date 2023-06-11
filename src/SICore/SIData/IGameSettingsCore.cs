@@ -27,6 +27,8 @@ public interface IGameSettingsCore<out T> where T: IAppSettingsCore
 
     string NetworkGamePassword { get; }
 
+    string NetworkVoiceChat { get; }
+
     /// <summary>
     /// Defines a private game.
     /// </summary>

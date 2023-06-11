@@ -11,6 +11,7 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:ps="clr-namespace:SIGame.ViewModel.PackageSources;assembly=SIGame.ViewModel"
     xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    xmlns:scp="clr-namespace:SICore.Properties;assembly=SICore"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:data="clr-namespace:SIData;assembly=SIData"
     mc:Ignorable="d"
@@ -303,6 +304,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             
@@ -329,7 +331,7 @@
                 VerticalAlignment="Center"
                 Margin="5"
                 Padding="1" />
-            
+
             <TextBlock
                 Style="{StaticResource GameServerOnlyHeader}"
                 Grid.Row="1"
@@ -374,6 +376,45 @@
                     👁
                 </ToggleButton>
             </Grid>
+
+            <TextBlock
+                Grid.Row="2"
+                VerticalAlignment="Center"
+                FontWeight="Medium"
+                Text="{x:Static scp:Resources.VoiceChatLink}">
+
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource GameServerOnlyHeader}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Model.AppSettings.Oral}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Background="White"
+                FontWeight="Medium"
+                Text="{Binding NetworkVoiceChat, UpdateSourceTrigger=PropertyChanged}"
+                MaxLength="50"
+                VerticalAlignment="Center"
+                Margin="5"
+                Padding="1">
+
+                <TextBox.Style>
+                    <Style TargetType="TextBox" BasedOn="{StaticResource GameServerOnly}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Model.AppSettings.Oral}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
             
             <TextBlock Style="{StaticResource DirectConnectOnlyHeader}" Text="{x:Static lp:Resources.PortNumber}" FontWeight="Medium" />
             
@@ -412,7 +453,7 @@
             
             <TextBlock
                 Style="{StaticResource DirectConnectOnly}"
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.ColumnSpan="4"
                 Foreground="Black"
                 Margin="5,0,5,5"
@@ -423,11 +464,11 @@
                 Text="{x:Static lp:Resources.QuestionPack}"
                 Style="{StaticResource Header}"
                 Margin="5,5,5,0"
-                Grid.Row="2"
+                Grid.Row="3"
                 FontWeight="SemiBold"
                 VerticalAlignment="Center" />
 
-            <DockPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
+            <DockPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,5,0,0">
                 <l:DropDownButton
                     ToolTip="{x:Static lp:Resources.Select}"
                     Width="35"
@@ -493,10 +534,10 @@
                     TextTrimming="CharacterEllipsis" />
             </DockPanel>
 
-            <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.Role}" Style="{StaticResource Header}" FontWeight="Medium" Margin="5,5,0,0" />
+            <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Role}" Style="{StaticResource Header}" FontWeight="Medium" Margin="5,5,0,0" />
 
             <ComboBox
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="1"
                 Margin="5,10,5,5"
                 FontWeight="Regular"
@@ -515,9 +556,9 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="{x:Static lp:Resources.Showman}" FontWeight="Medium" />
+            <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="{x:Static lp:Resources.Showman}" FontWeight="Medium" />
             
-            <StackPanel Grid.Row="5" HorizontalAlignment="Stretch">
+            <StackPanel Grid.Row="6" HorizontalAlignment="Stretch">
                 <ToggleButton
                     Style="{StaticResource showmanCBStyle}"
                     TextBlock.FontWeight="Medium"
@@ -531,7 +572,7 @@
                     ItemTemplate="{StaticResource ShowmanTemplate}" />
             </StackPanel>
             
-            <Grid Grid.Row="5" Grid.Column="1">
+            <Grid Grid.Row="6" Grid.Column="1">
                 <StackPanel VerticalAlignment="Bottom">
                     <Slider
                         Minimum="2"
@@ -547,7 +588,7 @@
                 </StackPanel>
             </Grid>
             
-            <ScrollViewer Grid.Row="7" Grid.ColumnSpan="4" Margin="0,19,0,0" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Grid.Row="8" Grid.ColumnSpan="4" Margin="0,19,0,0" VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding Players}" VerticalAlignment="Top">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -586,7 +627,7 @@
                 Padding="30,4"
                 FontSize="17"
                 FontWeight="Medium"
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="3"
                 Background="{StaticResource WindowBackground}"
                 HorizontalAlignment="Stretch"
@@ -595,7 +636,7 @@
                 Content="{x:Static lp:Resources.StartGame}" />
             
             <Button
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="3"
                 FontWeight="Medium"
                 Style="{StaticResource SIButton}"
@@ -620,7 +661,7 @@
                 </Button.ContentTemplate>
             </Button>
             
-            <Grid Grid.Row="3" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2">
+            <Grid Grid.Row="4" Grid.RowSpan="2" Grid.Column="2" Grid.ColumnSpan="2">
                 <ContentControl
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
