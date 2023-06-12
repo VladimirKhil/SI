@@ -21,6 +21,11 @@ public static class Messages
     public const string Answer = "ANSWER";
 
     /// <summary>
+    /// Answer version. Denotes a preliminary answer printed by player.
+    /// </summary>
+    public const string AnswerVersion = "ANSWER_VERSION";
+
+    /// <summary>
     /// Требование апелляции
     /// </summary>
     public const string Apellate = "APELLATE";

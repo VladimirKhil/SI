@@ -282,34 +282,6 @@ public sealed class TvEngine : EngineBase
         }
     }
 
-    private void OnFinalQuestion()
-    {
-        if (QuestionEngine != null)
-        {
-            if (!QuestionEngine.PlayNext())
-            {
-                OnQuestionFinished();
-                Stage = GameStage.QuestionPostInfo;
-                MoveNext();
-            }
-
-            return;
-        }
-
-        var playMode = PlayQuestionAtom();
-
-        if (playMode == QuestionPlayMode.AlreadyFinished)
-        {
-            Stage = GameStage.FinalThink;
-            MoveNext();
-        }
-        else
-        {
-            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, false);
-            AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
-        }
-    }
-
     public override Tuple<int, int, int> MoveBack()
     {
         var data = _history.Pop();

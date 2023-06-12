@@ -611,6 +611,10 @@ public sealed class Game : Actor<GameData, GameLogic>
                         OnPass(message);
                         break;
 
+                    case Messages.AnswerVersion:
+                        OnAnswerVersion(message, args);
+                        break;
+
                     case Messages.Answer:
                         OnAnswer(message, args);
                         break;
@@ -1798,6 +1802,44 @@ public sealed class Game : Actor<GameData, GameLogic>
             // Иногда кто-то отваливается, и процесс затягивается на 60 секунд. Это недопустимо. Дадим 3 секунды
             _logic.ScheduleExecution(Tasks.MoveNext, 30 + ClientData.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10, force: true);
         }
+    }
+
+    private void OnAnswerVersion(Message message, string[] args)
+    {
+        if (ClientData.Decision != DecisionType.Answering || args[1].Length == 0)
+        {
+            return;
+        }
+
+        if (ClientData.Round != null && ClientData.Round.Type == RoundTypes.Final)
+        {
+            ClientData.AnswererIndex = -1;
+
+            for (var i = 0; i < ClientData.Players.Count; i++)
+            {
+                if (ClientData.Players[i].Name == message.Sender && ClientData.Players[i].InGame)
+                {
+                    ClientData.AnswererIndex = i;
+                    break;
+                }
+            }
+
+            if (ClientData.AnswererIndex == -1)
+            {
+                return;
+            }
+        }
+        else if (!ClientData.IsWaiting || ClientData.Answerer != null && ClientData.Answerer.Name != message.Sender)
+        {
+            return;
+        }
+
+        if (ClientData.Answerer == null || !ClientData.Answerer.IsHuman)
+        {
+            return;
+        }
+
+        ClientData.Answerer.Answer = args[1];
     }
 
     private void OnAnswer(Message message, string[] args)

@@ -18,6 +18,8 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
     //public TableInfoViewModel TInfo { get; }
 
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
     public PlayerHumanLogic(
         ViewerData data,
         TableInfoViewModel tableInfoViewModel,
@@ -64,11 +66,37 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
     public void EndThink() => _data.PlayerDataExtensions.Pass.CanBeExecuted = false;
 
-    public void Answer() => _data.BackLink.OnFlash();
-
-    void SendAnswer(object sender, EventArgs e)
+    public void Answer()
     {
+        _data.BackLink.OnFlash();
 
+        StartSendingVersion(_cancellationTokenSource.Token);
+    }
+
+    /// <summary>
+    /// Periodically sends player answer to server.
+    /// </summary>
+    private async void StartSendingVersion(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var version = _data.PersonDataExtensions.Answer;
+
+            do
+            {
+                await Task.Delay(3000, cancellationToken);
+
+                if (_data.PersonDataExtensions.Answer != version)
+                {
+                    _data.PlayerDataExtensions.SendAnswerVersion.Execute(null);
+                    version = _data.PersonDataExtensions.Answer;
+                }
+            } while (_data.DialogMode == DialogModes.Answer && !cancellationToken.IsCancellationRequested);
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 
     public void Cat() => _data.BackLink.OnFlash();
@@ -200,5 +228,13 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
     public void OnPlayerAtom(string[] mparams)
     {
         
+    }
+
+    protected override ValueTask DisposeAsync(bool disposing)
+    {
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+
+        return base.DisposeAsync(disposing);
     }
 }

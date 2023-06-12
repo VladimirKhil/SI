@@ -1883,6 +1883,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             ClientData.PersonDataExtensions.IsWrong =
             ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
+            ClientData.PlayerDataExtensions.SendAnswerVersion =
             ClientData.PlayerDataExtensions.SendAnswer =
             ClientData.ShowmanDataExtensions.ChangeSums =
             ClientData.ShowmanDataExtensions.ChangeSums2 =

@@ -35,6 +35,7 @@ public sealed class Player : Viewer<IPlayerLogic>
             ReleaseGameButton();
         }) { CanBeExecuted = true };
 
+        ClientData.PlayerDataExtensions.SendAnswerVersion = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.AnswerVersion, ClientData.PersonDataExtensions.Answer); });
         ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
         
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>

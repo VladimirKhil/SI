@@ -1,16 +1,37 @@
-﻿<UserControl x:Class="SIGame.AnswerView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:lp="clr-namespace:SIGame.Properties" 
-             Loaded="UserControl_Loaded">
+﻿<UserControl
+    x:Class="SIGame.AnswerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:lp="clr-namespace:SIGame.Properties" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:sc="clr-namespace:SICore;assembly=SICore"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance sc:ViewerData}"
+    Loaded="UserControl_Loaded">
     <StackPanel Orientation="Horizontal">
-        <TextBox Margin="10" Text="{Binding PersonDataExtensions.Answer, UpdateSourceTrigger=PropertyChanged}" Width="450" Name="input" FontSize="20" Padding="0,2" VerticalAlignment="Center" VerticalContentAlignment="Center">
+        <TextBox
+            Margin="10"
+            Text="{Binding PersonDataExtensions.Answer, UpdateSourceTrigger=PropertyChanged}"
+            Width="450"
+            Name="input"
+            FontSize="20"
+            Padding="0,2"
+            VerticalAlignment="Center"
+            VerticalContentAlignment="Center"
+            CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
+            ContextMenu="{x:Null}">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding PlayerDataExtensions.SendAnswer}" />
             </TextBox.InputBindings>
         </TextBox>
-        <Button Style="{StaticResource SIButton}" Content="{x:Static lp:Resources.Send}" Padding="10,5" Margin="0,5,10,5"
-                FontSize="25" Command="{Binding PlayerDataExtensions.SendAnswer}" />
+        
+        <Button
+            Style="{StaticResource SIButton}"
+            Content="{x:Static lp:Resources.Send}"
+            Padding="10,5"
+            Margin="0,5,10,5"
+            FontSize="25"
+            Command="{Binding PlayerDataExtensions.SendAnswer}" />
     </StackPanel>
 </UserControl>

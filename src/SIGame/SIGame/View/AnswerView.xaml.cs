@@ -2,21 +2,24 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace SIGame
-{
-    /// <summary>
-    /// Логика взаимодействия для AnswerView.xaml
-    /// </summary>
-    public partial class AnswerView : UserControl
-    {
-        public AnswerView()
-        {
-            InitializeComponent();
-        }
+namespace SIGame;
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+/// <summary>
+/// Provides interaction logic for AnswerView.xaml.
+/// </summary>
+public partial class AnswerView : UserControl
+{
+    public AnswerView() => InitializeComponent();
+
+    private void UserControl_Loaded(object sender, RoutedEventArgs e) => Keyboard.Focus(input);
+
+    private void TextBox_PreviewExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (e.Command == ApplicationCommands.Copy ||
+            e.Command == ApplicationCommands.Cut ||
+            e.Command == ApplicationCommands.Paste)
         {
-            Keyboard.Focus(input);
+            e.Handled = true;
         }
     }
 }

@@ -95,6 +95,10 @@ public sealed class SportEngine : EngineBase
                 OnQuestion();
                 break;
 
+            case GameStage.FinalQuestion:
+                OnFinalQuestion();
+                break;
+
             case GameStage.RightAnswer:
                 ProcessRightAnswer();
                 break;

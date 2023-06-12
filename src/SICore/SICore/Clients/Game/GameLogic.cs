@@ -2218,8 +2218,11 @@ public sealed class GameLogic : Logic<GameData>
 
             _gameActions.SendMessage(Messages.Cancel, _data.Answerer.Name);
 
-            _data.Answerer.Answer = LO[nameof(R.IDontKnow)];
-            _data.Answerer.AnswerIsWrong = true;
+            if (string.IsNullOrEmpty(_data.Answerer.Answer))
+            {
+                _data.Answerer.Answer = LO[nameof(R.IDontKnow)];
+                _data.Answerer.AnswerIsWrong = true;
+            }
         }
         else
         {
@@ -2229,9 +2232,9 @@ public sealed class GameLogic : Logic<GameData>
                 {
                     _data.Players[i].Answer = LO[nameof(R.IDontKnow)];
                     _data.Players[i].AnswerIsWrong = true;
-
-                    _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
                 }
+
+                _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
             }
 
             _data.IsWaiting = true;
@@ -3881,7 +3884,6 @@ public sealed class GameLogic : Logic<GameData>
         if (arg == 0)
         {
             _gameActions.SendMessageWithArgs(Messages.Theme, theme.Name);
-            arg++;
         }
 
         if (arg == 1)
