@@ -604,6 +604,24 @@ public sealed class ViewerData : Data
         }
     }
 
+    private string? _voiceChatUrl = null;
+
+    /// <summary>
+    /// Voice chat url.
+    /// </summary>
+    public string? VoiceChatUri
+    {
+        get => _voiceChatUrl;
+        set
+        {
+            if (_voiceChatUrl != value)
+            {
+                _voiceChatUrl = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     internal event Action? AutoReadyChanged;
 
     private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();

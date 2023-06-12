@@ -1092,4 +1092,7 @@
   <data name="SetHost" xml:space="preserve">
     <value>Set host</value>
   </data>
+  <data name="VoiceChat" xml:space="preserve">
+    <value>Voice chat</value>
+  </data>
 </root>

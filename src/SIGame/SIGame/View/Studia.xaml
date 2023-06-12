@@ -326,7 +326,7 @@
             </Grid>
 
             <Expander Grid.Column="4" IsExpanded="{Binding Data.IsChatOpened}" Style="{DynamicResource ExpanderStyle1}">
-                <local:GameChat x:Name="chat" DataContext="{Binding Data}" />
+                <local:GameChat />
             </Expander>
 
             <local:StudiaCommandPanel x:Name="studiaCommandPanel" Grid.Column="4" Grid.Row="1" />

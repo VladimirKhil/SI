@@ -1092,4 +1092,7 @@
   <data name="SetHost" xml:space="preserve">
     <value>Сделать хостом</value>
   </data>
+  <data name="VoiceChat" xml:space="preserve">
+    <value>Голосовой чат</value>
+  </data>
 </root>

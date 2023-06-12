@@ -2905,6 +2905,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Voice chat.
+        /// </summary>
+        public static string VoiceChat {
+            get {
+                return ResourceManager.GetString("VoiceChat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Volume control.
         /// </summary>
         public static string VolumeControl {

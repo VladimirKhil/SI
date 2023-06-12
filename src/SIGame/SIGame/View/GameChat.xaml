@@ -10,45 +10,46 @@
     Background="#88000000"
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lc="clr-namespace:SIGame.Converters"
-    xmlns:sc="clr-namespace:SICore;assembly=SICore"
-    d:DataContext="{d:DesignInstance sc:ViewerData}"
+    xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}"
     DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
         <SolidColorBrush x:Key="SemiTransparentLightBlueVioletBrushKey">#FFC0CFF4</SolidColorBrush>
-        <CollectionViewSource x:Key="Persons" Source="{Binding AllPersons}" />
-        <CollectionViewSource x:Key="Banned" Source="{Binding Banned}" />
+        <CollectionViewSource x:Key="Persons" Source="{Binding Data.AllPersons}" />
+        <CollectionViewSource x:Key="Banned" Source="{Binding Data.Banned}" />
         <lc:HostNameConverter x:Key="HostNameConverter" />
     </UserControl.Resources>
     
     <TabControl Padding="0" BorderThickness="0" FontSize="19">
         <TabItem Header="💬" ToolTip="{x:Static lp:Resources.Messages}" Style="{StaticResource StudiaTab}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="1" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <DockPanel>
+                <Button
+                    DockPanel.Dock="Bottom"
+                    Style="{StaticResource SIButtonSimple}"
+                    Background="{StaticResource WindowBackground}"
+                    Margin="-1,-1,0,-1"
+                    Padding="20,4"
+                    Command="{Binding OpenLink}"
+                    CommandParameter="{Binding Data.VoiceChatUri}"
+                    ToolTip="{Binding Data.VoiceChatUri}"
+                    Visibility="{Binding Data.VoiceChatUri, Converter={StaticResource NotNullToVisibilityConverter1}}"
+                    FontSize="18"
+                    TextBlock.LineHeight="18"
+                    Content="{x:Static lp:Resources.VoiceChat}" />
                 
                 <TextBox
-                    Grid.Row="1"
-                    Grid.ColumnSpan="3"
+                    DockPanel.Dock="Bottom"
                     BorderThickness="0,1,0,0"
                     Name="input"
                     Padding="0,2"
-                    Text="{Binding PrintedText, UpdateSourceTrigger=PropertyChanged}"
+                    Text="{Binding Data.PrintedText, UpdateSourceTrigger=PropertyChanged}"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
                     <TextBox.InputBindings>
-                        <KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
+                        <KeyBinding Key="Enter" Command="{Binding Data.SendMessageCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>
                 
                 <RichTextBox
-                    Grid.ColumnSpan="3"
                     BorderThickness="0"
                     Name="text"
                     Padding="1,10"
@@ -56,7 +57,7 @@
                     IsReadOnly="True"
                     Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}"
                     FontSize="15" />
-            </Grid>
+            </DockPanel>
         </TabItem>
 
         <TabItem Header="👤" ToolTip="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
@@ -67,7 +68,7 @@
                         Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,0,-1"
                         Padding="20,4"
-                        Command="{Binding Kick}"
+                        Command="{Binding Data.Kick}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                         FontSize="18"
                         TextBlock.LineHeight="18"
@@ -78,7 +79,7 @@
                         Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,-1,-1"
                         Padding="20,4"
-                        Command="{Binding Ban}"
+                        Command="{Binding Data.Ban}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                         FontSize="18"
                         TextBlock.LineHeight="18"
@@ -91,7 +92,7 @@
                     Background="{StaticResource WindowBackground}"
                     Margin="-1,-1,-1,-1"
                     Padding="20,4"
-                    Command="{Binding SetHost}"
+                    Command="{Binding Data.SetHost}"
                     CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                     FontSize="18"
                     TextBlock.LineHeight="18"
@@ -134,7 +135,7 @@
                     Background="{StaticResource WindowBackground}"
                     Margin="-1,-1,-1,-1"
                     Padding="20,4"
-                    Command="{Binding Unban}"
+                    Command="{Binding Data.Unban}"
                     CommandParameter="{Binding Source={StaticResource Banned},Path=CurrentItem}"
                     FontSize="18"
                     TextBlock.LineHeight="18"
@@ -161,7 +162,7 @@
 
         <TabItem Header="ℹ" ToolTip="{x:Static lp:Resources.GameInfo}" Style="{StaticResource StudiaTab}">
             <TextBox
-                Text="{Binding GameMetadata}"
+                Text="{Binding Data.GameMetadata}"
                 Padding="10"
                 IsReadOnly="True"
                 Foreground="Black"

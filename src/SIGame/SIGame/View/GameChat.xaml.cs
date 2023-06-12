@@ -1,4 +1,5 @@
 ﻿using SICore;
+using SIGame.ViewModel;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,14 +35,14 @@ public partial class GameChat : UserControl
 
     private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (e.NewValue is ViewerData data)
+        if (e.NewValue is GameViewModel gameViewModel)
         {
-            data.StringAdding += AddMessage;
+            gameViewModel.Data.StringAdding += AddMessage;
         }
 
-        if (e.OldValue is ViewerData oldData)
+        if (e.OldValue is GameViewModel oldModel)
         {
-            oldData.StringAdding -= AddMessage;
+            oldModel.Data.StringAdding -= AddMessage;
         }
     }
 

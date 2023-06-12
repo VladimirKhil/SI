@@ -11,8 +11,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Utils;
 
 namespace SIGame.ViewModel;
 
@@ -40,6 +42,11 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     public CustomCommand ChangePauseInGame { get; }
 
     public CustomCommand Move { get; set; }
+
+    /// <summary>
+    /// Open provided link.
+    /// </summary>
+    public ICommand OpenLink { get; private set; }
 
     private bool _networkGame = false;
 
@@ -161,6 +168,34 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
 
         Timers[1].TimeChanged += GameViewModel_TimeChanged;
+
+        OpenLink = new CustomCommand(OpenLink_Executed);
+    }
+
+    private void OpenLink_Executed(object? arg)
+    {
+        if (arg == null)
+        {
+            throw new ArgumentNullException(nameof(arg));
+        }
+
+        var link = arg.ToString();
+
+        if (string.IsNullOrEmpty(link))
+        {
+            return;
+        }
+
+        try
+        {
+            Browser.Open(link);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowMessage(
+                string.Format(Resources.ErrorMovingToSite, exc.Message),
+                MessageType.Error);
+        }
     }
 
     private void Host_StageChanged(GameStage gameStage) => UpdateMoveCommand();
@@ -240,7 +275,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void UpdateMoveCommand()
     {
-        Move.CanBeExecuted = Data.Stage != SIData.GameStage.Before && (Host.IsHost || Host is Showman);
+        Move.CanBeExecuted = Data.Stage != GameStage.Before && (Host.IsHost || Host is Showman);
         ChangePauseInGame.CanBeExecuted = Move.CanBeExecuted;
     }
 

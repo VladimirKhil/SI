@@ -1371,5 +1371,10 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         gameInfo.AppendFormat(R.VoiceChatLink).Append(": ").Append(voiceChatUri).AppendLine();
 
         ClientData.GameMetadata = gameInfo.ToString();
+
+        if (!string.IsNullOrEmpty(voiceChatUri))
+        {
+            ClientData.VoiceChatUri = voiceChatUri;
+        }
     }
 }
