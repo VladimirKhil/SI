@@ -13,6 +13,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 {
     private bool _isDisposed = false;
 
+    protected ISIEnginePlayHandler PlayHandler { get; }
+
     protected Func<EngineOptions> OptionsProvider { get; }
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -47,7 +49,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected Round? _activeRound;
 
-    protected Theme _activeTheme;
+    protected Theme? _activeTheme;
 
     protected Question? _activeQuestion;
 
@@ -178,6 +180,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<string[]>? GameThemes;
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
+    public event Action RoundSkip;
     public event Action<Theme[]>? RoundThemes;
     public event Action<Theme>? Theme;
     public event Action<Question>? Question;
@@ -206,7 +209,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action? NextQuestion;
     public event Action? RoundTimeout;
 
-    public event Action<Theme[]>? FinalThemes;
+    public event Action<Theme[], bool, bool>? FinalThemes;
     public event Action? WaitDelete;
     public event Action<int>? ThemeSelected;
     public event Action<Theme, Question>? PrepareFinalQuestion;
@@ -220,10 +223,15 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     #endregion
 
-    protected EngineBase(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
+    protected EngineBase(
+        SIDocument document,
+        Func<EngineOptions> optionsProvider,
+        ISIEnginePlayHandler playHandler,
+        QuestionEngineFactory questionEngineFactory)
     {
         _document = document ?? throw new ArgumentNullException(nameof(document));
         OptionsProvider = optionsProvider ?? throw new ArgumentNullException(nameof(optionsProvider));
+        PlayHandler = playHandler;
         _questionEngineFactory = questionEngineFactory;
     }
 
@@ -243,6 +251,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnNextRound(bool showSign = true) => NextRound?.Invoke(showSign);
 
     protected void OnRound(Round round) => Round?.Invoke(round);
+
+    protected void OnRoundSkip() => RoundSkip?.Invoke();
 
     protected void OnRoundThemes(Theme[] roundThemes) => RoundThemes?.Invoke(roundThemes);
 
@@ -295,7 +305,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnRoundTimeout() => RoundTimeout?.Invoke();
 
-    protected void OnFinalThemes(Theme[] finalThemes) => FinalThemes?.Invoke(finalThemes);
+    protected void OnFinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay) =>
+        FinalThemes?.Invoke(finalThemes, willPlayAllThemes, isFirstPlay);
 
     protected void OnWaitDelete() => WaitDelete?.Invoke();
 
@@ -435,7 +446,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         return true;
     }
 
-    public bool AcceptRound(Round? round) =>
+    public static bool AcceptRound(Round? round) =>
         round != null
         && round.Themes.Any(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)
         && (round.Type != RoundTypes.Final || round.Themes.Any(theme => theme.Name != null)));

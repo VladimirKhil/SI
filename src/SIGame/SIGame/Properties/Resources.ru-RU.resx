@@ -1095,4 +1095,7 @@
   <data name="VoiceChat" xml:space="preserve">
     <value>Голосовой чат</value>
   </data>
+  <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
+    <value>Играть все вопросы в финальном раунде</value>
+  </data>
 </root>

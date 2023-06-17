@@ -801,4 +801,10 @@
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Voice chat (Discord)</value>
   </data>
+  <data name="LetsPlayNextTheme" xml:space="preserve">
+    <value>Let's play next theme</value>
+  </data>
+  <data name="WeWillPlayAllOfThem" xml:space="preserve">
+    <value>We will play all of them</value>
+  </data>
 </root>

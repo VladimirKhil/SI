@@ -254,6 +254,11 @@ public sealed class Showman : Viewer<IShowmanLogic>
                 case Messages.Stage:
                     {
                         ClientData.Hint = "";
+
+                        for (int i = 0; i < ClientData.Players.Count; i++)
+                        {
+                            ClientData.Players[i].CanBeSelected = false;
+                        }
                         break;
                     }
 

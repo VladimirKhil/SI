@@ -288,7 +288,7 @@ public sealed class ViewerData : Data
     private List<PlayerAccount> _players = new();
 
     /// <summary>
-    /// Игроки
+    /// Game players.
     /// </summary>
     public List<PlayerAccount> Players
     {
@@ -303,6 +303,11 @@ public sealed class ViewerData : Data
             }
         }
     }
+
+    /// <summary>
+    /// Observable version of <see cref="Players" />.
+    /// </summary>
+    public ObservableCollection<PlayerAccount> PlayersObservable { get; } = new();
 
     private PersonAccount? _showMan = null;
 

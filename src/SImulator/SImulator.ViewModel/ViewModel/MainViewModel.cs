@@ -435,6 +435,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                     SettingsViewModel.Model.GameMode == GameModes.Tv,
                     document,
                     GetEngineOptions,
+                    gameEngineController,
                     gameEngineController);
             }
             catch (Exception exc)

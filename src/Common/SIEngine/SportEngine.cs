@@ -12,8 +12,12 @@ public sealed class SportEngine : EngineBase
 
     protected override GameRules GameRules => WellKnownGameRules.Simple;
 
-    public SportEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
-        : base(document, optionsProvider, questionEngineFactory) { }
+    public SportEngine(
+        SIDocument document,
+        Func<EngineOptions> optionsProvider,
+        ISIEnginePlayHandler playHandler,
+        QuestionEngineFactory questionEngineFactory)
+        : base(document, optionsProvider, playHandler, questionEngineFactory) { }
 
     private void SetActiveTheme() => _activeTheme = _activeRound.Themes[_themeIndex];
 

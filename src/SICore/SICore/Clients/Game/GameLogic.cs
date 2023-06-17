@@ -94,6 +94,7 @@ public sealed class GameLogic : Logic<GameData>
         Engine.Package += Engine_Package;
         Engine.GameThemes += Engine_GameThemes;
         Engine.Round += Engine_Round;
+        Engine.RoundSkip += Engine_RoundSkip;
         Engine.RoundThemes += Engine_RoundThemes;
         Engine.Theme += Engine_Theme;
         Engine.Question += Engine_Question; // Simple game mode question
@@ -127,6 +128,12 @@ public sealed class GameLogic : Logic<GameData>
 
             _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, Constants.AutomaticGameStartDuration, -2);
         }
+    }
+
+    private void Engine_RoundSkip()
+    {
+        _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
+        ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
     }
 
     private void Engine_QuestionFinish()
@@ -171,7 +178,7 @@ public sealed class GameLogic : Logic<GameData>
         _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
         _data.IsPlayingMedia = false;
 
-        ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
+        ScheduleExecution(Tasks.QuestSourComm, 10, 1, force: true);
     }
 
     private void Engine_Package(Package package, IMedia packageLogo)
@@ -181,7 +188,7 @@ public sealed class GameLogic : Logic<GameData>
 
         _data.Rounds = _data.Package.Rounds
             .Select((round, index) => (round, index))
-            .Where(roundTuple => Engine.AcceptRound(roundTuple.round))
+            .Where(roundTuple => SIEngine.EngineBase.AcceptRound(roundTuple.round))
             .Select(roundTuple => new RoundInfo { Index = roundTuple.index, Name = roundTuple.round.Name })
             .ToArray();
 
@@ -226,7 +233,7 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
-    private void InitThemes(Theme[] themes)
+    private void InitThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
     {
         _data.TInfo.RoundInfo.Clear();
 
@@ -235,7 +242,20 @@ public sealed class GameLogic : Logic<GameData>
             _data.TInfo.RoundInfo.Add(new ThemeInfo { Name = theme.Name });
         }
 
-        _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.RoundThemes)]));
+        string themesReplic;
+
+        if (willPlayAllThemes)
+        {
+            themesReplic = isFirstPlay
+                ? $"{GetRandomString(LO[nameof(R.RoundThemes)])}. {LO[nameof(R.WeWillPlayAllOfThem)]}"
+                : LO[nameof(R.LetsPlayNextTheme)];
+        }
+        else
+        {
+            themesReplic = GetRandomString(LO[nameof(R.RoundThemes)]);
+        }
+
+        _gameActions.ShowmanReplic(themesReplic);
 
         _data.TableInformStageLock.WithLock(() =>
         {
@@ -252,7 +272,7 @@ public sealed class GameLogic : Logic<GameData>
             throw new ArgumentException("themes.Length == 0", nameof(themes));
         }
 
-        InitThemes(themes);
+        InitThemes(themes, false, true);
 
         // Filling initial questions table
         _data.ThemeInfoShown = new bool[themes.Length];
@@ -779,14 +799,25 @@ public sealed class GameLogic : Logic<GameData>
         FinishRound();
     }
 
-    private void Engine_FinalThemes(Theme[] themes)
+    private void Engine_FinalThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
     {
-        InitThemes(themes);
+        var s = new MessageBuilder(Messages.FinalRound);
+
+        for (var i = 0; i < _data.Players.Count; i++)
+        {
+            s.Add(_data.Players[i].InGame ? '+' : '-');
+        }
+
+        _gameActions.SendMessage(s.ToString());
+
+        _data.AnnounceAnswer = true; // initialization
+
+        InitThemes(themes, willPlayAllThemes, isFirstPlay);
 
         _data.ThemeDeleters = new ThemeDeletersEnumerator(_data.Players, _data.TInfo.RoundInfo.Count(t => t.Name != null));
         _data.ThemeDeleters.Reset(true);
 
-        ScheduleExecution(Tasks.MoveNext, 20 + Random.Shared.Next(10));
+        ScheduleExecution(Tasks.MoveNext, 30 + Random.Shared.Next(10));
     }
 
     private void Engine_WaitDelete() => ScheduleExecution(Tasks.AskToDelete, 1);
@@ -799,9 +830,7 @@ public sealed class GameLogic : Logic<GameData>
                 .Append(' ')
                 .Append(string.Join("|", _data.TInfo.RoundInfo.Select(t => $"({t.Name != QuestionHelper.InvalidThemeName} {t.Questions.Count})")))
                 .Append(' ')
-                .Append(_data.ThemeIndexToDelete)
-                .Append(' ')
-                .Append(string.Join(",", ((SIEngine.TvEngine)Engine).FinalMap));
+                .Append(_data.ThemeIndexToDelete);
 
             throw new ArgumentException(errorMessage.ToString(), nameof(themeIndex));
         }
@@ -2410,75 +2439,23 @@ public sealed class GameLogic : Logic<GameData>
 
     private void PrintFinal(int arg)
     {
-        if (arg == 1)
+        var roundIndex = -1;
+
+        for (int i = 0; i < _data.Rounds.Length; i++)
         {
-            var s = new StringBuilder(Messages.FinalRound);
-            var playFinal = false;
-
-            for (var i = 0; i < _data.Players.Count; i++)
+            if (_data.Rounds[i].Index == Engine.RoundIndex)
             {
-                if (_data.Players[i].Sum <= 0)
-                {
-                    _data.Players[i].InGame = false;
-                    s.Append("\n-");
-                }
-                else
-                {
-                    playFinal = true;
-                    _data.Players[i].InGame = true;
-                    s.Append("\n+");
-                }
-            }
-
-            _gameActions.SendMessage(s.ToString());
-
-            if (!playFinal)
-            {
-                _gameActions.ShowmanReplic(LO[nameof(R.NobodyInFinal)]);
-
-                if (Engine.MoveNextRound())
-                {
-                    ScheduleExecution(Tasks.MoveNext, 15 + Random.Shared.Next(10), 1);
-                }
-
-                return;
-            }
-
-            _data.AnnounceAnswer = true; // инициализация
-            ScheduleExecution(Tasks.PrintFinal, 1, 2, true);
-        }
-        else if (arg < 2 + _data.Players.Count)
-        {
-            if (_data.Players[arg - 2].InGame)
-            {
-                ScheduleExecution(Tasks.PrintFinal, 1, arg + 1, true);
-            }
-            else
-            {
-                _gameActions.ShowmanReplic($"{_data.Players[arg - 2].Name} {LO[nameof(R.NotInFinal)]}");
-                ScheduleExecution(Tasks.PrintFinal, 15, arg + 1);
+                roundIndex = i;
+                break;
             }
         }
-        else
-        {
-            var roundIndex = -1;
 
-            for (int i = 0; i < _data.Rounds.Length; i++)
-            {
-                if (_data.Rounds[i].Index == Engine.RoundIndex)
-                {
-                    roundIndex = i;
-                    break;
-                }
-            }
+        _gameActions.InformStage(name: _data.Round.Name, index: roundIndex);
+        _gameActions.InformRoundContent();
 
-            _gameActions.InformStage(name: _data.Round.Name, index: roundIndex);
-            _gameActions.InformRoundContent();
+        _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
 
-            _gameActions.ShowmanReplic($"{GetRandomString(LO[nameof(R.WeBeginRound)])} {_data.Round.Name}!");
-
-            ScheduleExecution(Tasks.Round, 10, 2);
-        }
+        ScheduleExecution(Tasks.Round, 20, 2);
     }
 
     private void Winner()

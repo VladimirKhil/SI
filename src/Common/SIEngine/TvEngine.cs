@@ -17,8 +17,9 @@ public sealed class TvEngine : EngineBase
     private readonly Stack<(int, int)> _forward = new();
 
     private readonly HashSet<(int, int)> _questionsTable = new();
-    private readonly HashSet<int> _themesTable = new();
-    private readonly List<int> _finalMap = new();
+
+    private readonly HashSet<int> _leftFinalThemesIndicies = new();
+    private readonly List<Theme> _finalThemes = new();
 
     protected override GameRules GameRules => WellKnownGameRules.Classic;
 
@@ -32,12 +33,14 @@ public sealed class TvEngine : EngineBase
 
     public bool CanSelectTheme => _stage == GameStage.WaitDelete;
 
-    public List<int> FinalMap => _finalMap; // for debugging only
-
     public override int LeftQuestionsCount => _questionsTable.Count; // for debugging only
 
-    public TvEngine(SIDocument document, Func<EngineOptions> optionsProvider, QuestionEngineFactory questionEngineFactory)
-        : base(document, optionsProvider, questionEngineFactory) { }
+    public TvEngine(
+        SIDocument document,
+        Func<EngineOptions> optionsProvider,
+        ISIEnginePlayHandler playHandler,
+        QuestionEngineFactory questionEngineFactory)
+        : base(document, optionsProvider, playHandler, questionEngineFactory) { }
 
     /// <summary>
     /// Moves to the next game stage.
@@ -80,9 +83,16 @@ public sealed class TvEngine : EngineBase
                 _history.Clear();
                 CanMoveBack = false;
 
-                OnRound(_activeRound);
-
-                Stage = _activeRound.Type != RoundTypes.Final ? GameStage.RoundThemes : GameStage.FinalThemes;
+                if (PlayHandler.ShouldPlayRound(GameRules.GetRulesForRoundType(_activeRound!.Type).QuestionSelectionStrategyType))
+                {
+                    OnRound(_activeRound);
+                    Stage = _activeRound.Type != RoundTypes.Final ? GameStage.RoundThemes : GameStage.FinalThemes;
+                }
+                else
+                {
+                    OnRoundSkip();
+                    MoveNextRound();
+                }
 
                 _timeout = false;
                 AutoNext(7000);
@@ -194,48 +204,26 @@ public sealed class TvEngine : EngineBase
                 }
 
                 break;
-                #endregion
+            #endregion
 
             case GameStage.FinalThemes:
                 #region FinalThemes
                 OnSound();
-                var finalThemes = _activeRound.Themes;
-                var selectedThemes = new List<Theme>();
 
-                _themesTable.Clear();
-                _finalMap.Clear();
+                var finalThemes = _activeRound.Themes;
+                _finalThemes.Clear();
+
                 for (int i = 0; i < finalThemes.Count; i++)
                 {
-                    if (finalThemes[i].Name != null && finalThemes[i].Questions.Any())
+                    if (!string.IsNullOrEmpty(finalThemes[i].Name) && finalThemes[i].Questions.Any())
                     {
-                        _themesTable.Add(i);
-                        _finalMap.Add(i);
-                        selectedThemes.Add(finalThemes[i]);
+                        _finalThemes.Add(finalThemes[i]);
                     }
                 }
 
-                OnFinalThemes(selectedThemes.ToArray());
-
-                var count = selectedThemes.Count;
-
-                if (count > 1)
-                {
-                    Stage = GameStage.WaitDelete;
-                    UpdateCanNext();
-                    AutoNext(2000);
-                }
-                else if (count == 1)
-                {
-                    DoPrepareFinalQuestion();
-                    AutoNext(4000);
-                }
-                else
-                {
-                    Stage = GameStage.AfterFinalThink;
-                    MoveNext();
-                }
+                PlayNextFinalTheme(true);
                 break;
-                #endregion
+            #endregion
 
             case GameStage.WaitDelete:
                 OnWaitDelete();
@@ -274,11 +262,61 @@ public sealed class TvEngine : EngineBase
 
             case GameStage.AfterFinalThink:
                 OnSound();
+
+                if (OptionsProvider().PlayAllQuestionsInFinalRound)
+                {
+                    _finalThemes.RemoveAt(_themeIndex);
+
+                    if (_finalThemes.Count > 0)
+                    {
+                        if (PlayHandler.ShouldPlayRound(GameRules.GetRulesForRoundType(_activeRound!.Type).QuestionSelectionStrategyType))
+                        {
+                            PlayNextFinalTheme(false);
+                            break;
+                        }
+                        else
+                        {
+                            OnRoundSkip();
+                        }
+                    }
+                }
+                
                 DoFinishRound();
                 break;
 
             case GameStage.End:
                 break;
+        }
+    }
+
+    private void PlayNextFinalTheme(bool isFirstPlay)
+    {
+        _leftFinalThemesIndicies.Clear();
+
+        for (var i = 0; i < _finalThemes.Count; i++)
+        {
+            _leftFinalThemesIndicies.Add(i);
+        }
+
+        OnFinalThemes(_finalThemes.ToArray(), OptionsProvider().PlayAllQuestionsInFinalRound, isFirstPlay);
+
+        var count = _finalThemes.Count;
+
+        if (count > 1)
+        {
+            Stage = GameStage.WaitDelete;
+            UpdateCanNext();
+            AutoNext(2000);
+        }
+        else if (count == 1)
+        {
+            DoPrepareFinalQuestion();
+            AutoNext(4000);
+        }
+        else
+        {
+            Stage = GameStage.AfterFinalThink;
+            MoveNext();
         }
     }
 
@@ -325,7 +363,7 @@ public sealed class TvEngine : EngineBase
         OnQuestionSelected();
     }
 
-    public override void SelectTheme(int publicThemeIndex)
+    public override void SelectTheme(int themeIndex)
     {
         if (_stage == GameStage.FinalQuestion)
         {
@@ -339,12 +377,10 @@ public sealed class TvEngine : EngineBase
         }
 
         Stage = GameStage.AfterDelete;
-        _themeIndex = _finalMap[publicThemeIndex];
+        _themeIndex = themeIndex;
         _questionIndex = 0;
 
-        SetActiveThemeQuestion();
-
-        OnThemeSelected(publicThemeIndex);
+        OnThemeSelected(themeIndex);
         OnSound("shrink.mp3");
         UpdateCanNext();
     }
@@ -381,10 +417,11 @@ public sealed class TvEngine : EngineBase
     {
         _atomIndex = 0;
         _isMedia = false;
-        _themeIndex = _themesTable.First();
+        _themeIndex = _leftFinalThemesIndicies.First();
         _questionIndex = 0;
 
-        SetActiveThemeQuestion();
+        _activeTheme = _finalThemes[_themeIndex];
+        _activeQuestion = _activeTheme.Questions[_questionIndex];
 
         OnPrepareFinalQuestion(_activeTheme, _activeQuestion);
         _useAnswerMarker = false;
@@ -409,9 +446,9 @@ public sealed class TvEngine : EngineBase
         else if (_stage == GameStage.AfterDelete)
         {
             result = _themeIndex;
-            _themesTable.Remove(_themeIndex);
+            _leftFinalThemesIndicies.Remove(_themeIndex);
 
-            if (_themesTable.Count == 1)
+            if (_leftFinalThemesIndicies.Count == 1)
             {
                 DoPrepareFinalQuestion();
             }
@@ -485,8 +522,8 @@ public sealed class TvEngine : EngineBase
 
         if (CanSelectTheme)
         {
-            var themeIndex = new Random().Next(_themesTable.Count);
-            themeIndex = _themesTable.Skip(themeIndex).First();
+            var themeIndex = new Random().Next(_leftFinalThemesIndicies.Count);
+            themeIndex = _leftFinalThemesIndicies.Skip(themeIndex).First();
 
             SelectTheme(themeIndex);
         }

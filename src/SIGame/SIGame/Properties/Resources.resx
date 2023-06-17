@@ -1095,4 +1095,7 @@
   <data name="VoiceChat" xml:space="preserve">
     <value>Voice chat</value>
   </data>
+  <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
+    <value>Play all questions in final round</value>
+  </data>
 </root>

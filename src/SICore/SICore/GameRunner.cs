@@ -15,16 +15,17 @@ namespace SICore;
 /// </summary>
 public sealed class GameRunner
 {
-    private static EngineOptions CreateEngineOptions(bool falseStarts) => new()
+    private static EngineOptions CreateEngineOptions(AppSettingsCore appSettingsCore) => new()
     {
-        IsMultimediaPressMode = falseStarts,
-        IsPressMode = falseStarts,
+        IsMultimediaPressMode = appSettingsCore.FalseStart,
+        IsPressMode = appSettingsCore.FalseStart,
         ShowRight = true,
         ShowScore = false,
         AutomaticGame = false,
         PlaySpecials = true,
         ThinkingTime = 0,
-        UseNewEngine = true
+        UseNewEngine = true,
+        PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
     };
 
     private readonly Node _node;
@@ -148,20 +149,22 @@ public sealed class GameRunner
             gameData.EndUpdatePersons();
         }
 
-        var playHandler = new QuestionPlayHandler();
+        var playHandler = new PlayHandler(gameData);
+        var questionPlayHandler = new QuestionPlayHandler();
 
         var engine = (EngineBase)EngineFactory.CreateEngine(
             gameData.Settings.AppSettings.GameMode == GameModes.Tv,
             _document,
-            () => CreateEngineOptions(gameData.Settings.AppSettings.FalseStart),
-            playHandler);
+            () => CreateEngineOptions(gameData.Settings.AppSettings),
+            playHandler,
+            questionPlayHandler);
 
         var client = Client.Create(NetworkConstants.GameName, _node);
 
         var gameActions = new GameActions(client, gameData, localizer, _fileShare);
         var gameLogic = new GameLogic(gameData, gameActions, engine, localizer, _fileShare);
 
-        playHandler.GameLogic = gameLogic;
+        questionPlayHandler.GameLogic = gameLogic;
 
         var game = new Game(
             client,

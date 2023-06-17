@@ -1699,6 +1699,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Play all questions in final round.
+        /// </summary>
+        public static string PlayAllQuestionsInFinalRound {
+            get {
+                return ResourceManager.GetString("PlayAllQuestionsInFinalRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Players.
         /// </summary>
         public static string Players {

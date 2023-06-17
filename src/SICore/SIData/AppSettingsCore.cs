@@ -13,6 +13,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultFalseStart = true;
     public const bool DefaultHintShowman = false;
     public const bool DefaultPartialText = false;
+    public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultOral = false;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
@@ -98,6 +99,21 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _partialText;
         set { _partialText = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _playAllQuestionsInFinalRound = DefaultPlayAllQuestionsInFinalRound;
+
+    /// <summary>
+    /// Play all questions in final round.
+    /// </summary>
+
+    [XmlAttribute]
+    [DefaultValue(DefaultPlayAllQuestionsInFinalRound)]
+    public bool PlayAllQuestionsInFinalRound
+    {
+        get => _playAllQuestionsInFinalRound;
+        set { _playAllQuestionsInFinalRound = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -261,6 +277,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _multimediaPort = origin._multimediaPort;
         _falseStart = origin._falseStart;
         _hintShowman = origin._hintShowman;
+        PlayAllQuestionsInFinalRound = origin.PlayAllQuestionsInFinalRound;
         _oral = origin._oral;
         _ignoreWrong = origin._ignoreWrong;
         _usePingPenalty = origin.UsePingPenalty;
@@ -285,6 +302,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         PartialText = settings.PartialText;
         Managed = settings.Managed;
         HintShowman = settings._hintShowman;
+        PlayAllQuestionsInFinalRound = settings.PlayAllQuestionsInFinalRound;
         Oral = settings._oral;
         _ignoreWrong = settings._ignoreWrong;
         _usePingPenalty = settings.UsePingPenalty;

@@ -934,6 +934,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Let&apos;s play next theme.
+        /// </summary>
+        public static string LetsPlayNextTheme {
+            get {
+                return ResourceManager.GetString("LetsPlayNextTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на So, let&apos;s look at the players&apos; answers;It&apos;s time to look at our players&apos; answers.
         /// </summary>
         public static string LetsSee {
@@ -1933,7 +1942,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Voice chat link.
+        ///   Ищет локализованную строку, похожую на Voice chat (Discord).
         /// </summary>
         public static string VoiceChatLink {
             get {
@@ -1947,6 +1956,15 @@ namespace SICore.Properties {
         public static string WeBeginRound {
             get {
                 return ResourceManager.GetString("WeBeginRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на We will play all of them.
+        /// </summary>
+        public static string WeWillPlayAllOfThem {
+            get {
+                return ResourceManager.GetString("WeWillPlayAllOfThem", resourceCulture);
             }
         }
         

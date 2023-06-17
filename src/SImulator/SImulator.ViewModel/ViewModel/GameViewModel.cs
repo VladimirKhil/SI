@@ -1272,7 +1272,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _playingQuestionType = false;
     }
 
-    private void Engine_FinalThemes(Theme[] finalThemes)
+    private void Engine_FinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay)
     {
         LocalInfo.RoundInfo.Clear();
 

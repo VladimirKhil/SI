@@ -44,4 +44,9 @@ public sealed class EngineOptions
     /// Use new game engine.
     /// </summary>
     public bool UseNewEngine { get; init; }
+
+    /// <summary>
+    /// Play all questions in final round.
+    /// </summary>
+    public bool PlayAllQuestionsInFinalRound { get; set; }
 }

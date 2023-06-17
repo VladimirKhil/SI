@@ -968,8 +968,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         lock (ClientData.TInfoLock)
                         {
                             ClientData.ThemeIndex = int.Parse(mparams[1]);
+
                             if (ClientData.ThemeIndex > -1 && ClientData.ThemeIndex < ClientData.TInfo.RoundInfo.Count)
+                            {
                                 _logic.Out(ClientData.ThemeIndex);
+                            }
                         }
 
                         #endregion
@@ -1390,13 +1393,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             };
 
             CreatePlayerCommands(account);
-
-            var clone = new List<PlayerAccount>(ClientData.Players)
-            {
-                account
-            };
-
-            ClientData.Players = clone;
+            ClientData.Players.Add(account);
 
             UpdateAddTableCommand();
             UpdateDeleteTableCommand();
@@ -1404,10 +1401,13 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             UpdatePlayerCommands(account);
 
             var canDelete = ClientData.Players.Count > 2;
+
             foreach (var player in ClientData.Players)
             {
                 player.Delete.CanBeExecuted = canDelete;
             }
+
+            Logic.AddPlayer(account);
         }
         finally
         {
@@ -1603,10 +1603,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             account = ClientData.Players[index];
 
-            var clone = new List<PlayerAccount>(ClientData.Players);
-            clone.RemoveAt(index);
-
-            ClientData.Players = clone;
+            ClientData.Players.RemoveAt(index);
 
             UpdateAddTableCommand();
 
@@ -1633,6 +1630,8 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             {
                 player.Delete.CanBeExecuted = canDelete;
             }
+
+            Logic.RemovePlayerAt(index);
         }
         finally
         {
@@ -1959,7 +1958,8 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                 newPlayers.Add(account);
             }
 
-            ClientData.Players = newPlayers;
+            ClientData.Players.Clear();
+            ClientData.Players.AddRange(newPlayers);
 
             var newViewers = new List<ViewerAccount>();
 
@@ -1985,6 +1985,8 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
             ClientData.Viewers = newViewers;
             ClientData.IsInfoInitialized = true;
+
+            Logic.ResetPlayers();
         }
         finally
         {

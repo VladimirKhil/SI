@@ -296,21 +296,49 @@
             <local:DropDownButton
                 Style="{StaticResource SIDropDownButton}"
                 BorderThickness="0"
-                Margin="-2,-2,0,0"
                 Padding="0"
                 Width="70"
                 BorderBrush="{StaticResource MainColor}"
                 ToolTip="{x:Static lp:Resources.Manage_Hint}"
                 Visibility="{Binding Data.ShowmanDataExtensions.Manage, Converter={StaticResource NotNullToVisibilityConverter1}}">
+                <local:DropDownButton.Resources>
+                    <ControlTemplate x:Key="ItemTemplate" TargetType="{x:Type MenuItem}">
+                        <Border x:Name="Border" BorderThickness="1" Padding="30,10">
+                            <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter Property="Background" TargetName="Border" Value="{StaticResource HoverColor}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </local:DropDownButton.Resources>
+                
                 <local:DropDownButton.DropDown>
-                    <ContextMenu Style="{StaticResource SIContextMenuStyle}" Placement="Top" FontSize="21">
+                    <ContextMenu
+                        Style="{StaticResource SIContextMenuStyle}"
+                        Placement="Top"
+                        FontSize="21">
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SIContextMenuItemStyle}">
+                                <Setter Property="Height" Value="50" />
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Template" Value="{StaticResource ItemTemplate}" />
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                        
                         <MenuItem
                             Header="{x:Static lp:Resources.PreviousRound}"
                             StaysOpenOnClick="True"
                             Command="{Binding Move}"
                             CommandParameter="-2" />
 
-                        <MenuItem Header="{x:Static lp:Resources.NextRound}" StaysOpenOnClick="True" Command="{Binding Move}" CommandParameter="2" />
+                        <MenuItem
+                            Header="{x:Static lp:Resources.NextRound}"
+                            StaysOpenOnClick="True"
+                            Command="{Binding Move}"
+                            CommandParameter="2" />
                     </ContextMenu>
                 </local:DropDownButton.DropDown>
 

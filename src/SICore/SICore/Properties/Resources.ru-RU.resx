@@ -806,4 +806,10 @@
   <data name="VoiceChatLink" xml:space="preserve">
     <value>Голосовой чат (Discord)</value>
   </data>
+  <data name="LetsPlayNextTheme" xml:space="preserve">
+    <value>Давайте сыграем остальные темы</value>
+  </data>
+  <data name="WeWillPlayAllOfThem" xml:space="preserve">
+    <value>Мы сыграем их все</value>
+  </data>
 </root>

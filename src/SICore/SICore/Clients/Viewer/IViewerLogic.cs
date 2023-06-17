@@ -167,4 +167,10 @@ public interface IViewerLogic : ILogic
     void SetCaption(string caption) { }
 
     void OnGameMetadata(string gameName, string packageName, string contactUri, string voiceChatUri) { }
+
+    void AddPlayer(PlayerAccount account) { }
+
+    void RemovePlayerAt(int index) { }
+
+    void ResetPlayers() { }
 }

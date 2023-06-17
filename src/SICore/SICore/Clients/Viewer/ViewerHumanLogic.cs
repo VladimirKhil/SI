@@ -1377,4 +1377,30 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             ClientData.VoiceChatUri = voiceChatUri;
         }
     }
+
+    public void AddPlayer(PlayerAccount account) => UI.Execute(
+        () =>
+        {
+            ClientData.PlayersObservable.Add(account);
+        },
+        ClientData.BackLink.OnError);
+
+    public void RemovePlayerAt(int index) => UI.Execute(
+        () =>
+        {
+            ClientData.PlayersObservable.RemoveAt(index);
+        },
+        ClientData.BackLink.OnError);
+
+    public void ResetPlayers() => UI.Execute(
+        () =>
+        {
+            ClientData.PlayersObservable.Clear();
+
+            foreach (var player in ClientData.Players)
+            {
+                ClientData.PlayersObservable.Add(player);
+            }
+        },
+        ClientData.BackLink.OnError);
 }

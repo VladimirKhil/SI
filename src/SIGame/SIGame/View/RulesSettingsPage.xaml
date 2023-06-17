@@ -89,7 +89,21 @@
         </ComboBox>
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{Binding GameModeHint}" TextWrapping="Wrap" />
-        
+
+        <CheckBox IsChecked="{Binding Model.PlayAllQuestionsInFinalRound}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PlayAllQuestionsInFinalRound}" />
+
+            <CheckBox.Style>
+                <Style TargetType="CheckBox" BasedOn="{StaticResource HeaderBox}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding GameMode}" Value="{x:Static data:GameModes.Sport}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </CheckBox.Style>
+        </CheckBox>
+
         <CheckBox IsChecked="{Binding Model.Oral}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.OralGame}" />
         </CheckBox>

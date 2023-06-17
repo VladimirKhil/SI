@@ -1,4 +1,6 @@
-﻿using SIEngine.Core;
+﻿using SIEngine;
+using SIEngine.Core;
+using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
 using SIPackages;
 using SIPackages.Core;
@@ -8,7 +10,7 @@ using SIUI.ViewModel.Core;
 namespace SImulator.ViewModel.Controllers;
 
 /// <inheritdoc cref="IQuestionEnginePlayHandler" />
-internal sealed class GameEngineController : IQuestionEnginePlayHandler
+internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEnginePlayHandler
 {
     public GameViewModel? GameViewModel { get; set; }
 
@@ -267,4 +269,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler
         PresentationController.SetSound();
         GameViewModel.OnRightAnswer();
     }
+
+    public bool ShouldPlayRound(QuestionSelectionStrategyType questionSelectionStrategyType) => true;
 }
