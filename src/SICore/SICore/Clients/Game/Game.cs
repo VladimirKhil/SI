@@ -712,7 +712,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                             {
                                 var player = ClientData.Players[i];
 
-                                if (player.InGame && player.FinalStake == -1 && message.Sender == player.Name)
+                                if (ClientData.QuestionPlayState.AnswererIndicies.Contains(i) && player.FinalStake == -1 && message.Sender == player.Name)
                                 {
                                     if (int.TryParse(args[1], out int finalStake) && finalStake >= 1 && finalStake <= player.Sum)
                                     {
@@ -1817,7 +1817,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender && ClientData.Players[i].InGame)
+                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i))
                 {
                     ClientData.AnswererIndex = i;
                     break;
@@ -1855,7 +1855,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             for (var i = 0; i < ClientData.Players.Count; i++)
             {
-                if (ClientData.Players[i].Name == message.Sender && ClientData.Players[i].InGame)
+                if (ClientData.Players[i].Name == message.Sender && ClientData.QuestionPlayState.AnswererIndicies.Contains(i))
                 {
                     ClientData.AnswererIndex = i;
 

@@ -529,6 +529,11 @@ public sealed class GameData : Data
     /// </summary>
     public ThemeDeletersEnumerator? ThemeDeleters { get; internal set; }
 
+    /// <summary>
+    /// Indices of players whose answers should be announced.
+    /// </summary>
+    public IEnumerator<int> AnnouncedAnswererIndices { get; internal set; }
+
     public string Text { get; internal set; }
 
     /// <summary>

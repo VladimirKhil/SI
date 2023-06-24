@@ -812,4 +812,7 @@
   <data name="WeWillPlayAllOfThem" xml:space="preserve">
     <value>Мы сыграем их все</value>
   </data>
+  <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
+    <value>вопрос с закрытыми ставками играют все</value>
+  </data>
 </root>

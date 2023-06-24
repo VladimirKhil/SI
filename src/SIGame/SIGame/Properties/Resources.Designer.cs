@@ -169,6 +169,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Everybody could play all stakes (final) question.
+        /// </summary>
+        public static string AllowEveryoneToPlayHiddenStakes {
+            get {
+                return ResourceManager.GetString("AllowEveryoneToPlayHiddenStakes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Answer check.
         /// </summary>
         public static string AnswerCheck {
@@ -777,6 +786,15 @@ namespace SIGame.Properties {
         public static string Erudition {
             get {
                 return ResourceManager.GetString("Erudition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на even having 0 or negative score.
+        /// </summary>
+        public static string EvenWithNegativeScore {
+            get {
+                return ResourceManager.GetString("EvenWithNegativeScore", resourceCulture);
             }
         }
         

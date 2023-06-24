@@ -30,7 +30,7 @@ public sealed class GamePlayerAccount : GamePersonAccount
         set { _pass = value; OnPropertyChanged(); }
     }
 
-    // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection
+    // TODO: Will be replaced with QuestionPlayState.PossibleAnswerers indicies collection and theme deletion strategy
     /// <summary>
     /// Is the player currently being able to play (by game rules, not by connection).
     /// </summary>

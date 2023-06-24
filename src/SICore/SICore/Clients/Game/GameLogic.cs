@@ -1522,10 +1522,14 @@ public sealed class GameLogic : Logic<GameData>
         var s = GetRandomString(LO[nameof(R.LetsSee)]);
         _gameActions.ShowmanReplic(s);
 
-        // TODO: Use _data.QuestionPlayState.AnswererIndicies to enumerate and check answerers with ascending score instead
-        _data.ThemeDeleters?.Reset(false);
-        ScheduleExecution(Tasks.Announce, 15);
+        var answerers = _data.Players
+            .Select((player, index) => (player, index))
+            .Where((player, index) => _data.QuestionPlayState.AnswererIndicies.Contains(index))
+            .OrderBy(pair => pair.player.Sum)
+            .Select(pair => pair.index);
 
+        _data.AnnouncedAnswererIndices = answerers.GetEnumerator();
+        ScheduleExecution(Tasks.Announce, 15);
         return true;
     }
 
@@ -2257,7 +2261,7 @@ public sealed class GameLogic : Logic<GameData>
         {
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (_data.Players[i].InGame && string.IsNullOrEmpty(_data.Players[i].Answer))
+                if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && string.IsNullOrEmpty(_data.Players[i].Answer))
                 {
                     _data.Players[i].Answer = LO[nameof(R.IDontKnow)];
                     _data.Players[i].AnswerIsWrong = true;
@@ -2312,7 +2316,7 @@ public sealed class GameLogic : Logic<GameData>
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            if (_data.Players[i].InGame && _data.Players[i].FinalStake == -1)
+            if (_data.QuestionPlayState.AnswererIndicies.Contains(i) && _data.Players[i].FinalStake == -1)
             {
                 _gameActions.SendMessage(Messages.Cancel, _data.Players[i].Name);
                 _data.Players[i].FinalStake = 1;
@@ -2395,9 +2399,9 @@ public sealed class GameLogic : Logic<GameData>
 
         for (var i = 0; i < _data.Players.Count; i++)
         {
-            if (_data.Players[i].InGame)
+            if (_data.QuestionPlayState.AnswererIndicies.Contains(i))
             {
-                if (_data.Players[i].Sum == 1)
+                if (_data.Players[i].Sum <= 1)
                 {
                     _data.Players[i].FinalStake = 1; // only one choice
                     _gameActions.SendMessageWithArgs(Messages.PersonFinalStake, i);
@@ -2801,44 +2805,20 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void Announce()
     {
-        // TODO: use custom enumerator without ThemeDeleters
-
-        if (!_data.ThemeDeleters.MoveNext())
+        if (!_data.AnnouncedAnswererIndices.MoveNext())
         {
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);
             return;
         }
 
-        var currentDeleter = _data.ThemeDeleters.Current;
+        var answererIndex = _data.AnnouncedAnswererIndices.Current;
 
-        if (currentDeleter == null)
+        if (answererIndex < 0 || answererIndex >= _data.Players.Count)
         {
-            throw new Exception("currentDeleter == null: " + _data.ThemeDeleters.GetRemoveLog());
+            throw new IndexOutOfRangeException($"answererIndex: {answererIndex}; player count: {_data.Players.Count}");
         }
 
-        if (currentDeleter.PlayerIndex == -1)
-        {
-            if (currentDeleter.PossibleIndicies.Count == 0)
-            {
-                throw new Exception($"currentDeleter.PossibleIndicies.Count == 0: {_data.ThemeDeleters.GetRemoveLog()}");
-            }
-
-            currentDeleter.SetIndex(currentDeleter.PossibleIndicies.First());
-        }
-
-        var playerIndex = currentDeleter.PlayerIndex;
-
-        if (playerIndex < -1 || playerIndex >= _data.Players.Count)
-        {
-            throw new ArgumentException($"{nameof(playerIndex)}: {_data.ThemeDeleters.GetRemoveLog()}");
-        }
-
-        _data.AnswererIndex = playerIndex;
-
-        if (_data.Answerer == null)
-        {
-            throw new Exception("_data.Answerer == null");
-        }
+        _data.AnswererIndex = answererIndex;
 
         var msg = new StringBuilder()
             .Append(LO[nameof(R.Answer)])
@@ -2958,6 +2938,16 @@ public sealed class GameLogic : Logic<GameData>
         if (settings.Managed)
         {
             rules.Add(LO[nameof(R.TypeManaged)]);
+        }
+
+        if (settings.UsePingPenalty)
+        {
+            rules.Add(LO[nameof(R.TypeUsePingPenalty)]);
+        }
+
+        if (settings.AllowEveryoneToPlayHiddenStakes)
+        {
+            rules.Add(LO[nameof(R.TypeAllowEveryoneToPlayStakes)]);
         }
 
         if (rules.Count == 0)
@@ -3172,7 +3162,7 @@ public sealed class GameLogic : Logic<GameData>
 
             for (var i = 0; i < _data.Players.Count; i++)
             {
-                if (_data.Players[i].InGame)
+                if (_data.QuestionPlayState.AnswererIndicies.Contains(i))
                 {
                     _data.Players[i].Answer = "";
                     _gameActions.SendMessage(Messages.Answer, _data.Players[i].Name);
@@ -4597,7 +4587,7 @@ public sealed class GameLogic : Logic<GameData>
 
         for (int i = 0; i < ClientData.Players.Count; i++)
         {
-            if (ClientData.Players[i].Sum > 0)
+            if (ClientData.Players[i].Sum > 0 || ClientData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes)
             {
                 answerers.Add(i);
             }

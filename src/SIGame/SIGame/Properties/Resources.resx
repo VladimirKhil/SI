@@ -1098,4 +1098,10 @@
   <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
     <value>Play all questions in final round</value>
   </data>
+  <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
+    <value>Everybody could play all stakes (final) question</value>
+  </data>
+  <data name="EvenWithNegativeScore" xml:space="preserve">
+    <value>even having 0 or negative score</value>
+  </data>
 </root>

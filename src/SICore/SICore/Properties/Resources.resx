@@ -807,4 +807,10 @@
   <data name="WeWillPlayAllOfThem" xml:space="preserve">
     <value>We will play all of them</value>
   </data>
+  <data name="TypeUsePingPenalty" xml:space="preserve">
+    <value>ping penalty</value>
+  </data>
+  <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
+    <value>everyone can play hiden stakes question</value>
+  </data>
 </root>

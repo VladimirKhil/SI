@@ -31,6 +31,17 @@ internal sealed class PlayHandler : ISIEnginePlayHandler
             }
         }
 
+        if (_gameData.Settings.AppSettings.AllowEveryoneToPlayHiddenStakes && !playRound)
+        {
+            // Nobody has positive score, but we allow everybody to play and delete themes
+            for (var i = 0; i < _gameData.Players.Count; i++)
+            {
+                _gameData.Players[i].InGame = true;
+            }
+            
+            playRound = true;
+        }
+
         return playRound;
     }
 }

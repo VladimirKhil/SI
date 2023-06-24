@@ -14,6 +14,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultHintShowman = false;
     public const bool DefaultPartialText = false;
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
+    public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
@@ -114,6 +115,20 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _playAllQuestionsInFinalRound;
         set { _playAllQuestionsInFinalRound = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _allowEveryoneToPlayHiddenStakes = DefaultAllowEveryoneToPlayHiddenStakes;
+
+    /// <summary>
+    /// Allow all players to play hidden stakes question.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultAllowEveryoneToPlayHiddenStakes)]
+    public bool AllowEveryoneToPlayHiddenStakes
+    {
+        get => _allowEveryoneToPlayHiddenStakes;
+        set { _allowEveryoneToPlayHiddenStakes = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -278,6 +293,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _falseStart = origin._falseStart;
         _hintShowman = origin._hintShowman;
         PlayAllQuestionsInFinalRound = origin.PlayAllQuestionsInFinalRound;
+        AllowEveryoneToPlayHiddenStakes = origin.AllowEveryoneToPlayHiddenStakes;
         _oral = origin._oral;
         _ignoreWrong = origin._ignoreWrong;
         _usePingPenalty = origin.UsePingPenalty;
@@ -303,6 +319,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         Managed = settings.Managed;
         HintShowman = settings._hintShowman;
         PlayAllQuestionsInFinalRound = settings.PlayAllQuestionsInFinalRound;
+        AllowEveryoneToPlayHiddenStakes = settings.AllowEveryoneToPlayHiddenStakes;
         Oral = settings._oral;
         _ignoreWrong = settings._ignoreWrong;
         _usePingPenalty = settings.UsePingPenalty;

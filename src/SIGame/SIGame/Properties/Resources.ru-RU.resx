@@ -1098,4 +1098,13 @@
   <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
     <value>Играть все вопросы в финальном раунде</value>
   </data>
+  <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
+    <value>Все могут играть общий вопрос со ставками (финал)</value>
+  </data>
+  <data name="TypeUsePingPenalty" xml:space="preserve">
+    <value>замедление пинга</value>
+  </data>
+  <data name="EvenWithNegativeScore" xml:space="preserve">
+    <value>даже с 0 или отрицательным счётом</value>
+  </data>
 </root>

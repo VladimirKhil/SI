@@ -124,7 +124,15 @@
         </CheckBox>
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.PartialQuestions_Hint}" />
-        
+
+        <CheckBox
+            IsChecked="{Binding Model.AllowEveryoneToPlayHiddenStakes}"
+            Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.AllowEveryoneToPlayHiddenStakes}" />
+        </CheckBox>
+
+        <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.EvenWithNegativeScore}" TextWrapping="Wrap" />
+
         <CheckBox IsChecked="{Binding Model.HintShowman}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.HintShowman}" />
         </CheckBox>

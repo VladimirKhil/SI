@@ -1834,6 +1834,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на everyone can play hiden stakes question.
+        /// </summary>
+        public static string TypeAllowEveryoneToPlayStakes {
+            get {
+                return ResourceManager.GetString("TypeAllowEveryoneToPlayStakes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на classic.
         /// </summary>
         public static string TypeClassic {
@@ -1884,6 +1893,15 @@ namespace SICore.Properties {
         public static string TypeSport {
             get {
                 return ResourceManager.GetString("TypeSport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ping penalty.
+        /// </summary>
+        public static string TypeUsePingPenalty {
+            get {
+                return ResourceManager.GetString("TypeUsePingPenalty", resourceCulture);
             }
         }
         
