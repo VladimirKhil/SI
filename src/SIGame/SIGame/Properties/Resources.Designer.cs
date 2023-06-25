@@ -196,6 +196,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Allow players to make actions in oral game.
+        /// </summary>
+        public static string AllowPlayersToActInOralGame {
+            get {
+                return ResourceManager.GetString("AllowPlayersToActInOralGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Answer check.
         /// </summary>
         public static string AnswerCheck {

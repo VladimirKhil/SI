@@ -1113,4 +1113,7 @@
   <data name="Accept50Percent" xml:space="preserve">
     <value>Зачесть половину суммы</value>
   </data>
+  <data name="AllowPlayersToActInOralGame" xml:space="preserve">
+    <value>Разрешать игрокам делать выбор в устной игре</value>
+  </data>
 </root>

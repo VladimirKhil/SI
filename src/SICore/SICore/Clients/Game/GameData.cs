@@ -503,12 +503,12 @@ public sealed class GameData : Data
     public MoveDirections MoveDirection { get; set; }
 
     /// <summary>
-    /// Устная игра
+    /// Oral game flag.
     /// </summary>
     public bool IsOral { get; set; }
 
     /// <summary>
-    /// Может ли ведущий сейчас принять решение за игрока в устной игре
+    /// Marks situations when showman could make decisions for players.
     /// </summary>
     public bool IsOralNow { get; set; }
 

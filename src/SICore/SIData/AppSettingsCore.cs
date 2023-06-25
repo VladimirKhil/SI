@@ -16,6 +16,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
+    public const bool DefaultOralPlayersActions = false;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
     public const bool DefaultUsePingPenalty = false;
@@ -144,6 +145,21 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _oral;
         set { _oral = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _oralPlayersActions = DefaultOralPlayersActions;
+
+    /// <summary>
+    /// Oral players actions game flag.
+    /// </summary>
+
+    [XmlAttribute]
+    [DefaultValue(DefaultOralPlayersActions)]
+    public bool OralPlayersActions
+    {
+        get => _oralPlayersActions;
+        set { _oralPlayersActions = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -321,6 +337,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         PlayAllQuestionsInFinalRound = settings.PlayAllQuestionsInFinalRound;
         AllowEveryoneToPlayHiddenStakes = settings.AllowEveryoneToPlayHiddenStakes;
         Oral = settings._oral;
+        OralPlayersActions = settings.OralPlayersActions;
         _ignoreWrong = settings._ignoreWrong;
         _usePingPenalty = settings.UsePingPenalty;
         _preloadRoundContent = settings.PreloadRoundContent;

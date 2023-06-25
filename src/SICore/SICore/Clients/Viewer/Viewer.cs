@@ -922,6 +922,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         }
                         break;
                     }
+
                 case Messages.PersonStake:
                     OnPersonStake(mparams);
                     break;

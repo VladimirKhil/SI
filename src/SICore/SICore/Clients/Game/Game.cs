@@ -557,7 +557,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                     case Messages.Choice:
                         if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.QuestionChoosing &&
+                            ClientData.Decision == DecisionType.QuestionSelection &&
                             args.Length == 3 &&
                             ClientData.Chooser != null &&
                                 (message.Sender == ClientData.Chooser.Name ||
@@ -589,8 +589,14 @@ public sealed class Game : Actor<GameData, GameLogic>
                                 }
 
                                 if (ClientData.IsOralNow)
-                                    _gameActions.SendMessage(Messages.Cancel, message.Sender == ClientData.ShowMan.Name ?
-                                        ClientData.Chooser.Name : ClientData.ShowMan.Name);
+                                {
+                                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                                }
+
+                                if (Logic.CanPlayerAct())
+                                {
+                                    _gameActions.SendMessage(Messages.Cancel, ClientData.Chooser.Name);
+                                }
 
                                 _logic.Stop(StopReason.Decision);
                             }
@@ -658,7 +664,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                     case Messages.Cat:
                         if (ClientData.IsWaiting &&
-                            ClientData.Decision == DecisionType.CatGiving &&
+                            ClientData.Decision == DecisionType.QuestionAnswererSelection &&
                             (ClientData.Chooser != null && message.Sender == ClientData.Chooser.Name ||
                             ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
                         {
@@ -1075,7 +1081,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     private void OnStake(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.AuctionStakeMaking ||
+            ClientData.Decision != DecisionType.StakeMaking ||
             (ClientData.ActivePlayer == null || message.Sender != ClientData.ActivePlayer.Name)
             && (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
         {
@@ -1201,11 +1207,12 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (ClientData.IsOralNow)
         {
-            _gameActions.SendMessage(
-                Messages.Cancel,
-                message.Sender == ClientData.ShowMan.Name
-                    ? ClientData.ActivePlayer.Name
-                    : ClientData.ShowMan.Name);
+            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+        }
+
+        if (Logic.CanPlayerAct())
+        {
+            _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
         }
 
         _logic.Stop(StopReason.Decision);
@@ -1523,7 +1530,7 @@ public sealed class Game : Actor<GameData, GameLogic>
     private void OnCatCost(Message message, string[] args)
     {
         if (!ClientData.IsWaiting ||
-            ClientData.Decision != DecisionType.CatCostSetting ||
+            ClientData.Decision != DecisionType.QuestionPriceSelection ||
             (ClientData.Answerer == null || message.Sender != ClientData.Answerer.Name) &&
             (!ClientData.IsOralNow || message.Sender != ClientData.ShowMan.Name))
         {
@@ -2538,7 +2545,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             Logic.AddHistory($"Current staker dropped");
 
-            if (ClientData.Decision == DecisionType.AuctionStakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
+            if (ClientData.Decision == DecisionType.StakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
             {
                 // Staker has been deleted. We need to move game futher
                 Logic.StopWaiting();

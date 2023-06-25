@@ -1110,4 +1110,7 @@
   <data name="Accept50Percent" xml:space="preserve">
     <value>Accept with half of price</value>
   </data>
+  <data name="AllowPlayersToActInOralGame" xml:space="preserve">
+    <value>Allow players to make actions in oral game</value>
+  </data>
 </root>

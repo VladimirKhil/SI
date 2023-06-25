@@ -86,22 +86,27 @@ public enum Tasks
     /// Продолжить отыгрыш вопроса
     /// </summary>
     ContinueQuestion,
+
     /// <summary>
-    /// Выяснение, кому будет отдан Вопрос с секретом
+    /// Ask to select question answerer.
     /// </summary>
-    AskCat,
+    AskToSelectQuestionAnswerer,
+
     /// <summary>
-    /// Ожидание решения игрока об отдаче Вопроса с секретом
+    /// Waiting for question answerer selection.
     /// </summary>
-    WaitCat,
+    WaitQuestionAnswererSelection,
+
     /// <summary>
-    /// Определение стоимости Вопроса с секретом
+    /// Ask player to select question price.
     /// </summary>
-    AskCatCost,
+    AskToSelectQuestionPrice,
+
     /// <summary>
-    /// Ожидание решения игрока о стоимости Вопросе с секретом
+    /// Waiting for question price selection.
     /// </summary>
-    WaitCatCost,
+    WaitSelectQuestionPrice,
+
     /// <summary>
     /// Ожидание решения ведущего о том, кто будет следующим делать ставку
     /// </summary>
@@ -264,29 +269,35 @@ public enum DialogModes
 public enum DecisionType
 {
     /// <summary>
-    /// Решение не ожидается
+    /// No decision.
     /// </summary>
     None,
+
     /// <summary>
-    /// Выбор вопроса
+    /// Question selection.
     /// </summary>
-    QuestionChoosing,
+    QuestionSelection,
+
     /// <summary>
-    /// Нажатие игроком кнопки
+    /// Player button pressing.
     /// </summary>
     PlayerButtonPressing,
+
     /// <summary>
-    /// Отдача Вопроса с секретом
+    /// Question answerer selection.
     /// </summary>
-    CatGiving,
+    QuestionAnswererSelection,
+
     /// <summary>
-    /// Выбор стоимости Вопроса с секретом
+    /// Question price selection.
     /// </summary>
-    CatCostSetting,
+    QuestionPriceSelection,
+
     /// <summary>
-    /// Выставление ставки на Вопросе со ставкой
+    /// Stake making.
     /// </summary>
-    AuctionStakeMaking,
+    StakeMaking,
+
     /// <summary>
     /// Удаление темы в финале
     /// </summary>

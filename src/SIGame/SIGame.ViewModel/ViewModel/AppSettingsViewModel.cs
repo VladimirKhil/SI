@@ -236,6 +236,7 @@ public sealed class AppSettingsViewModel : ViewModel<AppSettings>
         _model.FalseStart = AppSettingsCore.DefaultFalseStart;
         _model.HintShowman = AppSettingsCore.DefaultHintShowman;
         _model.Oral = AppSettingsCore.DefaultOral;
+        _model.OralPlayersActions = AppSettingsCore.DefaultOralPlayersActions;
         _model.IgnoreWrong = AppSettingsCore.DefaultIgnoreWrong;
         _model.GameMode = AppSettingsCore.DefaultGameMode;
         ThemeSettings.Reset();

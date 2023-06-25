@@ -949,104 +949,75 @@ public sealed class GameLogic : Logic<GameData>
     internal void CancelStop() => _stopReason = StopReason.None;
 
     /// <summary>
-    /// Решение принято
+    /// Processes decision been made.
     /// </summary>
-    private bool OnDecision()
+    private bool OnDecision() => _data.Decision switch
     {
-        switch (_data.Decision)
+        DecisionType.StarterChoosing => OnDecisionStarterChoosing(),
+        DecisionType.QuestionSelection => OnQuestionSelection(),
+        DecisionType.Answering => OnDecisionAnswering(),
+        DecisionType.AnswerValidating => OnDecisionAnswerValidating(),
+        DecisionType.QuestionAnswererSelection => QuestionAnswererSelection(),
+        DecisionType.QuestionPriceSelection => OnQuestionPriceSelection(),
+        DecisionType.NextPersonStakeMaking => OnDecisionNextPersonStakeMaking(),
+        DecisionType.StakeMaking => OnDecisionStakeMaking(),
+        DecisionType.NextPersonFinalThemeDeleting => OnNextPersonFinalThemeDeleting(),
+        DecisionType.FinalThemeDeleting => OnDecisionFinalThemeDeleting(),
+        DecisionType.FinalStakeMaking => OnFinalStakeMaking(),
+        DecisionType.AppellationDecision => OnAppellationDecision(),
+        _ => false,
+    };
+
+    private bool OnQuestionSelection()
+    {
+        if (_data.ThemeIndex == -1 || _data.QuestionIndex == -1)
         {
-            case DecisionType.StarterChoosing:
-                return OnDecisionStarterChoosing();
-
-            case DecisionType.QuestionChoosing:
-
-                #region QuestionChoosing
-
-                if (_data.ThemeIndex != -1 && _data.QuestionIndex != -1)
-                {
-                    _data.AppellationOpened = false;
-                    _data.AllowAppellation = false;
-                    StopWaiting();
-                    Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
-                    return true;
-                }
-
-                break;
-
-                #endregion
-
-            case DecisionType.Answering:
-                return OnDecisionAnswering();
-
-            case DecisionType.AnswerValidating:
-                return OnDecisionAnswerValidating();
-
-            case DecisionType.CatGiving:
-
-                #region CatGiving
-
-                if (_data.Answerer != null)
-                {
-                    StopWaiting();
-
-                    var s = _data.ChooserIndex == _data.AnswererIndex ? LO[nameof(R.ToMyself)] : _data.Answerer.Name;
-                    _gameActions.PlayerReplic(_data.ChooserIndex, s);
-
-                    _data.ChooserIndex = _data.AnswererIndex;
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-                    ScheduleExecution(Tasks.MoveNext, 10);
-                    return true;
-                }
-
-                break;
-
-                #endregion
-
-            case DecisionType.CatCostSetting:
-
-                #region CatCostSetting
-
-                if (_data.CurPriceRight != -1)
-                {
-                    StopWaiting();
-
-                    _data.CurPriceWrong = _data.CurPriceRight;
-                    _gameActions.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
-
-                    _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
-                    _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
-
-                    ScheduleExecution(Tasks.MoveNext, 20);
-                    return true;
-                }
-
-                break;
-
-                #endregion
-
-            case DecisionType.NextPersonStakeMaking:
-                return OnDecisionNextPersonStakeMaking();
-
-            case DecisionType.AuctionStakeMaking:
-                return OnDecisionAuctionStakeMaking();
-
-            case DecisionType.NextPersonFinalThemeDeleting:
-                return OnNextPersonFinalThemeDeleting();
-
-            case DecisionType.FinalThemeDeleting:
-                return OnDecisionFinalThemeDeleting();
-
-            case DecisionType.FinalStakeMaking:
-                return OnFinalStakeMaking();
-
-            case DecisionType.AppellationDecision:
-                return OnAppellationDecision();
-
-            default:
-                return false;
+            return false;
         }
 
-        return false;
+        _data.AppellationOpened = false;
+        _data.AllowAppellation = false;
+        StopWaiting();
+        Engine.SelectQuestion(_data.ThemeIndex, _data.QuestionIndex);
+        return true;
+    }
+
+    private bool QuestionAnswererSelection()
+    {
+        if (_data.Answerer == null)
+        {
+            return false;
+        }
+
+        StopWaiting();
+
+        var s = _data.ChooserIndex == _data.AnswererIndex ? LO[nameof(R.ToMyself)] : _data.Answerer.Name;
+        _gameActions.PlayerReplic(_data.ChooserIndex, s);
+
+        _data.ChooserIndex = _data.AnswererIndex;
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+        ScheduleExecution(Tasks.MoveNext, 10);
+        return true;
+    }
+
+    private bool OnQuestionPriceSelection()
+    {
+        if (_data.CurPriceRight == -1)
+        {
+            return false;
+        }
+
+        StopWaiting();
+
+        _data.CurPriceWrong = _data.CurPriceRight;
+        _gameActions.PlayerReplic(_data.AnswererIndex, _data.CurPriceRight.ToString());
+
+        _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
+        _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
+
+        ScheduleExecution(Tasks.MoveNext, 20);
+
+        return true;
     }
 
     private bool OnFinalStakeMaking()
@@ -1126,7 +1097,7 @@ public sealed class GameLogic : Logic<GameData>
         return true;
     }
 
-    private bool OnDecisionAuctionStakeMaking()
+    private bool OnDecisionStakeMaking()
     {
         if (!_data.StakeType.HasValue)
         {
@@ -1191,6 +1162,7 @@ public sealed class GameLogic : Logic<GameData>
             for (var i = 0; i < _data.Players.Count; i++)
             {
                 var player = _data.Players[i];
+
                 if (i != _data.StakerIndex && player.StakeMaking && player.Sum <= _data.Stake)
                 {
                     player.StakeMaking = false;
@@ -1204,7 +1176,7 @@ public sealed class GameLogic : Logic<GameData>
 
         var stakersCount = _data.Players.Count(p => p.StakeMaking);
 
-        if (stakersCount == 1) // Игрок определился
+        if (stakersCount == 1) // Answerer is defined
         {
             for (var i = 0; i < _data.Players.Count; i++)
             {
@@ -1214,7 +1186,7 @@ public sealed class GameLogic : Logic<GameData>
                 }
             }
 
-            ScheduleExecution(Tasks.PrintAuctPlayer, 10);
+            ScheduleExecution(Tasks.PrintAuctPlayer, 25);
             return true;
         }
         else if (stakersCount == 0)
@@ -1673,20 +1645,20 @@ public sealed class GameLogic : Logic<GameData>
                         PrintStakeQuestionPlayer();
                         break;
 
-                    case Tasks.AskCat:
-                        AskCat();
+                    case Tasks.AskToSelectQuestionAnswerer:
+                        AskToSelectQuestionAnswerer();
                         break;
 
-                    case Tasks.WaitCat:
-                        WaitCat();
+                    case Tasks.WaitQuestionAnswererSelection:
+                        WaitQuestionAnswererSelection();
                         break;
 
-                    case Tasks.AskCatCost:
-                        AskCatCost();
+                    case Tasks.AskToSelectQuestionPrice:
+                        AskToSelectQuestionPrice();
                         break;
 
-                    case Tasks.WaitCatCost:
-                        WaitCatCost();
+                    case Tasks.WaitSelectQuestionPrice:
+                        WaitSelectQuestionPrice();
                         break;
 
                     case Tasks.PrintPartial:
@@ -2061,7 +2033,7 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void AddHistory(string message) => _tasksHistory.AddLogEntry(message);
 
-    private void WaitCatCost()
+    private void WaitSelectQuestionPrice()
     {
         if (_data.AnswererIndex == -1)
         {
@@ -2195,7 +2167,7 @@ public sealed class GameLogic : Logic<GameData>
         OnDecision();
     }
 
-    private void AskCatCost()
+    private void AskToSelectQuestionPrice()
     {
         if (_data.AnswererIndex == -1)
         {
@@ -2213,7 +2185,8 @@ public sealed class GameLogic : Logic<GameData>
         {
             _gameActions.SendMessage(s, _data.ShowMan.Name);
         }
-        else
+        
+        if (CanPlayerAct())
         {
             _gameActions.SendMessage(s, _data.Answerer.Name);
 
@@ -2223,8 +2196,8 @@ public sealed class GameLogic : Logic<GameData>
             }
         }
 
-        ScheduleExecution(Tasks.WaitCatCost, waitTime);
-        WaitFor(DecisionType.CatCostSetting, waitTime, _data.AnswererIndex);
+        ScheduleExecution(Tasks.WaitSelectQuestionPrice, waitTime);
+        WaitFor(DecisionType.QuestionPriceSelection, waitTime, _data.AnswererIndex);
     }
 
     private void WaitFirst()
@@ -2281,7 +2254,7 @@ public sealed class GameLogic : Logic<GameData>
         OnDecision();
     }
 
-    private void WaitCat()
+    private void WaitQuestionAnswererSelection()
     {
         _gameActions.SendMessage(Messages.Cancel, _data.Chooser.Name);
 
@@ -3022,7 +2995,10 @@ public sealed class GameLogic : Logic<GameData>
                 time = 20;
             }
 
-            _gameActions.SendMessage(message, _data.Chooser.Name);
+            if (CanPlayerAct())
+            {
+                _gameActions.SendMessage(message, _data.Chooser.Name);
+            }
         }
         else
         {
@@ -3030,10 +3006,12 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         ScheduleExecution(Tasks.WaitChoose, time);
-        WaitFor(DecisionType.QuestionChoosing, time, _data.ChooserIndex);
+        WaitFor(DecisionType.QuestionSelection, time, _data.ChooserIndex);
     }
 
-    private void AskCat()
+    internal bool CanPlayerAct() => !_data.IsOralNow || _data.Settings.AppSettings.OralPlayersActions;
+
+    private void AskToSelectQuestionAnswerer()
     {
         var msg = new StringBuilder(Messages.Cat);
 
@@ -3057,10 +3035,13 @@ public sealed class GameLogic : Logic<GameData>
             waitTime = 20;
         }
 
-        _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
+        if (CanPlayerAct())
+        {
+            _gameActions.SendMessage(msg.ToString(), _data.Chooser.Name);
+        }
 
-        ScheduleExecution(Tasks.WaitCat, waitTime);
-        WaitFor(DecisionType.CatGiving, waitTime, _data.ChooserIndex);
+        ScheduleExecution(Tasks.WaitQuestionAnswererSelection, waitTime);
+        WaitFor(DecisionType.QuestionAnswererSelection, waitTime, _data.ChooserIndex);
     }
 
     private void AskFirst()
@@ -3224,11 +3205,12 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.IsOralNow)
         {
-            // Ведущий принимает ответ устно
+            // Showman accepts answer orally
             SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
         }
-        else
+        else // The only place where we do not check CanPlayerAct()
         {
+            // TODO: Support forced written answers here
             _gameActions.SendMessage(msg.ToString(), _data.Answerer.Name);
         }
 
@@ -3306,7 +3288,10 @@ public sealed class GameLogic : Logic<GameData>
             waitTime = 20;
         }
 
-        _gameActions.SendMessage(message, _data.ActivePlayer.Name);
+        if (CanPlayerAct())
+        {
+            _gameActions.SendMessage(message, _data.ActivePlayer.Name);
+        }
 
         _data.ThemeIndexToDelete = -1;
         ScheduleExecution(Tasks.WaitDelete, waitTime);
@@ -3539,14 +3524,14 @@ public sealed class GameLogic : Logic<GameData>
             var activePlayer = _data.Players[playerIndex];
             var playerMoney = activePlayer.Sum;
 
-            if (_data.Stake != -1 && playerMoney <= _data.Stake) // Не может сделать ставку
+            if (_data.Stake != -1 && playerMoney <= _data.Stake) // Could not make stakes
             {
                 activePlayer.StakeMaking = false;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, playerIndex, 2);
 
                 var stakersCount = _data.Players.Count(p => p.StakeMaking);
 
-                if (stakersCount == 1) // Игрок определился
+                if (stakersCount == 1) // Answerer is detected
                 {
                     for (var i = 0; i < _data.Players.Count; i++)
                     {
@@ -3564,9 +3549,9 @@ public sealed class GameLogic : Logic<GameData>
                 return;
             }
 
-            // Теперь определим возможные ставки
+            // Detecting possible stake outcomes
 
-            // Только номинал
+            // Only nominal
             if (_data.Stake == -1 && (playerMoney < cost || playerMoney == cost && others.All(p => playerMoney >= p.Sum)))
             {
                 var s = new StringBuilder(activePlayer.Name)
@@ -3612,14 +3597,7 @@ public sealed class GameLogic : Logic<GameData>
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
-            if (_data.IsOralNow)
-            {
-                _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
-                stakeMsg.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
-                stakeMsg.Add(_data.ActivePlayer.Name);
-                _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
-            }
-            else
+            if (CanPlayerAct())
             {
                 _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
 
@@ -3629,10 +3607,17 @@ public sealed class GameLogic : Logic<GameData>
                 }
             }
 
+            if (_data.IsOralNow)
+            {
+                stakeMsg.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
+                stakeMsg.Add(_data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
+            }
+
             _data.StakeType = null;
             _data.StakeSum = -1;
             ScheduleExecution(Tasks.WaitStake, waitTime);
-            WaitFor(DecisionType.AuctionStakeMaking, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
+            WaitFor(DecisionType.StakeMaking, waitTime, _data.Players.IndexOf(_data.ActivePlayer));
         }
         catch (Exception exc)
         {
@@ -4427,7 +4412,7 @@ public sealed class GameLogic : Logic<GameData>
         else
         {
             _gameActions.ShowmanReplic($"{_data.Chooser.Name}, {LO[nameof(R.GiveCat)]}");
-            ScheduleExecution(Tasks.AskCat, 10 + Random.Shared.Next(10), force: true);
+            ScheduleExecution(Tasks.AskToSelectQuestionAnswerer, 10 + Random.Shared.Next(10), force: true);
         }
     }
 
@@ -4543,7 +4528,7 @@ public sealed class GameLogic : Logic<GameData>
             else
             {
                 _data.CurPriceRight = -1;
-                ScheduleExecution(Tasks.AskCatCost, 1, force: true);
+                ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
             }
         }
         else if (availableRange.Minimum == availableRange.Maximum)
@@ -4564,7 +4549,7 @@ public sealed class GameLogic : Logic<GameData>
             else
             {
                 _data.CurPriceRight = -1;
-                ScheduleExecution(Tasks.AskCatCost, 1, force: true);
+                ScheduleExecution(Tasks.AskToSelectQuestionPrice, 1, force: true);
             }
         }
     }

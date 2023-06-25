@@ -107,9 +107,16 @@
         <CheckBox IsChecked="{Binding Model.Oral}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.OralGame}" />
         </CheckBox>
-        
+
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" TextWrapping="Wrap" Text="{x:Static lp:Resources.OralGame_Hint}" />
-       
+
+        <CheckBox
+            IsChecked="{Binding Model.OralPlayersActions}"
+            Style="{StaticResource HeaderBox}"
+            IsEnabled="{Binding Model.Oral}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.AllowPlayersToActInOralGame}" />
+        </CheckBox>
+
         <CheckBox IsChecked="{Binding Model.FalseStart}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.FalseStart}" />
         </CheckBox>
