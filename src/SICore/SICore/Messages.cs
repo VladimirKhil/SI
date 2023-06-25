@@ -480,6 +480,11 @@ public static class Messages
     public const string Validation = "VALIDATION";
 
     /// <summary>
+    /// Answer validation.
+    /// </summary>
+    public const string Validation2 = "VALIDATION2";
+
+    /// <summary>
     /// Победитель
     /// </summary>
     public const string Winner = "WINNER";

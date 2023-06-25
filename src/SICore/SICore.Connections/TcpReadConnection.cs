@@ -72,10 +72,12 @@ public abstract class TcpReadConnection : ConnectionBase
 
             var ns = _tcpClient.GetStream();
             ns.ReadTimeout = 20 * 1000;
+
             while (true)
             {
                 // TODO: use Memory
                 var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken);
+
                 if (bytesRead < 1)
                 {
                     // Нормальное закрытие соединения
@@ -99,8 +101,11 @@ public abstract class TcpReadConnection : ConnectionBase
                         _bufferCache.RemoveRange(0, _messageSize);
 
                         _messageSize = -1;
+
                         if (Deserialize(data, out Message message))
+                        {
                             OnMessageReceived(message);
+                        }
                     }
                 }
             }
@@ -137,6 +142,7 @@ public abstract class TcpReadConnection : ConnectionBase
             {
                 // TODO: use Memory
                 var bytesRead = await ns.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken);
+
                 if (bytesRead < 1)
                 {
                     break;
@@ -193,6 +199,7 @@ public abstract class TcpReadConnection : ConnectionBase
 
             var buffer = result.Buffer;
             SequencePosition? position;
+
             do
             {
                 position = buffer.PositionOf((byte)0);
@@ -225,6 +232,7 @@ public abstract class TcpReadConnection : ConnectionBase
         {
             // TODO: use Memory
             var bytesRead = await networkStream.ReadAsync(buffer, 0, buffer.Length);
+
             if (bytesRead < 1)
             {
                 // Нормальное закрытие соединения
@@ -248,6 +256,7 @@ public abstract class TcpReadConnection : ConnectionBase
             .ToDictionary(val => val.Name, val => val.Value);
 
         string connectionIdHeader = "";
+
         if (!headers.TryGetValue("ConnectionId", out string connectionId))
         {
             connectionId = Guid.NewGuid().ToString();

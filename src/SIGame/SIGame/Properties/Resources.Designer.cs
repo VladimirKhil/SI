@@ -106,6 +106,24 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Accept with doubled price.
+        /// </summary>
+        public static string Accept200Percent {
+            get {
+                return ResourceManager.GetString("Accept200Percent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Accept with half of price.
+        /// </summary>
+        public static string Accept50Percent {
+            get {
+                return ResourceManager.GetString("Accept50Percent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Computer.
         /// </summary>
         public static string AccountTypes_Computer {

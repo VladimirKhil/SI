@@ -1104,4 +1104,10 @@
   <data name="EvenWithNegativeScore" xml:space="preserve">
     <value>even having 0 or negative score</value>
   </data>
+  <data name="Accept200Percent" xml:space="preserve">
+    <value>Accept with doubled price</value>
+  </data>
+  <data name="Accept50Percent" xml:space="preserve">
+    <value>Accept with half of price</value>
+  </data>
 </root>

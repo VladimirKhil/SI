@@ -1107,4 +1107,10 @@
   <data name="EvenWithNegativeScore" xml:space="preserve">
     <value>даже с 0 или отрицательным счётом</value>
   </data>
+  <data name="Accept200Percent" xml:space="preserve">
+    <value>Зачесть удвоенную сумму</value>
+  </data>
+  <data name="Accept50Percent" xml:space="preserve">
+    <value>Зачесть половину суммы</value>
+  </data>
 </root>

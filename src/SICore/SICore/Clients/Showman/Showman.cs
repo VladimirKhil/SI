@@ -17,7 +17,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
     {
         ClientData.PersonDataExtensions.IsRight = new CustomCommand(arg =>
         {
-            _viewerActions.SendMessage(Messages.IsRight, "+");
+            _viewerActions.SendMessage(Messages.IsRight, "+", arg?.ToString() ?? "1");
             ClearSelections();
         });
 
@@ -223,6 +223,10 @@ public sealed class Showman : Viewer<IShowmanLogic>
                     OnValidation(mparams);
                     break;
 
+                case Messages.Validation2:
+                    OnValidation2(mparams);
+                    break;
+
                 case Messages.FirstDelete:
                     {
                         #region FirstDelete
@@ -359,7 +363,6 @@ public sealed class Showman : Viewer<IShowmanLogic>
     {
         ClientData.PersonDataExtensions.ValidatorName = mparams[1];
         ClientData.PersonDataExtensions.Answer = mparams[2];
-        _logic.IsRight();
         _ = int.TryParse(mparams[4], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
 
@@ -383,6 +386,39 @@ public sealed class Showman : Viewer<IShowmanLogic>
         ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
         ClientData.DialogMode = DialogModes.AnswerValidation;
         ((PersonAccount)ClientData.Me).IsDeciding = false;
+        _logic.IsRight();
+    }
+
+    private void OnValidation2(string[] mparams)
+    {
+        ClientData.PersonDataExtensions.ValidatorName = mparams[1];
+        ClientData.PersonDataExtensions.Answer = mparams[2];
+        _ = int.TryParse(mparams[5], out var rightAnswersCount);
+        rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
+
+        var right = new List<string>();
+
+        for (var i = 0; i < rightAnswersCount; i++)
+        {
+            right.Add(mparams[6 + i]);
+        }
+
+        var wrong = new List<string>();
+
+        for (var i = 6 + rightAnswersCount; i < mparams.Length; i++)
+        {
+            wrong.Add(mparams[i]);
+        }
+
+        ClientData.PersonDataExtensions.Right = right.ToArray();
+        ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
+        ClientData.PersonDataExtensions.ShowExtraRightButtons = mparams[4] == "+";
+
+        ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
+        ClientData.DialogMode = DialogModes.AnswerValidation;
+        ((PersonAccount)ClientData.Me).IsDeciding = false;
+
+        _logic.IsRight();
     }
 
     private void ClearSelections(bool full = false) => _logic.ClearSelections(full);

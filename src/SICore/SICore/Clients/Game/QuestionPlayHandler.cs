@@ -26,6 +26,7 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         GameData.IsQuestionFinished = true;
         GameData.IsPlayingMedia = false;
         GameData.IsPlayingMediaPaused = false;
+        GameData.AnswerMode = mode;
 
         switch (mode)
         {

@@ -98,6 +98,25 @@ public sealed class PersonData : INotifyPropertyChanged
         }
     }
 
+    private bool _showExtraRightButtons;
+
+    /// <summary>
+    /// Show additional buttons for accepting right answer with different reward.
+    /// </summary>
+    public bool ShowExtraRightButtons
+    {
+        get => _showExtraRightButtons;
+        set
+        {
+            if (_showExtraRightButtons != value)
+            {
+                _showExtraRightButtons = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+
     private ICommand? _isRight = null;
 
     public ICommand? IsRight

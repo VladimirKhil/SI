@@ -54,6 +54,12 @@ public sealed class GamePlayerAccount : GamePersonAccount
 
     // TODO: Will be moved to QuestionPlayState
     /// <summary>
+    /// Answer right price factor.
+    /// </summary>
+    internal double AnswerIsRightFactor { get; set; } = 1.0;
+
+    // TODO: Will be moved to QuestionPlayState
+    /// <summary>
     /// Ответ заведомо неверен
     /// </summary>
     internal bool AnswerIsWrong { get; set; }

@@ -1250,7 +1250,7 @@ public sealed class GameLogic : Logic<GameData>
         if (_data.Answerer.AnswerIsRight)
         {
             answerResult.IsRight = true;
-            var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Auction ? nameof(R.Bravo) : nameof(R.Right);
+            var showmanReplic = IsFinalRound() || _data.Question.Type.Name == QuestionTypes.Stake ? nameof(R.Bravo) : nameof(R.Right);
             
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
@@ -1271,7 +1271,11 @@ public sealed class GameLogic : Logic<GameData>
                     });
                 }
 
-                s.AppendFormat(" (+{0})", _data.CurPriceRight.ToString().FormatNumber());
+                s.AppendFormat(
+                    " (+{0}{1})",
+                    _data.CurPriceRight.ToString().FormatNumber(),
+                    Math.Abs(_data.Answerer.AnswerIsRightFactor - 1.0) < double.Epsilon ? "" : " * " + _data.Answerer.AnswerIsRightFactor);
+
                 _gameActions.ShowmanReplic(s.ToString());
 
                 s = new StringBuilder(Messages.Person)
@@ -1284,7 +1288,7 @@ public sealed class GameLogic : Logic<GameData>
 
                 _gameActions.SendMessage(s.ToString());
 
-                _data.Answerer.Sum += _data.CurPriceRight;
+                _data.Answerer.Sum += (int)(_data.CurPriceRight * _data.Answerer.AnswerIsRightFactor);
                 _data.ChooserIndex = _data.AnswererIndex;
                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
                 _gameActions.InformSums();
@@ -2049,6 +2053,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _data.Answerer.AnswerIsRight = isRight;
+        _data.Answerer.AnswerIsRightFactor = 1.0;
 
         _data.ShowmanDecision = true;
         OnDecision();
@@ -3120,6 +3125,7 @@ public sealed class GameLogic : Logic<GameData>
             _data.Decision = DecisionType.AnswerValidating;
 
             _data.Answerer.AnswerIsRight = !_data.Answerer.AnswerIsWrong;
+            _data.Answerer.AnswerIsRightFactor = 1.0;
             _data.ShowmanDecision = true;
 
             OnDecision();
@@ -3137,8 +3143,14 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
-    private void SendAnswersInfoToShowman(string answer) =>
+    private void SendAnswersInfoToShowman(string answer)
+    {
         _gameActions.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
+
+        _gameActions.SendMessage(
+            BuildValidation2Message(_data.Answerer.Name, answer, _data.AnswerMode == StepParameterValues.AskAnswerMode_Button),
+            _data.ShowMan.Name);
+    }
 
     private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
     {
@@ -3146,6 +3158,23 @@ public sealed class GameLogic : Logic<GameData>
         var wrongAnswers = _data.Question.Wrong;
 
         return new MessageBuilder(Messages.Validation, name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
+            .AddRange(rightAnswers)
+            .AddRange(wrongAnswers)
+            .Build();
+    }
+
+    private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
+    {
+        var rightAnswers = _data.Question.Right;
+        var wrongAnswers = _data.Question.Wrong;
+
+        return new MessageBuilder(
+            Messages.Validation2,
+            name,
+            answer,
+            isCheckingForTheRight ? '+' : '-',
+            allowPriceModifications ? '+' : '-',
+            rightAnswers.Count)
             .AddRange(rightAnswers)
             .AddRange(wrongAnswers)
             .Build();
@@ -3667,6 +3696,7 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
         var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
+        var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer, false, _data.IsAppelationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
         _data.AppellationTotalVoteCount = _data.Players.Count + 1; // players and showman
@@ -3701,6 +3731,7 @@ public sealed class GameLogic : Logic<GameData>
                 _data.AppellationAwaitedVoteCount++;
                 _data.Players[i].Flag = true;
                 _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
+                _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
             }
         }
 

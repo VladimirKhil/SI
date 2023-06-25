@@ -1969,6 +1969,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             ClientData.Decision = DecisionType.AnswerValidating;
             ClientData.Answerer.AnswerIsRight = args[1] == "+";
+            ClientData.Answerer.AnswerIsRightFactor = args.Length > 2 && double.TryParse(args[2], out var factor) && factor > 0.0 ? factor : 1.0;
             ClientData.ShowmanDecision = true;
 
             _logic.Stop(StopReason.Decision);

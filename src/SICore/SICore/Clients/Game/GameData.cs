@@ -607,6 +607,11 @@ public sealed class GameData : Data
     /// </summary>
     public string[] Files { get; internal set; }
 
+    /// <summary>
+    /// Current answer mode.
+    /// </summary>
+    public string AnswerMode { get; internal set; }
+
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {
         _showMan = showman;
