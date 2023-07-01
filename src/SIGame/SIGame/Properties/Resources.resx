@@ -1128,4 +1128,7 @@
   <data name="JoinModeViewer" xml:space="preserve">
     <value>Only as viewer</value>
   </data>
+  <data name="DisplaySources" xml:space="preserve">
+    <value>Display questions sources</value>
+  </data>
 </root>

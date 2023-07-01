@@ -170,6 +170,10 @@
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.NoPenaltyForWrongAnswer}" />
         </CheckBox>
 
+        <CheckBox IsChecked="{Binding Model.DisplaySources}" Style="{StaticResource HeaderBox}">
+            <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.DisplaySources}" />
+        </CheckBox>
+
         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ReadingSpeed}" />
         
         <TextBlock Style="{StaticResource CommonText}" Foreground="White" Text="{x:Static lp:Resources.CharactersPerSecond}" />

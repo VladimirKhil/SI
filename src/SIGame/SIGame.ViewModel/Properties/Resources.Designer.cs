@@ -448,6 +448,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на ping penalty.
+        /// </summary>
+        public static string GameRule_PingPenalty {
+            get {
+                return ResourceManager.GetString("GameRule_PingPenalty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на simplified.
         /// </summary>
         public static string GameRule_Sport {

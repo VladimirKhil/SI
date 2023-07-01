@@ -19,6 +19,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultOralPlayersActions = false;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
+    public const bool DefaultDisplaySources = false;
     public const bool DefaultUsePingPenalty = false;
     public const bool DefaultPreloadRoundContent = true;
     public const GameModes DefaultGameMode = GameModes.Tv;
@@ -188,6 +189,20 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     {
         get => _ignoreWrong;
         set { _ignoreWrong = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private bool _displaySources = DefaultDisplaySources;
+
+    /// <summary>
+    /// Diplay package items sources.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultDisplaySources)]
+    public bool DisplaySources
+    {
+        get => _displaySources;
+        set { _displaySources = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

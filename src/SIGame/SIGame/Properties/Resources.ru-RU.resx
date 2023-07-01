@@ -1131,4 +1131,7 @@
   <data name="JoinModeViewer" xml:space="preserve">
     <value>Только зрителем</value>
   </data>
+  <data name="DisplaySources" xml:space="preserve">
+    <value>Показывать источники вопросов</value>
+  </data>
 </root>

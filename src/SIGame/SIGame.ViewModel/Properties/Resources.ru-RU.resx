@@ -498,4 +498,7 @@
   <data name="CannotJoinGame" xml:space="preserve">
     <value>Не удалось войти в игру</value>
   </data>
+  <data name="GameRule_PingPenalty" xml:space="preserve">
+    <value>штраф за пинг</value>
+  </data>
 </root>

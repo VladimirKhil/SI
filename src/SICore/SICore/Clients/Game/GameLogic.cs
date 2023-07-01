@@ -200,7 +200,7 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.PackageId, package.ID));
         _gameActions.InformRoundsNames();
 
-        ProcessPackage(package, 1);
+        OnPackage(package, 1);
     }
 
     private void Engine_GameThemes(string[] gameThemes)
@@ -225,7 +225,7 @@ public sealed class GameLogic : Logic<GameData>
         _data.StakerIndex = -1;
         _data.Type = null;
 
-        ProcessRound(round, 1);
+        OnRound(round, 1);
 
         if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
         {
@@ -1597,11 +1597,11 @@ public sealed class GameLogic : Logic<GameData>
                         break;
 
                     case Tasks.Package:
-                        ProcessPackage(_data.Package, arg);
+                        OnPackage(_data.Package, arg);
                         break;
 
                     case Tasks.Round:
-                        ProcessRound(_data.Round, arg);
+                        OnRound(_data.Round, arg);
                         break;
 
                     case Tasks.AskFirst:
@@ -2732,7 +2732,7 @@ public sealed class GameLogic : Logic<GameData>
         {
             var sources = _data.PackageDoc.GetRealSources(_data.Question.Info.Sources);
 
-            if (sources.Length > 0)
+            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 var text = string.Format(OfObjectPropertyFormat, LO[nameof(R.PSources)], LO[nameof(R.OfQuestion)], string.Join(", ", sources));
                 _gameActions.ShowmanReplic(text);
@@ -3890,7 +3890,7 @@ public sealed class GameLogic : Logic<GameData>
         {
             var sources = _data.PackageDoc.GetRealSources(theme.Info.Sources);
 
-            if (sources.Length > 0)
+            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -3936,14 +3936,14 @@ public sealed class GameLogic : Logic<GameData>
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Go, time, person);
     }
 
-    private void ProcessPackage(Package package, int arg)
+    private void OnPackage(Package package, int stage)
     {
         var informed = false;
         var isRandomPackage = package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
 
         var baseTime = 0;
 
-        if (arg == 1)
+        if (stage == 1)
         {
             if (!isRandomPackage)
             {
@@ -3983,11 +3983,11 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 2)
+        if (stage == 2)
         {
             var authors = _data.PackageDoc.GetRealAuthors(package.Info.Authors);
 
@@ -4000,15 +4000,15 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 3)
+        if (stage == 3)
         {
             var sources = _data.PackageDoc.GetRealSources(package.Info.Sources);
 
-            if (sources.Length > 0)
+            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4017,11 +4017,11 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 4)
+        if (stage == 4)
         {
             if (package.Info.Comments.Text.Length > 0 && !isRandomPackage)
             {
@@ -4034,11 +4034,11 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 5)
+        if (stage == 5)
         {
             if (!string.IsNullOrWhiteSpace(package.Restriction))
             {
@@ -4049,11 +4049,11 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 6)
+        if (stage == 6)
         {
             if (!string.IsNullOrWhiteSpace(package.Date) && !isRandomPackage)
             {
@@ -4064,13 +4064,13 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg < 6)
+        if (stage < 6)
         {
-            ScheduleExecution(Tasks.Package, baseTime + 15, arg + 1, force: !informed);
+            ScheduleExecution(Tasks.Package, baseTime + 15, stage + 1, force: !informed);
         }
         else if (informed)
         {
@@ -4082,12 +4082,12 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
-    private void ProcessRound(Round round, int arg)
+    private void OnRound(Round round, int stage)
     {
         var informed = false;
-        var baseTime = arg == 1 ? 30 : 20;
+        var baseTime = stage == 1 ? 30 : 20;
 
-        if (arg == 1)
+        if (stage == 1)
         {
             _gameActions.InformSums();
 
@@ -4144,7 +4144,7 @@ public sealed class GameLogic : Logic<GameData>
                 RandomizeSpecials(round);
             }
         }
-        else if (arg == 2)
+        else if (stage == 2)
         {
             var authors = _data.PackageDoc.GetRealAuthors(round.Info.Authors);
 
@@ -4157,15 +4157,15 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 3)
+        if (stage == 3)
         {
             var sources = _data.PackageDoc.GetRealSources(round.Info.Sources);
 
-            if (sources.Length > 0)
+            if (sources.Length > 0 && _data.Settings.AppSettings.DisplaySources)
             {
                 informed = true;
                 var res = new StringBuilder();
@@ -4174,11 +4174,11 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
-        if (arg == 4)
+        if (stage == 4)
         {
             if (round.Info.Comments.Text.Length > 0)
             {
@@ -4191,13 +4191,13 @@ public sealed class GameLogic : Logic<GameData>
             }
             else
             {
-                arg++;
+                stage++;
             }
         }
 
         var adShown = false;
 
-        if (arg == 5)
+        if (stage == 5)
         {
             // Showing advertisement
             try
@@ -4224,19 +4224,19 @@ public sealed class GameLogic : Logic<GameData>
                 }
                 else
                 {
-                    arg++;
+                    stage++;
                 }
             }
             catch (Exception exc)
             {
                 _data.BackLink.SendError(exc);
-                arg++;
+                stage++;
             }
         }
 
-        if (arg < 5)
+        if (stage < 5)
         {
-            ScheduleExecution(Tasks.Round, baseTime + Random.Shared.Next(10), arg + 1);
+            ScheduleExecution(Tasks.Round, baseTime + Random.Shared.Next(10), stage + 1);
         }
         else if (informed)
         {

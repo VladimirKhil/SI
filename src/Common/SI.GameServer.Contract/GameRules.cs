@@ -9,5 +9,10 @@ public enum GameRules
     None = 0,
     FalseStart = 1,
     Oral = 2,
-    IgnoreWrong = 4
+    IgnoreWrong = 4,
+
+    /// <summary>
+    /// Ping penalty.
+    /// </summary>
+    PingPenalty = 8,
 }

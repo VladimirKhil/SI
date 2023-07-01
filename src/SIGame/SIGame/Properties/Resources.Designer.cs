@@ -619,6 +619,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Display questions sources.
+        /// </summary>
+        public static string DisplaySources {
+            get {
+                return ResourceManager.GetString("DisplaySources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Donate....
         /// </summary>
         public static string Donate {
