@@ -51,6 +51,23 @@ public sealed class Showman : Viewer<IShowmanLogic>
             ClientData.Hint = LO[nameof(R.HintSelectPlayerForSumChange)];
         });
 
+        ClientData.ShowmanDataExtensions.ChangeActivePlayer = new CustomCommand(arg =>
+        {
+            for (int i = 0; i < ClientData.Players.Count; i++)
+            {
+                ClientData.Players[i].CanBeSelected = true;
+                int num = i;
+
+                ClientData.Players[i].SelectionCallback = player =>
+                {
+                    _viewerActions.SendMessageWithArgs(Messages.SetChooser, num);
+                    ClearSelections();
+                };
+            }
+
+            ClientData.Hint = LO[nameof(R.HintSelectPlayerForSumChange)];
+        });
+
         ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>
         {
             _viewerActions.SendMessageWithArgs(

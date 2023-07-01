@@ -20,7 +20,7 @@
             <Setter Property="Padding" Value="3" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
-            
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ButtonBase}">
@@ -33,7 +33,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            
+
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
@@ -45,44 +45,44 @@
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
-            
+
             <Setter Property="Focusable" Value="False" />
-            
+
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ButtonBase}}">
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
                     <Setter Property="Foreground" Value="{StaticResource MainColor}" />
                 </Trigger>
-                
+
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
                         <Condition Property="IsMouseOver" Value="True" />
                     </MultiTrigger.Conditions>
-                    
+
                     <Setter Property="Background" Value="{StaticResource HoverColor}" />
                 </MultiTrigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type ButtonBase}}">
             <Style.Triggers>
                 <Trigger Property="Command" Value="{x:Null}">
                     <Setter Property="IsEnabled" Value="False" />
                 </Trigger>
-                
+
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{StaticResource HoverColor}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style TargetType="local:DropDownButton" BasedOn="{StaticResource {x:Type ButtonBase}}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -90,7 +90,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
             <Setter Property="Content" Value="⏸" />
             <Setter Property="ToolTip" Value="{x:Static lp:Resources.Pause}" />
@@ -135,7 +135,7 @@
                 CornerRadius="25"
                 BorderThickness="1"
                 MaxWidth="{Binding Path=ActualHeight, RelativeSource={RelativeSource Self}, Converter={StaticResource Multiplier}, ConverterParameter=5}">
-                
+
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Offset="0" Color="#FFFF7F7F" />
@@ -144,7 +144,7 @@
                         <GradientStop Offset="1" Color="#FF690000" />
                     </LinearGradientBrush>
                 </Border.Background>
-                
+
                 <Border Name="BdI" BorderThickness="0" CornerRadius="25" Opacity="0">
                     <Border.Background>
                         <RadialGradientBrush RadiusX="1.0" RadiusY="1.0">
@@ -155,7 +155,7 @@
                     </Border.Background>
                 </Border>
             </Border>
-            
+
             <ControlTemplate.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Trigger.EnterActions>
@@ -166,13 +166,13 @@
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                     To="#77666666"
                                     Duration="0:0:0.0" />
-                                
+
                                 <ColorAnimation
                                     Storyboard.TargetName="BdI"
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                     To="#77666666"
                                     Duration="0:0:0.0" />
-                                
+
                                 <ColorAnimation
                                     Storyboard.TargetName="BdI"
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
@@ -181,7 +181,7 @@
                             </Storyboard>
                         </BeginStoryboard>
                     </Trigger.EnterActions>
-                    
+
                     <Trigger.ExitActions>
                         <BeginStoryboard>
                             <Storyboard>
@@ -189,12 +189,12 @@
                                     Storyboard.TargetName="BdI"
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[0].(GradientStop.Color)"
                                     Duration="0:0:0.0" />
-                                
+
                                 <ColorAnimation
                                     Storyboard.TargetName="BdI"
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                     Duration="0:0:0.0" />
-                                
+
                                 <ColorAnimation
                                     Storyboard.TargetName="BdI"
                                     Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[2].(GradientStop.Color)"
@@ -204,7 +204,7 @@
                     </Trigger.ExitActions>
                     <Setter TargetName="BdI" Property="Opacity" Value="1" />
                 </Trigger>
-                
+
                 <EventTrigger RoutedEvent="Control.MouseEnter">
                     <BeginStoryboard>
                         <Storyboard>
@@ -212,7 +212,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
-                
+
                 <EventTrigger RoutedEvent="Control.MouseLeave">
                     <BeginStoryboard>
                         <Storyboard>
@@ -220,7 +220,7 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
-                
+
                 <EventTrigger RoutedEvent="Button.Click">
                     <BeginStoryboard>
                         <Storyboard>
@@ -229,15 +229,15 @@
                                 Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                 To="#AAFFDD00"
                                 Duration="0:0:0.2" />
-                            
+
                             <ColorAnimation
                                 Storyboard.TargetName="BdI"
                                 Storyboard.TargetProperty="(Border.Background).(GradientBrush.GradientStops)[1].(GradientStop.Color)"
                                 BeginTime="0:0:0.4"
                                 Duration="0:0:0.2" />
-                            
+
                             <ThicknessAnimation Storyboard.TargetName="BdI" Storyboard.TargetProperty="(Border.Margin)" To="-7" Duration="0:0:0.2" />
-                            
+
                             <ThicknessAnimation
                                 Storyboard.TargetName="BdI"
                                 Storyboard.TargetProperty="(Border.Margin)"
@@ -260,7 +260,6 @@
             <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" BeginTime="0:0:0.4" Duration="0:0:0.2" />
         </Storyboard>
     </UserControl.Resources>
-    
     <Grid>        
         <Grid.RowDefinitions>
             <RowDefinition Height="16*" />
@@ -441,6 +440,14 @@
                 Content="⏩"
                 ToolTip="{x:Static lp:Resources.Pass}"
                 FontSize="20" />
+
+            <Button
+                Width="70"
+                Cursor="Hand"
+                Command="{Binding Data.ShowmanDataExtensions.ChangeActivePlayer}"
+                Content="♟️"
+                FontSize="20"
+                ToolTip="{x:Static lp:Resources.ChangeActivePlayer_Hint}" />
 
             <Button
                 Width="70"

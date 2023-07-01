@@ -1886,6 +1886,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
             ClientData.PlayerDataExtensions.SendAnswerVersion =
             ClientData.PlayerDataExtensions.SendAnswer =
             ClientData.ShowmanDataExtensions.ChangeSums =
+            ClientData.ShowmanDataExtensions.ChangeActivePlayer =
             ClientData.ShowmanDataExtensions.ChangeSums2 =
             ClientData.ShowmanDataExtensions.Manage =
             ClientData.ShowmanDataExtensions.ManageTable =

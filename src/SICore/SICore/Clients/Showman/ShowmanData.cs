@@ -9,12 +9,12 @@ namespace SICore;
 /// </summary>
 public sealed class ShowmanData : INotifyPropertyChanged
 {
-    private ICommand _changeSums;
+    private ICommand? _changeSums;
 
     /// <summary>
-    /// Изменить суммы участников
+    /// Change players score.
     /// </summary>
-    public ICommand ChangeSums
+    public ICommand? ChangeSums
     {
         get => _changeSums;
         set
@@ -22,6 +22,24 @@ public sealed class ShowmanData : INotifyPropertyChanged
             if (_changeSums != value)
             {
                 _changeSums = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private ICommand? _changeActivePlayer;
+
+    /// <summary>
+    /// Change active player.
+    /// </summary>
+    public ICommand? ChangeActivePlayer
+    {
+        get => _changeActivePlayer;
+        set
+        {
+            if (_changeActivePlayer != value)
+            {
+                _changeActivePlayer = value;
                 OnPropertyChanged();
             }
         }

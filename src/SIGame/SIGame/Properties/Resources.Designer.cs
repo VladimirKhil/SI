@@ -448,6 +448,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Change active player.
+        /// </summary>
+        public static string ChangeActivePlayer_Hint {
+            get {
+                return ResourceManager.GetString("ChangeActivePlayer_Hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Change to Computer.
         /// </summary>
         public static string ChangeToComputer {

@@ -1116,4 +1116,7 @@
   <data name="AllowPlayersToActInOralGame" xml:space="preserve">
     <value>Разрешать игрокам делать выбор в устной игре</value>
   </data>
+  <data name="ChangeActivePlayer_Hint" xml:space="preserve">
+    <value>Передать ход игроку</value>
+  </data>
 </root>

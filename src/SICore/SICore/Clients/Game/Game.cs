@@ -536,6 +536,17 @@ public sealed class Game : Actor<GameData, GameLogic>
                         }
                         break;
 
+                    case Messages.SetChooser:
+                        if (message.Sender == ClientData.ShowMan.Name && args.Length > 1)
+                        {
+                            if (int.TryParse(args[1], out int playerIndex) && playerIndex > -1 && playerIndex < ClientData.Players.Count)
+                            {
+                                ClientData.ChooserIndex = playerIndex;
+                                _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+                            }
+                        }
+                        break;
+
                     case Messages.Pause:
                         OnPause(message, args);
                         break;

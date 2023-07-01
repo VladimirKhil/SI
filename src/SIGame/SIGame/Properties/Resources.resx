@@ -1113,4 +1113,7 @@
   <data name="AllowPlayersToActInOralGame" xml:space="preserve">
     <value>Allow players to make actions in oral game</value>
   </data>
+  <data name="ChangeActivePlayer_Hint" xml:space="preserve">
+    <value>Change active player</value>
+  </data>
 </root>
