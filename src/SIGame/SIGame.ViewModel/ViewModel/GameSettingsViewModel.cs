@@ -732,6 +732,8 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             avatarHelper)
             .Run();
 
+        host.MyData.IsNetworkGame = NetworkGame;
+
         if (!NetworkGame)
         {
             host.MyData.IsChatOpened = false;

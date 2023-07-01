@@ -11,6 +11,8 @@
     xmlns:lp="clr-namespace:SIGame.Properties"
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lvm="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:scm="clr-namespace:SICore.Models;assembly=SICore"
     d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}"
     DataContextChanged="UserControl_DataContextChanged">
     <UserControl.Resources>
@@ -18,6 +20,14 @@
         <CollectionViewSource x:Key="Persons" Source="{Binding Data.AllPersons}" />
         <CollectionViewSource x:Key="Banned" Source="{Binding Data.Banned}" />
         <lc:HostNameConverter x:Key="HostNameConverter" />
+
+        <ObjectDataProvider x:Key="JoinModes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="scm:JoinMode" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <lc:EnumConverter x:Key="JoinModeConverter" EnumType="{x:Type scm:JoinMode}" />
     </UserControl.Resources>
     
     <TabControl Padding="0" BorderThickness="0" FontSize="19">
@@ -62,41 +72,75 @@
 
         <TabItem Header="👤" ToolTip="{x:Static lp:Resources.Persons}" Style="{StaticResource StudiaTab}">
             <DockPanel Background="{StaticResource SemiTransparentLightBlueVioletBrushKey}">
-                <UniformGrid DockPanel.Dock="Bottom" Columns="2">
+                <DockPanel
+                    DockPanel.Dock="Bottom"
+                    Visibility="{Binding Data.IsNetworkGame, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                    <UniformGrid
+                        DockPanel.Dock="Bottom"
+                        Columns="2"
+                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}">
+                        <Button
+                            Style="{StaticResource SIButtonSimple}"
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,0,-1"
+                            Padding="20,4"
+                            Command="{Binding Data.Kick}"
+                            CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                            FontSize="18"
+                            TextBlock.LineHeight="18"
+                            Content="{x:Static lp:Resources.Kick}" />
+
+                        <Button
+                            Style="{StaticResource SIButtonSimple}"
+                            Background="{StaticResource WindowBackground}"
+                            Margin="-1,-1,-1,-1"
+                            Padding="20,4"
+                            Command="{Binding Data.Ban}"
+                            CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
+                            FontSize="18"
+                            TextBlock.LineHeight="18"
+                            Content="{x:Static lp:Resources.Ban}" />
+                    </UniformGrid>
+
                     <Button
-                        Style="{StaticResource SIButtonSimple}"
-                        Background="{StaticResource WindowBackground}"
-                        Margin="-1,-1,0,-1"
-                        Padding="20,4"
-                        Command="{Binding Data.Kick}"
-                        CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
-                        FontSize="18"
-                        TextBlock.LineHeight="18"
-                        Content="{x:Static lp:Resources.Kick}" />
-                    
-                    <Button
+                        DockPanel.Dock="Bottom"
                         Style="{StaticResource SIButtonSimple}"
                         Background="{StaticResource WindowBackground}"
                         Margin="-1,-1,-1,-1"
                         Padding="20,4"
-                        Command="{Binding Data.Ban}"
+                        Command="{Binding Data.SetHost}"
                         CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
                         FontSize="18"
                         TextBlock.LineHeight="18"
-                        Content="{x:Static lp:Resources.Ban}" />
-                </UniformGrid>
+                        Content="{x:Static lp:Resources.SetHost}"
+                        Visibility="{Binding Host.IsHost, Converter={StaticResource BooleanToVisibilityConverter1}}" />
 
-                <Button
-                    DockPanel.Dock="Bottom"
-                    Style="{StaticResource SIButtonSimple}"
-                    Background="{StaticResource WindowBackground}"
-                    Margin="-1,-1,-1,-1"
-                    Padding="20,4"
-                    Command="{Binding Data.SetHost}"
-                    CommandParameter="{Binding Source={StaticResource Persons},Path=Value}"
-                    FontSize="18"
-                    TextBlock.LineHeight="18"
-                    Content="{x:Static lp:Resources.SetHost}" />
+                    <DockPanel
+                        DockPanel.Dock="Bottom"
+                        TextBlock.FontSize="14"
+                        Height="32"
+                        Margin="0,0,0,2">
+                        <TextBlock
+                            Text="{x:Static lp:Resources.JoinMode}"
+                            DockPanel.Dock="Left"
+                            Padding="8,2"
+                            Foreground="Black"
+                            VerticalAlignment="Center" />
+
+                        <ComboBox
+                            ItemsSource="{Binding Source={StaticResource JoinModes}, Mode=OneTime}"
+                            SelectedItem="{Binding Data.JoinMode}"
+                            VerticalAlignment="Stretch"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="{Binding Host.IsHost}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource JoinModeConverter}, Mode=OneTime}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </DockPanel>
+                </DockPanel>
 
                 <ListBox
                     IsSynchronizedWithCurrentItem="True"

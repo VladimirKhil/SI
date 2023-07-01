@@ -2,6 +2,7 @@
 using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
+using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
@@ -181,6 +182,8 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         var maxPressingTime = appSettings.TimeSettings.TimeForThinkingOnQuestion * 10;
         _gameActions.SendMessageToWithArgs(person, Messages.Timer, 1, "MAXTIME", maxPressingTime);
+
+        _gameActions.SendMessageToWithArgs(person, Messages.SetJoinMode, ClientData.JoinMode);
     }
 
     private void InformBanned(string person)
@@ -331,8 +334,18 @@ public sealed class Game : Actor<GameData, GameLogic>
         Action connectionAuthenticator) =>
         ClientData.TaskLock.WithLock(() =>
         {
-            if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) &&
-                ClientData.Settings.NetworkGamePassword != password)
+            if (ClientData.JoinMode == JoinMode.Forbidden)
+            {
+                return (false, LO[nameof(R.JoinForbidden)]);
+            }
+
+            if (ClientData.JoinMode == JoinMode.OnlyViewer && role != GameRole.Viewer)
+            {
+                return (false, LO[nameof(R.JoinRoleForbidden)]);
+            }
+
+            if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword)
+                && ClientData.Settings.NetworkGamePassword != password)
             {
                 return (false, LO[nameof(R.WrongPassword)]);
             }
@@ -343,7 +356,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
 
             var index = -1;
-            IEnumerable<ViewerAccount> accountsToSearch = null;
+            IEnumerable<ViewerAccount>? accountsToSearch = null;
 
             switch (role)
             {
@@ -543,6 +556,28 @@ public sealed class Game : Actor<GameData, GameLogic>
                             {
                                 ClientData.ChooserIndex = playerIndex;
                                 _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex);
+
+                                _gameActions.SpecialReplic(string.Format(LO[nameof(R.SetChooser)], ClientData.ShowMan.Name, ClientData.Chooser?.Name));
+                            }
+                        }
+                        break;
+
+                    case Messages.SetJoinMode:
+                        if (message.Sender == ClientData.HostName && args.Length > 1)
+                        {
+                            if (Enum.TryParse<JoinMode>(args[1], out var joinMode))
+                            {
+                                ClientData.JoinMode = joinMode;
+                                _gameActions.SendMessageWithArgs(Messages.SetJoinMode, args[1]);
+
+                                var replic = joinMode switch
+                                {
+                                    JoinMode.AnyRole => LO[nameof(R.JoinModeSwitchedToAny)],
+                                    JoinMode.OnlyViewer => LO[nameof(R.JoinModeSwitchedToViewers)],
+                                    _ => LO[nameof(R.JoinModeSwitchedToForbidden)]
+                                };
+
+                                _gameActions.SpecialReplic(string.Format(replic, ClientData.HostName));
                             }
                         }
                         break;
@@ -1311,15 +1346,27 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
+        var role = args[1];
+        var name = args[2];
+        var sex = args[3];
+
+        if (ClientData.JoinMode == JoinMode.Forbidden)
+        {
+            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.JoinForbidden)], message.Sender);
+            return;
+        }
+
+        if (ClientData.JoinMode == JoinMode.OnlyViewer && role != Constants.Viewer)
+        {
+            _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.JoinRoleForbidden)], message.Sender);
+            return;
+        }
+
         if (!string.IsNullOrEmpty(ClientData.Settings.NetworkGamePassword) && (args.Length < 6 || ClientData.Settings.NetworkGamePassword != args[5]))
         {
             _gameActions.SendMessage(SystemMessages.Refuse + Message.ArgsSeparatorChar + LO[nameof(R.WrongPassword)], message.Sender);
             return;
         }
-
-        var role = args[1];
-        var name = args[2];
-        var sex = args[3];
 
         if (ClientData.AllPersons.ContainsKey(name))
         {

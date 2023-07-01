@@ -36,6 +36,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             
             <DockPanel Grid.ColumnSpan="2">
@@ -104,23 +105,28 @@
             </DockPanel>
             
             <TextBlock
-                Grid.Row="0"
-                Grid.Column="1"
-                Margin="45,8,5,10"
-                Foreground="#FFC10000"
+                Grid.Row="3"
+                Grid.ColumnSpan="4"
+                Height="50"
+                FontSize="18"
+                Padding="5"
+                Foreground="DarkRed"
                 Text="{Binding Error}"
                 TextWrapping="Wrap"
-                TextAlignment="Left" />
+                TextAlignment="Center"
+                VerticalAlignment="Center"
+                TextTrimming="CharacterEllipsis"
+                Background="#FF5A95E2" />
             
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Style="{StaticResource SIButton}"
                 Content="{x:Static lp:Resources.NewGame}"
                 Command="{Binding NewGame}"
                 Height="53"
                 FontSize="28" />
             
-            <UniformGrid Grid.Row="3" Grid.Column="1" Columns="3" Background="#FF5A95E2">
+            <UniformGrid Grid.Row="4" Grid.Column="1" Columns="3" Background="#FF5A95E2">
                 <UniformGrid.Style>
                     <Style TargetType="UniformGrid">
                         <Setter Property="Visibility" Value="Hidden" />

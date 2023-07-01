@@ -1116,4 +1116,16 @@
   <data name="ChangeActivePlayer_Hint" xml:space="preserve">
     <value>Change active player</value>
   </data>
+  <data name="JoinMode" xml:space="preserve">
+    <value>Join mode</value>
+  </data>
+  <data name="JoinModeAnyRole" xml:space="preserve">
+    <value>As any role</value>
+  </data>
+  <data name="JoinModeForbidden" xml:space="preserve">
+    <value>Forbidden</value>
+  </data>
+  <data name="JoinModeViewer" xml:space="preserve">
+    <value>Only as viewer</value>
+  </data>
 </root>

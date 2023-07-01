@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Game;
+using SICore.Models;
 using SICore.Results;
 using SIData;
 using SIPackages;
@@ -611,6 +612,11 @@ public sealed class GameData : Data
     /// Current answer mode.
     /// </summary>
     public string AnswerMode { get; internal set; }
+
+    /// <summary>
+    /// Allowed join game mode.
+    /// </summary>
+    public JoinMode JoinMode { get; internal set; }
 
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {

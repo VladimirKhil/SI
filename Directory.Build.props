@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<Authors>Vladimir Khil</Authors>
 		<Company>Khil-soft</Company>
+		<SIGameVersion>7.10.0</SIGameVersion>
 	</PropertyGroup>
 	
   <PropertyGroup>

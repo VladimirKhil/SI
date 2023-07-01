@@ -65,7 +65,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                 };
             }
 
-            ClientData.Hint = LO[nameof(R.HintSelectPlayerForSumChange)];
+            ClientData.Hint = LO[nameof(R.HintSelectActivePlayer)];
         });
 
         ClientData.ShowmanDataExtensions.ChangeSums2 = new CustomCommand(arg =>

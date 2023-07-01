@@ -1204,6 +1204,42 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Join mode.
+        /// </summary>
+        public static string JoinMode {
+            get {
+                return ResourceManager.GetString("JoinMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на As any role.
+        /// </summary>
+        public static string JoinModeAnyRole {
+            get {
+                return ResourceManager.GetString("JoinModeAnyRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Forbidden.
+        /// </summary>
+        public static string JoinModeForbidden {
+            get {
+                return ResourceManager.GetString("JoinModeForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Only as viewer.
+        /// </summary>
+        public static string JoinModeViewer {
+            get {
+                return ResourceManager.GetString("JoinModeViewer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Feedback.
         /// </summary>
         public static string JumpList_Feedback {

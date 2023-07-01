@@ -393,6 +393,11 @@ public static class Messages
     public const string SetHost = "SETHOST";
 
     /// <summary>
+    /// Set game join mode.
+    /// </summary>
+    public const string SetJoinMode = "SETJOINMODE";
+
+    /// <summary>
     /// Показать табло
     /// </summary>
     public const string ShowTable = "SHOWTABLO";

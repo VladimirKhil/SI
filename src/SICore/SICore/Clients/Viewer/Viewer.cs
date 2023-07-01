@@ -1,5 +1,6 @@
 ﻿using SICore.BusinessLogic;
 using SICore.Clients.Viewer;
+using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
 using SICore.Network.Contracts;
@@ -9,6 +10,8 @@ using SIData;
 using SIPackages.Core;
 using SIUI.Model;
 using SIUI.ViewModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using R = SICore.Properties.Resources;
 
@@ -17,7 +20,7 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
+public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPropertyChanged
     where L : class, IViewerLogic
 {
     protected readonly ViewerActions _viewerActions;
@@ -72,6 +75,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
                 UpdateAddTableCommand();
                 UpdateDeleteTableCommand();
+                OnPropertyChanged();
             }
         }
     }
@@ -92,6 +96,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
     public event Action? PersonConnected;
     public event Action? PersonDisconnected;
     public event Action<int, string, string>? Timer;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void Initialize(bool isHost)
     {
@@ -102,6 +107,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         ClientData.EventLog.Append($"Initial name {ClientData.Name}");
 
         ClientData.MessageSending = msg => Say(msg);
+        ClientData.JoinModeChanged += ClientData_JoinModeChanged;
 
         ClientData.Kick = new CustomCommand(Kick_Executed) { CanBeExecuted = IsHost };
         ClientData.Ban = new CustomCommand(Ban_Executed) { CanBeExecuted = IsHost };
@@ -114,6 +120,9 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
 
         ClientData.AtomViewed = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Atom));
     }
+
+    private void ClientData_JoinModeChanged(JoinMode joinMode) =>
+        _viewerActions.SendMessage(Messages.SetJoinMode, joinMode.ToString());
 
     private void ChangeType_Executed(object arg)
     {
@@ -491,6 +500,10 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
                         ClientData.DefaultComputerPlayers = mparams.Skip(1).Select(name => new Account { Name = name }).ToArray();
                         break;
                     }
+
+                case Messages.SetJoinMode:
+                    OnSetJoinMode(mparams);
+                    break;
 
                 case Messages.PackageId:
                     {
@@ -1047,6 +1060,16 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         {
             throw new Exception(string.Join(Message.ArgsSeparator, mparams), exc);
         }
+    }
+
+    private void OnSetJoinMode(string[] mparams)
+    {
+        if (mparams.Length < 2 || !Enum.TryParse<JoinMode>(mparams[1], out var joinMode))
+        {
+            return;
+        }
+
+        MyData.JoinMode = joinMode;
     }
 
     private void OnQType(string[] mparams)
@@ -1902,6 +1925,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
         ClientData.Kick = ClientData.AtomViewed = ClientData.Ban = ClientData.SetHost = ClientData.Unban = ClientData.ForceStart = ClientData.AddTable = null;
 
         ClientData.MessageSending = null;
+        ClientData.JoinModeChanged -= ClientData_JoinModeChanged;
 
         IViewerClient viewer = role switch
         {
@@ -2331,4 +2355,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient
     public void GetInfo() => _viewerActions.SendMessage(Messages.Info);
 
     public virtual void Init() => ClientData.IsPlayer = false;
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

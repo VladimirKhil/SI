@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Viewer;
+using SICore.Models;
 using SIData;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -493,6 +494,29 @@ public sealed class ViewerData : Data
         .Append("Viewers: ").Append(string.Join(", ", Viewers.Select(PrintAccount))).AppendLine()
         .ToString();
 
+    private JoinMode _joinMode = JoinMode.AnyRole;
+
+    /// <summary>
+    /// Allowed join mode.
+    /// </summary>
+    public JoinMode JoinMode
+    {
+        get => _joinMode;
+        set
+        {
+            if (_joinMode != value)
+            {
+                _joinMode = value;
+                OnPropertyChanged();
+                OnJoinModeChanged(value);
+            }
+        }
+    }
+
+    public event Action<JoinMode>? JoinModeChanged;
+
+    private void OnJoinModeChanged(JoinMode joinMode) => JoinModeChanged?.Invoke(joinMode);
+
     public ViewerData(IGameManager gameManager) : base(gameManager)
     {
         Winner = -1;
@@ -626,6 +650,11 @@ public sealed class ViewerData : Data
             }
         }
     }
+
+    /// <summary>
+    /// Network game flag.
+    /// </summary>
+    public bool IsNetworkGame { get; set; }
 
     internal event Action? AutoReadyChanged;
 

@@ -815,4 +815,25 @@
   <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
     <value>вопрос с закрытыми ставками играют все</value>
   </data>
+  <data name="HintSelectActivePlayer" xml:space="preserve">
+    <value>Выберите, кому передать ход</value>
+  </data>
+  <data name="JoinModeSwitchedToAny" xml:space="preserve">
+    <value>{0} разрешил(а) входить под любой ролью</value>
+  </data>
+  <data name="JoinModeSwitchedToForbidden" xml:space="preserve">
+    <value>{0} запретил вход в игру</value>
+  </data>
+  <data name="JoinModeSwitchedToViewers" xml:space="preserve">
+    <value>{0} разрешил(а) входить только как зритель</value>
+  </data>
+  <data name="JoinForbidden" xml:space="preserve">
+    <value>Подключение к этой игре запрещено</value>
+  </data>
+  <data name="JoinRoleForbidden" xml:space="preserve">
+    <value>Подключение к игре под данной ролью запрещено</value>
+  </data>
+  <data name="SetChooser" xml:space="preserve">
+    <value>{0} передал(а) ход {1}</value>
+  </data>
 </root>

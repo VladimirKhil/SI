@@ -7,7 +7,7 @@
     <Product>SIGame</Product>
     <Description>Quizz game</Description>
     <Copyright>Copyright © Khil-soft 2002-2023</Copyright>
-    <Version>7.9.0</Version>
+    <Version>$(SIGameVersion)</Version>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<Nullable>enable</Nullable>

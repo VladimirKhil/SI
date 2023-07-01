@@ -813,4 +813,25 @@
   <data name="TypeAllowEveryoneToPlayStakes" xml:space="preserve">
     <value>everyone can play hiden stakes question</value>
   </data>
+  <data name="HintSelectActivePlayer" xml:space="preserve">
+    <value>Select new active player</value>
+  </data>
+  <data name="JoinModeSwitchedToAny" xml:space="preserve">
+    <value>{0} allowed to join as any role</value>
+  </data>
+  <data name="JoinModeSwitchedToForbidden" xml:space="preserve">
+    <value>{0} disables join</value>
+  </data>
+  <data name="JoinModeSwitchedToViewers" xml:space="preserve">
+    <value>{0} allowed to join only is viewer</value>
+  </data>
+  <data name="JoinForbidden" xml:space="preserve">
+    <value>Join to this game is forbidden</value>
+  </data>
+  <data name="JoinRoleForbidden" xml:space="preserve">
+    <value>Join to this game under this role is forbidden</value>
+  </data>
+  <data name="SetChooser" xml:space="preserve">
+    <value>{0} set {1} as active player</value>
+  </data>
 </root>

@@ -311,7 +311,8 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
         {
             ServerPublicUrl = ContentPublicBaseUrls?.FirstOrDefault(),
             ContentPublicUrls = ContentPublicBaseUrls,
-            ServerAddress = ServerAddress
+            ServerAddress = ServerAddress,
+            IsNetworkGame = true
         };
 
         var localizer = new Localizer(Thread.CurrentThread.CurrentUICulture.Name);

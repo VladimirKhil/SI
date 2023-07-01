@@ -5,7 +5,7 @@
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
     <Authors>Vladimir Khil</Authors>
     <Company>Khil-soft</Company>
-    <Version>7.7.3</Version>
+    <Version>$(SIGameVersion)</Version>
     <Description>SIGame app</Description>
     <Copyright>Copyright © Khil-soft 2005 - 2023</Copyright>
     <Nullable>enable</Nullable>

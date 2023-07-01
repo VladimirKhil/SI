@@ -1119,4 +1119,16 @@
   <data name="ChangeActivePlayer_Hint" xml:space="preserve">
     <value>Передать ход игроку</value>
   </data>
+  <data name="JoinMode" xml:space="preserve">
+    <value>Режим входа</value>
+  </data>
+  <data name="JoinModeAnyRole" xml:space="preserve">
+    <value>С любой ролью</value>
+  </data>
+  <data name="JoinModeForbidden" xml:space="preserve">
+    <value>Вход запрещён</value>
+  </data>
+  <data name="JoinModeViewer" xml:space="preserve">
+    <value>Только зрителем</value>
+  </data>
 </root>

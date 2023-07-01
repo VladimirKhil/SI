@@ -754,6 +754,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Select new active player.
+        /// </summary>
+        public static string HintSelectActivePlayer {
+            get {
+                return ResourceManager.GetString("HintSelectActivePlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Select a player to give the question to.
         /// </summary>
         public static string HintSelectCatPlayer {
@@ -885,6 +894,51 @@ namespace SICore.Properties {
         public static string ItsShowmanIs {
             get {
                 return ResourceManager.GetString("ItsShowmanIs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Join to this game is forbidden.
+        /// </summary>
+        public static string JoinForbidden {
+            get {
+                return ResourceManager.GetString("JoinForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} allowed to join as any role.
+        /// </summary>
+        public static string JoinModeSwitchedToAny {
+            get {
+                return ResourceManager.GetString("JoinModeSwitchedToAny", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} disables join.
+        /// </summary>
+        public static string JoinModeSwitchedToForbidden {
+            get {
+                return ResourceManager.GetString("JoinModeSwitchedToForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} allowed to join only is viewer.
+        /// </summary>
+        public static string JoinModeSwitchedToViewers {
+            get {
+                return ResourceManager.GetString("JoinModeSwitchedToViewers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Join to this game under this role is forbidden.
+        /// </summary>
+        public static string JoinRoleForbidden {
+            get {
+                return ResourceManager.GetString("JoinRoleForbidden", resourceCulture);
             }
         }
         
@@ -1569,6 +1623,15 @@ namespace SICore.Properties {
         public static string Score {
             get {
                 return ResourceManager.GetString("Score", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} set {1} as active player.
+        /// </summary>
+        public static string SetChooser {
+            get {
+                return ResourceManager.GetString("SetChooser", resourceCulture);
             }
         }
         
