@@ -126,7 +126,7 @@
                 FontSize="20" />
 
             <ContentControl Grid.Column="2" Margin="0,0,0,0">
-                <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#88000000">
+                <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="#44000000">
                     <TextBlock
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
@@ -137,7 +137,7 @@
                         uib:FillManager.MaxFontSize="150">
 
                         <TextBlock.Effect>
-                            <DropShadowEffect BlurRadius="2" Opacity="1" ShadowDepth="1" />
+                            <DropShadowEffect BlurRadius="10" Opacity="1" ShadowDepth="1" />
                         </TextBlock.Effect>
                     </TextBlock>
                 </Border>
