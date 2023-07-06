@@ -66,6 +66,10 @@ public abstract class Logic<D> : ILogic
         {
             ExecuteTask(CurrentTask, _taskArgument);
         }
+        catch (ObjectDisposedException)
+        {
+            // Do nothing
+        }
         catch (Exception exc)
         {
             _data.BackLink.SendError(exc);

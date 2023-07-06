@@ -25,6 +25,7 @@ internal sealed class TvEngineTests
                 IsPressMode = true,
                 IsMultimediaPressMode = true,
             },
+            new SIEnginePlayHandlerMock(),
             new QuestionEnginePlayHandlerMock());
 
         Assert.AreEqual(GameStage.Begin, engine.Stage);

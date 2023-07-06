@@ -42,6 +42,7 @@ public class GameSettingsCore<T> : IGameSettingsCore<T>
     /// <summary>
     /// Network voice chat link.
     /// </summary>
+    [DataMember]
     public string NetworkVoiceChat { get; set; } = "";
 
     [XmlAttribute]
