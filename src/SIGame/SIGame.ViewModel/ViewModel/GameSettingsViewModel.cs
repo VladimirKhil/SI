@@ -690,6 +690,15 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
     {
         var localizer = new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name);
 
+        var fileShare = new WebManager(
+            _model.AppSettings.MultimediaPort,
+            new Dictionary<ResourceKind, string>
+            {
+                [ResourceKind.Package] = Path.Combine(documentPath, "package"),
+                [ResourceKind.Avatar] = Path.Combine(documentPath, "avatars"),
+                [ResourceKind.DefaultAvatar] = Global.PhotoUri,
+            });
+
         Node node;
 
         if (NetworkGame)
@@ -707,15 +716,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _model.NetworkGamePassword = "";
         _model.AppSettings.Culture = Thread.CurrentThread.CurrentUICulture.Name;
         _model.HumanPlayerName = Human.Name;
-
-        var fileShare = new WebManager(
-            _model.AppSettings.MultimediaPort,
-            new Dictionary<ResourceKind, string>
-            {
-                [ResourceKind.Package] = Path.Combine(documentPath, "package"),
-                [ResourceKind.Avatar] = Path.Combine(documentPath, "avatars"),
-                [ResourceKind.DefaultAvatar] = Global.PhotoUri,
-            });
 
         var avatarHelper = new AvatarHelper(Path.Combine(documentPath, "avatars"));
 

@@ -345,7 +345,14 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
     {
         await Task.Delay(4000);
 
-        Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector?.GameId}&invite=true");
+        try
+        {
+            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector?.GameId}&invite=true");
+        }
+        catch (Exception exc)
+        {
+            Trace.TraceError("PrintOnlineInformation error: " + exc.ToString());
+        }
     }
 
     private async void PrintNetworkInformation(CancellationToken cancellationToken = default)

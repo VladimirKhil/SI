@@ -13,6 +13,11 @@ public sealed class WebManager : IFileShare
 
     public WebManager(int port, Dictionary<ResourceKind, string> resourceLocations)
     {
+        if (port < 1 || port > 65535)
+        {
+            throw new ArgumentException($"Invalid multimedia port value {port}. Port must be between 1 and 65535", nameof(port));
+        }
+
         _port = port;
 
         var builder = WebApplication.CreateBuilder();

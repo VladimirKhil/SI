@@ -44,7 +44,14 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public int MultimediaPort
     {
         get => _multimediaPort;
-        set { _multimediaPort = value; OnPropertyChanged(); }
+        set
+        {
+            if (_multimediaPort != value)
+            {
+                _multimediaPort = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

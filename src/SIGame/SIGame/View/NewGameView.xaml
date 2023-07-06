@@ -677,7 +677,7 @@
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                     <TextBlock
-                        Width="450"
+                        Width="440"
                         Name="tbError"
                         Text="{Binding ErrorMessage}"
                         HorizontalAlignment="Right"

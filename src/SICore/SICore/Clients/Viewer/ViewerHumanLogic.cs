@@ -1372,7 +1372,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         ClientData.GameMetadata = gameInfo.ToString();
 
-        if (!string.IsNullOrEmpty(voiceChatUri))
+        if (!string.IsNullOrEmpty(voiceChatUri) && Uri.IsWellFormedUriString(voiceChatUri, UriKind.Absolute))
         {
             ClientData.VoiceChatUri = voiceChatUri;
         }
