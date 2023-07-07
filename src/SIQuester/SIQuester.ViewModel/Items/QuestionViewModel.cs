@@ -31,6 +31,13 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public SimpleCommand AddWrongAnswers { get; private set; }
 
+    public ICommand ClearType { get; private set; }
+
+    /// <summary>
+    /// Upgraded package flag.
+    /// </summary>
+    public bool IsUpgraded => OwnerTheme?.OwnerRound?.OwnerPackage?.Model.Version >= 5.0;
+
     public override ICommand Add
     {
         get => null;
@@ -61,6 +68,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         RemoveComplexAnswer = new SimpleCommand(RemoveComplexAnswer_Executed);
         AddWrongAnswers = new SimpleCommand(AddWrongAnswers_Executed);
 
+        ClearType = new SimpleCommand(ClearType_Executed);
+
         Clone = new SimpleCommand(CloneQuestion_Executed);
         Remove = new SimpleCommand(RemoveQuestion_Executed);
 
@@ -69,6 +78,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
         Wrong.CollectionChanged += Wrong_CollectionChanged;
     }
+
+    private void ClearType_Executed(object? arg) => Model.TypeName = QuestionTypes.Default;
 
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
@@ -144,18 +155,35 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void CloneQuestion_Executed(object? arg)
     {
-        if (OwnerTheme != null)
+        if (OwnerTheme == null)
         {
-            var quest = Model.Clone();
-            var newQuestionViewModel = new QuestionViewModel(quest);
-            OwnerTheme.Questions.Add(newQuestionViewModel);
-            OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
+            return;
         }
+
+        var quest = Model.Clone();
+        var newQuestionViewModel = new QuestionViewModel(quest);
+        OwnerTheme.Questions.Add(newQuestionViewModel);
+        OwnerTheme.OwnerRound.OwnerPackage.Document.Navigate.Execute(newQuestionViewModel);
     }
 
     private void RemoveQuestion_Executed(object? arg) => OwnerTheme?.Questions.Remove(this);
 
-    private void SetQuestionType_Executed(object? arg) => Type.Model.Name = (string)arg;
+    private void SetQuestionType_Executed(object? arg)
+    {
+        if (IsUpgraded)
+        {
+            var typeName = (string?)arg;
+            Model.TypeName = typeName == "" ? "?" : typeName;
+            return;
+        }
+
+        if (arg == null)
+        {
+            throw new ArgumentNullException(nameof(arg));
+        }
+
+        Type.Model.Name = (string)arg;
+    }
 
     private void SwitchEmpty_Executed(object? arg)
     {

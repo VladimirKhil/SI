@@ -101,6 +101,7 @@
                             <Trigger Property="IsEnabled" Value="false">
                                 <Setter Property="UIElement.Opacity" Value="0.4" />
                             </Trigger>
+                            
                             <Trigger Property="Command" Value="{x:Null}">
                                 <Setter Property="IsEnabled" Value="False" />
                             </Trigger>
@@ -109,6 +110,7 @@
 
                     <Style x:Key="TreeOnlyButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                         <Setter Property="Visibility" Value="Visible" />
+                        
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static m:AppSettings.Default},Path=View}" Value="{x:Static m:ViewMode.Flat}">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -140,30 +142,38 @@
                     
                     <siq:DropDownButton.DropDown>
                         <ContextMenu>
-                            <MenuItem Style="{StaticResource CommandRoutedItem}" Name="miSaveAs" Header="Сохранить как…" Command="ApplicationCommands.SaveAs" />
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Name="miSaveAs"
+                                Header="{x:Static lp:Resources.SaveAs}"
+                                Command="ApplicationCommands.SaveAs" />
+                            
                             <Separator />
                             <MenuItem Header="HTML" Command="{Binding ExportHtml}" />
-                            <MenuItem Header="HTML для печати" Command="{Binding ExportPrintHtml}" />
+                            <MenuItem Header="{x:Static lp:Resources.PrintedHtml}" Command="{Binding ExportPrintHtml}" />
                             
                             <MenuItem
-                                Header="Настраиваемый HTML"
+                                Header="{x:Static lp:Resources.FormattedHtml}"
                                 Command="{Binding ExportFormattedHtml}"
-                                ToolTip="Возможность настройки специфического представления пакета"/>
-                            
-                            <MenuItem Header="Скрипт mIRC" Command="{Binding ExportMirc}" ToolTip="Проведение игры в IRC">
+                                ToolTip="{x:Static lp:Resources.FormattedHtmlHint}" />
+
+                            <MenuItem
+                                Header="{x:Static lp:Resources.MircScript}"
+                                Command="{Binding ExportMirc}"
+                                ToolTip="{x:Static lp:Resources.MircScriptHint}">
                                 <MenuItem.Icon>
                                     <Image Source="{StaticResource MircImage}" />
                                 </MenuItem.Icon>
                             </MenuItem>
-                            
-                            <MenuItem Header="Табличный формат" Command="{Binding ExportTable}" />
+
+                            <MenuItem Header="{x:Static lp:Resources.TableFormat}" Command="{Binding ExportTable}" />
                             <MenuItem Header="YAML" Command="{Binding ExportYaml}" />
                             <Separator />
                             
                             <MenuItem
                                 Style="{StaticResource CommandRoutedItem}"
-                                Header="Выбрать темы…"
-                                ToolTip="Сохранить часть тем данного пакета в отдельный пакет"
+                                Header="{x:Static lp:Resources.SelectThemes}"
+                                ToolTip="{x:Static lp:Resources.SelectThemesHint}"
                                 Command="{Binding SelectThemes}" />
                         </ContextMenu>
                     </siq:DropDownButton.DropDown>
@@ -646,6 +656,7 @@
                     Visibility="{Binding Close, Converter={StaticResource NotNullToVisibilityConverter}}">
                     <Path Data="M0,1L1,0M0,1L1,2M-0.1,1L2,1" Stretch="Uniform" Stroke="Black" StrokeThickness="2" />
                 </Button>
+                
                 <TextBlock FontSize="16" FontWeight="Bold" Margin="3,3,0,0" Text="{Binding Header}"></TextBlock>
             </StackPanel>
             

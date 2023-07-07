@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Properties;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
@@ -18,6 +19,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
     public bool IsProgress => Storage.IsLoading || Storage.IsLoadingPackages;
 
+    private readonly AppOptions _appOptions;
     private readonly ILoggerFactory _loggerFactory;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -25,9 +27,11 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
     public ImportSIStorageViewModel(
         StorageContextViewModel storageContextViewModel,
         SIStorage siStorage,
+        AppOptions appOptions,
         ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
+        _appOptions = appOptions;
         _loggerFactory = loggerFactory;
 
         Storage = siStorage;
@@ -70,6 +74,11 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
             ms.Position = 0;
             var doc = SIPackages.SIDocument.Load(ms);
+
+            if (_appOptions.UpgradePackages)
+            {
+                doc.Upgrade();
+            }
 
             return new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name };
         };

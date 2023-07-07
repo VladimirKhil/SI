@@ -443,7 +443,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         try
         {
             var serializer = new XmlSerializer(typeof(AppSettings));
-            return (AppSettings)serializer.Deserialize(stream);
+            return (AppSettings?)serializer.Deserialize(stream) ?? Create();
         }
         catch { }
 

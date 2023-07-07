@@ -62,6 +62,7 @@ public sealed class QuestionTypeViewModel : ModelViewBase
 
             case NotifyCollectionChangedAction.Reset:
                 Model.Params.Clear();
+
                 foreach (QuestionTypeParamViewModel param in Params)
                 {
                     param.Owner = this;

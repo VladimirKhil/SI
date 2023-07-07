@@ -293,8 +293,13 @@ public sealed class SIDocument : IDisposable
     /// <summary>
     /// Upgrades the document to new format.
     /// </summary>
-    public void Upgrade()
+    public bool Upgrade()
     {
+        if (Package.Version >= 5.0)
+        {
+            return false;
+        }
+
         foreach (var round in Package.Rounds)
         {
             foreach (var theme in round.Themes)
@@ -305,6 +310,9 @@ public sealed class SIDocument : IDisposable
                 }
             }
         }
+
+        Package.Version = 5;
+        return true;
     }
 
     /// <summary>

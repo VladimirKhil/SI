@@ -439,6 +439,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить тип.
+        /// </summary>
+        public static string ClearType {
+            get {
+                return ResourceManager.GetString("ClearType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Клонировать вопрос.
         /// </summary>
         public static string CloneQuestion {
@@ -853,6 +862,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Настраиваемый HTML.
+        /// </summary>
+        public static string FormattedHtml {
+            get {
+                return ResourceManager.GetString("FormattedHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Возможность настройки специфического представления пакета.
+        /// </summary>
+        public static string FormattedHtmlHint {
+            get {
+                return ResourceManager.GetString("FormattedHtmlHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на от.
         /// </summary>
         public static string From {
@@ -1021,6 +1048,24 @@ namespace SIQuester.Properties {
         public static string MakeNonEmpty {
             get {
                 return ResourceManager.GetString("MakeNonEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Скрипт mIRC.
+        /// </summary>
+        public static string MircScript {
+            get {
+                return ResourceManager.GetString("MircScript", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Проведение игры в IRC.
+        /// </summary>
+        public static string MircScriptHint {
+            get {
+                return ResourceManager.GetString("MircScriptHint", resourceCulture);
             }
         }
         
@@ -1210,6 +1255,15 @@ namespace SIQuester.Properties {
         public static string PreviousFragment {
             get {
                 return ResourceManager.GetString("PreviousFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на HTML для печати.
+        /// </summary>
+        public static string PrintedHtml {
+            get {
+                return ResourceManager.GetString("PrintedHtml", resourceCulture);
             }
         }
         
@@ -1421,6 +1475,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Сохранить как….
+        /// </summary>
+        public static string SaveAs {
+            get {
+                return ResourceManager.GetString("SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Масштаб.
         /// </summary>
         public static string Scale {
@@ -1471,6 +1534,24 @@ namespace SIQuester.Properties {
         public static string SelectSearchFolder {
             get {
                 return ResourceManager.GetString("SelectSearchFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбрать темы….
+        /// </summary>
+        public static string SelectThemes {
+            get {
+                return ResourceManager.GetString("SelectThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сохранить часть тем данного пакета в отдельный пакет.
+        /// </summary>
+        public static string SelectThemesHint {
+            get {
+                return ResourceManager.GetString("SelectThemesHint", resourceCulture);
             }
         }
         
@@ -1678,6 +1759,15 @@ namespace SIQuester.Properties {
         public static string Table {
             get {
                 return ResourceManager.GetString("Table", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Табличный формат.
+        /// </summary>
+        public static string TableFormat {
+            get {
+                return ResourceManager.GetString("TableFormat", resourceCulture);
             }
         }
         

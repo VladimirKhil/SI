@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -114,14 +115,16 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     public AppSettings Settings => AppSettings.Default;
 
-    private readonly string[] _args = null;
+    private readonly string[] _args;
+    private readonly AppOptions _appOptions;
 
     private readonly StorageContextViewModel _storageContextViewModel;
     
-    public MainViewModel(string[] args, ISIStorageServiceClient siStorageServiceClient, ILoggerFactory loggerFactory)
+    public MainViewModel(string[] args, AppOptions appOptions, ISIStorageServiceClient siStorageServiceClient, ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<MainViewModel>();
+        _appOptions = appOptions;
 
         DocList.CollectionChanged += DocList_CollectionChanged;
         CollectionViewSource.GetDefaultView(DocList).CurrentChanged += MainViewModel_CurrentChanged;
@@ -379,6 +382,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
                 // Loads in read only mode to keep file LastUpdate time unmodified
                 var doc = SIDocument.Load(stream);
+
+                if (_appOptions.UpgradePackages)
+                {
+                    doc.Upgrade();
+                }
                 
                 _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
 
@@ -547,6 +555,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         var importViewModel = new ImportSIStorageViewModel(
             _storageContextViewModel,
             PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>(),
+            _appOptions,
             _loggerFactory);
 
         DocList.Add(importViewModel);

@@ -530,4 +530,13 @@ theme - тема Кота</value>
   <data name="ConversionError" xml:space="preserve">
     <value>Ошибка конвертации</value>
   </data>
+  <data name="SecretNoQuestion" xml:space="preserve">
+    <value>Вопрос с секретом без вопроса</value>
+  </data>
+  <data name="SecretPublicPrice" xml:space="preserve">
+    <value>Вопрос с секретом и объявленной стоимостью</value>
+  </data>
+  <data name="StakeAllQuestion" xml:space="preserve">
+    <value>Вопрос со ставками для всех</value>
+  </data>
 </root>

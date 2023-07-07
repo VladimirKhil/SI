@@ -844,6 +844,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом без вопроса.
+        /// </summary>
+        public static string SecretNoQuestion {
+            get {
+                return ResourceManager.GetString("SecretNoQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос с секретом и объявленной стоимостью.
+        /// </summary>
+        public static string SecretPublicPrice {
+            get {
+                return ResourceManager.GetString("SecretPublicPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вопрос с секретом.
         /// </summary>
         public static string SecretQuestion {
@@ -975,6 +993,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string SplittingError {
             get {
                 return ResourceManager.GetString("SplittingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос со ставками для всех.
+        /// </summary>
+        public static string StakeAllQuestion {
+            get {
+                return ResourceManager.GetString("StakeAllQuestion", resourceCulture);
             }
         }
         

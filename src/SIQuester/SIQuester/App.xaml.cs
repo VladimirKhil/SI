@@ -10,8 +10,8 @@ using NLog.Web;
 using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel;
+using SIQuester.ViewModel.Configuration;
 using SIStorageService.Client;
-using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -36,7 +36,6 @@ namespace SIQuester;
 public partial class App : Application
 {
     private IHost? _host;
-    private IConfiguration? _configuration;
     private bool _useAppService;
 
     /// <summary>
@@ -56,7 +55,7 @@ public partial class App : Application
     /// <summary>
     /// Имя приложения
     /// </summary>
-    public static string ProductName => Assembly.GetExecutingAssembly().GetName().Name;
+    public static string ProductName => Assembly.GetExecutingAssembly().GetName().Name ?? "SIQuester";
 
     /// <summary>
     /// Директория приложения
@@ -88,16 +87,10 @@ public partial class App : Application
             .UseEnvironment("Development")
 #endif
             .ConfigureAppConfiguration((context, configurationBuilder) =>
-            {
-                var env = context.HostingEnvironment;
-
                 configurationBuilder
                     .SetBasePath(context.HostingEnvironment.ContentRootPath)
                     .AddJsonFile("appsettings.json", optional: true)
-                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-                _configuration = configurationBuilder.Build();
-            })
+                    .AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true))
             .ConfigureServices(ConfigureServices)
             .ConfigureLogging((hostingContext, logging) =>
             {
@@ -158,9 +151,10 @@ public partial class App : Application
         try
         {
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
+            var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-            _mainViewModel = new MainViewModel(e.Args, siStorageClient, loggerFactory);
+            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, loggerFactory);
 
             MainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow.Show();
@@ -179,13 +173,12 @@ public partial class App : Application
 
     private void AutoSave(object? sender, EventArgs args) => _mainViewModel?.AutoSave();
 
-    private void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
-        services.AddAppServiceClient(_configuration);
-        services.AddSIStorageServiceClient(_configuration);
-        services.AddTransient(typeof(SIStorage));
-        services.AddTransient(typeof(MainWindow));
+        services.AddAppServiceClient(ctx.Configuration);
+        services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddSingleton(AppSettings.Default);
+        services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }
 
     /// <summary>

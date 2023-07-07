@@ -255,7 +255,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         writer.WriteStartElement("question");
         writer.WriteAttributeString("price", _price.ToString());
 
-        if (_typeName != null && _typeName != QuestionTypes.Simple)
+        if (_typeName != null && _typeName != QuestionTypes.Default)
         {
             writer.WriteAttributeString("type", _typeName.ToString());
         }
@@ -374,16 +374,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     public void Upgrade()
     {
-        if (TypeName != null)
-        {
-            return;
-        }
-
         if (Price == -1)
         {
             Scenario.Clear();
             Type.Params.Clear();
-            TypeName = Type.Name = QuestionTypes.Simple;
+            TypeName = Type.Name = QuestionTypes.Default;
             return;
         }
 
@@ -467,11 +462,16 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                 break;
 
             default:
-                Scenario.Clear();
-                Type.Params.Clear();
                 TypeName = Type.Name;
-                Type.Name = QuestionTypes.Simple;
-                return;
+                Type.Name = QuestionTypes.Default;
+
+                foreach (var item in Type.Params)
+                {
+                    Parameters.Add(item.Name, new StepParameter { SimpleValue = item.Value });
+                }
+
+                Type.Params.Clear();
+                break;
         }
 
         var content = new StepParameter { Type = StepParameterTypes.Content, ContentValue = new() };

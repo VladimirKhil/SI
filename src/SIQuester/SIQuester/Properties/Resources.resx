@@ -243,6 +243,9 @@
   <data name="CheckFileSize" xml:space="preserve">
     <value>Проверять, что файл вопросов подходит для игры через Игровой сервер</value>
   </data>
+  <data name="ClearType" xml:space="preserve">
+    <value>Удалить тип</value>
+  </data>
   <data name="CloneQuestion" xml:space="preserve">
     <value>Клонировать вопрос</value>
   </data>
@@ -381,6 +384,12 @@
   <data name="FlatLayoutModeHeader" xml:space="preserve">
     <value>Расположение элементов в режиме плиток</value>
   </data>
+  <data name="FormattedHtml" xml:space="preserve">
+    <value>Настраиваемый HTML</value>
+  </data>
+  <data name="FormattedHtmlHint" xml:space="preserve">
+    <value>Возможность настройки специфического представления пакета</value>
+  </data>
   <data name="From" xml:space="preserve">
     <value>от</value>
   </data>
@@ -438,6 +447,12 @@
   </data>
   <data name="MakeNonEmpty" xml:space="preserve">
     <value>Сделать непустым</value>
+  </data>
+  <data name="MircScript" xml:space="preserve">
+    <value>Скрипт mIRC</value>
+  </data>
+  <data name="MircScriptHint" xml:space="preserve">
+    <value>Проведение игры в IRC</value>
   </data>
   <data name="MoveDown" xml:space="preserve">
     <value>Переместить ниже</value>
@@ -501,6 +516,9 @@
   </data>
   <data name="PreviousFragment" xml:space="preserve">
     <value>Предыдущий фрагмент</value>
+  </data>
+  <data name="PrintedHtml" xml:space="preserve">
+    <value>HTML для печати</value>
   </data>
   <data name="Publisher" xml:space="preserve">
     <value>Издатель</value>
@@ -571,6 +589,9 @@
   <data name="SaveAndExport" xml:space="preserve">
     <value>Сохранение и экспорт</value>
   </data>
+  <data name="SaveAs" xml:space="preserve">
+    <value>Сохранить как…</value>
+  </data>
   <data name="Scale" xml:space="preserve">
     <value>Масштаб</value>
   </data>
@@ -588,6 +609,12 @@
   </data>
   <data name="SelectSearchFolder" xml:space="preserve">
     <value>Выберите папку для поиска</value>
+  </data>
+  <data name="SelectThemes" xml:space="preserve">
+    <value>Выбрать темы…</value>
+  </data>
+  <data name="SelectThemesHint" xml:space="preserve">
+    <value>Сохранить часть тем данного пакета в отдельный пакет</value>
   </data>
   <data name="SendErrorHeader" xml:space="preserve">
     <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
@@ -657,6 +684,9 @@
   </data>
   <data name="Table" xml:space="preserve">
     <value>Таблица</value>
+  </data>
+  <data name="TableFormat" xml:space="preserve">
+    <value>Табличный формат</value>
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Теги</value>
