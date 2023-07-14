@@ -221,9 +221,17 @@ public sealed class TvEngine : EngineBase
                     }
                 }
 
-                PlayNextFinalTheme(true);
+                if (_finalThemes.Count > 0)
+                {
+                    PlayNextFinalTheme(true);
+                }
+                else
+                {
+                    DoFinishRound();
+                }
+
                 break;
-            #endregion
+                #endregion
 
             case GameStage.WaitDelete:
                 OnWaitDelete();

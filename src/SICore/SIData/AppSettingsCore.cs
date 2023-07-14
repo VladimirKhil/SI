@@ -16,7 +16,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultPlayAllQuestionsInFinalRound = false;
     public const bool DefaultAllowEveryoneToPlayHiddenStakes = true;
     public const bool DefaultOral = false;
-    public const bool DefaultOralPlayersActions = false;
+    public const bool DefaultOralPlayersActions = true;
     public const bool DefaultManaged = false;
     public const bool DefaultIgnoreWrong = false;
     public const bool DefaultDisplaySources = false;

@@ -7,10 +7,9 @@ namespace SICore.Clients.Game;
 /// </summary>
 public sealed class ThemeDeletersEnumerator
 {
-    // TODO: move outside (nested classes are bad)
     /// <summary>
-    /// Информация об индексе игрока в очереди на удаление тем. Если игрок пока не определён, объект содержит допустимый набор индексов
-    /// В очереди имеются несколько экземпляров IndexInfo, разделяющих общий допустимый набор индексов
+    /// Contains index info of next player to delete theme.
+    /// If next player is undefined, contains a set of possible player indicies.
     /// </summary>
     public sealed class IndexInfo
     {
@@ -56,7 +55,7 @@ public sealed class ThemeDeletersEnumerator
 
             if (!PossibleIndicies.Contains(index))
             {
-                throw new InvalidOperationException("Недопустимый индекс!");
+                throw new InvalidOperationException($"Invalid player index {index}. Valid indicies are ({string.Join(", ", PossibleIndicies)})");
             }
 
             PlayerIndex = index;
@@ -94,6 +93,11 @@ public sealed class ThemeDeletersEnumerator
     /// <exception cref="InvalidOperationException">Invalid players collection has been provided.</exception>
     public ThemeDeletersEnumerator(IList<GamePlayerAccount> players, int themesCount)
     {
+        if (themesCount <= 0)
+        {
+            throw new ArgumentException("Value must be positive", nameof(themesCount));
+        }
+
         var playersCount = players.Count;
 
         // The player with the highest score should be the last to remove the theme
@@ -102,7 +106,7 @@ public sealed class ThemeDeletersEnumerator
 
         if (deletersCount == 0)
         {
-            throw new InvalidOperationException("No InGame players found!");
+            throw new InvalidOperationException("No InGame players found");
         }
 
         _order = new IndexInfo[deletersCount];
@@ -114,7 +118,7 @@ public sealed class ThemeDeletersEnumerator
             leftThemesCount = deletersCount;
         }
 
-        // Split players to classes accourding to their sums
+        // Split players to classes according to their sums
         var levels = goodPlayers.GroupBy(p => p.Sum).OrderByDescending(g => g.Key).ToArray();
         var k = leftThemesCount - 1;
 

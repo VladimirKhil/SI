@@ -875,20 +875,17 @@ public sealed class GameLogic : Logic<GameData>
         for (var i = 0; i < _data.Players.Count; i++)
         {
             _gameActions.SystemReplic($"{_data.Players[i].Name}: {Notion.FormatNumber(_data.Players[i].Sum)}");
-            _data.GameResultInfo.Results[_data.Players[i].Name] = _data.Players[i].Sum;
         }
 
-        _data.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_data.GameResultInfo.StartTime);
-
+        FillReport();
         ScheduleExecution(Tasks.Winner, 15 + Random.Shared.Next(10));
     }
 
     protected override async ValueTask DisposeAsync(bool disposing) =>
         await ClientData.TaskLock.TryLockAsync(
-            async () =>
+            () =>
             {
-                await TrySendReportAsync();
-
+                SendReport();
                 Engine.Dispose();
 
                 return base.DisposeAsync(disposing);
@@ -896,12 +893,14 @@ public sealed class GameLogic : Logic<GameData>
             5000,
             true);
 
-    private async Task TrySendReportAsync()
+    private void SendReport()
     {
         if (_data.ReportSent)
         {
             return;
         }
+
+        FillReport();
 
         var reviewers = _data.GameResultInfo.Reviews.Keys;
 
@@ -913,8 +912,23 @@ public sealed class GameLogic : Logic<GameData>
             }
         }
 
-        await _data.BackLink.SaveReportAsync(_data.GameResultInfo);
+        _data.BackLink.SaveReport(_data.GameResultInfo);
         _data.ReportSent = true;
+    }
+
+    private void FillReport()
+    {
+        if (_data.GameResultInfo.Duration > TimeSpan.Zero)
+        {
+            return;
+        }
+
+        for (var i = 0; i < _data.Players.Count; i++)
+        {
+            _data.GameResultInfo.Results[_data.Players[i].Name] = _data.Players[i].Sum;
+        }
+
+        _data.GameResultInfo.Duration = DateTimeOffset.UtcNow.Subtract(_data.GameResultInfo.StartTime);
     }
 
     internal override bool Stop(StopReason reason)
@@ -1226,8 +1240,8 @@ public sealed class GameLogic : Logic<GameData>
             
             var s = new StringBuilder(GetRandomString(LO[showmanReplic]));
 
-            var canonicalAnswer = _data.Question.Right.FirstOrDefault();
-            var isAnswerCanonical = canonicalAnswer != null && _data.Answerer.Answer.Simplify().Contains(canonicalAnswer.Simplify());
+            var canonicalAnswer = _data.Question?.Right.FirstOrDefault();
+            var isAnswerCanonical = canonicalAnswer != null && (_data.Answerer.Answer ?? "").Simplify().Contains(canonicalAnswer.Simplify());
 
             if (!IsFinalRound())
             {
@@ -1504,7 +1518,7 @@ public sealed class GameLogic : Logic<GameData>
             .OrderBy(pair => pair.player.Sum)
             .Select(pair => pair.index);
 
-        _data.AnnouncedAnswererIndices = answerers.GetEnumerator();
+        _data.AnnouncedAnswerersEnumerator = new CustomEnumerator<int>(answerers);
         ScheduleExecution(Tasks.Announce, 15);
         return true;
     }
@@ -2307,7 +2321,7 @@ public sealed class GameLogic : Logic<GameData>
         OnDecision();
     }
 
-    private async void WaitReport()
+    private void WaitReport()
     {
         try
         {
@@ -2316,8 +2330,7 @@ public sealed class GameLogic : Logic<GameData>
                 _gameActions.SendMessage(Messages.Cancel, item.Name);
             }
 
-            await TrySendReportAsync();
-
+            SendReport();
             StopWaiting();
         }
         catch (Exception exc)
@@ -2783,13 +2796,13 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void Announce()
     {
-        if (!_data.AnnouncedAnswererIndices.MoveNext())
+        if (_data.AnnouncedAnswerersEnumerator == null || !_data.AnnouncedAnswerersEnumerator.MoveNext())
         {
             ScheduleExecution(Tasks.MoveNext, 15, 1, true);
             return;
         }
 
-        var answererIndex = _data.AnnouncedAnswererIndices.Current;
+        var answererIndex = _data.AnnouncedAnswerersEnumerator.Current;
 
         if (answererIndex < 0 || answererIndex >= _data.Players.Count)
         {

@@ -148,7 +148,7 @@ public enum Tasks
     /// </summary>
     WaitFinalStake,
     /// <summary>
-    /// Объявление ответа игрока в финале
+    /// Announce hidden answer of next player.
     /// </summary>
     Announce,
     /// <summary>

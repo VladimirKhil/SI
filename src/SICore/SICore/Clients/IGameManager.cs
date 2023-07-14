@@ -54,7 +54,7 @@ public interface IGameManager : IPlatformManager
 
     void SendError(Exception exc, bool isWarning = false);
 
-    Task SaveReportAsync(Results.GameResult result, CancellationToken cancellationToken = default);
+    void SaveReport(Results.GameResult result, CancellationToken cancellationToken = default);
 
     void OnPictureError(string remoteUri);
 

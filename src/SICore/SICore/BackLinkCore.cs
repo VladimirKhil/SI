@@ -31,7 +31,7 @@ public abstract class BackLinkCore : IGameManager
 
     public abstract void SendError(Exception exc, bool isWarning = false);
 
-    public abstract Task SaveReportAsync(Results.GameResult result, CancellationToken cancellationToken = default);
+    public abstract void SaveReport(Results.GameResult result, CancellationToken cancellationToken = default);
 
     public abstract void OnPictureError(string remoteUri);
 

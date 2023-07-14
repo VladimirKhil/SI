@@ -200,9 +200,14 @@ public static class StringExtensions
     {
         var length = s.Length;
         var res = new StringBuilder();
+
         for (var i = 0; i < length; i++)
+        {
             if (char.IsLetterOrDigit(s[i]))
+            {
                 res.Append(char.ToLower(s[i]));
+            }
+        }
 
         return res.ToString().Replace('ё', 'е');
     }

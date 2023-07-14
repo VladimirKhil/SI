@@ -2667,6 +2667,8 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// </summary>
     private void DropCurrentAnswerer()
     {
+        var index = ClientData.AnswererIndex;
+
         // Drop answerer index
         ClientData.AnswererIndex = -1;
 
@@ -2691,8 +2693,16 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else if (nextTask == Tasks.AskRight)
         {
-            // Игрока удалил после того, как он дал ответ. Но ещё не обратились к ведущему
-            PlanExecution(Tasks.ContinueQuestion, 1);
+            // Player has been removed after giving answer. But the answer has not been validated by showman yet
+            if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0)
+            {
+                PlanExecution(Tasks.ContinueQuestion, 1);
+            }
+            else
+            {
+                ClientData.AnnouncedAnswerersEnumerator?.RemoveValue(index);
+                PlanExecution(Tasks.Announce, 15);
+            }
         }
         else if (ClientData.QuestionPlayState.AnswererIndicies.Count == 0
             && ClientData.Question?.TypeName != QuestionTypes.Simple)
@@ -2702,6 +2712,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else if (nextTask == Tasks.AnnounceStake)
         {
+            ClientData.AnnouncedAnswerersEnumerator?.RemoveValue(index);
             PlanExecution(Tasks.Announce, 15);
         }
     }
