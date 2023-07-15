@@ -12,6 +12,10 @@ namespace SIUI.Behaviors;
 /// </summary>
 public static class QuestionReading
 {
+    private static readonly DependencyPropertyDescriptor TextProperty = DependencyPropertyDescriptor.FromProperty(
+        TextBlock.TextProperty,
+        typeof(TextBlock));
+
     public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
 
     public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
@@ -25,21 +29,60 @@ public static class QuestionReading
         var textBlock = (TextBlock)d;
         var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
 
-        if (tableInfoViewModel.TextSpeed < double.Epsilon)
+        if ((bool)e.NewValue)
+        {
+            if (tableInfoViewModel.TextSpeed < double.Epsilon)
+            {
+                return;
+            }
+
+            textBlock.Loaded += OnLoaded;
+            textBlock.DataContextChanged += TextBlock_DataContextChanged;
+            TextProperty.AddValueChanged(textBlock, TextBlock_TextChanged);
+        }
+        else
+        {
+            textBlock.Loaded -= OnLoaded;
+            textBlock.DataContextChanged -= TextBlock_DataContextChanged;
+            TextProperty.RemoveValueChanged(textBlock, TextBlock_TextChanged);
+        }
+    }
+
+    private static void TextBlock_TextChanged(object? sender, EventArgs e)
+    {
+        if (sender == null)
         {
             return;
         }
 
-        textBlock.Loaded += (sender, e2) =>
-        {
-            textBlock.TextEffects[0].BeginAnimation(
-                TextEffect.PositionCountProperty,
-                new Int32Animation
-                { 
-                    To = tableInfoViewModel.Text.Length,
-                    Duration = new Duration(TimeSpan.FromSeconds(tableInfoViewModel.Text.Length * tableInfoViewModel.TextSpeed))
-                });
-        };
+        var textBlock = (TextBlock)sender;
+        AnimateTextReading(textBlock);
+    }
+
+    private static void TextBlock_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        var textBlock = (TextBlock)sender;
+        AnimateTextReading(textBlock);
+    }
+
+    private static void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        var textBlock = (TextBlock)sender;
+        AnimateTextReading(textBlock);
+    }
+
+    private static void AnimateTextReading(TextBlock textBlock)
+    {
+        var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+
+        textBlock.TextEffects[0].BeginAnimation(
+            TextEffect.PositionCountProperty,
+            new Int32Animation
+            {
+                From = 0,
+                To = tableInfoViewModel.Text.Length,
+                Duration = new Duration(TimeSpan.FromSeconds(tableInfoViewModel.Text.Length * tableInfoViewModel.TextSpeed))
+            });
     }
 
     public static bool GetIsAttachedPartial(DependencyObject obj) => (bool)obj.GetValue(IsAttachedPartialProperty);

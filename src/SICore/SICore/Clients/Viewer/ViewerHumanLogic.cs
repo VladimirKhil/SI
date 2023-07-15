@@ -559,7 +559,12 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             _data.IsPartial = false;
             _data.AtomIndex++;
-            TInfo.Text = "";
+
+            if (_data.AtomType != AtomTypes.Oral)
+            {
+                TInfo.Text = "";
+            }
+
             TInfo.PartialText = false;
         }
 
