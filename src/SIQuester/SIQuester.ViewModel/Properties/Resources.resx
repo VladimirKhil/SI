@@ -130,7 +130,7 @@
     <value>Автор</value>
   </data>
   <data name="AuthorSiteUrl" xml:space="preserve">
-    <value>http://ur-quan1986.livejournal.com/74013.html?mode=reply&amp;subject=Замечания по SIQuester'у</value>
+    <value>https://vk.com/si_game</value>
   </data>
   <data name="BaseAuthors" xml:space="preserve">
     <value>Автор</value>
@@ -384,7 +384,7 @@ theme - тема Кота</value>
     <value>База вопросов</value>
   </data>
   <data name="DBStorageComment" xml:space="preserve">
-    <value>Пакет хранится в Базе http://db.chgk.info/ под именем {0}</value>
+    <value>Пакет хранится в Базе {0} под именем {1}</value>
   </data>
   <data name="Editors" xml:space="preserve">
     <value>Редакторы</value>

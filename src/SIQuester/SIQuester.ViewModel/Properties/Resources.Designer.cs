@@ -133,7 +133,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на http://ur-quan1986.livejournal.com/74013.html?mode=reply&amp;subject=Замечания по SIQuester&apos;у.
+        ///   Ищет локализованную строку, похожую на https://vk.com/si_game.
         /// </summary>
         public static string AuthorSiteUrl {
             get {
@@ -214,7 +214,7 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет хранится в Базе http://db.chgk.info/ под именем {0}.
+        ///   Ищет локализованную строку, похожую на Пакет хранится в Базе {0} под именем {1}.
         /// </summary>
         public static string DBStorageComment {
             get {

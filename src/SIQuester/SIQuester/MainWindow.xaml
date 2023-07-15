@@ -341,8 +341,8 @@
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
-            
-            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Импорт">
+
+            <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.Import}">
                 <Path Stretch="Uniform" Fill="White" Margin="3,2,4,2" Data="{Binding Source={StaticResource app_import},Path=Data}" />
                 
                 <siq:DropDownButton.DropDown>
@@ -358,7 +358,7 @@
 
                         <MenuItem Header="{x:Static lp:Resources.ImportXml}" Command="{Binding ImportXml}" />
                         <MenuItem Header="YAML…" Command="{Binding ImportYaml}" />
-                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" ToolTip="http://db.chgk.info" Command="{Binding ImportBase}" />
+                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" Command="{Binding ImportBase}" />
                         <MenuItem Header="{x:Static lp:Resources.ImportSIStorage}" Command="{Binding ImportFromSIStore}" />
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>

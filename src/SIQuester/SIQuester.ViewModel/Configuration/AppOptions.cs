@@ -6,7 +6,7 @@
 public sealed class AppOptions
 {
     /// <summary>
-    /// Options configuration setion name.
+    /// Options configuration section name.
     /// </summary>
     public static readonly string ConfigurationSectionName = "SIQuester";
 

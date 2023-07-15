@@ -409,6 +409,9 @@
   <data name="Images" xml:space="preserve">
     <value>Изображения</value>
   </data>
+  <data name="Import" xml:space="preserve">
+    <value>Импорт</value>
+  </data>
   <data name="ImportDB" xml:space="preserve">
     <value>База вопросов…</value>
   </data>

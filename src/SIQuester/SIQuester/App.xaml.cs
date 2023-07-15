@@ -11,6 +11,7 @@ using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.Configuration;
+using SIQuester.ViewModel.Helpers;
 using SIStorageService.Client;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -44,11 +45,6 @@ public partial class App : Application
     private const string ConfigFileName = "user.config";
 
     private readonly Implementation.DesktopManager _manager = new();
-
-    /// <summary>
-    /// Используется ли версия Windows от Vista и выше
-    /// </summary>
-    public static bool IsVistaOrLater = Environment.OSVersion.Version.Major >= 6;
 
     public static bool IsWindows8_1OrLater = Environment.OSVersion.Version > new Version(6, 2);
 
@@ -154,7 +150,7 @@ public partial class App : Application
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, loggerFactory);
+            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, _host.Services, loggerFactory);
 
             MainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow.Show();
@@ -177,6 +173,7 @@ public partial class App : Application
     {
         services.AddAppServiceClient(ctx.Configuration);
         services.AddSIStorageServiceClient(ctx.Configuration);
+        services.AddChgkServiceClient(ctx.Configuration);
         services.AddSingleton(AppSettings.Default);
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }

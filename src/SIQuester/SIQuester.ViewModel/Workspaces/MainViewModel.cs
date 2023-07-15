@@ -117,10 +117,15 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private readonly string[] _args;
     private readonly AppOptions _appOptions;
-
     private readonly StorageContextViewModel _storageContextViewModel;
-    
-    public MainViewModel(string[] args, AppOptions appOptions, ISIStorageServiceClient siStorageServiceClient, ILoggerFactory loggerFactory)
+    private readonly IServiceProvider _serviceProvider;
+
+    public MainViewModel(
+        string[] args,
+        AppOptions appOptions,
+        ISIStorageServiceClient siStorageServiceClient,
+        IServiceProvider serviceProvider,
+        ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<MainViewModel>();
@@ -150,6 +155,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
         _storageContextViewModel = new StorageContextViewModel(siStorageServiceClient);
         _storageContextViewModel.Load();
+
+        _serviceProvider = serviceProvider;
 
         AddCommandBinding(ApplicationCommands.New, New_Executed);
         AddCommandBinding(ApplicationCommands.Open, (sender, e) => Open_Executed(e.Parameter));
@@ -545,7 +552,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// <summary>
     /// Imports package from Packages Database.
     /// </summary>
-    private void ImportBase_Executed(object? arg) => DocList.Add(new ImportDBStorageViewModel(_storageContextViewModel, _loggerFactory));
+    private void ImportBase_Executed(object? arg) =>
+        DocList.Add(new ImportDBStorageViewModel(
+            _storageContextViewModel,
+            _serviceProvider.GetRequiredService<IChgkDbClient>(),
+            _loggerFactory));
 
     /// <summary>
     /// Imports package from SI Storage.

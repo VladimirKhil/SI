@@ -2,18 +2,19 @@
 using Notions;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Properties;
-using System.Net;
 using System.Text;
 using System.Xml;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Represents view model for importing chgk database packages.
+/// </summary>
 public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 {
     private const string RootNodeName = "SVOYAK";
-
-    private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -38,7 +39,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
     public bool IsProgress
     {
-        get { return _isProgress; }
+        get => _isProgress;
         set
         {
             if (_isProgress != value)
@@ -69,12 +70,16 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
     }
 
     private readonly StorageContextViewModel _storageContextViewModel;
-
+    private readonly IChgkDbClient _chgkDbClient;
     private readonly ILoggerFactory _loggerFactory;
 
-    public ImportDBStorageViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    public ImportDBStorageViewModel(
+        StorageContextViewModel storageContextViewModel,
+        IChgkDbClient chgkDbClient,
+        ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
+        _chgkDbClient = chgkDbClient;
         _loggerFactory = loggerFactory;
     }
 
@@ -108,45 +113,49 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         base.Dispose(disposing);
     }
 
-    internal static async Task<SIDocument> SelectAsync(DBNode item, CancellationToken cancellationToken)
+    internal async Task<SIDocument> SelectAsync(DBNode item, CancellationToken cancellationToken)
     {
-        var doc = await GetXmlAsync(item.Key, cancellationToken);
+        var doc = await _chgkDbClient.GetXmlAsync(item.Key, cancellationToken);
         var manager = new XmlNamespaceManager(doc.NameTable);
 
-        var siDoc = SIDocument.Create(
+        var siDocument = SIDocument.Create(
             doc.SelectNodes(@"/tournament/Title", manager)[0].InnerText.GrowFirstLetter().ClearPoints(),
             Resources.EmptyValue);
 
-        siDoc.Package.Info.Comments.Text += string.Format(Resources.DBStorageComment, doc["tournament"]?["FileName"]?.InnerText);
-        var s = doc["tournament"]["Info"].InnerText;
+        siDocument.Package.Info.Comments.Text += string.Format(
+            Resources.DBStorageComment,
+            _chgkDbClient.ServiceUri,
+            doc["tournament"]?["FileName"]?.InnerText);
+
+        var s = doc["tournament"]?["Info"]?.InnerText ?? "";
 
         if (s.Length > 0)
         {
-            siDoc.Package.Info.Comments.Text += string.Format("\r\nИнфо: {0}", s);
+            siDocument.Package.Info.Comments.Text += string.Format("\r\nИнфо: {0}", s);
         }
 
         s = doc["tournament"]["URL"].InnerText;
 
         if (s.Length > 0)
         {
-            siDoc.Package.Info.Comments.Text += string.Format("\r\nURL: {0}", s);
+            siDocument.Package.Info.Comments.Text += string.Format("\r\nURL: {0}", s);
         }
 
         s = doc["tournament"]["PlayedAt"].InnerText;
 
         if (s.Length > 0)
         {
-            siDoc.Package.Info.Comments.Text += string.Format("\r\nИграно: {0}", s);
+            siDocument.Package.Info.Comments.Text += string.Format("\r\nИграно: {0}", s);
         }
 
         s = doc["tournament"]["Editors"].InnerText;
 
         if (s.Length > 0)
         {
-            siDoc.Package.Info.Authors[0] = $"{Resources.Editors}: {s}";
+            siDocument.Package.Info.Authors[0] = $"{Resources.Editors}: {s}";
         }
 
-        var round = siDoc.Package.CreateRound(RoundTypes.Standart, Resources.EmptyValue);
+        var round = siDocument.Package.CreateRound(RoundTypes.Standart, Resources.EmptyValue);
 
         var nodeList2 = doc.SelectNodes(@"/tournament/question", manager);
 
@@ -201,7 +210,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             while (++i < text.Length)
             {
                 text[i] = text[i].Trim();
-                string js = (j + 1).ToString();
+                var js = (j + 1).ToString();
 
                 if (text[i][..js.Length] == js && (text[i].Length > 3 && text[i].Substring(js.Length, 2) == ". " || text[i].Length > 4 && text[i].Substring(js.Length, 3) == "0. "))
                 {
@@ -383,7 +392,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             #endregion
         }
 
-        return siDoc;
+        return siDocument;
     }
 
     public async void LoadChildren(DBNode node)
@@ -410,15 +419,15 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         }
     }
 
-    internal static async Task<DBNode[]> LoadNodesAsync(string filename, CancellationToken cancellationToken)
+    internal async Task<DBNode[]> LoadNodesAsync(string filename, CancellationToken cancellationToken)
     {
-        var xmlDocument = await GetXmlAsync(filename, cancellationToken);
+        var xmlDocument = await _chgkDbClient.GetXmlAsync(filename, cancellationToken);
 
         var manager = new XmlNamespaceManager(xmlDocument.NameTable);
         var nodeList = xmlDocument.SelectNodes(@"/tournament/tour", manager);
 
         var result = new List<DBNode>();
-        var trim = filename == "SVOYAK";
+        var trim = filename == RootNodeName;
 
         foreach (XmlNode node in nodeList)
         {
@@ -434,29 +443,5 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         }
 
         return result.ToArray();
-    }
-
-    /// <summary>
-    /// Получить XML из Базы
-    /// </summary>
-    /// <param name="name">Имя турнира в Базе</param>
-    /// <returns>Скачанный XML</returns>
-    internal static async Task<XmlDocument> GetXmlAsync(string name, CancellationToken cancellationToken)
-    {
-        using var response = await HttpClient.GetAsync($"http://db.chgk.info/tour/{name}/xml", cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception(await response.Content.ReadAsStringAsync(cancellationToken));
-        }
-
-        var xmlDocument = new XmlDocument();
-
-        using (var stream = await response.Content.ReadAsStreamAsync(cancellationToken))
-        {
-            xmlDocument.Load(stream);
-        }
-
-        return xmlDocument;
     }
 }
