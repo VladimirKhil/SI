@@ -7,6 +7,7 @@ using SIGame.ViewModel.Helpers;
 using SIGame.ViewModel.Properties;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Contract;
+using SIStatisticsService.Contract.Models;
 using SIUI.ViewModel;
 using System.Diagnostics;
 
@@ -55,25 +56,29 @@ public sealed class BackLink : BackLinkCore
     /// <summary>
     /// Sends game results info to server.
     /// </summary>
-    public override async Task SaveReportAsync(GameResult gameResult, CancellationToken cancellationToken = default)
+    public override async void SaveReport(GameResult gameResult, CancellationToken cancellationToken = default)
     {
         if (gameResult.Reviews.Count == 0)
         {
             return;
         }
 
-        var gameReport = gameResult.ToGameReport();
+        GameReport? gameReport = null;
 
-        var statisticsService = _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>();
-        
         try
         {
+            gameReport = gameResult.ToGameReport();
+            var statisticsService = _serviceProvider.GetRequiredService<ISIStatisticsServiceClient>();
             await statisticsService.SendGameReportAsync(gameReport, cancellationToken);
         }
         catch (Exception)
         {
             PlatformSpecific.PlatformManager.Instance.ShowMessage(Resources.Error_SendingReport, PlatformSpecific.MessageType.Warning, true);
-            _appState.TryAddDelayedReport(gameReport);
+            
+            if (gameReport != null)
+            {
+                _appState.TryAddDelayedReport(gameReport);
+            }
         }
     }
 
