@@ -501,4 +501,7 @@
   <data name="GameRule_PingPenalty" xml:space="preserve">
     <value>штраф за пинг</value>
   </data>
+  <data name="YouNeedToUpgradeClientToJoinGame" xml:space="preserve">
+    <value>Необходимо обновить приложение для входа в эту игру</value>
+  </data>
 </root>

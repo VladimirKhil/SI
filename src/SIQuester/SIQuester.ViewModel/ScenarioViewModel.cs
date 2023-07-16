@@ -293,9 +293,9 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
         }
     }
 
-    private void SelectAtomObject_Executed(object arg) => SelectAtomObjectCore(arg, false);
+    private void SelectAtomObject_Executed(object? arg) => SelectAtomObjectCore(arg, false);
 
-    private void SelectAtomObjectCore(object arg, bool asAnswer)
+    private void SelectAtomObjectCore(object? arg, bool asAnswer)
     {
         var data = (Tuple<object, object>)arg;
         var media = data.Item1;

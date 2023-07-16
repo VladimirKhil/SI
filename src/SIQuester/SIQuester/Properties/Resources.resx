@@ -520,6 +520,9 @@
   <data name="PreviousFragment" xml:space="preserve">
     <value>Предыдущий фрагмент</value>
   </data>
+  <data name="Price" xml:space="preserve">
+    <value>Стоимость</value>
+  </data>
   <data name="PrintedHtml" xml:space="preserve">
     <value>HTML для печати</value>
   </data>
@@ -610,6 +613,9 @@
   <data name="SelectFile" xml:space="preserve">
     <value>Выбрать файл…</value>
   </data>
+  <data name="SelectionMode" xml:space="preserve">
+    <value>Режим передачи</value>
+  </data>
   <data name="SelectSearchFolder" xml:space="preserve">
     <value>Выберите папку для поиска</value>
   </data>
@@ -624,6 +630,12 @@
   </data>
   <data name="SendToPCGame" xml:space="preserve">
     <value>Отправить в компьютерную игру</value>
+  </data>
+  <data name="SetAnswererSelect_Any" xml:space="preserve">
+    <value>Кому угодно</value>
+  </data>
+  <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
+    <value>Всем кроме себя</value>
   </data>
   <data name="SetLogo" xml:space="preserve">
     <value>Задать логотип</value>

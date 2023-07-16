@@ -23,7 +23,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     private int _price;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string? _typeName;
+    private string _typeName = QuestionTypes.Default;
 
     /// <summary>
     /// Question base price.
@@ -47,7 +47,8 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <remarks>
     /// Replaces deprecated <see cref="Type" /> property.
     /// </remarks>
-    public string? TypeName
+    [DefaultValue(QuestionTypes.Default)]
+    public string TypeName
     {
         get => _typeName;
         set { var oldValue = _typeName; if (oldValue != value) { _typeName = value; OnPropertyChanged(oldValue); } }
@@ -255,7 +256,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         writer.WriteStartElement("question");
         writer.WriteAttributeString("price", _price.ToString());
 
-        if (_typeName != null && _typeName != QuestionTypes.Default)
+        if (_typeName != QuestionTypes.Default)
         {
             writer.WriteAttributeString("type", _typeName.ToString());
         }
@@ -374,6 +375,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     public void Upgrade()
     {
+        if (Parameters != null)
+        {
+            return;
+        }
+
         if (Price == -1)
         {
             Scenario.Clear();
@@ -560,7 +566,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// </summary>
     public string GetText()
     {
-        if (TypeName == null)
+        if (Scenario.Any())
         {
             return GetTextFromScenario();
         }

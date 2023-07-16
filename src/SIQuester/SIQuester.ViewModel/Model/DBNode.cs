@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SIQuester.ViewModel;
+namespace SIQuester.ViewModel.Model;
 
 /// <summary>
 /// Represents a questions database node.

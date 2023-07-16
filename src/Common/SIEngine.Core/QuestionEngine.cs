@@ -36,7 +36,7 @@ public sealed class QuestionEngine
         _playHandler = playHandler;
         _script = _question.Script;
 
-        if (_script == null && _question.TypeName != null)
+        if (_script == null)
         {
             var typeName = options.ForceDefaultTypeName || _question.TypeName == QuestionTypes.Default
                 ? options.DefaultTypeName

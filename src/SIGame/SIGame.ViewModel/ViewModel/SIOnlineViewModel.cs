@@ -24,6 +24,8 @@ namespace SIGame.ViewModel;
 /// </summary>
 public sealed class SIOnlineViewModel : ConnectionDataViewModel
 {
+    private const int SupportedProtocolVersion = 0;
+
     public const int MaxAvatarSizeMb = 2;
 
     private SI.GameServer.Contract.HostInfo? _gamesHostInfo;
@@ -557,6 +559,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         for (int i = 0; i < length; i++)
         {
             var comparison = ServerGames[i].GameName.CompareTo(gameName);
+
             if (comparison == 0)
             {
                 inserted = true;
@@ -1177,12 +1180,18 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     protected override string GetExtraCredentials() => !string.IsNullOrEmpty(_password) ? $"\n{_password}" : "";
 
     public override async Task JoinGameCoreAsync(
-        GameInfo gameInfo,
+        GameInfo? gameInfo,
         GameRole role,
         bool isHost = false,
         CancellationToken cancellationToken = default)
     {
         gameInfo ??= _currentGame;
+
+        if (gameInfo != null && gameInfo.MinimumClientProtocolVersion > SupportedProtocolVersion)
+        {
+            Error = Resources.YouNeedToUpgradeClientToJoinGame;
+            return;
+        }
 
         if (!isHost)
         {
@@ -1282,7 +1291,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             Rules = BuildRules(gameInfo),
             Stage = BuildStage(gameInfo),
             Started = gameInfo.Started,
-            StartTime = gameInfo.StartTime.ToLocalTime()
+            StartTime = gameInfo.StartTime.ToLocalTime(),
+            MinimumClientProtocolVersion = gameInfo.MinimumClientProtocolVersion
         };
 
     private static string BuildStage(SI.GameServer.Contract.GameInfo gameInfo) => gameInfo.Stage switch

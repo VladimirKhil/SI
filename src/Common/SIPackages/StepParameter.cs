@@ -267,6 +267,7 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
     {
         _numberSetValue = new();
 
+        reader.MoveToElement();
         reader.ReadToDescendant("numberSet");
 
         if (int.TryParse(reader.GetAttribute("minimum"), out var minimum))
@@ -284,39 +285,14 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
             _numberSetValue.Step = step;
         }
 
-        while (reader.Read())
-        {
-            switch (reader.NodeType)
-            {
-                case XmlNodeType.EndElement:
-                    if (reader.LocalName == "param")
-                    {
-                        reader.Read();
-                        return;
-                    }
-                    break;
-            }
-        }
+        reader.Read(); // numberSet
+        reader.Read(); // param
     }
 
     private void ReadValue(XmlReader reader)
     {
         reader.MoveToElement();
         _simpleValue = reader.ReadElementContentAsString();
-
-        while (reader.Read())
-        {
-            switch (reader.NodeType)
-            {
-                case XmlNodeType.EndElement:
-                    if (reader.LocalName == "param")
-                    {
-                        reader.Read();
-                        return;
-                    }
-                    break;
-            }
-        }
     }
 
     /// <inheritdoc />

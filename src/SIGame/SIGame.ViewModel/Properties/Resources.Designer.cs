@@ -1220,5 +1220,14 @@ namespace SIGame.ViewModel.Properties {
                 return ResourceManager.GetString("WrongAddressFormat", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на You need to upgrade application to join this game.
+        /// </summary>
+        public static string YouNeedToUpgradeClientToJoinGame {
+            get {
+                return ResourceManager.GetString("YouNeedToUpgradeClientToJoinGame", resourceCulture);
+            }
+        }
     }
 }

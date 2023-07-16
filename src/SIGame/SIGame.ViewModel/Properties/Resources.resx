@@ -504,4 +504,7 @@
   <data name="GameRule_PingPenalty" xml:space="preserve">
     <value>ping penalty</value>
   </data>
+  <data name="YouNeedToUpgradeClientToJoinGame" xml:space="preserve">
+    <value>You need to upgrade application to join this game</value>
+  </data>
 </root>

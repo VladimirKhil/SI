@@ -836,4 +836,7 @@
   <data name="SetChooser" xml:space="preserve">
     <value>{0} передал(а) ход {1}</value>
   </data>
+  <data name="TypeUsePingPenalty" xml:space="preserve">
+    <value>замедление пинга</value>
+  </data>
 </root>

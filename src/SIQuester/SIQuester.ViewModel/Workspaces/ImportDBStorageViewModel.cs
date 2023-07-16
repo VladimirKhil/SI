@@ -3,6 +3,7 @@ using Notions;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.Properties;
 using System.Text;
 using System.Xml;

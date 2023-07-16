@@ -41,5 +41,10 @@ public sealed class GameInfo
 
     public bool Started { get; set; }
 
-    public SIData.GameModes Mode { get; set; }
+    public GameModes Mode { get; set; }
+
+    /// <summary>
+    /// Minimum client protocol version required to join this game.
+    /// </summary>
+    public int MinimumClientProtocolVersion { get; set; }
 }

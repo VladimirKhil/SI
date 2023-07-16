@@ -64,7 +64,11 @@
     </UserControl.Resources>
     
     <StackPanel Orientation="Horizontal">
-        <ComboBox ItemsSource="{Binding Source={StaticResource Modes}}" SelectedValue="{Binding Mode}">
+        <ComboBox
+            Style="{StaticResource ComboBoxCommon}"
+            Padding="5,2,2,2"
+            ItemsSource="{Binding Source={StaticResource Modes}}"
+            SelectedValue="{Binding Mode}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Converter={StaticResource ModeDescription}}" />

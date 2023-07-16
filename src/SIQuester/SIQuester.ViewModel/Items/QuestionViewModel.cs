@@ -25,6 +25,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public QuestionTypeViewModel Type { get; private set; }
 
+    public StepParametersViewModel Parameters { get; private set; }
+
     public ICommand AddComplexAnswer { get; private set; }
 
     public ICommand RemoveComplexAnswer { get; private set; }
@@ -60,6 +62,11 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         Right = new AnswersViewModel(this, question.Right, true);
         Wrong = new AnswersViewModel(this, question.Wrong, false);
         Scenario = new ScenarioViewModel(this, question.Scenario);
+
+        if (question.Parameters != null)
+        {
+            Parameters = new StepParametersViewModel(question.Parameters);
+        }
 
         BindHelper.Bind(Right, question.Right);
         BindHelper.Bind(Wrong, question.Wrong);
@@ -172,8 +179,8 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     {
         if (IsUpgraded)
         {
-            var typeName = (string?)arg;
-            Model.TypeName = typeName == "" ? "?" : typeName;
+            var typeName = (string?)arg ?? "";
+            Model.TypeName = typeName == QuestionTypes.Default ? "?" : typeName;
             return;
         }
 

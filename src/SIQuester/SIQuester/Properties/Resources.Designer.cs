@@ -1268,6 +1268,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Стоимость.
+        /// </summary>
+        public static string Price {
+            get {
+                return ResourceManager.GetString("Price", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на HTML для печати.
         /// </summary>
         public static string PrintedHtml {
@@ -1538,6 +1547,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Режим передачи.
+        /// </summary>
+        public static string SelectionMode {
+            get {
+                return ResourceManager.GetString("SelectionMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Выберите папку для поиска.
         /// </summary>
         public static string SelectSearchFolder {
@@ -1579,6 +1597,24 @@ namespace SIQuester.Properties {
         public static string SendToPCGame {
             get {
                 return ResourceManager.GetString("SendToPCGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Кому угодно.
+        /// </summary>
+        public static string SetAnswererSelect_Any {
+            get {
+                return ResourceManager.GetString("SetAnswererSelect_Any", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Всем кроме себя.
+        /// </summary>
+        public static string SetAnswererSelect_ExceptCurrent {
+            get {
+                return ResourceManager.GetString("SetAnswererSelect_ExceptCurrent", resourceCulture);
             }
         }
         

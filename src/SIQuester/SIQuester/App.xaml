@@ -336,12 +336,29 @@
 
             <siqcv:MappedConverter x:Key="QuestionTypeParamConverter" Map="{StaticResource QTParams}" />
 
+            <siqcv:StringDictionary x:Key="QuestionParameterNames">
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.Question}" Member="lp:Resources.Question" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.Answer}" Member="lp:Resources.Answer" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.Theme}" Member="lp:Resources.Theme" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.Price}" Member="lp:Resources.Price" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.SelectionMode}" Member="lp:Resources.SelectionMode" />
+            </siqcv:StringDictionary>
+
+            <siqcv:MappedConverter x:Key="QuestionParameterNamesConverter" Map="{StaticResource QuestionParameterNames}" />
+
             <siqcv:StringDictionary x:Key="BCSelf">
                 <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_True}">Можно</sys:String>
                 <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_False}">Нельзя</sys:String>
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="BagCatSelfConverter" Map="{StaticResource BCSelf}" />
+
+            <siqcv:StringDictionary x:Key="SelectionModes">
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_Any}" Member="lp:Resources.SetAnswererSelect_Any" />
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_ExceptCurrent}" Member="lp:Resources.SetAnswererSelect_ExceptCurrent" />
+            </siqcv:StringDictionary>
+
+            <siqcv:MappedConverter x:Key="SelectionModesConverter" Map="{StaticResource SelectionModes}" />
 
             <siqcv:StringDictionary x:Key="BCKnows">
                 <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Before}">До отдачи</sys:String>
@@ -1278,7 +1295,7 @@
                                                             ItemContainerStyle="{StaticResource SubMenuItemQuestionType}" />
                                                     </Menu>
 
-                                                    <Button>
+                                                    <Button x:Name="complexAnswer">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource MenuButton}">
                                                                 <Setter Property="Command" Value="{Binding AddComplexAnswer}" />
@@ -1347,6 +1364,7 @@
                                                         <Setter TargetName="authors" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="sources" Property="Visibility" Value="Collapsed" />
                                                         <Setter TargetName="comments" Property="Visibility" Value="Collapsed" />
+                                                        <Setter TargetName="complexAnswer" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
 
                                                     <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
@@ -2337,6 +2355,7 @@
             </Style>
 
             <siqcv:NumberSetViewModelConverter x:Key="NumberSetViewModelConverter" />
+            <siqcv:NumberSetViewModelNewConverter x:Key="NumberSetViewModelNewConverter" />
 
             <DataTemplate x:Key="QuestionTypeParamTemplate" DataType="vm:QuestionTypeParamViewModel">
                 <DockPanel>
@@ -2382,9 +2401,20 @@
                         Padding="2"
                         MinWidth="100"
                         Height="Auto"
-                        SelectedItem="{Binding Path=Model.Value, Converter={StaticResource BagCatSelfConverter}}"
+                        SelectedItem="{Binding Model.Value, Converter={StaticResource BagCatSelfConverter}}"
                         ItemsSource="{Binding Source={StaticResource BCSelf},Path=Values,Mode=OneTime}" />
                 </DockPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SelectionModeTemplate" DataType="p:StepParameter">
+                <ComboBox
+                    Style="{StaticResource ComboBoxCommon}"
+                    Padding="5,2,2,2"
+                    Width="150"
+                    Height="Auto"
+                    HorizontalAlignment="Left"
+                    SelectedItem="{Binding SimpleValue, Converter={StaticResource SelectionModesConverter}}"
+                    ItemsSource="{Binding Source={StaticResource SelectionModes}, Path=Values, Mode=OneTime}" />
             </DataTemplate>
 
             <DataTemplate x:Key="QuestionTypeParamBagCatKnowsTemplate" DataType="vm:QuestionTypeParamViewModel">
@@ -2717,12 +2747,89 @@
                 <Setter Property="Margin" Value="-7,0,0,4" />
             </Style>
 
+            <siqcv:TemplateConverter x:Key="ContentItemSelector">
+                <siqcv:TemplateConverter.DefaultTemplate>
+                    <!-- pc:AtomTypes.Text -->
+                    <DataTemplate DataType="p:ContentItem">
+                        <TextBox
+                            siq:ActivateManager.IsWatching="True"
+                            TextWrapping="Wrap"
+                            AcceptsReturn="True"
+                            Height="Auto"
+                            MinWidth="50"
+                            Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource CommonTextBox}"
+                            TabIndex="2" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.DefaultTemplate>
+
+                <siqcv:TemplateConverter.Templates>
+                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
+                        <DockPanel>
+                            <ContentControl Style="{StaticResource ImageControlStyle}" />
+                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                        </DockPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:AtomTypes.AudioNew}">
+                        <DockPanel>
+                            <ContentControl Style="{StaticResource AudioControlStyle}" />
+                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                        </DockPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
+                        <DockPanel>
+                            <ContentControl Style="{StaticResource VideoControlStyle}" />
+                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                        </DockPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
+                        <DockPanel>
+                            <ContentControl Style="{StaticResource HtmlControlStyle}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </siqcv:TemplateConverter.Templates>
+            </siqcv:TemplateConverter>
+
+            <siqcv:TemplateConverter x:Key="ParameterSelector">
+                <siqcv:TemplateConverter.DefaultTemplate>
+                    <!-- pc:StepParameterTypes.Simple -->
+                    <DataTemplate DataType="p:StepParameter">
+                        <TextBox Text="{Binding SimpleValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.DefaultTemplate>
+
+                <siqcv:TemplateConverter.Templates>
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="p:StepParameter">
+                        <ItemsControl ItemsSource="{Binding ContentValue}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="p:ContentItem">
+                                    <ContentControl
+                                        Content="{Binding}"
+                                        ContentTemplate="{Binding Type, Converter={StaticResource ContentItemSelector}}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="p:StepParameter">
+                        <!-- Will be implemented in the future -->
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="p:StepParameter">
+                        <lv:NumberSetEditor DataContext="{Binding NumberSetValue, Converter={StaticResource NumberSetViewModelNewConverter}}" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.Templates>
+            </siqcv:TemplateConverter>
+
             <siqcv:TemplateConverter x:Key="AtomSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
                         <DockPanel>
                             <ContentControl Style="{StaticResource AtomStyle}" KeyboardNavigation.IsTabStop="False" />
-                            
+
                             <TextBox
                                 siq:ActivateManager.IsWatching="True"
                                 TextWrapping="Wrap"
@@ -2735,13 +2842,13 @@
                         </DockPanel>
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
-                
+
                 <siqcv:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static pc:AtomTypes.Oral}">
                         <DockPanel>
                             <ContentControl Style="{StaticResource AtomStyle}" />
                             <Image Source="{StaticResource AddVoiceImage}" Height="25" />
-                            
+
                             <TextBox
                                 siq:ActivateManager.IsWatching="True"
                                 TextWrapping="Wrap"
@@ -2789,7 +2896,7 @@
                         <DockPanel>
                             <ContentControl Style="{StaticResource AtomStyle}" />
                             <Image Source="{StaticResource AddMarkerImage}" Height="25" Margin="5,0,0,0" />
-                            
+
                             <TextBox
                                 FontStyle="Italic"
                                 FontSize="14"
@@ -2806,8 +2913,7 @@
 
             <Style x:Key="ScenarioStyle" TargetType="{x:Type ItemsControl}">
                 <Setter Property="Background" Value="Transparent" />
-                <Setter Property="DataContext" Value="{Binding Scenario}" />
-                <Setter Property="ItemsSource" Value="{Binding}" />
+                <Setter Property="ItemsSource" Value="{Binding Scenario}" />
                 
                 <Setter Property="ItemTemplate">
                     <Setter.Value>
@@ -2822,6 +2928,56 @@
                 
                 <Setter Property="siq:SmartMenuManager.SecondMenu" Value="True" />
                 <Setter Property="vm1:ItemsControlWatcher.IsWatching" Value="True" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
+                        <Setter Property="ItemsSource" Value="{Binding Parameters}" />
+                        <Setter Property="siq:SmartMenuManager.SecondMenu" Value="False" />
+                        <Setter Property="vm1:ItemsControlWatcher.IsWatching" Value="False" />
+
+                        <Setter Property="ItemTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <TextBlock
+                                            x:Name="name"
+                                            Text="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
+                                            DockPanel.Dock="Left"
+                                            MinWidth="250"
+                                            FontWeight="Bold"
+                                            Foreground="Black"
+                                            Margin="3,2,10,2" />
+                                        
+                                        <ContentControl
+                                            x:Name="value"
+                                            Margin="0,2,0,0"
+                                            TextBlock.Foreground="Black"
+                                            Content="{Binding Value}"
+                                            ContentTemplate="{Binding Value.Type, Converter={StaticResource ParameterSelector}}"
+                                            KeyboardNavigation.IsTabStop="False" />
+                                    </DockPanel>
+
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Question}">
+                                            <Setter TargetName="name" Property="Text" Value="" />
+                                            <Setter TargetName="name" Property="MinWidth" Value="0" />
+                                            <Setter TargetName="name" Property="Margin" Value="3,2,0,2" />
+                                        </DataTrigger>
+                                        
+                                        <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Answer}">
+                                            <Setter TargetName="name" Property="DockPanel.Dock" Value="Top" />
+                                            <Setter TargetName="name" Property="MinWidth" Value="0" />
+                                        </DataTrigger>
+                                        
+                                        <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.SelectionMode}">
+                                            <Setter TargetName="value" Property="ContentTemplate" Value="{StaticResource SelectionModeTemplate}" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
 
             <HierarchicalDataTemplate DataType="{x:Type vm:QuestionViewModel}">
