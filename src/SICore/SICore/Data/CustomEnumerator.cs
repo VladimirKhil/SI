@@ -7,6 +7,7 @@ namespace SICore;
 /// </summary>
 /// <typeparam name="T">Enumerator data type.</typeparam>
 public sealed class CustomEnumerator<T> : IEnumerator<T>
+    where T: struct
 {
     private readonly List<T> _data;
     private int _index = -1;
@@ -27,11 +28,17 @@ public sealed class CustomEnumerator<T> : IEnumerator<T>
 
     public void Reset() => _index = -1;
 
-    public void RemoveValue(T value)
+    /// <summary>
+    /// Updates underlying collection.
+    /// </summary>
+    /// <param name="itemUpdate">Items updater. If it returns null, the item is removed.</param>
+    public void Update(Func<T, T?> itemUpdate)
     {
-        for (int i = 0; i < _data.Count; i++)
+        for (var i = 0; i < _data.Count; i++)
         {
-            if (Equals(_data[i], value))
+            var updatedValue = itemUpdate(_data[i]);
+
+            if (!updatedValue.HasValue)
             {
                 _data.RemoveAt(i);
 
@@ -41,6 +48,10 @@ public sealed class CustomEnumerator<T> : IEnumerator<T>
                 }
 
                 i--;
+            }
+            else
+            {
+                _data[i] = updatedValue.Value;
             }
         }
     }

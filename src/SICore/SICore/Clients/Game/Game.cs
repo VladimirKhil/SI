@@ -2,6 +2,7 @@
 using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Contracts;
+using SICore.Extensions;
 using SICore.Models;
 using SICore.Network;
 using SICore.Network.Clients;
@@ -2700,7 +2701,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                ClientData.AnnouncedAnswerersEnumerator?.RemoveValue(index);
+                ClientData.AnnouncedAnswerersEnumerator?.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
                 PlanExecution(Tasks.Announce, 15);
             }
         }
@@ -2712,7 +2713,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else if (nextTask == Tasks.AnnounceStake)
         {
-            ClientData.AnnouncedAnswerersEnumerator?.RemoveValue(index);
+            ClientData.AnnouncedAnswerersEnumerator?.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
             PlanExecution(Tasks.Announce, 15);
         }
     }
