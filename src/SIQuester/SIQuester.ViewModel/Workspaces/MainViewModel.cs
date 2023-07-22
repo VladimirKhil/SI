@@ -336,7 +336,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// </summary>
     private void New_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
-        DocList.Add(new NewViewModel(_storageContextViewModel, _loggerFactory));
+        DocList.Add(new NewViewModel(_storageContextViewModel, _appOptions, _loggerFactory));
     }
 
     /// <summary>
@@ -457,7 +457,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 _ => throw new InvalidOperationException($"Incorrect text source: {arg}"),
             };
 
-            var model = new ImportTextViewModel(_storageContextViewModel, _loggerFactory);
+            var model = new ImportTextViewModel(_storageContextViewModel, _appOptions, _loggerFactory);
             DocList.Add(model);
 
             if (textSource != null)
@@ -527,6 +527,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
             var doc = SIDocument.Create(package);
 
+            if (_appOptions.UpgradePackages)
+            {
+                doc.Upgrade();
+            }
+
             var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
             {
                 Path = "",
@@ -556,6 +561,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         DocList.Add(new ImportDBStorageViewModel(
             _storageContextViewModel,
             _serviceProvider.GetRequiredService<IChgkDbClient>(),
+            _appOptions,
             _loggerFactory));
 
     /// <summary>
@@ -565,7 +571,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     {
         var importViewModel = new ImportSIStorageViewModel(
             _storageContextViewModel,
-            PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorage>(),
+            _serviceProvider.GetRequiredService<SIStorage>(),
             _appOptions,
             _loggerFactory);
 

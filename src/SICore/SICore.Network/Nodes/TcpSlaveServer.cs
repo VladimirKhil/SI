@@ -36,6 +36,7 @@ public sealed class TcpSlaveServer : SecondaryNode
         var task = tcp.ConnectAsync(_serverAddress, _port);
 
         var result = await Task.WhenAny(task, Task.Delay(15000));
+
         if (result != task)
         {
             throw new Exception($"{_localizer[nameof(R.CannotConnectToServer)]} {_serverAddress}:{_port}!");
@@ -43,7 +44,7 @@ public sealed class TcpSlaveServer : SecondaryNode
 
         if (result.IsFaulted)
         {
-            throw result.Exception;
+            throw result.Exception!;
         }
 
         var connection = new Connection(tcp, null, upgrade) { IsAuthenticated = true };

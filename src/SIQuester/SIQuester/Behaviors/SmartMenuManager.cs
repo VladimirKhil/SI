@@ -110,7 +110,21 @@ public static class SmartMenuManager
         var control = (FrameworkElement)sender;
 
         var doc = ((MainViewModel)Application.Current.MainWindow.DataContext).ActiveDocument;
-        doc.ActiveItem = control.DataContext;
+
+        if (doc == null)
+        {
+            return;
+        }
+
+        var context = control.DataContext;
+
+        // For backward compatibility
+        if (context is QuestionViewModel questionViewModel)
+        {
+            context = questionViewModel.Scenario;
+        }
+
+        doc.ActiveItem = context;
 
         ActionMenuViewModel.Instance.PlacementTarget = control;
         ActionMenuViewModel.Instance.IsOpen = true;

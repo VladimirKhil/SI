@@ -10,7 +10,7 @@
   <?define PhotoPath="$(var.SIGame.ProjectDir)Photo\" ?>
 	
     <?define SolutionDir = "$(var.SIGame.ProjectDir)..\..\..\" ?>
-    <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net6.0-windows\win-$(var.Platform)\publish\" ?>
+    <?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIGame\net7.0-windows\win-$(var.Platform)\publish\" ?>
     
     <Product
 		Id="*"

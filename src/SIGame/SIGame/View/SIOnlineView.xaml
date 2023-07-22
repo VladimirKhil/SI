@@ -592,11 +592,11 @@
                             <Style x:Key="Header" TargetType="{x:Type TextBlock}">
                                 <Setter Property="FontSize" Value="18" />
                                 <Setter Property="FontWeight" Value="SemiBold" />
-                                <Setter Property="Margin" Value="0,16,0,0" />
+                                <Setter Property="Margin" Value="0,9,0,0" />
                             </Style>
                         </StackPanel.Resources>
                         
-                        <TextBlock Text="{Binding CurrentGame.GameName}" TextWrapping="Wrap" FontSize="26" FontWeight="SemiBold" Margin="18,18,20,0" />
+                        <TextBlock Text="{Binding CurrentGame.GameName}" TextWrapping="Wrap" FontSize="26" FontWeight="SemiBold" Margin="18,12,20,0" />
                         
                         <StackPanel DataContext="{Binding CurrentGame}" Margin="18,0,5,5" TextBlock.FontSize="16">
                             <StackPanel.Style>

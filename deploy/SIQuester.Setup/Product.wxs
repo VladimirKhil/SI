@@ -10,7 +10,7 @@
 	<?define ProductNameR="SIQuester" ?>
 
     <?define SolutionDir = "$(var.SIQuester.ProjectDir)..\..\..\" ?>
-	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
+	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net7.0-windows\win-$(var.Platform)\publish\" ?>
 
 	<Product
 	  Id="*"

@@ -2,6 +2,7 @@
 using Notions;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.Properties;
@@ -71,15 +72,18 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
     }
 
     private readonly StorageContextViewModel _storageContextViewModel;
+    private readonly AppOptions _appOptions;
     private readonly IChgkDbClient _chgkDbClient;
     private readonly ILoggerFactory _loggerFactory;
 
     public ImportDBStorageViewModel(
         StorageContextViewModel storageContextViewModel,
         IChgkDbClient chgkDbClient,
+        AppOptions appOptions,
         ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
+        _appOptions = appOptions;
         _chgkDbClient = chgkDbClient;
         _loggerFactory = loggerFactory;
     }
@@ -391,6 +395,11 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             }
 
             #endregion
+        }
+
+        if (_appOptions.UpgradePackages)
+        {
+            siDocument.Upgrade();
         }
 
         return siDocument;

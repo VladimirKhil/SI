@@ -1611,6 +1611,149 @@
                                                 </StackPanel>
                                             </DataTemplate>
 
+                                            <DataTemplate DataType="{x:Type vm:ContentItemsViewModel}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.MoveUp}"
+                                                        Content="{StaticResource UpImage}"
+                                                        Command="{Binding MoveLeft}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddText}"
+                                                        Content="{StaticResource AddImage}"
+                                                        Command="{Binding AddText}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.AddOral}"
+                                                        Content="{StaticResource AddVoiceImage}"
+                                                        Command="{Binding AddVoice}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Menu Style="{StaticResource MenuMenu}">
+                                                        <MenuItem
+                                                            ToolTip="{x:Static lp:Resources.AddImage}"
+                                                            Header="{StaticResource AddImageImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            <MenuItem.ItemsSource>
+                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
+                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                    <Binding Path="OwnerDocument.Images.Files" />
+                                                                </MultiBinding>
+                                                            </MenuItem.ItemsSource>
+
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Image}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
+                                                        </MenuItem>
+                                                    </Menu>
+
+                                                    <Menu Style="{StaticResource MenuMenu}">
+                                                        <MenuItem
+                                                            ToolTip="{x:Static lp:Resources.AddAudio}"
+                                                            Header="{StaticResource AddAudioImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            <MenuItem.ItemsSource>
+                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
+                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                    <Binding Path="OwnerDocument.Audio.Files" />
+                                                                </MultiBinding>
+                                                            </MenuItem.ItemsSource>
+
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.AudioNew}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
+                                                        </MenuItem>
+                                                    </Menu>
+
+                                                    <Menu Style="{StaticResource MenuMenu}">
+                                                        <MenuItem
+                                                            ToolTip="{x:Static lp:Resources.AddVideo}"
+                                                            Header="{StaticResource AddVideoImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            <MenuItem.ItemsSource>
+                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
+                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                    <Binding Path="OwnerDocument.Video.Files" />
+                                                                </MultiBinding>
+                                                            </MenuItem.ItemsSource>
+
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
+
+                                                        </MenuItem>
+                                                    </Menu>
+
+                                                    <Menu Style="{StaticResource MenuMenu}">
+                                                        <MenuItem
+                                                            Command="{Binding SelectAtomObject}"
+                                                            CommandParameter="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}"
+                                                            ToolTip="{x:Static lp:Resources.AddHtml}"
+                                                            Header="{StaticResource AddHtmlImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
+                                                        </MenuItem>
+                                                    </Menu>
+
+                                                    <Separator Style="{StaticResource MenuSeparator}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.ToggleToOralAndBack}"
+                                                        Content="{StaticResource ChangeTypeImage}"
+                                                        Command="{Binding ChangePlacement}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.Delete}"
+                                                        Content="{StaticResource RemoveImage}"
+                                                        Command="{Binding RemoveItem}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.SetTime}"
+                                                        Content="{StaticResource AddTimeImage}"
+                                                        Command="{Binding SetTime}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.CollapseMedia}"
+                                                        Content="{StaticResource CollapseMediaImage}"
+                                                        Command="{Binding CollapseMedia}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.ExpandMedia}"
+                                                        Content="{StaticResource ExpandMediaImage}"
+                                                        Command="{Binding ExpandMedia}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.ExportMediaCommand}"
+                                                        Content="{StaticResource ExportMediaImage}"
+                                                        Command="{Binding ExportMedia}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
+                                                        ToolTip="{x:Static lp:Resources.MoveDown}"
+                                                        Content="{StaticResource DownImage}"
+                                                        Command="{Binding MoveRight}"
+                                                        Style="{StaticResource MenuButton}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+
                                             <DataTemplate DataType="{x:Type vm:AnswersViewModel}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <Button
@@ -2406,14 +2549,14 @@
                 </DockPanel>
             </DataTemplate>
 
-            <DataTemplate x:Key="SelectionModeTemplate" DataType="p:StepParameter">
+            <DataTemplate x:Key="SelectionModeTemplate" DataType="vm:StepParameterViewModel">
                 <ComboBox
                     Style="{StaticResource ComboBoxCommon}"
                     Padding="5,2,2,2"
                     Width="150"
                     Height="Auto"
                     HorizontalAlignment="Left"
-                    SelectedItem="{Binding SimpleValue, Converter={StaticResource SelectionModesConverter}}"
+                    SelectedItem="{Binding Model.SimpleValue, Converter={StaticResource SelectionModesConverter}}"
                     ItemsSource="{Binding Source={StaticResource SelectionModes}, Path=Values, Mode=OneTime}" />
             </DataTemplate>
 
@@ -2610,6 +2753,49 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="ImageControlNewStyle" TargetType="ContentControl">
+                <Setter Property="Content" Value="{Binding}" />
+
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
+                                <Image
+                                    MinWidth="20"
+                                    MinHeight="20"
+                                    MaxWidth="300"
+                                    MaxHeight="300"
+                                    Stretch="Uniform"
+                                    Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
+                            </Border>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{StaticResource AddImageImage}" Height="25" />
+
+                                        <TextBox
+                                            IsReadOnly="True"
+                                            Style="{StaticResource CommonTextBox}"
+                                            Foreground="DarkRed"
+                                            TextWrapping="Wrap"
+                                            Height="Auto"
+                                            MinWidth="50"
+                                            Text="{Binding Model.Value}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="AudioControlStyle" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding}" />
                 
@@ -2651,6 +2837,55 @@
                                             Height="Auto"
                                             MinWidth="50"
                                             Text="{Binding Model.Text}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="AudioControlNewStyle" TargetType="ContentControl">
+                <Setter Property="Content" Value="{Binding}" />
+
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
+                                    <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                                    <Slider Style="{StaticResource playSlider}" Name="progress" />
+
+                                    <MediaElement
+                                        Name="mediaElement1"
+                                        lb:MediaController.Source="{Binding}"
+                                        LoadedBehavior="Manual"
+                                        UnloadedBehavior="Manual"
+                                        ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                                        lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                                        lb:MediaController.Progress="{Binding ElementName=progress}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{StaticResource AddAudioImage}" Height="25" />
+
+                                        <TextBox
+                                            IsReadOnly="True"
+                                            Style="{StaticResource CommonTextBox}"
+                                            Foreground="DarkBlue"
+                                            TextWrapping="Wrap"
+                                            Height="Auto"
+                                            MinWidth="50"
+                                            Text="{Binding Model.Value}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </Setter.Value>
@@ -2719,6 +2954,66 @@
                 </Style.Triggers>
             </Style>
 
+            <Style x:Key="VideoControlNewStyle" TargetType="ContentControl">
+                <Setter Property="Content" Value="{Binding}" />
+
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Border Style="{StaticResource mediaBorder}" ToolTip="{Binding Model.Value}">
+                                <Grid Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+
+                                    <Rectangle Fill="Lavender" />
+
+                                    <MediaElement
+                                        Name="mediaElement1"
+                                        lb:MediaController.Source="{Binding}"
+                                        LoadedBehavior="Manual"
+                                        UnloadedBehavior="Manual"
+                                        Width="400"
+                                        Height="200"
+                                        ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                                        lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                                        lb:MediaController.Progress="{Binding ElementName=progress}" />
+
+                                    <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                                        <Slider Style="{StaticResource playSlider}" Name="progress" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsExpanded}" Value="False">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{StaticResource AddVideoImage}" Height="25" />
+
+                                        <TextBox
+                                            IsReadOnly="True"
+                                            Style="{StaticResource CommonTextBox}"
+                                            Foreground="DarkGreen"
+                                            TextWrapping="Wrap"
+                                            Height="Auto"
+                                            MinWidth="50"
+                                            Text="{Binding Model.Value}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="HtmlControlStyle" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding}" />
                 
@@ -2742,6 +3037,29 @@
                 </Setter>
             </Style>
 
+            <Style x:Key="HtmlControlNewStyle" TargetType="ContentControl">
+                <Setter Property="Content" Value="{Binding}" />
+
+                <Setter Property="ContentTemplate">
+                    <Setter.Value>
+                        <DataTemplate DataType="vm:ContentItemViewModel">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="{StaticResource AddHtmlImage}" Height="25" />
+
+                                <TextBox
+                                    IsReadOnly="True"
+                                    Style="{StaticResource CommonTextBox}"
+                                    Foreground="DarkCyan"
+                                    TextWrapping="Wrap"
+                                    Height="Auto"
+                                    MinWidth="50"
+                                    Text="{Binding Model.Value}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <Style x:Key="AtomWarningBox" BasedOn="{StaticResource WarningBox}" TargetType="ContentControl">
                 <Setter Property="VerticalAlignment" Value="Bottom" />
                 <Setter Property="Margin" Value="-7,0,0,4" />
@@ -2750,14 +3068,14 @@
             <siqcv:TemplateConverter x:Key="ContentItemSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:AtomTypes.Text -->
-                    <DataTemplate DataType="p:ContentItem">
+                    <DataTemplate DataType="vm:ContentItemViewModel">
                         <TextBox
                             siq:ActivateManager.IsWatching="True"
                             TextWrapping="Wrap"
                             AcceptsReturn="True"
                             Height="Auto"
                             MinWidth="50"
-                            Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                            Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource CommonTextBox}"
                             TabIndex="2" />
                     </DataTemplate>
@@ -2766,28 +3084,35 @@
                 <siqcv:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
                         <DockPanel>
-                            <ContentControl Style="{StaticResource ImageControlStyle}" />
+                            <ContentControl Style="{StaticResource ImageControlNewStyle}" />
+                            <ContentControl Style="{StaticResource AtomWarningBox}" />
+                        </DockPanel>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:AtomTypes.Audio}">
+                        <DockPanel>
+                            <ContentControl Style="{StaticResource AudioControlNewStyle}" />
                             <ContentControl Style="{StaticResource AtomWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:AtomTypes.AudioNew}">
                         <DockPanel>
-                            <ContentControl Style="{StaticResource AudioControlStyle}" />
+                            <ContentControl Style="{StaticResource AudioControlNewStyle}" />
                             <ContentControl Style="{StaticResource AtomWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
                         <DockPanel>
-                            <ContentControl Style="{StaticResource VideoControlStyle}" />
+                            <ContentControl Style="{StaticResource VideoControlNewStyle}" />
                             <ContentControl Style="{StaticResource AtomWarningBox}" />
                         </DockPanel>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
                         <DockPanel>
-                            <ContentControl Style="{StaticResource HtmlControlStyle}" />
+                            <ContentControl Style="{StaticResource HtmlControlNewStyle}" />
                         </DockPanel>
                     </DataTemplate>
                 </siqcv:TemplateConverter.Templates>
@@ -2796,30 +3121,34 @@
             <siqcv:TemplateConverter x:Key="ParameterSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:StepParameterTypes.Simple -->
-                    <DataTemplate DataType="p:StepParameter">
-                        <TextBox Text="{Binding SimpleValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" />
+                    <DataTemplate DataType="vm:StepParameterViewModel">
+                        <TextBox Text="{Binding Model.SimpleValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
 
                 <siqcv:TemplateConverter.Templates>
-                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="p:StepParameter">
-                        <ItemsControl ItemsSource="{Binding ContentValue}">
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="vm:StepParameterViewModel">
+                        <ItemsControl
+                            DataContext="{Binding ContentValue}"
+                            ItemsSource="{Binding}"
+                            siq:SmartMenuManager.SecondMenu="True"
+                            vm1:ItemsControlWatcher.IsWatching="True">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="p:ContentItem">
+                                <DataTemplate DataType="vm:ContentItemViewModel">
                                     <ContentControl
                                         Content="{Binding}"
-                                        ContentTemplate="{Binding Type, Converter={StaticResource ContentItemSelector}}"/>
+                                        ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}"/>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="p:StepParameter">
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
                         <!-- Will be implemented in the future -->
                     </DataTemplate>
 
-                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="p:StepParameter">
-                        <lv:NumberSetEditor DataContext="{Binding NumberSetValue, Converter={StaticResource NumberSetViewModelNewConverter}}" />
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
+                        <lv:NumberSetEditor DataContext="{Binding Model.NumberSetValue, Converter={StaticResource NumberSetViewModelNewConverter}}" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
@@ -2953,7 +3282,7 @@
                                             Margin="0,2,0,0"
                                             TextBlock.Foreground="Black"
                                             Content="{Binding Value}"
-                                            ContentTemplate="{Binding Value.Type, Converter={StaticResource ParameterSelector}}"
+                                            ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterSelector}}"
                                             KeyboardNavigation.IsTabStop="False" />
                                     </DockPanel>
 

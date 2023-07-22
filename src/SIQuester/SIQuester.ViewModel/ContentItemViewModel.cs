@@ -4,31 +4,29 @@ using SIPackages.Core;
 namespace SIQuester.ViewModel;
 
 /// <summary>
-/// Represents question scenario atom view model.
+/// Represents content item view model.
 /// </summary>
 /// <inheritdoc cref="MediaOwnerViewModel" />
-public sealed class AtomViewModel : MediaOwnerViewModel
+public sealed class ContentItemViewModel : MediaOwnerViewModel
 {
     /// <summary>
     /// Original model wrapped by this view model.
     /// </summary>
-    public Atom Model { get; }
+    public ContentItem Model { get; }
 
     /// <summary>
-    /// Media item type.
+    /// View model that contains current view model.
     /// </summary>
+    public ContentItemsViewModel? Owner { get; set; }
+
     public override string Type => Model.Type switch
     {
         AtomTypes.Image => SIDocument.ImagesStorageName,
         AtomTypes.Audio => SIDocument.AudioStorageName,
+        AtomTypes.AudioNew => SIDocument.AudioStorageName,
         AtomTypes.Video => SIDocument.VideoStorageName,
         _ => Model.Type,
     };
-
-    /// <summary>
-    /// Scenario view model that contains current view model.
-    /// </summary>
-    public ScenarioViewModel? OwnerScenario { get; set; }
 
     private bool _isExpanded = true;
 
@@ -45,22 +43,22 @@ public sealed class AtomViewModel : MediaOwnerViewModel
         }
     }
 
-    public AtomViewModel(Atom model) => Model = model;
+    public ContentItemViewModel(ContentItem model) => Model = model;
 
     protected override IMedia GetMedia()
     {
-        if (OwnerScenario == null)
+        if (Owner == null)
         {
             throw new InvalidOperationException("OwnerScenario is undefined");
         }
 
-        if (OwnerScenario.OwnerDocument == null)
+        if (Owner.OwnerDocument == null)
         {
             throw new InvalidOperationException("OwnerDocument is undefined");
         }
 
-        return OwnerScenario.OwnerDocument.Wrap(Model);
+        return Owner.OwnerDocument.Wrap(Model);
     }
 
-    protected override void OnError(Exception exc) => OwnerScenario?.OwnerDocument?.OnError(exc);
+    protected override void OnError(Exception exc) => Owner?.OwnerDocument?.OnError(exc);
 }

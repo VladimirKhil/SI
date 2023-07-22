@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 using Utils.Commands;
@@ -13,6 +14,7 @@ namespace SIQuester.ViewModel;
 public sealed class SelectThemesViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
+    private readonly AppOptions _appOptions;
 
     public override string Header => $"{_document.Document.Package.Name}: {Resources.ThemesSelection}";
 
@@ -56,9 +58,10 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
     private readonly ILoggerFactory _loggerFactory;
 
-    public SelectThemesViewModel(QDocument document, ILoggerFactory loggerFactory)
+    public SelectThemesViewModel(QDocument document, AppOptions appOptions, ILoggerFactory loggerFactory)
     {
         _document = document;
+        _appOptions = appOptions;
         _loggerFactory = loggerFactory;
 
         Themes = _document.Document.Package.Rounds
@@ -91,6 +94,11 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
                 await _document.Document.CopyCollectionsAsync(newDocument, allthemes[index - 1]);
             }
 
+            if (_appOptions.UpgradePackages)
+            {
+                newDocument.Upgrade();
+            }
+
             OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
         }
         catch (Exception exc)
@@ -116,6 +124,11 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
                 // Export neccessary collections
                 await _document.Document.CopyCollectionsAsync(newDocument, theme);
+            }
+
+            if (_appOptions.UpgradePackages)
+            {
+                newDocument.Upgrade();
             }
 
             OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });

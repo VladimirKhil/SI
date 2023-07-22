@@ -569,6 +569,32 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
+    /// Gets link from content item.
+    /// </summary>
+    /// <param name="contentItem">Content item.</param>
+    /// <returns>Linked resource.</returns>
+    public IMedia GetLink(ContentItem contentItem)
+    {
+        var link = contentItem.Value;
+
+        if (!contentItem.IsRef)
+        {
+            return new Media(link);
+        }
+
+        var collection = contentItem.Type switch
+        {
+            AtomTypes.Audio => _audio,
+            AtomTypes.AudioNew => _audio,
+            AtomTypes.Video => _video,
+            AtomTypes.Image => _images,
+            _ => throw new InvalidOperationException($"Unsupported content type {contentItem.Type}"),
+        };
+
+        return GetLinkFromCollection(link, collection);
+    }
+
+    /// <summary>
     /// Gets document package logo link.
     /// </summary>
     public IMedia GetLogoLink()

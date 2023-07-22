@@ -1285,7 +1285,9 @@ public sealed class QConverter
             document = SIDocument.Create(docName, authorName);
         }
         else
+        {
             roundIndex = document.Package.Rounds.Count - 1;
+        }
 
         string roundName = "";
         string themeName = "";
@@ -1298,7 +1300,7 @@ public sealed class QConverter
         string questSource = "";
         string questAuthor = "";
 
-        StringBuilder templateBuilder = null, variants = null;
+        StringBuilder? templateBuilder = null, variants = null;
 
         var packageFollow = new Follow() { TemplatesCollection = templates.PackageTemplate, SetLetter = 'P', Letter = 'p' };
         var roundFollow = new Follow() { TemplatesCollection = templates.RoundTemplate, SetLetter = 'R', Letter = 'r' };
@@ -1310,6 +1312,7 @@ public sealed class QConverter
         // Вставим дополнительные переносы в начале для корректной работы шаблона
         int numLines = Math.Max(CountLines(templates.RoundTemplate[0]), CountLines(templates.ThemeTemplate[0]));
         var newTitle = new StringBuilder();
+
         for (int i = 0; i < numLines; i++)
         {
             newTitle.AppendLine();
@@ -1361,23 +1364,33 @@ public sealed class QConverter
             .AppendLine(templates.QuestionTemplate[0]);
 
         variants = new StringBuilder();
+
         for (int i = 0; i < templates.ThemeTemplate.Count; i++)
         {            
             templateBuilder.AppendFormat("<T{0}> := [log, t, {0}]", i).AppendLine(templates.ThemeTemplate[i]);
+
             if (variants.Length > 0)
+            {
                 variants.Append('|');
+            }
+
             variants.AppendFormat("<T{0}>", i);
         }
 
         templateBuilder.AppendFormat("<T> := {0}", variants).AppendLine();
         
         variants = new StringBuilder();
+
         for (int i = 0; i < templates.RoundTemplate.Count; i++)
         {            
             templateBuilder.AppendFormat("<R{0}> := [log, r, {0}]", i)
             .AppendLine(templates.RoundTemplate[i]);
+
             if (variants.Length > 0)
+            {
                 variants.Append('|');
+            }
+
             variants.AppendFormat("<R{0}>", i);
         }
 

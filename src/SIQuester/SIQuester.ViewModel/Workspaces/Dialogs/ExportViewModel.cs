@@ -163,9 +163,11 @@ public sealed class ExportViewModel : WorkspaceViewModel
                     foreach (var atom in quest.Scenario)
                     {
                         var type = atom.Model.Type;
-                        if (type == AtomTypes.Image || type == AtomTypes.Audio || type == AtomTypes.Video)
+
+                        if (type == AtomTypes.Image || type == AtomTypes.Audio || type == AtomTypes.AudioNew || type == AtomTypes.Video)
                         {
                             var media = _source.Document.GetLink(atom.Model);
+
                             if (media.GetStream != null)
                             {
                                 if (media.Uri != null)

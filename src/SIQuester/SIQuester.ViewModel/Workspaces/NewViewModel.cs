@@ -2,6 +2,7 @@
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 using Utils.Commands;
@@ -66,13 +67,14 @@ public sealed class NewViewModel : WorkspaceViewModel
     public NonStandartPackageParams PackageParams { get; } = new NonStandartPackageParams();
 
     private readonly StorageContextViewModel _storageContextViewModel;
-
+    private readonly AppOptions _appOptions;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<NewViewModel> _logger;
 
-    public NewViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    public NewViewModel(StorageContextViewModel storageContextViewModel, AppOptions appOptions, ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
+        _appOptions = appOptions;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<NewViewModel>();
 
@@ -150,6 +152,11 @@ public sealed class NewViewModel : WorkspaceViewModel
                 case PackageType.Empty:
                 default:
                     break;
+            }
+
+            if (_appOptions.UpgradePackages)
+            {
+                doc.Upgrade();
             }
 
             OnNewItem(new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name });

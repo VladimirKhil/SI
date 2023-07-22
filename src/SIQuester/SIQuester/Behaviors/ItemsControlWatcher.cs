@@ -18,18 +18,18 @@ public sealed class ItemsControlWatcher
 
     private static void IsWatchingChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is ItemsControl element)
+        if (sender is not ItemsControl element)
         {
-            var parentList = element.DataContext as IItemsViewModel;
+            return;
+        }
 
-            if ((bool)e.NewValue)
-            {
-                element.GotFocus += Element_GotFocus;
-            }
-            else
-            {
-                element.GotFocus -= Element_GotFocus;
-            }
+        if ((bool)e.NewValue)
+        {
+            element.GotFocus += Element_GotFocus;
+        }
+        else
+        {
+            element.GotFocus -= Element_GotFocus;
         }
     }
 
@@ -44,7 +44,14 @@ public sealed class ItemsControlWatcher
 
         if (parent.DataContext is not IItemsViewModel parentList || childItem == null)
         {
-            return;
+            if (parent.DataContext is QuestionViewModel questionViewModel && childItem != null)
+            {
+                parentList = questionViewModel.Scenario;
+            }
+            else
+            {
+                return;
+            }
         }
 
         if (parentList.Contains(childItem))

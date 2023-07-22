@@ -65,7 +65,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
         if (question.Parameters != null)
         {
-            Parameters = new StepParametersViewModel(question.Parameters);
+            Parameters = new StepParametersViewModel(this, question.Parameters);
         }
 
         BindHelper.Bind(Right, question.Right);

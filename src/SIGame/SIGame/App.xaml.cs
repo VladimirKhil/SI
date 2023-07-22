@@ -27,6 +27,7 @@ using Utils;
 #if UPDATE
 using AppService.Client.Models;
 using SICore;
+using System.IO;
 using System.Reflection;
 using System.Net.Http;
 using System.Threading.Tasks;

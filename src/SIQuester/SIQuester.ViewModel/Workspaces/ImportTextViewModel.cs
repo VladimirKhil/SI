@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using QTxtConverter;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -18,7 +19,7 @@ using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
-// TODO: this class is too heavy. It requires a refactoring
+// TODO: this class is too heavy. It requires refactoring
 
 /// <summary>
 /// Provides a view model for text file import.
@@ -260,16 +261,16 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private readonly TaskScheduler _scheduler;
 
     private readonly StorageContextViewModel _storageContextViewModel;
-
+    private readonly AppOptions _appOptions;
     private string _badTextCopy = "";
 
     private readonly QConverter _converter = new();
 
-    private SIDocument _existing = null;
+    private SIDocument? _existing = null;
     private bool _automaticTextImport = false;
 
     private SIPart[][]? _parts = null;
-    private SITemplate _template = null;
+    private SITemplate? _template = null;
 
     private readonly object _sync = new();
 
@@ -300,8 +301,8 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private Stage _stage = Stage.Review;
 
-    private SplitErrorEventArgs _parseError = null;
-    private ReadErrorEventArgs _readError = null;
+    private SplitErrorEventArgs? _parseError = null;
+    private ReadErrorEventArgs? _readError = null;
 
     private int _badLength = 0;
 
@@ -378,9 +379,10 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     /// </summary>
     /// <param name="storageContextViewModel">Well-known SIStorage facets holder.</param>
     /// <param name="loggerFactory">Factory to create loggers.</param>
-    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, AppOptions appOptions, ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
+        _appOptions = appOptions;
         _loggerFactory = loggerFactory;
         _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -589,6 +591,11 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             Resources.ThemesCollection,
             out int themesNum);
 
+        if (_existing != null && _appOptions.UpgradePackages)
+        {
+            _existing.Upgrade();
+        }
+
         return Tuple.Create(result, themesNum);
     }
 
@@ -613,7 +620,8 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                 _stage = Stage.Reading;
                 Free = false;
 
-                _task = Task.Factory.StartNew(new Func<Tuple<bool, int>>(Analyze), _tokenSource.Token).ContinueWith(AnalyzeFinished, _tokenSource.Token, TaskContinuationOptions.ExecuteSynchronously, _scheduler);
+                _task = Task.Factory.StartNew(new Func<Tuple<bool, int>>(Analyze), _tokenSource.Token)
+                    .ContinueWith(AnalyzeFinished, _tokenSource.Token, TaskContinuationOptions.ExecuteSynchronously, _scheduler);
                 break;
 
             case Stage.Reading:

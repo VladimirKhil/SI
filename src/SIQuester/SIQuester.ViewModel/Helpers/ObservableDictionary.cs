@@ -9,8 +9,11 @@ namespace SIQuester.ViewModel.Helpers;
 /// Implements dictionary with collection change notifications.
 /// </summary>
 public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged
+    where TKey : notnull
 {
     private readonly IDictionary<TKey, TValue> _dictionary;
+
+    public ObservableDictionary() => _dictionary = new Dictionary<TKey, TValue>();
 
     public ObservableDictionary(IDictionary<TKey, TValue> dictionary) => _dictionary = dictionary;
 

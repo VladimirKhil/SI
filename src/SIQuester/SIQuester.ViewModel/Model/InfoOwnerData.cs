@@ -124,6 +124,7 @@ public sealed class InfoOwnerData
                 {
                     AtomTypes.Image => documentViewModel.Images,
                     AtomTypes.Audio => documentViewModel.Audio,
+                    AtomTypes.AudioNew => documentViewModel.Audio,
                     AtomTypes.Video => documentViewModel.Video,
                     _ => null,
                 };
@@ -137,6 +138,7 @@ public sealed class InfoOwnerData
                 {
                     AtomTypes.Image => Images,
                     AtomTypes.Audio => Audio,
+                    AtomTypes.AudioNew => Audio,
                     AtomTypes.Video => Video,
                     _ => null,
                 };

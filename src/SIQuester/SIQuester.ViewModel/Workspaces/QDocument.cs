@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Notions;
 using SIPackages;
 using SIPackages.Containers;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -229,6 +232,7 @@ public sealed class QDocument : WorkspaceViewModel
         {
             AtomTypes.Image => Images,
             AtomTypes.Audio => Audio,
+            AtomTypes.AudioNew => Audio,
             _ => Video,
         };
 
@@ -244,6 +248,38 @@ public sealed class QDocument : WorkspaceViewModel
             for (int i = 0; i < collection.Files.Count; i++)
             {
                 if (collection.Files[i].Model.Name == link[1..])
+                {
+                    collection.DeleteItem.Execute(collection.Files[i]);
+                    break;
+                }
+            }
+        }
+    }
+
+    internal void ClearLinks(ContentItem contentItem)
+    {
+        if (!AppSettings.Default.RemoveLinks || OperationsManager.IsMakingUndo || !contentItem.IsRef)
+        {
+            return;
+        }
+
+        var atomType = contentItem.Type;
+
+        var collection = atomType switch
+        {
+            AtomTypes.Image => Images,
+            AtomTypes.Audio => Audio,
+            AtomTypes.AudioNew => Audio,
+            _ => Video,
+        };
+
+        var link = contentItem.Value;
+
+        if (!HasLinksTo(link)) // Called after items removal so works properly
+        {
+            for (int i = 0; i < collection.Files.Count; i++)
+            {
+                if (collection.Files[i].Model.Name == link)
                 {
                     collection.DeleteItem.Execute(collection.Files[i]);
                     break;
@@ -1133,6 +1169,7 @@ public sealed class QDocument : WorkspaceViewModel
                                 break;
 
                             case AtomTypes.Audio:
+                            case AtomTypes.AudioNew:
                                 collection = audio;
                                 break;
 
@@ -1378,92 +1415,95 @@ public sealed class QDocument : WorkspaceViewModel
     {
         var files = PlatformManager.Instance.ShowOpenUI();
 
-        if (files != null)
+        if (files == null)
         {
-            try
+            return;
+        }
+
+        try
+        {
+            using var change = OperationsManager.BeginComplexChange();
+
+            foreach (var file in files)
             {
-                using var change = OperationsManager.BeginComplexChange();
+                using var stream = File.OpenRead(file);
+                using var doc = SIDocument.Load(stream);
 
-                foreach (var file in files)
+                foreach (var round in doc.Package.Rounds)
                 {
-                    using var stream = File.OpenRead(file);
-                    using var doc = SIDocument.Load(stream);
+                    Package.Rounds.Add(new RoundViewModel(round.Clone()));
+                }
 
-                    foreach (var round in doc.Package.Rounds)
+                CopyAuthorsAndSources(doc, doc.Package);
+
+                foreach (var round in doc.Package.Rounds)
+                {
+                    CopyAuthorsAndSources(doc, round);
+
+                    foreach (var theme in round.Themes)
                     {
-                        Package.Rounds.Add(new RoundViewModel(round.Clone()));
-                    }
+                        CopyAuthorsAndSources(doc, theme);
 
-                    CopyAuthorsAndSources(doc, doc.Package);
-
-                    foreach (var round in doc.Package.Rounds)
-                    {
-                        CopyAuthorsAndSources(doc, round);
-
-                        foreach (var theme in round.Themes)
+                        foreach (var question in theme.Questions)
                         {
-                            CopyAuthorsAndSources(doc, theme);
+                            CopyAuthorsAndSources(doc, question);
 
-                            foreach (var question in theme.Questions)
+                            foreach (var atom in question.Scenario)
                             {
-                                CopyAuthorsAndSources(doc, question);
-
-                                foreach (var atom in question.Scenario)
+                                if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video)
                                 {
-                                    if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.Video)
+                                    continue;
+                                }
+
+                                var collection = doc.Images;
+                                var newCollection = Images;
+
+                                switch (atom.Type)
+                                {
+                                    case AtomTypes.Audio:
+                                    case AtomTypes.AudioNew:
+                                        collection = doc.Audio;
+                                        newCollection = Audio;
+                                        break;
+
+                                    case AtomTypes.Video:
+                                        collection = doc.Video;
+                                        newCollection = Video;
+                                        break;
+                                }
+
+                                var link = doc.GetLink(atom);
+
+                                if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
+                                {
+                                    var tempPath = System.IO.Path.Combine(
+                                        System.IO.Path.GetTempPath(),
+                                        AppSettings.ProductName,
+                                        AppSettings.TempMediaFolderName,
+                                        Guid.NewGuid().ToString());
+
+                                    Directory.CreateDirectory(tempPath);
+
+                                    var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
+
+                                    using (var fileStream = File.Create(tempFile))
                                     {
-                                        continue;
+                                        await link.GetStream().Stream.CopyToAsync(fileStream);
                                     }
 
-                                    var collection = doc.Images;
-                                    var newCollection = Images;
-
-                                    switch (atom.Type)
-                                    {
-                                        case AtomTypes.Audio:
-                                            collection = doc.Audio;
-                                            newCollection = Audio;
-                                            break;
-
-                                        case AtomTypes.Video:
-                                            collection = doc.Video;
-                                            newCollection = Video;
-                                            break;
-                                    }
-
-                                    var link = doc.GetLink(atom);
-
-                                    if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
-                                    {
-                                        var tempPath = System.IO.Path.Combine(
-                                            System.IO.Path.GetTempPath(),
-                                            AppSettings.ProductName,
-                                            AppSettings.TempMediaFolderName,
-                                            Guid.NewGuid().ToString());
-
-                                        Directory.CreateDirectory(tempPath);
-
-                                        var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
-
-                                        using (var fileStream = File.Create(tempFile))
-                                        {
-                                            await link.GetStream().Stream.CopyToAsync(fileStream);
-                                        }
-
-                                        newCollection.AddFile(tempFile);
-                                    }
+                                    newCollection.AddFile(tempFile);
                                 }
                             }
                         }
                     }
                 }
+            }
 
-                change.Commit();
-            }
-            catch (Exception exc)
-            {
-                OnError(exc);
-            }
+            change.Commit();
+        }
+        catch (Exception exc)
+        {
+            OnError(exc);
         }
     }
 
@@ -1668,7 +1708,7 @@ public sealed class QDocument : WorkspaceViewModel
                                     showmanComments.Append("* изображение: ");
                                     showmanComments.Append(item.Text);
                                 }
-                                else if (item.Type == AtomTypes.Audio)
+                                else if (item.Type == AtomTypes.Audio || item.Type == AtomTypes.AudioNew)
                                 {
                                     if (showmanComments.Length > 0)
                                         showmanComments.AppendLine();
@@ -2681,7 +2721,11 @@ public sealed class QDocument : WorkspaceViewModel
 
     private void SelectThemes_Executed(object? arg)
     {
-        var selectThemesViewModel = new SelectThemesViewModel(this, _loggerFactory);
+        var selectThemesViewModel = new SelectThemesViewModel(
+            this,
+            PlatformManager.Instance.ServiceProvider.GetRequiredService<IOptions<AppOptions>>().Value,
+            _loggerFactory);
+
         selectThemesViewModel.NewItem += OnNewItem;
         Dialog = selectThemesViewModel;
     }
@@ -2778,6 +2822,7 @@ public sealed class QDocument : WorkspaceViewModel
         atom.Model.Type switch
         {
             AtomTypes.Audio => Audio,
+            AtomTypes.AudioNew => Audio,
             AtomTypes.Video => Video,
             _ => Images,
         };
@@ -2802,11 +2847,19 @@ public sealed class QDocument : WorkspaceViewModel
 
     internal IMedia Wrap(Atom atom)
     {
+        var link = atom.Text;
+
+        if (!atom.IsLink) // External link
+        {
+            return new Media(link);
+        }
+
         var collection = Images;
 
         switch (atom.Type)
         {
             case AtomTypes.Audio:
+            case AtomTypes.AudioNew:
                 collection = Audio;
                 break;
 
@@ -2815,14 +2868,33 @@ public sealed class QDocument : WorkspaceViewModel
                 break;
         }
 
-        var link = atom.Text;
+        return collection.Wrap(link[1..]);
+    }
 
-        if (!atom.IsLink) // External link
+    internal IMedia Wrap(ContentItem contentItem)
+    {
+        var link = contentItem.Value;
+
+        if (!contentItem.IsRef) // External link
         {
             return new Media(link);
         }
 
-        return collection.Wrap(link[1..]);
+        var collection = Images;
+
+        switch (contentItem.Type)
+        {
+            case AtomTypes.Audio:
+            case AtomTypes.AudioNew:
+                collection = Audio;
+                break;
+
+            case AtomTypes.Video:
+                collection = Video;
+                break;
+        }
+
+        return collection.Wrap(link);
     }
 
     internal void RestoreFromFolder(DirectoryInfo folder)
