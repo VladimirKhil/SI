@@ -33,7 +33,7 @@
     <Resource Include="Fonts\Clefs.ttf" />
     <Resource Include="Fonts\DINCondensedC.ttf" />
     <None Include="key.snk" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1774.30" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1823.32" />
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
