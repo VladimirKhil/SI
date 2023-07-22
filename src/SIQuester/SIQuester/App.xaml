@@ -1303,13 +1303,22 @@
                                                                 <Setter Property="Content" Value="{StaticResource AddMarkerImage}" />
 
                                                                 <Style.Triggers>
-                                                                    <DataTrigger
-                                                                        Binding="{Binding Scenario.IsComplex}"
-                                                                        Value="True">
+                                                                    <DataTrigger Binding="{Binding Scenario.IsComplex}" Value="True">
                                                                         <Setter Property="Command" Value="{Binding RemoveComplexAnswer}" />
                                                                         <Setter Property="ToolTip" Value="{x:Static lp:Resources.RemoveComplexAnswer}" />
                                                                         <Setter Property="Content" Value="{StaticResource RemoveMarkerImage}" />
                                                                     </DataTrigger>
+
+                                                                    <MultiDataTrigger>
+                                                                        <MultiDataTrigger.Conditions>
+                                                                            <Condition Binding="{Binding IsUpgraded}" Value="True" />
+                                                                            <Condition Binding="{Binding Parameters.HasComplexAnswer}" Value="True" />
+                                                                        </MultiDataTrigger.Conditions>
+                                                                        
+                                                                        <Setter Property="Command" Value="{Binding RemoveComplexAnswer}" />
+                                                                        <Setter Property="ToolTip" Value="{x:Static lp:Resources.RemoveComplexAnswer}" />
+                                                                        <Setter Property="Content" Value="{StaticResource RemoveMarkerImage}" />
+                                                                    </MultiDataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </Button.Style>

@@ -46,6 +46,7 @@ public sealed class ItemsControlWatcher
         {
             if (parent.DataContext is QuestionViewModel questionViewModel && childItem != null)
             {
+                // TODO: remove after switching to new format
                 parentList = questionViewModel.Scenario;
             }
             else

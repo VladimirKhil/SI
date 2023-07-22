@@ -40,14 +40,14 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
                 _dictionary[key] = value;
 
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                    NotifyCollectionChangedAction.Replace, value, oldValue));
+                    NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, oldValue)));
             }
             else
             {
                 _dictionary[key] = value;
 
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                    NotifyCollectionChangedAction.Add, value));
+                    NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value)));
 
                 OnPropertyChanged(nameof(Count));
             }
@@ -59,7 +59,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
         _dictionary.Add(key, value);
 
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-            NotifyCollectionChangedAction.Add, value));
+            NotifyCollectionChangedAction.Add, new KeyValuePair<TKey, TValue>(key, value)));
 
         OnPropertyChanged(nameof(Count));
     }
@@ -68,12 +68,13 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
     {
         if (_dictionary.TryGetValue(key, out var value))
         {
+            var index = Array.IndexOf(_dictionary.ToArray(), new KeyValuePair<TKey, TValue>(key, value));
             bool removed = _dictionary.Remove(key);
 
             if (removed)
             {
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                    NotifyCollectionChangedAction.Remove, value));
+                    NotifyCollectionChangedAction.Remove, new KeyValuePair<TKey, TValue>(key, value), index));
 
                 OnPropertyChanged(nameof(Count));
             }
@@ -92,9 +93,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
     {
         _dictionary.Add(item);
 
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-            NotifyCollectionChangedAction.Add, item.Value));
-
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         OnPropertyChanged(nameof(Count));
     }
 
@@ -115,9 +114,7 @@ public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, INo
 
         if (removed)
         {
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(
-                NotifyCollectionChangedAction.Remove, item.Value));
-
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
             OnPropertyChanged(nameof(Count));
         }
 

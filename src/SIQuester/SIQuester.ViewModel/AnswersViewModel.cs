@@ -1,4 +1,6 @@
 ﻿using Notions;
+using SIPackages;
+using SIPackages.Core;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Text;
@@ -234,6 +236,32 @@ public sealed class AnswersViewModel : ItemsViewModel<string>
 
     private void SelectAtomObject_Executed(object? arg)
     {
+        if (Owner.IsUpgraded)
+        {
+            if (Owner.Parameters == null)
+            {
+                return;
+            }
+
+            if (Owner.Parameters.Model.ContainsKey(QuestionParameterNames.Answer))
+            {
+                return;
+            }
+
+            var answer = new StepParameterViewModel(Owner, new StepParameter
+            {
+                Type = StepParameterTypes.Content,
+                ContentValue = new List<ContentItem>()
+            });
+
+            if (answer.ContentValue != null && answer.ContentValue.SelectAtomObjectCore(arg))
+            {
+                Owner.Parameters.AddAnswer(answer);
+            }
+
+            return;
+        }
+
         Owner.Scenario.SelectAtomObject_AsAnswer(arg);
         OwnerDocument.ActiveItem = this;
     }

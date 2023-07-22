@@ -13,6 +13,7 @@ using SIQuester.ViewModel;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Helpers;
 using SIStorageService.Client;
+using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -175,6 +176,7 @@ public partial class App : Application
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
         services.AddSingleton(AppSettings.Default);
+        services.AddTransient<SIStorage>();
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }
 

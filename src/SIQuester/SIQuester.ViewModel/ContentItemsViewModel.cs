@@ -261,40 +261,40 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     private void SelectAtomObject_Executed(object? arg) => SelectAtomObjectCore(arg);
 
-    private void SelectAtomObjectCore(object? arg)
+    public bool SelectAtomObjectCore(object? arg)
     {
         var data = (Tuple<object, object>)arg;
         var media = data.Item1;
-        var mediaType = data.Item2.ToString();
+        var mediaType = data.Item2.ToString() ?? "";
 
         if (media is MediaItemViewModel file)
         {
             SelectAtomObject_Do(mediaType, file);
-            return;
+            return false;
         }
 
         if (mediaType == AtomTypes.Html)
         {
             LinkAtomObject(mediaType);
-            return;
+            return false;
         }
 
         if (media is not string text)
         {
-            return;
+            return false;
         }
 
         if (text == Resources.File)
         {
-            AddAtomObject(mediaType);
+            return AddAtomObject(mediaType);
         }
         else
         {
-            LinkAtomObject(mediaType);
+            return LinkAtomObject(mediaType);
         }
     }
 
-    private void LinkAtomObject(string mediaType)
+    private bool LinkAtomObject(string mediaType)
     {
         var index = CurrentPosition;
 
@@ -302,7 +302,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         {
             if (Count == 0)
             {
-                return;
+                return false;
             }
 
             index = Count - 1;
@@ -312,7 +312,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         if (string.IsNullOrWhiteSpace(uri))
         {
-            return;
+            return false;
         }
 
         try
@@ -330,10 +330,12 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             OwnerDocument.ActiveItem = null;
 
             change.Commit();
+            return true;
         }
         catch (Exception exc)
         {
             OwnerDocument.OnError(exc);
+            return false;
         }
     }
 
@@ -370,7 +372,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         }
     }
 
-    private void AddAtomObject(string mediaType)
+    private bool AddAtomObject(string mediaType)
     {
         QDocument document;
 
@@ -381,12 +383,12 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         catch (Exception exc)
         {
             PlatformManager.Instance.ShowErrorMessage(exc.Message);
-            return;
+            return false;
         }
 
         if (document == null)
         {
-            return;
+            return false;
         }
 
         var collection = document.Images;
@@ -410,29 +412,36 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
             if (!collection.HasPendingChanges)
             {
-                return;
+                return false;
             }
 
             if (initialItemCount == collection.Files.Count)
             {
-                return;
+                return false;
             }
 
             var index = CurrentPosition;
 
-            if (index == -1 || index >= Count)
+            if (Count > 0)
             {
-                if (Count == 0)
+                if (index == -1 || index >= Count)
                 {
-                    return;
+                    if (Count == 0)
+                    {
+                        return false;
+                    }
+
+                    index = Count - 1;
                 }
 
-                index = Count - 1;
+                if (string.IsNullOrWhiteSpace(this[index].Model.Value) && this[index].Model.Type != AtomTypes.Marker)
+                {
+                    RemoveAt(index--);
+                }
             }
-
-            if (string.IsNullOrWhiteSpace(this[index].Model.Value) && this[index].Model.Type != AtomTypes.Marker)
+            else
             {
-                RemoveAt(index--);
+                index = -1;
             }
 
             var atom = new ContentItemViewModel(new ContentItem { Type = mediaType, Value = "" });
@@ -449,10 +458,12 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             document.ActiveItem = null;
 
             change.Commit();
+            return true;
         }
         catch (Exception exc)
         {
             document.OnError(exc);
+            return false;
         }
     }
 }

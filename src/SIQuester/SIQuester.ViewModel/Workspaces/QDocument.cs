@@ -689,6 +689,11 @@ public sealed class QDocument : WorkspaceViewModel
                         atom.PropertyChanged += Object_PropertyValueChanged;
                     }
 
+                    if (question.Parameters != null)
+                    {
+                        question.Parameters.CollectionChanged += Object_CollectionChanged;
+                    }
+
                     question.Right.CollectionChanged += Object_CollectionChanged;
                     question.Wrong.CollectionChanged += Object_CollectionChanged;
 

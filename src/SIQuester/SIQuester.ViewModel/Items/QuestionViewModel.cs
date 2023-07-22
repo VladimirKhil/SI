@@ -25,7 +25,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public QuestionTypeViewModel Type { get; private set; }
 
-    public StepParametersViewModel Parameters { get; private set; }
+    public StepParametersViewModel? Parameters { get; private set; }
 
     public ICommand AddComplexAnswer { get; private set; }
 
@@ -93,6 +93,20 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void AddComplexAnswer_Executed(object? arg)
     {
+        if (IsUpgraded)
+        {
+            Parameters?.AddAnswer(new StepParameterViewModel(this, new StepParameter
+            {
+                Type = StepParameterTypes.Content,
+                ContentValue = new List<ContentItem>(new[]
+                {
+                    new ContentItem { Type = AtomTypes.Text, Placement = ContentPlacements.Screen, Value = "" }
+                })
+            }));
+
+            return;
+        }
+
         if (Scenario.IsComplex)
         {
             return;
@@ -117,6 +131,12 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void RemoveComplexAnswer_Executed(object? arg)
     {
+        if (IsUpgraded)
+        {
+            Parameters?.RemoveAnswer();
+            return;
+        }
+
         if (!Scenario.IsComplex)
         {
             return;
