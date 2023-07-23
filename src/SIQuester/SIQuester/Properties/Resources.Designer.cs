@@ -1016,6 +1016,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Объединить со следующим.
+        /// </summary>
+        public static string JoinWithNext {
+            get {
+                return ResourceManager.GetString("JoinWithNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Язык.
         /// </summary>
         public static string Language {

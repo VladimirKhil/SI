@@ -2706,7 +2706,45 @@
                 </DockPanel>
             </ControlTemplate>
 
+            <siqcv:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
+
+            <ControlTemplate TargetType="ContentControl" x:Key="ContentItemDurationTemplate">
+                <StackPanel Background="#DDDDDD" Margin="0,0,2,0" Orientation="Horizontal">
+                    <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
+                    
+                    <siq:NumericTextBox
+                        siq:ActivateManager.IsWatching="True"
+                        Style="{StaticResource CommonTextBox}"
+                        Padding="2"
+                        Text="{Binding Model.Duration, Converter={StaticResource TimeSpanToSecondsConverter}}" />
+                </StackPanel>
+            </ControlTemplate>
+
             <siqcv:NotEqualsConverter x:Key="NotEquals" />
+            <siqcv:NotZeroTimeSpanConverter x:Key="NotZeroTimeSpanConverter" />
+
+            <ControlTemplate TargetType="ContentControl" x:Key="ContentItemWaitForFinishTemplate">
+                <Image Width="20" Height="20" ToolTip="{x:Static lp:Resources.JoinWithNext}">
+                    <Image.Source>
+                        <DrawingImage>
+                            <DrawingImage.Drawing>
+                                <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_down},Path=Data}" />
+                            </DrawingImage.Drawing>
+                        </DrawingImage>
+                    </Image.Source>
+                </Image>
+            </ControlTemplate>
+
+            <Style x:Key="ContentItemWaitForFinishStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="Content" Value="{Binding}" />
+                <Setter Property="Template" Value="{StaticResource EmptyTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Model.WaitForFinish}" Value="false">
+                        <Setter Property="Template" Value="{StaticResource ContentItemWaitForFinishTemplate}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
 
             <Style x:Key="AtomStyle" TargetType="{x:Type ContentControl}">
                 <Setter Property="Content" Value="{Binding}" />
@@ -2718,7 +2756,33 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
+
+            <Style x:Key="ContentItemDurationStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="Content" Value="{Binding}" />
+                <Setter Property="Template" Value="{StaticResource EmptyTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Model.Duration, Converter={StaticResource NotZeroTimeSpanConverter}}" Value="true">
+                        <Setter Property="Template" Value="{StaticResource ContentItemDurationTemplate}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <ControlTemplate TargetType="ContentControl" x:Key="ContentItemPlacementTemplate">
+                <Image Source="{StaticResource AddVoiceImage}" Width="15" Margin="2,3,2,0" />
+            </ControlTemplate>
+
+            <Style x:Key="ContentItemPlacementStyle" TargetType="{x:Type ContentControl}">
+                <Setter Property="Content" Value="{Binding}" />
+                <Setter Property="Template" Value="{StaticResource EmptyTemplate}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Model.Placement}" Value="replic">
+                        <Setter Property="Template" Value="{StaticResource ContentItemPlacementTemplate}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style x:Key="ImageControlStyle" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding}" />
                 
@@ -3086,7 +3150,9 @@
                             MinWidth="50"
                             Text="{Binding Model.Value, UpdateSourceTrigger=PropertyChanged}"
                             Style="{StaticResource CommonTextBox}"
-                            TabIndex="2" />
+                            TabIndex="2"
+                            Padding="0,2"
+                            VerticalAlignment="Center" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.DefaultTemplate>
 
@@ -3144,9 +3210,15 @@
                             vm1:ItemsControlWatcher.IsWatching="True">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:ContentItemViewModel">
-                                    <ContentControl
-                                        Content="{Binding}"
-                                        ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}"/>
+                                    <DockPanel>
+                                        <ContentControl Style="{StaticResource ContentItemWaitForFinishStyle}" KeyboardNavigation.IsTabStop="False" />
+                                        <ContentControl Style="{StaticResource ContentItemDurationStyle}" KeyboardNavigation.IsTabStop="False" />
+                                        <ContentControl Style="{StaticResource ContentItemPlacementStyle}" KeyboardNavigation.IsTabStop="False" />
+
+                                        <ContentControl
+                                            Content="{Binding}"
+                                            ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}" />
+                                    </DockPanel>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

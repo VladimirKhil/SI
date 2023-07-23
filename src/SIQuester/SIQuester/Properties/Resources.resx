@@ -436,6 +436,9 @@
   <data name="InstallUpdatesHint" xml:space="preserve">
     <value>Программа будет автоматически проверять наличие обновлений на сайте разработчика и устанавливать их</value>
   </data>
+  <data name="JoinWithNext" xml:space="preserve">
+    <value>Объединить со следующим</value>
+  </data>
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
   </data>
