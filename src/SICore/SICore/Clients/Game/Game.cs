@@ -1149,7 +1149,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         else if (ClientData.StakeType == StakeMode.Sum)
         {
             var minimum = ClientData.Stake != -1 ? ClientData.Stake + 100 : ClientData.CurPriceRight + 100;
-
+            
             // TODO: optimize
             while (minimum % 100 != 0)
             {
@@ -1173,9 +1173,17 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (ClientData.IsOralNow)
         {
-            _gameActions.SendMessage(
-                Messages.Cancel,
-                message.Sender == ClientData.ShowMan.Name ? ClientData.ActivePlayer.Name : ClientData.ShowMan.Name);
+            if (message.Sender == ClientData.ShowMan.Name)
+            {
+                if (ClientData.ActivePlayer != null)
+                {
+                    _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
+                }
+            }
+            else
+            {
+                _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+            }
         }
 
         _logic.Stop(StopReason.Decision);
@@ -1602,6 +1610,16 @@ public sealed class Game : Actor<GameData, GameLogic>
             && (sum - ClientData.CatInfo.Minimum) % ClientData.CatInfo.Step == 0)
         {
             ClientData.CurPriceRight = sum;
+        }
+
+        if (ClientData.IsOralNow)
+        {
+            _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+        }
+
+        if (Logic.CanPlayerAct() && ClientData.Answerer != null)
+        {
+            _gameActions.SendMessage(Messages.Cancel, ClientData.Answerer.Name);
         }
 
         _logic.Stop(StopReason.Decision);

@@ -20,6 +20,7 @@
             <Setter Property="Padding" Value="3" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="BorderBrush" Value="{StaticResource MainColor}" />
+            <Setter Property="Focusable" Value="False" />
 
             <Setter Property="Template">
                 <Setter.Value>
@@ -28,25 +29,11 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             Background="{TemplateBinding Background}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="{TemplateBinding Padding}" />
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" Margin="{TemplateBinding Padding}" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock
-                            Text="{Binding}"
-                            TextAlignment="Center"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center" />
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-
-            <Setter Property="Focusable" Value="False" />
 
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
@@ -92,7 +79,6 @@
         </Style>
 
         <Style x:Key="PauseButton" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource {x:Type ToggleButton}}">
-            <Setter Property="Content" Value="⏸" />
             <Setter Property="ToolTip" Value="{x:Static lp:Resources.Pause}" />
             <Setter Property="FontSize" Value="23" />
 
@@ -341,7 +327,7 @@
                     </ContextMenu>
                 </local:DropDownButton.DropDown>
 
-                <Image Source="/SIGame;component/Resources/settings.png" Stretch="Uniform" Height="26" />
+                <Image Source="/SIGame;component/Resources/move_round.png" RenderOptions.BitmapScalingMode="Fant" Height="35" />
             </local:DropDownButton>
 
             <ToggleButton
@@ -350,24 +336,26 @@
                 Width="70"
                 Style="{StaticResource PauseButton}"
                 IsChecked="{Binding IsPaused, Mode=OneWay}"
-                Command="{Binding ChangePauseInGame}" />
+                Command="{Binding ChangePauseInGame}">
+                <Image Source="/SIGame;component/Resources/pause.png" RenderOptions.BitmapScalingMode="Fant" Height="26" />
+            </ToggleButton>
 
             <Button
                 Grid.Column="2"
                 Cursor="Hand"
                 Width="70"
                 ToolTip="{x:Static lp:Resources.Forward}"
-                Content="▶"
                 Command="{Binding Move}"
                 CommandParameter="1"
-                FontSize="35" />
+                FontSize="35">
+                <Image Source="/SIGame;component/Resources/next.png" RenderOptions.BitmapScalingMode="Fant" Height="26" />
+            </Button>
 
             <Button
                 Grid.Column="2"
                 Cursor="Hand"
                 Width="70"
                 ToolTip="{x:Static lp:Resources.ForceStartGame_Hint}"
-                Content="▶"
                 Command="{Binding Data.ForceStart}"
                 FontSize="35"
                 Foreground="Orange">
@@ -380,6 +368,12 @@
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
+
+                <TextBlock
+                    Text="▶"
+                    TextAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center" />
             </Button>
         </StackPanel>
 
@@ -388,7 +382,6 @@
                 Width="70"
                 Cursor="Hand"
                 Command="{Binding Data.ShowmanDataExtensions.ManageTable}"
-                Content="✏️"
                 FontSize="20"
                 ToolTip="{x:Static lp:Resources.EditTable}"
                 Visibility="{Binding Data.ShowmanDataExtensions.ManageTable, Converter={StaticResource NotNullToVisibilityConverter1}}"
@@ -397,7 +390,7 @@
                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type ButtonBase}}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding TInfo.IsEditable}" Value="True">
-                                <Setter Property="Background" Value="#AACCCCCC" />
+                                <Setter Property="Background" Value="{StaticResource ActiveColorBrush}" />
                             </DataTrigger>
 
                             <Trigger Property="IsMouseOver" Value="True">
@@ -405,12 +398,13 @@
                             </Trigger>
 
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="BorderBrush" Value="Gray" />
-                                <Setter Property="Foreground" Value="Gray" />
+                                <Setter Property="Opacity" Value="0.5" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
+
+                <Image Source="/SIGame;component/Resources/edit.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />
             </Button>
 
             <Button
@@ -445,17 +439,18 @@
                 Width="70"
                 Cursor="Hand"
                 Command="{Binding Data.ShowmanDataExtensions.ChangeActivePlayer}"
-                Content="♟️"
-                FontSize="20"
-                ToolTip="{x:Static lp:Resources.ChangeActivePlayer_Hint}" />
+                ToolTip="{x:Static lp:Resources.ChangeActivePlayer_Hint}">
+                <Image Source="/SIGame;component/Resources/active_player.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />
+            </Button>
 
             <Button
                 Width="70"
                 Cursor="Hand"
                 Command="{Binding Data.ShowmanDataExtensions.ChangeSums}"
-                Content="💰"
                 FontSize="20"
-                ToolTip="{x:Static lp:Resources.Sums_Hint}" />
+                ToolTip="{x:Static lp:Resources.Sums_Hint}">
+                <Image Source="/SIGame;component/Resources/sums.png" RenderOptions.BitmapScalingMode="Fant" Height="24" />
+            </Button>
         </StackPanel>        
 
         <local:DropDownButton
@@ -467,7 +462,6 @@
             Width="70"
             HorizontalAlignment="Right"
             Cursor="Hand"
-            Content="🚪"
             ToolTip="{x:Static lp:Resources.Exit}">
             <local:DropDownButton.DropDown>
                 <ContextMenu Placement="Bottom" Style="{StaticResource SIContextMenuStyle}">
@@ -543,6 +537,8 @@
                     </ContextMenu.Template>
                 </ContextMenu>
             </local:DropDownButton.DropDown>
+            
+            <Image Source="/SIGame;component/Resources/exit.png" RenderOptions.BitmapScalingMode="Fant" Height="28" />
         </local:DropDownButton>
     </Grid>
 </UserControl>

@@ -1134,4 +1134,7 @@
   <data name="DisplaySources" xml:space="preserve">
     <value>Показывать источники вопросов</value>
   </data>
+  <data name="HasMove" xml:space="preserve">
+    <value>Право хода</value>
+  </data>
 </root>

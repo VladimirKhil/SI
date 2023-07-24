@@ -137,11 +137,18 @@
     <ProjectReference Include="..\SIGame.ViewModel\SIGame.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\active_player.png" />
+    <Resource Include="Resources\edit.png" />
+    <Resource Include="Resources\exit.png" />
     <Resource Include="Resources\load.png" />
+    <Resource Include="Resources\move_round.png" />
+    <Resource Include="Resources\next.png" />
+    <Resource Include="Resources\pause.png" />
     <Resource Include="Resources\protected.png" />
     <Resource Include="Resources\search.png" />
     <Resource Include="Resources\settings.png" />
     <Resource Include="Resources\sound.png" />
+    <Resource Include="Resources\sums.png" />
     <Resource Include="Resources\vk_logo.png" />
     <Resource Include="Resources\qlogo.png" />
     <Resource Include="Resources\avatar-f.png" />
@@ -219,12 +226,19 @@
     <None Remove="Fonts\Jost-Regular.ttf" />
     <None Remove="Fonts\Jost-SemiBold.ttf" />
     <None Remove="Fonts\Jost-Thin.ttf" />
+    <None Remove="Resources\active_player.png" />
+    <None Remove="Resources\edit.png" />
+    <None Remove="Resources\exit.png" />
     <None Remove="Resources\game_button.png" />
     <None Remove="Resources\load.png" />
+    <None Remove="Resources\move_round.png" />
+    <None Remove="Resources\next.png" />
+    <None Remove="Resources\pause.png" />
     <None Remove="Resources\protected.png" />
     <None Remove="Resources\search.png" />
     <None Remove="Resources\settings.png" />
     <None Remove="Resources\sound.png" />
+    <None Remove="Resources\sums.png" />
     <None Remove="Theme\main_background.png" />
     <None Remove="Theme\studia.png" />
   </ItemGroup>

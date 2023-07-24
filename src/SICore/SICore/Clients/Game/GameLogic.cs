@@ -2170,6 +2170,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _gameActions.SendMessage(Messages.Cancel, _data.Players[playerIndex].Name);
+
         if (_data.IsOralNow)
         {
             _gameActions.SendMessage(Messages.Cancel, _data.ShowMan.Name);

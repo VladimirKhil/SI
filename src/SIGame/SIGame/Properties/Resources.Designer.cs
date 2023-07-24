@@ -1132,6 +1132,15 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Has move.
+        /// </summary>
+        public static string HasMove {
+            get {
+                return ResourceManager.GetString("HasMove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Help....
         /// </summary>
         public static string Help {

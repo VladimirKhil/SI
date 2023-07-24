@@ -26,15 +26,20 @@
                 <Grid>
                     <Image Name="image" lb:ImageLoader.ImageSource="{Binding}" Stretch="Uniform" />
 
-                    <Rectangle
-                        Width="15"
-                        Height="15"
-                        Fill="{StaticResource MainColor}"
-                        Stroke="Black"
-                        Margin="0,0,-1,-1"
+                    <Border
+                        Width="25"
+                        Height="25"
+                        Margin="0,0,-10,-5"
+                        Background="#55000000"
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
-                        Visibility="{Binding IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}" />
+                        Padding="3"
+                        Visibility="{Binding IsChooser, Converter={StaticResource BooleanToVisibilityConverter1}}"
+                        ToolTip="{x:Static lp:Resources.HasMove}">
+                        <Image
+                            Source="/SIGame;component/Resources/active_player.png"
+                            RenderOptions.BitmapScalingMode="Fant" />
+                    </Border>
 
                     <Rectangle
                         Width="15"

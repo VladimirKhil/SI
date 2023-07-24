@@ -1131,4 +1131,7 @@
   <data name="DisplaySources" xml:space="preserve">
     <value>Display questions sources</value>
   </data>
+  <data name="HasMove" xml:space="preserve">
+    <value>Has move</value>
+  </data>
 </root>
