@@ -55,4 +55,6 @@ public sealed class CustomEnumerator<T> : IEnumerator<T>
             }
         }
     }
+
+    public override string ToString() => $"{_index}:[{string.Join(',', _data)}]";
 }

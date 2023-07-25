@@ -2483,6 +2483,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (Logic.IsFinalRound())
         {
+            DropPlayerFromAnnouncing(playerIndex);
             DropPlayerFromFinalRound(playerIndex);
         }
 
@@ -2517,12 +2518,11 @@ public sealed class Game : Actor<GameData, GameLogic>
                 continue;
             }
 
-            newHistory.Add(
-                new AnswerResult
-                {
-                    IsRight = answerResult.IsRight,
-                    PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
-                });
+            newHistory.Add(new AnswerResult
+            {
+                IsRight = answerResult.IsRight,
+                PlayerIndex = answerResult.PlayerIndex - (answerResult.PlayerIndex > playerIndex ? 1 : 0)
+            });
         }
 
         ClientData.QuestionHistory.Clear();
@@ -2686,8 +2686,6 @@ public sealed class Game : Actor<GameData, GameLogic>
     /// </summary>
     private void DropCurrentAnswerer()
     {
-        var index = ClientData.AnswererIndex;
-
         // Drop answerer index
         ClientData.AnswererIndex = -1;
 
@@ -2719,7 +2717,6 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                ClientData.AnnouncedAnswerersEnumerator?.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
                 PlanExecution(Tasks.Announce, 15);
             }
         }
@@ -2731,9 +2728,20 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else if (nextTask == Tasks.AnnounceStake)
         {
-            ClientData.AnnouncedAnswerersEnumerator?.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
             PlanExecution(Tasks.Announce, 15);
         }
+    }
+
+    private void DropPlayerFromAnnouncing(int index)
+    {
+        if (ClientData.AnnouncedAnswerersEnumerator == null)
+        {
+            return;
+        }
+
+        Logic.AddHistory($"AnnouncedAnswerersEnumerator before update: {ClientData.AnnouncedAnswerersEnumerator}");
+        ClientData.AnnouncedAnswerersEnumerator.Update(CustomEnumeratorUpdaters.RemoveByIndex(index));
+        Logic.AddHistory($"AnnouncedAnswerersEnumerator after update: {ClientData.AnnouncedAnswerersEnumerator}");
     }
 
     private void ContinueMakingStakes()
