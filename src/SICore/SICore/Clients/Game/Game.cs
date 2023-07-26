@@ -902,7 +902,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
             var nextTask = (Tasks)Logic.PendingTask;
 
-            if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose) && _logic.Engine.LeftQuestionsCount == 0)
+            if ((nextTask == Tasks.AskToChoose || nextTask == Tasks.WaitChoose || nextTask == Tasks.AskFirst || nextTask == Tasks.WaitFirst) && _logic.Engine.LeftQuestionsCount == 0)
             {
                 // Round is empty
                 PlanExecution(Tasks.EndRound, 10);
