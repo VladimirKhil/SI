@@ -727,7 +727,7 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
-    /// Copies authors, sources and media files from question to the new document.
+    /// Copies authors, sources and media files from question to the document.
     /// </summary>
     /// <param name="newDocument">Target document.</param>
     /// <param name="question">Original question.</param>
@@ -739,6 +739,25 @@ public sealed class SIDocument : IDisposable
         foreach (var atom in question.Scenario)
         {
             await CopyMediaAsync(newDocument, atom, cancellationToken);
+        }
+
+        if (question.Parameters != null)
+        {
+            if (question.Parameters.TryGetValue(QuestionParameterNames.Question, out var questionBody) && questionBody.ContentValue != null)
+            {
+                foreach (var item in questionBody.ContentValue)
+                {
+                    await CopyMediaAsync(newDocument, item, cancellationToken);
+                }
+            }
+
+            if (question.Parameters.TryGetValue(QuestionParameterNames.Answer, out var answerBody) && answerBody.ContentValue != null)
+            {
+                foreach (var item in answerBody.ContentValue)
+                {
+                    await CopyMediaAsync(newDocument, item, cancellationToken);
+                }
+            }
         }
     }
 
@@ -768,6 +787,41 @@ public sealed class SIDocument : IDisposable
             {
                 using var stream = collection.GetFile(link).Stream;
                 await newCollection.AddFileAsync(link, stream, cancellationToken);
+            }
+        }
+    }
+
+    private async Task CopyMediaAsync(SIDocument newDocument, ContentItem contentItem, CancellationToken cancellationToken = default)
+    {
+        var link = contentItem.Value;
+
+        var collection = Images;
+        var newCollection = newDocument.Images;
+
+        switch (contentItem.Type)
+        {
+            case AtomTypes.Audio:
+                collection = Audio;
+                newCollection = newDocument.Audio;
+                break;
+
+            case AtomTypes.Video:
+                collection = Video;
+                newCollection = newDocument.Video;
+                break;
+        }
+
+        if (!newCollection.Contains(link))
+        {
+            if (collection.Contains(link))
+            {
+                var file = collection.GetFile(link);
+
+                if (file != null)
+                {
+                    using var stream = file.Stream;
+                    await newCollection.AddFileAsync(link, stream, cancellationToken);
+                }
             }
         }
     }

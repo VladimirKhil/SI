@@ -30,6 +30,11 @@ public sealed class RoundViewModel : ItemViewModel<Round>
 
     public ICommand AddTheme { get; private set; }
 
+    /// <summary>
+    /// Upgraded package flag.
+    /// </summary>
+    public bool IsUpgraded => OwnerPackage?.Model.Version >= 5.0;
+
     public RoundViewModel(Round round)
         : base(round)
     {
@@ -82,7 +87,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
         }
     }
 
-    private void CloneRound_Executed(object arg)
+    private void CloneRound_Executed(object? arg)
     {
         var newRound = Model.Clone();
         var newRoundViewModel = new RoundViewModel(newRound);
@@ -90,7 +95,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
         OwnerPackage.Document.Navigate.Execute(newRoundViewModel);
     }
 
-    private void RemoveRound_Executed(object arg)
+    private void RemoveRound_Executed(object? arg)
     {
         if (OwnerPackage == null)
         {
@@ -100,7 +105,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
         OwnerPackage.Rounds.Remove(this);
     }
 
-    private void AddTheme_Executed(object arg)
+    private void AddTheme_Executed(object? arg)
     {
         var document = OwnerPackage.Document;
 
@@ -117,7 +122,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        var question = PackageItemsHelper.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase);
+                        var question = PackageItemsHelper.CreateQuestion((i + 1) * AppSettings.Default.QuestionBase, IsUpgraded);
                         themeViewModel.Questions.Add(new QuestionViewModel(question));
                     }
                 }

@@ -252,4 +252,14 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
         writer.WriteValue(_value);
         writer.WriteEndElement();
     }
+
+    internal ContentItem Clone() => new()
+    {
+        Duration = _duration,
+        IsRef = _isRef,
+        Placement = _placement,
+        WaitForFinish = _waitForFinish,
+        Type = _type,
+        Value = _value
+    };
 }

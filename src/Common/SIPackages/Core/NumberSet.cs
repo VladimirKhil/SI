@@ -91,6 +91,8 @@ public class NumberSet : IEquatable<NumberSet>, INotifyPropertyChanged
     protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
+    internal NumberSet Clone() => new() { Minimum = _minimum, Maximum = _maximum, Step = _step };
+
     /// <inheritdoc />
     public event PropertyChangedEventHandler? PropertyChanged;
 }

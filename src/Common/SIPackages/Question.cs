@@ -83,7 +83,10 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public Answers Wrong { get; } = new();
 
     /// <inheritdoc />
-    public override string ToString() => $"{_price}: {Scenario} ({(Right.Count > 0 ? Right[0] : "")})";
+    public override string ToString() =>
+        Parameters != null && Parameters.TryGetValue(QuestionParameterNames.Question, out var questionBody)
+            ? $"{_price}: {questionBody} ({Right.FirstOrDefault()})"
+            : $"{_price}: {Scenario} ({(Right.Count > 0 ? Right[0] : "")})";
 
     /// <summary>
     /// Question name (not used).
@@ -96,6 +99,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         base.Contains(value) ||
         Type.Contains(value) ||
         Scenario.ContainsQuery(value) ||
+        Parameters != null && Parameters.ContainsQuery(value) ||
         Right.ContainsQuery(value) ||
         Wrong.ContainsQuery(value);
 
@@ -115,6 +119,14 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         foreach (var item in Scenario.Search(value))
         {
             yield return item;
+        }
+
+        if (Parameters != null)
+        {
+            foreach (var item in Parameters.Search(value))
+            {
+                yield return item;
+            }
         }
 
         foreach (var item in Right.Search(value))
@@ -351,6 +363,11 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         question.Type.Name = Type.Name;
 
         question.SetInfoFromOwner(this);
+
+        if (Parameters != null)
+        {
+            question.Parameters = Parameters.Clone();
+        }
 
         foreach (var atom in Scenario)
         {

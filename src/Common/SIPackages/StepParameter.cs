@@ -142,6 +142,75 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         }
     }
 
+    /// <summary>
+    /// Does parameter contain specified value.
+    /// </summary>
+    /// <param name="value">Text value.</param>
+    public bool ContainsQuery(string value) => _type switch
+    {
+        StepParameterTypes.Content => _contentValue != null && _contentValue.Any(item => item.Value.Contains(value)),
+        StepParameterTypes.Group => _groupValue != null && _groupValue.ContainsQuery(value),
+        StepParameterTypes.NumberSet => _numberSetValue != null && _numberSetValue.ToString().Contains(value),
+        _ => _simpleValue.Contains(value),
+    };
+
+    /// <summary>
+    /// Searches a value inside the object.
+    /// </summary>
+    /// <param name="value">Value to search.</param>
+    /// <returns>Search results.</returns>
+    public IEnumerable<SearchData> Search(string value)
+    {
+        switch (_type)
+        {
+            case StepParameterTypes.Content:
+                if (_contentValue == null)
+                {
+                    break;
+                }
+
+                foreach (var item in _contentValue)
+                {
+                    foreach (var searchResult in SearchExtensions.Search(ResultKind.Text, item.Value, value))
+                    {
+                        yield return searchResult;
+                    }
+                }
+                break;
+
+            case StepParameterTypes.Group:
+                if (_groupValue == null)
+                {
+                    break;
+                }
+
+                foreach (var searchResult in _groupValue.Search(value))
+                {
+                    yield return searchResult;
+                }
+                break;
+
+            case StepParameterTypes.NumberSet:
+                if (_numberSetValue == null)
+                {
+                    break;
+                }
+
+                foreach (var searchResult in SearchExtensions.Search(ResultKind.Text, _numberSetValue.ToString(), value))
+                {
+                    yield return searchResult;
+                }
+                break;
+
+            default:
+                foreach (var searchResult in SearchExtensions.Search(ResultKind.Text, _simpleValue, value))
+                {
+                    yield return searchResult;
+                }
+                break;
+        }
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {
@@ -352,4 +421,14 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
             }
         }
     }
+
+    internal StepParameter Clone() => new()
+    {
+        Type = _type,
+        IsRef = _isRef,
+        ContentValue = _contentValue?.Select(item => item.Clone()).ToList(),
+        GroupValue = _groupValue?.Clone(),
+        NumberSetValue = _numberSetValue?.Clone(),
+        SimpleValue = _simpleValue
+    };
 }

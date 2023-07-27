@@ -2336,6 +2336,8 @@ public sealed class QDocument : WorkspaceViewModel
     {
         try
         {
+            var upgraded = Package.Model.Version >= 5.0;
+
             var allthemes = new List<ThemeViewModel>();
             using var change = OperationsManager.BeginComplexChange();
 
@@ -2346,7 +2348,7 @@ public sealed class QDocument : WorkspaceViewModel
                     allthemes.Add(theme);
                 }
             }
-
+            
             while (Package.Rounds.Count > 0)
             {
                 Package.Rounds.RemoveAt(0);
@@ -2387,7 +2389,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                         if (themeViewModel.Questions.Count <= k)
                         {
-                            var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1));
+                            var question = PackageItemsHelper.CreateQuestion(100 * (i + 1) * (k + 1), upgraded);
 
                             questionViewModel = new QuestionViewModel(question);
                             themeViewModel.Questions.Add(questionViewModel);
@@ -2436,7 +2438,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                 if (themeViewModel.Questions.Count == 0)
                 {
-                    var question = PackageItemsHelper.CreateQuestion(0);
+                    var question = PackageItemsHelper.CreateQuestion(0, upgraded);
 
                     questionViewModel = new QuestionViewModel(question);
                     themeViewModel.Questions.Add(questionViewModel);
@@ -2768,6 +2770,23 @@ public sealed class QDocument : WorkspaceViewModel
                     foreach (var atom in quest.Scenario)
                     {
                         atom.IsExpanded = expand;
+                    }
+
+                    if (quest.Parameters != null)
+                    {
+                        foreach (var parameter in quest.Parameters)
+                        {
+                            if (parameter.Key != QuestionParameterNames.Question && parameter.Key != QuestionParameterNames.Answer
+                                || parameter.Value.ContentValue == null)
+                            {
+                                continue;
+                            }
+
+                            foreach (var item in parameter.Value.ContentValue)
+                            {
+                                item.IsExpanded = expand;
+                            }
+                        }
                     }
                 }
             }

@@ -1603,6 +1603,8 @@ public sealed class QConverter
 
                         var quest = document.Package.Rounds[roundIndex].Themes[themeIndex].CreateQuestion(int.Parse(questNumber.ClearPoints().GrowFirstLetter()));
                         questIndex++;
+
+                        // The whole package is upgraded after completion
                         quest.Scenario.Clear();
                         quest.Scenario.Add(questText.ClearPoints().GrowFirstLetter());
                         quest.Right.Clear();
