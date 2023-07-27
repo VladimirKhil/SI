@@ -138,6 +138,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\active_player.png" />
+    <Resource Include="Resources\appellation.png" />
     <Resource Include="Resources\edit.png" />
     <Resource Include="Resources\exit.png" />
     <Resource Include="Resources\load.png" />
@@ -227,6 +228,7 @@
     <None Remove="Fonts\Jost-SemiBold.ttf" />
     <None Remove="Fonts\Jost-Thin.ttf" />
     <None Remove="Resources\active_player.png" />
+    <None Remove="Resources\appellation.png" />
     <None Remove="Resources\edit.png" />
     <None Remove="Resources\exit.png" />
     <None Remove="Resources\game_button.png" />

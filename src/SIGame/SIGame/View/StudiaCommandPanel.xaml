@@ -412,10 +412,11 @@
                 Cursor="Hand"
                 ToolTip="{x:Static lp:Resources.Apellate_Right_Hint}"
                 Command="{Binding Data.PlayerDataExtensions.Apellate}"
-                Content="❗"
                 CommandParameter="+"
                 Style="{StaticResource ApellateButton}"
-                FontSize="20" />
+                FontSize="20">
+                <Image Source="/SIGame;component/Resources/appellation.png" RenderOptions.BitmapScalingMode="Fant" Height="26" />
+            </Button>
 
             <Button
                 Width="70"
