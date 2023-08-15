@@ -560,6 +560,7 @@ public sealed class SIDocument : IDisposable
         var collection = atom.Type switch
         {
             AtomTypes.Audio => _audio,
+            AtomTypes.AudioNew => _audio,
             AtomTypes.Video => _video,
             AtomTypes.Image => _images,
             _ => throw new InvalidOperationException($"Unsupported atom type {atom.Type}"),

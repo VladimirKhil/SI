@@ -203,40 +203,80 @@ public sealed class GameActions
             persons = personsList;
         }
 
-        var contentUris = new List<string>();
+        var contentUris = new HashSet<string>();
 
         foreach (var theme in _gameData.Round.Themes)
         {
             foreach (var question in theme.Questions)
             {
-                foreach (var atom in question.Scenario)
+                // TODO: replace with question.GetContent() later
+                if (question.Parameters != null)
                 {
-                    var atomType = atom.Type;
-
-                    if (atomType == AtomTypes.Image || atomType == AtomTypes.Audio || atomType == AtomTypes.Video)
+                    foreach (var parameter in question.Parameters)
                     {
-                        var link = _gameData.PackageDoc.GetLink(atom);
-
-                        if (link.GetStream == null) // External link
+                        if (parameter.Value.ContentValue == null)
                         {
-                            if (Uri.TryCreate(link.Uri, UriKind.Absolute, out _))
-                            {
-                                contentUris.Add(link.Uri);
-                            }
+                            continue;
                         }
-                        else
+
+                        foreach (var contentItem in parameter.Value.ContentValue)
                         {
-                            var mediaCategory = atomType == AtomTypes.Image
-                                ? SIDocument.ImagesStorageName
-                                : (atomType == AtomTypes.Audio
-                                    ? SIDocument.AudioStorageName
-                                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+                            var contentType = contentItem.Type;
 
-                            var uri = _fileShare.CreateResourceUri(
-                                ResourceKind.Package,
-                                new Uri($"{mediaCategory}/{link.Uri}", UriKind.Relative));
+                            switch (contentType)
+                            {
+                                case AtomTypes.Image:
+                                case AtomTypes.Audio:
+                                case AtomTypes.AudioNew:
+                                case AtomTypes.Video:
+                                    {
+                                        if (!contentItem.IsRef) // External link
+                                        {
+                                            var link = contentItem.Value;
 
-                            contentUris.Add(uri.ToString().Replace("http://localhost", "http://" + Constants.GameHost));
+                                            if (Uri.TryCreate(link, UriKind.Absolute, out _))
+                                            {
+                                                contentUris.Add(link);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var mediaCategory = contentType == AtomTypes.Image
+                                                ? SIDocument.ImagesStorageName
+                                                : ((contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew)
+                                                    ? SIDocument.AudioStorageName
+                                                    : (contentType == AtomTypes.Video ? SIDocument.VideoStorageName : contentType));
+
+                                            string fileName;
+
+                                            if (_gameData.Files.Length > 0)
+                                            {
+                                                var file = _gameData.FindFile(mediaCategory, contentItem.Value);
+
+                                                if (file == null)
+                                                {
+                                                    _gameData.BackLink.SendError(new Exception($"InformRoundContent: File not found: {mediaCategory}/{contentItem.Value}"), true);
+                                                    break;
+                                                }
+
+                                                fileName = file;
+                                            }
+                                            else
+                                            {
+                                                var media = _gameData.PackageDoc.GetLink(new Atom { Text = "@" + contentItem.Value, Type = contentType });
+                                                fileName = media.Uri;
+                                            }
+
+                                            var uri = _fileShare.CreateResourceUri(
+                                                ResourceKind.Package,
+                                                new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
+
+                                            contentUris.Add(uri.ToString().Replace("http://localhost", "http://" + Constants.GameHost));
+                                        }
+
+                                        break;
+                                    }
+                            }
                         }
                     }
                 }

@@ -476,18 +476,18 @@ public sealed class GameLogic : Logic<GameData>
                     return true;
                 }
 
-                var checkedFileName = Path.Combine(mediaCategory, link).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
+                //var checkedFileName = Path.Combine(mediaCategory, link).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
 
-                if (_data.PackageDoc.GetFilteredFiles().Any(
-                    f => f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
-                {
-                    _gameActions.SendMessageWithArgs(
-                        isBackground ? Messages.Atom_Second : Messages.Atom,
-                        AtomTypes.Text,
-                        string.Format(LO[nameof(R.MediaFiltered)], link));
+                //if (_data.PackageDoc.GetFilteredFiles().Any(
+                //    f => f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
+                //{
+                //    _gameActions.SendMessageWithArgs(
+                //        isBackground ? Messages.Atom_Second : Messages.Atom,
+                //        AtomTypes.Text,
+                //        string.Format(LO[nameof(R.MediaFiltered)], link));
 
-                    return false;
-                }
+                //    return false;
+                //}
 
                 // There is no file in the package and it's name is not a valid absolute uri.
                 // So, considering that the file is missing
@@ -536,7 +536,7 @@ public sealed class GameLogic : Logic<GameData>
 
             if (ClientData.Files.Length > 0)
             {
-                var targetName = FindFile(mediaCategory, filename);
+                var targetName = ClientData.FindFile(mediaCategory, filename);
 
                 if (targetName == null)
                 {
@@ -589,39 +589,6 @@ public sealed class GameLogic : Logic<GameData>
             ClientData.BackLink.OnError(exc);
             return false;
         }
-    }
-
-    private bool FileExists(string mediaCategory, string filename) => ClientData.Files.Contains($"{mediaCategory}/{filename}");
-
-    private string? FindFile(string mediaCategory, string filename)
-    {
-        if (FileExists(mediaCategory, filename))
-        {
-            return filename;
-        }
-
-        var escapedFileName = Uri.EscapeUriString(filename);
-
-        if (FileExists(mediaCategory, escapedFileName))
-        {
-            return escapedFileName;
-        }
-
-        var hashedFileName = ZipHelper.CalculateHash(filename);
-
-        if (FileExists(mediaCategory, hashedFileName))
-        {
-            return hashedFileName;
-        }
-
-        var hashedEscapedFileName = ZipHelper.CalculateHash(escapedFileName);
-
-        if (FileExists(mediaCategory, hashedEscapedFileName))
-        {
-            return hashedEscapedFileName;
-        }
-
-        return null;
     }
 
     internal void OnContentScreenImage(ContentItem contentItem)
