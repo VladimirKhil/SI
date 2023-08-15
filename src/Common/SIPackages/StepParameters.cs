@@ -1,4 +1,5 @@
-﻿using SIPackages.Helpers;
+﻿using SIPackages.Core;
+using SIPackages.Helpers;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -17,6 +18,28 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
     /// </summary>
     /// <param name="ownerTagName">Parameters owner tag name.</param>
     public StepParameters(string ownerTagName = "params") => _ownerTagName = ownerTagName;
+
+    /// <summary>
+    /// Does any of parameters contain specified value.
+    /// </summary>
+    /// <param name="value">Text value.</param>
+    public bool ContainsQuery(string value) => Values.Any(parameter => parameter.ContainsQuery(value));
+
+    /// <summary>
+    /// Searches a value inside the object.
+    /// </summary>
+    /// <param name="value">Value to search.</param>
+    /// <returns>Search results.</returns>
+    public IEnumerable<SearchData> Search(string value)
+    {
+        foreach (var parameter in Values)
+        {
+            foreach (var item in parameter.Search(value))
+            {
+                yield return item;
+            }
+        }
+    }
 
     /// <inheritdoc />
     public bool Equals(StepParameters? other) => other is not null && this.SequenceEqual(other);
@@ -82,5 +105,17 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
             item.Value.WriteXml(writer);
             writer.WriteEndElement();
         }
+    }
+
+    internal StepParameters Clone()
+    {
+        var result = new StepParameters(_ownerTagName);
+
+        foreach (var parameter in this)
+        {
+            result[parameter.Key] = parameter.Value.Clone();
+        }
+
+        return result;
     }
 }

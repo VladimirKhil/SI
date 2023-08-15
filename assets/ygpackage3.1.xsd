@@ -1,0 +1,344 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ygpackage" targetNamespace="http://vladimirkhil.com/ygpackage3.0.xsd" elementFormDefault="qualified" xmlns="http://vladimirkhil.com/ygpackage3.0.xsd" xmlns:mstns="http://vladimirkhil.com/ygpackage3.0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="package">
+    <xs:annotation>
+      <xs:documentation>SIGame question package</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="tags" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="tag" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>Package tag</xs:documentation>
+                </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="info" type="infoType" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Package info</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="rounds" minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:documentation>Rounds</xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="round" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                  <xs:documentation>Round</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="info" type="infoType" minOccurs="1" maxOccurs="1">
+                      <xs:annotation>
+                        <xs:documentation>Round info</xs:documentation>
+                      </xs:annotation>
+                    </xs:element>
+                    <xs:element name="themes" minOccurs="1" maxOccurs="1">
+                      <xs:annotation>
+                        <xs:documentation>Themes</xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="theme" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>Theme</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="info" type="infoType" minOccurs="1" maxOccurs="1">
+                                  <xs:annotation>
+                                    <xs:documentation>Theme info</xs:documentation>
+                                  </xs:annotation>
+                                </xs:element>
+                                <xs:element name="questions" minOccurs="1" maxOccurs="1">
+                                  <xs:annotation>
+                                    <xs:documentation>Questions</xs:documentation>
+                                  </xs:annotation>
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="question" minOccurs="0" maxOccurs="unbounded">
+                                        <xs:annotation>
+                                          <xs:documentation>Question</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="info" type="infoType" minOccurs="1" maxOccurs="1">
+                                              <xs:annotation>
+                                                <xs:documentation>Question info</xs:documentation>
+                                              </xs:annotation>
+                                            </xs:element>
+                                            <xs:element name="type" minOccurs="1" maxOccurs="1">
+                                              <xs:annotation>
+                                                <xs:documentation>Question type. Well-know question types are described here: https://vladimirkhil.com/content/docs/QuestionsTypes.xml</xs:documentation>
+                                              </xs:annotation>
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                      <xs:documentation>Question type parameter</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                      <xs:simpleContent>
+                                                        <xs:extension base="xs:string">
+                                                          <xs:attribute name="name" type="xs:string" use="required">
+                                                            <xs:annotation>
+                                                              <xs:documentation>
+                                                                Parameter name
+                                                              </xs:documentation>
+                                                            </xs:annotation>
+                                                          </xs:attribute>
+                                                        </xs:extension>
+                                                      </xs:simpleContent>
+                                                    </xs:complexType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                                <xs:attribute name="name" type="xs:string" use="required">
+                                                  <xs:annotation>
+                                                    <xs:documentation>Question type name</xs:documentation>
+                                                  </xs:annotation>
+                                                </xs:attribute>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="scenario" minOccurs="1" maxOccurs="1">
+                                              <xs:annotation>
+                                                <xs:documentation>Question scenario: text, image, audio etc.</xs:documentation>
+                                              </xs:annotation>
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="atom" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                      <xs:documentation>Scenario fragment</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                      <xs:simpleContent>
+                                                        <xs:extension base="xs:string">
+                                                          <xs:attribute name="type">
+                                                            <xs:annotation>
+                                                              <xs:documentation>Fragment type</xs:documentation>
+                                                            </xs:annotation>
+                                                            <xs:simpleType>
+                                                              <xs:restriction base="xs:string">
+                                                                <xs:enumeration value="text">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Screen text</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="say">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Showman replic</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="image">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Image</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="voice">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Sound</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="video">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Video</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                                <xs:enumeration value="marker">
+                                                                  <xs:annotation>
+                                                                    <xs:documentation>Marker that separates question fragments from answer fragments</xs:documentation>
+                                                                  </xs:annotation>
+                                                                </xs:enumeration>
+                                                              </xs:restriction>
+                                                            </xs:simpleType>
+                                                          </xs:attribute>
+                                                          <xs:attribute name="time" type="xs:double" use="optional">
+                                                            <xs:annotation>
+                                                              <xs:documentation>Fragment time</xs:documentation>
+                                                            </xs:annotation>
+                                                          </xs:attribute>
+                                                        </xs:extension>
+                                                      </xs:simpleContent>
+                                                    </xs:complexType>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="right" minOccurs="1" maxOccurs="1">
+                                              <xs:annotation>
+                                                <xs:documentation>Right answers</xs:documentation>
+                                              </xs:annotation>
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="answer" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                      <xs:documentation>Answer</xs:documentation>
+                                                    </xs:annotation>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="wrong" minOccurs="1" maxOccurs="1">
+                                              <xs:annotation>
+                                                <xs:documentation>Wrong answers</xs:documentation>
+                                              </xs:annotation>
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="answer" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:annotation>
+                                                      <xs:documentation>Answer</xs:documentation>
+                                                    </xs:annotation>
+                                                  </xs:element>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                          </xs:sequence>
+                                          <xs:attribute name="price" type="xs:unsignedInt" use="required">
+                                            <xs:annotation>
+                                              <xs:documentation>Question price</xs:documentation>
+                                            </xs:annotation>
+                                          </xs:attribute>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="name" type="xs:string" use="required">
+                                <xs:annotation>
+                                  <xs:documentation>Theme name</xs:documentation>
+                                </xs:annotation>
+                              </xs:attribute>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="name" type="xs:string" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Round name</xs:documentation>
+                    </xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="type" use="required">
+                    <xs:annotation>
+                      <xs:documentation>Round type</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="standart">
+                          <xs:annotation>
+                            <xs:documentation>Standard round</xs:documentation>
+                          </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="final">
+                          <xs:annotation>
+                            <xs:documentation>Final round</xs:documentation>
+                          </xs:annotation>
+                        </xs:enumeration>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Unique package identifier</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="name" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Package name</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" type="xs:double" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Current schema version. Should be equal to 4 for this schema
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="restriction" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package restrictions (for example, "18+")</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="date" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package creation date in free form</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="publisher" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package publisher</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="difficulty" type="xs:unsignedInt" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package difficulty (from 0 to 10)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="logo" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package logo image link</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="language" type="xs:string" use="optional">
+        <xs:annotation>
+          <xs:documentation>Package language</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="infoType">
+    <xs:sequence>
+      <xs:element name="authors" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Authors</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="author" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Author</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="sources" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Sources</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="source" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>Source</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="comments" type="xs:string" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Comments</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="extension" type="xs:string" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>Item information extension</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

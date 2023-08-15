@@ -43,8 +43,6 @@ public partial class App : Application
 
     internal Settings Settings { get; } = LoadSettings();
 
-    private IConfiguration? _configuration;
-
     private bool _useAppService;
 
     private async void Application_Startup(object sender, StartupEventArgs e)
@@ -61,8 +59,6 @@ public partial class App : Application
                     .SetBasePath(context.HostingEnvironment.ContentRootPath)
                     .AddJsonFile("appsettings.json", optional: true)
                     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-                _configuration = configurationBuilder.Build();
             })
             .ConfigureServices(ConfigureServices)
             .ConfigureLogging((hostingContext, logging) =>
@@ -75,21 +71,23 @@ public partial class App : Application
         await _host.StartAsync();
 
         _manager.ServiceProvider = _host.Services;
-
-        var options = _configuration!.GetSection(AppServiceClientOptions.ConfigurationSectionName);
-        var appServiceClientOptions = options.Get<AppServiceClientOptions>();
-
-        _useAppService = appServiceClientOptions.ServiceUri != null;
     }
 
-    private void ConfigureServices(IServiceCollection services)
+    private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
     {
-        services.AddAppServiceClient(_configuration!);
-        services.AddSIStorageServiceClient(_configuration!);
+        var configuration = ctx.Configuration;
+
+        services.AddAppServiceClient(configuration);
+        services.AddSIStorageServiceClient(configuration);
 
         services.AddTransient(typeof(SIStorage));
 
         services.AddTransient<CommandWindow>();
+
+        var options = configuration.GetSection(AppServiceClientOptions.ConfigurationSectionName);
+        var appServiceClientOptions = options.Get<AppServiceClientOptions>();
+
+        _useAppService = appServiceClientOptions?.ServiceUri != null;
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -252,6 +250,7 @@ public partial class App : Application
         }
         else if (e.Exception is System.Windows.Markup.XamlParseException
             || e.Exception is NotImplementedException
+            || e.Exception is TypeInitializationException
             || e.Exception is COMException comException && (uint)comException.ErrorCode == 0x88980406)
         {
             MessageBox.Show(
@@ -260,7 +259,7 @@ public partial class App : Application
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-        else if (e.Exception is Win32Exception)
+        else if (e.Exception is Win32Exception || e.Exception is COMException)
         {
             MessageBox.Show(
                 e.Exception.Message,

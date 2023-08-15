@@ -101,7 +101,7 @@ public sealed class NewViewModel : WorkspaceViewModel
 
                                 for (int k = 0; k < 5; k++)
                                 {
-                                    theme.CreateQuestion(100 * (i + 1) * (k + 1));
+                                    theme.CreateQuestion(100 * (i + 1) * (k + 1), upgraded: _appOptions.UpgradePackages);
                                 }
                             }
                         }
@@ -109,7 +109,7 @@ public sealed class NewViewModel : WorkspaceViewModel
 
                         for (int j = 0; j < 7; j++)
                         {
-                            final.CreateTheme(null).CreateQuestion(0);
+                            final.CreateTheme(null).CreateQuestion(0, upgraded: _appOptions.UpgradePackages);
                         }
                     }
                     break;
@@ -128,7 +128,7 @@ public sealed class NewViewModel : WorkspaceViewModel
 
                                 for (int k = 0; k < param.NumOfQuestions; k++)
                                 {
-                                    theme.CreateQuestion(param.NumOfPoints * (i + 1) * (k + 1));
+                                    theme.CreateQuestion(param.NumOfPoints * (i + 1) * (k + 1), upgraded: _appOptions.UpgradePackages);
                                 }
                             }
                         }
@@ -139,7 +139,7 @@ public sealed class NewViewModel : WorkspaceViewModel
 
                             for (int j = 0; j < param.NumOfFinalThemes; j++)
                             {
-                                final.CreateTheme(null).CreateQuestion(0);
+                                final.CreateTheme(null).CreateQuestion(0, upgraded: _appOptions.UpgradePackages);
                             }
                         }
                     }

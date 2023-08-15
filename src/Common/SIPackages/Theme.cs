@@ -1,4 +1,5 @@
-﻿using SIPackages.Helpers;
+﻿using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.Properties;
 
 namespace SIPackages;
@@ -21,7 +22,8 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
     /// </summary>
     /// <param name="price">Question price.</param>
     /// <param name="isFinal">Does the question belong to the final round.</param>
-    public Question CreateQuestion(int price = -1, bool isFinal = false)
+    /// <param name="upgraded">Does the theme belong to an upgraded package.</param>
+    public Question CreateQuestion(int price = -1, bool isFinal = false, bool upgraded = false)
     {
         int qPrice = DetectQuestionPrice(price, isFinal);
 
@@ -30,9 +32,26 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
             Price = qPrice
         };
 
-        quest.Scenario.Add(new Atom());
-        quest.Right.Add("");
+        if (upgraded)
+        {
+            quest.Parameters = new StepParameters
+            {
+                [QuestionParameterNames.Question] = new StepParameter
+                {
+                    Type = StepParameterTypes.Content,
+                    ContentValue = new List<ContentItem>
+                    {
+                        new ContentItem { Type = AtomTypes.Text, Value = "" },
+                    }
+                }
+            };
+        }
+        else
+        {
+            quest.Scenario.Add(new Atom());
+        }
 
+        quest.Right.Add("");
         Questions.Add(quest);
 
         return quest;

@@ -52,6 +52,11 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     /// </summary>
     public ICommand ShuffleQuestions { get; private set; }
 
+    /// <summary>
+    /// Upgraded package flag.
+    /// </summary>
+    public bool IsUpgraded => OwnerRound?.OwnerPackage?.Model.Version >= 5.0;
+
     public ThemeViewModel(Theme theme)
         : base(theme)
     {
@@ -173,7 +178,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             var document = OwnerRound.OwnerPackage.Document;
             var price = DetectNextQuestionPrice();
 
-            var question = PackageItemsHelper.CreateQuestion(price);
+            var question = PackageItemsHelper.CreateQuestion(price, IsUpgraded);
 
             var questionViewModel = new QuestionViewModel(question);
             Questions.Add(questionViewModel);
