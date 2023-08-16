@@ -486,24 +486,37 @@ public partial class TreeDocView : UserControl
             }
         }
 
-        if (question1.Scenario.Count != question2.Scenario.Count)
+        if (!Equals(question1.Parameters, question2.Parameters))
         {
             return false;
         }
 
-        for (int i = 0; i < question1.Scenario.Count; i++)
+        if (!Equals(question1.Script, question2.Script))
         {
-            if (question1.Scenario[i].Type != question2.Scenario[i].Type)
+            return false;
+        }
+
+        var scenario1 = question1.Scenario;
+        var scenario2 = question2.Scenario;
+
+        if (scenario1.Count != scenario2.Count)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < scenario1.Count; i++)
+        {
+            if (scenario1[i].Type != scenario2[i].Type)
             {
                 return false;
             }
 
-            if (question1.Scenario[i].Text != question2.Scenario[i].Text)
+            if (scenario1[i].Text != scenario2[i].Text)
             {
                 return false;
             }
 
-            if (question1.Scenario[i].AtomTime != question2.Scenario[i].AtomTime)
+            if (scenario1[i].AtomTime != scenario2[i].AtomTime)
             {
                 return false;
             }

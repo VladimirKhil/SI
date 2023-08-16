@@ -5,6 +5,7 @@ using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Serializers;
@@ -14,6 +15,7 @@ using SIStorageService.ViewModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Text;
 using System.Windows.Data;
 using System.Windows.Input;
 using Utils;
@@ -26,7 +28,7 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 {
-    private const string DonateUrl = "https://yoomoney.ru/embed/shop.xml?account=410012283941753&quickpay=shop&payment-type-choice=on&writer=seller&targets=%D0%9F%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%BA%D0%B0+%D0%B0%D0%B2%D1%82%D0%BE%D1%80%D0%B0&targets-hint=&default-sum=100&button-text=03&comment=on&hint=%D0%92%D0%B0%D1%88+%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9";
+    private const string DonateUrl = "https://yoomoney.ru/to/410012283941753";
     private const int MaxMessageLength = 1000;
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<MainViewModel> _logger;
@@ -234,7 +236,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private void SetSettings_Executed(object? arg) => DocList.Add(new SettingsViewModel());
 
-    private void Help_Executed(object? sender, ExecutedRoutedEventArgs e) => DocList.Add(new HowToViewModel());
+    private void Help_Executed(object? sender, ExecutedRoutedEventArgs e) => PlatformManager.Instance.ShowHelp();
 
     private async void Close_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
@@ -373,6 +375,18 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// <param name="arg">Recent file path.</param>
     private void RemoveRecent_Executed(object? arg) => AppSettings.Default.History.Remove(arg.ToString());
 
+    private static void OpenFolder(string path)
+    {
+        try
+        {
+            Browser.Open(path);
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowErrorMessage(exc.Message);
+        }
+    }
+
     /// <summary>
     /// Opens the existing file.
     /// </summary>
@@ -390,11 +404,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 // Loads in read only mode to keep file LastUpdate time unmodified
                 var doc = SIDocument.Load(stream);
 
-                if (_appOptions.UpgradePackages)
+                if (_appOptions.UpgradeOpenedPackages)
                 {
                     doc.Upgrade();
                 }
-                
+
                 _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
 
                 var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
@@ -429,6 +443,12 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
             AppSettings.Default.History.Add(path);
             return document;
         }
+        catch (InvalidDataException exc)
+        {
+            _logger.LogError(exc, "File {path} open error: {error}", path, exc.Message);
+            ShowCorruptedPackageError(path);
+            return null;
+        }
         catch (Exception exc)
         {
             if (exc is FileNotFoundException)
@@ -436,10 +456,40 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 AppSettings.Default.History.Remove(path);
             }
 
-            _logger.LogError(exc, "File open error: {error}", exc.Message);
-            ShowError(exc);
+            _logger.LogError(exc, "File {path} open error: {error}", path, exc.Message);
+            ShowError(exc, Resources.FileOpenError);
             return null;
         }
+    }
+
+    private static void ShowCorruptedPackageError(string path)
+    {
+        var autoSavePath = Path.Combine(
+            Path.GetTempPath(),
+            AppSettings.ProductName,
+            AppSettings.AutoSaveSimpleFolderName,
+            PathHelper.EncodePath(path));
+
+        var logsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log");
+
+        var title = new StringBuilder(Resources.PackageCorruptedHint);
+        var options = new List<UserOption>();
+
+        if (Directory.Exists(autoSavePath))
+        {
+            title.Append(Resources.PackageCorruptedHintAutoSave);
+            options.Add(new UserOption(Resources.OpenAutosaveFolder, "", () => OpenFolder(autoSavePath)));
+        }
+
+        if (Directory.Exists(logsPath))
+        {
+            title.Append(". ").Append(Resources.PackageCorruptedHintLogs);
+            options.Add(new UserOption(Resources.OpenLogsFolder, "", () => OpenFolder(logsPath)));
+        }
+
+        options.Add(new UserOption(Resources.Close, "", () => { }));
+
+        PlatformManager.Instance.ShowSelectOptionDialog(title.ToString(), options.ToArray());
     }
 
     /// <summary>
@@ -527,7 +577,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
             var doc = SIDocument.Create(package);
 
-            if (_appOptions.UpgradePackages)
+            if (_appOptions.UpgradeNewPackages)
             {
                 doc.Upgrade();
             }

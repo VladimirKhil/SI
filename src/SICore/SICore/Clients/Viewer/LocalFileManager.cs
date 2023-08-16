@@ -23,7 +23,19 @@ internal sealed class LocalFileManager : ILocalFileManager
             AllowSynchronousContinuations = true
         });
 
-    public LocalFileManager() => _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
+    public event Action<Uri, Exception>? Error;
+
+    public LocalFileManager()
+    {
+        var socketsHttpHandler = new SocketsHttpHandler
+        {
+            KeepAlivePingPolicy = HttpKeepAlivePingPolicy.WithActiveRequests,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+        };
+        
+        _client = new(socketsHttpHandler) { DefaultRequestVersion = HttpVersion.Version20 };        
+        _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
+    }
 
     public async Task StartAsync(CancellationToken cancellationToken = default)
     {
@@ -40,8 +52,7 @@ internal sealed class LocalFileManager : ILocalFileManager
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 
-    public bool AddFile(Uri uri, Action<Exception> onError) =>
-        _processingQueue.Writer.TryWrite(new FileTask { Uri = uri, ErrorHandler = onError });
+    public bool AddFile(Uri uri) => _processingQueue.Writer.TryWrite(new FileTask { Uri = uri });
 
     private async Task ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
     {
@@ -66,13 +77,14 @@ internal sealed class LocalFileManager : ILocalFileManager
         try
         {
             Directory.CreateDirectory(_rootFolder);
-
-            var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
+            
+            using var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
-                fileTask.ErrorHandler(new Exception(
-                    $"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
+                Error?.Invoke(
+                    fileTask.Uri,
+                    new Exception($"{Resources.DownloadFileError}: {response.StatusCode} {await response.Content.ReadAsStringAsync(cancellationToken)}"));
 
                 return;
             }
@@ -84,7 +96,7 @@ internal sealed class LocalFileManager : ILocalFileManager
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
         catch (Exception exc)
         {
-            fileTask.ErrorHandler(exc);
+            Error?.Invoke(fileTask.Uri, exc);
 
             try
             {
@@ -154,7 +166,5 @@ internal sealed class LocalFileManager : ILocalFileManager
     private readonly struct FileTask
     {
         public Uri Uri { get; init; }
-
-        public Action<Exception> ErrorHandler { get; init; }
     }
 }

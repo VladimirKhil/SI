@@ -33,7 +33,7 @@ public sealed class RoundViewModel : ItemViewModel<Round>
     /// <summary>
     /// Upgraded package flag.
     /// </summary>
-    public bool IsUpgraded => OwnerPackage?.Model.Version >= 5.0;
+    public bool IsUpgraded => OwnerPackage?.IsUpgraded == true;
 
     public RoundViewModel(Round round)
         : base(round)

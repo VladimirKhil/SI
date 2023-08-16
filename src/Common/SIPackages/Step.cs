@@ -39,7 +39,7 @@ public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>, IX
     /// <summary>
     /// Step parameters.
     /// </summary>
-    public StepParameters Parameters { get; } = new("step");
+    public StepParameters Parameters { get; } = new();
 
     /// <summary>
     /// Adds simple parameter to the step.

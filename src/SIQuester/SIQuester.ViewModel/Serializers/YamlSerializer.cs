@@ -1,5 +1,4 @@
 ﻿using SIPackages;
-using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
@@ -100,6 +99,10 @@ internal sealed class YamlSerializer
             {
                 return new CollectionPropertyDesriptor<string>(nameof(Question.Wrong), typeof(Answers));
             }
+            else if (type == typeof(Question) && name == nameof(Question.Parameters).ToLowerInvariant())
+            {
+                return new StepParametersPropertyDesriptor();
+            }
             else if (type == typeof(Question) && name == nameof(Question.Type).ToLowerInvariant())
             {
                 return new QuestionTypePropertyDesriptor();
@@ -148,7 +151,9 @@ internal sealed class YamlSerializer
         public Type Type => _type;
 
         public Type? TypeOverride { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public int Order { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         public ScalarStyle ScalarStyle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public CustomPropertyDesriptor(Type type)
@@ -202,6 +207,28 @@ internal sealed class YamlSerializer
             foreach (var item in sourceColletion)
             {
                 collection.Add(item);
+            }
+        }
+    }
+
+    private sealed class StepParametersPropertyDesriptor : CustomPropertyDesriptor
+    {
+        public StepParametersPropertyDesriptor() : base(typeof(StepParameters)) { }
+
+        public override void Write(object target, object? value)
+        {
+            var question = (Question)target;
+
+            if (value is not StepParameters stepParameters)
+            {
+                return;
+            }
+
+            question.Parameters ??= new StepParameters();
+
+            foreach (var param in stepParameters)
+            {
+                question.Parameters[param.Key] = param.Value;
             }
         }
     }

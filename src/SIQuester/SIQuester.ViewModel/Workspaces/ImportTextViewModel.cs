@@ -591,7 +591,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             Resources.ThemesCollection,
             out int themesNum);
 
-        if (_existing != null && _appOptions.UpgradePackages)
+        if (_existing != null && _appOptions.UpgradeNewPackages)
         {
             _existing.Upgrade();
         }

@@ -178,6 +178,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Закрыть.
+        /// </summary>
+        public static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Комментарий.
         /// </summary>
         public static string Comment {
@@ -192,6 +201,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Comments {
             get {
                 return ResourceManager.GetString("Comments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы действительно хотите удалить все неиспользуемые в пакете медиафайлы.
+        /// </summary>
+        public static string ConfirmFilesRemoval {
+            get {
+                return ResourceManager.GetString("ConfirmFilesRemoval", resourceCulture);
             }
         }
         
@@ -349,6 +367,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Внешние ссылки не допускаются.
+        /// </summary>
+        public static string ExternalLinksAreForbidden {
+            get {
+                return ResourceManager.GetString("ExternalLinksAreForbidden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Недостаточное число вопросов.
         /// </summary>
         public static string FewQuestions {
@@ -367,11 +394,38 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} содержится в пакете в разных категориях!.
+        /// </summary>
+        public static string FileInMultipleCategories {
+            get {
+                return ResourceManager.GetString("FileInMultipleCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} содержится в пакете дважды!.
+        /// </summary>
+        public static string FileIsDuplicated {
+            get {
+                return ResourceManager.GetString("FileIsDuplicated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Файл доступен только для чтения!.
         /// </summary>
         public static string FileIsReadOnly {
             get {
                 return ResourceManager.GetString("FileIsReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка открытия файла.
+        /// </summary>
+        public static string FileOpenError {
+            get {
+                return ResourceManager.GetString("FileOpenError", resourceCulture);
             }
         }
         
@@ -556,6 +610,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на отсутствует файл.
+        /// </summary>
+        public static string MissingFile {
+            get {
+                return ResourceManager.GetString("MissingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Логотип пакета: отсутствует файл {0}!.
+        /// </summary>
+        public static string MissingLogoFile {
+            get {
+                return ResourceManager.GetString("MissingLogoFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Имя:.
         /// </summary>
         public static string NameOfPackage {
@@ -718,6 +790,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Открыть папку автосохранений.
+        /// </summary>
+        public static string OpenAutosaveFolder {
+            get {
+                return ResourceManager.GetString("OpenAutosaveFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Открыть папку с логами.
+        /// </summary>
+        public static string OpenLogsFolder {
+            get {
+                return ResourceManager.GetString("OpenLogsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Настройки.
         /// </summary>
         public static string Options {
@@ -732,6 +822,33 @@ namespace SIQuester.ViewModel.Properties {
         public static string OtherTypeQuestion {
             get {
                 return ResourceManager.GetString("OtherTypeQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл с вопросами повреждён! Попробуйте извлечь данные из него при помощи архиватора (открыв его как архив).
+        /// </summary>
+        public static string PackageCorruptedHint {
+            get {
+                return ResourceManager.GetString("PackageCorruptedHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на или получить данные из автосохранения.
+        /// </summary>
+        public static string PackageCorruptedHintAutoSave {
+            get {
+                return ResourceManager.GetString("PackageCorruptedHintAutoSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Если не получится, отправьте автору программы логи, чтобы можно было избежать проблемы в будущем.
+        /// </summary>
+        public static string PackageCorruptedHintLogs {
+            get {
+                return ResourceManager.GetString("PackageCorruptedHintLogs", resourceCulture);
             }
         }
         
@@ -1033,6 +1150,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на .
+        /// </summary>
+        public static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Входной файл считан полностью! Весь заголовок файла помещён в комментарии к пакету. Просьба самостоятельно рассортировать его содержимое. Всего импортировано тем:.
         /// </summary>
         public static string Success {
@@ -1213,6 +1339,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Untitled {
             get {
                 return ResourceManager.GetString("Untitled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} не используется. Удалите его.
+        /// </summary>
+        public static string UnusedFile {
+            get {
+                return ResourceManager.GetString("UnusedFile", resourceCulture);
             }
         }
         

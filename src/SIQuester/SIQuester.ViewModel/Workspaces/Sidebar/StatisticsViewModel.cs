@@ -70,36 +70,45 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
     public ICommand Create { get; private set; }
 
+    public ICommand RemoveUnusedFiles { get; private set; }
+
     public StatisticsViewModel(QDocument document)
     {
         _document = document;
 
         Create = new SimpleCommand(Create_Executed);
+        RemoveUnusedFiles = new SimpleCommand(RemoveUnusedFiles_Executed);
         Create_Executed();
     }
 
     private void Create_Executed(object? arg = null)
     {
         var stats = new StringBuilder();
-        stats.Append(Resources.NameOfPackage);
-        stats.Append(' ');
-        stats.AppendLine(_document.Document.Package.Name);
         stats.Append(Resources.NumOfRounds);
-        stats.Append(':');
+        stats.Append(": ");
         stats.AppendLine(_document.Document.Package.Rounds.Count.ToString());
 
-        int allt = 0, allq = 0;
+        int themeCount = 0, questionCount = 0;
 
         _document.Document.Package.Rounds.ForEach(round =>
         {
-            allt += round.Themes.Count;
-            round.Themes.ForEach(theme => allq += theme.Questions.Count);
+            themeCount += round.Themes.Count;
+            round.Themes.ForEach(theme => questionCount += theme.Questions.Count);
         });
 
-        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, allt));
-        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, allq));
+        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfThemes, themeCount));
+        stats.AppendLine(string.Format("{0}: {1}", Resources.NumOfQuests, questionCount));
         stats.AppendLine();
 
+        CheckText(stats);
+
+        stats.AppendLine(_document.CheckLinks(true));
+
+        Result = stats.ToString();
+    }
+
+    private void CheckText(StringBuilder stats)
+    {
         foreach (var round in _document.Document.Package.Rounds)
         {
             stats.AppendLine(string.Format("{0}: {1}", Resources.Round, round.Name));
@@ -110,12 +119,12 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                 var themeData = new StringBuilder();
                 bool here = false;
 
-                bool tb1 = theme.Info.Comments.Text.Contains(Resources.Undefined);
-                bool tb2 = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
-                bool tb3 = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
-                bool tb4 = round.Type == RoundTypes.Standart && theme.Questions.Count < 5;
-                
-                if (tb1 || tb2 || tb3 || tb4)
+                var unrecognizedText = theme.Info.Comments.Text.Contains(Resources.Undefined);
+                var noAuthors = theme.Info.Authors.Count == 0 && _checkEmptyAuthors;
+                var invalidBrackets = !Utils.ValidateTextBrackets(theme.Name) || !Utils.ValidateTextBrackets(theme.Info.Comments.Text);
+                var missingQuestions = round.Type == RoundTypes.Standart && theme.Questions.Count < 5;
+
+                if (unrecognizedText || noAuthors || invalidBrackets || missingQuestions)
                 {
                     if (!here)
                     {
@@ -123,17 +132,17 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         themeData.AppendLine(string.Format("{0}: {1}", Resources.Theme, theme.Name));
                     }
 
-                    if (tb1)
+                    if (unrecognizedText)
                     {
                         themeData.AppendLine(Resources.Unrecognized);
                     }
 
-                    if (tb2)
+                    if (noAuthors)
                     {
                         themeData.AppendLine(Resources.NoAuthors);
                     }
 
-                    if (tb4)
+                    if (missingQuestions)
                     {
                         themeData.AppendLine(Resources.FewQuestions);
                     }
@@ -141,9 +150,11 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                 foreach (var quest in theme.Questions)
                 {
-                    bool b1 = quest.Scenario.ToString() == Resources.Question;
-                    bool b2 = quest.Right.Count == 1 && quest.Right[0] == Resources.RightAnswer;
-                    bool b3 = quest.Info.Sources.Count == 0 && _checkEmptySources;
+                    var questionText = quest.GetText();
+
+                    var emptyQuestion = (questionText == "" || questionText == Resources.Question) && !quest.HasMediaContent();
+                    var noAnswer = quest.Right.Count == 1 && quest.Right[0] == Resources.RightAnswer;
+                    var emptySources = quest.Info.Sources.Count == 0 && _checkEmptySources;
 
                     var bracketsData = new StringBuilder();
 
@@ -151,12 +162,13 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     {
                         for (int i = 0; i < 4; i++)
                         {
-                            string text = string.Empty;
-                            string comment = string.Empty;
+                            var text = string.Empty;
+                            var comment = string.Empty;
+
                             switch (i)
                             {
                                 case 0:
-                                    text = quest.Scenario.ToString();
+                                    text = quest.GetText();
                                     comment = Resources.QText;
                                     break;
 
@@ -196,7 +208,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
                     bool b4 = bracketsData.Length > 0;
 
-                    if (b1 || b2 || b3 || b4)
+                    if (emptyQuestion || noAnswer || emptySources || b4)
                     {
                         if (!here)
                         {
@@ -205,17 +217,17 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         }
                     }
 
-                    if (b1)
+                    if (emptyQuestion)
                     {
                         themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoQuestion));
                     }
 
-                    if (b2)
+                    if (noAnswer)
                     {
                         themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoAnswer));
                     }
 
-                    if (b3)
+                    if (emptySources)
                     {
                         themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoSource));
                     }
@@ -234,9 +246,10 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
             stats.AppendLine();
         }
+    }
 
-        stats.AppendLine(_document.CheckLinks(true));
-
-        Result = stats.ToString();
+    private void RemoveUnusedFiles_Executed(object? arg)
+    {
+        _document.RemoveUnusedFiles();
     }
 }

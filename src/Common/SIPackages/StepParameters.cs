@@ -11,14 +11,6 @@ namespace SIPackages;
 /// </summary>
 public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatable<StepParameters>, IXmlSerializable
 {
-    private readonly string _ownerTagName;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="StepParameters" /> class.
-    /// </summary>
-    /// <param name="ownerTagName">Parameters owner tag name.</param>
-    public StepParameters(string ownerTagName = "params") => _ownerTagName = ownerTagName;
-
     /// <summary>
     /// Does any of parameters contain specified value.
     /// </summary>
@@ -57,6 +49,7 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
     public void ReadXml(XmlReader reader)
     {
         var read = true;
+        var parentTagName = reader.LocalName;
 
         while (!read || reader.Read())
         {
@@ -85,7 +78,7 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
                     break;
 
                 case XmlNodeType.EndElement:
-                    if (reader.LocalName == _ownerTagName)
+                    if (reader.LocalName == parentTagName)
                     {
                         reader.Read();
                         return;
@@ -109,7 +102,7 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
 
     internal StepParameters Clone()
     {
-        var result = new StepParameters(_ownerTagName);
+        var result = new StepParameters();
 
         foreach (var parameter in this)
         {

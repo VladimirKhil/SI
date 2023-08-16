@@ -55,7 +55,7 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
     /// <summary>
     /// Upgraded package flag.
     /// </summary>
-    public bool IsUpgraded => OwnerRound?.OwnerPackage?.Model.Version >= 5.0;
+    public bool IsUpgraded => OwnerRound?.OwnerPackage?.IsUpgraded == true;
 
     public ThemeViewModel(Theme theme)
         : base(theme)

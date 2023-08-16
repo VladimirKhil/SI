@@ -583,6 +583,9 @@
   <data name="RemoveTheme" xml:space="preserve">
     <value>Удалить тему</value>
   </data>
+  <data name="RemoveUnusedFiles" xml:space="preserve">
+    <value>Удалить неиспользуемые файлы</value>
+  </data>
   <data name="Restriction" xml:space="preserve">
     <value>Ограничение</value>
   </data>

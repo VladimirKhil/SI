@@ -633,6 +633,30 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         return result.ToString();
     }
 
+    /// <summary>
+    /// Gets question content parts.
+    /// </summary>
+    public IEnumerable<ContentItem> GetContent()
+    {
+        if (Parameters == null)
+        {
+            yield break;
+        }
+
+        foreach (var parameter in Parameters.Values)
+        {
+            if (parameter.ContentValue == null)
+            {
+                continue;
+            }
+
+            foreach (var contentItem in parameter.ContentValue)
+            {
+                yield return contentItem;
+            }
+        }
+    }
+
     private static string GetTextFromContent(StepParameter content)
     {
         if (content.ContentValue == null)
@@ -678,5 +702,26 @@ public sealed class Question : InfoOwner, IEquatable<Question>
         }
 
         return questionText.ToString();
+    }
+
+    public bool HasMediaContent()
+    {
+        foreach (var item in GetContent())
+        {
+            if (item.Type != AtomTypes.Text && item.Type != AtomTypes.Oral)
+            {
+                return true;
+            }
+        }
+
+        foreach (var atom in Scenario)
+        {
+            if (atom.Type != AtomTypes.Text && atom.Type != AtomTypes.Oral)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

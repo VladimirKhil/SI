@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides helper methods for working with document links.
 /// </summary>
-internal static class LinkExtensions
+public static class LinkExtensions
 {
     /// <summary>
     /// Extracts link from value.
@@ -11,7 +11,7 @@ internal static class LinkExtensions
     /// <param name="value">Text with format of "@link#tail".</param>
     /// <param name="useTail">Should the link tail (part after #) be used.</param>
     /// <returns>Extracted link.</returns>
-    internal static string ExtractLink(this string value, bool useTail = false)
+    public static string ExtractLink(this string value, bool useTail = false)
     {
         if (value.Length < 2 || value[0] != '@')
         {

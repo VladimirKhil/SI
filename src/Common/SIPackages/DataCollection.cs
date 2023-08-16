@@ -113,5 +113,5 @@ public sealed class DataCollection : IEnumerable<string>
         _files.Remove(oldName);
     }
 
-    internal void UpdateSource(ISIPackageContainer package) => _packageContainer = package;
+    internal void UpdateContainer(ISIPackageContainer packageContainer) => _packageContainer = packageContainer;
 }

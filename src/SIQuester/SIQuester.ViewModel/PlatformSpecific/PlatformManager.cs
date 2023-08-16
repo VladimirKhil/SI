@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
+using SIQuester.ViewModel.Model;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -48,13 +49,15 @@ public abstract class PlatformManager
 
     public abstract void ExportTable(SIDocument doc, string filename);
 
-    public abstract IXpsDocumentWrapper GetHelp();
+    public abstract void ShowHelp();
 
     public abstract void AddToRecentCategory(string fileName);
 
     public abstract void ShowErrorMessage(string message);
 
     public abstract void ShowExclamationMessage(string message);
+
+    public abstract void ShowSelectOptionDialog(string message, params UserOption[] options);
 
     public abstract void Inform(string message, bool exclamation = false);
 

@@ -1457,6 +1457,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить неиспользуемые файлы.
+        /// </summary>
+        public static string RemoveUnusedFiles {
+            get {
+                return ResourceManager.GetString("RemoveUnusedFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ограничение.
         /// </summary>
         public static string Restriction {

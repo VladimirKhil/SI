@@ -38,7 +38,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
     /// <summary>
     /// Upgraded package flag.
     /// </summary>
-    public bool IsUpgraded => OwnerTheme?.OwnerRound?.OwnerPackage?.Model.Version >= 5.0;
+    public bool IsUpgraded => OwnerTheme?.OwnerRound?.OwnerPackage?.IsUpgraded == true;
 
     public override ICommand Add
     {
@@ -223,9 +223,28 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             if (Model.Price == Question.InvalidPrice)
             {
                 Model.Price = AppSettings.Default.QuestionBase * ((OwnerTheme?.Questions.IndexOf(this) ?? 0) + 1);
-                Model.Scenario.Clear();
-                Model.Scenario.Add(new Atom());
-                Model.Type.Params.Clear();
+
+                if (IsUpgraded)
+                {
+                    Model.Parameters = new StepParameters
+                    {
+                        [QuestionParameterNames.Question] = new StepParameter
+                        {
+                            Type = StepParameterTypes.Content,
+                            ContentValue = new List<ContentItem>
+                            {
+                                new ContentItem { Type = AtomTypes.Text, Value = "" },
+                            }
+                        }
+                    };
+                }
+                else
+                {
+                    Model.Scenario.Clear();
+                    Model.Scenario.Add(new Atom());
+                    Model.Type.Params.Clear();
+                }
+
                 Model.Right.Clear();
                 Model.Right.Add("");
                 Model.Wrong.Clear();
@@ -235,8 +254,17 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
             }
 
             Model.Price = Question.InvalidPrice;
-            Model.Scenario.Clear();
-            Model.Type.Params.Clear();
+
+            if (IsUpgraded)
+            {
+                Model.Parameters?.Clear();
+            }
+            else
+            {
+                Model.Scenario.Clear();
+                Model.Type.Params.Clear();
+            }
+
             Model.Right.Clear();
             Model.Wrong.Clear();
 

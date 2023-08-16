@@ -224,7 +224,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
                     if (qText.Length > 0)
                     {
-                        quest = theme.CreateQuestion(10 * (j - 1), upgraded: _appOptions.UpgradePackages);
+                        quest = theme.CreateQuestion(10 * (j - 1), upgraded: _appOptions.UpgradeNewPackages);
                         quest.Type.Name = QuestionTypes.Simple;
                         quest.Scenario.Clear();
                         quest.Scenario.Add(qText.ToString().GrowFirstLetter().ClearPoints());
@@ -252,12 +252,12 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
             if (final)
             {
-                quest = theme.CreateQuestion(0, upgraded: _appOptions.UpgradePackages);
+                quest = theme.CreateQuestion(0, upgraded: _appOptions.UpgradeNewPackages);
                 quest.Right[0] = node2["Answer"].InnerText.Trim().GrowFirstLetter().ClearPoints();
             }
             else
             {
-                quest = theme.CreateQuestion(10 * j, upgraded: _appOptions.UpgradePackages);
+                quest = theme.CreateQuestion(10 * j, upgraded: _appOptions.UpgradeNewPackages);
             }
 
             quest.Scenario.Clear();
@@ -397,7 +397,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             #endregion
         }
 
-        if (_appOptions.UpgradePackages)
+        if (_appOptions.UpgradeNewPackages)
         {
             siDocument.Upgrade();
         }

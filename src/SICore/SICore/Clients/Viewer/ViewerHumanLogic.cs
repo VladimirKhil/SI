@@ -54,8 +54,15 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
         //ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
 
+        _localFileManager.Error += LocalFileManager_Error;
         _localFileManagerTask = _localFileManager.StartAsync(_cancellation.Token);
     }
+
+    private void LocalFileManager_Error(Uri mediaUri, Exception e) =>
+        _data.OnAddString(
+            null,
+            $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
+            LogMode.Log);
 
     private void TInfo_MediaLoad() => _viewerActions.SendMessage(Messages.MediaLoaded);
 
@@ -613,6 +620,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
             case AtomTypes.Video:
             case AtomTypes.Audio:
+            case AtomTypes.AudioNew:
             case AtomTypes.Image:
             case AtomTypes.Html:
                 string uri;
@@ -671,7 +679,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     TInfo.QuestionContentType = QuestionContentType.Image;
                     TInfo.Sound = false;
                 }
-                else if (_data.AtomType == AtomTypes.Audio)
+                else if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.AudioNew)
                 {
                     TInfo.SoundSource = new MediaSource(uri);
                     TInfo.QuestionContentType = QuestionContentType.Clef;
@@ -1297,7 +1305,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                 if (!string.IsNullOrWhiteSpace(address))
                 {
-                    if (Uri.TryCreate(address, UriKind.Absolute, out Uri hostUri))
+                    if (Uri.TryCreate(address, UriKind.Absolute, out var hostUri))
                     {
                         uri = uri.Replace(Constants.GameHost, hostUri.Host);
                     }
@@ -1317,12 +1325,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 continue;
             }
 
-            _localFileManager.AddFile(
-                mediaUri,
-                e => _data.OnAddString(
-                    null,
-                    $"\n{string.Format(R.FileLoadError, Path.GetFileName(mediaUri.ToString()))}: {e.Message}\n",
-                    LogMode.Log));
+            _localFileManager.AddFile(mediaUri);
         }
     }
 

@@ -11,7 +11,12 @@ public sealed class AppOptions
     public static readonly string ConfigurationSectionName = "SIQuester";
 
     /// <summary>
+    /// Upgrade new packages to new format.
+    /// </summary>
+    public bool UpgradeNewPackages { get; set; }
+
+    /// <summary>
     /// Upgrade opened packages to new format.
     /// </summary>
-    public bool UpgradePackages { get; set; }
+    public bool UpgradeOpenedPackages { get; set; }
 }

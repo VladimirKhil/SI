@@ -2,7 +2,6 @@
 using SIPackages.Containers;
 using SIPackages.Core;
 using SIPackages.Helpers;
-using SIPackages.PlatformSpecific;
 using SIPackages.Properties;
 using System.Diagnostics;
 using System.Xml;
@@ -99,11 +98,11 @@ public sealed class SIDocument : IDisposable
 
     #region Document Functions
 
-    private SIDocument(ISIPackageContainer source)
+    private SIDocument(ISIPackageContainer packageContainer)
     {
-        Ensure.That(source).IsNotNull();
+        Ensure.That(packageContainer).IsNotNull();
 
-        _packageContainer = source;
+        _packageContainer = packageContainer;
 
         _images = new DataCollection(_packageContainer, ImagesStorageName, "si/image");
         _audio = new DataCollection(_packageContainer, AudioStorageName, "si/audio");
@@ -116,6 +115,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="name">Document name.</param>
     /// <param name="author">Document author.</param>
     public static SIDocument Create(string name, string author) => CreateInternal(new MemoryStream(), name, author, false);
+        // CreateInternal(EmptySIPackageContainer.Instance, name, author);
 
     /// <summary>
     /// Creates a document and associates it with the stream.
@@ -145,10 +145,10 @@ public sealed class SIDocument : IDisposable
         CreateInternal(packageContainer, name, author);
 
     private static SIDocument CreateInternal(Stream stream, string name, string author, bool leaveStreamOpen) =>
-        CreateInternal(SIPackageFactory.Instance.CreatePackage(stream, leaveStreamOpen), name, author);
+        CreateInternal(PackageContainerFactory.CreatePackageContainer(stream, leaveStreamOpen), name, author);
 
     private static SIDocument CreateInternal(string folder, string name, string author) =>
-        CreateInternal(SIPackageFactory.Instance.CreatePackage(folder), name, author);
+        CreateInternal(PackageContainerFactory.CreatePackageContainer(folder), name, author);
 
     private static SIDocument CreateInternal(ISIPackageContainer packageContainer, string name, string author)
     {
@@ -165,7 +165,7 @@ public sealed class SIDocument : IDisposable
     public static SIDocument Create(Package package)
     {
         var stream = new MemoryStream();
-        var packageContainer = SIPackageFactory.Instance.CreatePackage(stream);
+        var packageContainer = PackageContainerFactory.CreatePackageContainer(stream);
 
         var document = new SIDocument(packageContainer);
         document.CreateCore(package);
@@ -175,8 +175,6 @@ public sealed class SIDocument : IDisposable
 
     private void CreateCore(string name, string author)
     {
-        InitContainer();
-
         _package.Name = name;
         _package.ID = Guid.NewGuid().ToString();
         _package.Date = DateTime.UtcNow.ToString("dd.MM.yyyy");
@@ -185,15 +183,7 @@ public sealed class SIDocument : IDisposable
 
     private void CreateCore(Package package)
     {
-        InitContainer();
         _package = package;
-    }
-
-    private void InitContainer()
-    {
-        _packageContainer.CreateStream(ContentFileName, "si/xml");
-        _packageContainer.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
-        _packageContainer.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
     }
 
     /// <summary>
@@ -362,30 +352,30 @@ public sealed class SIDocument : IDisposable
         Ensure.That(_audio).IsNotNull();
         Ensure.That(_video).IsNotNull();
 
-        var newSource = _packageContainer.CopyTo(stream, switchTo, out bool isNew);
+        var newContainer = _packageContainer.CopyTo(stream, switchTo, out bool isNew);
 
-        Ensure.That(newSource).IsNotNull();
+        Ensure.That(newContainer).IsNotNull();
 
         if (isNew)
         {
-            newSource.CreateStream(ContentFileName, "si/xml");
-            newSource.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
-            newSource.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
+            newContainer.CreateStream(ContentFileName, "si/xml");
+            newContainer.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
+            newContainer.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
         }
         
         if (switchTo)
         {
-            ResetTo(newSource);
+            UpdateContainer(newContainer);
         }
 
-        SaveCore(newSource);
+        SaveCore(newContainer);
 
         if (switchTo)
         {
             return this;
         }
 
-        return new SIDocument(newSource);
+        return new SIDocument(newContainer);
     }
 
     /// <summary>
@@ -742,23 +732,9 @@ public sealed class SIDocument : IDisposable
             await CopyMediaAsync(newDocument, atom, cancellationToken);
         }
 
-        if (question.Parameters != null)
+        foreach (var contentItem in question.GetContent())
         {
-            if (question.Parameters.TryGetValue(QuestionParameterNames.Question, out var questionBody) && questionBody.ContentValue != null)
-            {
-                foreach (var item in questionBody.ContentValue)
-                {
-                    await CopyMediaAsync(newDocument, item, cancellationToken);
-                }
-            }
-
-            if (question.Parameters.TryGetValue(QuestionParameterNames.Answer, out var answerBody) && answerBody.ContentValue != null)
-            {
-                foreach (var item in answerBody.ContentValue)
-                {
-                    await CopyMediaAsync(newDocument, item, cancellationToken);
-                }
-            }
+            await CopyMediaAsync(newDocument, contentItem, cancellationToken);
         }
     }
 
@@ -910,21 +886,21 @@ public sealed class SIDocument : IDisposable
     /// Switches document to the new source stream.
     /// </summary>
     /// <param name="stream">Source stream.</param>
-    public void ResetTo(Stream stream) => ResetTo(SIPackageFactory.Instance.GetPackage(stream));
+    public void ResetTo(Stream stream) => UpdateContainer(PackageContainerFactory.GetPackageContainer(stream));
 
     /// <summary>
-    /// Switches document to the new source.
+    /// Switches document to new container.
     /// </summary>
-    /// <param name="source">New source.</param>
-    public void ResetTo(ISIPackageContainer source)
+    /// <param name="packageContainer">New container.</param>
+    public void UpdateContainer(ISIPackageContainer packageContainer)
     {
-        Ensure.That(source).IsNotNull();
+        Ensure.That(packageContainer).IsNotNull();
 
         _packageContainer.Dispose();
-        _packageContainer = source;
+        _packageContainer = packageContainer;
 
-        _images.UpdateSource(_packageContainer);
-        _audio.UpdateSource(_packageContainer);
-        _video.UpdateSource(_packageContainer);
+        _images.UpdateContainer(_packageContainer);
+        _audio.UpdateContainer(_packageContainer);
+        _video.UpdateContainer(_packageContainer);
     }
 }

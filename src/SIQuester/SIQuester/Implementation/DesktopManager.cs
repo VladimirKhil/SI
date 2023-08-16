@@ -6,6 +6,7 @@ using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.Properties;
 using SIQuester.ViewModel;
+using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
 using System.IO;
@@ -361,7 +362,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             theme.Questions.ForEach(quest =>
                             {
                                 paragraph.AppendFormat("{0}. ", quest.Price);
-                                paragraph.AppendLine(quest.Scenario.ToString().EndWithPoint());
+                                paragraph.AppendLine(quest.GetText().EndWithPoint());
                                 paragraph.AppendFormat(STR_Definition, Resources.Answer, string.Join(", ", quest.Right.ToArray()).GrowFirstLetter().EndWithPoint());
                                 AppendInfo(doc, paragraph, quest);
                                 paragraph.AppendLine();
@@ -383,7 +384,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                 quest =>
                                 {
                                     paragraph.AppendFormat("\\{0}\\", theme.Name).AppendLine();
-                                    paragraph.AppendFormat("\\{0}", quest.Scenario);
+                                    paragraph.AppendFormat("\\{0}", quest.GetText());
 
                                     if (quest.Info.Comments.Text.Length > 0)
                                     {
@@ -444,7 +445,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                 paragraph.AppendLine();
                                 paragraph.Append(quest.Price.ToString());
                                 paragraph.AppendLine(".");
-                                paragraph.AppendLine(quest.Scenario.ToString().Replace(Environment.NewLine, "//").EndWithPoint());
+                                paragraph.AppendLine(quest.GetText().Replace(Environment.NewLine, "//").EndWithPoint());
                                 paragraph.AppendLine();
                                 paragraph.AppendFormat(STR_Definition, Resources.Answer, string.Join(", ", quest.Right.ToArray()).GrowFirstLetter().EndWithPoint());
                                 paragraph.AppendLine();
@@ -531,6 +532,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                         }
 
                         var i = 1;
+
                         foreach (var theme in round.Themes)
                         {
                             text.AppendLine(string.Format("{0} {1}:", Resources.Question, i));
@@ -548,6 +550,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             for (var j = 0; j < questionsCount; j++)
                             {
                                 text.Append("   ");
+
                                 if (j < 5)
                                 {
                                     text.Append(j + 1);
@@ -557,7 +560,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                     text.Append("Резерв");
                                 }
 
-                                text.AppendLine(string.Format(". {0}", theme.Questions[j].Scenario.ToString().EndWithPoint().GrowFirstLetter().Trim()));
+                                text.AppendLine(string.Format(". {0}", theme.Questions[j].GetText().EndWithPoint().GrowFirstLetter().Trim()));
                             }
 
                             text.AppendLine();
@@ -891,7 +894,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                     }
 
                     paragraph.Inlines.Add(new LineBreak());
-                    paragraph.Inlines.Add(quest.Scenario.ToString());
+                    paragraph.Inlines.Add(quest.GetText());
 
                     cell.Blocks.Add(paragraph);
                     row.Cells.Add(cell);
@@ -915,10 +918,18 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         manager.Commit();
     }
 
-    public override IXpsDocumentWrapper GetHelp()
+    public override void ShowHelp()
     {
-        var document = new XpsDocument(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Help.xps"), FileAccess.Read);
-        return new XpsDocumentWrapper(document);
+        var helpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Help.pdf");
+
+        try
+        {
+            Utils.Browser.Open(helpPath);
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show(exc.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     public override void AddToRecentCategory(string fileName) => JumpList.AddToRecentCategory(fileName);
@@ -928,6 +939,31 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     public override void ShowExclamationMessage(string message) =>
         MessageBox.Show(message, AppSettings.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+    public override void ShowSelectOptionDialog(string message, params UserOption[] options)
+    {
+        var dialog = new TaskDialog
+        {
+            Caption = AppSettings.ProductName,
+            Icon = TaskDialogStandardIcon.Warning,
+            Text = message
+        };
+
+        foreach (var option in options)
+        {
+            var button = new TaskDialogCommandLink(option.Title, option.Title, option.Description);
+
+            button.Click += (sender, e) =>
+            {
+                option.Callback();
+                dialog.Close();
+            };
+
+            dialog.Controls.Add(button);
+        }
+        
+        dialog.Show();
+    }
 
     public override void Inform(string message, bool exclamation = false) =>
         MessageBox.Show(

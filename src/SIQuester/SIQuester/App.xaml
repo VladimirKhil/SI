@@ -727,15 +727,11 @@
                     <DataTemplate x:Key="{x:Type vm:QDocument}" DataType="{x:Type vm:QDocument}">
                         <siq:DocumentView />
                     </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Type vm:AboutViewModel}" DataType="{x:Type vm:AboutViewModel}">
                         <siq:AboutView />
                     </DataTemplate>
-                    
-                    <DataTemplate x:Key="{x:Type vm:HowToViewModel}" DataType="{x:Type vm:HowToViewModel}">
-                        <siq:HowToView />
-                    </DataTemplate>
-                    
+
                     <DataTemplate x:Key="{x:Type vm:NewViewModel}" DataType="{x:Type vm:NewViewModel}">
                         <siq:NewView />
                     </DataTemplate>

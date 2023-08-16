@@ -58,6 +58,7 @@ public sealed class DesktopManager : PlatformManager
         };
 
         var docViewer = new System.Windows.Controls.DocumentViewer { Document = document.GetFixedDocumentSequence() };
+
         var frame = new System.Windows.Controls.Frame
         {
             NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden,

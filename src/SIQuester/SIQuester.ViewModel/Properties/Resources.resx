@@ -539,4 +539,49 @@ theme - тема Кота</value>
   <data name="StakeAllQuestion" xml:space="preserve">
     <value>Вопрос со ставками для всех</value>
   </data>
+  <data name="FileOpenError" xml:space="preserve">
+    <value>Ошибка открытия файла</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="OpenAutosaveFolder" xml:space="preserve">
+    <value>Открыть папку автосохранений</value>
+  </data>
+  <data name="OpenLogsFolder" xml:space="preserve">
+    <value>Открыть папку с логами</value>
+  </data>
+  <data name="PackageCorruptedHint" xml:space="preserve">
+    <value>Файл с вопросами повреждён! Попробуйте извлечь данные из него при помощи архиватора (открыв его как архив)</value>
+  </data>
+  <data name="PackageCorruptedHintAutoSave" xml:space="preserve">
+    <value>или получить данные из автосохранения</value>
+  </data>
+  <data name="PackageCorruptedHintLogs" xml:space="preserve">
+    <value>Если не получится, отправьте автору программы логи, чтобы можно было избежать проблемы в будущем</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value />
+  </data>
+  <data name="FileInMultipleCategories" xml:space="preserve">
+    <value>Файл {0} содержится в пакете в разных категориях!</value>
+  </data>
+  <data name="FileIsDuplicated" xml:space="preserve">
+    <value>Файл {0} содержится в пакете дважды!</value>
+  </data>
+  <data name="MissingLogoFile" xml:space="preserve">
+    <value>Логотип пакета: отсутствует файл {0}!</value>
+  </data>
+  <data name="ExternalLinksAreForbidden" xml:space="preserve">
+    <value>Внешние ссылки не допускаются</value>
+  </data>
+  <data name="MissingFile" xml:space="preserve">
+    <value>отсутствует файл</value>
+  </data>
+  <data name="UnusedFile" xml:space="preserve">
+    <value>Файл {0} не используется. Удалите его</value>
+  </data>
+  <data name="ConfirmFilesRemoval" xml:space="preserve">
+    <value>Вы действительно хотите удалить все неиспользуемые в пакете медиафайлы</value>
+  </data>
 </root>

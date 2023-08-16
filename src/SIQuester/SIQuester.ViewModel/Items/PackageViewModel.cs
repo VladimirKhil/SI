@@ -22,6 +22,11 @@ public sealed class PackageViewModel : ItemViewModel<Package>
 
     public ObservableCollection<RoundViewModel> Rounds { get; } = new();
 
+    /// <summary>
+    /// Does the package have the new format.
+    /// </summary>
+    public bool IsUpgraded => Model.Version >= 5.0;
+
     public ICommand AddRound { get; private set; }
 
     public SimpleCommand AddRestrictions { get; private set; }

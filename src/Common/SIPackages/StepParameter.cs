@@ -328,7 +328,7 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
 
     private void ReadGroup(XmlReader reader)
     {
-        _groupValue = new("param");
+        _groupValue = new();
         _groupValue.ReadXml(reader);
     }
 

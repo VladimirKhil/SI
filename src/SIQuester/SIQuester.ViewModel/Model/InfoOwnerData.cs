@@ -72,8 +72,8 @@ public sealed class InfoOwnerData
     /// <summary>
     /// Gets full object data including attached objects.
     /// </summary>
-    /// <param name="document">Document which contains the object.</param>
-    /// <param name="owner">Object having necessary data.</param>
+    /// <param name="documentViewModel">Document which contains the object.</param>
+    /// <param name="item">Object having necessary data.</param>
     private void GetFullData(QDocument documentViewModel, IItemViewModel item)
     {
         var model = item.GetModel();
@@ -113,6 +113,50 @@ public sealed class InfoOwnerData
 
         if (model is Question question)
         {
+            foreach (var contentItem in question.GetContent())
+            {
+                if (!contentItem.IsRef)
+                {
+                    continue;
+                }
+
+                var collection = contentItem.Type switch
+                {
+                    AtomTypes.Image => documentViewModel.Images,
+                    AtomTypes.Audio => documentViewModel.Audio,
+                    AtomTypes.AudioNew => documentViewModel.Audio,
+                    AtomTypes.Video => documentViewModel.Video,
+                    _ => null,
+                };
+
+                if (collection == null)
+                {
+                    continue;
+                }
+
+                var targetCollection = contentItem.Type switch
+                {
+                    AtomTypes.Image => Images,
+                    AtomTypes.Audio => Audio,
+                    AtomTypes.AudioNew => Audio,
+                    AtomTypes.Video => Video,
+                    _ => null,
+                };
+
+                if (targetCollection == null)
+                {
+                    continue;
+                }
+
+                var link = contentItem.Value;
+
+                if (!targetCollection.ContainsKey(link))
+                {
+                    var preparedMedia = collection.Wrap(link);
+                    targetCollection.Add(link, preparedMedia.Uri);
+                }
+            }
+
             foreach (var atom in question.Scenario)
             {
                 if (!atom.IsLink)

@@ -14,7 +14,11 @@ public sealed class EmptySIPackageContainer : ISIPackageContainer
     public static readonly EmptySIPackageContainer Instance = new();
 
     /// <inheritdoc />
-    public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
+    public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew)
+    {
+        isNew = true;
+        return ZipSIPackageContainer.Create(stream);
+    }
 
     /// <inheritdoc />
     public void CreateStream(string name, string contentType) => throw new NotImplementedException();
@@ -41,13 +45,13 @@ public sealed class EmptySIPackageContainer : ISIPackageContainer
     public void Flush() => throw new NotImplementedException();
 
     /// <inheritdoc />
-    public string[] GetEntries(string category) => throw new NotImplementedException();
+    public string[] GetEntries(string category) => Array.Empty<string>();
 
     /// <inheritdoc />
-    public StreamInfo GetStream(string name, bool read = true) => throw new NotImplementedException();
+    public StreamInfo? GetStream(string name, bool read = true) => null;
 
     /// <inheritdoc />
-    public StreamInfo GetStream(string category, string name, bool read = true) => throw new NotImplementedException();
+    public StreamInfo? GetStream(string category, string name, bool read = true) => null;
 
     /// <inheritdoc />
     public long GetStreamLength(string name) => throw new NotImplementedException();

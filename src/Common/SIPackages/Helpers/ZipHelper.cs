@@ -9,6 +9,7 @@ namespace SIPackages.Helpers;
 /// <summary>
 /// Provides helper methods for working with zip archives.
 /// </summary>
+[Obsolete("Use ZipUtils.ZipExtractor")]
 public static class ZipHelper
 {
     private const int DefaultMaxArchiveDataLength = 2 * 100 * 1024 * 1024;

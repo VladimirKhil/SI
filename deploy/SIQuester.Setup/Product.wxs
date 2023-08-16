@@ -10,7 +10,7 @@
 	<?define ProductNameR="SIQuester" ?>
 
     <?define SolutionDir = "$(var.SIQuester.ProjectDir)..\..\..\" ?>
-	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net7.0-windows\win-$(var.Platform)\publish\" ?>
+	<?define PublishFolder = "$(var.SolutionDir)bin\.Release\SIQuester\net6.0-windows\win-$(var.Platform)\publish\" ?>
 
 	<Product
 	  Id="*"
@@ -114,7 +114,7 @@
 				<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
 			</Component>
 			<Component Guid="52e158c9-4d0b-48e9-ba43-3c81c3799910">
-				<File KeyPath="yes" Source="$(var.PublishFolder)Help.xps" />
+				<File KeyPath="yes" Source="$(var.PublishFolder)Help.pdf" />
 			</Component>
 			<Component Guid="46306d8e-094a-4559-a541-df3cbf95b19a">
 				<File KeyPath="yes" Source="$(var.PublishFolder)ygpackagekey3.0.xslt" />

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
@@ -85,21 +86,23 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
             var allthemes = new List<Theme>();
             _document.Document.Package.Rounds.ForEach(round => round.Themes.ForEach(allthemes.Add));
 
+            var targetDocument = new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name };
+
             for (var index = _from; index <= _to; index++)
             {
                 var newTheme = allthemes[index - 1].Clone();
-                mainRound.Themes.Add(newTheme);
+                targetDocument.Package.Rounds[0].Themes.Add(new ThemeViewModel(newTheme));
 
                 // Export neccessary collections
-                await _document.Document.CopyCollectionsAsync(newDocument, allthemes[index - 1]);
+                await CopyCollectionsAsync(_document, targetDocument, allthemes[index - 1]);
             }
 
-            if (_appOptions.UpgradePackages)
+            if (_appOptions.UpgradeNewPackages)
             {
                 newDocument.Upgrade();
             }
 
-            OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
+            OnNewItem(targetDocument);
         }
         catch (Exception exc)
         {
@@ -117,25 +120,141 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
             var allthemes = Themes.Where(st => st.IsSelected).Select(st => st.Theme);
 
+            var targetDocument = new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name };
+
             foreach (var theme in allthemes)
             {
                 var newTheme = theme.Clone();
-                mainRound.Themes.Add(newTheme);
+                targetDocument.Package.Rounds[0].Themes.Add(new ThemeViewModel(newTheme));
 
                 // Export neccessary collections
-                await _document.Document.CopyCollectionsAsync(newDocument, theme);
+                await CopyCollectionsAsync(_document, targetDocument, theme);
             }
 
-            if (_appOptions.UpgradePackages)
+            if (_appOptions.UpgradeNewPackages)
             {
                 newDocument.Upgrade();
             }
 
-            OnNewItem(new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name });
+            OnNewItem(targetDocument);
         }
         catch (Exception exc)
         {
             _document.OnError(exc);
         }
+    }
+
+    private static async Task CopyCollectionsAsync(QDocument oldDocument, QDocument newDocument, Theme theme)
+    {
+        var tempMediaFolder = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName, Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempMediaFolder);
+
+        oldDocument.Document.CopyAuthorsAndSources(newDocument.Document, theme);
+
+        foreach (var question in theme.Questions)
+        {
+            await CopyCollectionsAsync(oldDocument, newDocument, question, tempMediaFolder);
+        }
+    }
+
+    private static async Task CopyCollectionsAsync(QDocument oldDocument, QDocument newDocument, Question question, string tempMediaFolder)
+    {
+        oldDocument.Document.CopyAuthorsAndSources(newDocument.Document, question);
+
+        foreach (var atom in question.Scenario)
+        {
+            await CopyMediaAsync(oldDocument, newDocument, atom, tempMediaFolder);
+        }
+
+        foreach (var contentItem in question.GetContent())
+        {
+            await CopyMediaAsync(oldDocument, newDocument, contentItem, tempMediaFolder);
+        }
+    }
+
+    private static async Task CopyMediaAsync(QDocument oldDocument, QDocument newDocument, ContentItem contentItem, string tempMediaFolder)
+    {
+        var link = contentItem.Value;
+
+        var collection = oldDocument.Document.Images;
+        var newCollection = newDocument.Images;
+
+        switch (contentItem.Type)
+        {
+            case AtomTypes.Audio:
+                collection = oldDocument.Document.Audio;
+                newCollection = newDocument.Audio;
+                break;
+
+            case AtomTypes.Video:
+                collection = oldDocument.Document.Video;
+                newCollection = newDocument.Video;
+                break;
+        }
+
+        if (newCollection.Files.Any(f => f.Model.Name == link))
+        {
+            return;
+        }
+
+        var file = collection.GetFile(link);
+
+        if (file == null)
+        {
+            return;
+        }
+
+        using var stream = file.Stream;
+        var tempFile = Path.Combine(tempMediaFolder, link);
+
+        using (var fs = File.Create(tempFile))
+        {
+            await stream.CopyToAsync(fs);
+        }
+
+        newCollection.AddFile(tempFile, link);
+    }
+
+    private static async Task CopyMediaAsync(QDocument oldDocument, QDocument newDocument, Atom atom, string tempMediaFolder)
+    {
+        var link = atom.Text.ExtractLink();
+
+        var collection = oldDocument.Document.Images;
+        var newCollection = newDocument.Images;
+
+        switch (atom.Type)
+        {
+            case AtomTypes.Audio:
+                collection = oldDocument.Document.Audio;
+                newCollection = newDocument.Audio;
+                break;
+
+            case AtomTypes.Video:
+                collection = oldDocument.Document.Video;
+                newCollection = newDocument.Video;
+                break;
+        }
+
+        if (newCollection.Files.Any(f => f.Model.Name == link))
+        {
+            return;
+        }
+
+        var file = collection.GetFile(link);
+
+        if (file == null)
+        {
+            return;
+        }
+
+        using var stream = file.Stream;
+        var tempFile = Path.Combine(tempMediaFolder, link);
+
+        using (var fs = File.Create(tempFile))
+        {
+            await stream.CopyToAsync(fs);
+        }
+
+        newCollection.AddFile(tempFile, link);
     }
 }
