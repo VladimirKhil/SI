@@ -59,51 +59,63 @@ public partial class FlatDocView : UserControl
 
         if (host != null)
         {
-            if (host.DataContext is QuestionViewModel question)
-            {
-                var doc = (QDocument)DataContext;
-                doc.Navigate.Execute(question);
-
-                popup.PlacementTarget = host;
-
-                if (AppSettings.Default.Edit == EditMode.FloatPanel)
-                {
-                    popup.IsOpen = false;
-                    popup.IsOpen = true;
-
-                    if (question.Model.Price == Question.InvalidPrice)
-                    {
-                        return;
-                    }
-
-                    var presenter = VisualTreeHelper.GetChild(_directEditHost, 0);
-                    var childrenCount = VisualTreeHelper.GetChildrenCount(presenter);
-
-                    if (childrenCount == 0)
-                    {
-                        return;
-                    }
-
-                    var directEdit = (NumericTextBox)VisualTreeHelper.GetChild(presenter, 0);
-
-                    var margin = host.TranslatePoint(new Point(0, 0), this);
-                    directEdit.Visibility = Visibility.Visible;
-                    directEdit.Margin = new Thickness(margin.X, margin.Y, 0, 0);
-
-                    Dispatcher.BeginInvoke(() =>
-                    {
-                        directEdit.Focus();
-                        directEdit.SelectAll();
-                        Keyboard.Focus(directEdit);
-                    });
-                }
-            }
+            OnHostClick(host);
         }
 
         if (AppSettings.Default.Edit != EditMode.FloatPanel)
         {
             _startPoint = e.GetPosition(null);
             PreviewMouseMove += MainWindow_PreviewMouseMove;
+        }
+    }
+
+    private void OnHostClick(Border host)
+    {
+        if (host.DataContext is not QuestionViewModel question)
+        {
+            if (host.DataContext is not ContentItemsViewModel contentItems)
+            {
+                return;
+            }
+
+            question = contentItems.Owner;
+        }
+
+        var doc = (QDocument)DataContext;
+        doc.Navigate.Execute(question);
+
+        popup.PlacementTarget = host;
+
+        if (AppSettings.Default.Edit == EditMode.FloatPanel)
+        {
+            popup.IsOpen = false;
+            popup.IsOpen = true;
+
+            if (question.Model.Price == Question.InvalidPrice)
+            {
+                return;
+            }
+
+            var presenter = VisualTreeHelper.GetChild(_directEditHost, 0);
+            var childrenCount = VisualTreeHelper.GetChildrenCount(presenter);
+
+            if (childrenCount == 0)
+            {
+                return;
+            }
+
+            var directEdit = (NumericTextBox)VisualTreeHelper.GetChild(presenter, 0);
+
+            var margin = host.TranslatePoint(new Point(0, 0), this);
+            directEdit.Visibility = Visibility.Visible;
+            directEdit.Margin = new Thickness(margin.X, margin.Y, 0, 0);
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                directEdit.Focus();
+                directEdit.SelectAll();
+                Keyboard.Focus(directEdit);
+            });
         }
     }
 

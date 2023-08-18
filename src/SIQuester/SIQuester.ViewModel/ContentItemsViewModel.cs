@@ -16,7 +16,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 {
     private List<ContentItem> Model { get; }
 
-    internal QuestionViewModel Owner { get; private set; }
+    public QuestionViewModel Owner { get; private set; }
 
     public override QDocument? OwnerDocument => Owner?.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
 

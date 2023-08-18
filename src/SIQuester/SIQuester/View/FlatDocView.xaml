@@ -37,6 +37,12 @@
 
         <Style x:Key="QHeaderStyle" TargetType="TextBlock">
             <Setter Property="Foreground" Value="{Binding Type.Model.Name, Converter={StaticResource QTypeToColorConverter}}" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
+                    <Setter Property="Foreground" Value="{Binding Model.TypeName, Converter={StaticResource QTypeToColorConverter}}" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="RoundHeaderStyle" TargetType="TextBlock">
@@ -172,6 +178,120 @@
             </lc:TemplateConverter.Templates>
         </lc:TemplateConverter>
 
+        <lc:TemplateConverter x:Key="FlatContentItemSelector">
+            <lc:TemplateConverter.DefaultTemplate>
+                <!-- pc:AtomTypes.Text -->
+                <DataTemplate DataType="vm:ContentItemViewModel">
+                    <TextBlock Text="{Binding Model.Value}" TextWrapping="WrapWithOverflow" Background="Transparent" />
+                </DataTemplate>
+            </lc:TemplateConverter.DefaultTemplate>
+
+            <lc:TemplateConverter.Templates>
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Image}">
+                    <Image
+                        MinWidth="20"
+                        MinHeight="20"
+                        MaxWidth="100"
+                        MaxHeight="100"
+                        Stretch="Uniform"
+                        Source="{Binding MediaSource.Uri, Converter={StaticResource ImageConverter}}" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Audio}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
+                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                        <Slider Style="{StaticResource playSlider}" Name="progress" />
+
+                        <MediaElement
+                            lb:MediaController.Source="{Binding}"
+                            LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.AudioNew}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4">
+                        <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                        <Slider Style="{StaticResource playSlider}" Name="progress" />
+
+                        <MediaElement
+                            lb:MediaController.Source="{Binding}"
+                            LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+                    </StackPanel>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Video}">
+                    <Grid Margin="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Rectangle Fill="Lavender" />
+
+                        <MediaElement
+                            lb:MediaController.Source="{Binding}"
+                            LoadedBehavior="Manual"
+                            UnloadedBehavior="Manual"
+                            Width="200"
+                            Height="100"
+                            ScrubbingEnabled="{Binding RelativeSource={RelativeSource Self}, Path=HasVideo}"
+                            lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
+                            lb:MediaController.Progress="{Binding ElementName=progress}" />
+
+                        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,5,0,0">
+                            <ToggleButton Style="{StaticResource playButton}" Name="play" />
+                            <Slider Style="{StaticResource playSlider}" Name="progress" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:AtomTypes.Html}">
+                    <TextBlock Text="{Binding Model.Value}" TextWrapping="WrapWithOverflow" />
+                </DataTemplate>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
+
+        <lc:TemplateConverter x:Key="FlatParameterSelector">
+            <lc:TemplateConverter.DefaultTemplate>
+                <!-- pc:StepParameterTypes.Simple -->
+                <DataTemplate DataType="vm:StepParameterViewModel">
+                    <TextBlock Text="{Binding Model.SimpleValue}" />
+                </DataTemplate>
+            </lc:TemplateConverter.DefaultTemplate>
+
+            <lc:TemplateConverter.Templates>
+                <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="vm:StepParameterViewModel">
+                    <ItemsControl DataContext="{Binding ContentValue}" ItemsSource="{Binding}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:ContentItemViewModel">
+                                <DockPanel>
+                                    <ContentControl
+                                        Content="{Binding}"
+                                        ContentTemplate="{Binding Model.Type, Converter={StaticResource FlatContentItemSelector}}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
+                    <!-- Will be implemented in the future -->
+                </DataTemplate>
+
+                <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
+                    <TextBlock Text="{Binding Model.NumberSetValue}" />
+                </DataTemplate>
+            </lc:TemplateConverter.Templates>
+        </lc:TemplateConverter>
+
         <DataTemplate x:Key="QuestionView">
             <Border
                 Name="bd"
@@ -182,9 +302,11 @@
                 HorizontalAlignment="Left"
                 Width="240">
                 <StackPanel>
-                    <TextBlock Style="{StaticResource QHeaderStyle}" Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" />
+                    <TextBlock
+                        Style="{StaticResource QHeaderStyle}"
+                        Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}" />
                     
-                    <ItemsControl ItemsSource="{Binding Scenario}">
+                    <ItemsControl Name="body" ItemsSource="{Binding Scenario}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <ContentControl
@@ -216,6 +338,55 @@
                 
                 <DataTrigger Binding="{Binding FlatLayoutMode, Source={x:Static m:AppSettings.Default}}" Value="{x:Static lm:FlatLayoutMode.Table}">
                     <Setter TargetName="bd" Property="Margin" Value="2,2,1,2" />
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
+                    <Setter TargetName="body" Property="ItemsSource" Value="{Binding Parameters}" />
+                    
+                    <Setter TargetName="body" Property="ItemTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock
+                                        x:Name="name"
+                                        Text="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
+                                        DockPanel.Dock="Left"
+                                        FontWeight="Bold"
+                                        Foreground="Black"
+                                        Margin="0,2,10,2"
+                                        TextWrapping="Wrap" />
+
+                                    <ContentControl
+                                        x:Name="value"
+                                        Margin="0,2,0,0"
+                                        TextBlock.Foreground="Black"
+                                        Content="{Binding Value}"
+                                        ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource FlatParameterSelector}}" />
+                                </DockPanel>
+
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Question}">
+                                        <Setter TargetName="name" Property="Text" Value="" />
+                                        <Setter TargetName="name" Property="Margin" Value="0" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Answer}">
+                                        <Setter TargetName="name" Property="DockPanel.Dock" Value="Top" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.SelectionMode}">
+                                        <Setter TargetName="value" Property="ContentTemplate">
+                                            <Setter.Value>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Model.SimpleValue, Converter={StaticResource SelectionModesConverter}}" />
+                                                </DataTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
@@ -433,8 +604,8 @@
 
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="10">
-                        <TextBlock Text="Вопрос" FontSize="18" />
-                        <TextBlock Text="Стоимость" Margin="0,5,0,0" />
+                        <TextBlock Text="{x:Static lp:Resources.Question}" FontSize="18" />
+                        <TextBlock Text="{x:Static lp:Resources.Price}" Margin="0,5,0,0" />
 
                         <l:NumericTextBox
                             x:Name="price"
@@ -448,8 +619,8 @@
                             x:Name="type"
                             Margin="0,1,0,0"
                             IsSynchronizedWithCurrentItem="False"
-                            SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}"
-                            ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}" />
+                            ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
+                            SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" />
 
                         <ItemsControl ItemsSource="{Binding Type.Params}">
                             <ItemsControl.ItemTemplate>
@@ -470,6 +641,28 @@
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+
+                        <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
+                            <Setter
+                                TargetName="type"
+                                Property="ItemsSource"
+                                Value="{Binding Source={StaticResource QuestionTypesNamesNew}}" />
+                            
+                            <Setter
+                                TargetName="type"
+                                Property="SelectedItem"
+                                Value="{Binding Model.TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
+                        </DataTrigger>
+
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsUpgraded}" Value="True" />
+                                <Condition Binding="{Binding Model.TypeName}" Value="" />
+                            </MultiDataTrigger.Conditions>
+
+                            <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ls:DictionaryTemplateSelector.Templates>
