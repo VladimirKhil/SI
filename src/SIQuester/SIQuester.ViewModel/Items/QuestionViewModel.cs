@@ -25,6 +25,25 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public QuestionTypeViewModel Type { get; private set; }
 
+    public event Action<QuestionViewModel, string> TypeNameChanged;
+
+    public string TypeName
+    {
+        get => Model.TypeName;
+        set
+        {
+            if (Model.TypeName == value)
+            {
+                return;
+            }
+
+            var oldValue = Model.TypeName;
+            Model.TypeName = value;
+            TypeNameChanged?.Invoke(this, oldValue);
+            OnPropertyChanged();
+        }
+    }
+
     public StepParametersViewModel? Parameters { get; private set; }
 
     public ICommand AddComplexAnswer { get; private set; }
@@ -86,7 +105,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         Wrong.CollectionChanged += Wrong_CollectionChanged;
     }
 
-    private void ClearType_Executed(object? arg) => Model.TypeName = QuestionTypes.Default;
+    private void ClearType_Executed(object? arg) => TypeName = QuestionTypes.Default;
 
     private void Wrong_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         AddWrongAnswers.CanBeExecuted = Model.Wrong.Count == 0;
@@ -200,7 +219,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         if (IsUpgraded)
         {
             var typeName = (string?)arg ?? "";
-            Model.TypeName = typeName == QuestionTypes.Default ? "?" : typeName;
+            TypeName = typeName == QuestionTypes.Default ? "?" : typeName;
             return;
         }
 

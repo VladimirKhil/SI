@@ -147,6 +147,16 @@ public partial class App : Application
 
         try
         {
+            if (AppSettings.Default.Language != null)
+            {
+                Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(AppSettings.Default.Language);
+            }
+            else
+            {
+                var currentLanguage = Thread.CurrentThread.CurrentUICulture.Name;
+                AppSettings.Default.Language = currentLanguage == "ru-RU" ? currentLanguage : "en-US";
+            }
+
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
@@ -163,7 +173,12 @@ public partial class App : Application
         }
         catch (Exception exc)
         {
-            MessageBox.Show($"Ошибка при запуске программы: {exc.Message}.\r\nПрограмма будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику.", ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(
+                $"{SIQuester.Properties.Resources.AppRunError}: {exc.Message}.\r\n{SIQuester.Properties.Resources.AppWillBeClosed}",
+                ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
             Shutdown();
         }
     }
@@ -337,24 +352,24 @@ public partial class App : Application
         if (e.Exception is OutOfMemoryException)
         {
             MessageBox.Show(
-                "Недостаточно памяти для выполнения программы!",
+                SIQuester.Properties.Resources.NotEnoughMemoryToStartApp,
                 ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
         else if (e.Exception is Win32Exception || e.Exception is NotImplementedException || e.Exception.ToString().Contains("VerifyNotClosing"))
         {
-            if (e.Exception.Message != "Параметр задан неверно")
+            if (e.Exception.Message != SIQuester.Properties.Resources.InvalidParameter)
             {
                 MessageBox.Show(
-                    string.Format("Ошибка выполнения программы: {0}!", e.Exception.Message),
+                    string.Format("{0}: {1}", SIQuester.Properties.Resources.CommonAppError, e.Exception.Message),
                     ProductName,
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
         }
         else if (e.Exception is InvalidOperationException
-            && e.Exception.Message.Contains("Идет завершение работы объекта Application"))
+            && e.Exception.Message.Contains(SIQuester.Properties.Resources.ApplicationIsClosing))
         {
             // Это нормально, ничего не сделаешь
         }
@@ -363,7 +378,7 @@ public partial class App : Application
             || e.Exception is NullReferenceException && e.Exception.Message.Contains("UpdateTaskbarThumbButtons"))
         {
             MessageBox.Show(
-                string.Format("Ошибка запуска программы: {0}!", e.Exception.Message),
+                string.Format("{0}: {1}", SIQuester.Properties.Resources.AppRunError, e.Exception.Message),
                 ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -372,7 +387,8 @@ public partial class App : Application
         {
             MessageBox.Show(
                 string.Format(
-                    "Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой: {0}!",
+                    "{0}: {1}",
+                    SIQuester.Properties.Resources.WrongMultimediaAddress,
                     e.Exception.Message),
                 ProductName,
                 MessageBoxButton.OK,
@@ -383,7 +399,7 @@ public partial class App : Application
             || e.Exception.ToString().Contains("FindNameInTemplateContent"))
         {
             MessageBox.Show(
-                string.Format("Ошибка выполнения программы: {0}!", e.ToString()),
+                string.Format("{0}: {1}", SIQuester.Properties.Resources.CommonAppError, e.ToString()),
                 ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -392,14 +408,14 @@ public partial class App : Application
         {
             // Ничего не сделаешь
         }
-        else if (e.Exception.ToString().Contains("StoryFragments part failed to load."))
+        else if (e.Exception.ToString().Contains("StoryFragments part failed to load"))
         {
             // https://learn.microsoft.com/en-us/answers/questions/1129597/wpf-apps-crash-on-windows-1011-after-windows-updat.html
             e.Handled = true;
             return;
         }
         else if (e.Exception is InvalidOperationException invalidOperationException
-            && (invalidOperationException.Message.Contains("Невозможно выполнить эту операцию, когда привязка отсоединена")
+            && (invalidOperationException.Message.Contains(SIQuester.Properties.Resources.BindingDetachedError)
             || invalidOperationException.Message.Contains("Cannot perform this operation when binding is detached")))
         {
             MessageBox.Show(invalidOperationException.Message, ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
@@ -409,9 +425,7 @@ public partial class App : Application
             || e.Exception.Message.Contains("UIAutomationTypes"))
         {
             MessageBox.Show(
-                "Ошибка старта приложения, связанная с Windows Automation." +
-                " Попробуйте установить обновления для своей операционной системы, для .NET Framework 4" +
-                " или установить библиотеку API Windows Automation (ссылка находится на странице приложения).",
+                SIQuester.Properties.Resources.WindowsAutomationError,
                 ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -533,7 +547,7 @@ public partial class App : Application
         catch (Exception exc)
         {
             MessageBox.Show(
-                string.Format("Ошибка сохранения настроек при выходе: {0}.", exc),
+                string.Format("{0}: {1}", SIQuester.Properties.Resources.SettingsSavingError, exc),
                 ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -563,7 +577,7 @@ public partial class App : Application
         catch (Exception exc)
         {
             MessageBox.Show(
-                $"Ошибка при сохранении настроек программы: {exc.Message}",
+                $"{SIQuester.Properties.Resources.SettingsSavingError}: {exc.Message}",
                 AppSettings.ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Exclamation);
@@ -578,6 +592,7 @@ public partial class App : Application
         try
         {
             using var file = IsolatedStorageFile.GetUserStoreForAssembly();
+
             if (file.FileExists(ConfigFileName) && Monitor.TryEnter(ConfigFileName, 2000))
             {
                 try

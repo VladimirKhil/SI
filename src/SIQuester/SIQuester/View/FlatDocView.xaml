@@ -40,7 +40,7 @@
 
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
-                    <Setter Property="Foreground" Value="{Binding Model.TypeName, Converter={StaticResource QTypeToColorConverter}}" />
+                    <Setter Property="Foreground" Value="{Binding TypeName, Converter={StaticResource QTypeToColorConverter}}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -651,13 +651,13 @@
                             <Setter
                                 TargetName="type"
                                 Property="SelectedItem"
-                                Value="{Binding Model.TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
+                                Value="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
                         </DataTrigger>
 
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding IsUpgraded}" Value="True" />
-                                <Condition Binding="{Binding Model.TypeName}" Value="" />
+                                <Condition Binding="{Binding TypeName}" Value="" />
                             </MultiDataTrigger.Conditions>
 
                             <Setter TargetName="typeHeader" Property="Visibility" Value="Collapsed" />

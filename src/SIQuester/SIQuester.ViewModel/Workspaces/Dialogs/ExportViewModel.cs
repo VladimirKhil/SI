@@ -84,18 +84,19 @@ public sealed class ExportViewModel : WorkspaceViewModel
         try
         {
             string filename = _source.FileName.Replace(".", "-");
+
             var filter = new Dictionary<string, string>
             {
-                ["Текстовые файлы"] = "txt",
-                ["Файлы HTML"] = "html",
-                ["Документы DOCX"] = "docx",
-                ["Документы RTF"] = "rtf",
-                ["Документы XPS"] = "xps"
+                [Resources.TextFiles] = "txt",
+                [Resources.HtmlFiles] = "html",
+                [Resources.DocxFiles] = "docx",
+                [Resources.RtfFiles] = "rtf",
+                [Resources.XpsFiles] = "xps"
             };
 
             int index = 0;
 
-            if (PlatformManager.Instance.ShowExportUI("Экспорт", filter, ref filename, ref index, out Encoding encoding, out bool start))
+            if (PlatformManager.Instance.ShowExportUI(Resources.Export, filter, ref filename, ref index, out Encoding encoding, out bool start))
             {
                 OnClosed();
                 await ExportAsync(filename, index, encoding);

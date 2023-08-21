@@ -420,6 +420,24 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private string? _language = null;
+
+    /// <summary>
+    /// Application language.
+    /// </summary>
+    public string? Language
+    {
+        get => _language;
+        set
+        {
+            if (_language != value)
+            {
+                _language = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     /// <summary>
     /// Maximum recommended image size.
     /// </summary>

@@ -3,7 +3,7 @@
 namespace SIGame.ViewModel;
 
 /// <summary>
-/// Главное меню программы
+/// Defines application main menu view model.
 /// </summary>
 public sealed class MainMenuViewModel : ViewModel<UserSettings>
 {

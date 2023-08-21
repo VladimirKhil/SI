@@ -214,6 +214,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Выровнять ответы по правому краю окна в древовидном отображении.
+        /// </summary>
+        public static string AlignAnswersRight {
+            get {
+                return ResourceManager.GetString("AlignAnswersRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Все файлы.
         /// </summary>
         public static string AllFiles {
@@ -246,6 +255,42 @@ namespace SIQuester.Properties {
         public static string AppAuthor {
             get {
                 return ResourceManager.GetString("AppAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Язык приложения (требуется перезапуск).
+        /// </summary>
+        public static string AppLanguage {
+            get {
+                return ResourceManager.GetString("AppLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Идет завершение работы объекта Application.
+        /// </summary>
+        public static string ApplicationIsClosing {
+            get {
+                return ResourceManager.GetString("ApplicationIsClosing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка запуска программы.
+        /// </summary>
+        public static string AppRunError {
+            get {
+                return ResourceManager.GetString("AppRunError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Программа будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику.
+        /// </summary>
+        public static string AppWillBeClosed {
+            get {
+                return ResourceManager.GetString("AppWillBeClosed", resourceCulture);
             }
         }
         
@@ -340,6 +385,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Автосохранение (требуется перезапуск приложения).
+        /// </summary>
+        public static string AutoSave {
+            get {
+                return ResourceManager.GetString("AutoSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Автоматическое задание стоимостей вопросов.
         /// </summary>
         public static string AutoSetQuestionPrices {
@@ -390,6 +444,24 @@ namespace SIQuester.Properties {
         public static string BasicSettings {
             get {
                 return ResourceManager.GetString("BasicSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Невозможно выполнить эту операцию, когда привязка отсоединена.
+        /// </summary>
+        public static string BindingDetachedError {
+            get {
+                return ResourceManager.GetString("BindingDetachedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на По умолчанию.
+        /// </summary>
+        public static string ByDefault {
+            get {
+                return ResourceManager.GetString("ByDefault", resourceCulture);
             }
         }
         
@@ -543,6 +615,15 @@ namespace SIQuester.Properties {
         public static string Common {
             get {
                 return ResourceManager.GetString("Common", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка выполнения программы.
+        /// </summary>
+        public static string CommonAppError {
+            get {
+                return ResourceManager.GetString("CommonAppError", resourceCulture);
             }
         }
         
@@ -709,11 +790,29 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Шрифт документа.
+        /// </summary>
+        public static string DocumentFont {
+            get {
+                return ResourceManager.GetString("DocumentFont", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Поблагодарить автора….
         /// </summary>
         public static string Donate {
             get {
                 return ResourceManager.GetString("Donate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Длительность.
+        /// </summary>
+        public static string Duration {
+            get {
+                return ResourceManager.GetString("Duration", resourceCulture);
             }
         }
         
@@ -1016,6 +1115,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Параметр задан неверно.
+        /// </summary>
+        public static string InvalidParameter {
+            get {
+                return ResourceManager.GetString("InvalidParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Объединить со следующим.
         /// </summary>
         public static string JoinWithNext {
@@ -1156,6 +1264,15 @@ namespace SIQuester.Properties {
         public static string NonStandardPackageParameters {
             get {
                 return ResourceManager.GetString("NonStandardPackageParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Недостаточно памяти для выполнения программы!.
+        /// </summary>
+        public static string NotEnoughMemoryToStartApp {
+            get {
+                return ResourceManager.GetString("NotEnoughMemoryToStartApp", resourceCulture);
             }
         }
         
@@ -1466,6 +1583,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалять мультимедиа из пакета при удалении последней ссылки на него.
+        /// </summary>
+        public static string RemoveUnusedMedia {
+            get {
+                return ResourceManager.GetString("RemoveUnusedMedia", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ограничение.
         /// </summary>
         public static string Restriction {
@@ -1673,11 +1799,38 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка сохранения настроек.
+        /// </summary>
+        public static string SettingsSavingError {
+            get {
+                return ResourceManager.GetString("SettingsSavingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Показывать всплывающие подсказки в плиточном отображении.
+        /// </summary>
+        public static string ShowToolTipsInFlatView {
+            get {
+                return ResourceManager.GetString("ShowToolTipsInFlatView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Перемешать вопросы и стоимости.
         /// </summary>
         public static string ShuffleQuestions {
             get {
                 return ResourceManager.GetString("ShuffleQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Размер.
+        /// </summary>
+        public static string Size {
+            get {
+                return ResourceManager.GetString("Size", resourceCulture);
             }
         }
         
@@ -1759,6 +1912,15 @@ namespace SIQuester.Properties {
         public static string SourcesHeader {
             get {
                 return ResourceManager.GetString("SourcesHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Проверка правописания (Windows 8.1 и выше).
+        /// </summary>
+        public static string SpellChecking {
+            get {
+                return ResourceManager.GetString("SpellChecking", resourceCulture);
             }
         }
         
@@ -1997,6 +2159,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка старта приложения, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице приложения)..
+        /// </summary>
+        public static string WindowsAutomationError {
+            get {
+                return ResourceManager.GetString("WindowsAutomationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на с шагом.
         /// </summary>
         public static string WithStep {
@@ -2011,6 +2182,15 @@ namespace SIQuester.Properties {
         public static string WrongAnswers {
             get {
                 return ResourceManager.GetString("WrongAnswers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой.
+        /// </summary>
+        public static string WrongMultimediaAddress {
+            get {
+                return ResourceManager.GetString("WrongMultimediaAddress", resourceCulture);
             }
         }
         

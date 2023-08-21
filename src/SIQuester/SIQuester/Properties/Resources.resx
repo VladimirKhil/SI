@@ -168,6 +168,9 @@
   <data name="AddVideo" xml:space="preserve">
     <value>Добавить видео</value>
   </data>
+  <data name="AlignAnswersRight" xml:space="preserve">
+    <value>Выровнять ответы по правому краю окна в древовидном отображении</value>
+  </data>
   <data name="AllFiles" xml:space="preserve">
     <value>Все файлы</value>
   </data>
@@ -179,6 +182,18 @@
   </data>
   <data name="AppAuthor" xml:space="preserve">
     <value>Владимир Хиль</value>
+  </data>
+  <data name="AppLanguage" xml:space="preserve">
+    <value>Язык приложения (требуется перезапуск)</value>
+  </data>
+  <data name="ApplicationIsClosing" xml:space="preserve">
+    <value>Идет завершение работы объекта Application</value>
+  </data>
+  <data name="AppRunError" xml:space="preserve">
+    <value>Ошибка запуска программы</value>
+  </data>
+  <data name="AppWillBeClosed" xml:space="preserve">
+    <value>Программа будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику</value>
   </data>
   <data name="AttachPackage" xml:space="preserve">
     <value>Присоединить пакет…</value>
@@ -210,6 +225,9 @@
   <data name="AutomaticallyDetectTemplates" xml:space="preserve">
     <value>Определить шаблоны входного файла автоматически</value>
   </data>
+  <data name="AutoSave" xml:space="preserve">
+    <value>Автосохранение (требуется перезапуск приложения)</value>
+  </data>
   <data name="AutoSetQuestionPrices" xml:space="preserve">
     <value>Автоматическое задание стоимостей вопросов</value>
   </data>
@@ -227,6 +245,12 @@
   </data>
   <data name="BasicSettings" xml:space="preserve">
     <value>Основные настройки</value>
+  </data>
+  <data name="BindingDetachedError" xml:space="preserve">
+    <value>Невозможно выполнить эту операцию, когда привязка отсоединена</value>
+  </data>
+  <data name="ByDefault" xml:space="preserve">
+    <value>По умолчанию</value>
   </data>
   <data name="Bytes" xml:space="preserve">
     <value>байт</value>
@@ -278,6 +302,9 @@
   </data>
   <data name="Common" xml:space="preserve">
     <value>Обычный</value>
+  </data>
+  <data name="CommonAppError" xml:space="preserve">
+    <value>Ошибка выполнения программы</value>
   </data>
   <data name="ContactAuthor" xml:space="preserve">
     <value>Написать замечания автору…</value>
@@ -333,8 +360,14 @@
   <data name="Difficulty" xml:space="preserve">
     <value>Сложность</value>
   </data>
+  <data name="DocumentFont" xml:space="preserve">
+    <value>Шрифт документа</value>
+  </data>
   <data name="Donate" xml:space="preserve">
     <value>Поблагодарить автора…</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Длительность</value>
   </data>
   <data name="Edit" xml:space="preserve">
     <value>Редактировать</value>
@@ -436,6 +469,9 @@
   <data name="InstallUpdatesHint" xml:space="preserve">
     <value>Программа будет автоматически проверять наличие обновлений на сайте разработчика и устанавливать их</value>
   </data>
+  <data name="InvalidParameter" xml:space="preserve">
+    <value>Параметр задан неверно</value>
+  </data>
   <data name="JoinWithNext" xml:space="preserve">
     <value>Объединить со следующим</value>
   </data>
@@ -483,6 +519,9 @@
   </data>
   <data name="NonStandardPackageParameters" xml:space="preserve">
     <value>Параметры нестандартного пакета</value>
+  </data>
+  <data name="NotEnoughMemoryToStartApp" xml:space="preserve">
+    <value>Недостаточно памяти для выполнения программы!</value>
   </data>
   <data name="Object" xml:space="preserve">
     <value>Объект</value>
@@ -586,6 +625,9 @@
   <data name="RemoveUnusedFiles" xml:space="preserve">
     <value>Удалить неиспользуемые файлы</value>
   </data>
+  <data name="RemoveUnusedMedia" xml:space="preserve">
+    <value>Удалять мультимедиа из пакета при удалении последней ссылки на него</value>
+  </data>
   <data name="Restriction" xml:space="preserve">
     <value>Ограничение</value>
   </data>
@@ -655,8 +697,17 @@
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
   </data>
+  <data name="SettingsSavingError" xml:space="preserve">
+    <value>Ошибка сохранения настроек</value>
+  </data>
+  <data name="ShowToolTipsInFlatView" xml:space="preserve">
+    <value>Показывать всплывающие подсказки в плиточном отображении</value>
+  </data>
   <data name="ShuffleQuestions" xml:space="preserve">
     <value>Перемешать вопросы и стоимости</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Размер</value>
   </data>
   <data name="SkipFragment" xml:space="preserve">
     <value>Пропустить фрагмент</value>
@@ -684,6 +735,9 @@
   </data>
   <data name="SourcesHeader" xml:space="preserve">
     <value>Источники:</value>
+  </data>
+  <data name="SpellChecking" xml:space="preserve">
+    <value>Проверка правописания (Windows 8.1 и выше)</value>
   </data>
   <data name="StandardLogicDescription" xml:space="preserve">
     <value>Ответ следует сразу после вопроса</value>
@@ -763,11 +817,17 @@
   <data name="WikifyHint" xml:space="preserve">
     <value>Вставить типографские кавычки, многоточие и тире</value>
   </data>
+  <data name="WindowsAutomationError" xml:space="preserve">
+    <value>Ошибка старта приложения, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице приложения).</value>
+  </data>
   <data name="WithStep" xml:space="preserve">
     <value>с шагом</value>
   </data>
   <data name="WrongAnswers" xml:space="preserve">
     <value>Неправильные ответы</value>
+  </data>
+  <data name="WrongMultimediaAddress" xml:space="preserve">
+    <value>Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой</value>
   </data>
   <data name="Years" xml:space="preserve">
     <value>гг.</value>

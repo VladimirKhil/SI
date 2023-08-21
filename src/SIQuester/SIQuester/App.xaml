@@ -2624,7 +2624,7 @@
                         MaxWidth="350"
                         IsEditable="True"
                         ItemsSource="{Binding Source={StaticResource QuestionTypesNamesNew}}"
-                        Text="{Binding Model.TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}"
+                        Text="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}"
                         FontWeight="Bold" />
 
                     <Button
@@ -2658,7 +2658,7 @@
                     <MultiDataTrigger>
                         <MultiDataTrigger.Conditions>
                             <Condition Binding="{Binding IsUpgraded}" Value="True" />
-                            <Condition Binding="{Binding Model.TypeName, Converter={StaticResource NotDefaultTypeConverter}}" Value="True" />
+                            <Condition Binding="{Binding TypeName, Converter={StaticResource NotDefaultTypeConverter}}" Value="True" />
                         </MultiDataTrigger.Conditions>
                         
                         <Setter Property="ContentTemplate" Value="{StaticResource QuestionTypeTemplateNew}" />
@@ -2705,7 +2705,7 @@
             <siqcv:TimeSpanToSecondsConverter x:Key="TimeSpanToSecondsConverter" />
 
             <ControlTemplate TargetType="ContentControl" x:Key="ContentItemDurationTemplate">
-                <StackPanel Background="#DDDDDD" Margin="0,0,2,0" Orientation="Horizontal">
+                <StackPanel Background="#DDDDDD" Margin="0,0,2,0" Orientation="Horizontal" ToolTip="{x:Static lp:Resources.Duration}">
                     <Image Source="{StaticResource AddTimeImage}" Width="10" Margin="4,0,0,0" />
                     
                     <siq:NumericTextBox

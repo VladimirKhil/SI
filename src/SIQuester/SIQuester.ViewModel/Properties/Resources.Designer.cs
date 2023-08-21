@@ -259,6 +259,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Документы DOCX.
+        /// </summary>
+        public static string DocxFiles {
+            get {
+                return ResourceManager.GetString("DocxFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Пакет {0} был изменён. Вы хотите сохранить его?.
         /// </summary>
         public static string DoYouWantToSave {
@@ -327,6 +336,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string ErrorInsertingBindedQuestion {
             get {
                 return ResourceManager.GetString("ErrorInsertingBindedQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Экспорт.
+        /// </summary>
+        public static string Export {
+            get {
+                return ResourceManager.GetString("Export", resourceCulture);
             }
         }
         
@@ -516,6 +534,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string HowToUseApp {
             get {
                 return ResourceManager.GetString("HowToUseApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файлы HTML.
+        /// </summary>
+        public static string HtmlFiles {
+            get {
+                return ResourceManager.GetString("HtmlFiles", resourceCulture);
             }
         }
         
@@ -952,6 +979,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Документы RTF.
+        /// </summary>
+        public static string RtfFiles {
+            get {
+                return ResourceManager.GetString("RtfFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Оригинальный файл был изменён. Сохранить его?.
         /// </summary>
         public static string SaveFile {
@@ -1186,6 +1222,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Текстовые файлы.
+        /// </summary>
+        public static string TextFiles {
+            get {
+                return ResourceManager.GetString("TextFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Импорт текста.
         /// </summary>
         public static string TextImport {
@@ -1366,6 +1411,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string XmlFilesFilter {
             get {
                 return ResourceManager.GetString("XmlFilesFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Документы XPS.
+        /// </summary>
+        public static string XpsFiles {
+            get {
+                return ResourceManager.GetString("XpsFiles", resourceCulture);
             }
         }
         

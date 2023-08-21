@@ -584,4 +584,22 @@ theme - тема Кота</value>
   <data name="ConfirmFilesRemoval" xml:space="preserve">
     <value>Вы действительно хотите удалить все неиспользуемые в пакете медиафайлы</value>
   </data>
+  <data name="DocxFiles" xml:space="preserve">
+    <value>Документы DOCX</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Экспорт</value>
+  </data>
+  <data name="HtmlFiles" xml:space="preserve">
+    <value>Файлы HTML</value>
+  </data>
+  <data name="RtfFiles" xml:space="preserve">
+    <value>Документы RTF</value>
+  </data>
+  <data name="TextFiles" xml:space="preserve">
+    <value>Текстовые файлы</value>
+  </data>
+  <data name="XpsFiles" xml:space="preserve">
+    <value>Документы XPS</value>
+  </data>
 </root>

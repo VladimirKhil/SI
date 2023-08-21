@@ -702,6 +702,7 @@ public sealed class QDocument : WorkspaceViewModel
                         foreach (var parameter in question.Parameters)
                         {
                             parameter.Value.PropertyChanged += Object_PropertyValueChanged;
+                            parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
 
                             if (parameter.Value.ContentValue != null)
                             {
@@ -718,6 +719,8 @@ public sealed class QDocument : WorkspaceViewModel
                     question.Right.CollectionChanged += Object_CollectionChanged;
                     question.Wrong.CollectionChanged += Object_CollectionChanged;
 
+                    question.TypeNameChanged += Question_TypeNameChanged;
+
                     Listen(question);
                 }
             }
@@ -726,6 +729,82 @@ public sealed class QDocument : WorkspaceViewModel
         Images.HasChanged += Media_Commited;
         Audio.HasChanged += Media_Commited;
         Video.HasChanged += Media_Commited;
+    }
+
+    private void Question_TypeNameChanged(QuestionViewModel question, string oldValue)
+    {
+        if (question.Parameters == null || OperationsManager.IsMakingUndo)
+        {
+            return;
+        }
+
+        using var change = OperationsManager.BeginComplexChange();
+
+        OperationsManager.AddChange(new SimplePropertyValueChange
+        {
+            Element = question,
+            PropertyName = nameof(QuestionViewModel.TypeName),
+            Value = oldValue
+        });
+
+        var requiredParametes = new List<(string, StepParameter)>();
+
+        var typeName = question.TypeName;
+
+        switch (typeName)
+        {
+            case QuestionTypes.Secret:
+            case QuestionTypes.SecretPublicPrice:
+                requiredParametes.Add((QuestionParameterNames.SelectionMode, new StepParameter { SimpleValue = StepParameterValues.SetAnswererSelect_ExceptCurrent }));
+
+                requiredParametes.Add((QuestionParameterNames.Price, new StepParameter
+                {
+                    Type = StepParameterTypes.NumberSet,
+                    NumberSetValue = new NumberSet()
+                }));
+
+                requiredParametes.Add((QuestionParameterNames.Theme, new StepParameter { SimpleValue = "" }));
+                break;
+
+            case QuestionTypes.SecretNoQuestion:
+                requiredParametes.Add((QuestionParameterNames.SelectionMode, new StepParameter { SimpleValue = StepParameterValues.SetAnswererSelect_ExceptCurrent }));
+
+                requiredParametes.Add((QuestionParameterNames.Price, new StepParameter
+                {
+                    Type = StepParameterTypes.NumberSet,
+                    NumberSetValue = new NumberSet()
+                }));
+                break;
+
+            default:
+                break;
+        }
+
+        foreach (var parameter in question.Parameters.ToArray())
+        {
+            if (parameter.Key == QuestionParameterNames.Question || parameter.Key == QuestionParameterNames.Answer)
+            {
+                continue;
+            }
+
+            var existingParameter = requiredParametes.FirstOrDefault(p => p.Item1 == parameter.Key);
+
+            if (existingParameter.Item2 != null)
+            {
+                requiredParametes.Remove(existingParameter);
+            }
+            else
+            {
+                question.Parameters.Remove(parameter);
+            }
+        }
+
+        foreach (var parameter in requiredParametes)
+        {
+            question.Parameters.Insert(0, new KeyValuePair<string, StepParameterViewModel>(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
+        }
+
+        change.Commit();
     }
 
     private void Object_PropertyValueChanged(object? sender, PropertyChangedEventArgs e)
@@ -777,7 +856,7 @@ public sealed class QDocument : WorkspaceViewModel
                     typeName == QuestionTypes.Simple ||
                     typeName == QuestionTypes.Sponsored)
                 {
-                    while (questionType.Params.Count > 0) // Очистим по одному, чтобы иметь возможность отката (Undo reset не работает)
+                    while (questionType.Params.Count > 0) // Delete one be one to support undo operation (Undo reset does not work)
                     {
                         questionType.Params.RemoveAt(0);
                     }
@@ -883,18 +962,53 @@ public sealed class QDocument : WorkspaceViewModel
                                         atom.PropertyChanged += Object_PropertyValueChanged;
                                     }
 
+                                    if (questionViewModel.Parameters != null)
+                                    {
+                                        questionViewModel.Parameters.CollectionChanged += Object_CollectionChanged;
+
+                                        foreach (var parameter in questionViewModel.Parameters)
+                                        {
+                                            parameter.Value.PropertyChanged += Object_PropertyValueChanged;
+                                            parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
+
+                                            if (parameter.Value.ContentValue != null)
+                                            {
+                                                parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
+
+                                                foreach (var contentItem in parameter.Value.ContentValue)
+                                                {
+                                                    contentItem.PropertyChanged += Object_PropertyValueChanged;
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     questionViewModel.Right.CollectionChanged += Object_CollectionChanged;
                                     questionViewModel.Wrong.CollectionChanged += Object_CollectionChanged;
+
+                                    questionViewModel.TypeNameChanged += Question_TypeNameChanged;
                                 }
                             }
                         }
                     }
-                    else
+                    else if (item is QuestionTypeViewModel type)
                     {
-                        if (item is QuestionTypeViewModel type)
+                        type.PropertyChanged += Object_PropertyValueChanged;
+                        type.Params.CollectionChanged += Object_CollectionChanged;
+                    }
+                    else if (item is KeyValuePair<string, StepParameterViewModel> parameter)
+                    {
+                        parameter.Value.PropertyChanged += Object_PropertyValueChanged;
+                        parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
+
+                        if (parameter.Value.ContentValue != null)
                         {
-                            type.PropertyChanged += Object_PropertyValueChanged;
-                            type.Params.CollectionChanged += Object_CollectionChanged;
+                            parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
+
+                            foreach (var contentItem in parameter.Value.ContentValue)
+                            {
+                                contentItem.PropertyChanged += Object_PropertyValueChanged;
+                            }
                         }
                     }
                 }
@@ -943,18 +1057,53 @@ public sealed class QDocument : WorkspaceViewModel
                                         atom.PropertyChanged -= Object_PropertyValueChanged;
                                     }
 
+                                    if (questionViewModel.Parameters != null)
+                                    {
+                                        questionViewModel.Parameters.CollectionChanged -= Object_CollectionChanged;
+
+                                        foreach (var parameter in questionViewModel.Parameters)
+                                        {
+                                            parameter.Value.PropertyChanged -= Object_PropertyValueChanged;
+                                            parameter.Value.Model.PropertyChanged -= Object_PropertyValueChanged;
+
+                                            if (parameter.Value.ContentValue != null)
+                                            {
+                                                parameter.Value.ContentValue.CollectionChanged -= Object_CollectionChanged;
+
+                                                foreach (var contentItem in parameter.Value.ContentValue)
+                                                {
+                                                    contentItem.PropertyChanged -= Object_PropertyValueChanged;
+                                                }
+                                            }
+                                        }
+                                    }
+
                                     questionViewModel.Right.CollectionChanged -= Object_CollectionChanged;
                                     questionViewModel.Wrong.CollectionChanged -= Object_CollectionChanged;
+
+                                    questionViewModel.TypeNameChanged -= Question_TypeNameChanged;
                                 }
                             }
                         }
                     }
-                    else
+                    else if (item is QuestionTypeViewModel type)
                     {
-                        if (item is QuestionTypeViewModel type)
+                        type.PropertyChanged -= Object_PropertyValueChanged;
+                        type.Params.CollectionChanged -= Object_CollectionChanged;
+                    }
+                    else if (item is KeyValuePair<string, StepParameterViewModel> parameter)
+                    {
+                        parameter.Value.PropertyChanged -= Object_PropertyValueChanged;
+                        parameter.Value.Model.PropertyChanged -= Object_PropertyValueChanged;
+
+                        if (parameter.Value.ContentValue != null)
                         {
-                            type.PropertyChanged -= Object_PropertyValueChanged;
-                            type.Params.CollectionChanged -= Object_CollectionChanged;
+                            parameter.Value.ContentValue.CollectionChanged -= Object_CollectionChanged;
+
+                            foreach (var contentItem in parameter.Value.ContentValue)
+                            {
+                                contentItem.PropertyChanged += Object_PropertyValueChanged;
+                            }
                         }
                     }
                 }

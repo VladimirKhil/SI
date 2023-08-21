@@ -8,6 +8,7 @@
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
     d:DesignHeight="300"
@@ -25,32 +26,47 @@
     </UserControl.Resources>
     
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-        <StackPanel Orientation="Vertical" Margin="10,0,0,10" DataContext="{x:Static m:AppSettings.Default}">
+        <StackPanel Orientation="Vertical" Margin="10,0,0,10">
+            <!--<TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
+
+            <ComboBox
+                Margin="0,4,0,0"
+                ItemsSource="{Binding Languages}"
+                SelectedItem="{Binding Model.Language}"
+                HorizontalAlignment="Left"
+                Width="200">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type sys:String}">
+                        <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>-->
+
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BasicSettings}" />
             
             <CheckBox
                 Content="{x:Static lp:Resources.InstallUpdates}"
                 ToolTip="{x:Static lp:Resources.InstallUpdatesHint}"
-                IsChecked="{Binding SearchForUpdates}" />
+                IsChecked="{Binding Model.SearchForUpdates}" />
 
-            <CheckBox Content="{x:Static lp:Resources.AutoDetectTemplateWhenImportingText}" IsChecked="{Binding AutomaticTextImport}" />
+            <CheckBox Content="{x:Static lp:Resources.AutoDetectTemplateWhenImportingText}" IsChecked="{Binding Model.AutomaticTextImport}" />
             
             <CheckBox
                 Content="{x:Static lp:Resources.UpdatePricesOnDragAndDrop}"
                 ToolTip="{x:Static lp:Resources.UpdatePricesOnDragAndDropHint}"
-                IsChecked="{Binding ChangePriceOnMove}" />
+                IsChecked="{Binding Model.ChangePriceOnMove}" />
 
-            <CheckBox Content="{x:Static lp:Resources.Create5QuestionsWithTheme}" IsChecked="{Binding CreateQuestionsWithTheme}" />
-            <CheckBox Content="Показывать всплывающие подсказки в плиточном отображении" IsChecked="{Binding ShowToolTips}" />
-            <CheckBox Content="Автосохранение (требуется перезапуск приложения)" IsChecked="{Binding AutoSave}" />
-            <CheckBox Content="Выровнять ответы по правому краю окна в древовидном отображении" IsChecked="{Binding AlightAnswersRight}" />
-            <CheckBox Content="Проверка правописания (Windows 8.1 и выше)" IsChecked="{Binding SpellChecking}" IsEnabled="{Binding DataContext.SpellCheckingEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}" />
-            <CheckBox Content="Удалять мультимедиа из пакета при удалении последней ссылки на него" IsChecked="{Binding RemoveLinks}" />
-            <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding CheckFileSize}" />
+            <CheckBox Content="{x:Static lp:Resources.Create5QuestionsWithTheme}" IsChecked="{Binding Model.CreateQuestionsWithTheme}" />
+            <CheckBox Content="{x:Static lp:Resources.ShowToolTipsInFlatView}" IsChecked="{Binding Model.ShowToolTips}" />
+            <CheckBox Content="{x:Static lp:Resources.AutoSave}" IsChecked="{Binding Model.AutoSave}" />
+            <CheckBox Content="{x:Static lp:Resources.AlignAnswersRight}" IsChecked="{Binding Model.AlightAnswersRight}" />
+            <CheckBox Content="{x:Static lp:Resources.SpellChecking}" IsChecked="{Binding Model.SpellChecking}" IsEnabled="{Binding SpellCheckingEnabled}" />
+            <CheckBox Content="{x:Static lp:Resources.RemoveUnusedMedia}" IsChecked="{Binding Model.RemoveLinks}" />
+            <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AutoSetQuestionPrices}" />
-            
-            <ItemsControl Margin="0,4,0,0" DataContext="{Binding CostSetters}" ItemsSource="{Binding}">
+
+            <ItemsControl Margin="0,4,0,0" DataContext="{Binding Model.CostSetters}" ItemsSource="{Binding}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
@@ -64,7 +80,7 @@
                                 Margin="4,0,0,0"
                                 Command="{Binding CostSetters.DeleteItem, Source={x:Static m:AppSettings.Default}}"
                                 CommandParameter="{Binding}"
-                                ToolTip="Удалить"
+                                ToolTip="{x:Static lp:Resources.Delete}"
                                 Width="20"
                                 Height="20">
                                 <Path Data="M0,0L1,1M0,1L1,0" Stroke="Black" Stretch="Fill" Margin="3" />
@@ -75,7 +91,7 @@
             </ItemsControl>
             
             <Button
-                DataContext="{Binding CostSetters}"
+                DataContext="{Binding Model.CostSetters}"
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 Margin="0,4,0,0"
                 HorizontalAlignment="Left"
@@ -86,20 +102,20 @@
             </Button>
             
             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                <TextBlock VerticalAlignment="Center"><Run Text="Базовая стоимость вопроса"/></TextBlock>
-                <l:NumericTextBox Margin="5,0" Padding="0,1" x:Name="tbQuestionBase" Width="50" Text="{Binding QuestionBase, Mode=TwoWay}" />
+                <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.BaseQuestionPrice}" /></TextBlock>
+                <l:NumericTextBox Margin="5,0" Padding="0,1" x:Name="tbQuestionBase" Width="50" Text="{Binding Model.QuestionBase, Mode=TwoWay}" />
             </StackPanel>
             
-            <TextBlock Style="{StaticResource Header}" Text="Шрифт документа" />
+            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.DocumentFont}" />
             
             <ComboBox
                 Margin="0,4,0,0"
                 HorizontalAlignment="Left"
                 Width="200"
                 ItemsSource="{Binding DataContext.Fonts, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                SelectedItem="{Binding FontFamily}" />
-            
-            <TextBlock Margin="0,10,0,0" Text="Размер" />
+                SelectedItem="{Binding Model.FontFamily}" />
+
+            <TextBlock Margin="0,10,0,0" Text="{x:Static lp:Resources.Size}" />
             
             <l:NumericTextBox
                 Margin="0,4,0,0"
@@ -108,12 +124,12 @@
                 HorizontalAlignment="Left"
                 Minimum="1"
                 Maximum="50"
-                Text="{Binding FontSize}" />
+                Text="{Binding Model.FontSize}" />
             
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FlatLayoutModeHeader}" />
             
             <ToggleButton
-                IsChecked="{Binding FlatLayoutMode, Converter={StaticResource FlatLayoutModeConverter}}"
+                IsChecked="{Binding Model.FlatLayoutMode, Converter={StaticResource FlatLayoutModeConverter}}"
                 HorizontalAlignment="Left"
                 Margin="0,5"
                 Width="150"
@@ -121,6 +137,7 @@
                 <ToggleButton.Style>
                     <Style TargetType="ToggleButton">
                         <Setter Property="Content" Value="{x:Static lp:Resources.Table}" />
+                        
                         <Style.Triggers>
                             <Trigger Property="IsChecked" Value="False">
                                 <Setter Property="Content" Value="{x:Static lp:Resources.List}" />
@@ -129,14 +146,13 @@
                     </Style>
                 </ToggleButton.Style>
             </ToggleButton>
-            
+
             <Button
                 Margin="0,30,0,0"
-                Command="{Binding DataContext.Reset, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Command="{Binding Reset}"
                 HorizontalAlignment="Left"
-                Padding="20,4">
-                По умолчанию
-            </Button>
+                Padding="20,4"
+                Content="{x:Static lp:Resources.ByDefault}" />
         </StackPanel>
     </ScrollViewer>
 </UserControl>

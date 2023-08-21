@@ -51,7 +51,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     public string TypeName
     {
         get => _typeName;
-        set { var oldValue = _typeName; if (oldValue != value) { _typeName = value; OnPropertyChanged(oldValue); } }
+        set { _typeName = value; }
     }
 
     /// <summary>

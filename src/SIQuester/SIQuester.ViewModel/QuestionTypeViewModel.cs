@@ -2,6 +2,7 @@
 using SIPackages.Core;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel;
@@ -72,7 +73,7 @@ public sealed class QuestionTypeViewModel : ModelViewBase
         }
     }
 
-    private void Model_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(QuestionType.Name))
         {

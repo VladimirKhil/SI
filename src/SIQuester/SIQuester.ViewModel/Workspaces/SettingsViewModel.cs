@@ -18,6 +18,10 @@ public sealed class SettingsViewModel : WorkspaceViewModel
 
     public bool SpellCheckingEnabled => Environment.OSVersion.Version > new Version(6, 2);
 
+    public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
+
+    public AppSettings Model => AppSettings.Default;
+
     public SettingsViewModel() => Reset = new SimpleCommand(Reset_Executed);
 
     private void Reset_Executed(object? arg) => AppSettings.Default.Reset();
