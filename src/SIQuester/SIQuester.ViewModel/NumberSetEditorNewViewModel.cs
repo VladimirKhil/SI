@@ -8,6 +8,8 @@ namespace SIQuester.ViewModel;
 /// </summary>
 public sealed class NumberSetEditorNewViewModel : ModelViewBase
 {
+    private readonly NumberSet _model;
+
     private NumberSetMode _mode = NumberSetMode.FixedValue;
 
     public NumberSetMode Mode
@@ -17,28 +19,12 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
         {
             if (_mode != value)
             {
+                var oldValue = _mode;
                 _mode = value;
-                OnPropertyChanged();
+                OnPropertyChanged(oldValue);
             }
         }
     }
-
-    private bool _useStep = false;
-
-    public bool UseStep
-    {
-        get => _useStep;
-        set
-        {
-            if (_useStep != value)
-            {
-                _useStep = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private readonly NumberSet _model;
 
     public int Minimum
     {
@@ -47,8 +33,9 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
         {
             if (_model.Minimum != value)
             {
+                var oldValue = _model.Minimum;
                 _model.Minimum = value;
-                OnPropertyChanged();
+                OnPropertyChanged(oldValue);
             }
         }
     }
@@ -60,8 +47,9 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
         {
             if (_model.Maximum != value)
             {
+                var oldValue = _model.Maximum;
                 _model.Maximum = value;
-                OnPropertyChanged();
+                OnPropertyChanged(oldValue);
             }
         }
     }
@@ -73,8 +61,14 @@ public sealed class NumberSetEditorNewViewModel : ModelViewBase
         {
             if (_model.Step != value)
             {
-                _model.Step = value;
-                OnPropertyChanged();
+                var oldValue = _model.Step;
+                
+                if (value >= 0)
+                {
+                    _model.Step = value;
+                }
+
+                OnPropertyChanged(oldValue);
             }
         }
     }

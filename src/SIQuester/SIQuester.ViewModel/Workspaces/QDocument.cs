@@ -710,8 +710,12 @@ public sealed class QDocument : WorkspaceViewModel
 
                                 foreach (var item in parameter.Value.ContentValue)
                                 {
-                                    item.PropertyChanged += Object_PropertyValueChanged;
+                                    item.Model.PropertyChanged += Object_PropertyValueChanged;
                                 }
+                            }
+                            else if (parameter.Value.NumberSetValue != null)
+                            {
+                                parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
                             }
                         }
                     }
@@ -814,15 +818,66 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        if (e.PropertyName == nameof(Question.Price) || e.PropertyName == nameof(Atom.AtomTime))
+        if (e is ExtendedPropertyChangedEventArgs<int> extNumber)
         {
-            var ext = (ExtendedPropertyChangedEventArgs<int>)e;
+            OperationsManager.AddChange(new SimplePropertyValueChange
+            {
+                Element = sender,
+                PropertyName = e.PropertyName,
+                Value = extNumber.OldValue
+            });
+        }
+        else if (e is ExtendedPropertyChangedEventArgs<NumberSetMode> extNumberSet)
+        {
+            var numberSetViewModel = (NumberSetEditorNewViewModel)sender;
+
+            using var change = OperationsManager.BeginComplexChange();
 
             OperationsManager.AddChange(new SimplePropertyValueChange
             {
                 Element = sender,
                 PropertyName = e.PropertyName,
-                Value = ext.OldValue
+                Value = extNumberSet.OldValue
+            });
+
+            switch (numberSetViewModel.Mode)
+            {
+                case NumberSetMode.FixedValue:
+                    numberSetViewModel.Maximum = numberSetViewModel.Minimum;
+                    break;
+
+                case NumberSetMode.MinimumOrMaximumInRound:
+                    numberSetViewModel.Maximum = numberSetViewModel.Minimum = 0;
+                    break;
+
+                case NumberSetMode.Range:
+                    break;
+
+                case NumberSetMode.RangeWithStep:
+                    break;
+
+                default:
+                    break;
+            }
+
+            change.Commit();
+        }
+        else if (e is ExtendedPropertyChangedEventArgs<TimeSpan> extTimeSpan)
+        {
+            OperationsManager.AddChange(new SimplePropertyValueChange
+            {
+                Element = sender,
+                PropertyName = e.PropertyName,
+                Value = extTimeSpan.OldValue
+            });
+        }
+        else if (e is ExtendedPropertyChangedEventArgs<bool> extBool)
+        {
+            OperationsManager.AddChange(new SimplePropertyValueChange
+            {
+                Element = sender,
+                PropertyName = e.PropertyName,
+                Value = extBool.OldValue
             });
         }
         else
@@ -977,8 +1032,12 @@ public sealed class QDocument : WorkspaceViewModel
 
                                                 foreach (var contentItem in parameter.Value.ContentValue)
                                                 {
-                                                    contentItem.PropertyChanged += Object_PropertyValueChanged;
+                                                    contentItem.Model.PropertyChanged += Object_PropertyValueChanged;
                                                 }
+                                            }
+                                            else if (parameter.Value.NumberSetValue != null)
+                                            {
+                                                parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
                                             }
                                         }
                                     }
@@ -1007,8 +1066,12 @@ public sealed class QDocument : WorkspaceViewModel
 
                             foreach (var contentItem in parameter.Value.ContentValue)
                             {
-                                contentItem.PropertyChanged += Object_PropertyValueChanged;
+                                contentItem.Model.PropertyChanged += Object_PropertyValueChanged;
                             }
+                        }
+                        else if (parameter.Value.NumberSetValue != null)
+                        {
+                            parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
                         }
                     }
                 }
@@ -1072,8 +1135,12 @@ public sealed class QDocument : WorkspaceViewModel
 
                                                 foreach (var contentItem in parameter.Value.ContentValue)
                                                 {
-                                                    contentItem.PropertyChanged -= Object_PropertyValueChanged;
+                                                    contentItem.Model.PropertyChanged -= Object_PropertyValueChanged;
                                                 }
+                                            }
+                                            else if (parameter.Value.NumberSetValue != null)
+                                            {
+                                                parameter.Value.NumberSetValue.PropertyChanged -= Object_PropertyValueChanged;
                                             }
                                         }
                                     }
@@ -1102,8 +1169,12 @@ public sealed class QDocument : WorkspaceViewModel
 
                             foreach (var contentItem in parameter.Value.ContentValue)
                             {
-                                contentItem.PropertyChanged += Object_PropertyValueChanged;
+                                contentItem.Model.PropertyChanged -= Object_PropertyValueChanged;
                             }
+                        }
+                        else if (parameter.Value.NumberSetValue != null)
+                        {
+                            parameter.Value.NumberSetValue.PropertyChanged -= Object_PropertyValueChanged;
                         }
                     }
                 }
@@ -3478,7 +3549,12 @@ public sealed class QDocument : WorkspaceViewModel
         var unusedAudio = audio.Except(usedAudio);
         var unusedVideo = video.Except(usedVideo);
 
-        var unusedFiles = unusedImages.Union(unusedAudio).Union(unusedVideo);
+        var unusedFiles = unusedImages.Union(unusedAudio).Union(unusedVideo).ToArray();
+
+        if (unusedFiles.Length == 0)
+        {
+            return;
+        }
 
         if (!PlatformManager.Instance.ConfirmExclWithWindow($"{Resources.ConfirmFilesRemoval}: {string.Join(", ", unusedFiles)}?"))
         {

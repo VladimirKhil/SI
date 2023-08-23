@@ -4,14 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lvmm="clr-namespace:SIQuester.ViewModel.Model;assembly=SIQuester.ViewModel"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="300"
-    d:DesignWidth="300">
+    d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance lvm:ImportDBStorageViewModel}">
     
     <UserControl.Resources>
         <HierarchicalDataTemplate DataType="{x:Type lvmm:DBNode}" ItemsSource="{Binding Children}">
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Text="{Binding Name}" Padding="5,3" />
         </HierarchicalDataTemplate>
     </UserControl.Resources>
     
@@ -22,8 +25,8 @@
         </Grid.RowDefinitions>
         
         <StackPanel Orientation="Horizontal">
-            <Button Padding="30,1" Click="Button_Click">Импорт</Button>
-            
+            <Button Padding="30,1" Click="Button_Click" Content="{x:Static lp:Resources.Import}" />
+
             <ProgressBar
                 IsIndeterminate="True"
                 Margin="10,0,0,0"

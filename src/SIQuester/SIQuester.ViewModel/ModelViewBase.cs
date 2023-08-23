@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SIPackages.Core;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
@@ -28,6 +29,14 @@ public abstract class ModelViewBase : INotifyPropertyChanged, IDisposable
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     protected void OnPropertyChanged(PropertyChangedEventArgs e) => PropertyChanged?.Invoke(this, e);
+
+    /// <summary>
+    /// Raises object property change event.
+    /// </summary>
+    /// <param name="oldValue">Old property value.</param>
+    /// <param name="propertyName">Changed property name.</param>
+    protected void OnPropertyChanged<T>(T oldValue, [CallerMemberName] string? propertyName = null) =>
+        PropertyChanged?.Invoke(this, new ExtendedPropertyChangedEventArgs<T>(propertyName, oldValue));
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

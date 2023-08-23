@@ -1733,6 +1733,22 @@
                                                         Command="{Binding SetTime}"
                                                         Style="{StaticResource MenuButton}" />
 
+                                                    <Button Command="{Binding JoinWithNext}">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource MenuButton}">
+                                                                <Setter Property="Content" Value="{StaticResource JoinWithNextImage}" />
+                                                                <Setter Property="ToolTip" Value="{x:Static lp:Resources.JoinWithNext}" />
+
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding CurrentItem.Model.WaitForFinish}" Value="False">
+                                                                        <Setter Property="Content" Value="{StaticResource JoinWithNextActiveImage}" />
+                                                                        <Setter Property="ToolTip" Value="{x:Static lp:Resources.UnlinkFromNext}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                    </Button>
+
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.CollapseMedia}"
                                                         Content="{StaticResource CollapseMediaImage}"
@@ -2099,6 +2115,7 @@
                         MinWidth="90"
                         ItemsSource="{Binding DataContext.StorageContext.Publishers, RelativeSource={RelativeSource AncestorType=TreeView}}"
                         Text="{Binding Model.Publisher}"
+                        VerticalContentAlignment="Center"
                         IsEditable="True" />
                 </DockPanel>
             </DataTemplate>
@@ -2289,54 +2306,52 @@
                         <ColumnDefinition MaxWidth="110" />
                         <ColumnDefinition />
                         <ColumnDefinition />
-                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    
+
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
                         <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     
-                    <ContentControl Grid.RowSpan="2" Style="{StaticResource LogoStyle}" Content="{Binding}" />
+                    <ContentControl Grid.RowSpan="5" Style="{StaticResource LogoStyle}" Content="{Binding}" />
                     
                     <TextBox
                         Grid.Column="1"
                         Grid.ColumnSpan="2"
                         FontSize="{Binding (TextBlock.FontSize), RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource Multiplier}, ConverterParameter=1.4}"
                         Style="{StaticResource LightTextBox}"
-                        Text="{Binding Model.Name}" />
+                        Text="{Binding Model.Name}"
+                        Padding="0,2" />
 
-                    <StackPanel Grid.Column="1" Grid.Row="2">
-                        <DockPanel>
-                            <TextBlock
-                                Text="{x:Static lp:Resources.CreationDate}"
-                                Style="{StaticResource BlockStyleKey}"
-                                VerticalAlignment="Center"
-                                Width="150"
-                                Height="25"
-                                Padding="0,2,0,0" />
-                            
-                            <TextBox
-                                siq:ActivateManager.IsWatching="True"
-                                Style="{StaticResource LightTextBox}"
-                                MinWidth="90"
-                                Text="{Binding Model.Date}" />
-                        </DockPanel>
-                        
-                        <ContentControl ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
-                        <ContentControl Content="{Binding Info}" />
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="2" Grid.Row="2" Margin="15,0,0,0">
-                        <ContentControl ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
-                        <ContentControl Style="{StaticResource TagsStyle}" Content="{Binding}" />
-                        <ContentControl ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Column="3" Grid.Row="2" Margin="15,0,0,0">
-                        <ContentControl Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />
-                        <ContentControl Style="{StaticResource LanguageStyle}" Content="{Binding}" />
-                    </StackPanel>
+                    <DockPanel Grid.Column="1" Grid.Row="1">
+                        <TextBlock
+                            Text="{x:Static lp:Resources.CreationDate}"
+                            Style="{StaticResource BlockStyleKey}"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Width="150"
+                            Height="25"
+                            Padding="0,2,0,0" />
+
+                        <TextBox
+                            siq:ActivateManager.IsWatching="True"
+                            Style="{StaticResource LightTextBox}"
+                            MinWidth="90"
+                            Text="{Binding Model.Date}" />
+                    </DockPanel>
+
+                    <ContentControl Grid.Column="1" Grid.Row="2" ContentTemplate="{StaticResource Publisher}" Content="{Binding}" />
+                    <ContentControl Grid.Column="1" Grid.Row="3" Style="{StaticResource TagsStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="1" Grid.Row="4" Style="{StaticResource LanguageStyle}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="1" Margin="15,0,0,0" ContentTemplate="{StaticResource Restrictions}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="2" Margin="15,0,0,0" ContentTemplate="{StaticResource Difficulty}" Content="{Binding}" />
+                    <ContentControl Grid.Column="2" Grid.Row="3" Margin="15,0,0,0" Style="{StaticResource ContactUrlStyle}" Content="{Binding}" />
+
+                    <ContentControl Grid.Row="5" Grid.ColumnSpan="3" Content="{Binding Info}" />
                 </Grid>
             </HierarchicalDataTemplate>
 
@@ -2372,7 +2387,8 @@
                         siq:ActivateManager.IsWatching="True"
                         Style="{StaticResource LightTextBox}"
                         Grid.ColumnSpan="2"
-                        Text="{Binding Model.Name}" />
+                        Text="{Binding Model.Name}"
+                        Padding="0,2" />
                     
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="(" VerticalAlignment="Center" Style="{StaticResource BlockStyleKey}" />
                     
@@ -2466,6 +2482,7 @@
                         siq:ActivateManager.IsWatching="True"
                         Style="{StaticResource LightTextBox}"
                         MinWidth="90"
+                        Padding="0,2"
                         Text="{Binding Model.Name}" />
                     
                     <ContentControl Content="{Binding Info}" KeyboardNavigation.IsTabStop="False" />                    
@@ -2503,7 +2520,6 @@
             </Style>
 
             <siqcv:NumberSetViewModelConverter x:Key="NumberSetViewModelConverter" />
-            <siqcv:NumberSetViewModelNewConverter x:Key="NumberSetViewModelNewConverter" />
 
             <DataTemplate x:Key="QuestionTypeParamTemplate" DataType="vm:QuestionTypeParamViewModel">
                 <DockPanel>
@@ -2720,15 +2736,7 @@
             <siqcv:NotZeroTimeSpanConverter x:Key="NotZeroTimeSpanConverter" />
 
             <ControlTemplate TargetType="ContentControl" x:Key="ContentItemWaitForFinishTemplate">
-                <Image Width="20" Height="20" ToolTip="{x:Static lp:Resources.JoinWithNext}">
-                    <Image.Source>
-                        <DrawingImage>
-                            <DrawingImage.Drawing>
-                                <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_down},Path=Data}" />
-                            </DrawingImage.Drawing>
-                        </DrawingImage>
-                    </Image.Source>
-                </Image>
+                <Image Source="{StaticResource JoinWithNextImage}" Width="20" Height="20" ToolTip="{x:Static lp:Resources.JoinWithNext}" Margin="0,0,5,0" />
             </ControlTemplate>
 
             <Style x:Key="ContentItemWaitForFinishStyle" TargetType="{x:Type ContentControl}">
@@ -3225,7 +3233,7 @@
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
-                        <lv:NumberSetEditor DataContext="{Binding Model.NumberSetValue, Converter={StaticResource NumberSetViewModelNewConverter}}" />
+                        <lv:NumberSetEditor DataContext="{Binding NumberSetValue}" />
                     </DataTemplate>
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>

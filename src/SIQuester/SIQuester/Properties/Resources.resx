@@ -473,7 +473,7 @@
     <value>Параметр задан неверно</value>
   </data>
   <data name="JoinWithNext" xml:space="preserve">
-    <value>Объединить со следующим</value>
+    <value>Объединить со следующим (играть одновременно)</value>
   </data>
   <data name="Language" xml:space="preserve">
     <value>Язык</value>
@@ -795,6 +795,9 @@
   </data>
   <data name="Undo" xml:space="preserve">
     <value>Отменить</value>
+  </data>
+  <data name="UnlinkFromNext" xml:space="preserve">
+    <value>Отсоединить от следующего</value>
   </data>
   <data name="UpdateException" xml:space="preserve">
     <value>При поиске обновления возникла следующая ошибка: {0}</value>

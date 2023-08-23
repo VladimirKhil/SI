@@ -1124,7 +1124,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Объединить со следующим.
+        ///   Ищет локализованную строку, похожую на Объединить со следующим (играть одновременно).
         /// </summary>
         public static string JoinWithNext {
             get {
@@ -2092,6 +2092,15 @@ namespace SIQuester.Properties {
         public static string Undo {
             get {
                 return ResourceManager.GetString("Undo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Отсоединить от следующего.
+        /// </summary>
+        public static string UnlinkFromNext {
+            get {
+                return ResourceManager.GetString("UnlinkFromNext", resourceCulture);
             }
         }
         

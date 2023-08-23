@@ -28,6 +28,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     public SimpleCommand SetTime { get; private set; }
 
+    /// <summary>
+    /// Joins content item with next one to play them together.
+    /// </summary>
+    public SimpleCommand JoinWithNext { get; private set; }
+
     public SimpleCommand CollapseMedia { get; private set; }
 
     public SimpleCommand ExpandMedia { get; private set; }
@@ -54,6 +59,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         ChangePlacement = new SimpleCommand(ChangePlacement_Executed);
 
         SetTime = new SimpleCommand(SetTime_Executed);
+        JoinWithNext = new SimpleCommand(JoinWithNext_Executed);
 
         CollapseMedia = new SimpleCommand(CollapseMedia_Executed);
         ExpandMedia = new SimpleCommand(ExpandMedia_Executed);
@@ -73,7 +79,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             RemoveAt(index);
         }
 
-        QDocument.ActivatedObject = Add(AtomTypes.Oral, "", ContentPlacements.Replic);
+        QDocument.ActivatedObject = Add(AtomTypes.Text, "", ContentPlacements.Replic);
     }
 
     private void ChangePlacement_Executed(object? arg)
@@ -91,11 +97,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
             if (contentItem.Model.Placement == ContentPlacements.Screen)
             {
-                contentItem.Model.Type = ContentPlacements.Replic;
+                contentItem.Model.Placement = ContentPlacements.Replic;
             }
-            else if (contentItem.Model.Type == ContentPlacements.Replic)
+            else if (contentItem.Model.Placement == ContentPlacements.Replic)
             {
-                contentItem.Model.Type = ContentPlacements.Screen;
+                contentItem.Model.Placement = ContentPlacements.Screen;
             }
         }
     }
@@ -211,6 +217,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     {
         QDocument.ActivatedObject = CurrentItem;
         CurrentItem.Model.Duration = TimeSpan.FromSeconds(5);
+    }
+
+    private void JoinWithNext_Executed(object? arg)
+    {
+        CurrentItem.Model.WaitForFinish = !CurrentItem.Model.WaitForFinish;
     }
 
     private void CollapseMedia_Executed(object? arg)

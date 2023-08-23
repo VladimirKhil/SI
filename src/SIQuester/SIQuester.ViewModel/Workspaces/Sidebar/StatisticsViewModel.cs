@@ -248,8 +248,5 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
         }
     }
 
-    private void RemoveUnusedFiles_Executed(object? arg)
-    {
-        _document.RemoveUnusedFiles();
-    }
+    private void RemoveUnusedFiles_Executed(object? arg) => _document.RemoveUnusedFiles();
 }
