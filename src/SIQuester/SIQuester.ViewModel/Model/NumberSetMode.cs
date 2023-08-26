@@ -10,24 +10,24 @@ public enum NumberSetMode
     /// <summary>
     /// Single fixed value.
     /// </summary>
-    [Description("Фиксированное значение")]
+    [Description("NumberSetModeFixedValue")]
     FixedValue,
 
     /// <summary>
     /// Minimum or maximum value in the round.
     /// </summary>
-    [Description("Минимум или максимум в раунде")]
+    [Description("NumberSetModeMinimumOrMaximumInRound")]
     MinimumOrMaximumInRound,
 
     /// <summary>
     /// Range value.
     /// </summary>
-    [Description("Выбор")]
+    [Description("NumberSetModeRange")]
     Range,
 
     /// <summary>
     /// Range value.
     /// </summary>
-    [Description("Выбор с шагом")]
+    [Description("NumberSetModeRangeWithStep")]
     RangeWithStep,
 }

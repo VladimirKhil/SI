@@ -214,6 +214,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Дополнительно.
+        /// </summary>
+        public static string Advanced {
+            get {
+                return ResourceManager.GetString("Advanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Выровнять ответы по правому краю окна в древовидном отображении.
         /// </summary>
         public static string AlignAnswersRight {
@@ -453,6 +462,15 @@ namespace SIQuester.Properties {
         public static string BindingDetachedError {
             get {
                 return ResourceManager.GetString("BindingDetachedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Содержимое внутри скобок вынести в комментарий.
+        /// </summary>
+        public static string BracketsContentToComment {
+            get {
+                return ResourceManager.GetString("BracketsContentToComment", resourceCulture);
             }
         }
         
@@ -763,6 +781,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Точечная выборка.
+        /// </summary>
+        public static string CustomThemes {
+            get {
+                return ResourceManager.GetString("CustomThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Вырезать.
         /// </summary>
         public static string Cut {
@@ -808,6 +835,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на A и B =&gt; A и B + B и A.
+        /// </summary>
+        public static string DuplicateAnd {
+            get {
+                return ResourceManager.GetString("DuplicateAnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Длительность.
         /// </summary>
         public static string Duration {
@@ -822,6 +858,42 @@ namespace SIQuester.Properties {
         public static string Edit {
             get {
                 return ResourceManager.GetString("Edit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Способ редактирования.
+        /// </summary>
+        public static string EditMode {
+            get {
+                return ResourceManager.GetString("EditMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Фиксированная панель.
+        /// </summary>
+        public static string EditModeFixedPanel {
+            get {
+                return ResourceManager.GetString("EditModeFixedPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Плавающая панель.
+        /// </summary>
+        public static string EditModeFloatPanel {
+            get {
+                return ResourceManager.GetString("EditModeFloatPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Только чтение.
+        /// </summary>
+        public static string EditModeNone {
+            get {
+                return ResourceManager.GetString("EditModeNone", resourceCulture);
             }
         }
         
@@ -898,11 +970,56 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на База вопросов.
+        /// </summary>
+        public static string ExportFormatsDb {
+            get {
+                return ResourceManager.GetString("ExportFormatsDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Динабанк.
+        /// </summary>
+        public static string ExportFormatsDinabank {
+            get {
+                return ResourceManager.GetString("ExportFormatsDinabank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на СНС.
+        /// </summary>
+        public static string ExportFormatsSns {
+            get {
+                return ResourceManager.GetString("ExportFormatsSns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Телевизионный аналог SIGame.
+        /// </summary>
+        public static string ExportFormatsTvSI {
+            get {
+                return ResourceManager.GetString("ExportFormatsTvSI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Выгрузить медиа….
         /// </summary>
         public static string ExportMediaCommand {
             get {
                 return ResourceManager.GetString("ExportMediaCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл {0} существует, заменить?.
+        /// </summary>
+        public static string FileExistReplace {
+            get {
+                return ResourceManager.GetString("FileExistReplace", resourceCulture);
             }
         }
         
@@ -957,6 +1074,24 @@ namespace SIQuester.Properties {
         public static string FlatLayoutModeHeader {
             get {
                 return ResourceManager.GetString("FlatLayoutModeHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Список.
+        /// </summary>
+        public static string FlatLayoutModeList {
+            get {
+                return ResourceManager.GetString("FlatLayoutModeList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Таблица.
+        /// </summary>
+        public static string FlatLayoutModeTable {
+            get {
+                return ResourceManager.GetString("FlatLayoutModeTable", resourceCulture);
             }
         }
         
@@ -1142,6 +1277,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Последнее слово в новый ответ.
+        /// </summary>
+        public static string LastWordToNewAnswer {
+            get {
+                return ResourceManager.GetString("LastWordToNewAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Лицензии.
         /// </summary>
         public static string Licences {
@@ -1277,6 +1421,42 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Фиксированное значение.
+        /// </summary>
+        public static string NumberSetModeFixedValue {
+            get {
+                return ResourceManager.GetString("NumberSetModeFixedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Минимум или максимум в раунде.
+        /// </summary>
+        public static string NumberSetModeMinimumOrMaximumInRound {
+            get {
+                return ResourceManager.GetString("NumberSetModeMinimumOrMaximumInRound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбор.
+        /// </summary>
+        public static string NumberSetModeRange {
+            get {
+                return ResourceManager.GetString("NumberSetModeRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбор с шагом.
+        /// </summary>
+        public static string NumberSetModeRangeWithStep {
+            get {
+                return ResourceManager.GetString("NumberSetModeRangeWithStep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Объект.
         /// </summary>
         public static string Object {
@@ -1304,11 +1484,38 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Открыть… (Ctrl+O).
+        /// </summary>
+        public static string Open {
+            get {
+                return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Несоответствие числа открывающих и закрывающих скобок.
         /// </summary>
         public static string OpenCloseBracketsIncosistency {
             get {
                 return ResourceManager.GetString("OpenCloseBracketsIncosistency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Открыть файл после сохранения.
+        /// </summary>
+        public static string OpenFileAfterSaving {
+            get {
+                return ResourceManager.GetString("OpenFileAfterSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Открыть пакет.
+        /// </summary>
+        public static string OpenPackage {
+            get {
+                return ResourceManager.GetString("OpenPackage", resourceCulture);
             }
         }
         
@@ -1331,11 +1538,65 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на в строку.
+        /// </summary>
+        public static string OrientationHorizontal {
+            get {
+                return ResourceManager.GetString("OrientationHorizontal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на в столбец.
+        /// </summary>
+        public static string OrientationVertical {
+            get {
+                return ResourceManager.GetString("OrientationVertical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Автор пакета.
         /// </summary>
         public static string PackageAuthor {
             get {
                 return ResourceManager.GetString("PackageAuthor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Такой же пакет, как и в Телевизионном аналоге SIGame.
+        /// </summary>
+        public static string PackageClassicDescription {
+            get {
+                return ResourceManager.GetString("PackageClassicDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Стандартный пакет для SIGame.
+        /// </summary>
+        public static string PackageClassicName {
+            get {
+                return ResourceManager.GetString("PackageClassicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет, изначально ничего не содержащий.
+        /// </summary>
+        public static string PackageEmptyDescription {
+            get {
+                return ResourceManager.GetString("PackageEmptyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пустой пакет.
+        /// </summary>
+        public static string PackageEmptyName {
+            get {
+                return ResourceManager.GetString("PackageEmptyName", resourceCulture);
             }
         }
         
@@ -1354,6 +1615,42 @@ namespace SIQuester.Properties {
         public static string PackageName {
             get {
                 return ResourceManager.GetString("PackageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame.
+        /// </summary>
+        public static string PackageSpecialDescription {
+            get {
+                return ResourceManager.GetString("PackageSpecialDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нестандартный пакет.
+        /// </summary>
+        public static string PackageSpecialName {
+            get {
+                return ResourceManager.GetString("PackageSpecialName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Просто набор тем.
+        /// </summary>
+        public static string PackageThemesCollectionDescription {
+            get {
+                return ResourceManager.GetString("PackageThemesCollectionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Коллекция тем.
+        /// </summary>
+        public static string PackageThemesCollectionName {
+            get {
+                return ResourceManager.GetString("PackageThemesCollectionName", resourceCulture);
             }
         }
         
@@ -1399,6 +1696,15 @@ namespace SIQuester.Properties {
         public static string Price {
             get {
                 return ResourceManager.GetString("Price", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Печать....
+        /// </summary>
+        public static string Print {
+            get {
+                return ResourceManager.GetString("Print", resourceCulture);
             }
         }
         
@@ -1471,6 +1777,15 @@ namespace SIQuester.Properties {
         public static string QuestionType {
             get {
                 return ResourceManager.GetString("QuestionType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Интервал.
+        /// </summary>
+        public static string Range {
+            get {
+                return ResourceManager.GetString("Range", resourceCulture);
             }
         }
         
@@ -1592,6 +1907,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Резерв.
+        /// </summary>
+        public static string Reserve {
+            get {
+                return ResourceManager.GetString("Reserve", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ограничение.
         /// </summary>
         public static string Restriction {
@@ -1678,6 +2002,69 @@ namespace SIQuester.Properties {
         public static string SearchText {
             get {
                 return ResourceManager.GetString("SearchText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопрос можно оставить себе.
+        /// </summary>
+        public static string SecretCanBeGivenToSelf {
+            get {
+                return ResourceManager.GetString("SecretCanBeGivenToSelf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сумма начисляется без вопроса.
+        /// </summary>
+        public static string SecretNoQuestion {
+            get {
+                return ResourceManager.GetString("SecretNoQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Тема и стоимость оглашаются до передачи.
+        /// </summary>
+        public static string SecretPublicPrice {
+            get {
+                return ResourceManager.GetString("SecretPublicPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбрать.
+        /// </summary>
+        public static string Select {
+            get {
+                return ResourceManager.GetString("Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый ответ.
+        /// </summary>
+        public static string SelectedToNewAnswer {
+            get {
+                return ResourceManager.GetString("SelectedToNewAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый комментарий.
+        /// </summary>
+        public static string SelectedToNewComment {
+            get {
+                return ResourceManager.GetString("SelectedToNewComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выделенное -&gt; Новый источник.
+        /// </summary>
+        public static string SelectedToNewSource {
+            get {
+                return ResourceManager.GetString("SelectedToNewSource", resourceCulture);
             }
         }
         
@@ -1822,6 +2209,24 @@ namespace SIQuester.Properties {
         public static string ShuffleQuestions {
             get {
                 return ResourceManager.GetString("ShuffleQuestions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Боковая панель.
+        /// </summary>
+        public static string SidePanel {
+            get {
+                return ResourceManager.GetString("SidePanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопросы СИ.
+        /// </summary>
+        public static string SIQuestions {
+            get {
+                return ResourceManager.GetString("SIQuestions", resourceCulture);
             }
         }
         
@@ -2078,6 +2483,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Всего тем:.
+        /// </summary>
+        public static string TotalThemes {
+            get {
+                return ResourceManager.GetString("TotalThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Тур.
         /// </summary>
         public static string Tour {
@@ -2132,6 +2546,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Версия.
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Видео.
         /// </summary>
         public static string Video {
@@ -2146,6 +2569,24 @@ namespace SIQuester.Properties {
         public static string View {
             get {
                 return ResourceManager.GetString("View", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Плитки.
+        /// </summary>
+        public static string ViewModeFlat {
+            get {
+                return ResourceManager.GetString("ViewModeFlat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Дерево.
+        /// </summary>
+        public static string ViewModeTree {
+            get {
+                return ResourceManager.GetString("ViewModeTree", resourceCulture);
             }
         }
         

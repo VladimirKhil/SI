@@ -118,871 +118,867 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="About" xml:space="preserve">
-    <value>О программе…</value>
+    <value>About the program…</value>
   </data>
   <data name="Accept" xml:space="preserve">
-    <value>Зачёт</value>
+    <value>Credit</value>
   </data>
   <data name="Actions" xml:space="preserve">
-    <value>Действия</value>
+    <value>Actions</value>
   </data>
   <data name="Add" xml:space="preserve">
-    <value>Добавить</value>
+    <value>Add</value>
   </data>
   <data name="AddAnswer" xml:space="preserve">
-    <value>Добавить ответ</value>
+    <value>Add answer</value>
   </data>
   <data name="AddAudio" xml:space="preserve">
-    <value>Добавить аудио</value>
+    <value>Add audio</value>
   </data>
   <data name="AddComplexAnswer" xml:space="preserve">
-    <value>Добавить сложный ответ</value>
+    <value>Add complex answer</value>
   </data>
   <data name="AddEmptyQuestion" xml:space="preserve">
-    <value>Добавить пустой вопрос</value>
+    <value>Add empty question</value>
   </data>
   <data name="AddHtml" xml:space="preserve">
-    <value>Добавить HTML</value>
+    <value>Add HTML</value>
   </data>
   <data name="AddImage" xml:space="preserve">
-    <value>Добавить изображение</value>
+    <value>Add image</value>
   </data>
   <data name="AddOral" xml:space="preserve">
-    <value>Добавить устный текст</value>
+    <value>Add oral text</value>
   </data>
   <data name="AddParameter" xml:space="preserve">
-    <value>Добавить параметр</value>
+    <value>Add parameter</value>
   </data>
   <data name="AddQuestion" xml:space="preserve">
-    <value>Добавить вопрос (Insert)</value>
+    <value>Add question (Insert)</value>
   </data>
   <data name="AddRound" xml:space="preserve">
-    <value>Добавить раунд (Insert)</value>
+    <value>Add round (Insert)</value>
   </data>
   <data name="AddText" xml:space="preserve">
-    <value>Добавить текст</value>
+    <value>Add text</value>
   </data>
   <data name="AddTheme" xml:space="preserve">
-    <value>Добавить тему (Insert)</value>
+    <value>Add topic (Insert)</value>
   </data>
   <data name="AddVideo" xml:space="preserve">
-    <value>Добавить видео</value>
+    <value>Add video</value>
   </data>
   <data name="Advanced" xml:space="preserve">
-    <value>Дополнительно</value>
+    <value>Advanced</value>
   </data>
   <data name="AlignAnswersRight" xml:space="preserve">
-    <value>Выровнять ответы по правому краю окна в древовидном отображении</value>
+    <value>Align answers to the right edge of the window in the tree view</value>
   </data>
   <data name="AllFiles" xml:space="preserve">
-    <value>Все файлы</value>
+    <value>All files</value>
   </data>
   <data name="Answer" xml:space="preserve">
-    <value>Ответ</value>
+    <value>Answer</value>
   </data>
   <data name="AnswerHeader" xml:space="preserve">
-    <value>Ответ:</value>
+    <value>Answer:</value>
   </data>
   <data name="AppAuthor" xml:space="preserve">
-    <value>Владимир Хиль</value>
+    <value>Vladimir Khil</value>
   </data>
   <data name="AppLanguage" xml:space="preserve">
-    <value>Язык приложения (требуется перезапуск)</value>
+    <value>App language (restart required)</value>
   </data>
   <data name="ApplicationIsClosing" xml:space="preserve">
-    <value>Идет завершение работы объекта Application</value>
+    <value>Closing the Application object</value>
   </data>
   <data name="AppRunError" xml:space="preserve">
-    <value>Ошибка запуска программы</value>
+    <value>Program start error</value>
   </data>
   <data name="AppWillBeClosed" xml:space="preserve">
-    <value>Программа будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику</value>
+    <value>The program will be closed. If this error occurs again, contact the developer</value>
   </data>
   <data name="AttachPackage" xml:space="preserve">
-    <value>Присоединить пакет…</value>
+    <value>Attach package…</value>
   </data>
   <data name="AttachPackageHint" xml:space="preserve">
-    <value>Присоединение другого файла вопросов</value>
+    <value>Attaching another question file</value>
   </data>
   <data name="Audio" xml:space="preserve">
-    <value>Аудио</value>
+    <value>Audio</value>
   </data>
   <data name="Author" xml:space="preserve">
-    <value>Автор</value>
+    <value>Author</value>
   </data>
   <data name="Authors" xml:space="preserve">
-    <value>Авторы</value>
+    <value>Authors</value>
   </data>
   <data name="AuthorsAbsence" xml:space="preserve">
-    <value>Отсутствие авторов</value>
+    <value>No authors</value>
   </data>
   <data name="AuthorsHeader" xml:space="preserve">
-    <value>Авторы:</value>
+    <value>Authors:</value>
   </data>
   <data name="AutoDetect" xml:space="preserve">
-    <value>Автоопределение</value>
+    <value>Auto-detect</value>
   </data>
   <data name="AutoDetectTemplateWhenImportingText" xml:space="preserve">
-    <value>Автоматический подбор шаблона при импорте текста</value>
+    <value>Automatic template selection when importing text</value>
   </data>
   <data name="AutomaticallyDetectTemplates" xml:space="preserve">
-    <value>Определить шаблоны входного файла автоматически</value>
+    <value>Define input file templates automatically</value>
   </data>
   <data name="AutoSave" xml:space="preserve">
-    <value>Автосохранение (требуется перезапуск приложения)</value>
+    <value>Auto-save (application restart required)</value>
   </data>
   <data name="AutoSetQuestionPrices" xml:space="preserve">
-    <value>Автоматическое задание стоимостей вопросов</value>
+    <value>Automatic setting of question costs</value>
   </data>
   <data name="BaseAuthors" xml:space="preserve">
-    <value>Автор</value>
+    <value>Author</value>
   </data>
   <data name="BaseQuestionPrice" xml:space="preserve">
-    <value>Базовая стоимость вопроса</value>
+    <value>Base cost of a question</value>
   </data>
   <data name="BaseSources" xml:space="preserve">
-    <value>Источник</value>
+    <value>Source</value>
   </data>
   <data name="BaseValue" xml:space="preserve">
-    <value>Базовое значение</value>
+    <value>Base value</value>
   </data>
   <data name="BasicSettings" xml:space="preserve">
-    <value>Основные настройки</value>
+    <value>Basic settings</value>
   </data>
   <data name="BindingDetachedError" xml:space="preserve">
-    <value>Невозможно выполнить эту операцию, когда привязка отсоединена</value>
+    <value>It is impossible to perform this operation when the binding is disconnected</value>
   </data>
   <data name="BracketsContentToComment" xml:space="preserve">
-    <value>Содержимое внутри скобок вынести в комментарий</value>
+    <value>Move brackets content to comment</value>
   </data>
   <data name="ByDefault" xml:space="preserve">
-    <value>По умолчанию</value>
+    <value>By default</value>
   </data>
   <data name="Bytes" xml:space="preserve">
-    <value>байт</value>
+    <value>byte</value>
   </data>
   <data name="Cancel" xml:space="preserve">
-    <value>Отмена</value>
+    <value>Cancel</value>
   </data>
   <data name="Championship" xml:space="preserve">
-    <value>Чемпионат</value>
+    <value>Championship</value>
   </data>
   <data name="ChangeLanguage" xml:space="preserve">
-    <value>Поменять язык</value>
+    <value>Change language</value>
   </data>
   <data name="CheckFileSize" xml:space="preserve">
-    <value>Проверять, что файл вопросов подходит для игры через Игровой сервер</value>
+    <value>Check that the question file is suitable for playing through the Game server</value>
   </data>
   <data name="ClearType" xml:space="preserve">
-    <value>Удалить тип</value>
+    <value>Remove type</value>
   </data>
   <data name="CloneQuestion" xml:space="preserve">
-    <value>Клонировать вопрос</value>
+    <value>Clone question</value>
   </data>
   <data name="CloneRound" xml:space="preserve">
-    <value>Клонировать раунд</value>
+    <value>Clone round</value>
   </data>
   <data name="CloneTheme" xml:space="preserve">
-    <value>Клонировать тему</value>
+    <value>Clone topic</value>
   </data>
   <data name="Close" xml:space="preserve">
-    <value>Закрыть</value>
+    <value>Close</value>
   </data>
   <data name="CollapseAll" xml:space="preserve">
-    <value>Развернуть всё</value>
+    <value>Expand all</value>
   </data>
   <data name="CollapseAllMedia" xml:space="preserve">
-    <value>Свернуть всё медиа</value>
+    <value>Collapse all media</value>
   </data>
   <data name="CollapseMedia" xml:space="preserve">
-    <value>Свернуть медиа</value>
+    <value>Collapse media</value>
   </data>
   <data name="Comment" xml:space="preserve">
-    <value>Комментарий</value>
+    <value>Comment</value>
   </data>
   <data name="Comments" xml:space="preserve">
-    <value>Комментарии</value>
+    <value>Comments</value>
   </data>
   <data name="CommentsHeader" xml:space="preserve">
-    <value>Комментарии:</value>
+    <value>Comments:</value>
   </data>
   <data name="Common" xml:space="preserve">
-    <value>Обычный</value>
+    <value>Normal</value>
   </data>
   <data name="CommonAppError" xml:space="preserve">
-    <value>Ошибка выполнения программы</value>
+    <value>Program execution error</value>
   </data>
   <data name="ContactAuthor" xml:space="preserve">
-    <value>Написать замечания автору…</value>
+    <value>Write remarks to the author…</value>
   </data>
   <data name="ContactAuthorToolTip" xml:space="preserve">
-    <value>Сообщить автору о багах или что-нибудь предложить</value>
+    <value>Report bugs to the author or make suggestions</value>
   </data>
   <data name="ContactUri" xml:space="preserve">
-    <value>Адрес для связи</value>
+    <value>Contact address</value>
   </data>
   <data name="ConvertToCompSI" xml:space="preserve">
-    <value>Оформить для Теле- и Комп-SIGame</value>
+    <value>Format for TV and Comp-SIGame</value>
   </data>
   <data name="ConvertToCompSIHint" xml:space="preserve">
-    <value>Разбить по раундам и назначить телевизионные стоимости</value>
+    <value>Split into rounds and assign television costs</value>
   </data>
   <data name="ConvertToCompSISimple" xml:space="preserve">
-    <value>Поправить для Теле- и Комп-SIGame</value>
+    <value>Correct for TV and Comp-SIGame</value>
   </data>
   <data name="ConvertToCompSISimpleHint" xml:space="preserve">
-    <value>Изменить названия тем, убрать точки в конце вопросов</value>
+    <value>Change topic names, remove dots at the end of questions</value>
   </data>
   <data name="ConvertToMillionaire" xml:space="preserve">
-    <value>Оформить для "Миллионера"</value>
+    <value>Format for "Millionaire"</value>
   </data>
   <data name="ConvertToMillionaireHint" xml:space="preserve">
-    <value>Разбить на группы по 15 вопросов</value>
+    <value>Split into groups of 15 questions</value>
   </data>
   <data name="ConvertToSportSI" xml:space="preserve">
-    <value>Оформить для Спорт-SIGame</value>
+    <value>Format for Sport-SIGame</value>
   </data>
   <data name="ConvertToSportSIHint" xml:space="preserve">
-    <value>Назначить стоимости 10, 20, 30 и т.д.</value>
+    <value>Assign costs of 10, 20, 30, etc.</value>
   </data>
   <data name="Copy" xml:space="preserve">
-    <value>Копировать</value>
+    <value>Copy</value>
   </data>
   <data name="Create" xml:space="preserve">
-    <value>Создать</value>
+    <value>Create</value>
   </data>
   <data name="Create5QuestionsWithTheme" xml:space="preserve">
-    <value>Создавать 5 вопросов вместе с темой</value>
+    <value>Create 5 questions along with the topic</value>
   </data>
   <data name="CreationDate" xml:space="preserve">
-    <value>Дата создания</value>
+    <value>Creation date</value>
   </data>
   <data name="CustomThemes" xml:space="preserve">
-    <value>Точечная выборка</value>
+    <value>Custom themes</value>
   </data>
   <data name="Cut" xml:space="preserve">
-    <value>Вырезать</value>
+    <value>Cut</value>
   </data>
   <data name="Delete" xml:space="preserve">
-    <value>Удалить</value>
+    <value>Delete</value>
   </data>
   <data name="Difficulty" xml:space="preserve">
-    <value>Сложность</value>
+    <value>Difficulty</value>
   </data>
   <data name="DocumentFont" xml:space="preserve">
-    <value>Шрифт документа</value>
+    <value>Document font</value>
   </data>
   <data name="Donate" xml:space="preserve">
-    <value>Поблагодарить автора…</value>
+    <value>Thank the author…</value>
   </data>
   <data name="DuplicateAnd" xml:space="preserve">
-    <value>A и B =&gt; A и B + B и A</value>
+    <value>A and B =&gt; A and B + B and A</value>
   </data>
   <data name="Duration" xml:space="preserve">
-    <value>Длительность</value>
+    <value>Duration</value>
   </data>
   <data name="Edit" xml:space="preserve">
-    <value>Редактировать</value>
+    <value>Edit</value>
   </data>
   <data name="EditMode" xml:space="preserve">
-    <value>Способ редактирования</value>
+    <value>Edit mode</value>
   </data>
   <data name="EditModeFixedPanel" xml:space="preserve">
-    <value>Фиксированная панель</value>
+    <value>Fixed panel</value>
   </data>
   <data name="EditModeFloatPanel" xml:space="preserve">
-    <value>Плавающая панель</value>
+    <value>Floating panel</value>
   </data>
   <data name="EditModeNone" xml:space="preserve">
-    <value>Только чтение</value>
+    <value>Read only</value>
   </data>
   <data name="EditText" xml:space="preserve">
-    <value>Редактировать текст</value>
+    <value>Edit text</value>
   </data>
   <data name="Empty" xml:space="preserve">
-    <value>Без имени</value>
+    <value>Untitled</value>
   </data>
   <data name="EmptyQuestion" xml:space="preserve">
-    <value>(пустой)</value>
+    <value>(empty)</value>
   </data>
   <data name="Encoding" xml:space="preserve">
-    <value>Кодировка</value>
+    <value>Encoding</value>
   </data>
   <data name="ExpandAll" xml:space="preserve">
-    <value>Свернуть всё</value>
+    <value>Collapse all</value>
   </data>
   <data name="ExpandAllMedia" xml:space="preserve">
-    <value>Развернуть всё медиа</value>
+    <value>Expand all media</value>
   </data>
   <data name="ExpandMedia" xml:space="preserve">
-    <value>Развернуть медиа</value>
+    <value>Expand media</value>
   </data>
   <data name="ExportAndPrint" xml:space="preserve">
-    <value>Экспорт и печать</value>
+    <value>Export and print</value>
   </data>
   <data name="ExportFormatsDb" xml:space="preserve">
-    <value>База вопросов</value>
+    <value>Questions database</value>
   </data>
   <data name="ExportFormatsDinabank" xml:space="preserve">
-    <value>Динабанк</value>
+    <value>Dinabank</value>
   </data>
   <data name="ExportFormatsSns" xml:space="preserve">
-    <value>СНС</value>
+    <value>SNS</value>
   </data>
   <data name="ExportFormatsTvSI" xml:space="preserve">
-    <value>Телевизионный аналог SIGame</value>
+    <value>SIGame TV version</value>
   </data>
   <data name="ExportMediaCommand" xml:space="preserve">
-    <value>Выгрузить медиа…</value>
+    <value>Unload media…</value>
   </data>
   <data name="FileExistReplace" xml:space="preserve">
-    <value>Файл {0} существует, заменить?</value>
+    <value>File {0} exists, replace it?</value>
   </data>
   <data name="FileImport" xml:space="preserve">
-    <value>Импорт файла</value>
+    <value>Import file</value>
   </data>
   <data name="FillPrices" xml:space="preserve">
-    <value>Задать стоимости</value>
+    <value>Set costs</value>
   </data>
   <data name="Final" xml:space="preserve">
-    <value>Финал</value>
+    <value>Final</value>
   </data>
   <data name="FinalRound" xml:space="preserve">
-    <value>Финальный раунд</value>
+    <value>Final round</value>
   </data>
   <data name="FinalThemeCount" xml:space="preserve">
-    <value>Число тем в финале</value>
+    <value>Number of topics in the final</value>
   </data>
   <data name="FlatLayoutModeHeader" xml:space="preserve">
-    <value>Расположение элементов в режиме плиток</value>
+    <value>Placement of elements in tile mode</value>
   </data>
   <data name="FlatLayoutModeList" xml:space="preserve">
-    <value>Список</value>
+    <value>List</value>
   </data>
   <data name="FlatLayoutModeTable" xml:space="preserve">
-    <value>Таблица</value>
+    <value>Table</value>
   </data>
   <data name="FormattedHtml" xml:space="preserve">
-    <value>Настраиваемый HTML</value>
+    <value>Customizable HTML</value>
   </data>
   <data name="FormattedHtmlHint" xml:space="preserve">
-    <value>Возможность настройки специфического представления пакета</value>
+    <value>Ability to configure a specific package view</value>
   </data>
   <data name="From" xml:space="preserve">
-    <value>от</value>
+    <value>from</value>
   </data>
   <data name="FullUpdates" xml:space="preserve">
-    <value>Обнаружено обновление программы до версии {0}. Будет произведена дополнительная установка. Установить обновление сейчас?</value>
+    <value>Program update to version {0} detected. Additional installation will be performed. Install the update now?</value>
   </data>
   <data name="Help" xml:space="preserve">
-    <value>Помощь</value>
+    <value>Help</value>
   </data>
   <data name="HowToUse" xml:space="preserve">
-    <value>Как использовать программу…</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\logo.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>How to use the program…</value>
   </data>
   <data name="Images" xml:space="preserve">
-    <value>Изображения</value>
+    <value>Images</value>
   </data>
   <data name="Import" xml:space="preserve">
-    <value>Импорт</value>
+    <value>Import</value>
   </data>
   <data name="ImportDB" xml:space="preserve">
-    <value>База вопросов…</value>
+    <value>Question database…</value>
   </data>
   <data name="ImportSIStorage" xml:space="preserve">
-    <value>Библиотека вопросов…</value>
+    <value>Question library…</value>
   </data>
   <data name="ImportText" xml:space="preserve">
-    <value>Текст…</value>
+    <value>Text…</value>
   </data>
   <data name="ImportTextTip" xml:space="preserve">
-    <value>Преобразование текстового файла в SIQ формат</value>
+    <value>Convert text file to SIQ format</value>
   </data>
   <data name="ImportXml" xml:space="preserve">
-    <value>XML-файл…</value>
+    <value>XML file…</value>
   </data>
   <data name="Increase" xml:space="preserve">
-    <value>Приращение</value>
+    <value>Increment</value>
   </data>
   <data name="InstallUpdates" xml:space="preserve">
-    <value>Устанавливать обновления</value>
+    <value>Install updates</value>
   </data>
   <data name="InstallUpdatesHint" xml:space="preserve">
-    <value>Программа будет автоматически проверять наличие обновлений на сайте разработчика и устанавливать их</value>
+    <value>The program will automatically check for updates on the developer's website and install them</value>
   </data>
   <data name="InvalidParameter" xml:space="preserve">
-    <value>Параметр задан неверно</value>
+    <value>Parameter is set incorrectly</value>
   </data>
   <data name="JoinWithNext" xml:space="preserve">
-    <value>Объединить со следующим (играть одновременно)</value>
+    <value>Merge with the next one (play simultaneously)</value>
   </data>
   <data name="Language" xml:space="preserve">
-    <value>Язык</value>
+    <value>Language</value>
   </data>
   <data name="LastWordToNewAnswer" xml:space="preserve">
-    <value>Последнее слово в новый ответ</value>
+    <value>Last word to new answer</value>
   </data>
   <data name="Licences" xml:space="preserve">
-    <value>Лицензии</value>
+    <value>Licenses</value>
   </data>
   <data name="List" xml:space="preserve">
-    <value>Список</value>
+    <value>List</value>
   </data>
   <data name="MakeEmpty" xml:space="preserve">
-    <value>Сделать пустым</value>
+    <value>Make empty</value>
   </data>
   <data name="MakeNonEmpty" xml:space="preserve">
-    <value>Сделать непустым</value>
+    <value>Make non-empty</value>
   </data>
   <data name="MircScript" xml:space="preserve">
-    <value>Скрипт mIRC</value>
+    <value>mIRC Script</value>
   </data>
   <data name="MircScriptHint" xml:space="preserve">
-    <value>Проведение игры в IRC</value>
+    <value>Conducting a game in IRC</value>
   </data>
   <data name="MoveDown" xml:space="preserve">
-    <value>Переместить ниже</value>
+    <value>Move down</value>
   </data>
   <data name="MoveLeft" xml:space="preserve">
-    <value>Переместить левее</value>
+    <value>Move left</value>
   </data>
   <data name="MoveRight" xml:space="preserve">
-    <value>Переместить правее</value>
+    <value>Move right</value>
   </data>
   <data name="MoveUp" xml:space="preserve">
-    <value>Переместить выше</value>
+    <value>Move up</value>
   </data>
   <data name="Next" xml:space="preserve">
-    <value>Дальше</value>
+    <value>Next</value>
   </data>
   <data name="NextFragment" xml:space="preserve">
-    <value>Следующий фрагмент</value>
+    <value>Next fragment</value>
   </data>
   <data name="No" xml:space="preserve">
-    <value>Нет</value>
+    <value>No</value>
   </data>
   <data name="NonStandardPackageParameters" xml:space="preserve">
-    <value>Параметры нестандартного пакета</value>
+    <value>Parameters of a non-standard package</value>
   </data>
   <data name="NotEnoughMemoryToStartApp" xml:space="preserve">
-    <value>Недостаточно памяти для выполнения программы!</value>
+    <value>Not enough memory to run the program!</value>
   </data>
   <data name="NumberSetModeFixedValue" xml:space="preserve">
-    <value>Фиксированное значение</value>
+    <value>Fixed value</value>
   </data>
   <data name="NumberSetModeMinimumOrMaximumInRound" xml:space="preserve">
-    <value>Минимум или максимум в раунде</value>
+    <value>Minimum or maximum in  round</value>
   </data>
   <data name="NumberSetModeRange" xml:space="preserve">
-    <value>Выбор</value>
+    <value>Select</value>
   </data>
   <data name="NumberSetModeRangeWithStep" xml:space="preserve">
-    <value>Выбор с шагом</value>
+    <value>Select with step</value>
   </data>
   <data name="Object" xml:space="preserve">
-    <value>Объект</value>
+    <value>Object</value>
   </data>
   <data name="OfficialSite" xml:space="preserve">
-    <value>Официальный сайт</value>
+    <value>Official website</value>
   </data>
   <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="Open" xml:space="preserve">
-    <value>Открыть… (Ctrl+O)</value>
+    <value>Open… (Ctrl+O)</value>
   </data>
   <data name="OpenCloseBracketsIncosistency" xml:space="preserve">
-    <value>Несоответствие числа открывающих и закрывающих скобок</value>
+    <value>Mismatch of the number of opening and closing brackets</value>
   </data>
   <data name="OpenFileAfterSaving" xml:space="preserve">
-    <value>Открыть файл после сохранения</value>
+    <value>Open file after saving</value>
   </data>
   <data name="OpenPackage" xml:space="preserve">
-    <value>Открыть пакет</value>
+    <value>Open package</value>
   </data>
   <data name="OpenRecent" xml:space="preserve">
-    <value>Открыть недавние</value>
+    <value>Open recent</value>
   </data>
   <data name="Or" xml:space="preserve">
-    <value>или</value>
+    <value>or</value>
   </data>
   <data name="OrientationHorizontal" xml:space="preserve">
-    <value>в строку</value>
+    <value>rows</value>
   </data>
   <data name="OrientationVertical" xml:space="preserve">
-    <value>в столбец</value>
+    <value>columns</value>
   </data>
   <data name="PackageAuthor" xml:space="preserve">
-    <value>Автор пакета</value>
+    <value>Package author</value>
   </data>
   <data name="PackageClassicDescription" xml:space="preserve">
-    <value>Такой же пакет, как и в Телевизионном аналоге SIGame</value>
+    <value>The same package as in the SIGame TV analogue</value>
   </data>
   <data name="PackageClassicName" xml:space="preserve">
-    <value>Стандартный пакет для SIGame</value>
+    <value>Standard SIGame package</value>
   </data>
   <data name="PackageEmptyDescription" xml:space="preserve">
-    <value>Пакет, изначально ничего не содержащий</value>
+    <value>Package without initial content</value>
   </data>
   <data name="PackageEmptyName" xml:space="preserve">
-    <value>Пустой пакет</value>
+    <value>Empty package</value>
   </data>
   <data name="PackageLogo" xml:space="preserve">
-    <value>Логотип пакета</value>
+    <value>Package logo</value>
   </data>
   <data name="PackageName" xml:space="preserve">
-    <value>Имя пакета</value>
+    <value>Package name</value>
   </data>
   <data name="PackageSpecialDescription" xml:space="preserve">
-    <value>Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame</value>
+    <value>Package with custom count of rounds, themes or questions</value>
   </data>
   <data name="PackageSpecialName" xml:space="preserve">
-    <value>Нестандартный пакет</value>
+    <value>Custom package</value>
   </data>
   <data name="PackageThemesCollectionDescription" xml:space="preserve">
-    <value>Просто набор тем</value>
+    <value>A single round with themes</value>
   </data>
   <data name="PackageThemesCollectionName" xml:space="preserve">
-    <value>Коллекция тем</value>
+    <value>Theme collection</value>
   </data>
   <data name="PackageType" xml:space="preserve">
-    <value>Тип пакета</value>
+    <value>Package type</value>
   </data>
   <data name="Paste" xml:space="preserve">
-    <value>Вставить</value>
+    <value>Insert</value>
   </data>
   <data name="PlayQuestion" xml:space="preserve">
-    <value>Запустить вопрос</value>
+    <value>Start question</value>
   </data>
   <data name="PreviousFragment" xml:space="preserve">
-    <value>Предыдущий фрагмент</value>
+    <value>Previous fragment</value>
   </data>
   <data name="Price" xml:space="preserve">
-    <value>Стоимость</value>
+    <value>Cost</value>
   </data>
   <data name="Print" xml:space="preserve">
-    <value>Печать...</value>
+    <value>Print...</value>
   </data>
   <data name="PrintedHtml" xml:space="preserve">
-    <value>HTML для печати</value>
+    <value>HTML for printing</value>
   </data>
   <data name="Publisher" xml:space="preserve">
-    <value>Издатель</value>
+    <value>Publisher</value>
   </data>
   <data name="PublishersAll" xml:space="preserve">
-    <value>(все)</value>
+    <value>(all)</value>
   </data>
   <data name="PublishersNotSet" xml:space="preserve">
-    <value>(не задано)</value>
+    <value>(not set)</value>
   </data>
   <data name="Question" xml:space="preserve">
-    <value>Вопрос</value>
+    <value>Question</value>
   </data>
   <data name="QuestionParsing" xml:space="preserve">
-    <value>Импорт вопросов</value>
+    <value>Import questions</value>
   </data>
   <data name="QuestionSplitting" xml:space="preserve">
-    <value>Разделение текста на вопросы</value>
+    <value>Splitting text into questions</value>
   </data>
   <data name="QuestionType" xml:space="preserve">
-    <value>Тип вопроса</value>
+    <value>Question type</value>
   </data>
   <data name="Range" xml:space="preserve">
-    <value>Интервал</value>
+    <value>Range</value>
   </data>
   <data name="RecentFiles" xml:space="preserve">
-    <value>Последние файлы</value>
+    <value>Recent files</value>
   </data>
   <data name="Redo" xml:space="preserve">
-    <value>Повторить</value>
+    <value>Repeat</value>
   </data>
   <data name="Refresh" xml:space="preserve">
-    <value>Обновить</value>
+    <value>Refresh</value>
   </data>
   <data name="RemoveAnswer" xml:space="preserve">
-    <value>Удалить ответ</value>
+    <value>Remove answer</value>
   </data>
   <data name="RemoveComplexAnswer" xml:space="preserve">
-    <value>Удалить сложный ответ</value>
+    <value>Remove complex answer</value>
   </data>
   <data name="RemoveLink" xml:space="preserve">
-    <value>Удалить ссылку</value>
+    <value>Remove link</value>
   </data>
   <data name="RemoveLogo" xml:space="preserve">
-    <value>Удалить логотип</value>
+    <value>Remove logo</value>
   </data>
   <data name="RemoveParameter" xml:space="preserve">
-    <value>Удалить параметр</value>
+    <value>Remove parameter</value>
   </data>
   <data name="RemoveQuestion" xml:space="preserve">
-    <value>Удалить вопрос</value>
+    <value>Remove question</value>
   </data>
   <data name="RemoveRound" xml:space="preserve">
-    <value>Удалить раунд</value>
+    <value>Remove round</value>
   </data>
   <data name="RemoveTheme" xml:space="preserve">
-    <value>Удалить тему</value>
+    <value>Remove topic</value>
   </data>
   <data name="RemoveUnusedFiles" xml:space="preserve">
-    <value>Удалить неиспользуемые файлы</value>
+    <value>Remove unused files</value>
   </data>
   <data name="RemoveUnusedMedia" xml:space="preserve">
-    <value>Удалять мультимедиа из пакета при удалении последней ссылки на него</value>
+    <value>Remove multimedia from the package when the last link to it is deleted</value>
   </data>
   <data name="Reserve" xml:space="preserve">
-    <value>Резерв</value>
+    <value>Reserve</value>
   </data>
   <data name="Restriction" xml:space="preserve">
-    <value>Ограничение</value>
+    <value>Restriction</value>
   </data>
   <data name="RoundCount" xml:space="preserve">
-    <value>Число раундов</value>
+    <value>Number of rounds</value>
   </data>
   <data name="RoundThemeCount" xml:space="preserve">
-    <value>Число тем в раунде</value>
+    <value>Number of topics in a round</value>
   </data>
   <data name="Save" xml:space="preserve">
-    <value>Сохранить</value>
+    <value>Save</value>
   </data>
   <data name="SaveAndExport" xml:space="preserve">
-    <value>Сохранение и экспорт</value>
+    <value>Save and export</value>
   </data>
   <data name="SaveAs" xml:space="preserve">
-    <value>Сохранить как…</value>
+    <value>Save as…</value>
   </data>
   <data name="Scale" xml:space="preserve">
-    <value>Масштаб</value>
+    <value>Scale</value>
   </data>
   <data name="SearchFolder" xml:space="preserve">
-    <value>Папка для поиска...</value>
+    <value>Folder to search...</value>
   </data>
   <data name="SearchResults" xml:space="preserve">
-    <value>Результаты поиска</value>
+    <value>Search results</value>
   </data>
   <data name="SearchText" xml:space="preserve">
-    <value>Искать текст</value>
+    <value>Search text</value>
   </data>
   <data name="SecretCanBeGivenToSelf" xml:space="preserve">
-    <value>Вопрос можно оставить себе</value>
+    <value>Question can be given to yourself</value>
   </data>
   <data name="SecretNoQuestion" xml:space="preserve">
-    <value>Сумма начисляется без вопроса</value>
+    <value>Price is accrued without question</value>
   </data>
   <data name="SecretPublicPrice" xml:space="preserve">
-    <value>Тема и стоимость оглашаются до передачи</value>
+    <value>Theme and cost are announced before question is given</value>
   </data>
   <data name="Select" xml:space="preserve">
-    <value>Выбрать</value>
+    <value>Select</value>
   </data>
   <data name="SelectedToNewAnswer" xml:space="preserve">
-    <value>Выделенное -&gt; Новый ответ</value>
+    <value>Selected -&gt; New answer</value>
   </data>
   <data name="SelectedToNewComment" xml:space="preserve">
-    <value>Выделенное -&gt; Новый комментарий</value>
+    <value>Selected -&gt; New comment</value>
   </data>
   <data name="SelectedToNewSource" xml:space="preserve">
-    <value>Выделенное -&gt; Новый источник</value>
+    <value>Selected -&gt; New source</value>
   </data>
   <data name="SelectFile" xml:space="preserve">
-    <value>Выбрать файл…</value>
+    <value>Select file…</value>
   </data>
   <data name="SelectionMode" xml:space="preserve">
-    <value>Режим передачи</value>
+    <value>Transfer mode</value>
   </data>
   <data name="SelectSearchFolder" xml:space="preserve">
-    <value>Выберите папку для поиска</value>
+    <value>Select a folder to search</value>
   </data>
   <data name="SelectThemes" xml:space="preserve">
-    <value>Выбрать темы…</value>
+    <value>Select themes…</value>
   </data>
   <data name="SelectThemesHint" xml:space="preserve">
-    <value>Сохранить часть тем данного пакета в отдельный пакет</value>
+    <value>Save part of the topics of this package into a separate package</value>
   </data>
   <data name="SendErrorHeader" xml:space="preserve">
-    <value>Серьёзный сбой в приложении. Отправить отчёт автору? (по возможности, свяжитесь с автором лично, так как в программе остались только крайне редкие ошибки)</value>
+    <value>Serious application failure. Send a report to the author? (if possible, contact the author personally, as there are only extremely rare errors left in the program)</value>
   </data>
   <data name="SendToPCGame" xml:space="preserve">
-    <value>Отправить в компьютерную игру</value>
+    <value>Send to computer game</value>
   </data>
   <data name="SetAnswererSelect_Any" xml:space="preserve">
-    <value>Кому угодно</value>
+    <value>To anyone</value>
   </data>
   <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
-    <value>Всем кроме себя</value>
+    <value>To everyone except oneself</value>
   </data>
   <data name="SetLogo" xml:space="preserve">
-    <value>Задать логотип</value>
+    <value>Set logo</value>
   </data>
   <data name="SetTags" xml:space="preserve">
-    <value>Задать теги</value>
+    <value>Set tags</value>
   </data>
   <data name="SetTime" xml:space="preserve">
-    <value>Указать временной интервал</value>
+    <value>Specify time interval</value>
   </data>
   <data name="Settings" xml:space="preserve">
-    <value>Настройки</value>
+    <value>Settings</value>
   </data>
   <data name="SettingsSavingError" xml:space="preserve">
-    <value>Ошибка сохранения настроек</value>
+    <value>Error saving settings</value>
   </data>
   <data name="ShowToolTipsInFlatView" xml:space="preserve">
-    <value>Показывать всплывающие подсказки в плиточном отображении</value>
+    <value>Show tooltips in tile view</value>
   </data>
   <data name="ShuffleQuestions" xml:space="preserve">
-    <value>Перемешать вопросы и стоимости</value>
+    <value>Shuffle questions and costs</value>
   </data>
   <data name="SidePanel" xml:space="preserve">
-    <value>Боковая панель</value>
+    <value>Side panel</value>
   </data>
   <data name="SIQuestions" xml:space="preserve">
-    <value>Вопросы СИ</value>
+    <value>SI questions</value>
   </data>
   <data name="Size" xml:space="preserve">
-    <value>Размер</value>
+    <value>Size</value>
   </data>
   <data name="SkipFragment" xml:space="preserve">
-    <value>Пропустить фрагмент</value>
+    <value>Skip fragment</value>
   </data>
   <data name="SnsTemplatesHint" xml:space="preserve">
-    <value>Использовать шаблоны проекта СНС</value>
+    <value>Use SNS project templates</value>
   </data>
   <data name="SortQuestionsByPrice" xml:space="preserve">
-    <value>Отсортировать вопросы по стоимости</value>
+    <value>Sort questions by cost</value>
   </data>
   <data name="Source" xml:space="preserve">
-    <value>Источник</value>
+    <value>Source</value>
   </data>
   <data name="SourceFile" xml:space="preserve">
-    <value>Исходный файл</value>
+    <value>Source file</value>
   </data>
   <data name="SourceFragment" xml:space="preserve">
-    <value>Исходный фрагмент</value>
+    <value>Source fragment</value>
   </data>
   <data name="Sources" xml:space="preserve">
-    <value>Источники</value>
+    <value>Sources</value>
   </data>
   <data name="SourcesAbsense" xml:space="preserve">
-    <value>Отсутствие источников</value>
+    <value>No sources</value>
   </data>
   <data name="SourcesHeader" xml:space="preserve">
-    <value>Источники:</value>
+    <value>Sources:</value>
   </data>
   <data name="SpellChecking" xml:space="preserve">
-    <value>Проверка правописания (Windows 8.1 и выше)</value>
+    <value>Spell check (Windows 8.1 and above)</value>
   </data>
   <data name="StandardLogicDescription" xml:space="preserve">
-    <value>Ответ следует сразу после вопроса</value>
+    <value>The answer immediately follows the question</value>
   </data>
   <data name="StandardLogicHint" xml:space="preserve">
-    <value>Ожидать, что за каждым вопросом немедленно идёт ответ, а не считывать сначала группу вопросов, а затем группу ответов</value>
+    <value>Expect that each question is immediately followed by an answer, rather than first reading a group of questions and then a group of answers</value>
   </data>
   <data name="StandardValue" xml:space="preserve">
-    <value>Стандартное значение</value>
+    <value>Standard value</value>
   </data>
   <data name="Start" xml:space="preserve">
-    <value>Старт</value>
+    <value>Start</value>
   </data>
   <data name="StartImport" xml:space="preserve">
-    <value>Начать импорт</value>
+    <value>Start import</value>
   </data>
   <data name="SubfolderSearch" xml:space="preserve">
-    <value>Искать в подпапках</value>
+    <value>Search in subfolders</value>
   </data>
   <data name="Table" xml:space="preserve">
-    <value>Таблица</value>
+    <value>Table</value>
   </data>
   <data name="TableFormat" xml:space="preserve">
-    <value>Табличный формат</value>
+    <value>Tabular format</value>
   </data>
   <data name="Tags" xml:space="preserve">
-    <value>Теги</value>
+    <value>Tags</value>
   </data>
   <data name="Template" xml:space="preserve">
-    <value>Шаблон</value>
+    <value>Template</value>
   </data>
   <data name="TextToImport" xml:space="preserve">
-    <value>Текст для импорта (скопируйте в поле ниже или откройте файл)</value>
+    <value>Text for import (copy into the field below or open a file)</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Тема</value>
+    <value>Topic</value>
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
-    <value>Число вопросов в теме</value>
+    <value>Number of questions in the topic</value>
   </data>
   <data name="To" xml:space="preserve">
-    <value>до</value>
+    <value>to</value>
   </data>
   <data name="ToggleToOralAndBack" xml:space="preserve">
-    <value>Поменять тип (на устный или обратно)</value>
+    <value>Change type (to oral or back)</value>
   </data>
   <data name="ToolTipFileSearch" xml:space="preserve">
-    <value>Поиск файлов</value>
+    <value>File search</value>
   </data>
   <data name="ToolTipNew" xml:space="preserve">
-    <value>Новый… (Ctrl+N)</value>
+    <value>New… (Ctrl+N)</value>
   </data>
   <data name="TotalThemes" xml:space="preserve">
-    <value>Всего тем:</value>
+    <value>Theme count:</value>
   </data>
   <data name="Tour" xml:space="preserve">
-    <value>Тур</value>
+    <value>Tour</value>
   </data>
   <data name="Undo" xml:space="preserve">
-    <value>Отменить</value>
+    <value>Cancel</value>
   </data>
   <data name="UnlinkFromNext" xml:space="preserve">
-    <value>Отсоединить от следующего</value>
+    <value>Disconnect from the next one</value>
   </data>
   <data name="UpdateException" xml:space="preserve">
-    <value>При поиске обновления возникла следующая ошибка: {0}</value>
+    <value>The following error occurred while searching for an update: {0}</value>
   </data>
   <data name="UpdatePricesOnDragAndDrop" xml:space="preserve">
-    <value>Изменять стоимости вопросов при перетаскивании</value>
+    <value>Change question costs when dragging</value>
   </data>
   <data name="UpdatePricesOnDragAndDropHint" xml:space="preserve">
-    <value>Вопросы будут перемещаться, а распределение стоимостей останется прежним</value>
+    <value>Questions will be moved, but the cost distribution will remain the same</value>
   </data>
   <data name="Version" xml:space="preserve">
-    <value>Версия</value>
+    <value>Version</value>
   </data>
   <data name="Video" xml:space="preserve">
-    <value>Видео</value>
+    <value>Video</value>
   </data>
   <data name="View" xml:space="preserve">
-    <value>Представление</value>
+    <value>View</value>
   </data>
   <data name="ViewModeFlat" xml:space="preserve">
-    <value>Плитки</value>
+    <value>Tiles</value>
   </data>
   <data name="ViewModeTree" xml:space="preserve">
-    <value>Дерево</value>
+    <value>Tree</value>
   </data>
   <data name="Wikify" xml:space="preserve">
-    <value>Викифицировать</value>
+    <value>Wikify</value>
   </data>
   <data name="WikifyHint" xml:space="preserve">
-    <value>Вставить типографские кавычки, многоточие и тире</value>
+    <value>Insert typographic quotes, ellipsis, and dash</value>
   </data>
   <data name="WindowsAutomationError" xml:space="preserve">
-    <value>Ошибка старта приложения, связанная с Windows Automation. Попробуйте установить обновления для своей операционной системы, для .NET Framework 4 или установить библиотеку API Windows Automation (ссылка находится на странице приложения).</value>
+    <value>Application startup error related to Windows Automation. Try installing updates for your operating system, for .NET Framework 4, or install the Windows Automation API library (the link is on the application page).</value>
   </data>
   <data name="WithStep" xml:space="preserve">
-    <value>с шагом</value>
+    <value>with a step</value>
   </data>
   <data name="WrongAnswers" xml:space="preserve">
-    <value>Неправильные ответы</value>
+    <value>Incorrect answers</value>
   </data>
   <data name="WrongMultimediaAddress" xml:space="preserve">
-    <value>Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой</value>
+    <value>Incorrect multimedia address. The program terminated abnormally with an error</value>
   </data>
   <data name="Years" xml:space="preserve">
-    <value>гг.</value>
+    <value>yrs.</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
-    <value>Ваши темы:</value>
+    <value>Your topics:</value>
   </data>
 </root>

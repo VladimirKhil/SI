@@ -39,10 +39,10 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     {
         var openDialog = new OpenFileDialog
         {
-            Title = "Открыть пакет",
+            Title = Resources.OpenPackage,
             FileName = "",
             DefaultExt = "siq",
-            Filter = "Вопросы СИ|*.siq",
+            Filter = Resources.SIQuestions + "|*.siq",
             Multiselect = true
         };
 
@@ -88,9 +88,9 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
         out Encoding encoding,
         out bool start)
     {
-        var checkBox = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogCheckBox("Открыть файл после сохранения", false);
+        var checkBox = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogCheckBox(Resources.OpenFileAfterSaving, false);
 
-        var comboBoxTitle = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogLabel("Кодировка");
+        var comboBoxTitle = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogLabel(Resources.Encoding);
         var comboBox = new Microsoft.WindowsAPICodePack.Dialogs.Controls.CommonFileDialogComboBox();
         var encodings = Encoding.GetEncodings();
         
@@ -186,7 +186,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
                     if (File.Exists(filename))
                     {
-                        if (MessageBox.Show(string.Format("Файл {0} существует, заменить?", Path.GetFileName(filename)), AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                        if (MessageBox.Show(string.Format(Resources.FileExistReplace, Path.GetFileName(filename)), AppSettings.ProductName, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                         {
                             return false;
                         }
@@ -352,7 +352,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             var theme = round.Themes[i];
                             
                             paragraph.AppendLine();
-                            paragraph.AppendFormat("Тема {0}. {1}", i + 1, (theme.Name ?? "").ToUpper().EndWithPoint());
+                            paragraph.Append(Resources.Theme).AppendFormat(" {0}. {1}", i + 1, (theme.Name ?? "").ToUpper().EndWithPoint());
                             
                             AppendInfo(doc, paragraph, theme);
                             
@@ -432,12 +432,16 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             paragraph.AppendLine();
                             paragraph.AppendFormat(STR_Definition, Resources.Theme, theme.Name.ToUpper());
                             paragraph.AppendLine();
-                            
+
                             if (theme.Info.Comments.Text.Length > 0)
+                            {
                                 paragraph.AppendFormat(STR_ExtendedDefinition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)), theme.Info.Comments.Text);
+                            }
                             else
+                            {
                                 paragraph.AppendFormat(STR_Definition, Resources.Author, string.Join(", ", doc.GetRealAuthors(theme.Info.Authors)));
-                            
+                            }
+
                             paragraph.AppendLine();
                             
                             theme.Questions.ForEach(quest =>
@@ -557,7 +561,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                 }
                                 else
                                 {
-                                    text.Append("Резерв");
+                                    text.Append(Resources.Reserve);
                                 }
 
                                 text.AppendLine(string.Format(". {0}", theme.Questions[j].GetText().EndWithPoint().GrowFirstLetter().Trim()));
@@ -576,7 +580,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                 }
                                 else
                                 {
-                                    qLine.Append("Резерв");
+                                    qLine.Append(Resources.Reserve);
                                 }
 
                                 qLine.Append(string.Format(". {0}", theme.Questions[j].Right[0].ClearPoints().GrowFirstLetter().Trim()));
@@ -623,7 +627,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                                         }
                                         else
                                         {
-                                            text.Append("   Резерв.");
+                                            text.Append($"   {Resources.Reserve}.");
                                         }
 
                                         text.AppendLine(string.Join(", ", doc.GetRealSources(theme.Questions[j].Info.Sources)).EndWithPoint().Trim());
@@ -731,13 +735,18 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                     }
 
                     var paragraph = new Paragraph();
+
                     foreach (var line in fileRes.ToString().Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.None))
                     {
                         if (paragraph.Inlines.Count > 0)
+                        {
                             paragraph.AppendLine();
+                        }
 
                         if (line.Length > 0)
+                        {
                             paragraph.AppendText(line);
+                        }
                     }
 
                     document.Blocks.Add(paragraph);
@@ -816,6 +825,7 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             foreach (var theme in round.Themes)
             {
                 var row = new TableRow();
+
                 foreach (var quest in theme.Questions)
                 {
                     var cell = new TableCell
@@ -833,12 +843,16 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                     if (quest.Type.Name != QuestionTypes.Simple)
                     {
                         if (quest.Type.Name == QuestionTypes.Sponsored)
-                            paragraph.Inlines.Add("ВОПРОС БЕЗ РИСКА");
+                        {
+                            paragraph.Inlines.Add(ViewModel.Properties.Resources.NoRiskQuestion.ToUpper());
+                        }
                         else if (quest.Type.Name == QuestionTypes.Auction)
-                            paragraph.Inlines.Add("ВОПРОС СО СТАВКОЙ");
+                        {
+                            paragraph.Inlines.Add(ViewModel.Properties.Resources.StakeQuestion.ToUpper());
+                        }
                         else if (quest.Type.Name == QuestionTypes.Cat)
                         {
-                            paragraph.Inlines.Add("ВОПРОС С СЕКРЕТОМ");
+                            paragraph.Inlines.Add(ViewModel.Properties.Resources.SecretQuestion.ToUpper());
                             paragraph.Inlines.Add(new LineBreak());
 
                             paragraph.Inlines.Add(string.Format(
@@ -848,19 +862,19 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                         }
                         else if (quest.Type.Name == QuestionTypes.BagCat)
                         {
-                            paragraph.Inlines.Add("ВОПРОС С СЕКРЕТОМ");
+                            paragraph.Inlines.Add(ViewModel.Properties.Resources.SecretQuestion.ToUpper());
                             var knows = quest.Type[QuestionTypeParams.BagCat_Knows];
                             var cost = quest.Type[QuestionTypeParams.Cat_Cost];
 
                             if (cost == "0")
                             {
-                                cost = "Минимум или максимум в раунде";
+                                cost = Resources.NumberSetModeMinimumOrMaximumInRound;
                             }
 
                             if (knows == QuestionTypeParams.BagCat_Knows_Value_Never)
                             {
                                 paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add(string.Format("Сумма начисляется без вопроса: {0}", cost));
+                                paragraph.Inlines.Add(string.Format("{0}: {1}", Resources.SecretNoQuestion, cost));
                                 continue;
                             }
 
@@ -870,13 +884,13 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
                             if (knows == QuestionTypeParams.BagCat_Knows_Value_Before)
                             {
                                 paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add("Тема и стоимость оглашаются до передачи");
+                                paragraph.Inlines.Add(Resources.SecretPublicPrice);
                             }
 
                             if (quest.Type[QuestionTypeParams.BagCat_Self] == QuestionTypeParams.BagCat_Self_Value_True)
                             {
                                 paragraph.Inlines.Add(new LineBreak());
-                                paragraph.Inlines.Add("Вопрос можно оставить себе");
+                                paragraph.Inlines.Add(Resources.SecretCanBeGivenToSelf);
                             }
                         }
                         else // Unsupported type

@@ -27,7 +27,7 @@
     
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" Margin="10,0,0,10">
-            <!--<TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
+            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AppLanguage}" />
 
             <ComboBox
                 Margin="0,4,0,0"
@@ -40,7 +40,7 @@
                         <TextBlock Text="{Binding Converter={StaticResource LanguageConverter}}" />
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
-            </ComboBox>-->
+            </ComboBox>
 
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BasicSettings}" />
             

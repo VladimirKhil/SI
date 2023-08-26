@@ -311,7 +311,7 @@
 
             <Button
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                ToolTip="Открыть… (Ctrl+O)"
+                ToolTip="{x:Static lp:Resources.Open}"
                 Command="ApplicationCommands.Open">
                 <Path Stretch="Uniform" Fill="#FFCD58" Margin="2" Data="{Binding Source={StaticResource app_open},Path=Data}" />
                

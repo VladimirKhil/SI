@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:local="clr-namespace:SIQuester"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     Name="root"
     xmlns:my="clr-namespace:SIQuester.Converters">
@@ -36,9 +36,9 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            
-            <Button Margin="0,2,5,2" Width="100" Height="25" Command="{Binding Save}" CommandParameter="{Binding ElementName=root}">Сохранить...</Button>
-            <Button Margin="0,2,5,2" Width="100" Command="{Binding Print}" CommandParameter="{Binding ElementName=root}">Печать...</Button>
+
+            <Button Margin="0,2,5,2" Width="100" Height="25" Command="{Binding Save}" CommandParameter="{Binding ElementName=root}" Content="{x:Static lp:Resources.Save}" />
+            <Button Margin="0,2,5,2" Width="100" Command="{Binding Print}" CommandParameter="{Binding ElementName=root}" Content="{x:Static lp:Resources.Print}" />
         </StackPanel>
         
         <FlowDocumentReader Name="viewer" Grid.Row="1" Grid.ColumnSpan="2" Margin="0,3,0,0" Document="{Binding Document}" BorderBrush="Gray" BorderThickness="1" ViewingMode="Scroll" />

@@ -1900,13 +1900,13 @@
                                                         Style="{StaticResource MenuButton}" />
                                                     
                                                     <Menu Style="{StaticResource MenuMenu}">
-                                                        <MenuItem Header="{StaticResource Selection}" ToolTip="Дополнительно" Style="{StaticResource MenuMenuHeader}">
-                                                            <MenuItem Header="Выделенное -> Новый ответ" Command="{Binding ToNewAnswer}" CommandParameter="{Binding}" />
-                                                            <MenuItem Header="Выделенное -> Новый источник" Command="{Binding ToNewSource}" CommandParameter="{Binding}" />
-                                                            <MenuItem Header="Выделенное -> Новый комментарий" Command="{Binding ToNewComment}" CommandParameter="{Binding}" />
-                                                            <MenuItem Header="Последнее слово в новый ответ" Command="{Binding AnswerSpecial1}" />
-                                                            <MenuItem Header="Содержимое внутри скобок вынести в комментарий" Command="{Binding AnswerSpecial2}" />
-                                                            <MenuItem Header="A и B => A и B + B и A" Command="{Binding AnswerSpecial3}" />
+                                                        <MenuItem Header="{StaticResource Selection}" ToolTip="{x:Static lp:Resources.Advanced}" Style="{StaticResource MenuMenuHeader}">
+                                                            <MenuItem Header="{x:Static lp:Resources.SelectedToNewAnswer}" Command="{Binding ToNewAnswer}" CommandParameter="{Binding}" />
+                                                            <MenuItem Header="{x:Static lp:Resources.SelectedToNewSource}" Command="{Binding ToNewSource}" CommandParameter="{Binding}" />
+                                                            <MenuItem Header="{x:Static lp:Resources.SelectedToNewComment}" Command="{Binding ToNewComment}" CommandParameter="{Binding}" />
+                                                            <MenuItem Header="{x:Static lp:Resources.LastWordToNewAnswer}" Command="{Binding AnswerSpecial1}" />
+                                                            <MenuItem Header="{x:Static lp:Resources.BracketsContentToComment}" Command="{Binding AnswerSpecial2}" />
+                                                            <MenuItem Header="{x:Static lp:Resources.DuplicateAnd}" Command="{Binding AnswerSpecial3}" />
                                                         </MenuItem>
                                                     </Menu>
                                                     

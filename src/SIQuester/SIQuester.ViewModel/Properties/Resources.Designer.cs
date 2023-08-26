@@ -133,6 +133,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Авторы.
+        /// </summary>
+        public static string Authors {
+            get {
+                return ResourceManager.GetString("Authors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на https://vk.com/si_game.
         /// </summary>
         public static string AuthorSiteUrl {
@@ -1128,6 +1137,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string SourceFail {
             get {
                 return ResourceManager.GetString("SourceFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Источники.
+        /// </summary>
+        public static string Sources {
+            get {
+                return ResourceManager.GetString("Sources", resourceCulture);
             }
         }
         

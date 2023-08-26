@@ -1,4 +1,5 @@
 ﻿using SIQuester.Model;
+using SIQuester.Properties;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -11,12 +12,17 @@ public sealed class PackageTypeNameConverter : IValueConverter
 
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        if (EnumType == null)
+        {
+            throw new InvalidOperationException("EnumType is undefined");
+        }
+
         if (value == null)
         {
             return null;
         }
 
-        var field = EnumType.GetField(value.ToString());
+        var field = EnumType.GetField(value.ToString() ?? "");
 
         if (field == null)
         {
@@ -25,7 +31,7 @@ public sealed class PackageTypeNameConverter : IValueConverter
 
         var packageTypeName = (PackageTypeNameAttribute?)Attribute.GetCustomAttribute(field, typeof(PackageTypeNameAttribute));
 
-        return packageTypeName != null ? packageTypeName.Name : value.ToString();
+        return packageTypeName != null ? Resources.ResourceManager.GetString(packageTypeName.Name ?? "") : value.ToString();
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

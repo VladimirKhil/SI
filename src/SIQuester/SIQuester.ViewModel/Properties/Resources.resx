@@ -602,4 +602,10 @@ theme - тема Кота</value>
   <data name="XpsFiles" xml:space="preserve">
     <value>Документы XPS</value>
   </data>
+  <data name="Authors" xml:space="preserve">
+    <value>Авторы</value>
+  </data>
+  <data name="Sources" xml:space="preserve">
+    <value>Источники</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.Properties;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -141,7 +142,7 @@ public abstract class TextsStorageViewModel<T> : TextsStorageViewModelBase
 public sealed class AuthorsStorageViewModel : TextsStorageViewModel<AuthorInfo> 
 {
     public AuthorsStorageViewModel(QDocument document)
-        : base("Авторы", document.Document.Authors)
+        : base(Resources.Authors, document.Document.Authors)
     {
 
     }
@@ -150,7 +151,7 @@ public sealed class AuthorsStorageViewModel : TextsStorageViewModel<AuthorInfo>
 public sealed class SourcesStorageViewModel : TextsStorageViewModel<SourceInfo>
 {
     public SourcesStorageViewModel(QDocument document)
-        : base("Источники", document.Document.Sources)
+        : base(Resources.Sources, document.Document.Sources)
     {
 
     }

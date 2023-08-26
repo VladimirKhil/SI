@@ -246,6 +246,7 @@
             <ThicknessAnimation Storyboard.TargetName="gameBorder" Storyboard.TargetProperty="Margin" BeginTime="0:0:0.4" Duration="0:0:0.2" />
         </Storyboard>
     </UserControl.Resources>
+    
     <Grid>        
         <Grid.RowDefinitions>
             <RowDefinition Height="16*" />

@@ -48,7 +48,6 @@
 
             <siqcv:UnionConverter x:Key="UnionConverter" />
             <siqcv:EnumConverter x:Key="ViewModeConverter" EnumType="m:ViewMode" />
-            <siqcv:EnumConverter x:Key="FlatScaleConverter" EnumType="m:FlatScale" />
 
             <Style x:Key="TreeOnly" TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
                 <Setter Property="Visibility" Value="Visible" />
@@ -118,8 +117,8 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Resources>
-                
-                <ToggleButton Name="bSidebar" ToolTip="Боковая панель">
+
+                <ToggleButton Name="bSidebar" ToolTip="{x:Static lp:Resources.SidePanel}">
                     <Path Stretch="Uniform" Margin="3" Fill="#FF806830" Data="{Binding Source={StaticResource app_sidebar},Path=Data}" />
                 </ToggleButton>
                 
@@ -346,8 +345,8 @@
                         </Style.Triggers>
                     </Style>
                 </Menu.Style>
-                
-                <MenuItem ToolTip="Способ редактирования">
+
+                <MenuItem ToolTip="{x:Static lp:Resources.EditMode}">
                     <MenuItem.HeaderTemplate>
                         <DataTemplate>
                             <Path Stretch="Uniform" Fill="#555555" Margin="3" Data="{Binding Source={StaticResource app_edit},Path=Data}" />
@@ -357,6 +356,7 @@
                     <MenuItem.Resources>
                         <Style x:Key="MenuSelect" TargetType="{x:Type MenuItem}">
                             <Setter Property="IsCheckable" Value="True" />
+                            
                             <Style.Triggers>
                                 <Trigger Property="IsChecked" Value="True">
                                     <Setter Property="IsCheckable" Value="False" />
