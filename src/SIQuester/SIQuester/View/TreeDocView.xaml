@@ -10,9 +10,9 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     PreviewMouseLeftButtonDown="Main_MouseLeftButtonDown"
-    DragEnter="Main_DragEnter"
-    DragOver="Main_DragOver"
-    Drop="Main_Drop"
+    PreviewDragEnter="Main_DragEnter"
+    PreviewDragOver="Main_DragOver"
+    PreviewDrop="Main_Drop"
     d:DataContext="{d:DesignInstance vm:QDocument}">
     <Grid Name="_grid">
         <lc:PackageTreeView Style="{StaticResource QTreeView}" KeyboardNavigation.TabNavigation="Contained" />

@@ -36,7 +36,7 @@
 
                 <TextBlock Grid.Column="1" Margin="5,5,0,0" Grid.Row="2">
                     <Run Text="{x:Static lp:Resources.Version}" />
-                    <Run Text="{Binding Version}" />
+                    <Run Text="{Binding Version, Mode=OneWay}" />
                 </TextBlock>
             </Grid>
 

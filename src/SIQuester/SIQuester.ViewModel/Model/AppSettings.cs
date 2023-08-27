@@ -328,9 +328,9 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private bool _alightAnswersRight = false;
+    private bool _alightAnswersRight = true;
 
-    [DefaultValue(false)]
+    [DefaultValue(true)]
     public bool AlightAnswersRight
     {
         get => _alightAnswersRight;
