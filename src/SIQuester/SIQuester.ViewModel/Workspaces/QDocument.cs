@@ -7,6 +7,7 @@ using SIPackages.Containers;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -18,8 +19,10 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
@@ -338,6 +341,11 @@ public sealed class QDocument : WorkspaceViewModel
     /// Сохранить
     /// </summary>
     public AsyncCommand Save { get; private set; }
+
+    /// <summary>
+    /// Save document as a template.
+    /// </summary>
+    public ICommand SaveAsTemplate { get; private set; }
 
     /// <summary>
     /// Экспорт в HTML
@@ -1217,7 +1225,10 @@ public sealed class QDocument : WorkspaceViewModel
 
     private readonly ILoggerFactory _loggerFactory;
 
-    internal QDocument(SIDocument document, StorageContextViewModel storageContextViewModel, ILoggerFactory loggerFactory)
+    internal QDocument(
+        SIDocument document,
+        StorageContextViewModel storageContextViewModel,
+        ILoggerFactory loggerFactory)
     {
         Lock = new Lock(document.Package.Name);
 
@@ -1232,6 +1243,7 @@ public sealed class QDocument : WorkspaceViewModel
         ImportSiq = new SimpleCommand(ImportSiq_Executed);
         
         Save = new AsyncCommand(Save_Executed);
+        SaveAsTemplate = new AsyncCommand(SaveAsTemplate_Executed);
 
         ExportHtml = new SimpleCommand(ExportHtml_Executed);
         ExportPrintHtml = new SimpleCommand(ExportPrintHtml_Executed);
@@ -1930,6 +1942,56 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 await SaveAsAsync();
             }
+        }
+        catch (Exception exc)
+        {
+            _logger.LogError(exc, "Saving error: {error}", exc.Message);
+            OnError(exc, Resources.DocumentSavingError);
+        }
+    }
+
+    private async Task SaveAsTemplate_Executed(object? arg)
+    {
+        try
+        {
+            var templateName = PlatformManager.Instance.AskText(Resources.TemplateName);
+
+            if (string.IsNullOrWhiteSpace(templateName))
+            {
+                return;
+            }
+
+            var packageTemplatesRepository = PlatformManager.Instance.ServiceProvider.GetRequiredService<IPackageTemplatesRepository>();
+
+            var templateFolder = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppSettings.TemplatesFolderName);
+            Directory.CreateDirectory(templateFolder);
+
+            var templateFileName = System.IO.Path.ChangeExtension(Guid.NewGuid().ToString(), AppSettings.SiqExtension);
+            var templatePath = System.IO.Path.Combine(templateFolder, templateFileName);
+
+            using var stream = File.Open(templatePath, FileMode.Create, FileAccess.ReadWrite);
+            using var tempDoc = Document.SaveAs(stream, false);
+
+            if (Images.HasPendingChanges)
+            {
+                await Images.ApplyToAsync(tempDoc.Images);
+            }
+
+            if (Audio.HasPendingChanges)
+            {
+                await Audio.ApplyToAsync(tempDoc.Audio);
+            }
+
+            if (Video.HasPendingChanges)
+            {
+                await Video.ApplyToAsync(tempDoc.Video);
+            }
+
+            packageTemplatesRepository.AddTemplate(new PackageTemplate
+            {
+                Name = templateName,
+                FileName = templateFileName
+            });
         }
         catch (Exception exc)
         {

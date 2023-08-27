@@ -384,6 +384,12 @@
   <data name="OtherTypeQuestion" xml:space="preserve">
     <value>Other</value>
   </data>
+  <data name="PackageClassicDescription" xml:space="preserve">
+    <value>The same package as in the SIGame TV analogue</value>
+  </data>
+  <data name="PackageClassicName" xml:space="preserve">
+    <value>Standard SIGame package</value>
+  </data>
   <data name="PackageCorruptedHint" xml:space="preserve">
     <value>The question file is damaged! Try to extract data from it using an archiver (opening it as an archive)</value>
   </data>
@@ -393,8 +399,26 @@
   <data name="PackageCorruptedHintLogs" xml:space="preserve">
     <value>If it does not work, send the logs to the program author so that the problem can be avoided in the future.</value>
   </data>
+  <data name="PackageEmptyDescription" xml:space="preserve">
+    <value>Package without initial content</value>
+  </data>
+  <data name="PackageEmptyName" xml:space="preserve">
+    <value>Empty package</value>
+  </data>
   <data name="PackageServerFull" xml:space="preserve">
     <value>currently, there is no space on the server to accept new packages</value>
+  </data>
+  <data name="PackageSpecialDescription" xml:space="preserve">
+    <value>Package with custom count of rounds, themes or questions</value>
+  </data>
+  <data name="PackageSpecialName" xml:space="preserve">
+    <value>Custom package</value>
+  </data>
+  <data name="PackageThemesCollectionDescription" xml:space="preserve">
+    <value>A single round with themes</value>
+  </data>
+  <data name="PackageThemesCollectionName" xml:space="preserve">
+    <value>Theme collection</value>
   </data>
   <data name="PhraseTemplates" xml:space="preserve">
     <value>The input text does not match the template below. Please correct the template, after which the analysis of the input file will continue. Besides, you can simply correct the input text. Problem:</value>
@@ -413,6 +437,9 @@
   </data>
   <data name="QuestionPlay" xml:space="preserve">
     <value>Question playback</value>
+  </data>
+  <data name="RemoveTemplateConfirm" xml:space="preserve">
+    <value>Do you really want to delete template "{0}"?</value>
   </data>
   <data name="Rest" xml:space="preserve">
     <value>REMAINDER</value>
@@ -506,6 +533,12 @@
   </data>
   <data name="TeleSI" xml:space="preserve">
     <value>Television analog of SIGame</value>
+  </data>
+  <data name="TemplateName" xml:space="preserve">
+    <value>Template name</value>
+  </data>
+  <data name="TemplateWithThisNameAlreadyExists" xml:space="preserve">
+    <value>Template with this name already exists!</value>
   </data>
   <data name="TextFiles" xml:space="preserve">
     <value>Text files</value>

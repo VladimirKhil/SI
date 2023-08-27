@@ -11,7 +11,9 @@ using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.Configuration;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Helpers;
+using SIQuester.ViewModel.Services;
 using SIStorageService.Client;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
@@ -191,6 +193,7 @@ public partial class App : Application
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
         services.AddSingleton(AppSettings.Default);
+        services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepository>();
         services.AddTransient<SIStorage>();
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }

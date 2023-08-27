@@ -3,29 +3,6 @@
 namespace SIQuester.Model;
 
 /// <summary>
-/// Defines well-known package templates.
-/// </summary>
-public enum PackageType
-{
-    [PackageTypeName("PackageClassicName")]
-    [Description("PackageClassicDescription")]
-    [Category("SIGame")]
-    Classic,
-    [PackageTypeName("PackageSpecialName")]
-    [Description("PackageSpecialDescription")]
-    [Category("SIGame")]
-    Special,
-    [PackageTypeName("PackageThemesCollectionName")]
-    [Description("PackageThemesCollectionDescription")]
-    [Category("SIGame")]
-    ThemesCollection,
-    [PackageTypeName("PackageEmptyName")]
-    [Description("PackageEmptyDescription")]
-    [Category("Common")]
-    Empty
-}
-
-/// <summary>
 /// Defines well-known packge export formats.
 /// </summary>
 public enum ExportFormats

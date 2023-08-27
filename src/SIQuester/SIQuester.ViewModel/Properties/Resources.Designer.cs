@@ -862,6 +862,24 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Такой же пакет, как и в Телевизионном аналоге SIGame.
+        /// </summary>
+        public static string PackageClassicDescription {
+            get {
+                return ResourceManager.GetString("PackageClassicDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Стандартный пакет для SIGame.
+        /// </summary>
+        public static string PackageClassicName {
+            get {
+                return ResourceManager.GetString("PackageClassicName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Файл с вопросами повреждён! Попробуйте извлечь данные из него при помощи архиватора (открыв его как архив).
         /// </summary>
         public static string PackageCorruptedHint {
@@ -889,11 +907,65 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет, изначально ничего не содержащий.
+        /// </summary>
+        public static string PackageEmptyDescription {
+            get {
+                return ResourceManager.GetString("PackageEmptyDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пустой пакет.
+        /// </summary>
+        public static string PackageEmptyName {
+            get {
+                return ResourceManager.GetString("PackageEmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на в настоящий момент на сервере нет места для принятия новых пакетов.
         /// </summary>
         public static string PackageServerFull {
             get {
                 return ResourceManager.GetString("PackageServerFull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame.
+        /// </summary>
+        public static string PackageSpecialDescription {
+            get {
+                return ResourceManager.GetString("PackageSpecialDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Нестандартный пакет.
+        /// </summary>
+        public static string PackageSpecialName {
+            get {
+                return ResourceManager.GetString("PackageSpecialName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Просто набор тем.
+        /// </summary>
+        public static string PackageThemesCollectionDescription {
+            get {
+                return ResourceManager.GetString("PackageThemesCollectionDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Коллекция тем.
+        /// </summary>
+        public static string PackageThemesCollectionName {
+            get {
+                return ResourceManager.GetString("PackageThemesCollectionName", resourceCulture);
             }
         }
         
@@ -948,6 +1020,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string QuestionPlay {
             get {
                 return ResourceManager.GetString("QuestionPlay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вы действительно хотите удалить шаблон &quot;{0}&quot;?.
+        /// </summary>
+        public static string RemoveTemplateConfirm {
+            get {
+                return ResourceManager.GetString("RemoveTemplateConfirm", resourceCulture);
             }
         }
         
@@ -1236,6 +1317,24 @@ namespace SIQuester.ViewModel.Properties {
         public static string TeleSI {
             get {
                 return ResourceManager.GetString("TeleSI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Имя шаблона.
+        /// </summary>
+        public static string TemplateName {
+            get {
+                return ResourceManager.GetString("TemplateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Шаблон с таким именем уже существует!.
+        /// </summary>
+        public static string TemplateWithThisNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("TemplateWithThisNameAlreadyExists", resourceCulture);
             }
         }
         

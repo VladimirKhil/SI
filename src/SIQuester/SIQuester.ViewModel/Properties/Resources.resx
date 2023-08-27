@@ -608,4 +608,37 @@ theme - тема Кота</value>
   <data name="Sources" xml:space="preserve">
     <value>Источники</value>
   </data>
+  <data name="PackageClassicDescription" xml:space="preserve">
+    <value>Такой же пакет, как и в Телевизионном аналоге SIGame</value>
+  </data>
+  <data name="PackageClassicName" xml:space="preserve">
+    <value>Стандартный пакет для SIGame</value>
+  </data>
+  <data name="PackageEmptyDescription" xml:space="preserve">
+    <value>Пакет, изначально ничего не содержащий</value>
+  </data>
+  <data name="PackageEmptyName" xml:space="preserve">
+    <value>Пустой пакет</value>
+  </data>
+  <data name="PackageSpecialDescription" xml:space="preserve">
+    <value>Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame</value>
+  </data>
+  <data name="PackageSpecialName" xml:space="preserve">
+    <value>Нестандартный пакет</value>
+  </data>
+  <data name="PackageThemesCollectionDescription" xml:space="preserve">
+    <value>Просто набор тем</value>
+  </data>
+  <data name="PackageThemesCollectionName" xml:space="preserve">
+    <value>Коллекция тем</value>
+  </data>
+  <data name="TemplateName" xml:space="preserve">
+    <value>Имя шаблона</value>
+  </data>
+  <data name="TemplateWithThisNameAlreadyExists" xml:space="preserve">
+    <value>Шаблон с таким именем уже существует!</value>
+  </data>
+  <data name="RemoveTemplateConfirm" xml:space="preserve">
+    <value>Вы действительно хотите удалить шаблон "{0}"?</value>
+  </data>
 </root>

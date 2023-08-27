@@ -338,7 +338,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// </summary>
     private void New_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
-        DocList.Add(new NewViewModel(_storageContextViewModel, _appOptions, _loggerFactory));
+        DocList.Add(new NewViewModel(_storageContextViewModel, _serviceProvider.GetRequiredService<IPackageTemplatesRepository>(), _appOptions, _loggerFactory));
     }
 
     /// <summary>

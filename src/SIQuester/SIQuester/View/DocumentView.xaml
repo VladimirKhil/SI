@@ -146,7 +146,12 @@
                                 Name="miSaveAs"
                                 Header="{x:Static lp:Resources.SaveAs}"
                                 Command="ApplicationCommands.SaveAs" />
-                            
+
+                            <MenuItem
+                                Style="{StaticResource CommandRoutedItem}"
+                                Header="{x:Static lp:Resources.SaveAsTemplate}"
+                                Command="{Binding SaveAsTemplate}" />
+
                             <Separator />
                             <MenuItem Header="HTML" Command="{Binding ExportHtml}" />
                             <MenuItem Header="{x:Static lp:Resources.PrintedHtml}" Command="{Binding ExportPrintHtml}" />

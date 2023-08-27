@@ -1,6 +1,7 @@
 ﻿using SICore.Properties;
 using System.Diagnostics;
 using System.Net;
+using System.Text;
 using System.Threading.Channels;
 
 namespace SICore.Clients.Viewer;
@@ -56,7 +57,7 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     private async Task ProcesFileAsync(FileTask fileTask, CancellationToken cancellationToken)
     {
-        var fileName = Path.GetFileName(fileTask.Uri.ToString());
+        var fileName = GetSafeFileName(fileTask.Uri);
         var localFile = Path.Combine(_rootFolder, fileName);
 
         if (File.Exists(localFile))
@@ -118,7 +119,7 @@ internal sealed class LocalFileManager : ILocalFileManager
 
     public string? TryGetFile(Uri uri)
     {
-        var fileName = Path.GetFileName(uri.ToString());
+        var fileName = GetSafeFileName(uri);
         var localFile = Path.Combine(_rootFolder, fileName);
 
         if (!File.Exists(localFile))
@@ -136,6 +137,9 @@ internal sealed class LocalFileManager : ILocalFileManager
 
         return localFile;
     }
+
+    private static string GetSafeFileName(Uri uri) =>
+        Convert.ToBase64String(Encoding.UTF8.GetBytes(uri.ToString())).Replace('/', '_').Replace('+', '-').Replace("=", "");
 
     public void Dispose()
     {

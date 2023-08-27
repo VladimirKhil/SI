@@ -6,8 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:l="clr-namespace:SIQuester"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
-    xmlns:lc="clr-namespace:SIQuester.Converters"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     mc:Ignorable="d"
@@ -15,17 +13,22 @@
     FontSize="14"
     FocusManager.FocusedElement="{Binding ElementName=bCreate}">
     <UserControl.Resources>
-        <ObjectDataProvider x:Key="PackageTypes" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
-            <ObjectDataProvider.MethodParameters>
-                <x:TypeExtension TypeName="m:PackageType" />
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
-        
-        <lc:EnumConverter x:Key="PackageDescription" EnumType="m:PackageType" />
-        <lc:PackageTypeNameConverter x:Key="PackageName" EnumType="m:PackageType" />
+        <DataTemplate DataType="{x:Type m:CustomPackageOptions}">
+            <GroupBox Header="{x:Static lp:Resources.NonStandardPackageParameters}" Padding="5">
+                <GroupBox.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,3" />
+                    </Style>
+                    
+                    <Style TargetType="l:NumericTextBox">
+                        <Setter Property="Margin" Value="0,3" />
+                    </Style>
 
-        <DataTemplate DataType="{x:Type m:NonStandartPackageParams}">
-            <GroupBox Header="{x:Static lp:Resources.NonStandardPackageParameters}">
+                    <Style TargetType="CheckBox">
+                        <Setter Property="Margin" Value="0,5" />
+                    </Style>
+                </GroupBox.Resources>
+                
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -43,25 +46,25 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{x:Static lp:Resources.RoundCount}" />
-                    <l:NumericTextBox Grid.Column="1" Text="{Binding NumOfRounds}" />
+                    <l:NumericTextBox Grid.Column="1" Text="{Binding RoundCount}" />
                     <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.RoundThemeCount}" />
-                    <l:NumericTextBox Grid.Row="1" Grid.Column="1" Text="{Binding NumOfThemes}" />
+                    <l:NumericTextBox Grid.Row="1" Grid.Column="1" Text="{Binding ThemeCount}" />
                     <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.ThemeQuestionCount}" />
-                    <l:NumericTextBox Grid.Row="2" Grid.Column="1" Text="{Binding NumOfQuestions}" />
+                    <l:NumericTextBox Grid.Row="2" Grid.Column="1" Text="{Binding QuestionCount}" />
                     <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.BaseQuestionPrice}" />
-                    <l:NumericTextBox Grid.Row="3" Grid.Column="1" Text="{Binding NumOfPoints}" />
+                    <l:NumericTextBox Grid.Row="3" Grid.Column="1" Text="{Binding BaseQuestionPrice}" />
                     <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.FinalRound}" />
                     <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding HasFinal}" />
                     <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.FinalThemeCount}" />
-                    <l:NumericTextBox Grid.Row="5" Grid.Column="1" Text="{Binding NumOfFinalThemes}" />
+                    <l:NumericTextBox Grid.Row="5" Grid.Column="1" Text="{Binding FinalThemeCount}" />
                 </Grid>
             </GroupBox>
         </DataTemplate>
 
         <Style x:Key="NonStandartArea" TargetType="ContentControl">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding PackageType}" Value="{x:Static m:PackageType.Special}">
-                    <Setter Property="Content" Value="{Binding PackageParams}" />
+                <DataTrigger Binding="{Binding CurrentTemplate.Type}" Value="{x:Static m:PackageType.Custom}">
+                    <Setter Property="Content" Value="{Binding CustomPackageOptions}" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -70,6 +73,7 @@
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <Grid HorizontalAlignment="Left" Width="500" Margin="5">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -90,14 +94,13 @@
             <ListView
                 Grid.ColumnSpan="2"
                 Grid.Row="1"
-                Height="100"
+                Height="200"
                 Margin="4"
-                ItemsSource="{Binding Source={StaticResource PackageTypes}}"
-                SelectedItem="{Binding PackageType}">
-                
+                ItemsSource="{Binding Templates}"
+                SelectedItem="{Binding CurrentTemplate}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Converter={StaticResource PackageName}}" />
+                        <TextBlock Text="{Binding Name}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 
@@ -111,19 +114,40 @@
             <TextBlock
                 Grid.Row="2"
                 Grid.ColumnSpan="2"
-                Text="{Binding PackageType, Mode=OneWay, Converter={StaticResource PackageDescription}}"
+                Text="{Binding CurrentTemplate.Description}"
                 Margin="4"
                 TextWrapping="Wrap"
                 Height="50" />
 
-            <TextBlock Grid.Row="3" Margin="4" Text="{x:Static lp:Resources.PackageName}" />
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding PackageName}" Margin="4" />
-            <TextBlock Grid.Row="4" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
+            <StackPanel
+                Grid.Row="3"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Right"
+                Margin="4">
+                <Button
+                    Content="{x:Static lp:Resources.RemoveTemplate}"
+                    Padding="15,2"
+                    Command="{Binding RemoveTemplate}" />
+
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentTemplate.FileName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+            </StackPanel>
+
+            <TextBlock Grid.Row="4" Margin="4" Text="{x:Static lp:Resources.PackageName}" />
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding PackageName}" Margin="4" />
+            <TextBlock Grid.Row="5" Margin="4" Text="{x:Static lp:Resources.PackageAuthor}" />
+            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding PackageAuthor}" Margin="4" />
 
             <Button
                 HorizontalAlignment="Right"
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.ColumnSpan="2"
                 Command="{Binding Create}"
                 Margin="4"
@@ -131,7 +155,7 @@
                 Name="bCreate"
                 Content="{x:Static lp:Resources.Create}" />
 
-            <ContentControl Grid.Row="6" Grid.ColumnSpan="2" Style="{StaticResource NonStandartArea}" />
+            <ContentControl Grid.Row="7" Grid.ColumnSpan="2" Style="{StaticResource NonStandartArea}" />
         </Grid>
     </ScrollViewer>
 </UserControl>

@@ -619,38 +619,14 @@
   <data name="PackageAuthor" xml:space="preserve">
     <value>Автор пакета</value>
   </data>
-  <data name="PackageClassicDescription" xml:space="preserve">
-    <value>Такой же пакет, как и в Телевизионном аналоге SIGame</value>
-  </data>
-  <data name="PackageClassicName" xml:space="preserve">
-    <value>Стандартный пакет для SIGame</value>
-  </data>
-  <data name="PackageEmptyDescription" xml:space="preserve">
-    <value>Пакет, изначально ничего не содержащий</value>
-  </data>
-  <data name="PackageEmptyName" xml:space="preserve">
-    <value>Пустой пакет</value>
-  </data>
   <data name="PackageLogo" xml:space="preserve">
     <value>Логотип пакета</value>
   </data>
   <data name="PackageName" xml:space="preserve">
     <value>Имя пакета</value>
   </data>
-  <data name="PackageSpecialDescription" xml:space="preserve">
-    <value>Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame</value>
-  </data>
-  <data name="PackageSpecialName" xml:space="preserve">
-    <value>Нестандартный пакет</value>
-  </data>
-  <data name="PackageThemesCollectionDescription" xml:space="preserve">
-    <value>Просто набор тем</value>
-  </data>
-  <data name="PackageThemesCollectionName" xml:space="preserve">
-    <value>Коллекция тем</value>
-  </data>
   <data name="PackageType" xml:space="preserve">
-    <value>Тип пакета</value>
+    <value>Шаблон пакета</value>
   </data>
   <data name="Paste" xml:space="preserve">
     <value>Вставить</value>
@@ -724,6 +700,9 @@
   <data name="RemoveRound" xml:space="preserve">
     <value>Удалить раунд</value>
   </data>
+  <data name="RemoveTemplate" xml:space="preserve">
+    <value>Удалить шаблон</value>
+  </data>
   <data name="RemoveTheme" xml:space="preserve">
     <value>Удалить тему</value>
   </data>
@@ -753,6 +732,9 @@
   </data>
   <data name="SaveAs" xml:space="preserve">
     <value>Сохранить как…</value>
+  </data>
+  <data name="SaveAsTemplate" xml:space="preserve">
+    <value>Сохранить как шаблон…</value>
   </data>
   <data name="Scale" xml:space="preserve">
     <value>Масштаб</value>

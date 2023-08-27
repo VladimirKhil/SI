@@ -1565,42 +1565,6 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Такой же пакет, как и в Телевизионном аналоге SIGame.
-        /// </summary>
-        public static string PackageClassicDescription {
-            get {
-                return ResourceManager.GetString("PackageClassicDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Стандартный пакет для SIGame.
-        /// </summary>
-        public static string PackageClassicName {
-            get {
-                return ResourceManager.GetString("PackageClassicName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет, изначально ничего не содержащий.
-        /// </summary>
-        public static string PackageEmptyDescription {
-            get {
-                return ResourceManager.GetString("PackageEmptyDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Пустой пакет.
-        /// </summary>
-        public static string PackageEmptyName {
-            get {
-                return ResourceManager.GetString("PackageEmptyName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Логотип пакета.
         /// </summary>
         public static string PackageLogo {
@@ -1619,43 +1583,7 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пакет, содержащий какое-то иное число раундов, тем или вопросов, чем в стандартной SIGame.
-        /// </summary>
-        public static string PackageSpecialDescription {
-            get {
-                return ResourceManager.GetString("PackageSpecialDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Нестандартный пакет.
-        /// </summary>
-        public static string PackageSpecialName {
-            get {
-                return ResourceManager.GetString("PackageSpecialName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Просто набор тем.
-        /// </summary>
-        public static string PackageThemesCollectionDescription {
-            get {
-                return ResourceManager.GetString("PackageThemesCollectionDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Коллекция тем.
-        /// </summary>
-        public static string PackageThemesCollectionName {
-            get {
-                return ResourceManager.GetString("PackageThemesCollectionName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип пакета.
+        ///   Ищет локализованную строку, похожую на Шаблон пакета.
         /// </summary>
         public static string PackageType {
             get {
@@ -1880,6 +1808,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить шаблон.
+        /// </summary>
+        public static string RemoveTemplate {
+            get {
+                return ResourceManager.GetString("RemoveTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Удалить тему.
         /// </summary>
         public static string RemoveTheme {
@@ -1966,6 +1903,15 @@ namespace SIQuester.Properties {
         public static string SaveAs {
             get {
                 return ResourceManager.GetString("SaveAs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Сохранить как шаблон….
+        /// </summary>
+        public static string SaveAsTemplate {
+            get {
+                return ResourceManager.GetString("SaveAsTemplate", resourceCulture);
             }
         }
         

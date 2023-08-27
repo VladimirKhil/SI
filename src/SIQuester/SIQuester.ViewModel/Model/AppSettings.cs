@@ -30,6 +30,16 @@ public sealed class AppSettings : INotifyPropertyChanged
     /// </summary>
     public const string TempMediaFolderName = "TempMedia";
 
+    /// <summary>
+    /// Templates folder name.
+    /// </summary>
+    public const string TemplatesFolderName = "Templates";
+
+    /// <summary>
+    /// SIQ file extension.
+    /// </summary>
+    public const string SiqExtension = "siq";
+
     private const string DefaultFontFamily = "Calibri";
 
     /// <summary>

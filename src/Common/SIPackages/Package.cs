@@ -209,7 +209,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// </summary>
     /// <param name="type">Round type.</param>
     /// <param name="name">Round name.</param>
-    public Round CreateRound(string type, string name)
+    public Round CreateRound(string type, string? name)
     {
         var round = new Round
         {

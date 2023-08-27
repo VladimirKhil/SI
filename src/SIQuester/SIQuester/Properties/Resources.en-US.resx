@@ -238,7 +238,7 @@
     <value>Author</value>
   </data>
   <data name="BaseQuestionPrice" xml:space="preserve">
-    <value>Base cost of a question</value>
+    <value>Base question price</value>
   </data>
   <data name="BaseSources" xml:space="preserve">
     <value>Source</value>
@@ -451,7 +451,7 @@
     <value>Final round</value>
   </data>
   <data name="FinalThemeCount" xml:space="preserve">
-    <value>Number of topics in the final</value>
+    <value>Final theme count</value>
   </data>
   <data name="FlatLayoutModeHeader" xml:space="preserve">
     <value>Placement of elements in tile mode</value>
@@ -562,7 +562,7 @@
     <value>No</value>
   </data>
   <data name="NonStandardPackageParameters" xml:space="preserve">
-    <value>Parameters of a non-standard package</value>
+    <value>Custom package settings</value>
   </data>
   <data name="NotEnoughMemoryToStartApp" xml:space="preserve">
     <value>Not enough memory to run the program!</value>
@@ -615,38 +615,14 @@
   <data name="PackageAuthor" xml:space="preserve">
     <value>Package author</value>
   </data>
-  <data name="PackageClassicDescription" xml:space="preserve">
-    <value>The same package as in the SIGame TV analogue</value>
-  </data>
-  <data name="PackageClassicName" xml:space="preserve">
-    <value>Standard SIGame package</value>
-  </data>
-  <data name="PackageEmptyDescription" xml:space="preserve">
-    <value>Package without initial content</value>
-  </data>
-  <data name="PackageEmptyName" xml:space="preserve">
-    <value>Empty package</value>
-  </data>
   <data name="PackageLogo" xml:space="preserve">
     <value>Package logo</value>
   </data>
   <data name="PackageName" xml:space="preserve">
     <value>Package name</value>
   </data>
-  <data name="PackageSpecialDescription" xml:space="preserve">
-    <value>Package with custom count of rounds, themes or questions</value>
-  </data>
-  <data name="PackageSpecialName" xml:space="preserve">
-    <value>Custom package</value>
-  </data>
-  <data name="PackageThemesCollectionDescription" xml:space="preserve">
-    <value>A single round with themes</value>
-  </data>
-  <data name="PackageThemesCollectionName" xml:space="preserve">
-    <value>Theme collection</value>
-  </data>
   <data name="PackageType" xml:space="preserve">
-    <value>Package type</value>
+    <value>Package template</value>
   </data>
   <data name="Paste" xml:space="preserve">
     <value>Insert</value>
@@ -720,6 +696,9 @@
   <data name="RemoveRound" xml:space="preserve">
     <value>Remove round</value>
   </data>
+  <data name="RemoveTemplate" xml:space="preserve">
+    <value>Delete template</value>
+  </data>
   <data name="RemoveTheme" xml:space="preserve">
     <value>Remove topic</value>
   </data>
@@ -736,10 +715,10 @@
     <value>Restriction</value>
   </data>
   <data name="RoundCount" xml:space="preserve">
-    <value>Number of rounds</value>
+    <value>Round count</value>
   </data>
   <data name="RoundThemeCount" xml:space="preserve">
-    <value>Number of topics in a round</value>
+    <value>Theme per round count</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>Save</value>
@@ -749,6 +728,9 @@
   </data>
   <data name="SaveAs" xml:space="preserve">
     <value>Save as…</value>
+  </data>
+  <data name="SaveAsTemplate" xml:space="preserve">
+    <value>Save as template…</value>
   </data>
   <data name="Scale" xml:space="preserve">
     <value>Scale</value>
@@ -907,7 +889,7 @@
     <value>Topic</value>
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
-    <value>Number of questions in the topic</value>
+    <value>Question per theme count</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>to</value>
