@@ -10,8 +10,7 @@
     mc:Ignorable="d" 
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance lvm:ImportDBStorageViewModel}">
-    
+    d:DataContext="{d:DesignInstance lvm:ImportDBStorageViewModel}">    
     <UserControl.Resources>
         <HierarchicalDataTemplate DataType="{x:Type lvmm:DBNode}" ItemsSource="{Binding Children}">
             <TextBlock Text="{Binding Name}" Padding="5,3" />

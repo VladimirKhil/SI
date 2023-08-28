@@ -1,7 +1,9 @@
 ﻿using MahApps.Metro.Controls;
+using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using SIQuester.ViewModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -293,19 +295,25 @@ public partial class MainWindow : MetroWindow
         UI.Execute(async () => await mainViewModel.InitializeAsync(), exc => MainViewModel.ShowError(exc));
     }
 
-    private async void Main_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private async void Main_Closing(object sender, CancelEventArgs e)
     {
         try
         {
             FocusManager.SetFocusedElement(this, this);
 
-            if (DataContext is MainViewModel mainViewModel && mainViewModel.DocList.Any())
+            if (DataContext is not MainViewModel mainViewModel)
+            {
+                return;
+            }
+
+            mainViewModel.Logger.LogInformation("Main_Closing");
+
+            if (mainViewModel.DocList.Any())
             {
                 e.Cancel = true;
+                var close = await mainViewModel.TryCloseAsync();
 
-                var result = await mainViewModel.DisposeRequestAsync();
-
-                if (result)
+                if (close)
                 {
                     await Dispatcher.BeginInvoke(Close);
                 }
@@ -313,7 +321,7 @@ public partial class MainWindow : MetroWindow
         }
         catch (Exception ex)
         {
-            Trace.TraceError($"Main_Drop error: {ex}");
+            Trace.TraceError($"Main_Closing error: {ex}");
         }
     }
 

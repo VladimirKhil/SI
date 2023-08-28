@@ -132,7 +132,7 @@ public partial class App : Application
 #endif
 
         _logger = _host.Services.GetRequiredService<ILogger<App>>();
-        _logger.LogInformation("Application started");
+        _logger.LogInformation("Application started. Version: {version}", Assembly.GetExecutingAssembly().GetName().Version);
     }
 
     private static void UpgradePackage(string packagePath)
@@ -455,32 +455,29 @@ public partial class App : Application
 
             var errorInfo = new Model.ErrorInfo { Time = DateTime.Now, Version = version, Error = systemMessage.ToString() };
 #if !DEBUG
-            if (IsVistaOrLater)
+            var dialog = new TaskDialog
             {
-                var dialog = new TaskDialog
-                {
-                    Caption = ProductName,
-                    InstructionText = SIQuester.Properties.Resources.SendErrorHeader,
-                    Text = message.ToString().Trim(),
-                    Icon = TaskDialogStandardIcon.Warning,
-                    StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
-                };
+                Caption = ProductName,
+                InstructionText = SIQuester.Properties.Resources.SendErrorHeader,
+                Text = message.ToString().Trim(),
+                Icon = TaskDialogStandardIcon.Warning,
+                StandardButtons = TaskDialogStandardButtons.Yes | TaskDialogStandardButtons.No
+            };
 
-                if (dialog.Show() == TaskDialogResult.Yes)
-                {
-                    await SendMessageAsync(errorInfo);
-                }
-            }
-            else
-#endif
-                if (MessageBox.Show(
-                    $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
-                    ProductName,
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+            if (dialog.Show() == TaskDialogResult.Yes)
             {
                 await SendMessageAsync(errorInfo);
             }
+#else
+            if (MessageBox.Show(
+                $"{SIQuester.Properties.Resources.SendErrorHeader}{Environment.NewLine}{Environment.NewLine}{message.ToString().Trim()}",
+                ProductName,
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
+            {
+                await SendMessageAsync(errorInfo);
+            }
+#endif
         }
 
         e.Handled = true;
@@ -540,6 +537,8 @@ public partial class App : Application
     {
         try
         {
+            _logger?.LogInformation("OnExit");
+
             if (AppSettings.Default != null)
             {
                 SaveSettings(AppSettings.Default);

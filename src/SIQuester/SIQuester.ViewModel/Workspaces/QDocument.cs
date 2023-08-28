@@ -19,10 +19,8 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml;
@@ -491,7 +489,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    public SIDocument Document { get; private set; } = null;
+    public SIDocument Document { get; private set; }
 
     public PackageViewModel Package { get; }
 
@@ -2441,7 +2439,7 @@ public sealed class QDocument : WorkspaceViewModel
              try
              {
                  // Checking saved document
-                 var testStream = File.Open(tempPath, FileMode.Open, FileAccess.Read);
+                 var testStream = File.OpenRead(tempPath);
                  using (SIDocument.Load(testStream)) { }
 
                  // Test ok, overwriting current file and switching to it
@@ -2455,13 +2453,14 @@ public sealed class QDocument : WorkspaceViewModel
 
                      Changed = false;
                      ClearTempFolder();
-
                      CheckFileSize();
                  }
                  finally
                  {
                      var stream = File.OpenRead(_path);
                      Document.ResetTo(stream);
+
+                     _logger.LogInformation("SaveInternalAsync: document has been reopened: {path}", _path);
                  }
              }
              finally
@@ -2680,12 +2679,17 @@ public sealed class QDocument : WorkspaceViewModel
                 {
                     try
                     {
+                        _logger.LogInformation("Save on exit started: {path}", _path);
+
                         await Save_Executed(null);
 
                         if (NeedSave())
                         {
+                            _logger.LogInformation("Save on exit aborted: {path}", _path);
                             return;
                         }
+
+                        _logger.LogInformation("Save on exit completed: {path}", _path);
                     }
                     catch (Exception exc)
                     {
@@ -3398,6 +3402,7 @@ public sealed class QDocument : WorkspaceViewModel
             PlatformManager.Instance.ClearMedia(Document.Audio);
             PlatformManager.Instance.ClearMedia(Document.Video);
 
+            _logger.LogInformation("Document closed: {path}", _path);
             Document = null;
         }
 

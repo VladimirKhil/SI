@@ -5,9 +5,12 @@
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     d:DesignWidth="564"
-    d:DesignHeight="708.29">
+    d:DesignHeight="708.29"
+    d:DataContext="{d:DesignInstance vm:ImportSIStorageViewModel}">
     <UserControl.Resources>
         <Style TargetType="{x:Type ListBoxItem}">
             <Setter Property="Padding" Value="10,15" />
@@ -16,7 +19,13 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
                         <Border x:Name="border" Background="Transparent">
-                            <ContentPresenter x:Name="header" TextBlock.FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Stretch" TextBlock.TextAlignment="Center" Margin="{TemplateBinding Padding}" />
+                            <ContentPresenter
+                                x:Name="header"
+                                TextBlock.FontSize="16"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                TextBlock.TextAlignment="Center"
+                                Margin="{TemplateBinding Padding}" />
                         </Border>
                         
                         <ControlTemplate.Triggers>
@@ -43,11 +52,13 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Button Click="Button_Click" Height="30" Content="Импорт"/>
+
+        <Button Click="Button_Click" Height="30" Content="{x:Static lp:Resources.Import}" />
         
         <ProgressBar
             Grid.Column="1"
@@ -63,9 +74,8 @@
                 VerticalAlignment="Center"
                 DockPanel.Dock="Left"
                 Width="200"
-                FontWeight="Bold">
-                <Run Text="Фильтр:"/>
-            </TextBlock>
+                FontWeight="Bold"
+                Text="{x:Static lp:Resources.Filter}" />
         </Border>
 
         <TextBox

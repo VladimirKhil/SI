@@ -43,11 +43,11 @@ public abstract class WorkspaceViewModel : ModelViewBase
     /// <summary>
     /// Workspace operation error event.
     /// </summary>
-    public event Action<Exception, string?> Error;
+    public event Action<Exception, string?>? Error;
 
-    public event Action<WorkspaceViewModel> Closed;
+    public event Action<WorkspaceViewModel>? Closed;
 
-    public event Action<WorkspaceViewModel> NewItem;
+    public event Action<WorkspaceViewModel>? NewItem;
 
     protected WorkspaceViewModel()
     {

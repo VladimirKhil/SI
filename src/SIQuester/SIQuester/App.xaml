@@ -18,6 +18,7 @@
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vmp="clr-namespace:SIQuester.ViewModel.Properties;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     Startup="Application_Startup"
     Exit="Application_Exit"
@@ -66,12 +67,12 @@
             </Style>
 
             <util:StringList x:Key="Base">
-                <sys:String>(файл…)</sys:String>
+                <x:Static Member="vmp:Resources.File" />
             </util:StringList>
 
             <util:StringList x:Key="Additional">
-                <sys:String>(файл…)</sys:String>
-                <sys:String>(ссылка…)</sys:String>
+                <x:Static Member="vmp:Resources.File" />
+                <x:Static Member="vmp:Resources.Link" />
             </util:StringList>
 
             <SolidColorBrush x:Key="MainBack" Color="#FFFBFBFF" />

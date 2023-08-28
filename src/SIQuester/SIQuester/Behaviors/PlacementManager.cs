@@ -6,9 +6,9 @@ namespace SIQuester.Behaviors;
 
 public static class PlacementManager
 {
-    public static UIElement GetPlacementTarget(DependencyObject obj) => (UIElement)obj.GetValue(PlacementTargetProperty);
+    public static UIElement? GetPlacementTarget(DependencyObject obj) => (UIElement)obj.GetValue(PlacementTargetProperty);
 
-    public static void SetPlacementTarget(DependencyObject obj, UIElement value) => obj.SetValue(PlacementTargetProperty, value);
+    public static void SetPlacementTarget(DependencyObject obj, UIElement? value) => obj.SetValue(PlacementTargetProperty, value);
 
     public static readonly DependencyProperty PlacementTargetProperty =
         DependencyProperty.RegisterAttached(
@@ -19,8 +19,14 @@ public static class PlacementManager
 
     public static void OnPlacementTargetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
+        if (e.NewValue == null)
+        {
+            return;
+        }
+
         var grid = (FrameworkElement)VisualTreeHelper.GetParent(d);
-        var margin = ((UIElement)e.NewValue).TranslatePoint(new Point(0, 0), grid);
+        var newPlacement = (UIElement)e.NewValue;
+        var margin = newPlacement.TranslatePoint(new Point(0, 0), grid);
 
         var newX = Math.Min(margin.X + (margin.Y == 0 ? 400 : 100), grid.ActualWidth - 300);
         var newY = Math.Max(0, margin.Y - 90);

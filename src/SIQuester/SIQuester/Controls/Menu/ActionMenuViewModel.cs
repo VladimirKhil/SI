@@ -28,9 +28,9 @@ public sealed class ActionMenuViewModel : DependencyObject
     public static readonly DependencyProperty IsOpenProperty =
         DependencyProperty.Register("IsOpen", typeof(bool), typeof(ActionMenuViewModel), new UIPropertyMetadata(false));
 
-    public UIElement PlacementTarget
+    public UIElement? PlacementTarget
     {
-        get => (UIElement)GetValue(PlacementTargetProperty);
+        get => (UIElement?)GetValue(PlacementTargetProperty);
         set { SetValue(PlacementTargetProperty, value); }
     }
 

@@ -39,6 +39,7 @@ public static class SmartMenuManager
         if (ActionMenuViewModel.Instance.PlacementTarget == sender)
         {
             ActionMenuViewModel.Instance.IsOpen = false;
+            ActionMenuViewModel.Instance.PlacementTarget = null;
         }
     }
 
@@ -91,8 +92,13 @@ public static class SmartMenuManager
             if (ActionMenuViewModel.Instance.PlacementTarget == control)
             {
                 ActionMenuViewModel.Instance.IsOpen = false;
+                ActionMenuViewModel.Instance.PlacementTarget = null;
                 var doc = ((MainViewModel)Application.Current.MainWindow.DataContext).ActiveDocument;
-                doc.ActiveItem = null;
+
+                if (doc != null)
+                {
+                    doc.ActiveItem = null;
+                }
             }
         }
     }
@@ -102,6 +108,7 @@ public static class SmartMenuManager
         if (ActionMenuViewModel.Instance.PlacementTarget == sender)
         {
             ActionMenuViewModel.Instance.IsOpen = false;
+            ActionMenuViewModel.Instance.PlacementTarget = null;
         }
     }
 
@@ -134,6 +141,7 @@ public static class SmartMenuManager
     private static void Control_LostFocus(object sender, RoutedEventArgs e)
     {
         ActionMenuViewModel.Instance.IsOpen = false;
+        ActionMenuViewModel.Instance.PlacementTarget = null;
 
         var doc = ((MainViewModel)Application.Current.MainWindow.DataContext).ActiveDocument;
 

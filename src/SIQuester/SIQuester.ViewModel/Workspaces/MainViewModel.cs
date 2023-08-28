@@ -33,6 +33,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<MainViewModel> _logger;
 
+    public ILogger Logger => _logger;
+
     #region Commands
 
     /// <summary>
@@ -240,24 +242,31 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private async void Close_Executed(object? sender, ExecutedRoutedEventArgs e)
     {
-        if (await DisposeRequestAsync())
+        _logger.LogInformation("Close_Executed");
+
+        if (await TryCloseAsync())
         {
+            _logger.LogInformation("Close_Executed complete");
             PlatformManager.Instance.Exit();
         }
     }
 
-    public async Task<bool> DisposeRequestAsync()
+    public async Task<bool> TryCloseAsync()
     {
+        _logger.LogInformation("TryCloseAsync started");
+
         foreach (var doc in DocList.ToArray())
         {
             await doc.Close.ExecuteAsync(null);
 
             if (DocList.Contains(doc)) // Closing has been cancelled
             {
+                _logger.LogInformation("TryCloseAsync cancelled");
                 return false;
             }
         }
 
+        _logger.LogInformation("TryCloseAsync completed");
         return true;
     }
 

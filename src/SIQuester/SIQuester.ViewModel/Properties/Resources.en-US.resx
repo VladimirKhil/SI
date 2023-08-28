@@ -297,6 +297,9 @@
   <data name="Left" xml:space="preserve">
     <value>REMAINDER</value>
   </data>
+  <data name="Link" xml:space="preserve">
+    <value>(link…)</value>
+  </data>
   <data name="LocalProgramName" xml:space="preserve">
     <value>SIQuester</value>
   </data>
@@ -517,7 +520,7 @@
     <value>Question with stakes for everyone</value>
   </data>
   <data name="StakeQuestion" xml:space="preserve">
-    <value>Question with stake</value>
+    <value>Stake question</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Start</value>
@@ -529,7 +532,7 @@
     <value>The input file has been completely read! The entire file header is placed in the package comments. Please sort its content yourself. Total imported themes:</value>
   </data>
   <data name="SuperSecretQuestion" xml:space="preserve">
-    <value>Superquestion with a secret</value>
+    <value>Super Secret question</value>
   </data>
   <data name="TeleSI" xml:space="preserve">
     <value>Television analog of SIGame</value>
@@ -550,7 +553,7 @@
     <value>Topic</value>
   </data>
   <data name="ThemesCollection" xml:space="preserve">
-    <value>Collection of topics</value>
+    <value>Theme collection</value>
   </data>
   <data name="ThemesSelection" xml:space="preserve">
     <value>theme selection</value>
@@ -596,7 +599,7 @@ theme - Cat's theme</value>
     <value>Transformation</value>
   </data>
   <data name="TxtFilesFilter" xml:space="preserve">
-    <value>Question files (*.txt) | .txt</value>
+    <value>Question files (*.txt) | *.txt</value>
   </data>
   <data name="Undefined" xml:space="preserve">
     <value>Not recognized:</value>
@@ -623,7 +626,7 @@ theme - Cat's theme</value>
     <value>Incorrect bracket placement</value>
   </data>
   <data name="XmlFilesFilter" xml:space="preserve">
-    <value>Question files (.xml) | .xml</value>
+    <value>Question files (.xml) | *.xml</value>
   </data>
   <data name="XpsFiles" xml:space="preserve">
     <value>XPS documents</value>

@@ -444,6 +444,9 @@
   <data name="FillPrices" xml:space="preserve">
     <value>Set costs</value>
   </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
   <data name="Final" xml:space="preserve">
     <value>Final</value>
   </data>
@@ -571,7 +574,7 @@
     <value>Fixed value</value>
   </data>
   <data name="NumberSetModeMinimumOrMaximumInRound" xml:space="preserve">
-    <value>Minimum or maximum in  round</value>
+    <value>Minimum or maximum in round</value>
   </data>
   <data name="NumberSetModeRange" xml:space="preserve">
     <value>Select</value>
@@ -908,6 +911,9 @@
   </data>
   <data name="Tour" xml:space="preserve">
     <value>Tour</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
   </data>
   <data name="Undo" xml:space="preserve">
     <value>Cancel</value>

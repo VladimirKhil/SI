@@ -641,4 +641,7 @@ theme - тема Кота</value>
   <data name="RemoveTemplateConfirm" xml:space="preserve">
     <value>Вы действительно хотите удалить шаблон "{0}"?</value>
   </data>
+  <data name="Link" xml:space="preserve">
+    <value>(ссылка…)</value>
+  </data>
 </root>

@@ -6,17 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:l="clr-namespace:SIQuester"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     FontSize="14"
     d:DesignHeight="300"
-    d:DesignWidth="300">
+    d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance vm:SelectThemesViewModel}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="10,10,0,0">
             <GroupBox Header="{x:Static lp:Resources.Range}">
                 <StackPanel>
                     <TextBlock>
                         <Run Text="{x:Static lp:Resources.TotalThemes}" />
-                        <Run Text="{Binding Total}" />
+                        <Run Text="{Binding Total, Mode=OneWay}" />
                     </TextBlock>
 
                     <StackPanel Orientation="Horizontal" Margin="0,7,0,0">

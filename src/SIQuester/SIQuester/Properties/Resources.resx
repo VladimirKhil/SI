@@ -444,6 +444,9 @@
   <data name="FillPrices" xml:space="preserve">
     <value>Задать стоимости</value>
   </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
   <data name="Final" xml:space="preserve">
     <value>Финал</value>
   </data>
@@ -912,6 +915,9 @@
   </data>
   <data name="Tour" xml:space="preserve">
     <value>Тур</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Тип</value>
   </data>
   <data name="Undo" xml:space="preserve">
     <value>Отменить</value>
