@@ -443,7 +443,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    virtual public void GameThemes() => TInfo.TStage = TableStage.GameThemes;
+    virtual public void GameThemes()
+    {
+        TInfo.TStage = TableStage.GameThemes;
+        _data.EnableMediaLoadButton = false;
+    }
 
     virtual public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.BackLink.SendError(exc));
 
@@ -616,6 +620,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                 TInfo.QuestionContentType = QuestionContentType.Text;
                 TInfo.Sound = false;
+                _data.EnableMediaLoadButton = false;
                 break;
 
             case AtomTypes.Video:
@@ -698,6 +703,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     TInfo.Sound = false;
                 }
 
+                _data.EnableMediaLoadButton = false;
                 break;
         }
     }
@@ -828,6 +834,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             TInfo.TStage = TableStage.Answer;
             TInfo.Text = answer;
+            _data.EnableMediaLoadButton = false;
         }
         catch (NullReferenceException exc)
         {
@@ -1145,6 +1152,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         TInfo.Text = text;
         TInfo.TStage = stage;
+        _data.EnableMediaLoadButton = false;
     }
 
     public void OnPauseChanged(bool isPaused) => TInfo.Pause = isPaused;

@@ -318,7 +318,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
             return;
         }
 
-        if (text == Resources.File)
+        if (text == Resources.File) // TODO: do not rely business logic on resource strings
         {
             AddAtomObject(mediaType, asAnswer);
         }

@@ -48,7 +48,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     protected IViewerClient _host;
     protected Connector? _connector;
 
-    protected virtual string[] ContentPublicBaseUrls { get; } = null;
+    protected virtual string[] ContentPublicBaseUrls { get; } = Array.Empty<string>();
 
     protected void UpdateJoinCommand(ConnectionPersonData[] persons)
     {

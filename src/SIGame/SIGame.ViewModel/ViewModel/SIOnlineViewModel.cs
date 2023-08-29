@@ -1000,7 +1000,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     }
 
     private async Task<bool> UploadPackageAsync(
-        PackageSources.PackageSource packageSource,
+        PackageSource packageSource,
         PackageKey packageKey,
         CancellationToken cancellationToken)
     {

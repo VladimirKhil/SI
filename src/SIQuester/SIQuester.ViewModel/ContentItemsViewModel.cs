@@ -295,7 +295,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             return false;
         }
 
-        if (text == Resources.File)
+        if (text == Resources.File) // TODO: do not rely business logic on resource strings
         {
             return AddAtomObject(mediaType);
         }
