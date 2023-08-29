@@ -255,7 +255,6 @@ public sealed class GameActions
 
                                                 if (file == null)
                                                 {
-                                                    _gameData.BackLink.SendError(new Exception($"InformRoundContent: File not found: {mediaCategory}/{contentItem.Value}"), true);
                                                     break;
                                                 }
 

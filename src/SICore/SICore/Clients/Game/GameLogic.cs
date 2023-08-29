@@ -8,7 +8,6 @@ using SICore.Utils;
 using SIData;
 using SIPackages;
 using SIPackages.Core;
-using SIPackages.Helpers;
 using SIPackages.Providers;
 using SIUI.Model;
 using System.Text;
@@ -224,6 +223,7 @@ public sealed class GameLogic : Logic<GameData>
         _data.QuestionPlayState.Clear();
         _data.StakerIndex = -1;
         _data.Type = null;
+        _data.ThemeDeleters = null;
 
         OnRound(round, 1);
 
@@ -2557,7 +2557,7 @@ public sealed class GameLogic : Logic<GameData>
             if (themeComments.Length > 0)
             {
                 _gameActions.ShowmanReplic(themeComments);
-                ScheduleExecution(Tasks.QuestionType, 20, arg + 1);
+                ScheduleExecution(Tasks.QuestionType, 10, arg + 1);
                 return;
             }
 
