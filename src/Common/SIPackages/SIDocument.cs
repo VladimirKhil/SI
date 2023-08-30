@@ -317,25 +317,61 @@ public sealed class SIDocument : IDisposable
 
     private void SaveCore(ISIPackageContainer packageContainer)
     {
-        using (var stream = packageContainer.GetStream(ContentFileName, false).Stream)
+        using (var stream = CreateIfNotExists(packageContainer, ContentFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
             _package.WriteXml(writer);
         }
 
-        using (var stream = packageContainer.GetStream(TextsStorageName, AuthorsFileName, false).Stream)
+        using (var stream = CreateIfNotExists(packageContainer, TextsStorageName, AuthorsFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
             _authors.WriteXml(writer);
         }
 
-        using (var stream = packageContainer.GetStream(TextsStorageName, SourcesFileName, false).Stream)
+        using (var stream = CreateIfNotExists(packageContainer, TextsStorageName, SourcesFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
             _sources.WriteXml(writer);
         }
 
         packageContainer.Flush();
+    }
+
+    private static StreamInfo CreateIfNotExists(ISIPackageContainer packageContainer, string streamName)
+    {
+        var streamInfo = packageContainer.GetStream(streamName, false);
+
+        if (streamInfo == null)
+        {
+            packageContainer.CreateStream(streamName, "si/xml");
+            streamInfo = packageContainer.GetStream(streamName, false);
+
+            if (streamInfo == null)
+            {
+                throw new InvalidOperationException($"Cannot create stream {streamName}");
+            }
+        }
+
+        return streamInfo;
+    }
+
+    private static StreamInfo CreateIfNotExists(ISIPackageContainer packageContainer, string categoryName, string streamName)
+    {
+        var streamInfo = packageContainer.GetStream(categoryName, streamName, false);
+
+        if (streamInfo == null)
+        {
+            packageContainer.CreateStream(categoryName, streamName, "si/xml");
+            streamInfo = packageContainer.GetStream(categoryName, streamName, false);
+
+            if (streamInfo == null)
+            {
+                throw new InvalidOperationException($"Cannot create stream {categoryName}/{streamName}");
+            }
+        }
+
+        return streamInfo;
     }
 
     /// <summary>
