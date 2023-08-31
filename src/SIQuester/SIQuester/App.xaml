@@ -9,7 +9,6 @@
     xmlns:lv="clr-namespace:SIQuester.View"
     xmlns:ls="clr-namespace:SIQuester.Selectors"
     xmlns:lb="clr-namespace:SIQuester.Behaviors"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
     xmlns:pc="clr-namespace:SIPackages.Core;assembly=SIPackages"
     xmlns:util="clr-namespace:SIQuester.Utilities"
@@ -329,10 +328,10 @@
             <siqcv:MappedConverter x:Key="QuestionTypeConverterNew" Map="{StaticResource QuestionTypesNew}" />
 
             <siqcv:StringDictionary x:Key="QTParams">
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.Cat_Theme}">Тема</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.Cat_Cost}">Стоимость</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows}">Тема и стоимость известны</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self}">Отдать себе</sys:String>
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.Cat_Theme}" Member="lp:Resources.Theme" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.Cat_Cost}" Member="lp:Resources.Price" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows}" Member="lp:Resources.BagCat_Knows" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self}" Member="lp:Resources.BagCat_Self" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="QuestionTypeParamConverter" Map="{StaticResource QTParams}" />
@@ -348,23 +347,26 @@
             <siqcv:MappedConverter x:Key="QuestionParameterNamesConverter" Map="{StaticResource QuestionParameterNames}" />
 
             <siqcv:StringDictionary x:Key="BCSelf">
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_True}">Можно</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_False}">Нельзя</sys:String>
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_True}" Member="lp:Resources.BagCat_Self_Value_True" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Self_Value_False}" Member="lp:Resources.BagCat_Self_Value_False" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="BagCatSelfConverter" Map="{StaticResource BCSelf}" />
 
             <siqcv:StringDictionary x:Key="SelectionModes">
                 <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_Any}" Member="lp:Resources.SetAnswererSelect_Any" />
-                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_ExceptCurrent}" Member="lp:Resources.SetAnswererSelect_ExceptCurrent" />
+                
+                <x:Static
+                    x:Key="{x:Static pc:StepParameterValues.SetAnswererSelect_ExceptCurrent}"
+                    Member="lp:Resources.SetAnswererSelect_ExceptCurrent" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="SelectionModesConverter" Map="{StaticResource SelectionModes}" />
 
             <siqcv:StringDictionary x:Key="BCKnows">
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Before}">До отдачи</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_After}">После отдачи</sys:String>
-                <sys:String x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Never}">Никогда</sys:String>
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Before}" Member="lp:Resources.BagCat_Knows_Value_Before" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_After}" Member="lp:Resources.BagCat_Knows_Value_After" />
+                <x:Static x:Key="{x:Static pc:QuestionTypeParams.BagCat_Knows_Value_Never}" Member="lp:Resources.BagCat_Knows_Value_Never" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="BagCatKnowsConverter" Map="{StaticResource BCKnows}" />

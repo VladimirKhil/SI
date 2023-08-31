@@ -174,6 +174,9 @@
   <data name="AlignAnswersRight" xml:space="preserve">
     <value>Align answers to the right edge of the window in the tree view</value>
   </data>
+  <data name="AlignPriceWithQuestionText" xml:space="preserve">
+    <value>The price is written in the same line as the question</value>
+  </data>
   <data name="AllFiles" xml:space="preserve">
     <value>All files</value>
   </data>
@@ -182,6 +185,12 @@
   </data>
   <data name="AnswerHeader" xml:space="preserve">
     <value>Answer:</value>
+  </data>
+  <data name="AnswerMetaHint" xml:space="preserve">
+    <value>Hint about metacharacters in answers</value>
+  </data>
+  <data name="AnswersLayout" xml:space="preserve">
+    <value>Answers layout</value>
   </data>
   <data name="AppAuthor" xml:space="preserve">
     <value>Vladimir Khil</value>
@@ -219,6 +228,9 @@
   <data name="AuthorsHeader" xml:space="preserve">
     <value>Authors:</value>
   </data>
+  <data name="AuthorsLayout" xml:space="preserve">
+    <value>Authors layout</value>
+  </data>
   <data name="AutoDetect" xml:space="preserve">
     <value>Auto-detect</value>
   </data>
@@ -233,6 +245,27 @@
   </data>
   <data name="AutoSetQuestionPrices" xml:space="preserve">
     <value>Automatic setting of question costs</value>
+  </data>
+  <data name="BagCat_Knows" xml:space="preserve">
+    <value>Theme and prices are announced</value>
+  </data>
+  <data name="BagCat_Knows_Value_After" xml:space="preserve">
+    <value>After giving</value>
+  </data>
+  <data name="BagCat_Knows_Value_Before" xml:space="preserve">
+    <value>Before giving</value>
+  </data>
+  <data name="BagCat_Knows_Value_Never" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="BagCat_Self" xml:space="preserve">
+    <value>Can give to yourself</value>
+  </data>
+  <data name="BagCat_Self_Value_False" xml:space="preserve">
+    <value>Disallow</value>
+  </data>
+  <data name="BagCat_Self_Value_True" xml:space="preserve">
+    <value>Allow</value>
   </data>
   <data name="BaseAuthors" xml:space="preserve">
     <value>Author</value>
@@ -369,6 +402,9 @@
   <data name="Difficulty" xml:space="preserve">
     <value>Difficulty</value>
   </data>
+  <data name="DocumentCaption" xml:space="preserve">
+    <value>Document title</value>
+  </data>
   <data name="DocumentFont" xml:space="preserve">
     <value>Document font</value>
   </data>
@@ -396,11 +432,23 @@
   <data name="EditModeNone" xml:space="preserve">
     <value>Read only</value>
   </data>
+  <data name="EditMode_FixedPanel" xml:space="preserve">
+    <value>Fixed panel</value>
+  </data>
+  <data name="EditMode_FloatPanel" xml:space="preserve">
+    <value>Floating panel</value>
+  </data>
+  <data name="EditMode_ReadOnly" xml:space="preserve">
+    <value>Read only</value>
+  </data>
   <data name="EditText" xml:space="preserve">
     <value>Edit text</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>Untitled</value>
+  </data>
+  <data name="EmptyLineBeforeThemeName" xml:space="preserve">
+    <value>Is an empty line needed after the topic</value>
   </data>
   <data name="EmptyQuestion" xml:space="preserve">
     <value>(empty)</value>
@@ -416,6 +464,9 @@
   </data>
   <data name="ExpandMedia" xml:space="preserve">
     <value>Expand media</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Export</value>
   </data>
   <data name="ExportAndPrint" xml:space="preserve">
     <value>Export and print</value>
@@ -482,6 +533,9 @@
   </data>
   <data name="HowToUse" xml:space="preserve">
     <value>How to use the program…</value>
+  </data>
+  <data name="HtmlExportHint" xml:space="preserve">
+    <value>Set the parameters of the output document and press the "Export" button</value>
   </data>
   <data name="Images" xml:space="preserve">
     <value>Images</value>
@@ -582,6 +636,9 @@
   <data name="NumberSetModeRangeWithStep" xml:space="preserve">
     <value>Select with step</value>
   </data>
+  <data name="NumberThemes" xml:space="preserve">
+    <value>Number the themes</value>
+  </data>
   <data name="Object" xml:space="preserve">
     <value>Object</value>
   </data>
@@ -624,6 +681,9 @@
   <data name="PackageName" xml:space="preserve">
     <value>Package name</value>
   </data>
+  <data name="PackageNameFontSize" xml:space="preserve">
+    <value>Package name font size</value>
+  </data>
   <data name="PackageType" xml:space="preserve">
     <value>Package template</value>
   </data>
@@ -662,6 +722,9 @@
   </data>
   <data name="QuestionSplitting" xml:space="preserve">
     <value>Splitting text into questions</value>
+  </data>
+  <data name="QuestionTextFontSize" xml:space="preserve">
+    <value>Question text font size</value>
   </data>
   <data name="QuestionType" xml:space="preserve">
     <value>Question type</value>
@@ -719,6 +782,9 @@
   </data>
   <data name="RoundCount" xml:space="preserve">
     <value>Round count</value>
+  </data>
+  <data name="RoundNameFontSize" xml:space="preserve">
+    <value>Round name font size</value>
   </data>
   <data name="RoundThemeCount" xml:space="preserve">
     <value>Theme per round count</value>
@@ -852,6 +918,9 @@
   <data name="SourcesHeader" xml:space="preserve">
     <value>Sources:</value>
   </data>
+  <data name="SourcesLayout" xml:space="preserve">
+    <value>Sources layout</value>
+  </data>
   <data name="SpellChecking" xml:space="preserve">
     <value>Spell check (Windows 8.1 and above)</value>
   </data>
@@ -877,7 +946,7 @@
     <value>Table</value>
   </data>
   <data name="TableFormat" xml:space="preserve">
-    <value>Tabular format</value>
+    <value>Table format</value>
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
@@ -885,11 +954,17 @@
   <data name="Template" xml:space="preserve">
     <value>Template</value>
   </data>
+  <data name="TextBeforeThemeName" xml:space="preserve">
+    <value>Text before theme name</value>
+  </data>
   <data name="TextToImport" xml:space="preserve">
     <value>Text for import (copy into the field below or open a file)</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Topic</value>
+    <value>Theme</value>
+  </data>
+  <data name="ThemeNameFontSize" xml:space="preserve">
+    <value>Theme name fotn size</value>
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Question per theme count</value>

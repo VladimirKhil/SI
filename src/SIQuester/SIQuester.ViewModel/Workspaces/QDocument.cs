@@ -2015,7 +2015,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             var filter = new Dictionary<string, string>
             {
-                ["HTML файлы"] = "html"
+                [Resources.HtmlFiles] = "html"
             };
 
             if (PlatformManager.Instance.ShowSaveUI(Resources.Transform, "html", filter, ref filename))
@@ -2059,7 +2059,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             var filter = new Dictionary<string, string>
             {
-                ["Текстовые файлы"] = "txt"
+                [Resources.TextFiles] = "txt"
             };
 
             if (PlatformManager.Instance.ShowSaveUI(Resources.ToIRC, "txt", filter, ref filename))
@@ -2146,7 +2146,7 @@ public sealed class QDocument : WorkspaceViewModel
                                             showmanComments.AppendLine();
                                         }
 
-                                        showmanComments.Append("* изображение: ");
+                                        showmanComments.Append($"* {Resources.MircImage}: ");
                                         showmanComments.Append(item.Value);
                                         break;
 
@@ -2157,7 +2157,7 @@ public sealed class QDocument : WorkspaceViewModel
                                             showmanComments.AppendLine();
                                         }
 
-                                        showmanComments.Append("* звук: ");
+                                        showmanComments.Append($"* {Resources.MircAudio}: ");
                                         showmanComments.Append(item.Value);
                                         break;
 
@@ -2167,7 +2167,7 @@ public sealed class QDocument : WorkspaceViewModel
                                             showmanComments.AppendLine();
                                         }
 
-                                        showmanComments.Append("* видео: ");
+                                        showmanComments.Append($"* {Resources.MircVideo}: ");
                                         showmanComments.Append(item.Value);
                                         break;
 
@@ -2189,7 +2189,7 @@ public sealed class QDocument : WorkspaceViewModel
                                     if (showmanComments.Length > 0)
                                         showmanComments.AppendLine();
 
-                                    showmanComments.Append("* изображение: ");
+                                    showmanComments.Append($"* {Resources.MircImage}: ");
                                     showmanComments.Append(item.Text);
                                 }
                                 else if (item.Type == AtomTypes.Audio || item.Type == AtomTypes.AudioNew)
@@ -2197,7 +2197,7 @@ public sealed class QDocument : WorkspaceViewModel
                                     if (showmanComments.Length > 0)
                                         showmanComments.AppendLine();
 
-                                    showmanComments.Append("* звук: ");
+                                    showmanComments.Append($"* {Resources.MircAudio}: ");
                                     showmanComments.Append(item.Text);
                                 }
                                 else if (item.Type == AtomTypes.Video)
@@ -2205,7 +2205,7 @@ public sealed class QDocument : WorkspaceViewModel
                                     if (showmanComments.Length > 0)
                                         showmanComments.AppendLine();
 
-                                    showmanComments.Append("* видео: ");
+                                    showmanComments.Append($"* {Resources.MircVideo}: ");
                                     showmanComments.Append(item.Text);
                                 }
                                 else
@@ -2249,7 +2249,7 @@ public sealed class QDocument : WorkspaceViewModel
                     rind++;
                 });
 
-                using var writer = new StreamWriter(filename, false, Encoding.GetEncoding(1251));
+                using var writer = new StreamWriter(filename, false);
                 writer.Write(file);
             }
         }
@@ -2271,10 +2271,10 @@ public sealed class QDocument : WorkspaceViewModel
 
         var filter = new Dictionary<string, string>
         {
-            ["Документы (*.xps)"] = "xps"
+            [Resources.XpsFiles] = "xps"
         };
 
-        if (PlatformManager.Instance.ShowSaveUI("Экспорт в формат таблицы", "xps", filter, ref filename))
+        if (PlatformManager.Instance.ShowSaveUI(Resources.ExportTableHeader, "xps", filter, ref filename))
         {
             IsProgress = true;
 

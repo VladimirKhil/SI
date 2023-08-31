@@ -7,10 +7,13 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:m="clr-namespace:SIQuester.Model;assembly=SIQuester.ViewModel"
     xmlns:lc="clr-namespace:SIQuester.Converters"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     d:DesignHeight="473"
     d:DesignWidth="788"
-    FontSize="14">
+    FontSize="14"
+    d:DataContext="{d:DesignInstance vm:ExportHtmlViewModel}">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Margin" Value="5,5,5,0" />
@@ -71,44 +74,50 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            
-            <TextBlock Grid.ColumnSpan="3" Text="Настройте параметры выходного документа и нажмите кнопку &quot;Экспорт&quot;" TextWrapping="Wrap" />
-            <TextBlock Grid.Row="1" Text="Шрифт документа" />
-            <TextBlock Grid.Row="2" Name="textBlock1" Text="Подсказка про метасиволы в ответах" />
-            <TextBlock Grid.Row="3" Name="textBlock2" Text="Заголовок документа" />
-            <TextBlock Grid.Row="4" Name="textBlock3" Text="Размер шрифта в имени пакета" />
-            <TextBlock Grid.Row="5" Name="textBlock4" Text="Размер шрифта в названии раунда" />
-            <TextBlock Grid.Row="6" Name="textBlock5" Text="Размер шрифта в названии темы" />
-            <TextBlock Grid.Row="7" Name="textBlock6" Text="Текст перед темой" />
-            <TextBlock Grid.Row="8" Name="textBlock7" Text="Нужна ли пустая строка после темы" />
-            <TextBlock Grid.Row="9" Name="textBlock8" Text="Размер шрифта в вопросе" />
-            <TextBlock Grid.Row="10" Name="textBlock9" Text="Цена пишется в той же строке, что и вопрос" />
-            <TextBlock Grid.Row="11" Name="textBlock10" Text="Ответы пишутся" />
-            <TextBlock Grid.Row="12" Name="textBlock11" Text="Авторы пишутся" />
-            <TextBlock Grid.Row="13" Name="textBlock12" Text="Источники пишутся" />
-            <TextBlock Grid.Row="14" Name="textBlock13" Text="Нумеровать темы" />
-            <TextBox Grid.Column="1" Grid.Row="1" Name="textBox1" Text="{Binding DocumentFontFamily}" />
-            <CheckBox Grid.Column="1" Grid.Row="2" Name="checkBox1" IsChecked="{Binding ShowMetaTips}" />
-            <TextBox Grid.Column="1" Grid.Row="3" Name="textBox2" Text="{Binding DocHeader}" />
-            <TextBox Grid.Column="1" Grid.Row="4" Name="textBox3" Text="{Binding PackageFontSize}" />
+
+            <TextBlock Grid.ColumnSpan="3" Text="{x:Static lp:Resources.HtmlExportHint}" TextWrapping="Wrap" />
+            <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.DocumentFont}" />
+            <TextBlock Grid.Row="2" Text="{x:Static lp:Resources.AnswerMetaHint}" />
+            <TextBlock Grid.Row="3" Text="{x:Static lp:Resources.DocumentCaption}" />
+            <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.PackageNameFontSize}" />
+            <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.RoundNameFontSize}" />
+            <TextBlock Grid.Row="6" Text="{x:Static lp:Resources.ThemeNameFontSize}" />
+            <TextBlock Grid.Row="7" Text="{x:Static lp:Resources.TextBeforeThemeName}" />
+            <TextBlock Grid.Row="8" Text="{x:Static lp:Resources.EmptyLineBeforeThemeName}" />
+            <TextBlock Grid.Row="9" Text="{x:Static lp:Resources.QuestionTextFontSize}" />
+            <TextBlock Grid.Row="10" Text="{x:Static lp:Resources.AlignPriceWithQuestionText}" />
+            <TextBlock Grid.Row="11" Text="{x:Static lp:Resources.AnswersLayout}" />
+            <TextBlock Grid.Row="12" Text="{x:Static lp:Resources.AuthorsLayout}" />
+            <TextBlock Grid.Row="13" Text="{x:Static lp:Resources.SourcesLayout}" />
+            <TextBlock Grid.Row="14" Text="{x:Static lp:Resources.NumberThemes}" />
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DocumentFontFamily}" />
+            <CheckBox Grid.Column="1" Grid.Row="2" IsChecked="{Binding ShowMetaTips}" />
+            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding DocHeader}" />
+            <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding PackageFontSize}" />
             <TextBlock Grid.Column="2" Grid.Row="4" Text="pt" />
-            <TextBox Grid.Column="1" Grid.Row="5" Name="textBox4" Text="{Binding RoundFontSize}" />
+            <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding RoundFontSize}" />
             <TextBlock Grid.Column="2" Grid.Row="5" Text="pt" />
-            <TextBox Grid.Column="1" Grid.Row="6" Name="textBox5" Text="{Binding ThemeFontSize}" />
+            <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding ThemeFontSize}" />
             <TextBlock Grid.Column="2" Grid.Row="6" Text="pt" />
-            <TextBox Grid.Column="1" Grid.Row="7" Name="textBox6" Text="{Binding ThemeHeader}" />
-            <CheckBox Content="" Grid.Column="1" Grid.Row="8" Name="checkBox2" IsChecked="{Binding EmptyStringAfterThemeName}" />
-            <TextBox Grid.Column="1" Grid.Row="9" Name="textBox7" Text="{Binding QuestionFontSize}" />
+            <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding ThemeHeader}" />
+            <CheckBox Content="" Grid.Column="1" Grid.Row="8" IsChecked="{Binding EmptyStringAfterThemeName}" />
+            <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding QuestionFontSize}" />
             <TextBlock Grid.Column="2" Grid.Row="9" Text="pt" />
-            <CheckBox Grid.Column="1" Grid.Row="10" Name="checkBox3" IsChecked="{Binding PriceNearText}" />
-            <ComboBox Grid.Column="1" Grid.Row="11" Name="comboBox1" SelectedItem="{Binding AnswerOrientation}" />
-            <ComboBox Grid.Column="1" Grid.Row="12" Name="comboBox2" SelectedItem="{Binding AuthorsOrientation}"  />
-            <ComboBox Grid.Column="1" Grid.Row="13" Name="comboBox3" SelectedItem="{Binding SourcesOrientation}" />
-            <CheckBox Grid.Column="1" Grid.Row="14" Name="checkBox4" IsChecked="{Binding ThemeNumbers}" />
-            
-            <Button Grid.Row="15" Grid.ColumnSpan="3" HorizontalAlignment="Right" Width="100" Margin="0,5,0,0" Command="{Binding Export}">
-                Экспорт
-            </Button>
+            <CheckBox Grid.Column="1" Grid.Row="10" IsChecked="{Binding PriceNearText}" />
+            <ComboBox Grid.Column="1" Grid.Row="11" SelectedItem="{Binding AnswerOrientation}" />
+            <ComboBox Grid.Column="1" Grid.Row="12" SelectedItem="{Binding AuthorsOrientation}"  />
+            <ComboBox Grid.Column="1" Grid.Row="13" SelectedItem="{Binding SourcesOrientation}" />
+            <CheckBox Grid.Column="1" Grid.Row="14" IsChecked="{Binding ThemeNumbers}" />
+
+            <Button
+                Grid.Row="15"
+                Grid.ColumnSpan="3"
+                HorizontalAlignment="Right"
+                Width="100"
+                Margin="0,5,27,0"
+                Padding="15,4"
+                Command="{Binding Export}"
+                Content="{x:Static lp:Resources.Export}" />
         </Grid>
     </ScrollViewer>
 </UserControl>

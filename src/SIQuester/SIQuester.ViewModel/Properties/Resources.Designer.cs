@@ -385,6 +385,33 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Экспорт в формат таблицы.
+        /// </summary>
+        public static string ExportTableHeader {
+            get {
+                return ResourceManager.GetString("ExportTableHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на экспорт в HTML.
+        /// </summary>
+        public static string ExportToHtml {
+            get {
+                return ResourceManager.GetString("ExportToHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вопросы &quot;SIGame&quot;.
+        /// </summary>
+        public static string ExportToHtmlHeader {
+            get {
+                return ResourceManager.GetString("ExportToHtmlHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Экспорт в формат СНС.
         /// </summary>
         public static string ExportToSns {
@@ -651,6 +678,33 @@ namespace SIQuester.ViewModel.Properties {
         public static string MediaFileTooLarge {
             get {
                 return ResourceManager.GetString("MediaFileTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на звук.
+        /// </summary>
+        public static string MircAudio {
+            get {
+                return ResourceManager.GetString("MircAudio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на изображение.
+        /// </summary>
+        public static string MircImage {
+            get {
+                return ResourceManager.GetString("MircImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на видео.
+        /// </summary>
+        public static string MircVideo {
+            get {
+                return ResourceManager.GetString("MircVideo", resourceCulture);
             }
         }
         
@@ -1290,15 +1344,6 @@ namespace SIQuester.ViewModel.Properties {
         public static string Statistic {
             get {
                 return ResourceManager.GetString("Statistic", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на .
-        /// </summary>
-        public static string String1 {
-            get {
-                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

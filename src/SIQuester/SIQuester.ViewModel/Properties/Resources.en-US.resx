@@ -130,7 +130,7 @@
     <value>Add a round</value>
   </data>
   <data name="AddTheme" xml:space="preserve">
-    <value>Add a topic</value>
+    <value>Add a theme</value>
   </data>
   <data name="And" xml:space="preserve">
     <value>and</value>
@@ -225,6 +225,15 @@
   <data name="ExportMediaError" xml:space="preserve">
     <value>Media export error</value>
   </data>
+  <data name="ExportTableHeader" xml:space="preserve">
+    <value>Export to table format</value>
+  </data>
+  <data name="ExportToHtml" xml:space="preserve">
+    <value>export to HTML</value>
+  </data>
+  <data name="ExportToHtmlHeader" xml:space="preserve">
+    <value>SIGame questions</value>
+  </data>
   <data name="ExportToSns" xml:space="preserve">
     <value>Export to CNS format</value>
   </data>
@@ -315,6 +324,15 @@
   <data name="MediaFileTooLarge" xml:space="preserve">
     <value>File {0} exceeds the recommended size of {1} KB</value>
   </data>
+  <data name="MircAudio" xml:space="preserve">
+    <value>audio</value>
+  </data>
+  <data name="MircImage" xml:space="preserve">
+    <value>image</value>
+  </data>
+  <data name="MircVideo" xml:space="preserve">
+    <value>video</value>
+  </data>
   <data name="MissingFile" xml:space="preserve">
     <value>missing file</value>
   </data>
@@ -364,13 +382,13 @@
     <value>Please CAREFULLY familiarize yourself with the proposed format. Note that errors when reading a file may occur even due to the absence of a line break symbol or a space.</value>
   </data>
   <data name="NumOfQuests" xml:space="preserve">
-    <value>Number of questions</value>
+    <value>Question count</value>
   </data>
   <data name="NumOfRounds" xml:space="preserve">
-    <value>Number of rounds</value>
+    <value>Round count</value>
   </data>
   <data name="NumOfThemes" xml:space="preserve">
-    <value>Number of topics</value>
+    <value>Theme count</value>
   </data>
   <data name="ObjectNotFound" xml:space="preserve">
     <value>The next object was not found: {0}</value>
@@ -550,7 +568,7 @@
     <value>Import text</value>
   </data>
   <data name="Theme" xml:space="preserve">
-    <value>Topic</value>
+    <value>Theme</value>
   </data>
   <data name="ThemesCollection" xml:space="preserve">
     <value>Theme collection</value>
@@ -638,6 +656,6 @@ theme - Cat's theme</value>
     <value>YAML files (.yaml) | *.yaml</value>
   </data>
   <data name="YourThemes" xml:space="preserve">
-    <value>Your topics:</value>
+    <value>Your themes:</value>
   </data>
 </root>

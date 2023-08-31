@@ -370,9 +370,20 @@
                         </Style>
                     </MenuItem.Resources>
                     
-                    <MenuItem Style="{StaticResource MenuSelect}" Header="Только чтение" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.None}}" />
-                    <MenuItem Style="{StaticResource MenuSelect}" Header="Фиксированная панель" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}" />
-                    <MenuItem Style="{StaticResource MenuSelect}" Header="Плавающая панель" IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FloatPanel}}" />
+                    <MenuItem
+                        Style="{StaticResource MenuSelect}"
+                        Header="{x:Static lp:Resources.EditMode_ReadOnly}"
+                        IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.None}}" />
+                    
+                    <MenuItem
+                        Style="{StaticResource MenuSelect}"
+                        Header="{x:Static lp:Resources.EditMode_FixedPanel}"
+                        IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FixedPanel}}" />
+                    
+                    <MenuItem
+                        Style="{StaticResource MenuSelect}"
+                        Header="{x:Static lp:Resources.EditMode_FloatPanel}"
+                        IsChecked="{Binding Source={x:Static m:AppSettings.Default},Path=Edit,Converter={StaticResource Equals},ConverterParameter={x:Static m:EditMode.FloatPanel}}" />
                 </MenuItem>
             </Menu>
             

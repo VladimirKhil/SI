@@ -174,6 +174,9 @@
   <data name="AlignAnswersRight" xml:space="preserve">
     <value>Выровнять ответы по правому краю окна в древовидном отображении</value>
   </data>
+  <data name="AlignPriceWithQuestionText" xml:space="preserve">
+    <value>Цена пишется в той же строке, что и вопрос</value>
+  </data>
   <data name="AllFiles" xml:space="preserve">
     <value>Все файлы</value>
   </data>
@@ -182,6 +185,12 @@
   </data>
   <data name="AnswerHeader" xml:space="preserve">
     <value>Ответ:</value>
+  </data>
+  <data name="AnswerMetaHint" xml:space="preserve">
+    <value>Подсказка про метасиволы в ответах</value>
+  </data>
+  <data name="AnswersLayout" xml:space="preserve">
+    <value>Ответы пишутся</value>
   </data>
   <data name="AppAuthor" xml:space="preserve">
     <value>Владимир Хиль</value>
@@ -219,6 +228,9 @@
   <data name="AuthorsHeader" xml:space="preserve">
     <value>Авторы:</value>
   </data>
+  <data name="AuthorsLayout" xml:space="preserve">
+    <value>Авторы пишутся</value>
+  </data>
   <data name="AutoDetect" xml:space="preserve">
     <value>Автоопределение</value>
   </data>
@@ -233,6 +245,27 @@
   </data>
   <data name="AutoSetQuestionPrices" xml:space="preserve">
     <value>Автоматическое задание стоимостей вопросов</value>
+  </data>
+  <data name="BagCat_Knows" xml:space="preserve">
+    <value>Тема и стоимость известны</value>
+  </data>
+  <data name="BagCat_Knows_Value_After" xml:space="preserve">
+    <value>После отдачи</value>
+  </data>
+  <data name="BagCat_Knows_Value_Before" xml:space="preserve">
+    <value>До отдачи</value>
+  </data>
+  <data name="BagCat_Knows_Value_Never" xml:space="preserve">
+    <value>Никогда</value>
+  </data>
+  <data name="BagCat_Self" xml:space="preserve">
+    <value>Отдать себе</value>
+  </data>
+  <data name="BagCat_Self_Value_False" xml:space="preserve">
+    <value>Нельзя</value>
+  </data>
+  <data name="BagCat_Self_Value_True" xml:space="preserve">
+    <value>Можно</value>
   </data>
   <data name="BaseAuthors" xml:space="preserve">
     <value>Автор</value>
@@ -369,6 +402,9 @@
   <data name="Difficulty" xml:space="preserve">
     <value>Сложность</value>
   </data>
+  <data name="DocumentCaption" xml:space="preserve">
+    <value>Заголовок документа</value>
+  </data>
   <data name="DocumentFont" xml:space="preserve">
     <value>Шрифт документа</value>
   </data>
@@ -396,11 +432,23 @@
   <data name="EditModeNone" xml:space="preserve">
     <value>Только чтение</value>
   </data>
+  <data name="EditMode_FixedPanel" xml:space="preserve">
+    <value>Фиксированная панель</value>
+  </data>
+  <data name="EditMode_FloatPanel" xml:space="preserve">
+    <value>Плавающая панель</value>
+  </data>
+  <data name="EditMode_ReadOnly" xml:space="preserve">
+    <value>Только чтение</value>
+  </data>
   <data name="EditText" xml:space="preserve">
     <value>Редактировать текст</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>Без имени</value>
+  </data>
+  <data name="EmptyLineBeforeThemeName" xml:space="preserve">
+    <value>Нужна ли пустая строка после темы</value>
   </data>
   <data name="EmptyQuestion" xml:space="preserve">
     <value>(пустой)</value>
@@ -416,6 +464,9 @@
   </data>
   <data name="ExpandMedia" xml:space="preserve">
     <value>Развернуть медиа</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Экспорт</value>
   </data>
   <data name="ExportAndPrint" xml:space="preserve">
     <value>Экспорт и печать</value>
@@ -482,6 +533,9 @@
   </data>
   <data name="HowToUse" xml:space="preserve">
     <value>Как использовать программу…</value>
+  </data>
+  <data name="HtmlExportHint" xml:space="preserve">
+    <value>Настройте параметры выходного документа и нажмите кнопку "Экспорт"</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -586,6 +640,9 @@
   <data name="NumberSetModeRangeWithStep" xml:space="preserve">
     <value>Выбор с шагом</value>
   </data>
+  <data name="NumberThemes" xml:space="preserve">
+    <value>Нумеровать темы</value>
+  </data>
   <data name="Object" xml:space="preserve">
     <value>Объект</value>
   </data>
@@ -628,6 +685,9 @@
   <data name="PackageName" xml:space="preserve">
     <value>Имя пакета</value>
   </data>
+  <data name="PackageNameFontSize" xml:space="preserve">
+    <value>Размер шрифта в имени пакета</value>
+  </data>
   <data name="PackageType" xml:space="preserve">
     <value>Шаблон пакета</value>
   </data>
@@ -666,6 +726,9 @@
   </data>
   <data name="QuestionSplitting" xml:space="preserve">
     <value>Разделение текста на вопросы</value>
+  </data>
+  <data name="QuestionTextFontSize" xml:space="preserve">
+    <value>Размер шрифта в вопросе</value>
   </data>
   <data name="QuestionType" xml:space="preserve">
     <value>Тип вопроса</value>
@@ -723,6 +786,9 @@
   </data>
   <data name="RoundCount" xml:space="preserve">
     <value>Число раундов</value>
+  </data>
+  <data name="RoundNameFontSize" xml:space="preserve">
+    <value>Размер шрифта в названии раунда</value>
   </data>
   <data name="RoundThemeCount" xml:space="preserve">
     <value>Число тем в раунде</value>
@@ -856,6 +922,9 @@
   <data name="SourcesHeader" xml:space="preserve">
     <value>Источники:</value>
   </data>
+  <data name="SourcesLayout" xml:space="preserve">
+    <value>Авторы пишутся</value>
+  </data>
   <data name="SpellChecking" xml:space="preserve">
     <value>Проверка правописания (Windows 8.1 и выше)</value>
   </data>
@@ -889,11 +958,17 @@
   <data name="Template" xml:space="preserve">
     <value>Шаблон</value>
   </data>
+  <data name="TextBeforeThemeName" xml:space="preserve">
+    <value>Текст перед темой</value>
+  </data>
   <data name="TextToImport" xml:space="preserve">
     <value>Текст для импорта (скопируйте в поле ниже или откройте файл)</value>
   </data>
   <data name="Theme" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="ThemeNameFontSize" xml:space="preserve">
+    <value>Размер шрифта в названии темы</value>
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Число вопросов в теме</value>

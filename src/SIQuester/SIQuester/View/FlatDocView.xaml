@@ -622,7 +622,7 @@
                             ItemsSource="{Binding Source={StaticResource QuestionTypesNames}}"
                             SelectedItem="{Binding Type.Model.Name, Converter={StaticResource QuestionTypeConverter}, Mode=TwoWay}" />
 
-                        <ItemsControl ItemsSource="{Binding Type.Params}">
+                        <ItemsControl x:Name="typeParams" ItemsSource="{Binding Type.Params}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
@@ -652,6 +652,9 @@
                                 TargetName="type"
                                 Property="SelectedItem"
                                 Value="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
+
+                            <!-- TODO: add new menu for upgraded question type params -->
+                            <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
 
                         <MultiDataTrigger>
@@ -675,7 +678,7 @@
                 <DataTemplate x:Key="{x:Type vm:ThemeViewModel}" />
                 <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
                     <StackPanel Margin="8">
-                        <TextBlock x:Name="typeHeader" Text="Тип" />
+                        <TextBlock x:Name="typeHeader" Text="{x:Static lp:Resources.Type}" />
                         
                         <ComboBox
                             x:Name="type"
@@ -730,6 +733,21 @@
                             <Setter TargetName="type" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="switch" Property="ToolTip" Value="{x:Static lp:Resources.MakeNonEmpty}" />
+                        </DataTrigger>
+
+                        <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
+                            <Setter
+                                TargetName="type"
+                                Property="ItemsSource"
+                                Value="{Binding Source={StaticResource QuestionTypesNamesNew}}" />
+
+                            <Setter
+                                TargetName="type"
+                                Property="SelectedItem"
+                                Value="{Binding TypeName, Converter={StaticResource QuestionTypeConverterNew}, Mode=TwoWay}" />
+
+                            <!-- TODO: add new floating menu for upgraded question type params -->
+                            <Setter TargetName="typeParams" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>

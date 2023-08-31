@@ -560,9 +560,6 @@ theme - тема Кота</value>
   <data name="PackageCorruptedHintLogs" xml:space="preserve">
     <value>Если не получится, отправьте автору программы логи, чтобы можно было избежать проблемы в будущем</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value />
-  </data>
   <data name="FileInMultipleCategories" xml:space="preserve">
     <value>Файл {0} содержится в пакете в разных категориях!</value>
   </data>
@@ -643,5 +640,23 @@ theme - тема Кота</value>
   </data>
   <data name="Link" xml:space="preserve">
     <value>(ссылка…)</value>
+  </data>
+  <data name="ExportToHtml" xml:space="preserve">
+    <value>экспорт в HTML</value>
+  </data>
+  <data name="ExportToHtmlHeader" xml:space="preserve">
+    <value>Вопросы "SIGame"</value>
+  </data>
+  <data name="ExportTableHeader" xml:space="preserve">
+    <value>Экспорт в формат таблицы</value>
+  </data>
+  <data name="MircAudio" xml:space="preserve">
+    <value>звук</value>
+  </data>
+  <data name="MircImage" xml:space="preserve">
+    <value>изображение</value>
+  </data>
+  <data name="MircVideo" xml:space="preserve">
+    <value>видео</value>
   </data>
 </root>

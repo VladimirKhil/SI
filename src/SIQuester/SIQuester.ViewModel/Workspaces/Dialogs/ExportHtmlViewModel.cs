@@ -1,4 +1,5 @@
 ﻿using SIQuester.Model;
+using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 using System.Xml;
 using Utils.Commands;
@@ -7,9 +8,9 @@ namespace SIQuester.ViewModel;
 
 public sealed class ExportHtmlViewModel : WorkspaceViewModel
 {
-    private readonly QDocument _document = null;
+    private readonly QDocument _document;
 
-    public override string Header => $"{_document.Document.Package.Name}: экспорт в HTML";
+    public override string Header => $"{_document.Document.Package.Name}: {Resources.ExportToHtml}";
 
     public ICommand Export { get; private set; }
 
@@ -17,7 +18,7 @@ public sealed class ExportHtmlViewModel : WorkspaceViewModel
 
     public bool ShowMetaTips { get; set; } = false;
 
-    public string DocHeader { get; set; } = "Вопросы \"SIGame\"";
+    public string DocHeader { get; set; } = Resources.ExportToHtmlHeader;
 
     public int PackageFontSize { get; set; } = 24;
 
@@ -25,7 +26,7 @@ public sealed class ExportHtmlViewModel : WorkspaceViewModel
 
     public int ThemeFontSize { get; set; } = 12;
 
-    public string ThemeHeader { get; set; } = "Тема: ";
+    public string ThemeHeader { get; set; } = Resources.Theme + ": ";
 
     public bool EmptyStringAfterThemeName { get; set; } = false;
 
@@ -47,7 +48,7 @@ public sealed class ExportHtmlViewModel : WorkspaceViewModel
         Export = new SimpleCommand(Export_Executed);
     }
 
-    private void Export_Executed(object arg)
+    private void Export_Executed(object? arg)
     {
         try
         {
