@@ -38,6 +38,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question type.
     /// </summary>
+    [Obsolete("Left for backward compatibility with old format. Use TypeName and Parameters properties")]
     [DefaultValue(typeof(QuestionType), QuestionTypes.Simple)]
     public QuestionType Type { get; } = new();
 
@@ -57,6 +58,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question scenario.
     /// </summary>
+    [Obsolete("Left for backward compatibility with old format. Use Parameters property")]
     public Scenario Scenario { get; } = new();
 
     /// <summary>
@@ -70,6 +72,9 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     /// <summary>
     /// Question parameters.
     /// </summary>
+    /// <remarks>
+    /// Replaces deprecated <see cref="Scenario" /> and <see cref="Type" /> properties.
+    /// </remarks>
     public StepParameters? Parameters { get; set; }
 
     /// <summary>

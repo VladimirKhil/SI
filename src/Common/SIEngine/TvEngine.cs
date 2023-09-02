@@ -151,36 +151,8 @@ public sealed class TvEngine : EngineBase
                 OnQuestion();
                 break;
 
-            case GameStage.RightAnswer:
-                ProcessRightAnswer();
-                break;
-
-            case GameStage.RightAnswerProceed:
-                #region RightAnswerProceed
-                {
-                    var mode = PlayQuestionAtom();
-
-                    if (mode == QuestionPlayMode.AlreadyFinished)
-                    {
-                        OnQuestionFinished();
-                        Stage = GameStage.QuestionPostInfo;
-                        MoveNext();
-                    }
-
-                    AutoNext(4000);
-                    break;
-                }
-            #endregion
-
-            case GameStage.QuestionPostInfo:
-                OnQuestionPostInfo();
-                Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
-                AutoNext(3000);
-                break;
-
             case GameStage.EndQuestion:
                 #region EndQuestion
-
                 OnQuestionFinish();
                 OnEndQuestion(_themeIndex, _questionIndex);
 
@@ -240,33 +212,6 @@ public sealed class TvEngine : EngineBase
             case GameStage.FinalQuestion:
                 OnFinalQuestion();
                 break;
-
-            case GameStage.FinalThink:
-                OnSound("finalthink.wav");
-                Stage = OptionsProvider().ShowRight || _useAnswerMarker ? GameStage.RightFinalAnswer : GameStage.QuestionPostInfo;
-                OnWaitTry(_activeQuestion, true);
-                AutoNext(38000);
-                break;
-
-            case GameStage.RightFinalAnswer:
-                #region RightFinalAnswer
-                OnSound();
-                if (!_useAnswerMarker)
-                {
-                    OnSimpleAnswer(_activeQuestion.Right.Count > 0 ? _activeQuestion.Right[0] : "-");
-                }
-                else
-                {
-                    PlayQuestionAtom();
-                    Stage = GameStage.RightAnswerProceed;
-                    AutoNext(3000);
-                    break;
-                }
-
-                Stage = GameStage.QuestionPostInfo;
-                AutoNext(4000);
-                break;
-                #endregion
 
             case GameStage.AfterFinalThink:
                 OnSound();
@@ -400,22 +345,18 @@ public sealed class TvEngine : EngineBase
         _history.Push((_themeIndex, _questionIndex));
         CanMoveBack = true;
 
-        if (_activeQuestion.Type.Name != QuestionTypes.Simple && !OptionsProvider().PlaySpecials)
+        if (!OptionsProvider().PlaySpecials)
         {
-            _activeQuestion.Type.Name = QuestionTypes.Simple;
+            _activeQuestion.TypeName = QuestionTypes.Default;
         }
+
+        OnMoveToQuestion();
 
         _questionsTable.Remove((_themeIndex, _questionIndex));
         OnQuestionSelected(_themeIndex, _questionIndex, _activeTheme, _activeQuestion);
-
-        _atomIndex = 0;
-        _isMedia = false;
-        _useAnswerMarker = false;
-
-        OnMoveToQuestion();
         UpdateCanNext();
 
-        if (_activeQuestion != null && _activeQuestion.Type.Name != QuestionTypes.Simple)
+        if (_activeQuestion != null && _activeQuestion.TypeName != QuestionTypes.Simple)
         {
             AutoNext(6000);
         }
@@ -423,8 +364,6 @@ public sealed class TvEngine : EngineBase
 
     private void DoPrepareFinalQuestion()
     {
-        _atomIndex = 0;
-        _isMedia = false;
         _themeIndex = _leftFinalThemesIndicies.First();
         _questionIndex = 0;
 
@@ -432,7 +371,6 @@ public sealed class TvEngine : EngineBase
         _activeQuestion = _activeTheme.Questions[_questionIndex];
 
         OnPrepareFinalQuestion(_activeTheme, _activeQuestion);
-        _useAnswerMarker = false;
         UpdateCanNext();
 
         OnMoveToQuestion();
@@ -445,8 +383,7 @@ public sealed class TvEngine : EngineBase
 
         if (_stage == GameStage.Question)
         {
-            if (_activeQuestion.TypeName == null && _activeQuestion.Type.Name == QuestionTypes.Simple
-                || _activeQuestion.TypeName == QuestionTypes.Simple)
+            if (_activeQuestion.TypeName == QuestionTypes.Simple)
             {
                 MoveNext();
             }

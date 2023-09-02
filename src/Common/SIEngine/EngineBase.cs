@@ -4,7 +4,6 @@ using SIPackages;
 using SIPackages.Core;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace SIEngine;
 
@@ -43,9 +42,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     public SIDocument Document => _document;
 
-    protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0, _atomIndex = 0;
-
-    protected bool _isMedia;
+    protected int _roundIndex = -1, _themeIndex = 0, _questionIndex = 0;
 
     protected Round? _activeRound;
 
@@ -58,8 +55,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected object _autoLock = new();
 
     protected bool _timeout = false;
-
-    protected bool _useAnswerMarker = false;
 
     private bool _canMoveNext = true;
 
@@ -78,8 +73,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public int ThemeIndex => _themeIndex;
 
     public int QuestionIndex => _questionIndex;
-
-    private Atom? ActiveAtom => _atomIndex < _activeQuestion.Scenario.Count ? _activeQuestion.Scenario[_atomIndex] : null;
 
     private readonly QuestionEngineFactory _questionEngineFactory;
 
@@ -139,27 +132,9 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public bool CanChangeSum() =>
         _stage == GameStage.Question
         || _stage == GameStage.RoundTable
-        || _stage == GameStage.AfterFinalThink
-        || _stage == GameStage.QuestionPostInfo
-        || _stage == GameStage.RightAnswer;
-
-    public bool CanReturnToQuestion() =>
-        _activeRound != null
-        && _activeRound.Type != RoundTypes.Final
-        && _activeQuestion != null && _activeQuestion.Type.Name == QuestionTypes.Simple;
-
-    public bool CanPress() =>
-        _activeQuestion.Type.Name == QuestionTypes.Simple
-        && (_stage == GameStage.RightAnswer || _stage == GameStage.QuestionPostInfo);
+        || _stage == GameStage.AfterFinalThink;
 
     public bool IsQuestion() => _stage == GameStage.Question;
-
-    public bool IsWaitingForPress() =>
-        _stage == GameStage.Question
-        || _stage == GameStage.RightAnswer
-        || _stage == GameStage.QuestionPostInfo;
-
-    public bool IsQuestionFinished() => _activeQuestion != null && _atomIndex == _activeQuestion.Scenario.Count;
 
     public void OnIntroFinished()
     {
@@ -180,25 +155,12 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public event Action<string[]>? GameThemes;
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
-    public event Action RoundSkip;
+    public event Action? RoundSkip;
     public event Action<Theme[]>? RoundThemes;
     public event Action<Theme>? Theme;
     public event Action<Question>? Question;
     public event Action<int, int, Theme, Question>? QuestionSelected;
 
-    public event Action<Atom>? QuestionAtom;
-    public event Action<string, IMedia>? QuestionText;
-    public event Action<string>? QuestionOral;
-    public event Action<IMedia, IMedia>? QuestionImage;
-    public event Action<IMedia>? QuestionSound;
-    public event Action<IMedia>? QuestionVideo;
-    public event Action<IMedia>? QuestionHtml;
-    public event Action<Atom>? QuestionOther;
-    public event Action<Question, bool, bool>? QuestionProcessed;
-    public event Action? QuestionFinished;
-    public event Action<Question, bool>? WaitTry;
-    public event Action<string>? SimpleAnswer;
-    public event Action? RightAnswer;
     public event Action? QuestionPostInfo;
 
     public event Action? ShowScore;
@@ -263,32 +225,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnQuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question) =>
         QuestionSelected?.Invoke(themeIndex, questionIndex, theme, question);
 
-    protected void OnQuestionAtom(Atom atom) => QuestionAtom?.Invoke(atom);
-
-    protected void OnQuestionText(string text, IMedia sound) => QuestionText?.Invoke(text, sound);
-
-    protected void OnQuestionOral(string oralText) => QuestionOral?.Invoke(oralText);
-
-    protected void OnQuestionImage(IMedia image, IMedia sound) => QuestionImage?.Invoke(image, sound);
-
-    protected void OnQuestionSound(IMedia sound) => QuestionSound?.Invoke(sound);
-
-    protected void OnQuestionVideo(IMedia video) => QuestionVideo?.Invoke(video);
-
-    protected void OnQuestionHtml(IMedia html) => QuestionHtml?.Invoke(html);
-
-    protected void OnQuestionOther(Atom atom) => QuestionOther?.Invoke(atom);
-
-    protected void OnQuestionProcessed(Question question, bool finished, bool pressMode) => QuestionProcessed?.Invoke(question, finished, pressMode);
-
-    protected void OnQuestionFinished() => QuestionFinished?.Invoke();
-
-    protected void OnWaitTry(Question question, bool final = false) => WaitTry?.Invoke(question, final);
-
-    protected void OnSimpleAnswer(string answer) => SimpleAnswer?.Invoke(answer);
-
-    protected void OnRightAnswer() => RightAnswer?.Invoke();
-
     protected void OnQuestionPostInfo() => QuestionPostInfo?.Invoke();
 
     protected void OnShowScore() => ShowScore?.Invoke();
@@ -326,7 +262,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public object SyncRoot { get; } = new object();
 
     /// <summary>
-    /// Number of unanswered questions in the round.
+    /// Number of unanswered questions in round.
     /// </summary>
     public abstract int LeftQuestionsCount { get; }
 
@@ -504,354 +440,41 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     /// </summary>
     public void MoveToAnswer()
     {
-        if (QuestionEngine != null)
+        if (QuestionEngine == null)
         {
-            QuestionEngine.MoveToAnswer();
-            return;
+            throw new InvalidOperationException("QuestionEngine == null");
         }
 
-        if (Stage == GameStage.Question && _atomIndex < _activeQuestion.Scenario.Count)
-        {
-            do
-            {
-                if (ActiveAtom.Type == AtomTypes.Marker)
-                {
-                    _atomIndex++;
-                    if (_atomIndex < _activeQuestion.Scenario.Count)
-                    {
-                        _useAnswerMarker = true;
-                    }
-
-                    break;
-                }
-
-                _atomIndex++;
-            } while (_atomIndex < _activeQuestion.Scenario.Count);
-        }
-
-        SetAnswerStage();
-    }
-
-    private void SetAnswerStage()
-    {
-        Stage = OptionsProvider().ShowRight || _useAnswerMarker ? GameStage.RightAnswer : GameStage.QuestionPostInfo;
+        QuestionEngine.MoveToAnswer();
     }
 
     protected void OnQuestion()
     {
-        if (QuestionEngine != null)
+        if (QuestionEngine == null)
         {
-            if (!QuestionEngine.PlayNext())
-            {
-                OnQuestionFinished();
-                Stage = GameStage.QuestionPostInfo;
-                MoveNext();
-            }
-
-            return;
+            throw new InvalidOperationException("QuestionEngine == null");
         }
 
-        var playMode = PlayQuestionAtom();
-        var options = OptionsProvider();
-        var pressMode = _isMedia ? options.IsMultimediaPressMode : options.IsPressMode;
-
-        if (playMode == QuestionPlayMode.AlreadyFinished)
+        if (!QuestionEngine.PlayNext())
         {
-            OnQuestionFinished();
-            SetAnswerStage();
-
-            if (pressMode)
-            {
-                OnWaitTry(_activeQuestion);
-                AutoNext(1000 * Math.Min(5, options.ThinkingTime));
-            }
-            else
-            {
-                MoveNext();
-            }
+            OnQuestionPostInfo();
+            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
+            AutoNext(3000);
         }
-        else
-        {
-            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, pressMode);
-            AutoNext(1000 * (Math.Min(1, options.ThinkingTime) + _activeQuestion.Scenario.ToString().Length / 20));
-        }
-    }
-
-    /// <summary>
-    /// Отобразить вопрос (его часть)
-    /// </summary>
-    /// <returns>
-    /// <see cref="QuestionPlayMode.JustFinished" />, если вопрос был показан полностью
-    /// <see cref="QuestionPlayMode.InProcess" />, если вопрос был показан не полностью,
-    /// <see cref="QuestionPlayMode.AlreadyFinished" />, если вопрос уже был показан ранее
-    /// </returns>
-    protected QuestionPlayMode PlayQuestionAtom()
-    {
-        if (_atomIndex == _activeQuestion.Scenario.Count)
-        {
-            return QuestionPlayMode.AlreadyFinished;
-        }
-
-        var activeAtom = ActiveAtom;
-        _isMedia = false;
-
-        switch (activeAtom.Type)
-        {
-            case AtomTypes.Text:
-                {
-                    var text = CollectText();
-                    var sound = GetBackgroundSound();
-                    _isMedia = sound != null;
-
-                    OnQuestionText(text, sound);
-
-                    _atomIndex++;
-                    break;
-                }
-
-            case AtomTypes.Oral:
-                var oralText = CollectText(AtomTypes.Oral);
-                OnQuestionOral(oralText);
-
-                _atomIndex++;
-
-                break;
-
-            case AtomTypes.Image:
-            case AtomTypes.Audio:
-            case AtomTypes.Video:
-                {
-                    // Multimedia content
-                    var media = GetMedia();
-
-                    if (media == null)
-                    {
-                        break;
-                    }
-
-                    var isSound = activeAtom.Type == AtomTypes.Audio;
-                    var isImage = activeAtom.Type == AtomTypes.Image;
-
-                    if (isImage)
-                    {
-                        var sound = GetBackgroundSound();
-                        _isMedia = sound != null;
-
-                        OnQuestionImage(media, sound);
-                    }
-                    else
-                    {
-                        if (isSound)
-                        {
-                            var backItem = GetBackgroundImageOrText();
-
-                            if (backItem != null)
-                            {
-                                if (backItem.Item1 != null)
-                                {
-                                    OnQuestionImage(backItem.Item1, media);
-                                }
-                                else
-                                {
-                                    OnQuestionText(backItem.Item2, media);
-                                }
-                            }
-                            else
-                            {
-                                OnQuestionSound(media);
-                            }
-                        }
-                        else
-                        {
-                            OnQuestionVideo(media);
-                        }
-
-                        _isMedia = true;
-                    }
-
-                    _atomIndex++;
-                    break;
-                }
-
-            case AtomTypes.Html:
-                var html = GetMedia();
-
-                if (html == null)
-                {
-                    break;
-                }
-
-                OnQuestionHtml(html);
-
-                _atomIndex++;
-                break;
-
-            case AtomTypes.Marker:
-                _atomIndex++;
-
-                if (_atomIndex < _activeQuestion.Scenario.Count)
-                {
-                    _useAnswerMarker = true; // Прерываем отыгрыш вопроса: остальное - ответ
-                }
-
-                return QuestionPlayMode.AlreadyFinished;
-
-            default:
-                OnQuestionOther(activeAtom);
-                _atomIndex++; // Прочие типы не выводятся
-                break;
-        }
-
-        OnQuestionAtom(activeAtom);
-
-        if (_atomIndex == _activeQuestion.Scenario.Count)
-        {
-            return QuestionPlayMode.JustFinished;
-        }
-
-        if (ActiveAtom.Type == AtomTypes.Marker)
-        {
-            if (_atomIndex + 1 < _activeQuestion.Scenario.Count)
-            {
-                _useAnswerMarker = true;
-            }
-
-            return QuestionPlayMode.JustFinished;
-        }
-
-        return QuestionPlayMode.InProcess;
     }
 
     protected void OnFinalQuestion()
     {
-        if (QuestionEngine != null)
+        if (QuestionEngine == null)
         {
-            if (!QuestionEngine.PlayNext())
-            {
-                OnQuestionFinished();
-                Stage = GameStage.QuestionPostInfo;
-                MoveNext();
-            }
-
-            return;
+            throw new InvalidOperationException("QuestionEngine == null");
         }
 
-        var playMode = PlayQuestionAtom();
-
-        if (playMode == QuestionPlayMode.AlreadyFinished)
+        if (!QuestionEngine.PlayNext())
         {
-            Stage = GameStage.FinalThink;
-            MoveNext();
-        }
-        else
-        {
-            OnQuestionProcessed(_activeQuestion, playMode == QuestionPlayMode.JustFinished, false);
-            AutoNext(1000 * (_activeQuestion.Scenario.ToString().Length / 20));
-        }
-    }
-
-    protected void ProcessRightAnswer()
-    {
-        OnRightAnswer();
-
-        if (!_useAnswerMarker)
-        {
-            OnSimpleAnswer(_activeQuestion.Right.FirstOrDefault() ?? " ");
-        }
-        else // Ответ находится в тексте вопроса
-        {
-            PlayQuestionAtom();
-            Stage = GameStage.RightAnswerProceed;
+            OnQuestionPostInfo();
+            Stage = _activeRound.Type != RoundTypes.Final ? GameStage.EndQuestion : GameStage.AfterFinalThink;
             AutoNext(3000);
-            return;
-        }
-
-        Stage = GameStage.QuestionPostInfo;
-        AutoNext(3000);
-    }
-
-    /// <summary>
-    /// Собрать текст последовательно расположенных элементов вопроса
-    /// </summary>
-    /// <returns>Собранный текст</returns>
-    private string CollectText(string atomType = AtomTypes.Text)
-    {
-        var text = new StringBuilder();
-
-        while (ActiveAtom != null && ActiveAtom.Type == atomType)
-        {
-            if (text.Length > 0)
-            {
-                text.AppendLine();
-            }
-
-            text.Append(ActiveAtom.Text);
-
-            _atomIndex++;
-        }
-
-        _atomIndex--;
-
-        return text.ToString();
-    }
-
-    /// <summary>
-    /// Задать дополнительный звук к текущему элементу
-    /// </summary>
-    /// <returns></returns>
-    private IMedia GetBackgroundSound()
-    {
-        if (ActiveAtom != null && ActiveAtom.AtomTime == -1 && _atomIndex + 1 < _activeQuestion.Scenario.Count) // Объединить со следующим
-        {
-            var nextAtom = _activeQuestion.Scenario[_atomIndex + 1];
-            if (nextAtom.Type == AtomTypes.Audio)
-            {
-                _atomIndex++;
-                return GetMedia();
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Задать дополнительные изображение или текст к текущему элементу
-    /// </summary>
-    /// <returns></returns>
-    private Tuple<IMedia?, string?> GetBackgroundImageOrText()
-    {
-        if (ActiveAtom != null && ActiveAtom.AtomTime == -1 && _atomIndex + 1 < _activeQuestion.Scenario.Count) // Объединить со следующим
-        {
-            var nextAtom = _activeQuestion.Scenario[_atomIndex + 1];
-            if (nextAtom.Type == AtomTypes.Image)
-            {
-                _atomIndex++;
-
-                var media = GetMedia();
-                if (media != null)
-                    return Tuple.Create((IMedia?)media, (string?)null);
-            }
-            else if (nextAtom.Type == AtomTypes.Text)
-            {
-                _atomIndex++;
-                return Tuple.Create((IMedia?)null, (string?)CollectText());
-            }
-        }
-
-        return null;
-    }
-
-    private IMedia GetMedia()
-    {
-        try
-        {
-            return _document.GetLink(ActiveAtom);
-        }
-        catch (Exception exc)
-        {
-            OnError(string.Format("При попытке обнаружить ссылку на медиа файл \"{0}\" обнаружена ошибка: {1}", ActiveAtom.Text, exc.Message));
-            _atomIndex++;
-            return null;
         }
     }
 
@@ -889,22 +512,24 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         var options = OptionsProvider();
 
-        if (options.UseNewEngine && _activeQuestion != null)
+        if (_activeQuestion == null)
         {
-            QuestionEngine = _questionEngineFactory.CreateEngine(
-                _activeQuestion,
-                new QuestionEngineOptions
-                {
-                    FalseStarts = options.IsPressMode
-                        ? (options.IsMultimediaPressMode ? FalseStartMode.Enabled : FalseStartMode.TextContentOnly)
-                        : FalseStartMode.Disabled,
-
-                    ShowSimpleRightAnswers = options.ShowRight,
-
-                    DefaultTypeName = GameRules.GetRulesForRoundType(_activeRound!.Type).DefaultQuestionType,
-                    ForceDefaultTypeName = isFinal
-                });
+            throw new InvalidOperationException("_activeQuestion == null");
         }
+
+        QuestionEngine = _questionEngineFactory.CreateEngine(
+            _activeQuestion,
+            new QuestionEngineOptions
+            {
+                FalseStarts = options.IsPressMode
+                    ? (options.IsMultimediaPressMode ? FalseStartMode.Enabled : FalseStartMode.TextContentOnly)
+                    : FalseStartMode.Disabled,
+
+                ShowSimpleRightAnswers = options.ShowRight,
+
+                DefaultTypeName = GameRules.GetRulesForRoundType(_activeRound!.Type).DefaultQuestionType,
+                ForceDefaultTypeName = isFinal
+            });
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -18,12 +18,12 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public void OnAskAnswer(string mode)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnAskAnswerStop()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnButtonPressStart()
@@ -33,17 +33,17 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnQuestionContentItem(ContentItem contentItem)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnQuestionStart(bool buttonsRequired)
     {
-        throw new NotImplementedException();
+        
     }
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
@@ -63,6 +63,6 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public void OnSimpleRightAnswerStart()
     {
-        throw new NotImplementedException();
+        
     }
 }

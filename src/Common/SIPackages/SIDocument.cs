@@ -281,7 +281,7 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
-    /// Upgrades the document to new format.
+    /// Upgrades document to new format.
     /// </summary>
     public bool Upgrade()
     {

@@ -40,8 +40,7 @@ internal sealed class TvEngineTests
         Assert.AreEqual(GameStage.Question, engine.Stage);
 
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.RightAnswer);
-        AssertMove(engine, GameStage.QuestionPostInfo);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
         AssertMove(engine, GameStage.RoundTable);
 
@@ -50,8 +49,7 @@ internal sealed class TvEngineTests
         Assert.AreEqual(GameStage.Question, engine.Stage);
 
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.RightAnswer);
-        AssertMove(engine, GameStage.QuestionPostInfo);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
         AssertMove(engine, GameStage.RoundTable);
 
@@ -60,9 +58,7 @@ internal sealed class TvEngineTests
         Assert.AreEqual(GameStage.Question, engine.Stage);
 
         AssertMove(engine, GameStage.Question);
-        AssertMove(engine, GameStage.RightAnswer);
-        AssertMove(engine, GameStage.RightAnswerProceed);
-        AssertMove(engine, GameStage.QuestionPostInfo);
+        AssertMove(engine, GameStage.Question);
         AssertMove(engine, GameStage.EndQuestion);
 
         AssertMove(engine, GameStage.End);

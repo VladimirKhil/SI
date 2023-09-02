@@ -6,6 +6,6 @@ internal class SIEnginePlayHandlerMock : ISIEnginePlayHandler
 {
     public bool ShouldPlayRound(QuestionSelectionStrategyType questionSelectionStrategyType)
     {
-        throw new NotImplementedException();
+        return true;
     }
 }

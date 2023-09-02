@@ -82,9 +82,6 @@ public sealed class SportEngine : EngineBase
                 }
 
                 CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
-                _atomIndex = 0;
-                _isMedia = false;
-                _useAnswerMarker = false;
                 SetActiveQuestion();
                 OnQuestion(_activeQuestion);
                 OnMoveToQuestion();
@@ -101,32 +98,6 @@ public sealed class SportEngine : EngineBase
 
             case GameStage.FinalQuestion:
                 OnFinalQuestion();
-                break;
-
-            case GameStage.RightAnswer:
-                ProcessRightAnswer();
-                break;
-
-            case GameStage.RightAnswerProceed:
-                #region RightAnswerProceed
-                {
-                    var mode = PlayQuestionAtom();
-                    if (mode == QuestionPlayMode.AlreadyFinished)
-                    {
-                        OnQuestionFinished();
-                        Stage = GameStage.QuestionPostInfo;
-                        MoveNext();
-                    }
-
-                    AutoNext(4000);
-                    break;
-                }
-                #endregion
-
-            case GameStage.QuestionPostInfo:
-                OnQuestionPostInfo();
-                Stage = GameStage.EndQuestion;
-                AutoNext(3000);
                 break;
 
             case GameStage.EndQuestion:
@@ -198,9 +169,6 @@ public sealed class SportEngine : EngineBase
 
         CanMoveBack = _questionIndex > 0 || _themeIndex > 0;
 
-        _atomIndex = 0;
-        _isMedia = false;
-        _useAnswerMarker = false;
         SetActiveQuestion();
         OnMoveToQuestion();
 

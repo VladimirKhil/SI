@@ -141,15 +141,12 @@ namespace SIPackages.Providers
             CancellationToken cancellationToken = default)
         {
             var fIndex = Rand.Next(files.Count);
-            var doc2 = await provider.GetPackageAsync(files[fIndex], cancellationToken);
-
-            if (doc2 == null)
-            {
-                throw new PackageNotFoundException(files[fIndex]);
-            }
+            var doc2 = await provider.GetPackageAsync(files[fIndex], cancellationToken) ?? throw new PackageNotFoundException(files[fIndex]);
 
             using (doc2)
             {
+                doc2.Upgrade();
+
                 var normal = doc2.Package.Rounds.Where(predicate).ToList();
                 var count = normal.Count;
 
@@ -232,20 +229,20 @@ namespace SIPackages.Providers
             Question question,
             CancellationToken cancellationToken = default)
         {
-            foreach (var atom in question.Scenario)
+            foreach (var contentItem in question.GetContent())
             {
-                if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
+                if (contentItem.Type == AtomTypes.Text)
                 {
                     continue;
                 }
 
-                var link = doc2.GetLink(atom);
+                var link = doc2.GetLink(contentItem);
 
                 if (link.GetStream != null)
                 {
-                    DataCollection collection = null;
+                    DataCollection? collection = null;
 
-                    switch (atom.Type)
+                    switch (contentItem.Type)
                     {
                         case AtomTypes.Video:
                             collection = doc.Video;

@@ -161,12 +161,14 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     /// <summary>
     /// Index of player who wins the button competition.
     /// </summary>
+    [Obsolete("Implement players view model outside the table")]
     public int PlayerIndex
     {
         get => _playerIndex;
         set { _playerIndex = value; OnPropertyChanged(nameof(ActivePlayer)); }
     }
 
+    [Obsolete("Implement players view model outside the table")]
     public string? ActivePlayer => (_playerIndex < 0 || _playerIndex >= Players.Count) ? "" : Players[_playerIndex].Name;
 
     /// <summary>
@@ -257,9 +259,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public SimpleCommand ToggleQuestion { get; private set; }
 
     public event Action<QuestionInfoViewModel>? QuestionSelected;
-
     public event Action<ThemeInfoViewModel>? ThemeSelected;
-
     public event Action<QuestionInfoViewModel>? QuestionToggled;
 
     public void SelectQuestion_Executed(object? arg) => QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
@@ -279,12 +279,12 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         set { _mediaSource = value; OnPropertyChanged(); }
     }
 
-    private MediaSource _soundSource;
+    private MediaSource? _soundSource;
 
     /// <summary>
     /// Background sound source.
     /// </summary>
-    public MediaSource SoundSource
+    public MediaSource? SoundSource
     {
         get => _soundSource;
         set { _soundSource = value; OnPropertyChanged(); }
@@ -349,7 +349,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
     }
 
-    public event Action<double> VolumeChanged;
+    public event Action<double>? VolumeChanged;
 
     /// <summary>
     /// Questions prices table.
@@ -361,7 +361,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     /// <summary>
     /// Game players.
     /// </summary>
-    [Obsolete]
+    [Obsolete("Implement players view model outside the table")]
     public IList<SimplePlayerInfo> Players { get; private set; } = new ObservableCollection<SimplePlayerInfo>();
 
     private SettingsViewModel _settings;
@@ -379,6 +379,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         Init();
     }
 
+    [Obsolete("Implement players view model outside the table")]
     public TableInfoViewModel(IList<SimplePlayerInfo> players)
     {
         _settings = new SettingsViewModel();
@@ -444,16 +445,16 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         }
     }
 
-    public event Action MediaStart;
-    public event Action MediaEnd;
-    public event Action<double> MediaProgress;
+    public event Action? MediaStart;
+    public event Action? MediaEnd;
+    public event Action<double>? MediaProgress;
 
-    public event Action<int> MediaSeek;
-    public event Action MediaPause;
-    public event Action MediaResume;
+    public event Action<int>? MediaSeek;
+    public event Action? MediaPause;
+    public event Action? MediaResume;
 
     public event Action? MediaLoad;
-    public event Action<Exception> MediaLoadError;
+    public event Action<Exception>? MediaLoadError;
 
     public void OnMediaStart() => MediaStart?.Invoke();
 

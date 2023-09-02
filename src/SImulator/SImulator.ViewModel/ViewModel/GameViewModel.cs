@@ -404,20 +404,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _engine.Theme += Engine_Theme;
         _engine.Question += Engine_Question;
         _engine.QuestionSelected += Engine_QuestionSelected;
-
-        _engine.QuestionAtom += Engine_QuestionAtom;
-        _engine.QuestionText += Engine_QuestionText;
-        _engine.QuestionOral += Engine_QuestionOral;
-        _engine.QuestionImage += Engine_QuestionImage;
-        _engine.QuestionSound += Engine_QuestionSound;
-        _engine.QuestionVideo += Engine_QuestionVideo;
-        _engine.QuestionHtml += Engine_QuestionHtml;
-        _engine.QuestionOther += Engine_QuestionOther;
-        _engine.QuestionProcessed += Engine_QuestionProcessed;
-        _engine.WaitTry += Engine_WaitTry;
-
-        _engine.SimpleAnswer += Engine_SimpleAnswer;
-        _engine.RightAnswer += Engine_RightAnswer;
         _engine.ShowScore += Engine_ShowScore;
         _engine.LogScore += LogScore;
         _engine.QuestionPostInfo += Engine_QuestionPostInfo;
@@ -909,7 +895,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     }
 
     /// <summary>
-    /// Moves the game to the next stage.
+    /// Moves game to next stage.
     /// </summary>
     private void Next_Executed(object? arg = null)
     {
@@ -925,8 +911,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (_playingQuestionType)
             {
                 _playingQuestionType = false;
+                var (played, _) = PlayQuestionType();
 
-                if (PlayQuestionType())
+                if (played)
                 {
                     return;
                 }
@@ -940,19 +927,28 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private bool PlayQuestionType()
+    private (bool played, bool highlightTheme) PlayQuestionType()
     {
         if (_activeQuestion == null)
         {
-            return false;
+            return (false, false);
         }
 
-        var typeName = _activeQuestion.TypeName ?? _activeQuestion.Type.Name;
+        var typeName = _activeQuestion.TypeName ?? QuestionTypes.Simple;
+
+        // Only StakeAll type is supported in final for now
+        // This will be removed when full question type support will have been implemented
+        if (_activeRound?.Type == RoundTypes.Final)
+        {
+            typeName = QuestionTypes.StakeAll;
+        }
 
         if (typeName == QuestionTypes.Simple)
         {
-            return false;
+            return (false, false);
         }
+
+        var highlightTheme = true;
 
         switch (typeName)
         {
@@ -963,6 +959,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             case QuestionTypes.SecretNoQuestion:
                 PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
                 PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
+                highlightTheme = false;
                 break;
 
             case QuestionTypes.Auction:
@@ -975,9 +972,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             case QuestionTypes.NoRisk:
                 PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
                 PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
-                break;
-
-            case QuestionTypes.Choice:
+                highlightTheme = false;
                 break;
 
             default:
@@ -986,7 +981,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         LocalInfo.TStage = TableStage.Special;
-        return true;
+        return (true, highlightTheme);
     }
 
     private void Engine_Package(Package package, IMedia packageLogo)
@@ -1084,75 +1079,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.TStage = TableStage.RoundTable;
     }
 
-    private void Engine_QuestionProcessed(Question question, bool finished, bool pressMode)
-    {
-        if (question.Type.Name == QuestionTypes.Simple && _buttonManager != null)
-        {
-            _buttonManager.Start(); // Buttons are activated in advance for false starts to work
-        }
-
-        if (finished)
-        {
-            if (_activeRound.Type == RoundTypes.Standart && question.Type.Name == QuestionTypes.Simple)
-            {
-                if (!pressMode && Settings.Model.ThinkingTime > 0 && ActiveMediaCommand == null)
-                {
-                    // Запуск таймера при игре:
-                    // 1) без фальстартов - на фальстартах он активируется доп. нажатием (см. WaitTry)
-                    // 2) не мультимедиа-элемент - таймер будет запущен только по его завершении
-                    QuestionTimeMax = Settings.Model.ThinkingTime + question.Scenario.ToString().Length / 20;
-                    RunQuestionTimer_Executed(0);
-                }
-            }
-            else if (_activeRound.Type == RoundTypes.Standart)
-            {
-                var time = Settings.Model.SpecialQuestionThinkingTime;
-
-                if (time > 0)
-                {
-                    ThinkingTimeMax = time;
-                    RunThinkingTimer_Executed(0);
-                }
-            }
-        }
-    }
-
-    private void Engine_WaitTry(Question question, bool final)
-    {
-        if (final)
-        {
-            PresentationController.SetSound(Settings.Model.Sounds.FinalThink);
-
-            var time = Settings.Model.FinalQuestionThinkingTime;
-
-            if (time > 0)
-            {
-                ThinkingTimeMax = time;
-                RunThinkingTimer_Executed(0);
-            }
-
-            return;
-        }
-
-        if (ActiveMediaCommand == StopMediaTimer)
-        {
-            StopMediaTimer_Executed(null);
-            MediaProgress = 100;
-        }
-
-        if (question.Type.Name == QuestionTypes.Simple)
-        {
-            PresentationController.SetQuestionStyle(QuestionStyle.WaitingForPress);
-
-            if (Settings.Model.ThinkingTime > 0)
-            {
-                // Runs timer in game with false starts
-                QuestionTimeMax = Settings.Model.ThinkingTime;
-                RunQuestionTimer_Executed(0);
-            }
-        }
-    }
-
     public void StartQuestionTimer()
     {
         if (Settings.Model.ThinkingTime <= 0)
@@ -1191,16 +1117,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 RunThinkingTimer_Executed(0);
             }
         }
-    }
-
-    private void Engine_RightAnswer()
-    {
-        StopQuestionTimer.Execute(0);
-
-        _buttonManager?.Stop();
-
-        State = QuestionState.Normal;
-        PresentationController.SetSound();
     }
 
     public void OnRightAnswer()
@@ -1290,13 +1206,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
         PresentationController.SetSound("");
         LocalInfo.TStage = TableStage.Final;
-    }
-
-    private void Engine_SimpleAnswer(string answer)
-    {
-        PresentationController.SetText(answer);
-        PresentationController.SetStage(TableStage.Answer);
-        PresentationController.SetSound();
     }
 
     /// <summary>
@@ -1505,14 +1414,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private void Engine_QuestionOther(Atom atom)
-    {
-        PresentationController.SetText("");
-        PresentationController.SetQuestionSound(false);
-
-        ActiveMediaCommand = null;
-    }
-
     internal void InitMedia()
     {
         ActiveMediaCommand = StopMediaTimer;
@@ -1537,116 +1438,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.SetMedia(new MediaSource(localFile), background);
         return true;
-    }
-
-    private void Engine_QuestionSound(IMedia sound)
-    {
-        PresentationController.SetQuestionSound(true);
-
-        var result = SetMedia(sound, SIDocument.AudioStorageName, true);
-
-        PresentationController.SetSound();
-        PresentationController.SetQuestionContentType(QuestionContentType.Void);
-
-        if (result)
-        {
-            InitMedia();
-        }
-    }
-
-    private void Engine_QuestionVideo(IMedia video)
-    {
-        PresentationController.SetQuestionSound(false);
-
-        var result = SetMedia(video, SIDocument.VideoStorageName);
-
-        if (result)
-        {
-            PresentationController.SetQuestionContentType(QuestionContentType.Video);
-            PresentationController.SetSound();
-            InitMedia();
-        }
-        else
-        {
-            PresentationController.SetQuestionContentType(QuestionContentType.Void);
-        }
-    }
-
-    private void Engine_QuestionHtml(IMedia html)
-    {
-        PresentationController.SetMedia(new MediaSource(html.Uri), false);
-        PresentationController.SetQuestionSound(false);
-        PresentationController.SetSound();
-        PresentationController.SetQuestionContentType(QuestionContentType.Html);
-    }
-
-    private void Engine_QuestionImage(IMedia image, IMedia sound)
-    {
-        PresentationController.SetQuestionSound(sound != null);
-
-        var resultImage = SetMedia(image, SIDocument.ImagesStorageName);
-
-        if (sound != null)
-        {
-            if (SetMedia(sound, SIDocument.AudioStorageName, true))
-            {
-                PresentationController.SetSound();
-                InitMedia();
-            }
-        }
-        else
-        {
-            ActiveMediaCommand = null;
-        }
-
-        if (resultImage)
-        {
-            PresentationController.SetQuestionContentType(QuestionContentType.Image);
-        }
-        else
-        {
-            PresentationController.SetQuestionContentType(QuestionContentType.Void);
-        }
-    }
-
-    private void Engine_QuestionText(string text, IMedia sound)
-    {
-        // Если без фальстартов, то выведем тему и стоимость
-        var displayedText = 
-            Settings.Model.FalseStart || Settings.Model.ShowTextNoFalstart || _activeRound?.Type == RoundTypes.Final
-            ? text
-            : $"{CurrentTheme}\n{Price}";
-
-        PresentationController.SetText(displayedText);
-        PresentationController.SetQuestionContentType(QuestionContentType.Text);
-
-        var useSound = sound != null && SetMedia(sound, SIDocument.AudioStorageName, true);
-
-        PresentationController.SetQuestionSound(useSound);
-
-        if (useSound)
-        {
-            PresentationController.SetSound();
-            InitMedia();
-        }
-        else
-        {
-            ActiveMediaCommand = null;
-        }
-    }
-
-    private void Engine_QuestionOral(string oralText)
-    {
-        // Show nothing. The text should be read by the showman
-        PresentationController.SetQuestionSound(false);
-        ActiveMediaCommand = null;
-    }
-
-    private void Engine_QuestionAtom(Atom atom)
-    {
-        LocalInfo.TStage = TableStage.Question;
-        PresentationController.SetStage(TableStage.Question);
-        ActiveAtom = atom;
     }
 
     private string? _currentTheme;
@@ -1685,9 +1476,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LogScore();
         _logger?.Write("\r\n{0}, {1}", theme.Name, question.Price);
 
-        var typeName = question.TypeName ?? question.Type.Name;
+        var (played, highlightTheme) = PlayQuestionType();
 
-        if (typeName == QuestionTypes.Simple)
+        if (!played)
         {
             PresentationController.SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
@@ -1704,46 +1495,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         else
         {
-            var setActive = true;
-
-            switch (typeName)
-            {
-                case QuestionTypes.Cat:
-                case QuestionTypes.BagCat:
-                case QuestionTypes.Secret:
-                case QuestionTypes.SecretPublicPrice:
-                case QuestionTypes.SecretNoQuestion:
-                    PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
-                    PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
-                    setActive = false;
-                    break;
-
-                case QuestionTypes.Auction:
-                case QuestionTypes.Stake:
-                    PresentationController.SetSound(Settings.Model.Sounds.StakeQuestion);
-                    PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
-                    break;
-
-                case QuestionTypes.Sponsored:
-                case QuestionTypes.NoRisk:
-                    PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
-                    PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
-                    setActive = false;
-                    break;
-
-                case QuestionTypes.Choice:
-                    break;
-
-                default:
-                    PresentationController.SetText(typeName);
-                    break;
-            }
-
-            LocalInfo.TStage = TableStage.Special;
-            PresentationController.PlayComplexSelection(themeIndex, questionIndex, setActive);
+            PresentationController.PlayComplexSelection(themeIndex, questionIndex, highlightTheme);
         }
 
-        _logger.Write(question.Scenario.ToString());
+        _logger.Write(question.GetText());
     }
 
     private void PrintQuestionType(string originalTypeName, string? aliasName)

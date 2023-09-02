@@ -64,9 +64,4 @@ public static class QuestionTypes
     /// No-risk question.
     /// </summary>
     public const string NoRisk = "noRisk";
-
-    /// <summary>
-    /// Multiple choice question.
-    /// </summary>
-    public const string Choice = "choice";
 }

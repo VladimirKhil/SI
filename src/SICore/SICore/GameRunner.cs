@@ -24,7 +24,6 @@ public sealed class GameRunner
         AutomaticGame = false,
         PlaySpecials = true,
         ThinkingTime = 0,
-        UseNewEngine = true,
         PlayAllQuestionsInFinalRound = appSettingsCore.PlayAllQuestionsInFinalRound,
     };
 
