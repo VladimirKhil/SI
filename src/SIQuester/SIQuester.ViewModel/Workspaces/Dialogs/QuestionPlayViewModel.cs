@@ -152,6 +152,14 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         Play.CanBeExecuted = _questionEngine.CanNext;
     }
 
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    {
+        foreach (var contentItem in content)
+        {
+            OnQuestionContentItem(contentItem);
+        }
+    }
+
     public void OnQuestionContentItem(ContentItem contentItem)
     {
         switch (contentItem.Placement)
