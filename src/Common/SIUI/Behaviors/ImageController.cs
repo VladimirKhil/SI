@@ -4,19 +4,22 @@ using System.Windows.Controls;
 
 namespace SIUI.Behaviors;
 
+/// <summary>
+/// Allows to attach load handler to Image control.
+/// </summary>
 public static class ImageController
 {
-    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
+    public static TableInfoViewModel? GetLoadHandler(DependencyObject obj) => (TableInfoViewModel?)obj.GetValue(LoadHandlerProperty);
 
-    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
+    public static void SetLoadHandler(DependencyObject obj, TableInfoViewModel? value) => obj.SetValue(LoadHandlerProperty, value);
 
-    public static readonly DependencyProperty IsAttachedProperty =
-        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(ImageController), new PropertyMetadata(false, OnIsAttachedChanged));
+    public static readonly DependencyProperty LoadHandlerProperty =
+        DependencyProperty.RegisterAttached("LoadHandler", typeof(TableInfoViewModel), typeof(ImageController), new PropertyMetadata(null, OnLoadHandlerChanged));
 
-    public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public static void OnLoadHandlerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var image = (Image)d;
-        var tableInfo = (TableInfoViewModel?)image?.DataContext;
+        var tableInfo = (TableInfoViewModel?)e.NewValue;
 
         if (tableInfo == null || image == null)
         {

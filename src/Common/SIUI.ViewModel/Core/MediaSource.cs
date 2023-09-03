@@ -7,19 +7,7 @@ namespace SIUI.ViewModel.Core;
 public sealed class MediaSource
 {
     [DataMember]
-    public Stream? Stream { get; private set; }
-
-    [DataMember]
     public string Uri { get; private set; }
 
-    public MediaSource(Stream? stream, string uri)
-    {
-        Stream = stream;
-        Uri = uri;
-    }
-
-    public MediaSource(string uri)
-    {
-        Uri = uri;
-    }
+    public MediaSource(string uri) => Uri = uri;
 }

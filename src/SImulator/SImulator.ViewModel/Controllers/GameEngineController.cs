@@ -12,16 +12,18 @@ namespace SImulator.ViewModel.Controllers;
 /// <inheritdoc cref="IQuestionEnginePlayHandler" />
 internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEnginePlayHandler
 {
+    /// <summary>
+    /// Relative image and video weight on screen.
+    /// </summary>
+    private const double ImageVideoWeight = 3.0;
+
     public GameViewModel? GameViewModel { get; set; }
 
     public IPresentationController PresentationController => GameViewModel!.PresentationController;
 
     private readonly string _packageFolder;
 
-    public GameEngineController(string packageFolder)
-    {
-        _packageFolder = packageFolder;
-    }
+    public GameEngineController(string packageFolder) => _packageFolder = packageFolder;
 
     public bool OnAccept() => false;
 
@@ -56,100 +58,109 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel?.AskAnswerButton();
     }
 
-    public void OnQuestionContentItem(ContentItem contentItem)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
         if (GameViewModel == null)
         {
             return;
         }
 
-        switch (contentItem.Placement)
+        var screenContent = new List<ContentViewModel>();
+
+        foreach (var contentItem in content)
         {
-            case ContentPlacements.Screen:
-                switch (contentItem.Type)
-                {
-                    case AtomTypes.Text:
-                        // Show theme name and question price instead of empty text
-                        var displayedText =
-                            GameViewModel.Settings.Model.FalseStart
-                                || GameViewModel.Settings.Model.ShowTextNoFalstart
-                                || GameViewModel.ActiveRound?.Type == RoundTypes.Final
-                            ? contentItem.Value
-                            : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
+            switch (contentItem.Placement)
+            {
+                case ContentPlacements.Screen:
+                    switch (contentItem.Type)
+                    {
+                        case AtomTypes.Text:
+                            // Show theme name and question price instead of empty text
+                            var displayedText =
+                                GameViewModel.Settings.Model.FalseStart
+                                    || GameViewModel.Settings.Model.ShowTextNoFalstart
+                                    || GameViewModel.ActiveRound?.Type == RoundTypes.Final
+                                ? contentItem.Value
+                                : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 
-                        PresentationController.SetText(displayedText);
-                        PresentationController.SetQuestionContentType(QuestionContentType.Text);
-                        break;
+                            PresentationController.SetText(displayedText); // For simple answer
+                            screenContent.Add(new ContentViewModel(ContentType.Text, displayedText));
+                            break;
 
-                    case AtomTypes.Image:
-                        var resultImage = SetMedia(contentItem, SIDocument.ImagesStorageName);
+                        case AtomTypes.Image:
+                            var imageUri = TryGetMediaUri(contentItem, SIDocument.ImagesStorageName);
 
-                        if (resultImage)
-                        {
-                            PresentationController.SetQuestionContentType(QuestionContentType.Image);
-                        }
-                        else
-                        {
-                            PresentationController?.SetQuestionContentType(QuestionContentType.Void);
-                        }
-                        break;
+                            if (imageUri != null)
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Image, imageUri, ImageVideoWeight));
+                            }
+                            else
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                            }                            
+                            break;
 
-                    case AtomTypes.Video:
-                        var result = SetMedia(contentItem, SIDocument.VideoStorageName);
+                        case AtomTypes.Video:
+                            var videoUri = TryGetMediaUri(contentItem, SIDocument.VideoStorageName);
 
-                        if (result)
-                        {
-                            PresentationController.SetQuestionContentType(QuestionContentType.Video);
+                            if (videoUri != null)
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Video, videoUri, ImageVideoWeight));
+                                PresentationController.SetSound();
+                                GameViewModel.InitMedia();
+                            }
+                            else
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                            }
+                            break;
+
+                        case AtomTypes.Html:
+                            screenContent.Add(new ContentViewModel(ContentType.Html, contentItem.Value, ImageVideoWeight));
+                            PresentationController.SetQuestionSound(false);
                             PresentationController.SetSound();
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case ContentPlacements.Replic:
+                    if (contentItem.Type == AtomTypes.Text)
+                    {
+                        // Show nothing. The text should be read by showman
+                    }
+                    break;
+
+                case ContentPlacements.Background:
+                    if (contentItem.Type == AtomTypes.AudioNew)
+                    {
+                        PresentationController.SetQuestionSound(true);
+
+                        var audioUri = TryGetMediaUri(contentItem, SIDocument.AudioStorageName);
+
+                        PresentationController.SetSound();
+
+                        if (audioUri != null)
+                        {
+                            PresentationController.SetMedia(new MediaSource(audioUri), true);
                             GameViewModel.InitMedia();
                         }
-                        else
-                        {
-                            PresentationController.SetQuestionContentType(QuestionContentType.Void);
-                        }
-                        break;
-
-                    case AtomTypes.Html:
-                        PresentationController.SetMedia(new MediaSource(contentItem.Value), false);
-                        PresentationController.SetQuestionSound(false);
-                        PresentationController.SetSound();
-                        PresentationController.SetQuestionContentType(QuestionContentType.Html);
-                        break;
-
-                    default:
-                        PresentationController.SetQuestionContentType(QuestionContentType.Void);
-                        break;
-                }
-                break;
-
-            case ContentPlacements.Replic:
-                if (contentItem.Type == AtomTypes.Text)
-                {
-                    // Show nothing. The text should be read by the showman
-                }
-                break;
-
-            case ContentPlacements.Background:
-                if (contentItem.Type == AtomTypes.AudioNew)
-                {
-                    PresentationController.SetQuestionSound(true);
-
-                    var result = SetMedia(contentItem, SIDocument.AudioStorageName, true);
-
-                    PresentationController.SetSound();
-
-                    if (result)
-                    {
-                        GameViewModel.InitMedia();
                     }
-                }
-                break;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
-        GameViewModel.ActiveContentItem = contentItem;
+        if (screenContent.Any())
+        {
+            PresentationController.SetScreenContent(screenContent);
+        }
+
+        GameViewModel.ActiveContent = content;
     }
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
@@ -196,23 +207,21 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    private bool SetMedia(ContentItem contentItem, string category, bool background = false)
+    private string? TryGetMediaUri(ContentItem contentItem, string category)
     {
         if (!contentItem.IsRef)
         {
-            PresentationController.SetMedia(new MediaSource(contentItem.Value), background);
-            return true;
+            return contentItem.Value;
         }
 
         var localFile = Path.Combine(_packageFolder, category, contentItem.Value);
 
         if (!File.Exists(localFile))
         {
-            return false;
+            return null;
         }
 
-        PresentationController.SetMedia(new MediaSource(localFile), background);
-        return true;
+        return localFile;
     }
 
     public void OnQuestionStart(bool buttonsRequired)

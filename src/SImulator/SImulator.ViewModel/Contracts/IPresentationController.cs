@@ -29,6 +29,12 @@ public interface IPresentationController
 
     void SetText(string text = "");
 
+    /// <summary>
+    /// Sets content to display.
+    /// </summary>
+    /// <param name="content">Content to display.</param>
+    void SetScreenContent(IReadOnlyCollection<ContentViewModel> content);
+
     void SetQuestionContentType(QuestionContentType questionContentType);
 
     void SetQuestionStyle(QuestionStyle questionStyle);

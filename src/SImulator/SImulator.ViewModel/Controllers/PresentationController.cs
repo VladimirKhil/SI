@@ -6,7 +6,6 @@ using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
@@ -204,6 +203,12 @@ public sealed class PresentationController : IPresentationController, INotifyPro
     }
 
     public void SetText(string text) => TInfo.Text = text;
+
+    public void SetScreenContent(IReadOnlyCollection<ContentViewModel> content)
+    {
+        TInfo.Content = content;
+        SetQuestionContentType(QuestionContentType.Collection);
+    }
 
     public void SetQuestionContentType(QuestionContentType questionContentType)
     {

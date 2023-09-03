@@ -26,6 +26,10 @@ public sealed class QuestionTemplateSelector : DataTemplateSelector
 
     public override DataTemplate? SelectTemplate(object item, DependencyObject container) =>
         item is TableInfoViewModel info
-            ? info.PartialText ? Partial : info.AnimateText ? Animated : Simple
+            ? info.PartialText
+                ? Partial
+                : info.AnimateText
+                    ? Animated
+                    : Simple
             : base.SelectTemplate(item, container);
 }

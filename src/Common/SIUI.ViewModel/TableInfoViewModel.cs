@@ -178,6 +178,8 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     private bool _animateText = false;
 
+    // TODO: consider joining AnimateText and PartialText into an Enum property
+
     /// <summary>
     /// Should the question text be animated as it is reading aloud.
     /// </summary>
@@ -267,6 +269,21 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     public void SelectTheme_Executed(object? arg) => ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
 
     public void ToggleQuestion_Executed(object? arg) => QuestionToggled?.Invoke((QuestionInfoViewModel)arg);
+
+    private IReadOnlyCollection<ContentViewModel>? _content;
+
+    /// <summary>
+    /// Table collection content.
+    /// </summary>
+    public IReadOnlyCollection<ContentViewModel>? Content
+    {
+        get => _content;
+        set
+        {
+            _content = value;
+            OnPropertyChanged();
+        }
+    }
 
     private MediaSource? _mediaSource;
 

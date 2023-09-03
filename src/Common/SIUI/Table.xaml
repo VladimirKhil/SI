@@ -411,6 +411,97 @@
                         </locals:QuestionTemplateSelector.Partial>
                     </locals:QuestionTemplateSelector>
 
+                    <Style x:Key="QuestionTextStyle" TargetType="ContentControl">
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate DataType="{x:Type vm:ContentViewModel}">
+                                    <TextBlock Text="{Binding Value}" Style="{StaticResource QuestionText}" Margin="10" />
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding DataContext.AnimateText, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate DataType="{x:Type vm:ContentViewModel}">
+                                            <TextBlock
+                                                Text="{Binding Value}"
+                                                Style="{StaticResource QuestionText}"
+                                                Margin="10"
+                                                TextOptions.TextFormattingMode="Ideal"
+                                                lb:QuestionReading.IsAttached="True">
+                                                <TextBlock.CacheMode>
+                                                    <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                                </TextBlock.CacheMode>
+
+                                                <TextBlock.TextEffects>
+                                                    <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                                </TextBlock.TextEffects>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding DataContext.PartialText, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                                <Setter Property="ContentTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate DataType="{x:Type vm:ContentViewModel}">
+                                            <TextBlock
+                                                Text="{Binding Value}"
+                                                Style="{StaticResource QuestionText}"
+                                                Foreground="Transparent"
+                                                Margin="10"
+                                                TextWrapping="Wrap"
+                                                HorizontalAlignment="Left"
+                                                TextAlignment="Left"
+                                                lb:QuestionReading.IsAttachedPartial="True">
+
+                                                <TextBlock.CacheMode>
+                                                    <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
+                                                </TextBlock.CacheMode>
+
+                                                <TextBlock.TextEffects>
+                                                    <TextEffect x:Name="effect" Foreground="Cyan" PositionStart="0" PositionCount="0" />
+                                                </TextBlock.TextEffects>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <localc:TemplateConverter x:Key="QuestionContentSelector2">
+                        <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Void}" />
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Text}">
+                                <ContentControl Content="{Binding}" Style="{StaticResource QuestionTextStyle}" />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Image}">
+                                <Image
+                                    Name="image"
+                                    Stretch="Uniform"
+                                    Source="{Binding Value, Converter={StaticResource UriConverter}}"
+                                    lb:ImageController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Video}">
+                                <MediaElement
+                                    Source="{Binding Value}"
+                                    Stretch="Uniform"
+                                    lb:MediaController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Html}">
+                                <wv2:WebView2 Source="{Binding Value}" lb:WebView2Behavior.IsAttached="True" />
+                            </DataTemplate>
+                        </localc:TemplateConverter.Templates>
+                    </localc:TemplateConverter>
+
                     <localc:TemplateConverter x:Key="QuestionContentSelector">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Void}" />
@@ -447,11 +538,11 @@
                                     Name="image"
                                     Stretch="Uniform"
                                     Source="{Binding MediaSource.Uri, Converter={StaticResource UriConverter}}"
-                                    lb:ImageController.IsAttached="True" />
+                                    lb:ImageController.LoadHandler="{Binding}" />
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Video}">
-                                <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.IsAttached="True" />
+                                <MediaElement Source="{Binding MediaSource.Uri}" Stretch="Uniform" lb:MediaController.LoadHandler="{Binding}" />
                             </DataTemplate>
                             
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Html}">
@@ -468,6 +559,22 @@
 
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Loading}">
                                 <ProgressBar Foreground="DarkBlue" IsIndeterminate="True" Width="300" Height="15" />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Collection}">
+                                <ItemsControl ItemsSource="{Binding Content}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Grid lb:ContentCollectionBehavior.IsAttached="{Binding}" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <ContentControl Content="{Binding}" ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </DataTemplate>
                         </localc:TemplateConverter.Templates>
                     </localc:TemplateConverter>
@@ -846,7 +953,7 @@
                                                                 <DataTemplate>
                                                                     <MediaElement
                                                                         Source="{Binding SoundSource.Uri}"
-                                                                        lb:MediaController.IsAttached="True" />
+                                                                        lb:MediaController.LoadHandler="{Binding}" />
                                                                 </DataTemplate>
                                                             </Setter.Value>
                                                         </Setter>

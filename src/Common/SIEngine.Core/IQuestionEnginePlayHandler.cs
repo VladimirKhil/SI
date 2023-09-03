@@ -9,10 +9,10 @@ namespace SIEngine.Core;
 public interface IQuestionEnginePlayHandler
 {
     /// <summary>
-    /// Shows question content item.
+    /// Shows question content.
     /// </summary>
-    /// <param name="contentItem">Question content item.</param>
-    void OnQuestionContentItem(ContentItem contentItem);
+    /// <param name="content">Question content to display.</param>
+    void OnQuestionContent(IReadOnlyCollection<ContentItem> content);
 
     /// <summary>
     /// Asks for the answer.

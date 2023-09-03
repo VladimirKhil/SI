@@ -239,6 +239,8 @@ public sealed class QuestionEngine
                         continue;
                     }
 
+                    var contentItems = new List<ContentItem>();
+
                     while (_contentIndex < content.ContentValue.Count)
                     {
                         if (_contentIndex == 0)
@@ -253,10 +255,15 @@ public sealed class QuestionEngine
                             continue;
                         }
 
-                        _playHandler.OnQuestionContentItem(contentItem);
+                        contentItems.Add(contentItem);
 
                         if (contentItem.WaitForFinish)
                         {
+                            if (contentItems.Any())
+                            {
+                                _playHandler.OnQuestionContent(contentItems);
+                            }
+
                             if (_contentIndex == content.ContentValue.Count)
                             {
                                 _stepIndex++;
@@ -265,6 +272,11 @@ public sealed class QuestionEngine
 
                             return true;
                         }
+                    }
+
+                    if (contentItems.Any())
+                    {
+                        _playHandler.OnQuestionContent(contentItems);
                     }
 
                     _stepIndex++;

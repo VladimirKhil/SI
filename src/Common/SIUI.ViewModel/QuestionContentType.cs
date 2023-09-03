@@ -61,5 +61,11 @@ public enum QuestionContentType
     /// Loading content mode.
     /// </summary>
     [EnumMember]
-    Loading
+    Loading,
+
+    /// <summary>
+    /// Collection of different content items.
+    /// </summary>
+    [EnumMember]
+    Collection,
 }

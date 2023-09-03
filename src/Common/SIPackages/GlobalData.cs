@@ -4,6 +4,8 @@ using System.Xml.Serialization;
 
 namespace SIPackages;
 
+// TODO: consider adding scripts section here that would allow to write common scripts for the whole package
+
 /// <summary>
 /// Contains global package data.
 /// </summary>

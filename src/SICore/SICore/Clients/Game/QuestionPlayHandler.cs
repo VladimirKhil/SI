@@ -77,6 +77,14 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
     }
 
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
+    {
+        foreach (var contentItem in content)
+        {
+            OnQuestionContentItem(contentItem);
+        }
+    }
+
     public void OnQuestionContentItem(ContentItem contentItem)
     {
         if (GameLogic == null || GameData == null)

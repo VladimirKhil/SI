@@ -298,7 +298,8 @@
                             Grid.Row="1"
                             Grid.Column="1"
                             ItemsSource="{Binding ContentItems}"
-                            SelectedItem="{Binding ActiveContentItem}"
+                            SelectionMode="Multiple"
+                            lb:ListBoxExtensions.SelectedItems="{Binding ActiveContent}"
                             IsEnabled="False"
                             BorderThickness="0"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">

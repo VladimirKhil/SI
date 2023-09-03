@@ -36,7 +36,7 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         
     }
 
-    public void OnQuestionContentItem(ContentItem contentItem)
+    public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
         
     }

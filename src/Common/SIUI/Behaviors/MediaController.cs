@@ -1,6 +1,5 @@
 ﻿using SIUI.ViewModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,30 +8,20 @@ namespace SIUI.Behaviors;
 
 public static class MediaController
 {
-    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
-
-    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
-
-    public static readonly DependencyProperty IsAttachedProperty =
-        DependencyProperty.RegisterAttached(
-            "IsAttached",
-            typeof(bool),
-            typeof(MediaController),
-            new PropertyMetadata(false, OnIsAttachedChanged));
-
-    [DllImport("winmm.dll")]
-    private static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
-
-    [DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
-    private static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
-
     private static readonly DependencyPropertyDescriptor SourceDescriptor =
         DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));
 
-    public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public static TableInfoViewModel? GetLoadHandler(DependencyObject obj) => (TableInfoViewModel?)obj.GetValue(LoadHandlerProperty);
+
+    public static void SetLoadHandler(DependencyObject obj, TableInfoViewModel? value) => obj.SetValue(LoadHandlerProperty, value);
+
+    public static readonly DependencyProperty LoadHandlerProperty =
+        DependencyProperty.RegisterAttached("LoadHandler", typeof(TableInfoViewModel), typeof(MediaController), new PropertyMetadata(null, OnLoadHandlerChanged));
+
+    public static void OnLoadHandlerChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var mediaElement = (MediaElement)d;
-        var tableInfo = (TableInfoViewModel?)mediaElement?.DataContext;
+        var tableInfo = (TableInfoViewModel?)e.NewValue;
 
         if (mediaElement == null || tableInfo == null)
         {
@@ -162,4 +151,10 @@ public static class MediaController
             tableInfo.OnMediaEnd();
         };
     }
+
+    [DllImport("winmm.dll")]
+    private static extern int waveOutGetVolume(IntPtr hwo, out uint dwVolume);
+
+    [DllImport("winmm.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+    private static extern uint waveOutSetVolume(IntPtr uDeviceID, uint dwVolume);
 }

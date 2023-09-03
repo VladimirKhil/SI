@@ -275,15 +275,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _contentItems = value; OnPropertyChanged(); }
     }
 
-    private ContentItem? _activeContentItem;
+    private IReadOnlyCollection<ContentItem> _activeContent = Array.Empty<ContentItem>();
 
     /// <summary>
-    /// Currently active content item.
+    /// Currently active content items.
     /// </summary>
-    public ContentItem? ActiveContentItem
+    public IReadOnlyCollection<ContentItem> ActiveContent
     {
-        get => _activeContentItem;
-        set { if (_activeContentItem != value) { _activeContentItem = value; OnPropertyChanged(); } }
+        get => _activeContent;
+        set { if (_activeContent != value) { _activeContent = value; OnPropertyChanged(); } }
     }
 
     private int _mediaProgress;
