@@ -202,7 +202,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     private bool _displaySources = DefaultDisplaySources;
 
     /// <summary>
-    /// Diplay package items sources.
+    /// Display package items sources.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultDisplaySources)]

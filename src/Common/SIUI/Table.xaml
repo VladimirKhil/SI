@@ -517,18 +517,9 @@
                                     </Border>
                                 </ContentControl>
                             </DataTemplate>
-                            
-                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Clef}">
-                                <ContentControl Style="{StaticResource Rotator}">
-                                    <Border Background="Transparent">
-                                        <TextBlock
-                                            Text="&amp;"
-                                            Style="{StaticResource RotatingText}"
-                                            FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
-                                    </Border>
-                                </ContentControl>
-                            </DataTemplate>
-                            
+
+                            <DataTemplate x:Key="{x:Static vm:QuestionContentType.Clef}" />
+
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Text}">
                                 <ContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource QuestionTextSelector}" />
                             </DataTemplate>
@@ -937,7 +928,7 @@
                                     </ContentControl>
                                     
                                     <!-- Background sound -->
-                                    <ContentControl Content="{Binding}">
+                                    <ContentControl Content="{Binding}" Grid.RowSpan="2">
                                         <ContentControl.Style>
                                             <Style TargetType="ContentControl">
                                                 <Setter Property="ContentTemplate">
@@ -945,15 +936,41 @@
                                                         <DataTemplate />
                                                     </Setter.Value>
                                                 </Setter>
-                                                
+
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Sound}" Value="True">
                                                         <Setter Property="ContentTemplate">
                                                             <Setter.Value>
                                                                 <DataTemplate>
-                                                                    <MediaElement
-                                                                        Source="{Binding SoundSource.Uri}"
-                                                                        lb:MediaController.LoadHandler="{Binding}" />
+                                                                    <Grid>
+                                                                        <MediaElement
+                                                                            Source="{Binding SoundSource.Uri}"
+                                                                            lb:MediaController.LoadHandler="{Binding}" />
+
+                                                                        <ContentControl
+                                                                            x:Name="clef"
+                                                                            Style="{StaticResource Rotator}"
+                                                                            Width="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}"
+                                                                            Height="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}"
+                                                                            HorizontalAlignment="Right"
+                                                                            VerticalAlignment="Bottom">
+                                                                            <Border Background="Transparent">
+                                                                                <TextBlock
+                                                                                    Text="&amp;"
+                                                                                    Style="{StaticResource RotatingText}"
+                                                                                    FontFamily="pack://application:,,,/SIUI;component/Fonts/#Clefs" />
+                                                                            </Border>
+                                                                        </ContentControl>
+                                                                    </Grid>
+
+                                                                    <DataTemplate.Triggers>
+                                                                        <DataTrigger  Binding="{Binding QuestionContentType}" Value="{x:Static vm:QuestionContentType.Clef}">
+                                                                            <Setter TargetName="clef" Property="Width" Value="Auto" />
+                                                                            <Setter TargetName="clef" Property="Height" Value="Auto" />
+                                                                            <Setter TargetName="clef" Property="HorizontalAlignment" Value="Stretch" />
+                                                                            <Setter TargetName="clef" Property="VerticalAlignment" Value="Stretch" />
+                                                                        </DataTrigger>
+                                                                    </DataTemplate.Triggers>
                                                                 </DataTemplate>
                                                             </Setter.Value>
                                                         </Setter>
