@@ -415,7 +415,7 @@
                         <Setter Property="ContentTemplate">
                             <Setter.Value>
                                 <DataTemplate DataType="{x:Type vm:ContentViewModel}">
-                                    <TextBlock Text="{Binding Value}" Style="{StaticResource QuestionText}" Margin="10" />
+                                    <TextBlock Text="{Binding Value}" Style="{StaticResource QuestionText}" Margin="0" />
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -553,7 +553,7 @@
                             </DataTemplate>
 
                             <DataTemplate x:Key="{x:Static vm:QuestionContentType.Collection}">
-                                <ItemsControl ItemsSource="{Binding Content}">
+                                <ItemsControl ItemsSource="{Binding Content}" AlternationCount="100000">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <Grid lb:ContentCollectionBehavior.IsAttached="{Binding}" />
@@ -562,9 +562,18 @@
 
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <ContentControl Content="{Binding}" ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
+                                            <ContentControl
+                                                Margin="10"
+                                                Content="{Binding}"
+                                                ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
+
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Grid.Row" Value="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource Mode=Self}}" />
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
                                 </ItemsControl>
                             </DataTemplate>
                         </localc:TemplateConverter.Templates>
