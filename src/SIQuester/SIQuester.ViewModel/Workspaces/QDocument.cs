@@ -2412,9 +2412,10 @@ public sealed class QDocument : WorkspaceViewModel
     internal ValueTask SaveInternalAsync() =>
          Lock.WithLockAsync(async () =>
          {
-             // Saving at temporary path to validate saved file first
-             var tempPath = System.IO.Path.GetTempFileName();
-             var tempStream = File.Open(tempPath, FileMode.Open, FileAccess.ReadWrite);
+             // 1. Saving at temporary path to validate saved file first
+             var tempPath = FileHelper.GenerateUniqueFileName(System.IO.Path.ChangeExtension(_path, "tmp"));
+
+             var tempStream = File.Open(tempPath, FileMode.CreateNew, FileAccess.ReadWrite);
 
              using (var tempDoc = Document.SaveAs(tempStream, false))
              {
@@ -2436,36 +2437,43 @@ public sealed class QDocument : WorkspaceViewModel
 
              _logger.LogInformation("SaveInternalAsync: document has been saved to temp path: {path}", tempPath);
 
+             // 2. Checking saved document
+             var testStream = File.OpenRead(tempPath);
+             using (SIDocument.Load(testStream)) { }
+
+             // 3. Test ok, overwriting current file and switching to it. Underlying _path stream is closed
+             Document.UpdateContainer(EmptySIPackageContainer.Instance); // reset source temporarily
+
+             _logger.LogInformation("SaveInternalAsync: document is ready to be copied to final path: {path}", _path);
+
              try
              {
-                 // Checking saved document
-                 var testStream = File.OpenRead(tempPath);
-                 using (SIDocument.Load(testStream)) { }
-
-                 // Test ok, overwriting current file and switching to it
-                 Document.UpdateContainer(EmptySIPackageContainer.Instance); // reset source temporarily
-
                  try
                  {
-                     File.Copy(tempPath, _path, true);
-
-                     _logger.LogInformation("SaveInternalAsync: document has been validated and saved to final path: {path}", _path);
-
-                     Changed = false;
-                     ClearTempFolder();
-                     CheckFileSize();
+                     File.Replace(tempPath, _path, null); // It is possible to provide backup file on save here
                  }
-                 finally
+                 catch (UnauthorizedAccessException exc)
                  {
-                     var stream = File.OpenRead(_path);
-                     Document.ResetTo(stream);
+                     _logger.LogWarning(exc, "SaveInternalAsync error. Switching to old saving method: {error}", exc.Message);
 
-                     _logger.LogInformation("SaveInternalAsync: document has been reopened: {path}", _path);
+                     // Fallback to old unsafe method
+                     File.Copy(tempPath, _path, true);
+                     File.Delete(tempPath);
                  }
+
+                 _logger.LogInformation("SaveInternalAsync: document has been validated and saved to final path: {path}", _path);
+
+                 Changed = false;
+                 ClearTempFolder();
+                 CheckFileSize();
              }
              finally
              {
-                 File.Delete(tempPath);
+                 // 4. Opening new file
+                 var stream = File.OpenRead(_path);
+                 Document.ResetTo(stream);
+
+                 _logger.LogInformation("SaveInternalAsync: document has been reopened: {path}", _path);
              }
          });
 

@@ -925,7 +925,7 @@ public sealed class SIDocument : IDisposable
     public void ResetTo(Stream stream) => UpdateContainer(PackageContainerFactory.GetPackageContainer(stream));
 
     /// <summary>
-    /// Switches document to new container.
+    /// Switches document to new container disposing the old one.
     /// </summary>
     /// <param name="packageContainer">New container.</param>
     public void UpdateContainer(ISIPackageContainer packageContainer)
