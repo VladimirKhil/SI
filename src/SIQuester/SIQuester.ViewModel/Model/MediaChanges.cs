@@ -19,4 +19,9 @@ public readonly struct MediaChanges
     /// Video changes.
     /// </summary>
     public StorageChanges VideoChanges { get; init; }
+
+    /// <summary>
+    /// Html changes.
+    /// </summary>
+    public StorageChanges HtmlChanges { get; init; }
 }

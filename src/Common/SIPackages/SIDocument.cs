@@ -17,26 +17,6 @@ public sealed class SIDocument : IDisposable
     internal const string AuthorsFileName = "authors.xml";
     internal const string SourcesFileName = "sources.xml";
 
-    /// <summary>
-    /// Хранилище текстов
-    /// </summary>
-    internal const string TextsStorageName = "Texts";
-
-    /// <summary>
-    /// Хранилище изображений
-    /// </summary>
-    public const string ImagesStorageName = "Images";
-
-    /// <summary>
-    /// Хранилище звуков
-    /// </summary>
-    public const string AudioStorageName = "Audio";
-
-    /// <summary>
-    /// Хранилище видео
-    /// </summary>
-    public const string VideoStorageName = "Video";
-
     private bool _disposed;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -65,6 +45,9 @@ public sealed class SIDocument : IDisposable
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private readonly DataCollection _video;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private readonly DataCollection _html;
 
     /// <summary>
     /// Игровой пакет
@@ -96,6 +79,11 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     public DataCollection Video => _video;
 
+    /// <summary>
+    /// Document HTML collection.
+    /// </summary>
+    public DataCollection Html => _html;
+
     #region Document Functions
 
     private SIDocument(ISIPackageContainer packageContainer)
@@ -104,9 +92,10 @@ public sealed class SIDocument : IDisposable
 
         _packageContainer = packageContainer;
 
-        _images = new DataCollection(_packageContainer, ImagesStorageName, "si/image");
-        _audio = new DataCollection(_packageContainer, AudioStorageName, "si/audio");
-        _video = new DataCollection(_packageContainer, VideoStorageName, "si/video");
+        _images = new DataCollection(_packageContainer, CollectionNames.ImagesStorageName, "si/image");
+        _audio = new DataCollection(_packageContainer, CollectionNames.AudioStorageName, "si/audio");
+        _video = new DataCollection(_packageContainer, CollectionNames.VideoStorageName, "si/video");
+        _html = new DataCollection(_packageContainer, CollectionNames.HtmlStorageName, "si/html");
     }
 
     /// <summary>
@@ -257,7 +246,7 @@ public sealed class SIDocument : IDisposable
             }
         }
 
-        streamInfo = _packageContainer.GetStream(TextsStorageName, AuthorsFileName);
+        streamInfo = _packageContainer.GetStream(CollectionNames.TextsStorageName, AuthorsFileName);
 
         if (streamInfo != null)
         {
@@ -268,7 +257,7 @@ public sealed class SIDocument : IDisposable
             }
         }
 
-        streamInfo = _packageContainer.GetStream(TextsStorageName, SourcesFileName);
+        streamInfo = _packageContainer.GetStream(CollectionNames.TextsStorageName, SourcesFileName);
 
         if (streamInfo != null)
         {
@@ -323,13 +312,13 @@ public sealed class SIDocument : IDisposable
             _package.WriteXml(writer);
         }
 
-        using (var stream = CreateIfNotExists(packageContainer, TextsStorageName, AuthorsFileName).Stream)
+        using (var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, AuthorsFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
             _authors.WriteXml(writer);
         }
 
-        using (var stream = CreateIfNotExists(packageContainer, TextsStorageName, SourcesFileName).Stream)
+        using (var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, SourcesFileName).Stream)
         {
             using var writer = XmlWriter.Create(stream);
             _sources.WriteXml(writer);
@@ -387,6 +376,7 @@ public sealed class SIDocument : IDisposable
         Ensure.That(_images).IsNotNull();
         Ensure.That(_audio).IsNotNull();
         Ensure.That(_video).IsNotNull();
+        Ensure.That(_html).IsNotNull();
 
         var newContainer = _packageContainer.CopyTo(stream, switchTo, out bool isNew);
 
@@ -395,8 +385,8 @@ public sealed class SIDocument : IDisposable
         if (isNew)
         {
             newContainer.CreateStream(ContentFileName, "si/xml");
-            newContainer.CreateStream(TextsStorageName, AuthorsFileName, "si/xml");
-            newContainer.CreateStream(TextsStorageName, SourcesFileName, "si/xml");
+            newContainer.CreateStream(CollectionNames.TextsStorageName, AuthorsFileName, "si/xml");
+            newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName, "si/xml");
         }
         
         if (switchTo)
@@ -583,15 +573,7 @@ public sealed class SIDocument : IDisposable
             return new Media(atom.Text);
         }
 
-        var collection = atom.Type switch
-        {
-            AtomTypes.Audio => _audio,
-            AtomTypes.AudioNew => _audio,
-            AtomTypes.Video => _video,
-            AtomTypes.Image => _images,
-            _ => throw new InvalidOperationException($"Unsupported atom type {atom.Type}"),
-        };
-
+        var collection = GetCollection(atom.Type);
         return GetLinkFromCollection(link, collection);
     }
 
@@ -609,17 +591,31 @@ public sealed class SIDocument : IDisposable
             return new Media(link);
         }
 
-        var collection = contentItem.Type switch
-        {
-            AtomTypes.Audio => _audio,
-            AtomTypes.AudioNew => _audio,
-            AtomTypes.Video => _video,
-            AtomTypes.Image => _images,
-            _ => throw new InvalidOperationException($"Unsupported content type {contentItem.Type}"),
-        };
-
+        var collection = GetCollection(contentItem.Type);
         return GetLinkFromCollection(link, collection);
     }
+
+    /// <summary>
+    /// Tries to get media collection by media type.
+    /// </summary>
+    /// <param name="mediaType">Collection media type.</param>
+    /// <returns>Found collection or null.</returns>
+    public DataCollection? TryGetCollection(string mediaType) => mediaType switch
+    {
+        AtomTypes.Image => _images,
+        AtomTypes.Audio or AtomTypes.AudioNew => _audio,
+        AtomTypes.Video => _video,
+        AtomTypes.Html => _html,
+        _ => null,
+    };
+
+    /// <summary>
+    /// Gets media collection by media type.
+    /// </summary>
+    /// <param name="mediaType">Collection media type.</param>
+    /// <exception cref="ArgumentException">Invalid media type has been provided.</exception>
+    public DataCollection GetCollection(string mediaType) => TryGetCollection(mediaType)
+        ?? throw new ArgumentException($"Invalid media type {mediaType}", nameof(mediaType));
 
     /// <summary>
     /// Gets document package logo link.
@@ -778,21 +774,8 @@ public sealed class SIDocument : IDisposable
     {
         var link = atom.Text.ExtractLink();
 
-        var collection = Images;
-        var newCollection = newDocument.Images;
-
-        switch (atom.Type)
-        {
-            case AtomTypes.Audio:
-                collection = Audio;
-                newCollection = newDocument.Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = Video;
-                newCollection = newDocument.Video;
-                break;
-        }
+        var collection = GetCollection(atom.Type);
+        var newCollection = newDocument.GetCollection(atom.Type);
 
         if (!newCollection.Contains(link))
         {
@@ -808,21 +791,8 @@ public sealed class SIDocument : IDisposable
     {
         var link = contentItem.Value;
 
-        var collection = Images;
-        var newCollection = newDocument.Images;
-
-        switch (contentItem.Type)
-        {
-            case AtomTypes.Audio:
-                collection = Audio;
-                newCollection = newDocument.Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = Video;
-                newCollection = newDocument.Video;
-                break;
-        }
+        var collection = GetCollection(contentItem.Type);
+        var newCollection = newDocument.GetCollection(contentItem.Type);
 
         if (!newCollection.Contains(link))
         {
@@ -938,5 +908,6 @@ public sealed class SIDocument : IDisposable
         _images.UpdateContainer(_packageContainer);
         _audio.UpdateContainer(_packageContainer);
         _video.UpdateContainer(_packageContainer);
+        _html.UpdateContainer(_packageContainer);
     }
 }

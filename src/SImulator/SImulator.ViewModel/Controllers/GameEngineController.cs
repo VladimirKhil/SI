@@ -88,7 +88,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Image:
-                            var imageUri = TryGetMediaUri(contentItem, SIDocument.ImagesStorageName);
+                            var imageUri = TryGetMediaUri(contentItem, CollectionNames.ImagesStorageName);
 
                             if (imageUri != null)
                             {
@@ -101,7 +101,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Video:
-                            var videoUri = TryGetMediaUri(contentItem, SIDocument.VideoStorageName);
+                            var videoUri = TryGetMediaUri(contentItem, CollectionNames.VideoStorageName);
 
                             if (videoUri != null)
                             {
@@ -138,7 +138,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                     {
                         PresentationController.SetQuestionSound(true);
 
-                        var audioUri = TryGetMediaUri(contentItem, SIDocument.AudioStorageName);
+                        var audioUri = TryGetMediaUri(contentItem, CollectionNames.AudioStorageName);
 
                         PresentationController.SetSound();
 

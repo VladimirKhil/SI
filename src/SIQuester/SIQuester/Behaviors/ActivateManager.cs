@@ -38,7 +38,9 @@ public static class ActivateManager
         if (control.DataContext == QDocument.ActivatedObject)
         {
             // Финт для того, чтобы появился TextBox для комментария и ограничения. Пустой - сразу исчезает по триггеру
-            if (control is TextBox textBox && (textBox.Text == "Ограничение" || textBox.Text == ViewModel.Properties.Resources.Comment))
+            if (control is TextBox textBox
+                && (textBox.Text == Properties.Resources.Restriction
+                    || textBox.Text == ViewModel.Properties.Resources.Comment))
             {
                 textBox.Clear();
             }

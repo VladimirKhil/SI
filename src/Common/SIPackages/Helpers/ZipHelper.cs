@@ -128,10 +128,11 @@ public static class ZipHelper
         fileName == SIDocument.ContentFileName;
 
     private static bool ValidateDirectoryName(string subDirectoryName) =>
-        subDirectoryName == SIDocument.TextsStorageName ||
-        subDirectoryName == SIDocument.ImagesStorageName ||
-        subDirectoryName == SIDocument.AudioStorageName ||
-        subDirectoryName == SIDocument.VideoStorageName;
+        subDirectoryName == CollectionNames.TextsStorageName ||
+        subDirectoryName == CollectionNames.ImagesStorageName ||
+        subDirectoryName == CollectionNames.AudioStorageName ||
+        subDirectoryName == CollectionNames.VideoStorageName ||
+        subDirectoryName == CollectionNames.HtmlStorageName;
 
     /// <summary>
     /// Extracts entity to directory.

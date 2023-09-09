@@ -204,7 +204,12 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
     {
         var contentItem = CurrentItem;
         var atomType = contentItem.Model.Type;
-        var isMedia = atomType == AtomTypes.Image || atomType == AtomTypes.Audio || atomType == AtomTypes.AudioNew || atomType == AtomTypes.Video;
+
+        var isMedia = atomType == AtomTypes.Image
+            || atomType == AtomTypes.Audio
+            || atomType == AtomTypes.AudioNew
+            || atomType == AtomTypes.Video
+            || atomType == AtomTypes.Html;
 
         SetTime.CanBeExecuted = contentItem != null && contentItem.Model.Duration == TimeSpan.Zero;
 
@@ -281,12 +286,6 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         if (media is MediaItemViewModel file)
         {
             SelectAtomObject_Do(mediaType, file);
-            return false;
-        }
-
-        if (mediaType == AtomTypes.Html)
-        {
-            LinkAtomObject(mediaType);
             return false;
         }
 
@@ -402,17 +401,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
             return false;
         }
 
-        var collection = document.Images;
-
-        if (mediaType == AtomTypes.Audio || mediaType == AtomTypes.AudioNew)
-        {
-            collection = document.Audio;
-        }
-        else if (mediaType == AtomTypes.Video)
-        {
-            collection = document.Video;
-        }
-
+        var collection = document.GetCollectionByMediaType(mediaType);
         var initialItemCount = collection.Files.Count;
 
         try

@@ -13,15 +13,18 @@ public sealed class AtomTypeSelector : DataTemplateSelector
 
     public DataTemplate? VideoTemplate { get; set; }
 
+    public DataTemplate? HtmlTemplate { get; set; }
+
     public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
         var mediaItem = (MediaItemViewModel)item;
 
         return mediaItem.Type switch
         {
-            SIDocument.ImagesStorageName => ImageTemplate,
-            SIDocument.AudioStorageName => AudioTemplate,
-            SIDocument.VideoStorageName => VideoTemplate,
+            CollectionNames.ImagesStorageName => ImageTemplate,
+            CollectionNames.AudioStorageName => AudioTemplate,
+            CollectionNames.VideoStorageName => VideoTemplate,
+            CollectionNames.HtmlStorageName => HtmlTemplate,
             _ => base.SelectTemplate(item, container),
         };
     }

@@ -659,4 +659,7 @@ theme - тема Кота</value>
   <data name="MircVideo" xml:space="preserve">
     <value>видео</value>
   </data>
+  <data name="Restriction" xml:space="preserve">
+    <value>Ограничение</value>
+  </data>
 </root>

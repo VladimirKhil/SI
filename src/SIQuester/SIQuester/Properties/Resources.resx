@@ -297,6 +297,9 @@
   <data name="Cancel" xml:space="preserve">
     <value>Отмена</value>
   </data>
+  <data name="CancelSearch" xml:space="preserve">
+    <value>Отменить поиск</value>
+  </data>
   <data name="Championship" xml:space="preserve">
     <value>Чемпионат</value>
   </data>
@@ -619,6 +622,9 @@
   <data name="NextFragment" xml:space="preserve">
     <value>Следующий фрагмент</value>
   </data>
+  <data name="NextSearchResult" xml:space="preserve">
+    <value>Следующий результат</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>Нет</value>
   </data>
@@ -699,6 +705,9 @@
   </data>
   <data name="PreviousFragment" xml:space="preserve">
     <value>Предыдущий фрагмент</value>
+  </data>
+  <data name="PreviousSearchResult" xml:space="preserve">
+    <value>Предыдущий результат</value>
   </data>
   <data name="Price" xml:space="preserve">
     <value>Стоимость</value>
@@ -807,6 +816,9 @@
   </data>
   <data name="Scale" xml:space="preserve">
     <value>Масштаб</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Поиск</value>
   </data>
   <data name="SearchFolder" xml:space="preserve">
     <value>Папка для поиска...</value>

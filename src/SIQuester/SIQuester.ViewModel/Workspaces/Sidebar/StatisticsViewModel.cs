@@ -1,4 +1,5 @@
-﻿using SIPackages.Core;
+﻿using SIPackages;
+using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
 using System.Text;
 using System.Windows.Input;
@@ -152,7 +153,11 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                 {
                     var questionText = quest.GetText();
 
-                    var emptyQuestion = (questionText == "" || questionText == Resources.Question) && !quest.HasMediaContent();
+                    var emptyQuestion = quest.Price > Question.InvalidPrice
+                        && quest.TypeName != QuestionTypes.SecretNoQuestion
+                        && (questionText == "" || questionText == Resources.Question)
+                        && !quest.HasMediaContent();
+
                     var noAnswer = quest.Right.Count == 1 && quest.Right[0] == Resources.RightAnswer;
                     var emptySources = quest.Info.Sources.Count == 0 && _checkEmptySources;
 

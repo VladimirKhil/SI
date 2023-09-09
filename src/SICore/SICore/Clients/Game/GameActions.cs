@@ -242,10 +242,10 @@ public sealed class GameActions
                                         else
                                         {
                                             var mediaCategory = contentType == AtomTypes.Image
-                                                ? SIDocument.ImagesStorageName
+                                                ? CollectionNames.ImagesStorageName
                                                 : ((contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew)
-                                                    ? SIDocument.AudioStorageName
-                                                    : (contentType == AtomTypes.Video ? SIDocument.VideoStorageName : contentType));
+                                                    ? CollectionNames.AudioStorageName
+                                                    : (contentType == AtomTypes.Video ? CollectionNames.VideoStorageName : contentType));
 
                                             string fileName;
 

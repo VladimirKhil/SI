@@ -21,10 +21,11 @@ public sealed class ContentItemViewModel : MediaOwnerViewModel
 
     public override string Type => Model.Type switch
     {
-        AtomTypes.Image => SIDocument.ImagesStorageName,
-        AtomTypes.Audio => SIDocument.AudioStorageName,
-        AtomTypes.AudioNew => SIDocument.AudioStorageName,
-        AtomTypes.Video => SIDocument.VideoStorageName,
+        AtomTypes.Image => CollectionNames.ImagesStorageName,
+        AtomTypes.Audio => CollectionNames.AudioStorageName,
+        AtomTypes.AudioNew => CollectionNames.AudioStorageName,
+        AtomTypes.Video => CollectionNames.VideoStorageName,
+        AtomTypes.Html => CollectionNames.HtmlStorageName,
         _ => Model.Type,
     };
 

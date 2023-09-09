@@ -17,16 +17,18 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 {
     private static readonly Dictionary<string, int> RecommenedSizeMb = new()
     {
-        [SIDocument.ImagesStorageName] = 1,
-        [SIDocument.AudioStorageName] = 5,
-        [SIDocument.VideoStorageName] = 10,
+        [CollectionNames.ImagesStorageName] = 1,
+        [CollectionNames.AudioStorageName] = 5,
+        [CollectionNames.VideoStorageName] = 10,
+        [CollectionNames.HtmlStorageName] = 1,
     };
 
     private static readonly Dictionary<string, string[]> RecommenedExtensions = new()
     {
-        [SIDocument.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png", ".gif" },
-        [SIDocument.AudioStorageName] = new[] { ".mp3" },
-        [SIDocument.VideoStorageName] = new[] { ".mp4" },
+        [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png", ".gif" },
+        [CollectionNames.AudioStorageName] = new[] { ".mp3" },
+        [CollectionNames.VideoStorageName] = new[] { ".mp4" },
+        [CollectionNames.HtmlStorageName] = new[] { ".html" },
     };
 
     private IMedia? _mediaSource = null;

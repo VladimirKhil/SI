@@ -38,7 +38,7 @@ public sealed class WebManager : IFileShare
 
         var packageFolder = resourceLocations[ResourceKind.Package];
 
-        var imagesFolder = Path.Combine(packageFolder, SIDocument.ImagesStorageName);
+        var imagesFolder = Path.Combine(packageFolder, CollectionNames.ImagesStorageName);
 
         if (Directory.Exists(imagesFolder))
         {
@@ -48,7 +48,7 @@ public sealed class WebManager : IFileShare
                 RequestPath = "/package/Images",
             });
         }
-        var audioFolder = Path.Combine(packageFolder, SIDocument.AudioStorageName);
+        var audioFolder = Path.Combine(packageFolder, CollectionNames.AudioStorageName);
 
         if (Directory.Exists(audioFolder))
         {
@@ -59,7 +59,7 @@ public sealed class WebManager : IFileShare
             });
         }
 
-        var videoFolder = Path.Combine(packageFolder, SIDocument.VideoStorageName);
+        var videoFolder = Path.Combine(packageFolder, CollectionNames.VideoStorageName);
 
         if (Directory.Exists(videoFolder))
         {

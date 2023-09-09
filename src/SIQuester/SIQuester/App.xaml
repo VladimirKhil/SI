@@ -1702,17 +1702,38 @@
                                                                         Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Video}}" />
                                                                 </Style>
                                                             </MenuItem.ItemContainerStyle>
-
                                                         </MenuItem>
                                                     </Menu>
 
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
+                                                            Visibility="{Binding OwnerDocument.Package.IsUpgraded, Converter={StaticResource FalseToVisiblityConverter}}"
                                                             Command="{Binding SelectAtomObject}"
                                                             CommandParameter="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}"
                                                             ToolTip="{x:Static lp:Resources.AddHtml}"
                                                             Header="{StaticResource AddHtmlImage}"
                                                             Style="{StaticResource MenuMenuHeader}">
+                                                        </MenuItem>
+                                                        
+                                                        <MenuItem
+                                                            Visibility="{Binding OwnerDocument.Package.IsUpgraded, Converter={StaticResource VisibilityConverter}}"
+                                                            ToolTip="{x:Static lp:Resources.AddHtml}"
+                                                            Header="{StaticResource AddHtmlImage}"
+                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            <MenuItem.ItemsSource>
+                                                                <MultiBinding Converter="{StaticResource ListJoinConverter}">
+                                                                    <Binding Source="{StaticResource Additional}" />
+                                                                    <Binding Path="OwnerDocument.Html.Files" />
+                                                                </MultiBinding>
+                                                            </MenuItem.ItemsSource>
+
+                                                            <MenuItem.ItemContainerStyle>
+                                                                <Style TargetType="MenuItem" BasedOn="{StaticResource SubMenuItem}">
+                                                                    <Setter
+                                                                        Property="CommandParameter"
+                                                                        Value="{Binding Converter={StaticResource MediaArgsConverter}, ConverterParameter={x:Static pc:AtomTypes.Html}}" />
+                                                                </Style>
+                                                            </MenuItem.ItemContainerStyle>
                                                         </MenuItem>
                                                     </Menu>
 

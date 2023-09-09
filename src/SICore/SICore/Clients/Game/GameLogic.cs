@@ -459,10 +459,10 @@ public sealed class GameLogic : Logic<GameData>
                 .Append(Message.ArgsSeparatorChar);
 
             var mediaCategory = atomType == AtomTypes.Image
-                ? SIDocument.ImagesStorageName
+                ? CollectionNames.ImagesStorageName
                 : (atomType == AtomTypes.Audio
-                    ? SIDocument.AudioStorageName
-                    : (atomType == AtomTypes.Video ? SIDocument.VideoStorageName : atomType));
+                    ? CollectionNames.AudioStorageName
+                    : (atomType == AtomTypes.Video ? CollectionNames.VideoStorageName : atomType));
 
             if (!contentItem.IsRef) // External link
             {
@@ -3937,7 +3937,7 @@ public sealed class GameLogic : Logic<GameData>
                 {
                     var uri = _fileShare.CreateResourceUri(
                         ResourceKind.Package,
-                        new Uri($"{SIDocument.ImagesStorageName}/{logoLink.Uri}", UriKind.Relative));
+                        new Uri($"{CollectionNames.ImagesStorageName}/{logoLink.Uri}", UriKind.Relative));
 
                     foreach (var person in _data.AllPersons.Keys)
                     {

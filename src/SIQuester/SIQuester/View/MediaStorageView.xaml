@@ -49,20 +49,20 @@
                     </DockPanel>
                 </DataTemplate>
             </ls:AtomTypeSelector.AudioTemplate>
-            
+
             <ls:AtomTypeSelector.VideoTemplate>
                 <DataTemplate>
-                    <Grid Margin="4">                        
+                    <Grid Margin="4">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        
+
                         <MediaElement
                             Grid.ColumnSpan="2"
                             Name="mediaElement1"
@@ -72,9 +72,9 @@
                             ScrubbingEnabled="True"
                             lb:MediaController.PlayPauseButton="{Binding ElementName=play}"
                             lb:MediaController.Progress="{Binding ElementName=progress}" />
-                        
+
                         <ToggleButton Style="{StaticResource playButton}" Name="play" Grid.Row="1" Margin="0,10,0,0" />
-                        
+
                         <Slider
                             Style="{StaticResource playSlider}"
                             Name="progress"
@@ -82,10 +82,16 @@
                             Grid.Row="1"
                             Grid.Column="1"
                             Margin="20,10,0,0"
-                            VerticalAlignment="Center" />                        
+                            VerticalAlignment="Center" />
                     </Grid>
                 </DataTemplate>
-            </ls:AtomTypeSelector.VideoTemplate>            
+            </ls:AtomTypeSelector.VideoTemplate>
+
+            <ls:AtomTypeSelector.HtmlTemplate>
+                <DataTemplate>
+                    <ContentControl />
+                </DataTemplate>
+            </ls:AtomTypeSelector.HtmlTemplate>
         </ls:AtomTypeSelector>
     </UserControl.Resources>
     
@@ -98,9 +104,8 @@
                 Name="bAdd"
                 Command="{Binding AddItem}"
                 ToolTip="{x:Static lp:Resources.Add}">
-                
+
                 <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
-                
             </Button>
         </StackPanel>
         
@@ -110,8 +115,7 @@
             ItemsSource="{Binding Files}"
             IsSynchronizedWithCurrentItem="True"
             SelectionMode="Single"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled">            
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel />
@@ -156,8 +160,7 @@
             
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Background="Transparent">
-                        
+                    <Grid Background="Transparent">                        
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
@@ -180,15 +183,13 @@
                             CommandParameter="{Binding}"
                             Width="25"
                             Height="25"
-                            ToolTip="{x:Static lp:Resources.Delete}">
-                            
+                            ToolTip="{x:Static lp:Resources.Delete}">                            
                             <Path
                                 Stretch="Uniform"
                                 Stroke="#FF555555"
                                 StrokeThickness="2"
                                 Margin="3"
-                                Data="{Binding Source={StaticResource app_delete},Path=Data}" />
-                            
+                                Data="{Binding Source={StaticResource app_delete},Path=Data}" />                            
                         </Button>
 
                         <ToggleButton
@@ -199,10 +200,8 @@
                             Style="{StaticResource {x:Static ToolBar.ToggleButtonStyleKey}}"
                             Margin="5,0,0,0"
                             Width="25"
-                            ToolTip="{x:Static lp:Resources.Edit}">
-                            
-                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />
-                        
+                            ToolTip="{x:Static lp:Resources.Edit}">                            
+                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_edit}, Path=Data}" />                        
                         </ToggleButton>
 
                         <DockPanel Grid.Row="1">
@@ -248,8 +247,7 @@
                         <DataTrigger Binding="{Binding Type}" Value="Video">
                             <Setter Property="Width" Value="250" />
                             <Setter Property="Height" Value="200" />
-                        </DataTrigger>
-                        
+                        </DataTrigger>                        
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListBox.ItemTemplate>

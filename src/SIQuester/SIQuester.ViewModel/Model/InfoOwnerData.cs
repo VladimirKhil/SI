@@ -28,6 +28,8 @@ public sealed class InfoOwnerData
 
     public Dictionary<string, string> Video { get; set; } = new();
 
+    public Dictionary<string, string> Html { get; set; } = new();
+
     public InfoOwnerData(QDocument document, IItemViewModel item)
     {
         var model = item.GetModel();
@@ -120,14 +122,7 @@ public sealed class InfoOwnerData
                     continue;
                 }
 
-                var collection = contentItem.Type switch
-                {
-                    AtomTypes.Image => documentViewModel.Images,
-                    AtomTypes.Audio => documentViewModel.Audio,
-                    AtomTypes.AudioNew => documentViewModel.Audio,
-                    AtomTypes.Video => documentViewModel.Video,
-                    _ => null,
-                };
+                var collection = documentViewModel.TryGetCollectionByMediaType(contentItem.Type);
 
                 if (collection == null)
                 {
@@ -140,6 +135,7 @@ public sealed class InfoOwnerData
                     AtomTypes.Audio => Audio,
                     AtomTypes.AudioNew => Audio,
                     AtomTypes.Video => Video,
+                    AtomTypes.Html => Html,
                     _ => null,
                 };
 
@@ -164,14 +160,7 @@ public sealed class InfoOwnerData
                     continue;
                 }
 
-                var collection = atom.Type switch
-                {
-                    AtomTypes.Image => documentViewModel.Images,
-                    AtomTypes.Audio => documentViewModel.Audio,
-                    AtomTypes.AudioNew => documentViewModel.Audio,
-                    AtomTypes.Video => documentViewModel.Video,
-                    _ => null,
-                };
+                var collection = documentViewModel.TryGetCollectionByMediaType(atom.Type);
 
                 if (collection == null)
                 {

@@ -176,21 +176,8 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
     {
         var link = contentItem.Value;
 
-        var collection = oldDocument.Document.Images;
-        var newCollection = newDocument.Images;
-
-        switch (contentItem.Type)
-        {
-            case AtomTypes.Audio:
-                collection = oldDocument.Document.Audio;
-                newCollection = newDocument.Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = oldDocument.Document.Video;
-                newCollection = newDocument.Video;
-                break;
-        }
+        var collection = oldDocument.Document.GetCollection(contentItem.Type);
+        var newCollection = newDocument.GetCollectionByMediaType(contentItem.Type);
 
         if (newCollection.Files.Any(f => f.Model.Name == link))
         {
@@ -219,21 +206,8 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
     {
         var link = atom.Text.ExtractLink();
 
-        var collection = oldDocument.Document.Images;
-        var newCollection = newDocument.Images;
-
-        switch (atom.Type)
-        {
-            case AtomTypes.Audio:
-                collection = oldDocument.Document.Audio;
-                newCollection = newDocument.Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = oldDocument.Document.Video;
-                newCollection = newDocument.Video;
-                break;
-        }
+        var collection = oldDocument.Document.GetCollection(atom.Type);
+        var newCollection = newDocument.GetCollectionByMediaType(atom.Type);
 
         if (newCollection.Files.Any(f => f.Model.Name == link))
         {

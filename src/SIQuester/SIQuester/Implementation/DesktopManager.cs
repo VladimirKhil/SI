@@ -57,9 +57,11 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
             Multiselect = true,
             Filter = mediaCategory switch
             {
-                SIDocument.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpeg, *.png, *.gif)|*.jpg;*.jpeg;*.png;*.gif|{Resources.AllFiles} (*.*)|*.*",
-                SIDocument.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3|{Resources.AllFiles} (*.*)|*.*",
-                _ => $"{Resources.Video} (*.mp4)|*.mp4|{Resources.AllFiles} (*.*)|*.*",
+                CollectionNames.ImagesStorageName => $"{Resources.Images} (*.jpg, *.jpeg, *.png, *.gif)|*.jpg;*.jpeg;*.png;*.gif|{Resources.AllFiles} (*.*)|*.*",
+                CollectionNames.AudioStorageName => $"{Resources.Audio} (*.mp3)|*.mp3|{Resources.AllFiles} (*.*)|*.*",
+                CollectionNames.VideoStorageName => $"{Resources.Video} (*.mp4)|*.mp4|{Resources.AllFiles} (*.*)|*.*",
+                CollectionNames.HtmlStorageName => $"{SIQuester.ViewModel.Properties.Resources.HtmlFiles} (*.html)|*.html|{Resources.AllFiles} (*.*)|*.*",
+                _ => throw new ArgumentException($"Invalid category {mediaCategory}", nameof(mediaCategory))
             }
         };
 

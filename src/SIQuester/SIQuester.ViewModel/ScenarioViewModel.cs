@@ -438,16 +438,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
             return;
         }
 
-        var collection = document.Images;
-        if (mediaType == AtomTypes.Audio)
-        {
-            collection = document.Audio;
-        }
-        else if (mediaType == AtomTypes.Video)
-        {
-            collection = document.Video;
-        }
-
+        var collection = document.GetCollectionByMediaType(mediaType);
         var initialItemCount = collection.Files.Count;
 
         try

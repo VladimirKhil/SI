@@ -15,6 +15,7 @@
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
     xmlns:mamc="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:vmp="clr-namespace:SIQuester.ViewModel.Properties;assembly=SIQuester.ViewModel"
     mc:Ignorable="d"
     d:DesignHeight="357.297"
     d:DesignWidth="584.402"
@@ -404,7 +405,7 @@
                     VerticalAlignment="Center"
                     Padding="0,2"
                     Width="200"
-                    ToolTip="Поиск"
+                    ToolTip="{x:Static lp:Resources.Search}"
                     Margin="0">
                     <TextBox.Style>
                         <Style TargetType="TextBox">
@@ -416,16 +417,32 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                
-                <Button ToolTip="Отменить поиск" Command="{Binding ClearSearchText}" Height="22" Width="22" Margin="0,-1,0,0" VerticalAlignment="Center">
+
+                <Button
+                    ToolTip="{x:Static lp:Resources.CancelSearch}"
+                    Command="{Binding ClearSearchText}"
+                    Height="22"
+                    Width="22"
+                    Margin="0,-1,0,0"
+                    VerticalAlignment="Center">
                     <Path Data="M0,0L10,10M0,10L10,0" Stroke="Black" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
                 </Button>
-                
-                <Button ToolTip="Предыдущий результат" Command="{Binding PreviousSearchResult}" Padding="5" Margin="0,-1,0,0" VerticalAlignment="Center">
+
+                <Button
+                    ToolTip="{x:Static lp:Resources.PreviousSearchResult}"
+                    Command="{Binding PreviousSearchResult}"
+                    Padding="5"
+                    Margin="0,-1,0,0"
+                    VerticalAlignment="Center">
                     <Path Data="M0,5L10,0L10,10" Fill="Black" />
                 </Button>
-                
-                <Button ToolTip="Следующий результат" Command="{Binding NextSearchResult}" Padding="5" Margin="0,-1,0,0" VerticalAlignment="Center">
+
+                <Button
+                    ToolTip="{x:Static lp:Resources.NextSearchResult}"
+                    Command="{Binding NextSearchResult}"
+                    Padding="5"
+                    Margin="0,-1,0,0"
+                    VerticalAlignment="Center">
                     <Path Data="M10,5L0,0L0,10" Fill="Black" />
                 </Button>
             </StackPanel>
@@ -470,13 +487,11 @@
                                     <TextBlock Text="{Binding Model.Name}" TextTrimming="CharacterEllipsis" lb:SmartTipBehavior.IsAttached="True" />
                                 </HierarchicalDataTemplate>
                                 
-                                <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">
-                                    
+                                <DataTemplate x:Key="{x:Type vm:QuestionViewModel}">                                    
                                     <TextBlock 
                                         Text="{Binding Model.Price, Converter={StaticResource PriceConverter}}"
                                         TextTrimming="CharacterEllipsis"
-                                        lb:SmartTipBehavior.IsAttached="True" />
-                                    
+                                        lb:SmartTipBehavior.IsAttached="True" />                                    
                                 </DataTemplate>
                             </siqsel:DictionaryTemplateSelector.Templates>
                         </siqsel:DictionaryTemplateSelector>
@@ -489,6 +504,7 @@
                             <Setter Property="MenuItem.HeaderTemplateSelector" Value="{StaticResource NavigateSelector}" />
                             <Setter Property="FocusManager.IsFocusScope" Value="False" />
                             <Setter Property="Focusable" Value="False" />
+                            
                             <Setter Property="MenuItem.ItemContainerStyle">
                                 <Setter.Value>
                                     <Style TargetType="{x:Type MenuItem}">
@@ -526,20 +542,46 @@
                                                             <Setter Property="Template">
                                                                 <Setter.Value>
                                                                     <ControlTemplate TargetType="TabItem">
-                                                                        <Border x:Name="borderMain" BorderThickness="0,0,1,0" BorderBrush="#FFAEAEAE" Margin="0,1">
-                                                                            <Border x:Name="border" Background="Transparent" Height="30" Width="30" Padding="3" Margin="4,1">
-                                                                                <ContentPresenter x:Name="header" ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                                        <Border
+                                                                            x:Name="borderMain"
+                                                                            BorderThickness="0,0,1,0"
+                                                                            BorderBrush="#FFAEAEAE"
+                                                                            Margin="0,1">
+                                                                            <Border
+                                                                                x:Name="border"
+                                                                                Background="Transparent"
+                                                                                Height="30"
+                                                                                Width="30"
+                                                                                Padding="3"
+                                                                                Margin="4,1">
+                                                                                <ContentPresenter
+                                                                                    x:Name="header"
+                                                                                    ContentSource="Header"
+                                                                                    VerticalAlignment="Center"
+                                                                                    HorizontalAlignment="Center" />
                                                                             </Border>
                                                                         </Border>
+                                                                        
                                                                         <ControlTemplate.Triggers>
                                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                                <Setter TargetName="border" Property="Background" Value="{StaticResource ToolBarButtonHover}" />
+                                                                                <Setter
+                                                                                    TargetName="border"
+                                                                                    Property="Background"
+                                                                                    Value="{StaticResource ToolBarButtonHover}" />
                                                                             </Trigger>
+                                                                            
                                                                             <Trigger Property="IsSelected" Value="True">
-                                                                                <Setter TargetName="border" Property="Background" Value="{StaticResource ToolBarButtonPressed}" />
+                                                                                <Setter
+                                                                                    TargetName="border"
+                                                                                    Property="Background"
+                                                                                    Value="{StaticResource ToolBarButtonPressed}" />
                                                                             </Trigger>
+                                                                            
                                                                             <Trigger Property="Tag" Value="last">
-                                                                                <Setter TargetName="borderMain" Property="BorderThickness" Value="0" />
+                                                                                <Setter
+                                                                                    TargetName="borderMain"
+                                                                                    Property="BorderThickness"
+                                                                                    Value="0" />
                                                                             </Trigger>
                                                                         </ControlTemplate.Triggers>
                                                                     </ControlTemplate>
@@ -547,48 +589,104 @@
                                                             </Setter>
                                                         </Style>
                                                     </TabControl.Resources>
+                                                    
                                                     <TabControl.ContentTemplate>
                                                         <DataTemplate>
                                                             <DockPanel>
-                                                                <TextBlock Style="{StaticResource SideHeader}" Text="{Binding Header}" DockPanel.Dock="Top" />
-                                                                <mamc:TransitioningContentControl Content="{Binding}" ContentTemplateSelector="{StaticResource ContentSelector}" Transition="Left" />
+                                                                <TextBlock
+                                                                    Style="{StaticResource SideHeader}"
+                                                                    Text="{Binding Header}"
+                                                                    DockPanel.Dock="Top" />
+                                                                
+                                                                <mamc:TransitioningContentControl
+                                                                    Content="{Binding}"
+                                                                    ContentTemplateSelector="{StaticResource ContentSelector}"
+                                                                    Transition="Left" />
                                                             </DockPanel>
                                                         </DataTemplate>
                                                     </TabControl.ContentTemplate>
-                                                    <TabItem ToolTip="Авторы" Content="{Binding Authors}">
+
+                                                    <TabItem ToolTip="{x:Static lp:Resources.Authors}" Content="{Binding Authors}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="5,3" Data="{Binding Source={StaticResource app_author},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="5,3"
+                                                                Data="{Binding Source={StaticResource app_author},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
-                                                    <TabItem ToolTip="Источники" Content="{Binding Sources}">
+
+                                                    <TabItem ToolTip="{x:Static lp:Resources.Sources}" Content="{Binding Sources}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_source},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="3"
+                                                                Data="{Binding Source={StaticResource app_source},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
-                                                    <TabItem ToolTip="Изображения" Content="{Binding Images}">
+
+                                                    <TabItem ToolTip="{x:Static lp:Resources.Images}" Content="{Binding Images}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="4" Data="{Binding Source={StaticResource app_image},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="4"
+                                                                Data="{Binding Source={StaticResource app_image},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
-                                                    <TabItem ToolTip="Аудио" Content="{Binding Audio}">
+
+                                                    <TabItem ToolTip="{x:Static lp:Resources.Audio}" Content="{Binding Audio}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="4,3" Data="{Binding Source={StaticResource app_audio},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="4,3"
+                                                                Data="{Binding Source={StaticResource app_audio},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
-                                                    <TabItem ToolTip="Видео" Content="{Binding Video}">
+
+                                                    <TabItem ToolTip="{x:Static lp:Resources.Video}" Content="{Binding Video}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="2,4" Data="{Binding Source={StaticResource app_video},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="2,4"
+                                                                Data="{Binding Source={StaticResource app_video},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
-                                                    <TabItem ToolTip="Статистика" Content="{Binding Statistics}" Tag="last">
+
+                                                    <TabItem
+                                                        ToolTip="HTML"
+                                                        Content="{Binding Html}"
+                                                        Visibility="{Binding Package.IsUpgraded, Converter={StaticResource VisibilityConverter}}">
                                                         <TabItem.Header>
-                                                            <Path Stretch="Uniform" Fill="#FF555555" Margin="3" Data="{Binding Source={StaticResource app_stat},Path=Data}" />
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="2,4"
+                                                                Data="{Binding Source={StaticResource app_html},Path=Data}" />
+                                                        </TabItem.Header>
+                                                    </TabItem>
+
+                                                    <TabItem ToolTip="{x:Static vmp:Resources.Statistic}" Content="{Binding Statistics}" Tag="last">
+                                                        <TabItem.Header>
+                                                            <Path
+                                                                Stretch="Uniform"
+                                                                Fill="#FF555555"
+                                                                Margin="3"
+                                                                Data="{Binding Source={StaticResource app_stat},Path=Data}" />
                                                         </TabItem.Header>
                                                     </TabItem>
                                                 </TabControl>
-                                                <Button ToolTip="Закрыть" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                                        HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,5,5"
-                                                        lb:ToggleBehavior.Target="{Binding ElementName=bSidebar}">
+                                                
+                                                <Button
+                                                    ToolTip="{x:Static lp:Resources.Close}"
+                                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Top"
+                                                    Margin="0,10,5,5"
+                                                    lb:ToggleBehavior.Target="{Binding ElementName=bSidebar}">
                                                     <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="2" Data="M0,0L10,10M0,10L10,0" />
                                                 </Button>
                                             </Grid>

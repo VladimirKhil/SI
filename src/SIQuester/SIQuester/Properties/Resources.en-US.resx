@@ -297,6 +297,9 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="CancelSearch" xml:space="preserve">
+    <value>Cancel search</value>
+  </data>
   <data name="Championship" xml:space="preserve">
     <value>Championship</value>
   </data>
@@ -615,6 +618,9 @@
   <data name="NextFragment" xml:space="preserve">
     <value>Next fragment</value>
   </data>
+  <data name="NextSearchResult" xml:space="preserve">
+    <value>Next result</value>
+  </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
@@ -695,6 +701,9 @@
   </data>
   <data name="PreviousFragment" xml:space="preserve">
     <value>Previous fragment</value>
+  </data>
+  <data name="PreviousSearchResult" xml:space="preserve">
+    <value>Previous result</value>
   </data>
   <data name="Price" xml:space="preserve">
     <value>Cost</value>
@@ -803,6 +812,9 @@
   </data>
   <data name="Scale" xml:space="preserve">
     <value>Scale</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
   </data>
   <data name="SearchFolder" xml:space="preserve">
     <value>Folder to search...</value>

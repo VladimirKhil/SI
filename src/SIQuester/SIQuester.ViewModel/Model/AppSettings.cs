@@ -464,6 +464,11 @@ public sealed class AppSettings : INotifyPropertyChanged
     public int MaxVideoSizeKb { get; } = 10 * 1024;
 
     /// <summary>
+    /// Maximum recommended html size.
+    /// </summary>
+    public int MaxHtmlSizeKb { get; } = 1 * 1024;
+
+    /// <summary>
     /// Loads settings from stream.
     /// </summary>
     public static AppSettings Load(Stream stream)
@@ -500,10 +505,10 @@ public sealed class AppSettings : INotifyPropertyChanged
         serializer.Serialize(stream, this);
     }
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     internal void Reset()
     {

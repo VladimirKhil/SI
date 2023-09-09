@@ -183,7 +183,7 @@ public sealed class PackageViewModel : ItemViewModel<Package>
     private void AddRestrictions_Executed(object? arg)
     {
         QDocument.ActivatedObject = this;
-        Model.Restriction = "Ограничение";
+        Model.Restriction = Resources.Restriction;
     }
 
     private void AddTags_Executed(object? arg)

@@ -601,6 +601,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Отменить поиск.
+        /// </summary>
+        public static string CancelSearch {
+            get {
+                return ResourceManager.GetString("CancelSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Чемпионат.
         /// </summary>
         public static string Championship {
@@ -1565,6 +1574,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Следующий результат.
+        /// </summary>
+        public static string NextSearchResult {
+            get {
+                return ResourceManager.GetString("NextSearchResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Нет.
         /// </summary>
         public static string No {
@@ -1804,6 +1822,15 @@ namespace SIQuester.Properties {
         public static string PreviousFragment {
             get {
                 return ResourceManager.GetString("PreviousFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Предыдущий результат.
+        /// </summary>
+        public static string PreviousSearchResult {
+            get {
+                return ResourceManager.GetString("PreviousSearchResult", resourceCulture);
             }
         }
         
@@ -2128,6 +2155,15 @@ namespace SIQuester.Properties {
         public static string Scale {
             get {
                 return ResourceManager.GetString("Scale", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Поиск.
+        /// </summary>
+        public static string Search {
+            get {
+                return ResourceManager.GetString("Search", resourceCulture);
             }
         }
         

@@ -61,15 +61,29 @@ public sealed class QDocument : WorkspaceViewModel
 
     public OperationsManager OperationsManager { get; } = new();
 
-    private IItemViewModel _activeNode = null;
+    private IItemViewModel? _activeNode = null;
 
-    private IItemViewModel[] _activeChain = null;
+    private IItemViewModel[]? _activeChain = null;
 
     public MediaStorageViewModel Images { get; private set; }
 
     public MediaStorageViewModel Audio { get; private set; }
 
     public MediaStorageViewModel Video { get; private set; }
+
+    public MediaStorageViewModel Html { get; private set; }
+
+    public MediaStorageViewModel? TryGetCollectionByMediaType(string mediaType) => mediaType switch
+    {
+        AtomTypes.Image => Images,
+        AtomTypes.Audio or AtomTypes.AudioNew => Audio,
+        AtomTypes.Video => Video,
+        AtomTypes.Html => Html,
+        _ => null,
+    };
+
+    public MediaStorageViewModel GetCollectionByMediaType(string mediaType) => TryGetCollectionByMediaType(mediaType)
+        ?? throw new ArgumentException($"Invalid media type {mediaType}", nameof(mediaType));
 
     private readonly ILogger<QDocument> _logger;
 
@@ -227,16 +241,6 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        var atomType = atom.Model.Type;
-
-        var collection = atomType switch
-        {
-            AtomTypes.Image => Images,
-            AtomTypes.Audio => Audio,
-            AtomTypes.AudioNew => Audio,
-            _ => Video,
-        };
-
         var link = atom.Model.Text;
 
         if (!link.StartsWith("@")) // External link
@@ -246,6 +250,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         if (!HasLinksTo(link)) // Called after items removal so works properly
         {
+            var collection = GetCollectionByMediaType(atom.Model.Type);
             RemoveFileByName(collection, link[1..]);
         }
     }
@@ -258,19 +263,11 @@ public sealed class QDocument : WorkspaceViewModel
         }
 
         var atomType = contentItem.Type;
-
-        var collection = atomType switch
-        {
-            AtomTypes.Image => Images,
-            AtomTypes.Audio => Audio,
-            AtomTypes.AudioNew => Audio,
-            _ => Video,
-        };
-
         var link = contentItem.Value;
 
         if (!HasLinksTo(link)) // Called after items removal so works properly
         {
+            var collection = GetCollectionByMediaType(atomType);
             RemoveFileByName(collection, link);
         }
     }
@@ -459,9 +456,11 @@ public sealed class QDocument : WorkspaceViewModel
     internal DataCollection GetCollection(string name) =>
         name switch
         {
-            SIDocument.ImagesStorageName => Document.Images,
-            SIDocument.AudioStorageName => Document.Audio,
-            _ => Document.Video,
+            CollectionNames.ImagesStorageName => Document.Images,
+            CollectionNames.AudioStorageName => Document.Audio,
+            CollectionNames.VideoStorageName => Document.Video,
+            CollectionNames.HtmlStorageName => Document.Html,
+            _ => throw new ArgumentException($"Invalid collection name {name}", nameof(name))
         };
 
     /// <summary>
@@ -561,6 +560,7 @@ public sealed class QDocument : WorkspaceViewModel
                 ImagesChanges = Images.GetChanges(),
                 AudioChanges = Audio.GetChanges(),
                 VideoChanges = Video.GetChanges(),
+                HtmlChanges = Html.GetChanges(),
             };
 
             var changesFileName = System.IO.Path.Combine(path, ChangesFileName);
@@ -739,6 +739,7 @@ public sealed class QDocument : WorkspaceViewModel
         Images.HasChanged += Media_Commited;
         Audio.HasChanged += Media_Commited;
         Video.HasChanged += Media_Commited;
+        Html.HasChanged += Media_Commited;
     }
 
     private void Question_TypeNameChanged(QuestionViewModel question, string oldValue)
@@ -1300,14 +1301,17 @@ public sealed class QDocument : WorkspaceViewModel
         Images = new MediaStorageViewModel(this, Document.Images, Resources.Images, msvmLogger);
         Audio = new MediaStorageViewModel(this, Document.Audio, SIPackages.Properties.Resources.Audio, msvmLogger);
         Video = new MediaStorageViewModel(this, Document.Video, SIPackages.Properties.Resources.Video, msvmLogger);
+        Html = new MediaStorageViewModel(this, Document.Html, SIPackages.Properties.Resources.Html, msvmLogger);
 
         Images.Changed += OperationsManager.AddChange;
         Audio.Changed += OperationsManager.AddChange;
         Video.Changed += OperationsManager.AddChange;
+        Html.Changed += OperationsManager.AddChange;
 
         Images.Error += OnError;
         Audio.Error += OnError;
         Video.Error += OnError;
+        Html.Error += OnError;
 
         CreatePropertyListeners();
     }
@@ -1382,14 +1386,16 @@ public sealed class QDocument : WorkspaceViewModel
         var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, errors);
         var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, errors);
         var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, errors);
+        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, errors);
 
-        CheckCommonFiles(images, audio, video, errors);
+        CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo) = CollectUsedFiles(allowExternal, images, audio, video, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(allowExternal, images, audio, video, html, errors);
 
         var extraFiles = images.Except(usedImages)
             .Union(audio).Except(usedAudio)
             .Union(video).Except(usedVideo)
+            .Union(html).Except(usedHtml)
             .ToArray();
 
         if (extraFiles.Length > 0)
@@ -1403,16 +1409,18 @@ public sealed class QDocument : WorkspaceViewModel
         return string.Join(Environment.NewLine, errors);
     }
 
-    private (ICollection<string> usedImages, ICollection<string> usedAudio, ICollection<string> usedVideo) CollectUsedFiles(
+    private (ICollection<string> usedImages, ICollection<string> usedAudio, ICollection<string> usedVideo, ICollection<string> usedHtml) CollectUsedFiles(
         bool allowExternal,
         ICollection<string> images,
         ICollection<string> audio,
         ICollection<string> video,
+        ICollection<string> html,
         List<string> errors)
     {
         var usedImages = new HashSet<string>();
         var usedAudio = new HashSet<string>();
         var usedVideo = new HashSet<string>();
+        var usedHtml = new HashSet<string>();
 
         var logo = Document.GetLogoLink();
 
@@ -1455,6 +1463,11 @@ public sealed class QDocument : WorkspaceViewModel
                             case AtomTypes.Video:
                                 collection = video;
                                 usedFiles = usedVideo;
+                                break;
+
+                            case AtomTypes.Html:
+                                collection = html;
+                                usedFiles = usedHtml;
                                 break;
 
                             default:
@@ -1500,6 +1513,11 @@ public sealed class QDocument : WorkspaceViewModel
                                 usedFiles = usedVideo;
                                 break;
 
+                            case AtomTypes.Html:
+                                collection = html;
+                                usedFiles = usedHtml;
+                                break;
+
                             default:
                                 continue;
                         }
@@ -1523,14 +1541,17 @@ public sealed class QDocument : WorkspaceViewModel
             }
         }
 
-        return (usedImages, usedAudio, usedVideo);
+        return (usedImages, usedAudio, usedVideo, usedHtml);
     }
 
-    private static void CheckCommonFiles(ICollection<string> images, ICollection<string> audio, ICollection<string> video, List<string> errors)
+    private static void CheckCommonFiles(ICollection<string> images, ICollection<string> audio, ICollection<string> video, ICollection<string> html, List<string> errors)
     {
         var crossList = images.Intersect(audio)
             .Union(images.Intersect(video))
             .Union(audio.Intersect(video))
+            .Union(images.Intersect(html))
+            .Union(audio.Intersect(html))
+            .Union(video.Intersect(html))
             .ToArray();
 
         if (crossList.Length == 0)
@@ -1714,6 +1735,17 @@ public sealed class QDocument : WorkspaceViewModel
                 Video.AddFile(tmp, item.Key);
             }
         }
+
+        foreach (var item in data.Html)
+        {
+            if (!Html.Files.Any(file => file.Model.Name == item.Key))
+            {
+                var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                File.Copy(item.Value, tmp);
+
+                Html.AddFile(tmp, item.Key);
+            }
+        }
     }
 
     private void NextSearchResult_Executed(object? arg)
@@ -1811,26 +1843,12 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private async Task ImportContentItemAsync(SIDocument doc, ContentItem item)
+    private async Task ImportContentItemAsync(SIDocument doc, ContentItem contentItem)
     {
-        var collection = doc.Images;
-        var newCollection = Images;
+        var collection = doc.GetCollection(contentItem.Type);
+        var newCollection = GetCollectionByMediaType(contentItem.Type);
 
-        switch (item.Type)
-        {
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-                collection = doc.Audio;
-                newCollection = Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = doc.Video;
-                newCollection = Video;
-                break;
-        }
-
-        var link = doc.GetLink(item);
+        var link = doc.GetLink(contentItem);
 
         if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
         {
@@ -1855,22 +1873,8 @@ public sealed class QDocument : WorkspaceViewModel
 
     private async Task ImportAtomAsync(SIDocument doc, Atom atom)
     {
-        var collection = doc.Images;
-        var newCollection = Images;
-
-        switch (atom.Type)
-        {
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-                collection = doc.Audio;
-                newCollection = Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = doc.Video;
-                newCollection = Video;
-                break;
-        }
+        var collection = doc.GetCollection(atom.Type);
+        var newCollection = GetCollectionByMediaType(atom.Type);
 
         var link = doc.GetLink(atom);
 
@@ -1983,6 +1987,11 @@ public sealed class QDocument : WorkspaceViewModel
             if (Video.HasPendingChanges)
             {
                 await Video.ApplyToAsync(tempDoc.Video);
+            }
+
+            if (Html.HasPendingChanges)
+            {
+                await Html.ApplyToAsync(tempDoc.Html);
             }
 
             packageTemplatesRepository.AddTemplate(new PackageTemplate
@@ -2321,6 +2330,7 @@ public sealed class QDocument : WorkspaceViewModel
                 ExportMediaCollection(Images, baseFolder);
                 ExportMediaCollection(Audio, baseFolder);
                 ExportMediaCollection(Video, baseFolder);
+                ExportMediaCollection(Html, baseFolder);
             }
         }
         catch (Exception exc)
@@ -2433,6 +2443,11 @@ public sealed class QDocument : WorkspaceViewModel
                  {
                      await Video.CommitAsync(tempDoc.Video);
                  }
+
+                 if (Html.HasPendingChanges)
+                 {
+                     await Html.CommitAsync(tempDoc.Html);
+                 }
              }
 
              _logger.LogInformation("SaveInternalAsync: document has been saved to temp path: {path}", tempPath);
@@ -2501,6 +2516,11 @@ public sealed class QDocument : WorkspaceViewModel
                     if (Video.HasPendingChanges)
                     {
                         await Video.CommitAsync(tempDoc.Video);
+                    }
+
+                    if (Html.HasPendingChanges)
+                    {
+                        await Html.CommitAsync(tempDoc.Html);
                     }
                 }
 
@@ -3315,7 +3335,7 @@ public sealed class QDocument : WorkspaceViewModel
                         }
 
                         var link = Document.GetLink(contentItem);
-                        var mediaStorage = GetMediaStorageByContentType(contentItem.Type);
+                        var mediaStorage = GetCollectionByMediaType(contentItem.Type);
 
                         if (mediaStorage.Files.Any(f => f.Model.Name == link.Uri))
                         {
@@ -3345,7 +3365,7 @@ public sealed class QDocument : WorkspaceViewModel
                         }
 
                         var link = Document.GetLink(atom.Model);
-                        var mediaStorage = GetMediaStorageByContentType(atom.Model.Type);
+                        var mediaStorage = GetCollectionByMediaType(atom.Model.Type);
 
                         if (mediaStorage.Files.Any(f => f.Model.Name == link.Uri))
                         {
@@ -3391,15 +3411,6 @@ public sealed class QDocument : WorkspaceViewModel
         mediaStorage.AddFile(mediaFileName);
     }
 
-    private MediaStorageViewModel GetMediaStorageByContentType(string contentType) =>
-        contentType switch
-        {
-            AtomTypes.Audio => Audio,
-            AtomTypes.AudioNew => Audio,
-            AtomTypes.Video => Video,
-            _ => Images,
-        };
-
     protected override void Dispose(bool disposing)
     {
         if (Document != null)
@@ -3409,6 +3420,7 @@ public sealed class QDocument : WorkspaceViewModel
             PlatformManager.Instance.ClearMedia(Document.Images);
             PlatformManager.Instance.ClearMedia(Document.Audio);
             PlatformManager.Instance.ClearMedia(Document.Video);
+            PlatformManager.Instance.ClearMedia(Document.Html);
 
             _logger.LogInformation("Document closed: {path}", _path);
             Document = null;
@@ -3428,20 +3440,7 @@ public sealed class QDocument : WorkspaceViewModel
             return new Media(link);
         }
 
-        var collection = Images;
-
-        switch (atom.Type)
-        {
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-                collection = Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = Video;
-                break;
-        }
-
+        var collection = GetCollectionByMediaType(atom.Type);
         return collection.Wrap(link[1..]);
     }
 
@@ -3454,20 +3453,7 @@ public sealed class QDocument : WorkspaceViewModel
             return new Media(link);
         }
 
-        var collection = Images;
-
-        switch (contentItem.Type)
-        {
-            case AtomTypes.Audio:
-            case AtomTypes.AudioNew:
-                collection = Audio;
-                break;
-
-            case AtomTypes.Video:
-                collection = Video;
-                break;
-        }
-
+        var collection = GetCollectionByMediaType(contentItem.Type);
         return collection.Wrap(link);
     }
 
@@ -3530,6 +3516,7 @@ public sealed class QDocument : WorkspaceViewModel
                 Images.RestoreChanges(changes.ImagesChanges);
                 Audio.RestoreChanges(changes.AudioChanges);
                 Video.RestoreChanges(changes.VideoChanges);
+                Html.RestoreChanges(changes.HtmlChanges);
             }
 
             change.Commit();
@@ -3615,16 +3602,18 @@ public sealed class QDocument : WorkspaceViewModel
         var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, errors);
         var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, errors);
         var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, errors);
+        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, errors);
 
-        CheckCommonFiles(images, audio, video, errors);
+        CheckCommonFiles(images, audio, video, html, errors);
 
-        var (usedImages, usedAudio, usedVideo) = CollectUsedFiles(true, images, audio, video, errors);
+        var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(true, images, audio, video, html, errors);
 
         var unusedImages = images.Except(usedImages);
         var unusedAudio = audio.Except(usedAudio);
         var unusedVideo = video.Except(usedVideo);
+        var unusedHtml = html.Except(usedHtml);
 
-        var unusedFiles = unusedImages.Union(unusedAudio).Union(unusedVideo).ToArray();
+        var unusedFiles = unusedImages.Union(unusedAudio).Union(unusedVideo).Union(unusedHtml).ToArray();
 
         if (unusedFiles.Length == 0)
         {
@@ -3649,6 +3638,11 @@ public sealed class QDocument : WorkspaceViewModel
         foreach (var item in unusedVideo)
         {
             RemoveFileByName(Video, item);
+        }
+
+        foreach (var item in unusedHtml)
+        {
+            RemoveFileByName(Html, item);
         }
     }
 }

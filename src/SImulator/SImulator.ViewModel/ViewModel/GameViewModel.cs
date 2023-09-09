@@ -995,7 +995,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (!string.IsNullOrWhiteSpace(videoUrl))
         {
-            if (SetMedia(new Media(videoUrl), SIDocument.VideoStorageName))
+            if (SetMedia(new Media(videoUrl), CollectionNames.VideoStorageName))
             {
                 PresentationController.SetStage(TableStage.Question);
                 PresentationController.SetQuestionContentType(QuestionContentType.Video);
@@ -1005,7 +1005,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (!string.IsNullOrEmpty(packageLogo?.Uri))
             {
-                if (SetMedia(packageLogo, SIDocument.AudioStorageName))
+                if (SetMedia(packageLogo, CollectionNames.AudioStorageName))
                 {
                     PresentationController.SetStage(TableStage.Question);
                     PresentationController.SetQuestionSound(false);

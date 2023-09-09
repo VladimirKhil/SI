@@ -468,6 +468,9 @@
   <data name="RestoreConfirmation" xml:space="preserve">
     <value>Files have been detected that were not correctly saved during the last work with the program. Restore them?</value>
   </data>
+  <data name="Restriction" xml:space="preserve">
+    <value>Restriction</value>
+  </data>
   <data name="RightAnswer" xml:space="preserve">
     <value>Correct answer</value>
   </data>
