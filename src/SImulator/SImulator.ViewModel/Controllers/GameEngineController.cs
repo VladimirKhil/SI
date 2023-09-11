@@ -116,9 +116,18 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Html:
-                            screenContent.Add(new ContentViewModel(ContentType.Html, contentItem.Value, ImageVideoWeight));
-                            PresentationController.SetQuestionSound(false);
-                            PresentationController.SetSound();
+                            var htmlUri = TryGetMediaUri(contentItem, CollectionNames.HtmlStorageName);
+
+                            if (htmlUri != null)
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Html, htmlUri, ImageVideoWeight));
+                                PresentationController.SetQuestionSound(false);
+                                PresentationController.SetSound();
+                            }
+                            else
+                            {
+                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                            }
                             break;
 
                         default:
