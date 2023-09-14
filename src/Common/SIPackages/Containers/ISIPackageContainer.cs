@@ -42,6 +42,13 @@ public interface ISIPackageContainer : IDisposable
     StreamInfo? GetStream(string category, string name, bool read = true);
 
     /// <summary>
+    /// Tries to find object stream and return a media object to access it.
+    /// </summary>
+    /// <param name="category">Object category.</param>
+    /// <param name="name">Object name.</param>
+    MediaInfo? TryGetMedia(string category, string name);
+
+    /// <summary>
     /// Creates a stream.
     /// </summary>
     /// <param name="name">Stream name.</param>
@@ -87,9 +94,4 @@ public interface ISIPackageContainer : IDisposable
     /// Flushes container changes.
     /// </summary>
     void Flush();
-
-    /// <summary>
-    /// Gets entries filtered from package container.
-    /// </summary>
-    string[] GetFilteredEntries() => Array.Empty<string>();
 }

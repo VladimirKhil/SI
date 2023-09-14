@@ -137,7 +137,7 @@ public sealed class SIDocument : IDisposable
         CreateInternal(PackageContainerFactory.CreatePackageContainer(stream, leaveStreamOpen), name, author);
 
     private static SIDocument CreateInternal(string folder, string name, string author) =>
-        CreateInternal(PackageContainerFactory.CreatePackageContainer(folder), name, author);
+        CreateInternal(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()), name, author);
 
     private static SIDocument CreateInternal(ISIPackageContainer packageContainer, string name, string author)
     {
@@ -184,12 +184,35 @@ public sealed class SIDocument : IDisposable
         LoadInternal(PackageContainerFactory.GetPackageContainer(stream, read));
 
     /// <summary>
-    /// loads document from folder.
+    /// Loads document from folder.
     /// </summary>
     /// <param name="folder">Source folder.</param>
     /// <param name="read">Should the document be read-only.</param>
+    [Obsolete("Use ExtractToFolderAndLoadAsync")]
     public static SIDocument Load(string folder, bool read = true) =>
-        LoadInternal(PackageContainerFactory.GetPackageContainer(folder));
+        LoadInternal(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()));
+
+    /// <summary>
+    /// Extracts document to folder and load from it.
+    /// </summary>
+    /// <param name="sourceFile">Source pakage file.</param>
+    /// <param name="folder">Target folder.</param>
+    /// <param name="maxAllowedDataLength">Maximum allowed length of extracted data in archive.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    public static async Task<SIDocument> ExtractToFolderAndLoadAsync(
+        string sourceFile,
+        string folder,
+        long maxAllowedDataLength = long.MaxValue,
+        CancellationToken cancellationToken = default)
+    {
+        var extractionMap = await PackageExtractor.ExtractPackageToFolderAsync(
+            sourceFile,
+            folder,
+            maxAllowedDataLength,
+            cancellationToken);
+
+        return LoadInternal(PackageContainerFactory.GetPackageContainer(folder, extractionMap));
+    }
 
     /// <summary>
     /// Loads document from stream as XML.
@@ -298,11 +321,6 @@ public sealed class SIDocument : IDisposable
     /// Saves current document accepting all made changed.
     /// </summary>
     public void Save() => SaveCore(_packageContainer);
-
-    /// <summary>
-    /// Gets filtered file names.
-    /// </summary>
-    public string[] GetFilteredFiles() => _packageContainer.GetFilteredEntries();
 
     private void SaveCore(ISIPackageContainer packageContainer)
     {
@@ -596,6 +614,24 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
+    /// Tries to get media from content item.
+    /// </summary>
+    /// <param name="contentItem">Content item.</param>
+    /// <returns>Media resource.</returns>
+    public MediaInfo? TryGetMedia(ContentItem contentItem)
+    {
+        var link = contentItem.Value;
+
+        if (!contentItem.IsRef)
+        {
+            return new MediaInfo(link);
+        }
+
+        var collectionName = CollectionNames.GetCollectionName(contentItem.Type);
+        return TryGetMedia(collectionName, link);
+    }
+
+    /// <summary>
     /// Tries to get media collection by media type.
     /// </summary>
     /// <param name="mediaType">Collection media type.</param>
@@ -616,21 +652,6 @@ public sealed class SIDocument : IDisposable
     /// <exception cref="ArgumentException">Invalid media type has been provided.</exception>
     public DataCollection GetCollection(string mediaType) => TryGetCollection(mediaType)
         ?? throw new ArgumentException($"Invalid media type {mediaType}", nameof(mediaType));
-
-    /// <summary>
-    /// Gets document package logo link.
-    /// </summary>
-    public IMedia GetLogoLink()
-    {
-        var link = _package.Logo.ExtractLink();
-
-        if (string.IsNullOrEmpty(link))
-        {
-            return new Media(_package.Logo);
-        }
-
-        return GetLinkFromCollection(link, _images);
-    }
 
     private static IMedia GetLinkFromCollection(string link, DataCollection collection)
     {
@@ -664,6 +685,26 @@ public sealed class SIDocument : IDisposable
 
         // This is a link to an external resource
         return new Media(link);
+    }
+
+    private MediaInfo? TryGetMedia(string category, string link)
+    {
+        var media = _packageContainer.TryGetMedia(category, link);
+
+        if (media.HasValue)
+        {
+            return media.Value;
+        }
+
+        var escapedLink = Uri.EscapeUriString(link);
+        media = _packageContainer.TryGetMedia(category, escapedLink);
+
+        if (media.HasValue)
+        {
+            return media.Value;
+        }
+
+        return null;
     }
 
     /// <summary>

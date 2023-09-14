@@ -19,15 +19,7 @@ public sealed class ContentItemViewModel : MediaOwnerViewModel
     /// </summary>
     public ContentItemsViewModel? Owner { get; set; }
 
-    public override string Type => Model.Type switch
-    {
-        AtomTypes.Image => CollectionNames.ImagesStorageName,
-        AtomTypes.Audio => CollectionNames.AudioStorageName,
-        AtomTypes.AudioNew => CollectionNames.AudioStorageName,
-        AtomTypes.Video => CollectionNames.VideoStorageName,
-        AtomTypes.Html => CollectionNames.HtmlStorageName,
-        _ => Model.Type,
-    };
+    public override string Type => CollectionNames.TryGetCollectionName(Model.Type) ?? Model.Type;
 
     private bool _isExpanded = true;
 

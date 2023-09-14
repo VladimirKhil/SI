@@ -151,7 +151,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     #region Events
 
-    public event Action<Package, IMedia>? Package;
+    public event Action<Package>? Package;
     public event Action<string[]>? GameThemes;
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
@@ -206,7 +206,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     #region Fire events
 
-    protected void OnPackage(Package package, IMedia packageLogo) => Package?.Invoke(package, packageLogo);
+    protected void OnPackage(Package package) => Package?.Invoke(package);
 
     protected void OnGameThemes(string[] gameThemes) => GameThemes?.Invoke(gameThemes);
 

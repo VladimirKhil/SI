@@ -58,4 +58,7 @@ public sealed class EmptySIPackageContainer : ISIPackageContainer
 
     /// <inheritdoc />
     public long GetStreamLength(string category, string name) => throw new NotImplementedException();
+
+    /// <inheritdoc />
+    public MediaInfo? TryGetMedia(string category, string name) => throw new NotImplementedException();
 }

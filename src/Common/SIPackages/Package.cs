@@ -1,4 +1,5 @@
-﻿using SIPackages.Helpers;
+﻿using SIPackages.Core;
+using SIPackages.Helpers;
 using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -145,6 +146,29 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                 _logo = value;
                 OnPropertyChanged(oldValue);
             }
+        }
+    }
+
+    /// <summary>
+    /// Gets package logo content item.
+    /// </summary>
+    public ContentItem? LogoItem
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Logo))
+            {
+                return null;
+            }
+
+            var link = Logo.ExtractLink();
+
+            if (string.IsNullOrEmpty(link)) // External link
+            {
+                return new ContentItem { IsRef = false, Value = Logo, Type = AtomTypes.Image };
+            }
+
+            return new ContentItem { IsRef = true, Value = link, Type = AtomTypes.Image };
         }
     }
 

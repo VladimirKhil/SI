@@ -14,16 +14,12 @@ public static class PackageContainerFactory
         ZipSIPackageContainer.Create(stream, leaveOpen);
 
     /// <summary>
-    /// Creates a new package container based on folder.
-    /// </summary>
-    /// <param name="folder">Container folder.</param>
-    public static ISIPackageContainer CreatePackageContainer(string folder) => FolderSIPackageContainer.Create(folder);
-
-    /// <summary>
     /// Gets a package container based on folder.
     /// </summary>
     /// <param name="folder">Container folder.</param>
-    public static ISIPackageContainer GetPackageContainer(string folder) => FolderSIPackageContainer.Open(folder);
+    /// <param name="fileNameMap">File name map.</param>
+    public static ISIPackageContainer GetPackageContainer(string folder, IReadOnlyDictionary<string, string> fileNameMap) =>
+        FolderSIPackageContainer.Open(folder, fileNameMap);
 
     /// <summary>
     /// Gets a package container based on stream.

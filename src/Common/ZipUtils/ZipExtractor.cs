@@ -21,12 +21,12 @@ public static class ZipExtractor
     /// <param name="destinationFolderPath">Target folder path.</param>
     /// <param name="extractionOptions">Extraction options.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>Collection of extracted file names.</returns>
+    /// <returns>Map of archive file names to extracted file names.</returns>
     /// <exception cref="InvalidOperationException" />
     /// <remarks>
     /// File names are forcibly hashed when they are too long.
     /// </remarks>
-    public static async Task<string[]> ExtractArchiveFileToFolderAsync(
+    public static async Task<IReadOnlyDictionary<string, string>> ExtractArchiveFileToFolderAsync(
         string sourceArchiveFilePath,
         string destinationFolderPath,
         ExtractionOptions? extractionOptions = null,
@@ -47,7 +47,7 @@ public static class ZipExtractor
             throw new InvalidOperationException($"Archive data is too big ({declaredSize} bytes)");
         }
 
-        var extractedFiles = new List<string>();
+        var extractedFiles = new Dictionary<string, string>();
 
         foreach (var entry in archive.Entries)
         {
@@ -64,11 +64,11 @@ public static class ZipExtractor
 
             if (targetFilePath != null)
             {
-                extractedFiles.Add(targetFilePath);
+                extractedFiles[entry.FullName] = targetFilePath;
             }
         }
 
-        return extractedFiles.ToArray();
+        return extractedFiles;
     }
 
     /// <summary>

@@ -30,8 +30,7 @@ public sealed class SportEngine : EngineBase
             case GameStage.Begin:
                 #region Begin
                 //this.Stage = GameStage.GameThemes;
-                OnPackage(_document.Package, _document.GetLogoLink());
-
+                OnPackage(_document.Package);
                 MoveNextRound(false);
                 AutoNext(1000);
                 break;

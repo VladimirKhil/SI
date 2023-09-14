@@ -158,7 +158,7 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnContentScreenHtml(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem, AtomTypes.Html);
+        _data.MediaOk = ShareMedia(contentItem);
 
         int atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
 
@@ -180,10 +180,9 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.QuestSourComm, 10, 1, force: true);
     }
 
-    private void Engine_Package(Package package, IMedia packageLogo)
+    private void Engine_Package(Package package)
     {
         _data.Package = package;
-        _data.PackageLogo = packageLogo;
 
         _data.Rounds = _data.Package.Rounds
             .Select((round, index) => (round, index))
@@ -205,11 +204,8 @@ public sealed class GameLogic : Logic<GameData>
     private void Engine_GameThemes(string[] gameThemes)
     {
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)]));
-
         var msg = new MessageBuilder(Messages.GameThemes).AddRange(gameThemes);
-
         _gameActions.SendMessage(msg.Build());
-
         ScheduleExecution(Tasks.MoveNext, Math.Max(40, 11 + 150 * gameThemes.Length / 18));
     }
 
@@ -447,22 +443,16 @@ public sealed class GameLogic : Logic<GameData>
         _data.UseBackgroundAudio = !waitForFinish;
     }
 
-    private bool ShareMedia(ContentItem contentItem, string atomType, bool isBackground = false)
+    private bool ShareMedia(ContentItem contentItem, bool isBackground = false)
     {
         try
         {
-            var msg = new StringBuilder();
+            var msg = new MessageBuilder();
+            var contentType = contentItem.Type;
 
-            msg.Append(isBackground ? Messages.Atom_Second : Messages.Atom)
-                .Append(Message.ArgsSeparatorChar)
-                .Append(atomType)
-                .Append(Message.ArgsSeparatorChar);
+            msg.Add(isBackground ? Messages.Atom_Second : Messages.Atom).Add(contentType);
 
-            var mediaCategory = atomType == AtomTypes.Image
-                ? CollectionNames.ImagesStorageName
-                : (atomType == AtomTypes.Audio
-                    ? CollectionNames.AudioStorageName
-                    : (atomType == AtomTypes.Video ? CollectionNames.VideoStorageName : atomType));
+            var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
 
             if (!contentItem.IsRef) // External link
             {
@@ -470,24 +460,11 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (Uri.TryCreate(link, UriKind.Absolute, out _))
                 {
-                    msg.Append(MessageParams.Atom_Uri).Append(Message.ArgsSeparatorChar).Append(link);
+                    msg.Add(MessageParams.Atom_Uri).Add(link);
                     _gameActions.SendMessage(msg.ToString());
 
                     return true;
                 }
-
-                //var checkedFileName = Path.Combine(mediaCategory, link).ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar);
-
-                //if (_data.PackageDoc.GetFilteredFiles().Any(
-                //    f => f.ToLowerInvariant().Replace('\\', Path.AltDirectorySeparatorChar) == checkedFileName))
-                //{
-                //    _gameActions.SendMessageWithArgs(
-                //        isBackground ? Messages.Atom_Second : Messages.Atom,
-                //        AtomTypes.Text,
-                //        string.Format(LO[nameof(R.MediaFiltered)], link));
-
-                //    return false;
-                //}
 
                 // There is no file in the package and it's name is not a valid absolute uri.
                 // So, considering that the file is missing
@@ -500,39 +477,12 @@ public sealed class GameLogic : Logic<GameData>
                 return false;
             }
 
-            // TODO: rewrite without creating Atom
-            var media = _data.PackageDoc.GetLink(new Atom { Text = "@" + contentItem.Value, Type = atomType });
+            var media = _data.PackageDoc.GetLink(contentItem);
 
             var filename = media.Uri;
             var fileLength = media.StreamLength;
 
-            int? maxRecommendedFileLength = atomType == AtomTypes.Image ? _data.BackLink.MaxImageSizeKb
-                : (atomType == AtomTypes.Audio ? _data.BackLink.MaxAudioSizeKb
-                : (atomType == AtomTypes.Video ? _data.BackLink.MaxVideoSizeKb : null));
-
-            if (maxRecommendedFileLength.HasValue && fileLength > (long)maxRecommendedFileLength * 1024)
-            {
-                // Notify users that the media file is too large and could be downloaded slowly
-
-                var contentName = atomType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
-                    (atomType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
-                    (atomType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
-
-                var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
-                var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
-
-                _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
-
-                if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
-                {
-                    _data.OversizedMediaNotificationsCount++;
-
-                    // Show message on table
-
-                    _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, errorMessage); // Will be removed in the future
-                    _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
-                }
-            }
+            CheckFileLength(contentType, fileLength);
 
             if (ClientData.Files.Length > 0)
             {
@@ -562,20 +512,20 @@ public sealed class GameLogic : Logic<GameData>
                 localUri = null;
             }
 
+            msg.Add(MessageParams.Atom_Uri);
+
             foreach (var person in _data.AllPersons.Keys)
             {
                 var msg2 = new StringBuilder(msg.ToString());
 
                 if (_gameActions.Client.CurrentServer.Contains(person))
                 {
-                    msg2.Append(MessageParams.Atom_Uri)
-                        .Append(Message.ArgsSeparatorChar)
+                    msg2.Append(Message.ArgsSeparatorChar)
                         .Append(localUri ?? uri.ToString());
                 }
                 else
                 {
-                    msg2.Append(MessageParams.Atom_Uri)
-                        .Append(Message.ArgsSeparatorChar)
+                    msg2.Append(Message.ArgsSeparatorChar)
                         .Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
                 }
 
@@ -591,10 +541,40 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
+    private void CheckFileLength(string contentType, long fileLength)
+    {
+        int? maxRecommendedFileLength = contentType == AtomTypes.Image ? _data.BackLink.MaxImageSizeKb
+            : (contentType == AtomTypes.Audio ? _data.BackLink.MaxAudioSizeKb
+            : (contentType == AtomTypes.Video ? _data.BackLink.MaxVideoSizeKb : null));
+
+        if (!maxRecommendedFileLength.HasValue || fileLength <= (long)maxRecommendedFileLength * 1024)
+        {
+            return;
+        }
+
+        // Notify users that the media file is too large and could be downloaded slowly
+        var contentName = contentType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
+            (contentType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
+            (contentType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
+
+        var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
+        var errorMessage = string.Format(LO[nameof(R.OversizedFile)], contentName, fileLocation, maxRecommendedFileLength);
+
+        _gameActions.SendMessageWithArgs(Messages.Replic, ReplicCodes.Special.ToString(), errorMessage);
+
+        if (_data.OversizedMediaNotificationsCount < MaxMediaNotifications)
+        {
+            _data.OversizedMediaNotificationsCount++;
+
+            // Show message on table
+            _gameActions.SendMessageWithArgs(Messages.Atom_Hint, errorMessage);
+        }
+    }
+
     internal void OnContentScreenImage(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        ShareMedia(contentItem, AtomTypes.Image);
+        ShareMedia(contentItem);
 
         int atomTime = GetContentItemDuration(contentItem, DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10);
 
@@ -615,7 +595,7 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnContentBackgroundAudio(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem, AtomTypes.Audio, _data.UseBackgroundAudio);
+        _data.MediaOk = ShareMedia(contentItem, _data.UseBackgroundAudio);
 
         var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
 
@@ -643,7 +623,7 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnContentScreenVideo(ContentItem contentItem)
     {
         _data.IsPartial = false;
-        _data.MediaOk = ShareMedia(contentItem, AtomTypes.Video);
+        _data.MediaOk = ShareMedia(contentItem);
 
         var defaultTime = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
 
@@ -3931,35 +3911,11 @@ public sealed class GameLogic : Logic<GameData>
                 _gameActions.ShowmanReplic(string.Format(OfObjectPropertyFormat, LO[nameof(R.PName)], LO[nameof(R.OfPackage)], package.Name));
                 informed = true;
 
-                var logoLink = _data.PackageLogo;
+                var logoItem = package.LogoItem;
 
-                if (logoLink.GetStream != null)
+                if (logoItem != null)
                 {
-                    var uri = _fileShare.CreateResourceUri(
-                        ResourceKind.Package,
-                        new Uri($"{CollectionNames.ImagesStorageName}/{logoLink.Uri}", UriKind.Relative));
-
-                    foreach (var person in _data.AllPersons.Keys)
-                    {
-                        var msg = new StringBuilder(Messages.PackageLogo).Append(Message.ArgsSeparatorChar);
-
-                        if (_gameActions.Client.CurrentServer.Contains(person))
-                        {
-                            msg.Append(uri);
-                        }
-                        else
-                        {
-                            msg.Append(uri.ToString().Replace("http://localhost", "http://" + Constants.GameHost));
-                        }
-
-                        _gameActions.SendMessage(msg.ToString(), person);
-                    }
-                }
-                else if (!string.IsNullOrEmpty(logoLink.Uri))
-                {
-                    ShareMedia(
-                        new ContentItem { IsRef = true, Value = logoLink.Uri },
-                        AtomTypes.Image);
+                    ShareMedia(logoItem);
                 }
             }
             else

@@ -21,9 +21,9 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     public IPresentationController PresentationController => GameViewModel!.PresentationController;
 
-    private readonly string _packageFolder;
+    private readonly SIDocument _document;
 
-    public GameEngineController(string packageFolder) => _packageFolder = packageFolder;
+    public GameEngineController(SIDocument document) => _document = document;
 
     public bool OnAccept() => false;
 
@@ -88,7 +88,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Image:
-                            var imageUri = TryGetMediaUri(contentItem, CollectionNames.ImagesStorageName);
+                            var imageUri = TryGetMediaUri(contentItem);
 
                             if (imageUri != null)
                             {
@@ -101,7 +101,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Video:
-                            var videoUri = TryGetMediaUri(contentItem, CollectionNames.VideoStorageName);
+                            var videoUri = TryGetMediaUri(contentItem);
 
                             if (videoUri != null)
                             {
@@ -116,7 +116,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             break;
 
                         case AtomTypes.Html:
-                            var htmlUri = TryGetMediaUri(contentItem, CollectionNames.HtmlStorageName);
+                            var htmlUri = TryGetMediaUri(contentItem);
 
                             if (htmlUri != null)
                             {
@@ -147,7 +147,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                     {
                         PresentationController.SetQuestionSound(true);
 
-                        var audioUri = TryGetMediaUri(contentItem, CollectionNames.AudioStorageName);
+                        var audioUri = TryGetMediaUri(contentItem);
 
                         PresentationController.SetSound();
 
@@ -216,21 +216,10 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    private string? TryGetMediaUri(ContentItem contentItem, string category)
+    private string? TryGetMediaUri(ContentItem contentItem)
     {
-        if (!contentItem.IsRef)
-        {
-            return contentItem.Value;
-        }
-
-        var localFile = Path.Combine(_packageFolder, category, contentItem.Value);
-
-        if (!File.Exists(localFile))
-        {
-            return null;
-        }
-
-        return localFile;
+        var media = _document.TryGetMedia(contentItem);
+        return media?.Uri?.OriginalString;
     }
 
     public void OnQuestionStart(bool buttonsRequired)

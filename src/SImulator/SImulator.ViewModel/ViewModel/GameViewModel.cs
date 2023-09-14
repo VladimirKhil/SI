@@ -333,8 +333,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly IExtendedListener _presentationListener;
 
-    private readonly string _packageFolder;
-
     #endregion
 
     public GameViewModel(
@@ -343,13 +341,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         IExtendedListener presentationListener,
         IPresentationController presentationController,
         IList<SimplePlayerInfo> players,
-        string packageFolder,
         ILogger logger)
     {
         Settings = settings;
         _engine = (EngineBase)engine;
         _presentationListener = presentationListener;
-        _packageFolder = packageFolder;
         _logger = logger;
         PresentationController = presentationController;
 
@@ -984,7 +980,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         return (true, highlightTheme);
     }
 
-    private void Engine_Package(Package package, IMedia packageLogo)
+    private void Engine_Package(Package package)
     {
         if (PresentationController == null)
         {
@@ -995,7 +991,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (!string.IsNullOrWhiteSpace(videoUrl))
         {
-            if (SetMedia(new Media(videoUrl), CollectionNames.VideoStorageName))
+            if (SetMedia(new MediaInfo(videoUrl)))
             {
                 PresentationController.SetStage(TableStage.Question);
                 PresentationController.SetQuestionContentType(QuestionContentType.Video);
@@ -1003,9 +999,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
         else
         {
-            if (!string.IsNullOrEmpty(packageLogo?.Uri))
+            var logo = package.LogoItem;
+
+            if (logo != null)
             {
-                if (SetMedia(packageLogo, CollectionNames.AudioStorageName))
+                var media = _engine.Document.TryGetMedia(logo);
+
+                if (media.HasValue && SetMedia(media.Value))
                 {
                     PresentationController.SetStage(TableStage.Question);
                     PresentationController.SetQuestionSound(false);
@@ -1337,22 +1337,18 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _buttonManager = null;
             }
 
-            if (Directory.Exists(_packageFolder))
-            {
-                try
-                {
-                    Directory.Delete(_packageFolder, true);
-                }
-                catch (IOException exc)
-                {
-                    _logger.Write($"Temp folder delete error: {exc}");
-                }
-            }
-
             lock (_engine.SyncRoot)
             {
                 _engine.PropertyChanged -= Engine_PropertyChanged;
-                _engine.Dispose();
+                
+                try
+                {
+                    _engine.Dispose();
+                }
+                catch (IOException exc)
+                {
+                    _logger.Write($"Engine dispose error: {exc}");
+                }
 
                 _logger.Dispose();
 
@@ -1421,22 +1417,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         MediaProgress = 0;
     }
 
-    private bool SetMedia(IMedia media, string category, bool background = false)
+    private bool SetMedia(MediaInfo media, bool background = false)
     {
-        if (media.GetStream == null)
-        {
-            PresentationController.SetMedia(new MediaSource(media.Uri), background);
-            return true;
-        }
-
-        var localFile = Path.Combine(_packageFolder, category, media.Uri);
-
-        if (!File.Exists(localFile))
+        if (media.Uri == null)
         {
             return false;
         }
 
-        PresentationController.SetMedia(new MediaSource(localFile), background);
+        PresentationController.SetMedia(new MediaSource(media.Uri.OriginalString), background);
         return true;
     }
 

@@ -7,7 +7,6 @@ using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
 using SImulator.ViewModel.Properties;
 using SIPackages;
-using SIPackages.Helpers;
 using SIUI.ViewModel;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -341,17 +340,15 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private async Task<string> PreparePackageAsync(CancellationToken cancellationToken = default)
+    private async Task<SIDocument> PreparePackageAsync(CancellationToken cancellationToken = default)
     {
         var (filePath, isTemporary) = await _packageSource.GetPackageFileAsync(cancellationToken);
 
         var tempDir = Path.Combine(Path.GetTempPath(), AppSettings.AppName, Guid.NewGuid().ToString());
 
-        await ZipHelper.ExtractToDirectoryAsync(
+        var document = await SIDocument.ExtractToFolderAndLoadAsync(
             filePath,
             tempDir,
-            ExtractedFileNamingModes.Unescape,
-            long.MaxValue,
             cancellationToken: cancellationToken);
 
         if (isTemporary)
@@ -359,7 +356,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             File.Delete(filePath);
         }
 
-        return tempDir;
+        return document;
     }
 
     private EngineOptions GetEngineOptions()
@@ -418,16 +415,14 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             _start.CanBeExecuted = false;
             IsStarting = true;
 
-            var tempDir = await PreparePackageAsync(_cancellationTokenSource.Token);
+            var document = await PreparePackageAsync(_cancellationTokenSource.Token);
 
             ISIEngine engine;
 
-            var gameEngineController = new GameEngineController(tempDir);
+            var gameEngineController = new GameEngineController(document);
 
             try
             {
-                var document = SIDocument.Load(tempDir);
-
                 document.Upgrade();
 
                 engine = EngineFactory.CreateEngine(
@@ -456,7 +451,14 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             var logger = CreateLogger();
 
-            var game = new GameViewModel(SettingsViewModel, engine, presentationListener, presentationController, Players, tempDir, logger);
+            var game = new GameViewModel(
+                SettingsViewModel,
+                engine,
+                presentationListener,
+                presentationController,
+                Players,
+                logger);
+
             Game = game;
 
             gameEngineController.GameViewModel = game;

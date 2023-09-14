@@ -663,11 +663,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
             var packageFolderPath = Path.Combine(tempDir, "package");
 
-            await ZipHelper.ExtractToDirectoryAsync(
+            var document = await SIDocument.ExtractToFolderAndLoadAsync(
                 packageFile,
                 packageFolderPath,
-                ExtractedFileNamingModes.Unescape,
-                long.MaxValue,
                 cancellationToken: cancellationToken);
 
             Directory.CreateDirectory(Path.Combine(tempDir, "avatars"));
@@ -677,7 +675,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
                 File.Delete(packageFile);
             }
 
-            return (SIDocument.Load(packageFolderPath), tempDir);
+            return (document, tempDir);
         }
         finally
         {

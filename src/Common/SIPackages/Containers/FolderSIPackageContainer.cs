@@ -1,5 +1,4 @@
 ﻿using SIPackages.Core;
-using SIPackages.Helpers;
 
 namespace SIPackages.Containers;
 
@@ -9,14 +8,23 @@ namespace SIPackages.Containers;
 internal sealed class FolderSIPackageContainer : ISIPackageContainer
 {
     private readonly string _folder;
+    private readonly IReadOnlyDictionary<string, string> _fileNameMap;
+    private readonly bool _deleteOnClose;
 
-    public FolderSIPackageContainer(string folder) => _folder = folder;
+    public FolderSIPackageContainer(
+        string folder,
+        IReadOnlyDictionary<string, string> fileNameMap,
+        bool deleteOnClose = true)
+    {
+        _folder = folder;
+        _fileNameMap = fileNameMap;
+        _deleteOnClose = deleteOnClose;
+    }
 
     public ISIPackageContainer CopyTo(Stream stream, bool close, out bool isNew) => throw new NotImplementedException();
 
-    internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder);
-
-    internal static ISIPackageContainer Open(string folder) => new FolderSIPackageContainer(folder);
+    internal static ISIPackageContainer Open(string folder, IReadOnlyDictionary<string, string> fileNameMap) =>
+        new FolderSIPackageContainer(folder, fileNameMap);
 
     public void CreateStream(string name, string contentType)
     {
@@ -37,15 +45,21 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
         CancellationToken cancellationToken = default)
     {
         Directory.CreateDirectory(Path.Combine(_folder, category));
-
         using var fs = File.Create(Path.Combine(_folder, category, name));
-
         await stream.CopyToAsync(fs, cancellationToken);
     }
 
     public bool DeleteStream(string category, string name) => throw new NotImplementedException();
 
-    public void Dispose() { }
+    public void Dispose()
+    {
+        if (!_deleteOnClose)
+        {
+            return;
+        }
+
+        Directory.Delete(_folder, true);
+    }
 
     public void Flush() { }
 
@@ -63,7 +77,9 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
 
     public StreamInfo? GetStream(string name, bool read = true)
     {
-        var file = new FileInfo(Path.Combine(_folder, name));
+        var mappedName = GetName(name);
+
+        var file = new FileInfo(Path.Combine(_folder, mappedName));
 
         if (!file.Exists)
         {
@@ -73,19 +89,13 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
         return new StreamInfo { Length = file.Length, Stream = read ? file.OpenRead() : file.Open(FileMode.Open) };
     }
 
-    public StreamInfo? GetStream(string category, string name, bool read = true)
-    {
-        if (name.Length > ZipHelper.MaxFileNameLength)
-        {
-            name = ZipHelper.CalculateHash(name);
-        }
-
-        return GetStream(Path.Combine(category, name), read);
-    }
+    public StreamInfo? GetStream(string category, string name, bool read = true) => GetStream($"{category}/{name}", read);
 
     public long GetStreamLength(string name)
     {
-        var file = new FileInfo(Path.Combine(_folder, name));
+        var mappedName = GetName(name);
+
+        var file = new FileInfo(Path.Combine(_folder, mappedName));
 
         if (!file.Exists)
         {
@@ -95,25 +105,30 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
         return file.Length;
     }
 
-    public long GetStreamLength(string category, string name)
+    public long GetStreamLength(string category, string name) => GetStreamLength($"{category}/{name}");
+
+    public MediaInfo? TryGetMedia(string category, string name)
     {
-        if (name.Length > ZipHelper.MaxFileNameLength)
+        var fullName = $"{category}/{name}";
+        var mappedName = GetName(fullName);
+
+        var file = new FileInfo(Path.Combine(_folder, mappedName));
+
+        if (!file.Exists)
         {
-            name = ZipHelper.CalculateHash(name);
+            return null;
         }
 
-        return GetStreamLength(Path.Combine(category, name));
+        return new MediaInfo(file.OpenRead, file.Length, new Uri(file.FullName));
     }
 
-    public string[] GetFilteredEntries()
+    private string GetName(string name)
     {
-        var filteredFile = new FileInfo(Path.Combine(_folder, "filtered.txt"));
-        
-        if (!filteredFile.Exists)
+        if (!_fileNameMap.TryGetValue(name, out var mappedName))
         {
-            return Array.Empty<string>();
+            mappedName = name;
         }
 
-        return File.ReadAllLines(filteredFile.FullName);
+        return mappedName;
     }
 }

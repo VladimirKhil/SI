@@ -582,8 +582,6 @@ public sealed class GameData : Data
     /// </summary>
     internal int OversizedMediaNotificationsCount { get; set; }
 
-    public IMedia PackageLogo { get; internal set; }
-
     /// <summary>
     /// Index of player called for negative appellation.
     /// </summary>

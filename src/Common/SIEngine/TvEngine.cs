@@ -52,7 +52,7 @@ public sealed class TvEngine : EngineBase
             case GameStage.Begin:
                 #region Begin
                 Stage = GameStage.GameThemes;
-                OnPackage(_document.Package, _document.GetLogoLink());
+                OnPackage(_document.Package);
                 break;
                 #endregion
 

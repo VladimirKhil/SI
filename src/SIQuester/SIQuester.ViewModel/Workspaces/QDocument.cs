@@ -1422,17 +1422,17 @@ public sealed class QDocument : WorkspaceViewModel
         var usedVideo = new HashSet<string>();
         var usedHtml = new HashSet<string>();
 
-        var logo = Document.GetLogoLink();
+        var logoItem = Document.Package.LogoItem;
 
-        if (logo != null && !string.IsNullOrEmpty(Document.Package.Logo))
+        if (logoItem != null && logoItem.IsRef)
         {
-            if (images.Contains(logo.Uri))
+            if (images.Contains(logoItem.Value))
             {
-                usedImages.Add(logo.Uri);
+                usedImages.Add(logoItem.Value);
             }
             else
             {
-                errors.Add(string.Format(Resources.MissingLogoFile, logo.Uri));
+                errors.Add(string.Format(Resources.MissingLogoFile, logoItem.Value));
             }
         }
 

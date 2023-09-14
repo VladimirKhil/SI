@@ -276,6 +276,7 @@ public static class Messages
     /// <summary>
     /// Логотип пакета
     /// </summary>
+    [Obsolete]
     public const string PackageLogo = "PACKAGELOGO";
 
     /// <summary>
