@@ -19,4 +19,9 @@ public sealed class AppOptions
     /// Upgrade opened packages to new format.
     /// </summary>
     public bool UpgradeOpenedPackages { get; set; }
+
+    /// <summary>
+    /// Is select answer type enabled.
+    /// </summary>
+    public bool SelectAnswerTypeEnabled { get; set; }
 }

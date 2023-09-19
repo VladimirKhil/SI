@@ -703,27 +703,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                     if (question.Parameters != null)
                     {
-                        question.Parameters.CollectionChanged += Object_CollectionChanged;
-
-                        foreach (var parameter in question.Parameters)
-                        {
-                            parameter.Value.PropertyChanged += Object_PropertyValueChanged;
-                            parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
-
-                            if (parameter.Value.ContentValue != null)
-                            {
-                                parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
-
-                                foreach (var item in parameter.Value.ContentValue)
-                                {
-                                    item.Model.PropertyChanged += Object_PropertyValueChanged;
-                                }
-                            }
-                            else if (parameter.Value.NumberSetValue != null)
-                            {
-                                parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
-                            }
-                        }
+                        AttachParametersListener(question.Parameters);
                     }
 
                     question.Right.CollectionChanged += Object_CollectionChanged;
@@ -740,6 +720,40 @@ public sealed class QDocument : WorkspaceViewModel
         Audio.HasChanged += Media_Commited;
         Video.HasChanged += Media_Commited;
         Html.HasChanged += Media_Commited;
+    }
+
+    private void AttachParametersListener(StepParametersViewModel parameters)
+    {
+        parameters.CollectionChanged += Object_CollectionChanged;
+
+        foreach (var parameter in parameters)
+        {
+            AttachParameterListeners(parameter);
+        }
+    }
+
+    private void AttachParameterListeners(StepParameterRecord parameter)
+    {
+        parameter.Value.PropertyChanged += Object_PropertyValueChanged;
+        parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
+
+        if (parameter.Value.ContentValue != null)
+        {
+            parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
+
+            foreach (var item in parameter.Value.ContentValue)
+            {
+                item.Model.PropertyChanged += Object_PropertyValueChanged;
+            }
+        }
+        else if (parameter.Value.NumberSetValue != null)
+        {
+            parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
+        }
+        else if (parameter.Value.GroupValue != null)
+        {
+            AttachParametersListener(parameter.Value.GroupValue);
+        }
     }
 
     private void Question_TypeNameChanged(QuestionViewModel question, string oldValue)
@@ -812,7 +826,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         foreach (var parameter in requiredParametes)
         {
-            question.Parameters.Insert(0, new KeyValuePair<string, StepParameterViewModel>(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
+            question.Parameters.Insert(0, new StepParameterRecord(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
         }
 
         change.Commit();
@@ -1026,27 +1040,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                                     if (questionViewModel.Parameters != null)
                                     {
-                                        questionViewModel.Parameters.CollectionChanged += Object_CollectionChanged;
-
-                                        foreach (var parameter in questionViewModel.Parameters)
-                                        {
-                                            parameter.Value.PropertyChanged += Object_PropertyValueChanged;
-                                            parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
-
-                                            if (parameter.Value.ContentValue != null)
-                                            {
-                                                parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
-
-                                                foreach (var contentItem in parameter.Value.ContentValue)
-                                                {
-                                                    contentItem.Model.PropertyChanged += Object_PropertyValueChanged;
-                                                }
-                                            }
-                                            else if (parameter.Value.NumberSetValue != null)
-                                            {
-                                                parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
-                                            }
-                                        }
+                                        AttachParametersListener(questionViewModel.Parameters);
                                     }
 
                                     questionViewModel.Right.CollectionChanged += Object_CollectionChanged;
@@ -1062,24 +1056,9 @@ public sealed class QDocument : WorkspaceViewModel
                         type.PropertyChanged += Object_PropertyValueChanged;
                         type.Params.CollectionChanged += Object_CollectionChanged;
                     }
-                    else if (item is KeyValuePair<string, StepParameterViewModel> parameter)
+                    else if (item is StepParameterRecord parameter)
                     {
-                        parameter.Value.PropertyChanged += Object_PropertyValueChanged;
-                        parameter.Value.Model.PropertyChanged += Object_PropertyValueChanged;
-
-                        if (parameter.Value.ContentValue != null)
-                        {
-                            parameter.Value.ContentValue.CollectionChanged += Object_CollectionChanged;
-
-                            foreach (var contentItem in parameter.Value.ContentValue)
-                            {
-                                contentItem.Model.PropertyChanged += Object_PropertyValueChanged;
-                            }
-                        }
-                        else if (parameter.Value.NumberSetValue != null)
-                        {
-                            parameter.Value.NumberSetValue.PropertyChanged += Object_PropertyValueChanged;
-                        }
+                        AttachParameterListeners(parameter);
                     }
                 }
                 break;
@@ -1129,27 +1108,7 @@ public sealed class QDocument : WorkspaceViewModel
 
                                     if (questionViewModel.Parameters != null)
                                     {
-                                        questionViewModel.Parameters.CollectionChanged -= Object_CollectionChanged;
-
-                                        foreach (var parameter in questionViewModel.Parameters)
-                                        {
-                                            parameter.Value.PropertyChanged -= Object_PropertyValueChanged;
-                                            parameter.Value.Model.PropertyChanged -= Object_PropertyValueChanged;
-
-                                            if (parameter.Value.ContentValue != null)
-                                            {
-                                                parameter.Value.ContentValue.CollectionChanged -= Object_CollectionChanged;
-
-                                                foreach (var contentItem in parameter.Value.ContentValue)
-                                                {
-                                                    contentItem.Model.PropertyChanged -= Object_PropertyValueChanged;
-                                                }
-                                            }
-                                            else if (parameter.Value.NumberSetValue != null)
-                                            {
-                                                parameter.Value.NumberSetValue.PropertyChanged -= Object_PropertyValueChanged;
-                                            }
-                                        }
+                                        DetachParametersLsteners(questionViewModel.Parameters);
                                     }
 
                                     questionViewModel.Right.CollectionChanged -= Object_CollectionChanged;
@@ -1165,24 +1124,9 @@ public sealed class QDocument : WorkspaceViewModel
                         type.PropertyChanged -= Object_PropertyValueChanged;
                         type.Params.CollectionChanged -= Object_CollectionChanged;
                     }
-                    else if (item is KeyValuePair<string, StepParameterViewModel> parameter)
+                    else if (item is StepParameterRecord parameter)
                     {
-                        parameter.Value.PropertyChanged -= Object_PropertyValueChanged;
-                        parameter.Value.Model.PropertyChanged -= Object_PropertyValueChanged;
-
-                        if (parameter.Value.ContentValue != null)
-                        {
-                            parameter.Value.ContentValue.CollectionChanged -= Object_CollectionChanged;
-
-                            foreach (var contentItem in parameter.Value.ContentValue)
-                            {
-                                contentItem.Model.PropertyChanged -= Object_PropertyValueChanged;
-                            }
-                        }
-                        else if (parameter.Value.NumberSetValue != null)
-                        {
-                            parameter.Value.NumberSetValue.PropertyChanged -= Object_PropertyValueChanged;
-                        }
+                        DetachParameterListeners(parameter);
                     }
                 }
                 break;
@@ -1215,6 +1159,40 @@ public sealed class QDocument : WorkspaceViewModel
         if (!OperationsManager.IsMakingUndo)
         {
             OperationsManager.AddChange(new CollectionChange((IList)sender, e));
+        }
+    }
+
+    private void DetachParametersLsteners(StepParametersViewModel parameters)
+    {
+        parameters.CollectionChanged -= Object_CollectionChanged;
+
+        foreach (var parameter in parameters)
+        {
+            DetachParameterListeners(parameter);
+        }
+    }
+
+    private void DetachParameterListeners(StepParameterRecord parameter)
+    {
+        parameter.Value.PropertyChanged -= Object_PropertyValueChanged;
+        parameter.Value.Model.PropertyChanged -= Object_PropertyValueChanged;
+
+        if (parameter.Value.ContentValue != null)
+        {
+            parameter.Value.ContentValue.CollectionChanged -= Object_CollectionChanged;
+
+            foreach (var contentItem in parameter.Value.ContentValue)
+            {
+                contentItem.Model.PropertyChanged -= Object_PropertyValueChanged;
+            }
+        }
+        else if (parameter.Value.NumberSetValue != null)
+        {
+            parameter.Value.NumberSetValue.PropertyChanged -= Object_PropertyValueChanged;
+        }
+        else if (parameter.Value.GroupValue != null)
+        {
+            DetachParametersLsteners(parameter.Value.GroupValue);
         }
     }
 
@@ -3578,7 +3556,7 @@ public sealed class QDocument : WorkspaceViewModel
                                 {
                                     questionViewModel.Parameters.Merge(
                                         question.Parameters.ToList(),
-                                        p => new KeyValuePair<string, StepParameterViewModel>(p.Key, new StepParameterViewModel(questionViewModel, p.Value)));
+                                        p => new StepParameterRecord(p.Key, new StepParameterViewModel(questionViewModel, p.Value)));
                                 }
 
                                 questionViewModel.Scenario.Merge(

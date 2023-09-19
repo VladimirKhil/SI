@@ -6,12 +6,12 @@
 public static class QuestionTypeParams
 {
     /// <summary>
-    /// Тема "Вопроса с секретом"
+    /// Question special theme.
     /// </summary>
     public const string Cat_Theme = "theme";
 
     /// <summary>
-    /// Стоимость "Вопроса с секретом"
+    /// Question special (hidden) price.
     /// </summary>
     public const string Cat_Cost = "cost";
 

@@ -6,6 +6,11 @@
 public static class StepTypes
 {
     /// <summary>
+    /// Set answer type (and options).
+    /// </summary>
+    public const string SetAnswerType = "setAnswerType";
+
+    /// <summary>
     /// Display content.
     /// </summary>
     public const string ShowContent = "showContent";
@@ -36,7 +41,7 @@ public static class StepTypes
     public const string SetTheme = "setTheme";
 
     /// <summary>
-    /// Accept.
+    /// Accept (finish question pretending that active player is right).
     /// </summary>
     public const string Accept = "accept";
 }

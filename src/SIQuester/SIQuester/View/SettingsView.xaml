@@ -64,6 +64,11 @@
             <CheckBox Content="{x:Static lp:Resources.RemoveUnusedMedia}" IsChecked="{Binding Model.RemoveLinks}" />
             <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
 
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.SelectOptionCount}" /></TextBlock>
+                <l:NumericTextBox Margin="15,0" Padding="0,1" Width="50" Text="{Binding Model.SelectOptionCount, Mode=TwoWay}" Minimum="2" />
+            </StackPanel>
+
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AutoSetQuestionPrices}" />
 
             <ItemsControl Margin="0,4,0,0" DataContext="{Binding Model.CostSetters}" ItemsSource="{Binding}">
@@ -103,7 +108,7 @@
             
             <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                 <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.BaseQuestionPrice}" /></TextBlock>
-                <l:NumericTextBox Margin="5,0" Padding="0,1" x:Name="tbQuestionBase" Width="50" Text="{Binding Model.QuestionBase, Mode=TwoWay}" />
+                <l:NumericTextBox Margin="15,0" Padding="0,1" Width="50" Text="{Binding Model.QuestionBase, Mode=TwoWay}" />
             </StackPanel>
             
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.DocumentFont}" />

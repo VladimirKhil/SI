@@ -147,6 +147,9 @@
   <data name="AddImage" xml:space="preserve">
     <value>Add image</value>
   </data>
+  <data name="AddOption" xml:space="preserve">
+    <value>Add answer option</value>
+  </data>
   <data name="AddOral" xml:space="preserve">
     <value>Add oral text</value>
   </data>
@@ -189,8 +192,14 @@
   <data name="AnswerMetaHint" xml:space="preserve">
     <value>Hint about metacharacters in answers</value>
   </data>
+  <data name="AnswerOptions" xml:space="preserve">
+    <value>Answer options</value>
+  </data>
   <data name="AnswersLayout" xml:space="preserve">
     <value>Answers layout</value>
+  </data>
+  <data name="AnswerType" xml:space="preserve">
+    <value>Answer type</value>
   </data>
   <data name="AppAuthor" xml:space="preserve">
     <value>Vladimir Khil</value>
@@ -852,6 +861,9 @@
   <data name="SelectionMode" xml:space="preserve">
     <value>Transfer mode</value>
   </data>
+  <data name="SelectOptionCount" xml:space="preserve">
+    <value>Default option count</value>
+  </data>
   <data name="SelectSearchFolder" xml:space="preserve">
     <value>Select a folder to search</value>
   </data>
@@ -872,6 +884,12 @@
   </data>
   <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
     <value>To everyone except oneself</value>
+  </data>
+  <data name="SetAnswerTypeType_Select" xml:space="preserve">
+    <value>Select from options</value>
+  </data>
+  <data name="SetAnswerTypeType_Text" xml:space="preserve">
+    <value>Text</value>
   </data>
   <data name="SetLogo" xml:space="preserve">
     <value>Set logo</value>

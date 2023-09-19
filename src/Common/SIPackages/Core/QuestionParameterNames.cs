@@ -11,6 +11,16 @@ public static class QuestionParameterNames
     public const string Question = "question";
 
     /// <summary>
+    /// Question answer type.
+    /// </summary>
+    public const string AnswerType = "answerType";
+
+    /// <summary>
+    /// Question answer options.
+    /// </summary>
+    public const string AnswerOptions = "answerOptions";
+
+    /// <summary>
     /// Question answer.
     /// </summary>
     public const string Answer = "answer";

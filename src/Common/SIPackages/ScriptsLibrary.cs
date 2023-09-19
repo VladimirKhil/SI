@@ -7,28 +7,29 @@ namespace SIPackages;
 /// </summary>
 public static class ScriptsLibrary
 {
-    private static readonly Dictionary<string, Script> _scripts = new();
+    private static readonly Dictionary<string, Script> _scripts;
 
     /// <summary>
     /// Predefined question scripts.
     /// </summary>
     public static IReadOnlyDictionary<string, Script> Scripts => _scripts;
 
-    static ScriptsLibrary()
+    static ScriptsLibrary() => _scripts = new Dictionary<string, Script>
     {
-        _scripts[QuestionTypes.Simple] = CreateSimpleScript();
-        _scripts[QuestionTypes.Stake] = CreateStakeScript();
-        _scripts[QuestionTypes.StakeAll] = CreateStakeAllScript();
-        _scripts[QuestionTypes.Secret] = CreateSecretScript();
-        _scripts[QuestionTypes.SecretPublicPrice] = CreateSecretPublicPriceScript();
-        _scripts[QuestionTypes.SecretNoQuestion] = CreateSecretNoQuestionScript();
-        _scripts[QuestionTypes.NoRisk] = CreateNoRiskScript();
-    }
+        [QuestionTypes.Simple] = CreateSimpleScript(),
+        [QuestionTypes.Stake] = CreateStakeScript(),
+        [QuestionTypes.StakeAll] = CreateStakeAllScript(),
+        [QuestionTypes.Secret] = CreateSecretScript(),
+        [QuestionTypes.SecretPublicPrice] = CreateSecretPublicPriceScript(),
+        [QuestionTypes.SecretNoQuestion] = CreateSecretNoQuestionScript(),
+        [QuestionTypes.NoRisk] = CreateNoRiskScript()
+    };
 
     private static Script CreateSimpleScript()
     {
         var simpleScript = new Script();
 
+        simpleScript.Steps.Add(CreateSetAnswerTypeStep());
         simpleScript.Steps.Add(CreateQuestionStep());
         simpleScript.Steps.Add(CreateAskAnswerStep());
         simpleScript.Steps.Add(CreateAnswerStep());
@@ -40,6 +41,7 @@ public static class ScriptsLibrary
     {
         var stakeScript = new Script();
 
+        stakeScript.Steps.Add(CreateSetAnswerTypeStep());
         stakeScript.Steps.Add(CreateSetAnswererStep());
         stakeScript.Steps.Add(CreateQuestionStep());
         stakeScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
@@ -52,6 +54,7 @@ public static class ScriptsLibrary
     {
         var stakeScript = new Script();
 
+        stakeScript.Steps.Add(CreateSetAnswerTypeStep());
         stakeScript.Steps.Add(CreateSetAnswererAllStep());
         stakeScript.Steps.Add(CreateQuestionStep());
         stakeScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
@@ -62,51 +65,54 @@ public static class ScriptsLibrary
 
     private static Script CreateSecretScript()
     {
-        var noRiskScript = new Script();
+        var secretScript = new Script();
 
-        noRiskScript.Steps.Add(CreateSetAnswererSecretStep());
-        noRiskScript.Steps.Add(CreateSetThemeStep());
-        noRiskScript.Steps.Add(CreateAnnouncePriceSecretStep());
-        noRiskScript.Steps.Add(CreateSetPriceSecretStep());
-        noRiskScript.Steps.Add(CreateQuestionStep());
-        noRiskScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
-        noRiskScript.Steps.Add(CreateAnswerStep());
+        secretScript.Steps.Add(CreateSetAnswerTypeStep());
+        secretScript.Steps.Add(CreateSetAnswererSecretStep());
+        secretScript.Steps.Add(CreateSetThemeStep());
+        secretScript.Steps.Add(CreateAnnouncePriceSecretStep());
+        secretScript.Steps.Add(CreateSetPriceSecretStep());
+        secretScript.Steps.Add(CreateQuestionStep());
+        secretScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
+        secretScript.Steps.Add(CreateAnswerStep());
 
-        return noRiskScript;
+        return secretScript;
     }
 
     private static Script CreateSecretPublicPriceScript()
     {
-        var noRiskScript = new Script();
+        var secretScript = new Script();
 
-        noRiskScript.Steps.Add(CreateSetThemeStep());
-        noRiskScript.Steps.Add(CreateAnnouncePriceSecretStep());
-        noRiskScript.Steps.Add(CreateSetAnswererSecretStep());
-        noRiskScript.Steps.Add(CreateSetPriceSecretStep());
-        noRiskScript.Steps.Add(CreateQuestionStep());
-        noRiskScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
-        noRiskScript.Steps.Add(CreateAnswerStep());
+        secretScript.Steps.Add(CreateSetAnswerTypeStep());
+        secretScript.Steps.Add(CreateSetThemeStep());
+        secretScript.Steps.Add(CreateAnnouncePriceSecretStep());
+        secretScript.Steps.Add(CreateSetAnswererSecretStep());
+        secretScript.Steps.Add(CreateSetPriceSecretStep());
+        secretScript.Steps.Add(CreateQuestionStep());
+        secretScript.Steps.Add(CreateAskAnswerStep(StepParameterValues.AskAnswerMode_Direct));
+        secretScript.Steps.Add(CreateAnswerStep());
 
-        return noRiskScript;
+        return secretScript;
     }
 
     private static Script CreateSecretNoQuestionScript()
     {
-        var noRiskScript = new Script();
+        var secretScript = new Script();
 
-        noRiskScript.Steps.Add(CreateSetAnswererSecretStep());
-        noRiskScript.Steps.Add(CreateSetThemeStep());
-        noRiskScript.Steps.Add(CreateAnnouncePriceSecretStep());
-        noRiskScript.Steps.Add(CreateSetPriceSecretStep());
-        noRiskScript.Steps.Add(CreateAcceptStep());
+        secretScript.Steps.Add(CreateSetAnswererSecretStep());
+        secretScript.Steps.Add(CreateSetThemeStep());
+        secretScript.Steps.Add(CreateAnnouncePriceSecretStep());
+        secretScript.Steps.Add(CreateSetPriceSecretStep());
+        secretScript.Steps.Add(CreateAcceptStep());
 
-        return noRiskScript;
+        return secretScript;
     }
 
     private static Script CreateNoRiskScript()
     {
         var noRiskScript = new Script();
 
+        noRiskScript.Steps.Add(CreateSetAnswerTypeStep());
         noRiskScript.Steps.Add(CreateSetAnswererNoRiskStep());
         noRiskScript.Steps.Add(CreateSetPriceNoRiskStep());
         noRiskScript.Steps.Add(CreateQuestionStep());
@@ -114,6 +120,31 @@ public static class ScriptsLibrary
         noRiskScript.Steps.Add(CreateAnswerStep());
 
         return noRiskScript;
+    }
+
+    private static Step CreateSetAnswerTypeStep()
+    {
+        var setAnswerTypeStep = new Step { Type = StepTypes.SetAnswerType };
+
+        setAnswerTypeStep.Parameters.Add(
+            StepParameterNames.Type,
+            new StepParameter
+            {
+                IsRef = true,
+                Type = StepParameterTypes.Simple,
+                SimpleValue = QuestionParameterNames.AnswerType
+            });
+
+        setAnswerTypeStep.Parameters.Add(
+            StepParameterNames.Options,
+            new StepParameter
+            {
+                IsRef = true,
+                Type = StepParameterTypes.Simple,
+                SimpleValue = QuestionParameterNames.AnswerOptions
+            });
+
+        return setAnswerTypeStep;
     }
 
     private static Step CreateAcceptStep() => new() { Type = StepTypes.Accept };
@@ -125,7 +156,7 @@ public static class ScriptsLibrary
         var price = new StepParameter
         {
             IsRef = true,
-            Type = StepParameterTypes.NumberSet,
+            Type = StepParameterTypes.Simple,
             SimpleValue = QuestionParameterNames.Price
         };
 

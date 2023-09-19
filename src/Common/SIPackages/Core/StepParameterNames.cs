@@ -26,7 +26,17 @@ public static class StepParameterNames
     public const string StakeVisibity = "stakeVisibility";
 
     /// <summary>
-    /// Content parameter.
+    /// Fallback reference identifier (used when main ref is missing).
     /// </summary>
     public const string FallbackRefId = "fallbackRefId";
+
+    /// <summary>
+    /// Target type.
+    /// </summary>
+    public const string Type = "type";
+
+    /// <summary>
+    /// Target options.
+    /// </summary>
+    public const string Options = "options";
 }

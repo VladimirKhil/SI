@@ -42,6 +42,8 @@ public sealed class AppSettings : INotifyPropertyChanged
 
     private const string DefaultFontFamily = "Calibri";
 
+    private const int DefaultSelectOptionCount = 4;
+
     /// <summary>
     /// Auto-save interval.
     /// </summary>
@@ -448,6 +450,26 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private int _selectOptionCount = DefaultSelectOptionCount;
+
+    /// <summary>
+    /// Default option count created with select answer.
+    /// </summary>
+    [DefaultValue(DefaultSelectOptionCount)]
+    public int SelectOptionCount
+    {
+        get => _selectOptionCount;
+        set
+        {
+            if (_selectOptionCount != value && value > 1)
+            {
+                _selectOptionCount = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+
     /// <summary>
     /// Maximum recommended image size.
     /// </summary>
@@ -536,5 +558,6 @@ public sealed class AppSettings : INotifyPropertyChanged
         CheckFileSize = defaultSettings.CheckFileSize;
         _flatScale = defaultSettings._flatScale;
         FlatLayoutMode = defaultSettings.FlatLayoutMode;
+        SelectOptionCount = DefaultSelectOptionCount;
     }
 }

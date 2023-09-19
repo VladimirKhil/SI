@@ -78,4 +78,14 @@ public static class StepParameterValues
     /// Select SetPrice mode.
     /// </summary>
     public const string SetPriceMode_Select = "select";
+
+    /// <summary>
+    /// SetAnswerType text type (default value).
+    /// </summary>
+    public const string SetAnswerTypeType_Text = "text";
+
+    /// <summary>
+    /// SetAnswerType select type.
+    /// </summary>
+    public const string SetAnswerTypeType_Select = "select";
 }

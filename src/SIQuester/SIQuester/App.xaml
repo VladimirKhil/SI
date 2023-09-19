@@ -43,6 +43,7 @@
             <siqcv:PriceConverter x:Key="PriceConverter" />
             <siqcv:NotNullConverter x:Key="NotNullConverter" />
             <siqcv:FalseToVisiblityConverter x:Key="FalseToVisiblityConverter" />
+            <siqcv:EqualsMultiConverter x:Key="EqualsMultiConverter" />
 
             <Style x:Key="WarningBox" TargetType="ContentControl">
                 <Setter Property="Content" Value="{Binding ErrorMessage}" />
@@ -342,6 +343,8 @@
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.Theme}" Member="lp:Resources.Theme" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.Price}" Member="lp:Resources.Price" />
                 <x:Static x:Key="{x:Static pc:QuestionParameterNames.SelectionMode}" Member="lp:Resources.SelectionMode" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerType}" Member="lp:Resources.AnswerType" />
+                <x:Static x:Key="{x:Static pc:QuestionParameterNames.AnswerOptions}" Member="lp:Resources.AnswerOptions" />
             </siqcv:StringDictionary>
 
             <siqcv:MappedConverter x:Key="QuestionParameterNamesConverter" Map="{StaticResource QuestionParameterNames}" />
@@ -374,6 +377,11 @@
             <DataTemplate x:Key="TypeParamBaseTemplate">
                 <TextBox Text="{Binding Model.Value}" Padding="0,1" />
             </DataTemplate>
+
+            <siqcv:StringDictionary x:Key="AnswerTypes">
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Text}" Member="lp:Resources.SetAnswerTypeType_Text" />
+                <x:Static x:Key="{x:Static pc:StepParameterValues.SetAnswerTypeType_Select}" Member="lp:Resources.SetAnswerTypeType_Select" />
+            </siqcv:StringDictionary>
 
             <ls:QuestionTypeParamTemplateSelector
                 x:Key="TypeParamSelector"
@@ -1082,6 +1090,33 @@
                                                 <Setter Property="Header" Value="{Binding Value}" />
                                             </Style>
 
+                                            <Style x:Key="SubMenuItemAnswerType" TargetType="MenuItem">
+                                                <Setter
+                                                    Property="Command"
+                                                    Value="{Binding DataContext.SetAnswerType, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}}" />
+
+                                                <Setter Property="CommandParameter" Value="{Binding Key}" />
+                                                <Setter Property="Header" Value="{Binding Value}" />
+
+                                                <Style.Triggers>
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <MultiBinding Converter="{StaticResource EqualsMultiConverter}">
+                                                                <MultiBinding.Bindings>
+                                                                    <Binding Path="Key" />
+
+                                                                    <Binding
+                                                                        Path="DataContext.AnswerType"
+                                                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType=Menu}" />
+                                                                </MultiBinding.Bindings>
+                                                            </MultiBinding>
+                                                        </DataTrigger.Binding>
+
+                                                        <Setter Property="IsChecked" Value="True" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+
                                             <DataTemplate DataType="{x:Type vm:PackageViewModel}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <Button
@@ -1294,6 +1329,15 @@
                                                             ItemContainerStyle="{StaticResource SubMenuItemQuestionType}" />
                                                     </Menu>
 
+                                                    <Menu x:Name="answerType" Style="{StaticResource MenuMenu}" Visibility="Collapsed">
+                                                        <MenuItem x:Name="answerTypesList"
+                                                            Header="{StaticResource AnswerTypeImage}"
+                                                            ToolTip="{x:Static lp:Resources.AnswerType}"
+                                                            ItemsSource="{StaticResource AnswerTypes}"
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            ItemContainerStyle="{StaticResource SubMenuItemAnswerType}" />
+                                                    </Menu>
+
                                                     <Button x:Name="complexAnswer">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource MenuButton}">
@@ -1377,6 +1421,13 @@
 
                                                     <DataTrigger Binding="{Binding IsUpgraded}" Value="True">
                                                         <Setter TargetName="typesList" Property="ItemsSource" Value="{StaticResource QTypesNew}" />
+                                                        <Setter TargetName="answerType" Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+
+                                                    <DataTrigger
+                                                        Binding="{Binding DataContext.AppOptions.SelectAnswerTypeEnabled, RelativeSource={RelativeSource AncestorType=siq:MainWindow}}"
+                                                        Value="False">
+                                                        <Setter TargetName="answerType" Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </DataTemplate.Triggers>
                                             </DataTemplate>
@@ -1637,7 +1688,8 @@
                                                         ToolTip="{x:Static lp:Resources.AddOral}"
                                                         Content="{StaticResource AddVoiceImage}"
                                                         Command="{Binding AddVoice}"
-                                                        Style="{StaticResource MenuButton}" />
+                                                        Style="{StaticResource MenuButton}"
+                                                        Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}" />
 
                                                     <Menu Style="{StaticResource MenuMenu}">
                                                         <MenuItem
@@ -1665,7 +1717,8 @@
                                                         <MenuItem
                                                             ToolTip="{x:Static lp:Resources.AddAudio}"
                                                             Header="{StaticResource AddAudioImage}"
-                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
@@ -1687,7 +1740,8 @@
                                                         <MenuItem
                                                             ToolTip="{x:Static lp:Resources.AddVideo}"
                                                             Header="{StaticResource AddVideoImage}"
-                                                            Style="{StaticResource MenuMenuHeader}">
+                                                            Style="{StaticResource MenuMenuHeader}"
+                                                            Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                             <MenuItem.ItemsSource>
                                                                 <MultiBinding Converter="{StaticResource ListJoinConverter}">
                                                                     <Binding Source="{StaticResource Additional}" />
@@ -1716,6 +1770,7 @@
                                                         </MenuItem>
                                                         
                                                         <MenuItem
+                                                            x:Name="addHtml"
                                                             Visibility="{Binding OwnerDocument.Package.IsUpgraded, Converter={StaticResource VisibilityConverter}}"
                                                             ToolTip="{x:Static lp:Resources.AddHtml}"
                                                             Header="{StaticResource AddHtmlImage}"
@@ -1737,13 +1792,16 @@
                                                         </MenuItem>
                                                     </Menu>
 
-                                                    <Separator Style="{StaticResource MenuSeparator}" />
+                                                    <Separator
+                                                        Style="{StaticResource MenuSeparator}"
+                                                        Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}" />
 
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.ToggleToOralAndBack}"
                                                         Content="{StaticResource ChangeTypeImage}"
                                                         Command="{Binding ChangePlacement}"
-                                                        Style="{StaticResource MenuButton}" />
+                                                        Style="{StaticResource MenuButton}"
+                                                        Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}" />
 
                                                     <Button
                                                         ToolTip="{x:Static lp:Resources.Delete}"
@@ -1755,9 +1813,12 @@
                                                         ToolTip="{x:Static lp:Resources.SetTime}"
                                                         Content="{StaticResource AddTimeImage}"
                                                         Command="{Binding SetTime}"
-                                                        Style="{StaticResource MenuButton}" />
+                                                        Style="{StaticResource MenuButton}"
+                                                        Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}" />
 
-                                                    <Button Command="{Binding JoinWithNext}">
+                                                    <Button
+                                                        Command="{Binding JoinWithNext}"
+                                                        Visibility="{Binding IsTopLevel, Converter={StaticResource VisibilityConverter}}">
                                                         <Button.Style>
                                                             <Style TargetType="Button" BasedOn="{StaticResource MenuButton}">
                                                                 <Setter Property="Content" Value="{StaticResource JoinWithNextImage}" />
@@ -1797,6 +1858,12 @@
                                                         Command="{Binding MoveRight}"
                                                         Style="{StaticResource MenuButton}" />
                                                 </StackPanel>
+
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding IsTopLevel}" Value="False">
+                                                        <Setter TargetName="addHtml" Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
                                             </DataTemplate>
 
                                             <DataTemplate DataType="{x:Type vm:AnswersViewModel}">
@@ -3221,6 +3288,43 @@
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
 
+            <siqcv:TemplateConverter x:Key="GroupParameterSelector">
+                <siqcv:TemplateConverter.DefaultTemplate>
+                    <!-- pc:StepParameterTypes.Simple -->
+                    <DataTemplate DataType="vm:StepParameterViewModel">
+                        <TextBox Text="{Binding Model.SimpleValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource CommonTextBox}" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.DefaultTemplate>
+
+                <siqcv:TemplateConverter.Templates>
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Content}" DataType="vm:StepParameterViewModel">
+                        <ItemsControl
+                            DataContext="{Binding ContentValue}"
+                            ItemsSource="{Binding}"
+                            siq:SmartMenuManager.SecondMenu="True"
+                            vm1:ItemsControlWatcher.IsWatching="True">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:ContentItemViewModel">
+                                    <DockPanel>
+                                        <ContentControl Style="{StaticResource ContentItemWaitForFinishStyle}" KeyboardNavigation.IsTabStop="False" />
+                                        <ContentControl Style="{StaticResource ContentItemDurationStyle}" KeyboardNavigation.IsTabStop="False" />
+                                        <ContentControl Style="{StaticResource ContentItemPlacementStyle}" KeyboardNavigation.IsTabStop="False" />
+
+                                        <ContentControl
+                                            Content="{Binding}"
+                                            ContentTemplate="{Binding Model.Type, Converter={StaticResource ContentItemSelector}}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
+                        <lv:NumberSetEditor DataContext="{Binding NumberSetValue}" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.Templates>
+            </siqcv:TemplateConverter>
+
             <siqcv:TemplateConverter x:Key="ParameterSelector">
                 <siqcv:TemplateConverter.DefaultTemplate>
                     <!-- pc:StepParameterTypes.Simple -->
@@ -3253,7 +3357,69 @@
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
-                        <!-- Will be implemented in the future -->
+                        <ItemsControl ItemsSource="{Binding GroupValue}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Background="Transparent">
+                                        <Border
+                                            x:Name="delete"
+                                            Margin="0,2,0,0"
+                                            Visibility="Hidden">
+                                            <Button
+                                                Command="{Binding DataContext.GroupValue.DeleteItem, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip="{x:Static lp:Resources.Delete}"
+                                                VerticalAlignment="Center">
+                                                <Path Fill="#00FFFFFF" Stroke="#FF989898" StrokeThickness="1" Data="M0,0L9,9M0,9L9,0" />
+
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </Border>
+
+                                        <TextBlock
+                                            x:Name="name"
+                                            Text="{Binding Key}"
+                                            DockPanel.Dock="Left"
+                                            MinWidth="25"
+                                            FontWeight="Bold"
+                                            Foreground="Black"
+                                            VerticalAlignment="Center"
+                                            TextAlignment="Left"
+                                            Margin="5,2,3,2" />
+
+                                        <Border
+                                            Background="LightBlue"
+                                            MinWidth="25"
+                                            Margin="1">
+                                            <ContentControl
+                                                x:Name="value"
+                                                Margin="0,2,0,0"
+                                                TextBlock.Foreground="Black"
+                                                Content="{Binding Value}"
+                                                ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource GroupParameterSelector}}"
+                                                KeyboardNavigation.IsTabStop="False" />
+                                        </Border>
+                                    </DockPanel>
+
+                                    <DataTemplate.Triggers>
+                                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                            <Setter TargetName="delete" Property="Visibility" Value="Visible" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="delete" Property="Visibility" Value="Visible" />
+                                        </Trigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </DataTemplate>
 
                     <DataTemplate x:Key="{x:Static pc:StepParameterTypes.NumberSet}" DataType="vm:StepParameterViewModel">
@@ -3349,6 +3515,44 @@
                 </siqcv:TemplateConverter.Templates>
             </siqcv:TemplateConverter>
 
+            <siqcv:TemplateConverter x:Key="ParameterNameSelector">
+                <siqcv:TemplateConverter.DefaultTemplate>
+                    <!-- pc:StepParameterTypes.Simple -->
+                    <DataTemplate DataType="vm:StepParameterViewModel">
+                        <TextBlock
+                            Text="{Binding}"
+                            FontWeight="Bold"
+                            Foreground="Black" />
+                    </DataTemplate>
+                </siqcv:TemplateConverter.DefaultTemplate>
+
+                <siqcv:TemplateConverter.Templates>
+                    <DataTemplate x:Key="{x:Static pc:StepParameterTypes.Group}" DataType="vm:StepParameterViewModel">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                DockPanel.Dock="Left"
+                                Text="{Binding}"
+                                FontWeight="Bold"
+                                Foreground="Black"
+                                Margin="0,3,0,0" />
+                            
+                            <Button
+                                VerticalAlignment="Top"
+                                DockPanel.Dock="Left"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                ToolTip="{x:Static lp:Resources.AddOption}"
+                                Command="{Binding DataContext.Value.GroupValue.AddItem, RelativeSource={RelativeSource AncestorType=DockPanel}}"
+                                CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                Width="25"
+                                Height="25"
+                                Margin="5,0,0,0" >
+                                <Path Stretch="Uniform" Fill="#FF989898" Margin="1" Data="{Binding Source={StaticResource app_add}, Path=Data}" />
+                            </Button>
+                        </StackPanel>
+                    </DataTemplate>
+                </siqcv:TemplateConverter.Templates>
+            </siqcv:TemplateConverter>
+
             <Style x:Key="ScenarioStyle" TargetType="{x:Type ItemsControl}">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="ItemsSource" Value="{Binding Scenario}" />
@@ -3377,13 +3581,12 @@
                             <Setter.Value>
                                 <DataTemplate>
                                     <DockPanel>
-                                        <TextBlock
+                                        <ContentControl
                                             x:Name="name"
-                                            Text="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
+                                            Content="{Binding Key, Converter={StaticResource QuestionParameterNamesConverter}}"
+                                            ContentTemplate="{Binding Value.Model.Type, Converter={StaticResource ParameterNameSelector}}"
                                             DockPanel.Dock="Left"
                                             MinWidth="250"
-                                            FontWeight="Bold"
-                                            Foreground="Black"
                                             Margin="3,2,10,2" />
                                         
                                         <ContentControl
@@ -3397,7 +3600,7 @@
 
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.Question}">
-                                            <Setter TargetName="name" Property="Text" Value="" />
+                                            <Setter TargetName="name" Property="Content" Value="" />
                                             <Setter TargetName="name" Property="MinWidth" Value="0" />
                                             <Setter TargetName="name" Property="Margin" Value="3,2,0,2" />
                                         </DataTrigger>
@@ -3409,6 +3612,11 @@
                                         
                                         <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.SelectionMode}">
                                             <Setter TargetName="value" Property="ContentTemplate" Value="{StaticResource SelectionModeTemplate}" />
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerType}">
+                                            <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                            <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>

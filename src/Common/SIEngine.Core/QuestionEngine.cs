@@ -169,6 +169,11 @@ public sealed class QuestionEngine
                     }
 
                     break;
+
+                case StepTypes.SetAnswerType:
+                    // TODO: implement SetAnswerType step
+                    _stepIndex++;
+                    continue;
                 // Preambula part end
 
                 case StepTypes.ShowContent:
@@ -302,7 +307,7 @@ public sealed class QuestionEngine
 
                 default:
                     _stepIndex++;
-                    break;
+                    continue;
             }
         }
 

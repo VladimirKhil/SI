@@ -383,6 +383,16 @@
                                             </Setter.Value>
                                         </Setter>
                                     </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerType}">
+                                        <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding Key}" Value="{x:Static pc:QuestionParameterNames.AnswerOptions}">
+                                        <Setter TargetName="name" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="value" Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
                         </Setter.Value>

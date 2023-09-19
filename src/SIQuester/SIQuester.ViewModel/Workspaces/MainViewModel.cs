@@ -124,6 +124,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     private readonly StorageContextViewModel _storageContextViewModel;
     private readonly IServiceProvider _serviceProvider;
 
+    public AppOptions AppOptions => _appOptions;
+
     public MainViewModel(
         string[] args,
         AppOptions appOptions,

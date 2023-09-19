@@ -151,6 +151,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Добавить вариант ответа.
+        /// </summary>
+        public static string AddOption {
+            get {
+                return ResourceManager.GetString("AddOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Добавить устный текст.
         /// </summary>
         public static string AddOral {
@@ -277,11 +286,29 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Варианты ответа.
+        /// </summary>
+        public static string AnswerOptions {
+            get {
+                return ResourceManager.GetString("AnswerOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ответы пишутся.
         /// </summary>
         public static string AnswersLayout {
             get {
                 return ResourceManager.GetString("AnswersLayout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Тип ответа.
+        /// </summary>
+        public static string AnswerType {
+            get {
+                return ResourceManager.GetString("AnswerType", resourceCulture);
             }
         }
         
@@ -2276,6 +2303,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Число вариантов ответа по умолчанию.
+        /// </summary>
+        public static string SelectOptionCount {
+            get {
+                return ResourceManager.GetString("SelectOptionCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Выберите папку для поиска.
         /// </summary>
         public static string SelectSearchFolder {
@@ -2335,6 +2371,24 @@ namespace SIQuester.Properties {
         public static string SetAnswererSelect_ExceptCurrent {
             get {
                 return ResourceManager.GetString("SetAnswererSelect_ExceptCurrent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выбор из вариантов.
+        /// </summary>
+        public static string SetAnswerTypeType_Select {
+            get {
+                return ResourceManager.GetString("SetAnswerTypeType_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Текст.
+        /// </summary>
+        public static string SetAnswerTypeType_Text {
+            get {
+                return ResourceManager.GetString("SetAnswerTypeType_Text", resourceCulture);
             }
         }
         

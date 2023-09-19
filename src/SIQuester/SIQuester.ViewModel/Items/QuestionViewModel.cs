@@ -71,7 +71,30 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     public ICommand SetQuestionType { get; private set; }
 
+    public ICommand SetAnswerType { get; private set; }
+
     public ICommand SwitchEmpty { get; private set; }
+
+    /// <summary>
+    /// Question answer type.
+    /// </summary>
+    public string AnswerType
+    {
+        get
+        {
+            if (Parameters == null)
+            {
+                return StepParameterValues.SetAnswerTypeType_Text;
+            }
+            
+            if (!Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
+            {
+                return StepParameterValues.SetAnswerTypeType_Text;
+            }
+
+            return answerTypeParameter.Model.SimpleValue;
+        }
+    }
 
     public QuestionViewModel(Question question)
         : base(question)
@@ -100,6 +123,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         Remove = new SimpleCommand(RemoveQuestion_Executed);
 
         SetQuestionType = new SimpleCommand(SetQuestionType_Executed);
+        SetAnswerType = new SimpleCommand(SetAnswerType_Executed);
         SwitchEmpty = new SimpleCommand(SwitchEmpty_Executed);
 
         Wrong.CollectionChanged += Wrong_CollectionChanged;
@@ -229,6 +253,70 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
         }
 
         Type.Model.Name = (string)arg;
+    }
+
+    private void SetAnswerType_Executed(object? arg)
+    {
+        if (Parameters == null || arg == null)
+        {
+            return;
+        }
+
+        var answerType = (string)arg;
+
+        if (answerType == StepParameterValues.SetAnswerTypeType_Text)
+        {
+            // Default value; remove parameter
+            Parameters.RemoveParameter(QuestionParameterNames.AnswerType);
+            Parameters.RemoveParameter(QuestionParameterNames.AnswerOptions);
+            OnPropertyChanged(nameof(AnswerType));
+            return;
+        }
+
+        if (!Parameters.TryGetValue(QuestionParameterNames.AnswerType, out var answerTypeParameter))
+        {
+            answerTypeParameter = new StepParameterViewModel(this, new StepParameter
+            {
+                Type = StepParameterTypes.Simple,
+                SimpleValue = answerType
+            });
+
+            Parameters.AddParameter(QuestionParameterNames.AnswerType, answerTypeParameter);
+        }
+        else
+        {
+            answerTypeParameter.Model.SimpleValue = answerType;
+        }
+
+        if (answerType == StepParameterValues.SetAnswerTypeType_Select)
+        {
+            var options = new StepParameter
+            {
+                Type = StepParameterTypes.Group,
+                GroupValue = new StepParameters()
+            };
+
+            static StepParameter answerOptionGenerator() => new()
+            {
+                Type = StepParameterTypes.Content,
+                ContentValue = new List<ContentItem>
+                {
+                    new ContentItem { Type = AtomTypes.Text, Value = "" },
+                }
+            };
+
+            for (var i = 0; i < AppSettings.Default.SelectOptionCount; i++)
+            {
+                var label = i < 26 ? ((char)('A' + i)).ToString() : 'A' + (i - 25).ToString();
+                options.GroupValue.Add(label, answerOptionGenerator());
+            }
+
+            var optionsViewModel = new StepParameterViewModel(this, options);
+
+            Parameters.AddParameter(QuestionParameterNames.AnswerOptions, optionsViewModel);
+        }
+
+        OnPropertyChanged(nameof(AnswerType));
     }
 
     private void SwitchEmpty_Executed(object? arg)

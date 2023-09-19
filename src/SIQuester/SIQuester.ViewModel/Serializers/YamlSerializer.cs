@@ -23,6 +23,7 @@ internal sealed class YamlSerializer
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithEventEmitter(next => new FlowEmitter(next))
             .WithAttributeOverride<Package>(package => package.ID, new YamlMemberAttribute { Alias = "id" })
+            .WithAttributeOverride<Package>(package => package.LogoItem, ignore)
             .WithAttributeOverride<Atom>(atom => atom.IsLink, ignore)
             .WithAttributeOverride<Atom>(atom => atom.TypeString, ignore)
             .ConfigureDefaultValuesHandling(DefaultValuesHandling.OmitDefaults | DefaultValuesHandling.OmitEmptyCollections)
@@ -32,6 +33,7 @@ internal sealed class YamlSerializer
             .WithTypeInspector(typeInspector => new CustomTypeInspector(typeInspector))
             .WithNamingConvention(CamelCaseNamingConvention.Instance)
             .WithAttributeOverride<Package>(package => package.ID, new YamlMemberAttribute { Alias = "id" })
+            .WithAttributeOverride<Package>(package => package.LogoItem, ignore)
             .WithAttributeOverride<Atom>(atom => atom.IsLink, ignore)
             .WithAttributeOverride<Atom>(atom => atom.TypeString, ignore)
             .Build();

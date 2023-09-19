@@ -147,6 +147,9 @@
   <data name="AddImage" xml:space="preserve">
     <value>Добавить изображение</value>
   </data>
+  <data name="AddOption" xml:space="preserve">
+    <value>Добавить вариант ответа</value>
+  </data>
   <data name="AddOral" xml:space="preserve">
     <value>Добавить устный текст</value>
   </data>
@@ -189,8 +192,14 @@
   <data name="AnswerMetaHint" xml:space="preserve">
     <value>Подсказка про метасиволы в ответах</value>
   </data>
+  <data name="AnswerOptions" xml:space="preserve">
+    <value>Варианты ответа</value>
+  </data>
   <data name="AnswersLayout" xml:space="preserve">
     <value>Ответы пишутся</value>
+  </data>
+  <data name="AnswerType" xml:space="preserve">
+    <value>Тип ответа</value>
   </data>
   <data name="AppAuthor" xml:space="preserve">
     <value>Владимир Хиль</value>
@@ -856,6 +865,9 @@
   <data name="SelectionMode" xml:space="preserve">
     <value>Режим передачи</value>
   </data>
+  <data name="SelectOptionCount" xml:space="preserve">
+    <value>Число вариантов ответа по умолчанию</value>
+  </data>
   <data name="SelectSearchFolder" xml:space="preserve">
     <value>Выберите папку для поиска</value>
   </data>
@@ -876,6 +888,12 @@
   </data>
   <data name="SetAnswererSelect_ExceptCurrent" xml:space="preserve">
     <value>Всем кроме себя</value>
+  </data>
+  <data name="SetAnswerTypeType_Select" xml:space="preserve">
+    <value>Выбор из вариантов</value>
+  </data>
+  <data name="SetAnswerTypeType_Text" xml:space="preserve">
+    <value>Текст</value>
   </data>
   <data name="SetLogo" xml:space="preserve">
     <value>Задать логотип</value>

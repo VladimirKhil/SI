@@ -41,10 +41,13 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     public ICommand SelectAtomObject { get; private set; }
 
-    public ContentItemsViewModel(QuestionViewModel question, List<ContentItem> contentItems)
+    public bool IsTopLevel { get; private set; }
+
+    public ContentItemsViewModel(QuestionViewModel question, List<ContentItem> contentItems, bool isTopLevel)
     {
         Owner = question;
         Model = contentItems;
+        IsTopLevel = isTopLevel;
 
         foreach (var item in contentItems)
         {
@@ -66,6 +69,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         ExportMedia = new SimpleCommand(ExportMedia_Executed);
 
         SelectAtomObject = new SimpleCommand(SelectAtomObject_Executed);
+        IsTopLevel = isTopLevel;
     }
 
     internal void AddText_Executed(object? arg) => QDocument.ActivatedObject = Add(AtomTypes.Text, "", ContentPlacements.Screen);
