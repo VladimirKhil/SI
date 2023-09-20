@@ -113,76 +113,112 @@ public sealed class InfoOwnerData
 
         Sources = sources.ToArray();
 
+        GetMedia(documentViewModel, model);
+    }
+
+    private void GetMedia(QDocument documentViewModel, InfoOwner model)
+    {
         if (model is Question question)
         {
-            foreach (var contentItem in question.GetContent())
+            GetQuestion(documentViewModel, question);
+        }
+
+        if (model is Theme theme)
+        {
+            GetTheme(documentViewModel, theme);
+        }
+
+        if (model is Round round)
+        {
+            GetRound(documentViewModel, round);
+        }
+    }
+
+    private void GetRound(QDocument documentViewModel, Round round)
+    {
+        foreach (var theme in round.Themes)
+        {
+            GetTheme(documentViewModel, theme);
+        }
+    }
+
+    private void GetTheme(QDocument documentViewModel, Theme theme)
+    {
+        foreach (var question in theme.Questions)
+        {
+            GetQuestion(documentViewModel, question);
+        }
+    }
+
+    private void GetQuestion(QDocument documentViewModel, Question question)
+    {
+        foreach (var contentItem in question.GetContent())
+        {
+            if (!contentItem.IsRef)
             {
-                if (!contentItem.IsRef)
-                {
-                    continue;
-                }
-
-                var collection = documentViewModel.TryGetCollectionByMediaType(contentItem.Type);
-
-                if (collection == null)
-                {
-                    continue;
-                }
-
-                var targetCollection = contentItem.Type switch
-                {
-                    AtomTypes.Image => Images,
-                    AtomTypes.Audio => Audio,
-                    AtomTypes.AudioNew => Audio,
-                    AtomTypes.Video => Video,
-                    AtomTypes.Html => Html,
-                    _ => null,
-                };
-
-                if (targetCollection == null)
-                {
-                    continue;
-                }
-
-                var link = contentItem.Value;
-
-                if (!targetCollection.ContainsKey(link))
-                {
-                    var preparedMedia = collection.Wrap(link);
-                    targetCollection.Add(link, preparedMedia.Uri);
-                }
+                continue;
             }
 
-            foreach (var atom in question.Scenario)
+            var collection = documentViewModel.TryGetCollectionByMediaType(contentItem.Type);
+
+            if (collection == null)
             {
-                if (!atom.IsLink)
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                var collection = documentViewModel.TryGetCollectionByMediaType(atom.Type);
+            var targetCollection = contentItem.Type switch
+            {
+                AtomTypes.Image => Images,
+                AtomTypes.Audio => Audio,
+                AtomTypes.AudioNew => Audio,
+                AtomTypes.Video => Video,
+                AtomTypes.Html => Html,
+                _ => null,
+            };
 
-                if (collection == null)
-                {
-                    continue;
-                }
+            if (targetCollection == null)
+            {
+                continue;
+            }
 
-                var targetCollection = atom.Type switch
-                {
-                    AtomTypes.Image => Images,
-                    AtomTypes.Audio => Audio,
-                    AtomTypes.AudioNew => Audio,
-                    AtomTypes.Video => Video,
-                    _ => null,
-                };
+            var link = contentItem.Value;
 
-                var link = atom.Text[1..];
+            if (!targetCollection.ContainsKey(link))
+            {
+                var preparedMedia = collection.Wrap(link);
+                targetCollection.Add(link, preparedMedia.Uri);
+            }
+        }
 
-                if (!targetCollection.ContainsKey(link))
-                {
-                    var preparedMedia = collection.Wrap(link);
-                    targetCollection.Add(link, preparedMedia.Uri);
-                }
+        foreach (var atom in question.Scenario)
+        {
+            if (!atom.IsLink)
+            {
+                continue;
+            }
+
+            var collection = documentViewModel.TryGetCollectionByMediaType(atom.Type);
+
+            if (collection == null)
+            {
+                continue;
+            }
+
+            var targetCollection = atom.Type switch
+            {
+                AtomTypes.Image => Images,
+                AtomTypes.Audio => Audio,
+                AtomTypes.AudioNew => Audio,
+                AtomTypes.Video => Video,
+                _ => null,
+            };
+
+            var link = atom.Text[1..];
+
+            if (!targetCollection.ContainsKey(link))
+            {
+                var preparedMedia = collection.Wrap(link);
+                targetCollection.Add(link, preparedMedia.Uri);
             }
         }
     }
