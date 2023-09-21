@@ -328,7 +328,7 @@ public sealed class QDocument : WorkspaceViewModel
     #region Commands
 
     /// <summary>
-    /// Импортировать существующий пакет
+    /// Imports another package into current.
     /// </summary>
     public ICommand ImportSiq { get; private set; }
 
@@ -1658,6 +1658,10 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
+    /// <summary>
+    /// Applies data from other document into current.
+    /// </summary>
+    /// <param name="data">Document data to import.</param>
     public void ApplyData(InfoOwnerData data)
     {
         foreach (var author in data.Authors)
@@ -1685,7 +1689,8 @@ public sealed class QDocument : WorkspaceViewModel
         {
             if (!Images.Files.Any(file => file.Model.Name == item.Key))
             {
-                var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                var extension = System.IO.Path.GetExtension(item.Key);
+                var tmp = System.IO.Path.ChangeExtension(System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString()), extension);
                 File.Copy(item.Value, tmp);
 
                 Images.AddFile(tmp, item.Key);
@@ -1696,7 +1701,8 @@ public sealed class QDocument : WorkspaceViewModel
         {
             if (!Audio.Files.Any(file => file.Model.Name == item.Key))
             {
-                var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                var extension = System.IO.Path.GetExtension(item.Key);
+                var tmp = System.IO.Path.ChangeExtension(System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString()), extension);
                 File.Copy(item.Value, tmp);
 
                 Audio.AddFile(tmp, item.Key);
@@ -1707,7 +1713,8 @@ public sealed class QDocument : WorkspaceViewModel
         {
             if (!Video.Files.Any(file => file.Model.Name == item.Key))
             {
-                var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                var extension = System.IO.Path.GetExtension(item.Key);
+                var tmp = System.IO.Path.ChangeExtension(System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString()), extension);
                 File.Copy(item.Value, tmp);
 
                 Video.AddFile(tmp, item.Key);
@@ -1718,7 +1725,8 @@ public sealed class QDocument : WorkspaceViewModel
         {
             if (!Html.Files.Any(file => file.Model.Name == item.Key))
             {
-                var tmp = System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString());
+                var extension = System.IO.Path.GetExtension(item.Key);
+                var tmp = System.IO.Path.ChangeExtension(System.IO.Path.Combine(tempMediaDirectory, Guid.NewGuid().ToString()), extension);
                 File.Copy(item.Value, tmp);
 
                 Html.AddFile(tmp, item.Key);
@@ -1765,15 +1773,13 @@ public sealed class QDocument : WorkspaceViewModel
         {
             using var change = OperationsManager.BeginComplexChange();
 
+            var contentImportTable = new Dictionary<string, string>();
+            var scenarioImportTable = new Dictionary<string, string>();
+
             foreach (var file in files)
             {
                 using var stream = File.OpenRead(file);
                 using var doc = SIDocument.Load(stream);
-
-                foreach (var round in doc.Package.Rounds)
-                {
-                    Package.Rounds.Add(new RoundViewModel(round.Clone()));
-                }
 
                 CopyAuthorsAndSources(doc, doc.Package);
 
@@ -1791,25 +1797,27 @@ public sealed class QDocument : WorkspaceViewModel
 
                             foreach (var item in question.GetContent())
                             {
-                                if (item.Type != AtomTypes.Image && item.Type != AtomTypes.Audio && item.Type != AtomTypes.AudioNew && item.Type != AtomTypes.Video)
+                                if (item.Type != AtomTypes.Image && item.Type != AtomTypes.Audio && item.Type != AtomTypes.AudioNew && item.Type != AtomTypes.Video && item.Type != AtomTypes.Html)
                                 {
                                     continue;
                                 }
 
-                                await ImportContentItemAsync(doc, item);
+                                await ImportContentItemAsync(doc, item, contentImportTable);
                             }
 
                             foreach (var atom in question.Scenario)
                             {
-                                if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video)
+                                if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video && atom.Type != AtomTypes.Html)
                                 {
                                     continue;
                                 }
 
-                                await ImportAtomAsync(doc, atom);
+                                await ImportAtomAsync(doc, atom, scenarioImportTable);
                             }
                         }
                     }
+
+                    Package.Rounds.Add(new RoundViewModel(round.Clone()));
                 }
             }
 
@@ -1821,60 +1829,86 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    private async Task ImportContentItemAsync(SIDocument doc, ContentItem contentItem)
+    private async Task ImportContentItemAsync(SIDocument doc, ContentItem contentItem, Dictionary<string, string> contentImportTable)
     {
         var collection = doc.GetCollection(contentItem.Type);
         var newCollection = GetCollectionByMediaType(contentItem.Type);
 
         var link = doc.GetLink(contentItem);
 
-        if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
+        if (link.GetStream == null)
         {
-            var tempPath = System.IO.Path.Combine(
-                System.IO.Path.GetTempPath(),
-                AppSettings.ProductName,
-                AppSettings.TempMediaFolderName,
-                Guid.NewGuid().ToString());
-
-            Directory.CreateDirectory(tempPath);
-
-            var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
-
-            using (var fileStream = File.Create(tempFile))
-            {
-                await link.GetStream().Stream.CopyToAsync(fileStream);
-            }
-
-            newCollection.AddFile(tempFile);
+            return;
         }
+
+        if (contentImportTable.TryGetValue(link.Uri, out var newName))
+        {
+            contentItem.Value = newName;
+            return;
+        }
+
+        var fileName = FileHelper.GenerateUniqueFileName(link.Uri, name => newCollection.Files.Any(f => f.Model.Name == name));
+        contentImportTable[link.Uri] = fileName;
+
+        var tempPath = System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(),
+            AppSettings.ProductName,
+            AppSettings.TempMediaFolderName,
+            Guid.NewGuid().ToString());
+
+        Directory.CreateDirectory(tempPath);
+
+        var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
+
+        using (var fileStream = File.Create(tempFile))
+        using (var mediaStream = link.GetStream().Stream)
+        {
+            await mediaStream.CopyToAsync(fileStream);
+        }
+
+        newCollection.AddFile(tempFile);
+        contentItem.Value = fileName;
     }
 
-    private async Task ImportAtomAsync(SIDocument doc, Atom atom)
+    private async Task ImportAtomAsync(SIDocument doc, Atom atom, Dictionary<string, string> scenarioImportTable)
     {
         var collection = doc.GetCollection(atom.Type);
         var newCollection = GetCollectionByMediaType(atom.Type);
 
         var link = doc.GetLink(atom);
 
-        if (link.GetStream != null && !newCollection.Files.Any(f => f.Model.Name == link.Uri))
+        if (link.GetStream == null)
         {
-            var tempPath = System.IO.Path.Combine(
-                System.IO.Path.GetTempPath(),
-                AppSettings.ProductName,
-                AppSettings.TempMediaFolderName,
-                Guid.NewGuid().ToString());
-
-            Directory.CreateDirectory(tempPath);
-
-            var tempFile = System.IO.Path.Combine(tempPath, link.Uri);
-
-            using (var fileStream = File.Create(tempFile))
-            {
-                await link.GetStream().Stream.CopyToAsync(fileStream);
-            }
-
-            newCollection.AddFile(tempFile);
+            return;
         }
+
+        if (scenarioImportTable.TryGetValue(link.Uri, out var newName))
+        {
+            SIDocument.SetLink(atom, newName);
+            return;
+        }
+
+        var fileName = FileHelper.GenerateUniqueFileName(link.Uri, name => newCollection.Files.Any(f => f.Model.Name == name));
+        scenarioImportTable[link.Uri] = fileName;
+
+        var tempPath = System.IO.Path.Combine(
+            System.IO.Path.GetTempPath(),
+            AppSettings.ProductName,
+            AppSettings.TempMediaFolderName,
+            Guid.NewGuid().ToString());
+
+        Directory.CreateDirectory(tempPath);
+
+        var tempFile = System.IO.Path.Combine(tempPath, fileName);
+
+        using (var fileStream = File.Create(tempFile))
+        using (var mediaStream = link.GetStream().Stream)
+        {
+            await mediaStream.CopyToAsync(fileStream);
+        }
+
+        newCollection.AddFile(tempFile);
+        SIDocument.SetLink(atom, fileName);
     }
 
     private void CopyAuthorsAndSources(SIDocument document, InfoOwner infoOwner)
@@ -2401,7 +2435,7 @@ public sealed class QDocument : WorkspaceViewModel
          Lock.WithLockAsync(async () =>
          {
              // 1. Saving at temporary path to validate saved file first
-             var tempPath = FileHelper.GenerateUniqueFileName(System.IO.Path.ChangeExtension(_path, "tmp"));
+             var tempPath = FileHelper.GenerateUniqueFilePath(System.IO.Path.ChangeExtension(_path, "tmp"));
 
              var tempStream = File.Open(tempPath, FileMode.CreateNew, FileAccess.ReadWrite);
 

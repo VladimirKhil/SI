@@ -136,7 +136,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
         if (s.Length > 0)
         {
-            siDocument.Package.Info.Comments.Text += string.Format("\r\nИнфо: {0}", s);
+            siDocument.Package.Info.Comments.Text += string.Format("\r\n{0}: {1}", Resources.Info, s);
         }
 
         s = doc["tournament"]["URL"].InnerText;
@@ -150,7 +150,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
         if (s.Length > 0)
         {
-            siDocument.Package.Info.Comments.Text += string.Format("\r\nИграно: {0}", s);
+            siDocument.Package.Info.Comments.Text += string.Format("\r\n{0}: {1}", Resources.Played, s);
         }
 
         s = doc["tournament"]["Editors"].InnerText;
@@ -446,7 +446,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 
             result.Add(new DBNode
             {
-                Name = string.Format("{0} {1} (тем: {2})", node["Title"].InnerText, node["PlayedAt"].InnerText, node["QuestionsNum"].InnerText),
+                Name = $"{node["Title"].InnerText} {node["PlayedAt"].InnerText} ({Resources.OfThemes}: {node["QuestionsNum"].InnerText})",
                 Key = trim ? Path.GetFileNameWithoutExtension(node["FileName"].InnerText) : node["FileName"].InnerText,
                 Children = isLeaf ? Array.Empty<DBNode>() : new DBNode[] { null }
             });

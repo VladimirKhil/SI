@@ -297,6 +297,9 @@
   <data name="InColumn" xml:space="preserve">
     <value>In a column</value>
   </data>
+  <data name="Info" xml:space="preserve">
+    <value>Info</value>
+  </data>
   <data name="InputMediaUri" xml:space="preserve">
     <value>Enter the address of the multimedia object</value>
   </data>
@@ -316,13 +319,13 @@
     <value>Save the unprocessed part of the file to:</value>
   </data>
   <data name="MediaFileExtensionIsNotRecommened" xml:space="preserve">
-    <value>The multimedia file extension is not among the recommended ones ({0})!</value>
+    <value>Multimedia file extension is not among recommended ones ({0})!</value>
   </data>
   <data name="MediaFileSizeExceedsRecommenedValue" xml:space="preserve">
-    <value>The multimedia file size exceeds the recommended value ({0} MB)!</value>
+    <value>Multimedia file size exceeds recommended value ({0} MB)!</value>
   </data>
   <data name="MediaFileTooLarge" xml:space="preserve">
-    <value>File {0} exceeds the recommended size of {1} KB</value>
+    <value>File {0} exceeds recommended size of {1} KB</value>
   </data>
   <data name="MircAudio" xml:space="preserve">
     <value>audio</value>
@@ -381,6 +384,9 @@
   <data name="Notice" xml:space="preserve">
     <value>Please CAREFULLY familiarize yourself with the proposed format. Note that errors when reading a file may occur even due to the absence of a line break symbol or a space.</value>
   </data>
+  <data name="Number" xml:space="preserve">
+    <value>Number</value>
+  </data>
   <data name="NumOfQuests" xml:space="preserve">
     <value>Question count</value>
   </data>
@@ -392,6 +398,9 @@
   </data>
   <data name="ObjectNotFound" xml:space="preserve">
     <value>The next object was not found: {0}</value>
+  </data>
+  <data name="OfThemes" xml:space="preserve">
+    <value>themes</value>
   </data>
   <data name="OpenAutosaveFolder" xml:space="preserve">
     <value>Open autosave folder</value>
@@ -443,6 +452,9 @@
   </data>
   <data name="PhraseTemplates" xml:space="preserve">
     <value>The input text does not match the template below. Please correct the template, after which the analysis of the input file will continue. Besides, you can simply correct the input text. Problem:</value>
+  </data>
+  <data name="Played" xml:space="preserve">
+    <value>Played</value>
   </data>
   <data name="ProgramName" xml:space="preserve">
     <value>SIQuester</value>
@@ -500,6 +512,9 @@
   </data>
   <data name="SendToGame" xml:space="preserve">
     <value>Sending the package to the computer game</value>
+  </data>
+  <data name="Separator" xml:space="preserve">
+    <value>Separator</value>
   </data>
   <data name="SIGameQuestions" xml:space="preserve">
     <value>SIGame questions</value>
@@ -618,6 +633,9 @@ theme - Cat's theme</value>
   </data>
   <data name="Transform" xml:space="preserve">
     <value>Transformation</value>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Trash</value>
   </data>
   <data name="TxtFilesFilter" xml:space="preserve">
     <value>Question files (*.txt) | *.txt</value>

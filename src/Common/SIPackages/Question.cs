@@ -645,13 +645,26 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     {
         if (Parameters == null)
         {
-            yield break;
+            return Array.Empty<ContentItem>();
         }
 
-        foreach (var parameter in Parameters.Values)
+        return GetContentFromParameters(Parameters);
+    }
+
+    private static IEnumerable<ContentItem> GetContentFromParameters(StepParameters parameters)
+    {
+        foreach (var parameter in parameters.Values)
         {
             if (parameter.ContentValue == null)
             {
+                if (parameter.GroupValue != null)
+                {
+                    foreach (var contentItem in GetContentFromParameters(parameter.GroupValue))
+                    {
+                        yield return contentItem;
+                    }
+                }
+
                 continue;
             }
 
@@ -666,6 +679,28 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     {
         if (content.ContentValue == null)
         {
+            if (content.GroupValue != null)
+            {
+                var sb = new StringBuilder();
+
+                foreach (var parameter in content.GroupValue.Values)
+                {
+                    var parameterText = GetTextFromContent(parameter);
+
+                    if (parameterText.Length > 0)
+                    {
+                        if (sb.Length > 0)
+                        {
+                            sb.Append(UniversalLineSeparatorChar);
+                        }
+
+                        sb.Append(parameterText);
+                    }
+                }
+
+                return sb.ToString();
+            }
+
             return "";
         }
 
@@ -673,7 +708,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
 
         foreach (var contentItem in content.ContentValue)
         {
-            if (contentItem.Type != AtomTypes.Text)
+            if (contentItem.Type != AtomTypes.Text || contentItem.Value.Length == 0)
             {
                 continue;
             }

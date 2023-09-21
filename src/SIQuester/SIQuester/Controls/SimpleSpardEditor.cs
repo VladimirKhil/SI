@@ -962,9 +962,9 @@ public sealed class SimpleSpardEditor : RichTextBox
     private void GetSetDisplayData(Set set, out string text, out SolidColorBrush color, out bool isReadOnly)
     {
         var name = ((StringValue)set.Operand.Operands().First()).Value;
-        _spardViewModel.Aliases.TryGetValue(name, out EditAlias alias);
+        _spardViewModel.Aliases.TryGetValue(name, out var alias);
         text = alias == null ? (name == "Line" ? "\n" : name) : alias.VisibleName;
-        color = new SolidColorBrush(alias == null ? Colors.MediumSlateBlue : alias.Color);
+        color = new SolidColorBrush(alias == null ? Colors.MediumSlateBlue : (Color)ColorConverter.ConvertFromString(alias.Color));
         isReadOnly = name != "Line" && name != "Some";
     }
 

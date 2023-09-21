@@ -52,6 +52,15 @@ public sealed class GlobalData : IXmlSerializable
                     }
 
                     break;
+
+                case XmlNodeType.EndElement:
+                    if (reader.LocalName == "global")
+                    {
+                        reader.Read();
+                        return;
+                    }
+
+                    break;
             }
         }
     }

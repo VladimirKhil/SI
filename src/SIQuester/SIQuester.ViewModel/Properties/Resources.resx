@@ -662,4 +662,22 @@ theme - тема Кота</value>
   <data name="Restriction" xml:space="preserve">
     <value>Ограничение</value>
   </data>
+  <data name="Number" xml:space="preserve">
+    <value>Номер</value>
+  </data>
+  <data name="Separator" xml:space="preserve">
+    <value>Разделитель</value>
+  </data>
+  <data name="Trash" xml:space="preserve">
+    <value>Мусор</value>
+  </data>
+  <data name="OfThemes" xml:space="preserve">
+    <value>тем</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>Инфо</value>
+  </data>
+  <data name="Played" xml:space="preserve">
+    <value>Играно</value>
+  </data>
 </root>

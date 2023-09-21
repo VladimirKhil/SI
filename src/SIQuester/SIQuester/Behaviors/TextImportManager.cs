@@ -30,7 +30,7 @@ public static class TextImportManager
         var model = (ImportTextViewModel)e.NewValue;
 
 
-        void highlightText(int start, int length, Color? color, bool scroll)
+        void highlightText(int start, int length, string? color, bool scroll)
         {
             textBox.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -71,9 +71,9 @@ public static class TextImportManager
 
                         var range = new TextRange(startPos, endPos);
 
-                        if (color.HasValue)
+                        if (color != null)
                         {
-                            range.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(color.Value));
+                            range.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)));
                         }
                         else
                         {

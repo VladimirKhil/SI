@@ -103,14 +103,9 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
 
     private string? DetectErrorMessage(IMedia media)
     {
-        if (!AppSettings.Default.CheckFileSize)
-        {
-            return null;
-        }
-
         var extension = Path.GetExtension(media.Uri).ToLowerInvariant();
 
-        var sizeWarning = RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
+        var sizeWarning = AppSettings.Default.CheckFileSize && RecommenedSizeMb.TryGetValue(Type, out var recommendedMaxSize)
             && media.StreamLength > recommendedMaxSize * 1024 * 1024
                 ? string.Format(Resources.MediaFileSizeExceedsRecommenedValue, recommendedMaxSize)
                 : null;

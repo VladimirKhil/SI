@@ -313,6 +313,22 @@ public sealed class SIDocument : IDisposable
             }
         }
 
+        foreach (var author in Authors)
+        {
+            Package.Global ??= new GlobalData();
+            Package.Global.Authors ??= new AuthorInfoList();
+
+            Package.Global.Authors.Add(author);
+        }
+
+        foreach (var source in Sources)
+        {
+            Package.Global ??= new GlobalData();
+            Package.Global.Sources ??= new SourceInfoList();
+
+            Package.Global.Sources.Add(source);
+        }
+
         Package.Version = 5;
         return true;
     }

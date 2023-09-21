@@ -601,6 +601,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Инфо.
+        /// </summary>
+        public static string Info {
+            get {
+                return ResourceManager.GetString("Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Введите адрес мультимедиа-объекта.
         /// </summary>
         public static string InputMediaUri {
@@ -853,6 +862,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Номер.
+        /// </summary>
+        public static string Number {
+            get {
+                return ResourceManager.GetString("Number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Число вопросов.
         /// </summary>
         public static string NumOfQuests {
@@ -885,6 +903,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string ObjectNotFound {
             get {
                 return ResourceManager.GetString("ObjectNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на тем.
+        /// </summary>
+        public static string OfThemes {
+            get {
+                return ResourceManager.GetString("OfThemes", resourceCulture);
             }
         }
         
@@ -1038,6 +1065,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string PhraseTemplates {
             get {
                 return ResourceManager.GetString("PhraseTemplates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Играно.
+        /// </summary>
+        public static string Played {
+            get {
+                return ResourceManager.GetString("Played", resourceCulture);
             }
         }
         
@@ -1209,6 +1245,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string SendToGame {
             get {
                 return ResourceManager.GetString("SendToGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Разделитель.
+        /// </summary>
+        public static string Separator {
+            get {
+                return ResourceManager.GetString("Separator", resourceCulture);
             }
         }
         
@@ -1501,6 +1546,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string Transform {
             get {
                 return ResourceManager.GetString("Transform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Мусор.
+        /// </summary>
+        public static string Trash {
+            get {
+                return ResourceManager.GetString("Trash", resourceCulture);
             }
         }
         

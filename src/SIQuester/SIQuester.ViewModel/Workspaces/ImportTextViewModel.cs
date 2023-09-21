@@ -5,6 +5,7 @@ using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
@@ -13,7 +14,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Input;
-using System.Windows.Media;
 using Utils;
 using Utils.Commands;
 
@@ -196,7 +196,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private string _goText;
+    private string _goText = "";
 
     public string GoText
     {
@@ -274,7 +274,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     private readonly object _sync = new();
 
-    private static Color BadSourceBackColor = Colors.Wheat;
+    private static string BadSourceBackColor = "#FFF5DEB3";
 
     /// <summary>
     /// Parser state machine stage.
@@ -318,7 +318,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         set { _info = value; OnPropertyChanged(); }
     }
 
-    private string _problem;
+    private string _problem = "";
 
     public string Problem
     {
@@ -342,7 +342,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private string _skipToolTip;
+    private string _skipToolTip = "";
 
     public string SkipToolTip
     {
@@ -350,7 +350,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         set { _skipToolTip = value; OnPropertyChanged(); }
     }
 
-    public event Action<int, int, Color?, bool> HighlightText;
+    public event Action<int, int, string?, bool>? HighlightText;
 
     private readonly ILoggerFactory _loggerFactory;
 
@@ -378,47 +378,49 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     /// Initializes a new instance of <see cref="ImportTextViewModel" /> class.
     /// </summary>
     /// <param name="storageContextViewModel">Well-known SIStorage facets holder.</param>
+    /// <param name="appOptions">Application options.</param>
+    /// <param name="clipboardService">Clipboard access service.</param>
     /// <param name="loggerFactory">Factory to create loggers.</param>
-    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, AppOptions appOptions, ILoggerFactory loggerFactory)
+    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, AppOptions appOptions, IClipboardService clipboardService, ILoggerFactory loggerFactory)
     {
         _storageContextViewModel = storageContextViewModel;
         _appOptions = appOptions;
         _loggerFactory = loggerFactory;
         _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-        var trashAlias = new EditAlias("Мусор", Colors.LightGray);
+        var trashAlias = new EditAlias(Resources.Trash, "#FFD3D3D3");
 
-        _packageTemplate = new SpardTemplateViewModel { Name = "Пакет" };
-        _packageTemplate.Aliases["PName"] = new EditAlias("Пакет", Colors.Orchid);
+        _packageTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Package, clipboardService);
+        _packageTemplate.Aliases["PName"] = new EditAlias(SIPackages.Properties.Resources.Package, "#FFDA70D6");
         _packageTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_packageTemplate);
 
-        _roundTemplate = new SpardTemplateViewModel { Name = "Раунд" };
-        _roundTemplate.Aliases["RName"] = new EditAlias("Раунд", Colors.LightYellow);
+        _roundTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Round, clipboardService);
+        _roundTemplate.Aliases["RName"] = new EditAlias(SIPackages.Properties.Resources.Round, "#FFFFFFE0");
         _roundTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_roundTemplate);
 
-        _themeTemplate = new SpardTemplateViewModel { Name = "Тема" };
-        _themeTemplate.Aliases["TName"] = new EditAlias("Тема", Colors.Wheat);
-        _themeTemplate.Aliases["TAuthor"] = new EditAlias("Автор", Colors.Maroon);
-        _themeTemplate.Aliases["TComment"] = new EditAlias("Комментарий", Colors.LightSalmon);
+        _themeTemplate = new SpardTemplateViewModel(SIPackages.Properties.Resources.Theme, clipboardService);
+        _themeTemplate.Aliases["TName"] = new EditAlias(SIPackages.Properties.Resources.Theme, "#FFF5DEB3");
+        _themeTemplate.Aliases["TAuthor"] = new EditAlias(Resources.Author, "#FF800000");
+        _themeTemplate.Aliases["TComment"] = new EditAlias(Resources.Comment, "#FFFFA07A");
         _themeTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_themeTemplate);
 
-        _questTemplate = new SpardTemplateViewModel { Name = "Вопрос" };
-        _questTemplate.Aliases["Number"] = new EditAlias("Номер", Colors.SkyBlue);
-        _questTemplate.Aliases["QText"] = new EditAlias("Вопрос", Colors.PaleGreen);
-        _questTemplate.Aliases["Answer"] = new EditAlias("Ответ", Colors.Yellow);
-        _questTemplate.Aliases["QAuthor"] = new EditAlias("Автор", Colors.Goldenrod);
-        _questTemplate.Aliases["QComment"] = new EditAlias("Комментарий", Colors.Cyan);
-        _questTemplate.Aliases["QSource"] = new EditAlias("Источник", Colors.Chocolate);
+        _questTemplate = new SpardTemplateViewModel(Resources.Question, clipboardService);
+        _questTemplate.Aliases["Number"] = new EditAlias(Resources.Number, "#FF87CEEB");
+        _questTemplate.Aliases["QText"] = new EditAlias(Resources.Question, "#FF98FB98");
+        _questTemplate.Aliases["Answer"] = new EditAlias(Resources.Answer, "#FFFFFF00");
+        _questTemplate.Aliases["QAuthor"] = new EditAlias(Resources.Author, "#FFDAA520");
+        _questTemplate.Aliases["QComment"] = new EditAlias(Resources.Comment, "#FF00FFFF");
+        _questTemplate.Aliases["QSource"] = new EditAlias(Resources.Source, "#FFD2691E");
         _questTemplate.Aliases["Some"] = trashAlias;
         Templates.Add(_questTemplate);
 
-        _separatorTemplate = new SpardTemplateViewModel { Name = "Разделитель", NonStandartOnly = true };
+        _separatorTemplate = new SpardTemplateViewModel(Resources.Separator, clipboardService) { NonStandartOnly = true };
         _separatorTemplate.Aliases["Some"] = trashAlias;            
 
-        _answerTemplate = new SpardTemplateViewModel { Name = "Ответ", NonStandartOnly = true };
+        _answerTemplate = new SpardTemplateViewModel(Resources.Answer, clipboardService) { NonStandartOnly = true };
 
         foreach (var item in _questTemplate.Aliases)
         {
@@ -881,7 +883,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
         }
     }
 
-    private void OnHighlightText(int start, int length, Color? color, bool scroll) => HighlightText?.Invoke(start, length, color, scroll);
+    private void OnHighlightText(int start, int length, string? color, bool scroll) => HighlightText?.Invoke(start, length, color, scroll);
 
     private void PrepareUI()
     {

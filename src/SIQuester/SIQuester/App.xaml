@@ -2665,7 +2665,7 @@
                 <ComboBox
                     Style="{StaticResource ComboBoxCommon}"
                     Padding="5,2,2,2"
-                    Width="150"
+                    Width="200"
                     Height="Auto"
                     HorizontalAlignment="Left"
                     SelectedItem="{Binding Model.SimpleValue, Converter={StaticResource SelectionModesConverter}}"

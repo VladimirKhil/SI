@@ -4,6 +4,7 @@ using SIPackages;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -122,6 +123,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     private readonly string[] _args;
     private readonly AppOptions _appOptions;
     private readonly StorageContextViewModel _storageContextViewModel;
+    private readonly IClipboardService _clipboardService;
     private readonly IServiceProvider _serviceProvider;
 
     public AppOptions AppOptions => _appOptions;
@@ -130,10 +132,12 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         string[] args,
         AppOptions appOptions,
         ISIStorageServiceClient siStorageServiceClient,
+        IClipboardService clipboardService,
         IServiceProvider serviceProvider,
         ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
+        _clipboardService = clipboardService;
         _logger = loggerFactory.CreateLogger<MainViewModel>();
         _appOptions = appOptions;
 
@@ -518,7 +522,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 _ => throw new InvalidOperationException($"Incorrect text source: {arg}"),
             };
 
-            var model = new ImportTextViewModel(_storageContextViewModel, _appOptions, _loggerFactory);
+            var model = new ImportTextViewModel(_storageContextViewModel, _appOptions, _clipboardService, _loggerFactory);
             DocList.Add(model);
 
             if (textSource != null)

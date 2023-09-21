@@ -9,9 +9,11 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SIPackages;
 using SIQuester.Model;
+using SIQuester.Services.Host;
 using SIQuester.ViewModel;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Services;
 using SIStorageService.Client;
@@ -160,10 +162,11 @@ public partial class App : Application
             }
 
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
+            var clipboardService = _host.Services.GetRequiredService<IClipboardService>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, _host.Services, loggerFactory);
+            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, clipboardService, _host.Services, loggerFactory);
 
             MainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow.Show();
@@ -194,6 +197,7 @@ public partial class App : Application
         services.AddChgkServiceClient(ctx.Configuration);
         services.AddSingleton(AppSettings.Default);
         services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepository>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddTransient<SIStorage>();
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }

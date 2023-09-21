@@ -1,14 +1,19 @@
 ﻿using SIQuester.Model;
+using SIQuester.ViewModel.Contracts.Host;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Input;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Defines SPARD template editor view model.
+/// </summary>
 public sealed class SpardTemplateViewModel : ModelViewBase
 {
-    public string Name { get; set; }
+    private static string UnicodeDataFormat = "UnicodeText";
+
+    public string Name { get; private set; }
 
     public bool NonStandartOnly { get; set; }
 
@@ -65,12 +70,13 @@ public sealed class SpardTemplateViewModel : ModelViewBase
 
     public ICommand ChangeTemplate { get; private set; }
 
-    public event Action<string> AliasInserted;
+    public event Action<string>? AliasInserted;
 
-    public event Action OptionalInserted;
+    public event Action? OptionalInserted;
 
-    public SpardTemplateViewModel()
+    public SpardTemplateViewModel(string name, IClipboardService clipboardService)
     {
+        Name = name;
         Aliases = new Dictionary<string, EditAlias>();
 
         Cut = new SimpleCommand(
@@ -78,7 +84,7 @@ public sealed class SpardTemplateViewModel : ModelViewBase
             {
                 if (_transform != null)
                 {
-                    Clipboard.SetData(DataFormats.UnicodeText, _transform);
+                    clipboardService.SetData(UnicodeDataFormat, _transform);
                     Transform = "";
                 }
             });
@@ -88,14 +94,14 @@ public sealed class SpardTemplateViewModel : ModelViewBase
             {
                 if (_transform != null)
                 {
-                    Clipboard.SetData(DataFormats.UnicodeText, _transform);
+                    clipboardService.SetData(UnicodeDataFormat, _transform);
                 }
             });
 
         Paste = new SimpleCommand(
             arg =>
             {
-                Transform = (string)Clipboard.GetData(DataFormats.UnicodeText);
+                Transform = (string)clipboardService.GetData(UnicodeDataFormat);
             });
 
         InsertAlias = new SimpleCommand(
