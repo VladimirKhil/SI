@@ -23,9 +23,11 @@ public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
         AuthorInfo authorInfo = null;
 
         var read = true;
+
         while (!read || reader.Read())
         {
             read = true;
+
             switch (reader.NodeType)
             {
                 case System.Xml.XmlNodeType.Element:
@@ -64,6 +66,15 @@ public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
                             authorInfo.City = reader.ReadElementContentAsString();
                             read = false;
                             break;
+                    }
+
+                    break;
+
+                case System.Xml.XmlNodeType.EndElement:
+                    if (reader.LocalName == "Authors")
+                    {
+                        reader.Read();
+                        return;
                     }
 
                     break;

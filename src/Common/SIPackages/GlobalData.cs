@@ -14,12 +14,12 @@ public sealed class GlobalData : IXmlSerializable
     /// <summary>
     /// Global authors.
     /// </summary>
-    public AuthorInfoList? Authors { get; set; }
+    public AuthorInfoList Authors { get; } = new();
 
     /// <summary>
     /// Global sources.
     /// </summary>
-    public SourceInfoList? Sources { get; set; }
+    public SourceInfoList Sources { get; } = new();
 
     /// <inheritdoc />
     public XmlSchema? GetSchema() => null;
@@ -39,13 +39,11 @@ public sealed class GlobalData : IXmlSerializable
                     switch (reader.LocalName)
                     {
                         case "Authors":
-                            Authors = new AuthorInfoList();
                             Authors.ReadXml(reader);
                             read = false;
                             break;
 
                         case "Sources":
-                            Sources = new SourceInfoList();
                             Sources.ReadXml(reader);
                             read = false;
                             break;
@@ -68,7 +66,14 @@ public sealed class GlobalData : IXmlSerializable
     /// <inheritdoc />
     public void WriteXml(XmlWriter writer)
     {
-        Authors?.WriteXml(writer);
-        Sources?.WriteXml(writer);
+        if (Authors.Count > 0)
+        {
+            Authors.WriteXml(writer);
+        }
+
+        if (Sources.Count > 0)
+        {
+            Sources.WriteXml(writer);
+        }
     }
 }

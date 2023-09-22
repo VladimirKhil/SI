@@ -2,7 +2,13 @@
     x:Class="SIQuester.TextsStorageView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:p="clr-namespace:SIPackages;assembly=SIPackages"
+    xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:lvm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance lvm:TextsStorageViewModelBase}"
     FontSize="14">
     <UserControl.Resources>
         <Style x:Key="LightTextBox" TargetType="{x:Type TextBox}">
@@ -32,16 +38,16 @@
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Фамилия" Style="{StaticResource BlockStyleKey}" />
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static lp:Resources.Surname}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Surname}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Имя" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static lp:Resources.Name}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Отчество" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static lp:Resources.SecondName}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SecondName}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Страна" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static lp:Resources.Country}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Country}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Город" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static lp:Resources.City}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding City}" Style="{StaticResource LightTextBox}" />
             </Grid>
         </DataTemplate>
@@ -60,16 +66,16 @@
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
-                
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Автор" Style="{StaticResource BlockStyleKey}" />
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static lp:Resources.Author}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Author}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Название" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static lp:Resources.Title}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Title}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Год" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static lp:Resources.Year}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=Year}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Издательство" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static lp:Resources.PublisherCompany}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=Publish}" Style="{StaticResource LightTextBox}" />
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="Город" Style="{StaticResource BlockStyleKey}" />
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static lp:Resources.City}" Style="{StaticResource BlockStyleKey}" />
                 <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Path=City}" Style="{StaticResource LightTextBox}" />
             </Grid>
         </DataTemplate>

@@ -55,14 +55,14 @@ public sealed class SIDocument : IDisposable
     public Package Package => _package;
 
     /// <summary>
-    /// Коллекция авторов
+    /// Document authors collection.
     /// </summary>
-    public List<AuthorInfo> Authors => _authors;
+    public List<AuthorInfo> Authors => Package.Version >= 5.0 ? Package.Global.Authors : _authors;
 
     /// <summary>
-    /// Коллекция источников
+    /// Document sources collection.
     /// </summary>
-    public List<SourceInfo> Sources => _sources;
+    public List<SourceInfo> Sources => Package.Version >= 5.0 ? Package.Global.Sources : _sources;
 
     /// <summary>
     /// Document images collection.
@@ -313,21 +313,19 @@ public sealed class SIDocument : IDisposable
             }
         }
 
-        foreach (var author in Authors)
+        foreach (var author in _authors)
         {
-            Package.Global ??= new GlobalData();
-            Package.Global.Authors ??= new AuthorInfoList();
-
             Package.Global.Authors.Add(author);
         }
 
-        foreach (var source in Sources)
-        {
-            Package.Global ??= new GlobalData();
-            Package.Global.Sources ??= new SourceInfoList();
+        _authors.Clear();
 
+        foreach (var source in _sources)
+        {
             Package.Global.Sources.Add(source);
         }
+
+        _sources.Clear();
 
         Package.Version = 5;
         return true;
@@ -346,14 +344,16 @@ public sealed class SIDocument : IDisposable
             _package.WriteXml(writer);
         }
 
-        using (var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, AuthorsFileName).Stream)
+        if (_authors.Any())
         {
+            using var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, AuthorsFileName).Stream;
             using var writer = XmlWriter.Create(stream);
             _authors.WriteXml(writer);
         }
 
-        using (var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, SourcesFileName).Stream)
+        if (_sources.Any())
         {
+            using var stream = CreateIfNotExists(packageContainer, CollectionNames.TextsStorageName, SourcesFileName).Stream;
             using var writer = XmlWriter.Create(stream);
             _sources.WriteXml(writer);
         }
@@ -867,7 +867,7 @@ public sealed class SIDocument : IDisposable
     }
 
     /// <summary>
-    /// Copies object authors and sources to the new document.
+    /// Copies object authors and sources to new document.
     /// </summary>
     /// <param name="newDocument">Target document.</param>
     /// <param name="infoOwner">Sorce object.</param>

@@ -276,7 +276,7 @@
     </Window.InputBindings>
     
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="Редактор вопросов SIGame" />
+        <TaskbarItemInfo Description="{x:Static lp:Resources.AppTitle}" />
     </Window.TaskbarItemInfo>
     
     <metro:MetroWindow.IconTemplate>
@@ -363,19 +363,17 @@
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>
             </siq:DropDownButton>
-            
-            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="Сохранить всё (Shift+Ctrl+S)" Command="{Binding SaveAll}">
+
+            <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.SaveAll}" Command="{Binding SaveAll}">
                 <Button.ContentTemplate>
                     <DataTemplate>
-                        <Grid Width="20" Height="20">
-                            
+                        <Grid Width="20" Height="20">                            
                             <Path
                                 Name="p1"
                                 Stretch="Uniform"
                                 Fill="#FF5000C3"
                                 Margin="5"
-                                Data="{Binding Source={StaticResource app_save},Path=Data}">
-                                
+                                Data="{Binding Source={StaticResource app_save},Path=Data}">                                
                                 <Path.RenderTransform>
                                     <TranslateTransform X="-4" Y="4" />
                                 </Path.RenderTransform>
@@ -386,13 +384,11 @@
                                 Stretch="Uniform"
                                 Fill="#FF5000C3"
                                 Margin="5"
-                                Data="{Binding Source={StaticResource app_save},Path=Data}">
-                                
+                                Data="{Binding Source={StaticResource app_save},Path=Data}">                                
                                 <Path.RenderTransform>
                                     <TranslateTransform X="4" Y="-4" />
                                 </Path.RenderTransform>
-                            </Path>
-                            
+                            </Path>                            
                         </Grid>
                         
                         <DataTemplate.Triggers>
@@ -408,10 +404,8 @@
             <Button
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 ToolTip="{x:Static lp:Resources.ToolTipFileSearch}"
-                Command="{Binding SearchFolder}">
-                
-                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_search},Path=Data}" />
-            
+                Command="{Binding SearchFolder}">                
+                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_search},Path=Data}" />            
             </Button>
         </metro:WindowCommands>
     </metro:MetroWindow.LeftWindowCommands>
@@ -423,14 +417,12 @@
                 Width="25"
                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                 ToolTip="{x:Static lp:Resources.Settings}"
-                Command="{Binding SetSettings}">
-                
-                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />
-                
+                Command="{Binding SetSettings}">                
+                <Path Stretch="Uniform" Fill="White" Margin="2" Data="{Binding Source={StaticResource app_cog},Path=Data}" />                
             </Button>
             
             <siq:DropDownButton Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" ToolTip="{x:Static lp:Resources.Help}">
-                <TextBlock Text="?" FontSize="14" FontWeight="Bold" Foreground="White" Width="20" TextAlignment="Center" />
+                <TextBlock Text="?" FontSize="14" FontWeight="Bold" Foreground="White" Width="20" TextAlignment="Center" Margin="0,-2,0,0" />
                 
                 <siq:DropDownButton.DropDown>
                     <ContextMenu>
@@ -452,6 +444,5 @@
         Name="tabControl1" 
         SelectionChanged="TabControl1_SelectionChanged"
         Style="{StaticResource TabControlStyle1}"
-        ItemContainerStyle="{StaticResource TabItemStyle1}" />
-    
+        ItemContainerStyle="{StaticResource TabItemStyle1}" />    
 </metro:MetroWindow>

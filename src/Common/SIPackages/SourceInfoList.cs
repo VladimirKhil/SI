@@ -70,6 +70,15 @@ public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
                     }
 
                     break;
+
+                case System.Xml.XmlNodeType.EndElement:
+                    if (reader.LocalName == "Sources")
+                    {
+                        reader.Read();
+                        return;
+                    }
+
+                    break;
             }
         }
     }

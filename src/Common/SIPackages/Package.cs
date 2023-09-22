@@ -218,7 +218,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// <summary>
     /// Global package data.
     /// </summary>
-    public GlobalData? Global { get; set; }
+    public GlobalData Global { get; set; } = new();
 
     /// <summary>
     /// Package rounds.
@@ -412,7 +412,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
             writer.WriteEndElement();
         }
 
-        if (Global != null)
+        if (Global.Authors.Count > 0 || Global.Sources.Count > 0)
         {
             writer.WriteStartElement("global");
             Global.WriteXml(writer);

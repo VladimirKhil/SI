@@ -251,7 +251,7 @@ public sealed class NewViewModel : WorkspaceViewModel
         }
     }
 
-    private static SIDocument CreateFromCustomTemplate(string filePath)
+    private SIDocument CreateFromCustomTemplate(string filePath)
     {
         FileStream? stream = null;
 
@@ -259,6 +259,10 @@ public sealed class NewViewModel : WorkspaceViewModel
         {
             stream = File.OpenRead(Path.Combine(IPackageTemplatesRepository.TemplateFolder, filePath));
             var document = SIDocument.Load(stream);
+
+            document.Package.Name = _packageName;
+            document.Package.Info.Authors.Clear();
+            document.Package.Info.Authors.Add(_packageAuthor);
 
             return document;
         }

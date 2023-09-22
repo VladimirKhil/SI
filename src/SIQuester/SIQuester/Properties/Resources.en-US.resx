@@ -213,6 +213,9 @@
   <data name="AppRunError" xml:space="preserve">
     <value>Program start error</value>
   </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>SIGame question editor</value>
+  </data>
   <data name="AppWillBeClosed" xml:space="preserve">
     <value>The program will be closed. If this error occurs again, contact the developer</value>
   </data>
@@ -318,6 +321,9 @@
   <data name="CheckFileSize" xml:space="preserve">
     <value>Check that the question file is suitable for playing through the Game server</value>
   </data>
+  <data name="City" xml:space="preserve">
+    <value>City</value>
+  </data>
   <data name="ClearType" xml:space="preserve">
     <value>Remove type</value>
   </data>
@@ -392,6 +398,9 @@
   </data>
   <data name="Copy" xml:space="preserve">
     <value>Copy</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Country</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>Create</value>
@@ -621,6 +630,9 @@
   <data name="MoveUp" xml:space="preserve">
     <value>Move up</value>
   </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
   </data>
@@ -726,6 +738,9 @@
   <data name="Publisher" xml:space="preserve">
     <value>Publisher</value>
   </data>
+  <data name="PublisherCompany" xml:space="preserve">
+    <value>Publisher</value>
+  </data>
   <data name="PublishersAll" xml:space="preserve">
     <value>(all)</value>
   </data>
@@ -810,6 +825,9 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="SaveAll" xml:space="preserve">
+    <value>Save all (Shift+Ctrl+S)</value>
+  </data>
   <data name="SaveAndExport" xml:space="preserve">
     <value>Save and export</value>
   </data>
@@ -833,6 +851,9 @@
   </data>
   <data name="SearchText" xml:space="preserve">
     <value>Search text</value>
+  </data>
+  <data name="SecondName" xml:space="preserve">
+    <value>Second name</value>
   </data>
   <data name="SecretCanBeGivenToSelf" xml:space="preserve">
     <value>Question can be given to yourself</value>
@@ -972,6 +993,9 @@
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Search in subfolders</value>
   </data>
+  <data name="Surname" xml:space="preserve">
+    <value>Surname</value>
+  </data>
   <data name="Table" xml:space="preserve">
     <value>Table</value>
   </data>
@@ -998,6 +1022,9 @@
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Question per theme count</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Title</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>to</value>
@@ -1067,6 +1094,9 @@
   </data>
   <data name="WrongMultimediaAddress" xml:space="preserve">
     <value>Incorrect multimedia address. The program terminated abnormally with an error</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
   </data>
   <data name="Years" xml:space="preserve">
     <value>yrs.</value>

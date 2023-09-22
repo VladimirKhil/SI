@@ -213,6 +213,9 @@
   <data name="AppRunError" xml:space="preserve">
     <value>Ошибка запуска программы</value>
   </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>Редактор вопросов SIGame</value>
+  </data>
   <data name="AppWillBeClosed" xml:space="preserve">
     <value>Программа будет закрыта. При повторном возникновении этой ошибки обратитесь к разработчику</value>
   </data>
@@ -318,6 +321,9 @@
   <data name="CheckFileSize" xml:space="preserve">
     <value>Проверять, что файл вопросов подходит для игры через Игровой сервер</value>
   </data>
+  <data name="City" xml:space="preserve">
+    <value>Город</value>
+  </data>
   <data name="ClearType" xml:space="preserve">
     <value>Удалить тип</value>
   </data>
@@ -392,6 +398,9 @@
   </data>
   <data name="Copy" xml:space="preserve">
     <value>Копировать</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>Страна</value>
   </data>
   <data name="Create" xml:space="preserve">
     <value>Создать</value>
@@ -625,6 +634,9 @@
   <data name="MoveUp" xml:space="preserve">
     <value>Переместить выше</value>
   </data>
+  <data name="Name" xml:space="preserve">
+    <value>Имя</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>
@@ -730,6 +742,9 @@
   <data name="Publisher" xml:space="preserve">
     <value>Издатель</value>
   </data>
+  <data name="PublisherCompany" xml:space="preserve">
+    <value>Издательство</value>
+  </data>
   <data name="PublishersAll" xml:space="preserve">
     <value>(все)</value>
   </data>
@@ -814,6 +829,9 @@
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
   </data>
+  <data name="SaveAll" xml:space="preserve">
+    <value>Сохранить всё (Shift+Ctrl+S)</value>
+  </data>
   <data name="SaveAndExport" xml:space="preserve">
     <value>Сохранение и экспорт</value>
   </data>
@@ -837,6 +855,9 @@
   </data>
   <data name="SearchText" xml:space="preserve">
     <value>Искать текст</value>
+  </data>
+  <data name="SecondName" xml:space="preserve">
+    <value>Отчество</value>
   </data>
   <data name="SecretCanBeGivenToSelf" xml:space="preserve">
     <value>Вопрос можно оставить себе</value>
@@ -976,6 +997,9 @@
   <data name="SubfolderSearch" xml:space="preserve">
     <value>Искать в подпапках</value>
   </data>
+  <data name="Surname" xml:space="preserve">
+    <value>Фамилия</value>
+  </data>
   <data name="Table" xml:space="preserve">
     <value>Таблица</value>
   </data>
@@ -1002,6 +1026,9 @@
   </data>
   <data name="ThemeQuestionCount" xml:space="preserve">
     <value>Число вопросов в теме</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Название</value>
   </data>
   <data name="To" xml:space="preserve">
     <value>до</value>
@@ -1071,6 +1098,9 @@
   </data>
   <data name="WrongMultimediaAddress" xml:space="preserve">
     <value>Некорректный адрес мультимедиа. Программа аварийно завершена с ошибкой</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Год</value>
   </data>
   <data name="Years" xml:space="preserve">
     <value>гг.</value>
