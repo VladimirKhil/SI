@@ -15,11 +15,11 @@ internal sealed class TestGameHost : IExtendedListener
     public ICommand PreviousRound { get => throw new NotImplementedException(); set { } }
     public ICommand Stop { get => throw new NotImplementedException(); set { } }
 
-    public event Action<int> ThemeDeleted { add { } remove { } }
     public event Action MediaStart { add { } remove { } }
     public event Action MediaEnd { add { } remove { } }
     public event Action<double> MediaProgress { add { } remove { } }
     public event Action RoundThemesFinished { add { } remove { } }
+    public event Action<int>? AnswerSelected;
 
     public TestGameHost(EngineBase engine)
     {
@@ -87,6 +87,11 @@ internal sealed class TestGameHost : IExtendedListener
     }
 
     public void OnThemeSelected(int themeIndex)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OnAnswerSelected(int answerIndex)
     {
         throw new NotImplementedException();
     }

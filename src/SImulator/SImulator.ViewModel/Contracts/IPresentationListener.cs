@@ -7,6 +7,8 @@ public interface IPresentationListener
 {
     void OnQuestionSelected(int theme, int question);
 
+    void OnAnswerSelected(int answerIndex);
+
     void OnThemeSelected(int themeIndex);
 
     void AskNext();

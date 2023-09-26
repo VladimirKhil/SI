@@ -10,6 +10,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     private GameData? GameData => GameLogic?.ClientData;
 
+    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+
     public bool OnAccept()
     {
         GameLogic?.AcceptQuestion();
@@ -261,5 +263,10 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
 
         GameData.IsAnswerSimple = true;
+    }
+
+    public void OnRightAnswerOption(string rightOptionLabel)
+    {
+        
     }
 }

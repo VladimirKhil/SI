@@ -419,8 +419,16 @@ public sealed class SIDocument : IDisposable
         if (isNew)
         {
             newContainer.CreateStream(ContentFileName, "si/xml");
-            newContainer.CreateStream(CollectionNames.TextsStorageName, AuthorsFileName, "si/xml");
-            newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName, "si/xml");
+
+            if (_authors.Any())
+            {
+                newContainer.CreateStream(CollectionNames.TextsStorageName, AuthorsFileName, "si/xml");
+            }
+
+            if (_sources.Any())
+            {
+                newContainer.CreateStream(CollectionNames.TextsStorageName, SourcesFileName, "si/xml");
+            }
         }
         
         if (switchTo)

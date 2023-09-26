@@ -16,6 +16,8 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
         throw new NotImplementedException();
     }
 
+    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+
     public void OnAskAnswer(string mode)
     {
         
@@ -63,6 +65,11 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     public void OnSimpleRightAnswerStart()
     {
-        
+
+    }
+
+    public void OnRightAnswerOption(string rightOptionLabel)
+    {
+
     }
 }

@@ -1,11 +1,14 @@
-﻿using SImulator.ViewModel.Contracts;
+﻿using SIEngine.Core;
+using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
+using SIPackages;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
@@ -75,6 +78,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         TInfo.PropertyChanged += TInfo_PropertyChanged;
         TInfo.QuestionSelected += QuestionInfo_Selected;
         TInfo.ThemeSelected += ThemeInfo_Selected;
+        TInfo.AnswerSelected += TInfo_AnswerSelected;
 
         TInfo.MediaStart += () =>
         {
@@ -110,6 +114,21 @@ public sealed class PresentationController : IPresentationController, INotifyPro
                 UI.Execute(() => _listener.AskStop(), exc => Error?.Invoke(exc));
             }
         });
+    }
+
+    private void TInfo_AnswerSelected(ItemViewModel answer)
+    {
+        int answerIndex;
+
+        for (answerIndex = 0; answerIndex < TInfo.AnswerOptions.Options.Length; answerIndex++)
+        {
+            if (TInfo.AnswerOptions.Options[answerIndex] == answer)
+            {
+                break;
+            }
+        }
+
+        Listener?.OnAnswerSelected(answerIndex);
     }
 
     private void TInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -199,6 +218,11 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             _stageCallbackBlock = false;
             _previousCode = -1;
             TInfo.QuestionStyle = QuestionStyle.Normal;
+        }
+
+        if (stage == TableStage.Question)
+        {
+            TInfo.LayoutMode = LayoutMode.Simple;
         }
     }
 
@@ -498,6 +522,51 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+    public void SetAnswerOptions(ItemViewModel[] answerOptions)
+    {
+        TInfo.LayoutMode = LayoutMode.AnswerOptions;
+        TInfo.AnswerOptions.Options = answerOptions;
+    }
+
+    public async void ShowAnswerOptions()
+    {
+        try
+        {
+            for (var i = 0; i < TInfo.AnswerOptions.Options.Length; i++)
+            {
+                TInfo.AnswerOptions.Options[i].IsVisible = true;
+                await Task.Delay(1000);
+            }
+        }
+        catch (Exception exc)
+        {
+            Trace.TraceError("ShowAnswerOptions error: " + exc.Message);
+        }
+    }
+
+    public void SetAnswerState(int answerIndex, ItemState state)
+    {
+        var answerOptions = TInfo.AnswerOptions.Options;
+
+        if (answerIndex < 0 || answerIndex >= answerOptions.Length)
+        {
+            return;
+        }
+
+        if (state == ItemState.Active || state == ItemState.Right)
+        {
+            for (var i = 0; i < answerOptions.Length; i++)
+            {
+                if (i != answerIndex && answerOptions[i].State == ItemState.Active)
+                {
+                    answerOptions[i].State = ItemState.Normal;
+                }
+            }
+        }
+
+        answerOptions[answerIndex].State = state;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

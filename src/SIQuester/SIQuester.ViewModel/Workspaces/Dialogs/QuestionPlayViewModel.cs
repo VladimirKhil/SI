@@ -249,4 +249,11 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     }
 
     public bool OnAnnouncePrice(NumberSet? availableRange) => false;
+
+    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+
+    public void OnRightAnswerOption(string rightOptionLabel)
+    {
+        
+    }
 }

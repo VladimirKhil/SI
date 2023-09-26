@@ -129,6 +129,9 @@
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
   </data>
+  <data name="AnswerOptions" xml:space="preserve">
+    <value>Варианты ответа</value>
+  </data>
   <data name="Audio" xml:space="preserve">
     <value>Аудио</value>
   </data>

@@ -97,6 +97,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Варианты ответа.
+        /// </summary>
+        public static string AnswerOptions {
+            get {
+                return ResourceManager.GetString("AnswerOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Аудио.
         /// </summary>
         public static string Audio {

@@ -149,15 +149,15 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     public TableInfoViewModel LocalInfo { get; set; }
 
-    private bool _showingRoundThemes = false;
+    private Func<bool>? _continuation = null;
 
-    private bool ShowingRoundThemes
+    public Func<bool>? Continuation
     {
         set
         {
-            if (_showingRoundThemes != value)
+            if (_continuation != value)
             {
-                _showingRoundThemes = value;
+                _continuation = value;
                 UpdateNextCommand();
             }
         }
@@ -333,6 +333,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly IExtendedListener _presentationListener;
 
+    private int _selectedAnswerIndex = -1;
+
     #endregion
 
     public GameViewModel(
@@ -359,6 +361,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
         LocalInfo.ThemeSelected += ThemeInfo_Selected;
+        LocalInfo.AnswerSelected += LocalInfo_AnswerSelected;
 
         _presentationListener.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
         _presentationListener.Back = _back = new SimpleCommand(Back_Executed) { CanBeExecuted = false };
@@ -420,6 +423,81 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationListener.MediaProgress += GameHost_MediaProgress;
         _presentationListener.MediaEnd += GameHost_MediaEnd;
         _presentationListener.RoundThemesFinished += GameHost_RoundThemesFinished;
+        _presentationListener.AnswerSelected += PresentationListener_AnswerSelected;
+    }
+
+    private void LocalInfo_AnswerSelected(ItemViewModel answer)
+    {
+        if (answer.State != ItemState.Normal)
+        {
+            if (answer.State == ItemState.Active)
+            {
+                answer.State = ItemState.Normal;
+                PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Normal);
+                _selectedAnswerIndex = -1;
+            }
+
+            return;
+        }
+
+        answer.State = ItemState.Active;
+
+        var answerOptions = LocalInfo.AnswerOptions.Options;
+        _selectedAnswerIndex = -1;
+
+        for (var answerIndex = 0; answerIndex < answerOptions.Length; answerIndex++)
+        {
+            if (answerOptions[answerIndex] == answer)
+            {
+                _selectedAnswerIndex = answerIndex;
+            }
+            else if (answerOptions[answerIndex].State == ItemState.Active)
+            {
+                answerOptions[answerIndex].State = ItemState.Normal;
+            }
+        }
+
+        if (_selectedAnswerIndex == -1)
+        {
+            return;
+        }
+
+        PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Active);
+    }
+
+    private void PresentationListener_AnswerSelected(int answerIndex)
+    {
+        var answerOptions = LocalInfo.AnswerOptions.Options;
+
+        if (answerIndex < 0 || answerIndex >= answerOptions.Length)
+        {
+            return;
+        }
+
+        if (answerOptions[answerIndex].State != ItemState.Normal)
+        {
+            if (answerOptions[answerIndex].State == ItemState.Active)
+            {
+                answerOptions[answerIndex].State = ItemState.Normal;
+                PresentationController.SetAnswerState(answerIndex, ItemState.Normal);
+                _selectedAnswerIndex = -1;
+            }
+
+            return;
+        }
+
+        _selectedAnswerIndex = answerIndex;
+
+        for (var i = 0; i < answerOptions.Length; i++)
+        {
+            if (i != answerIndex && answerOptions[i].State == ItemState.Active)
+            {
+                answerOptions[i].State = ItemState.Normal;
+            }
+        }
+
+        answerOptions[answerIndex].State = ItemState.Active;
+        PresentationController.SetAnswerState(answerIndex, ItemState.Active);
     }
 
     private void Engine_QuestionFinish() => ClearState();
@@ -448,8 +526,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void GameHost_RoundThemesFinished()
     {
-        ShowingRoundThemes = false;
-        PresentationController.SetStage(TableStage.RoundTable);
+        if (_continuation == null)
+        {
+            return;
+        }
+
+        _continuation();
+        _continuation = null;
     }
 
     private void GameHost_MediaEnd()
@@ -581,7 +664,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void QuestionInfo_Selected(QuestionInfoViewModel question)
     {
-        if (!((TvEngine)_engine).CanSelectQuestion || _showingRoundThemes)
+        if (!((TvEngine)_engine).CanSelectQuestion || _continuation != null)
         {
             return;
         }
@@ -621,7 +704,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
         _engine.MoveNextRound();
-        _showingRoundThemes = false;
+        Continuation = null;
     }
 
     private void PreviousRound_Executed(object? arg)
@@ -794,6 +877,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.SetSound(Settings.Model.Sounds.AnswerWrong);
 
+        if (LocalInfo.LayoutMode == LayoutMode.AnswerOptions && _selectedAnswerIndex > -1)
+        {
+            if (_selectedAnswerIndex < LocalInfo.AnswerOptions.Options.Length)
+            {
+                LocalInfo.AnswerOptions.Options[_selectedAnswerIndex].State = ItemState.Wrong;
+            }
+
+            PresentationController.SetAnswerState(_selectedAnswerIndex, ItemState.Wrong);
+        }
+
         _logger.Write("{0} -{1}", player.Name, substract);
 
         _answeringHistory.Push(Tuple.Create(player, Price, false));
@@ -814,8 +907,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         PresentationController.Start();
-
-        ShowingRoundThemes = false;
 
         _buttonManager = PlatformManager.Instance.ButtonManagerFactory.Create(Settings.Model, this);
 
@@ -897,10 +988,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         try
         {
-            if (_showingRoundThemes)
+            if (_continuation != null)
             {
-                PresentationController.SetStage(TableStage.RoundTable);
-                ShowingRoundThemes = false;
+                _continuation();
+                _continuation = null;
                 return;
             }
 
@@ -1075,8 +1166,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
         PresentationController.SetSound(Settings.Model.Sounds.RoundThemes);
-        ShowingRoundThemes = true;
         LocalInfo.TStage = TableStage.RoundTable;
+        Continuation = AfterRoundThemes;
+    }
+
+    private bool AfterRoundThemes()
+    {
+        PresentationController.SetStage(TableStage.RoundTable);
+        return true;
     }
 
     public void StartQuestionTimer()
@@ -1186,6 +1283,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         Price = 0;
 
         _playingQuestionType = false;
+        _selectedAnswerIndex = -1;
+        LocalInfo.LayoutMode = LayoutMode.Simple;
+        LocalInfo.AnswerOptions.Options = Array.Empty<ItemViewModel>();
     }
 
     private void Engine_FinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay)
@@ -1281,10 +1381,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetSound(Settings.Model.Sounds.FinalDelete);
     }
 
-    private void UpdateNextCommand()
-    {
-        _next.CanBeExecuted = _engine != null && _engine.CanMoveNext || _showingRoundThemes;
-    }
+    private void UpdateNextCommand() => _next.CanBeExecuted = _continuation != null || _engine != null && _engine.CanMoveNext;
 
     private void Engine_ShowScore()
     {

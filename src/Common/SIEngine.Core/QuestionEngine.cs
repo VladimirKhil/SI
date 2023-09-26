@@ -19,6 +19,8 @@ public sealed class QuestionEngine
     private int? _askAnswerStartIndex = null;
     private bool _isAskingAnswer = false;
 
+    private bool _isAnswerTypeSelect = false;
+
     private readonly Script? _script;
 
     public bool CanNext => _script != null && _stepIndex < _script.Steps.Count;
@@ -171,9 +173,52 @@ public sealed class QuestionEngine
                     break;
 
                 case StepTypes.SetAnswerType:
-                    // TODO: implement SetAnswerType step
+                    var answerType = TryGetParameter(step, StepParameterNames.Type)?.SimpleValue;
+
+                    if (answerType != StepParameterValues.SetAnswerTypeType_Select) // Only "select" type is currently supported
+                    {
+                        _stepIndex++;
+                        continue;
+                    }
+
+                    var answerOptionsValue = TryGetParameter(step, StepParameterNames.Options)?.GroupValue;
+
+                    if (answerOptionsValue == null)
+                    {
+                        _stepIndex++;
+                        continue;
+                    }
+
+                    var answerOptions = new List<AnswerOption>();
+
+                    foreach (var (label, value) in answerOptionsValue)
+                    {
+                        if (value == null || value.ContentValue == null || !value.ContentValue.Any())
+                        {
+                            continue;
+                        }
+
+                        var contentValue = value.ContentValue[0]; // only first item is used
+                        answerOptions.Add(new AnswerOption(label, contentValue));
+                    }
+
+                    if (answerOptions.Count < 2) // At least 2 options are required
+                    {
+                        _stepIndex++;
+                        continue;
+                    }
+
+                    _isAnswerTypeSelect = true;
+                    var setAnswerOptions = _playHandler.OnAnswerOptions(answerOptions.ToArray());
                     _stepIndex++;
-                    continue;
+                    
+                    if (setAnswerOptions)
+                    {
+                        return true;
+                    }
+
+                    break;
+
                 // Preambula part end
 
                 case StepTypes.ShowContent:
@@ -207,6 +252,15 @@ public sealed class QuestionEngine
                             {
                                 if (fallbackRefId == StepParameterValues.FallbackStepIdRef_Right)
                                 {
+                                    var rightAnswer = _question.Right.FirstOrDefault() ?? "";
+
+                                    if (_isAnswerTypeSelect && rightAnswer.Length > 0)
+                                    {
+                                        _playHandler.OnRightAnswerOption(rightAnswer);
+                                        _stepIndex++;
+                                        return true;
+                                    }
+
                                     if (!_options.ShowSimpleRightAnswers)
                                     {
                                         _stepIndex++;
@@ -221,7 +275,7 @@ public sealed class QuestionEngine
                                             {
                                                 Placement = ContentPlacements.Screen,
                                                 Type = AtomTypes.Text,
-                                                Value = _question.Right.FirstOrDefault() ?? ""
+                                                Value = rightAnswer
                                             }
                                         }
                                     };

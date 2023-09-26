@@ -9,6 +9,12 @@ namespace SIEngine.Core;
 public interface IQuestionEnginePlayHandler
 {
     /// <summary>
+    /// Sets answer options.
+    /// </summary>
+    /// <param name="answerOptions">Answer options.</param>
+    bool OnAnswerOptions(AnswerOption[] answerOptions);
+
+    /// <summary>
     /// Shows question content.
     /// </summary>
     /// <param name="content">Question content to display.</param>
@@ -74,6 +80,12 @@ public interface IQuestionEnginePlayHandler
     /// Handles simple right answer start.
     /// </summary>
     void OnSimpleRightAnswerStart();
+
+    /// <summary>
+    /// Handles right answer option for select answer type.
+    /// </summary>
+    /// <param name="rightOptionLabel">Right option label.</param>
+    void OnRightAnswerOption(string rightOptionLabel);
 
     /// <summary>
     /// Handles the ending of asking for an answer.

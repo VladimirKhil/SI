@@ -55,6 +55,8 @@
 
             <my:KeyConverter x:Key="KeyConverter" />
 
+            <my:StateConverter x:Key="StateConverter" />
+
             <my:MappedConverter x:Key="QuestionTypeConverter">
                 <my:MappedConverter.Map>
                     <my:StringDictionary>
@@ -242,6 +244,24 @@
                 </Style.Triggers>
             </Style>
 
+            <uic:TemplateConverter x:Key="ContentSelector">
+                <uic:TemplateConverter.DefaultTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Content.Value}" />
+                    </DataTemplate>
+                </uic:TemplateConverter.DefaultTemplate>
+
+                <uic:TemplateConverter.Templates>
+                    <DataTemplate x:Key="{x:Static uim:ContentType.Image}">
+                        <Image
+                            Stretch="Uniform"
+                            Source="{Binding Content.Value}"
+                            Width="100"
+                            Height="100" />
+                    </DataTemplate>
+                </uic:TemplateConverter.Templates>
+            </uic:TemplateConverter>
+
             <ControlTemplate x:Key="QuestGrid" TargetType="{x:Type ContentControl}">
                 <ScrollViewer
                     HorizontalScrollBarVisibility="Disabled"
@@ -249,6 +269,7 @@
                     d:DataContext="{d:DesignInstance vm:GameViewModel}">
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -277,23 +298,6 @@
 
                         <TextBlock Grid.Row="1" Text="{x:Static lp:Resources.Question}" Foreground="DarkGray" />
 
-                        <StackPanel
-                            Visibility="{Binding ActiveMediaCommand, Converter={StaticResource NotNull}}"
-                            IsEnabled="{Binding IsMediaControlled}"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            Margin="0,10,0,0"
-                            Grid.Row="2"
-                            Grid.ColumnSpan="2">
-
-                            <Button Style="{StaticResource TimeButton}" Margin="5,0,0,0" Height="20" DataContext="{Binding ActiveMediaCommand}" />
-                            <Slider Width="300" Margin="10,0,0,0" Value="{Binding MediaProgress}" IsMoveToPointEnabled="True" Maximum="100" />
-                        </StackPanel>
-
-                        <TextBlock Grid.Row="4" Text="{x:Static lp:Resources.Answer}" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Source}" Foreground="DarkGray" />
-                        <TextBlock Grid.Row="6" Text="{x:Static lp:Resources.Comment}" Foreground="DarkGray" />
-
                         <ListBox
                             Grid.Row="1"
                             Grid.Column="1"
@@ -308,7 +312,7 @@
                                     <StackPanel />
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
-                            
+
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock x:Name="text" Grid.Column="1" TextWrapping="Wrap">
@@ -318,23 +322,87 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
+                        <StackPanel
+                            Visibility="{Binding ActiveMediaCommand, Converter={StaticResource NotNull}}"
+                            IsEnabled="{Binding IsMediaControlled}"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,0"
+                            Grid.Row="2"
+                            Grid.ColumnSpan="2">
+                            <Button Style="{StaticResource TimeButton}" Margin="5,0,0,0" Height="20" DataContext="{Binding ActiveMediaCommand}" />
+                            <Slider Width="300" Margin="10,0,0,0" Value="{Binding MediaProgress}" IsMoveToPointEnabled="True" Maximum="100" />
+                        </StackPanel>
+
                         <TextBlock
-                            Grid.Row="4"
+                            x:Name="answerOptionsHeader"
+                            Grid.Row="3"
+                            Visibility="Collapsed"
+                            Text="{x:Static lp:Resources.AnswerOptions}"
+                            Foreground="DarkGray" />
+
+                        <ItemsControl
+                            x:Name="answerOptions"
+                            Grid.Column="1"
+                            Grid.Row="3"
+                            Visibility="Collapsed"
+                            Margin="2"
+                            ItemsSource="{Binding LocalInfo.AnswerOptions.Options}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="uim:ItemViewModel">
+                                    <Button
+                                        Style="{StaticResource FlatButton}"
+                                        Command="{Binding DataContext.LocalInfo.SelectAnswer, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding}"
+                                        Margin="-1,-1,0,0"
+                                        Padding="10,2"
+                                        Background="{Binding State, Converter={StaticResource StateConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontWeight="SemiBold" Text="{Binding Label}" VerticalAlignment="Center" Margin="0,0,5,0" />
+
+                                            <ContentControl
+                                                Content="{Binding}"
+                                                ContentTemplate="{Binding Content.Type, Converter={StaticResource ContentSelector}}" />
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Grid.Row="5" Text="{x:Static lp:Resources.Answer}" Foreground="DarkGray" />
+                        <TextBlock Grid.Row="6" Text="{x:Static lp:Resources.Source}" Foreground="DarkGray" />
+                        <TextBlock Grid.Row="7" Text="{x:Static lp:Resources.Comment}" Foreground="DarkGray" />
+
+                        <TextBlock
+                            Grid.Row="5"
                             Grid.Column="1"
                             Text="{Binding ActiveQuestion.Right, Converter={StaticResource CollectionsConverter}}"
                             TextWrapping="Wrap" />
 
                         <TextBlock
-                            Grid.Row="5"
+                            Grid.Row="6"
                             Grid.Column="1"
                             Text="{Binding ActiveQuestion.Info.Sources, Converter={StaticResource CollectionsConverter}}"
                             TextWrapping="Wrap" />
 
-                        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding ActiveQuestion.Info.Comments.Text}" TextWrapping="Wrap" />
+                        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding ActiveQuestion.Info.Comments.Text}" TextWrapping="Wrap" />
                     </Grid>
                 </ScrollViewer>
-            </ControlTemplate>
 
+                <ControlTemplate.Triggers>
+                    <DataTrigger Binding="{Binding LocalInfo.LayoutMode}" Value="{x:Static uim:LayoutMode.AnswerOptions}">
+                        <Setter TargetName="answerOptionsHeader" Property="Visibility" Value="Visible" />
+                        <Setter TargetName="answerOptions" Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+            
             <uic:TemplateConverter x:Key="Selector">
                 <uic:TemplateConverter.DefaultTemplate>
                     <DataTemplate>

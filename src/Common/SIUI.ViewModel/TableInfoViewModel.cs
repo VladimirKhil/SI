@@ -260,15 +260,31 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     public SimpleCommand ToggleQuestion { get; private set; }
 
+    /// <summary>
+    /// Selects question answer.
+    /// </summary>
+    public SimpleCommand SelectAnswer { get; private set; }
+
     public event Action<QuestionInfoViewModel>? QuestionSelected;
     public event Action<ThemeInfoViewModel>? ThemeSelected;
     public event Action<QuestionInfoViewModel>? QuestionToggled;
+    public event Action<ItemViewModel>? AnswerSelected;
 
     public void SelectQuestion_Executed(object? arg) => QuestionSelected?.Invoke((QuestionInfoViewModel)arg);
 
     public void SelectTheme_Executed(object? arg) => ThemeSelected?.Invoke((ThemeInfoViewModel)arg);
 
     public void ToggleQuestion_Executed(object? arg) => QuestionToggled?.Invoke((QuestionInfoViewModel)arg);
+
+    public void SelectAnswer_Executed(object? arg)
+    {
+        if (arg is not ItemViewModel itemViewModel)
+        {
+            return;
+        }
+
+        AnswerSelected?.Invoke(itemViewModel);
+    }
 
     private IReadOnlyCollection<ContentViewModel>? _content;
 
@@ -389,6 +405,29 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     public bool PartialText { get => _partialText; set { _partialText = value; OnPropertyChanged(); } }
 
+    private LayoutMode _layoutMode = LayoutMode.Simple;
+
+    /// <summary>
+    /// Table layout mode.
+    /// </summary>
+    public LayoutMode LayoutMode
+    {
+        get => _layoutMode;
+        set
+        {
+            if (_layoutMode != value)
+            {
+                _layoutMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Answer options.
+    /// </summary>
+    public AnswerOptionsViewModel AnswerOptions { get; } = new();
+
     public TableInfoViewModel()
     {
         _settings = new SettingsViewModel();
@@ -418,6 +457,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         SelectQuestion = new SimpleCommand(SelectQuestion_Executed);
         SelectTheme = new SimpleCommand(SelectTheme_Executed);
         ToggleQuestion = new SimpleCommand(ToggleQuestion_Executed);
+        SelectAnswer = new SimpleCommand(SelectAnswer_Executed);
     }
 
     public void PlaySelection(int themeIndex)

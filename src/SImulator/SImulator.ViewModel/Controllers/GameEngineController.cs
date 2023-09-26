@@ -23,7 +23,57 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
 
     private readonly SIDocument _document;
 
+    private bool? _optionsShown = null;
+
     public GameEngineController(SIDocument document) => _document = document;
+
+    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    {
+        var options = new List<ItemViewModel>();
+
+        foreach (var (label, content) in answerOptions)
+        {
+            switch (content.Type)
+            {
+                case AtomTypes.Text:
+                    options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Text, content.Value) });
+                    break;
+
+                case AtomTypes.Image:
+                    var imageUri = TryGetMediaUri(content);
+
+                    if (imageUri != null)
+                    {
+                        options.Add(new ItemViewModel
+                        {
+                            Label = label, 
+                            Content = new ContentViewModel(ContentType.Image, imageUri, ImageVideoWeight)
+                        });
+                    }
+                    else
+                    {
+                        options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "", ImageVideoWeight) });
+                    }
+                    break;
+
+                default:
+                    options.Add(new ItemViewModel { Label = label, Content = new ContentViewModel(ContentType.Void, "") });
+                    break;
+            }
+        }
+
+        var optionsArray = options.ToArray();
+
+        if (GameViewModel != null)
+        {
+            GameViewModel.LocalInfo.LayoutMode = LayoutMode.AnswerOptions;
+            GameViewModel.LocalInfo.AnswerOptions.Options = optionsArray;
+            _optionsShown = false;
+        }
+
+        PresentationController.SetAnswerOptions(optionsArray);
+        return false;
+    }
 
     public bool OnAccept() => false;
 
@@ -31,6 +81,19 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
     {
         if (GameViewModel == null)
         {
+            return;
+        }
+
+        if (_optionsShown.HasValue && !_optionsShown.Value)
+        {
+            GameViewModel.Continuation = () =>
+            {
+                OnAskAnswer(mode);
+                return true;
+            };
+
+            PresentationController.ShowAnswerOptions();
+            _optionsShown = true;
             return;
         }
 
@@ -97,7 +160,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                             else
                             {
                                 screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
-                            }                            
+                            }
                             break;
 
                         case AtomTypes.Video:
@@ -239,6 +302,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         {
             GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
         }
+
+        _optionsShown = null;
     }
 
     public void OnAskAnswerStop()
@@ -275,6 +340,34 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         PresentationController.SetStage(TableStage.Answer);
         PresentationController.SetSound();
         GameViewModel.OnRightAnswer();
+    }
+
+    public void OnRightAnswerOption(string rightOptionLabel)
+    {
+        if (GameViewModel == null)
+        {
+            return;
+        }
+
+        PresentationController.SetQuestionSound(false);
+        PresentationController.SetSound();
+        GameViewModel.OnRightAnswer();
+
+        var answerOptions = GameViewModel.LocalInfo.AnswerOptions.Options;
+
+        for (var answerIndex = 0; answerIndex < answerOptions.Length; answerIndex++)
+        {
+            if (answerOptions[answerIndex].Label == rightOptionLabel)
+            {
+                answerOptions[answerIndex].State = ItemState.Right;
+                PresentationController.SetAnswerState(answerIndex, ItemState.Right);
+                break;
+            }
+            else if (answerOptions[answerIndex].State == ItemState.Active)
+            {
+                answerOptions[answerIndex].State = ItemState.Normal;
+            }
+        }
     }
 
     public bool ShouldPlayRound(QuestionSelectionStrategyType questionSelectionStrategyType) => true;

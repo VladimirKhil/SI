@@ -26,4 +26,6 @@ public interface IExtendedListener : IPresentationListener
     event Action<double> MediaProgress;
 
     event Action RoundThemesFinished;
+
+    event Action<int>? AnswerSelected;
 }

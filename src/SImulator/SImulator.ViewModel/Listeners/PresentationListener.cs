@@ -21,8 +21,6 @@ public sealed class PresentationListener : IExtendedListener
 
     public ICommand Stop { get; set; }
 
-    public event Action<int>? ThemeDeleted;
-
     public event Action? MediaStart;
 
     public event Action? MediaEnd;
@@ -31,15 +29,19 @@ public sealed class PresentationListener : IExtendedListener
 
     public event Action? RoundThemesFinished;
 
+    public event Action<int>? AnswerSelected;
+
     public PresentationListener(ISIEngine engine) => _engine = engine;
 
     public void OnQuestionSelected(int theme, int question) => _engine.SelectQuestion(theme, question);
 
     public void OnThemeSelected(int themeIndex)
     {
-        ((TvEngine)_engine).SelectTheme(themeIndex);
-        ((TvEngine)_engine).OnReady(out _);
+        _engine.SelectTheme(themeIndex);
+        _engine.OnReady(out _);
     }
+
+    public void OnAnswerSelected(int answerIndex) => AnswerSelected?.Invoke(answerIndex);
 
     private readonly object _moveLock = new();
 

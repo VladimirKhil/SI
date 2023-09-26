@@ -78,4 +78,22 @@ public interface IPresentationController
     void SetCaption(string caption);
 
     void SetLeftTime(double leftTime);
+
+    /// <summary>
+    /// Sets answer options (invisible by default) and corresponding table layout.
+    /// </summary>
+    /// <param name="answerOptions">Answer options.</param>
+    void SetAnswerOptions(ItemViewModel[] answerOptions);
+
+    /// <summary>
+    /// Makes answer options visible on screen.
+    /// </summary>
+    void ShowAnswerOptions();
+
+    /// <summary>
+    /// Sets answer state.
+    /// </summary>
+    /// <param name="answerIndex">Answer index.</param>
+    /// <param name="state">Answer state.</param>
+    void SetAnswerState(int answerIndex, ItemState state);
 }

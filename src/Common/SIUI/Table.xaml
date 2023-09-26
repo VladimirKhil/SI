@@ -24,6 +24,10 @@
                 <ResourceDictionary Source="Themes\generic.xaml" />
                 
                 <ResourceDictionary>
+                    <Color x:Key="HighlightColor">Cyan</Color>
+
+                    <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
+
                     <localc:HeightToThicknessConverter x:Key="HeightToThickness" />
                     <localc:RoundTabloConverter x:Key="RTConverter" />
                     <localc:UriToImageSourceConverter x:Key="UriConverter" />
@@ -33,7 +37,10 @@
                     <localc:PressedBottomRowHeightConverter x:Key="PressedBottomRowHeightConverter"/>
                     <localc:PressedTopRowHeightConverter x:Key="PressedTopRowHeightConverter"/>
                     <localc:NotNullOrEmptyConverter x:Key="NotNullOrEmptyConverter" />
-                    
+                    <localc:StateConverter x:Key="StateConverter" />
+
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
                     <localc:QuestionPriceEditorConverter x:Key="QuestionPriceEditorConverter">
                         <localc:QuestionPriceEditorConverter.RemoveColor>
                             <RadialGradientBrush RadiusX="1" RadiusY="1">
@@ -121,6 +128,60 @@
                         <TextBlock Style="{StaticResource SIThemeText}" />
                     </DataTemplate>
 
+                    <Style x:Key="QuestionText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
+                        <Setter Property="lb:FillManager.Fill" Value="True" />
+
+                        <Setter
+                            Property="lb:FillManager.Interlinyage"
+                            Value="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}" />
+
+                        <Setter
+                            Property="lb:FillManager.MaxFontSize"
+                            Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}" />
+
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="Margin" Value="10" />
+                    </Style>
+
+                    <localc:TemplateConverter x:Key="AnswerContentSelector">
+                        <localc:TemplateConverter.Templates>
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Void}" />
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Text}">
+                                <TextBlock
+                                    Text="{Binding Value}"
+                                    Style="{StaticResource QuestionText}"
+                                    lb:FillManager.Interlinyage="0.0"
+                                    Margin="0" />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="{x:Static vm:ContentType.Image}">
+                                <Image
+                                    Stretch="Uniform"
+                                    Source="{Binding Value, Converter={StaticResource UriConverter}}"
+                                    lb:ImageController.LoadHandler="{Binding DataContext, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            </DataTemplate>
+                        </localc:TemplateConverter.Templates>
+                    </localc:TemplateConverter>
+
+                    <DataTemplate x:Key="SIAnswerTemplate" DataType="{x:Type vm:ItemViewModel}">
+                        <DockPanel>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="20,20,10,20"
+                                FontSize="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=30}"
+                                Foreground="{StaticResource HighlightBrush}"
+                                Text="{Binding Label}" />
+
+                            <ContentControl
+                                Margin="10"
+                                Visibility="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Content="{Binding Content}"
+                                ContentTemplate="{Binding Content.Type, Converter={StaticResource AnswerContentSelector}}" />
+                        </DockPanel>
+                    </DataTemplate>
+
                     <Style x:Key="SIItemButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIButtonBase}">
                         <Setter Property="Content" Value="{Binding}" />
                         <Setter Property="Background" Value="{StaticResource TransparentSIButtonBackground}" />
@@ -197,6 +258,26 @@
                         </Style.Triggers>
                     </Style>
 
+                    <Style x:Key="SIAnswerButton" TargetType="{x:Type Button}" BasedOn="{StaticResource SIItemButton}">
+                        <Setter Property="Margin" Value="0,0,0,-1" />
+                        <Setter Property="BorderThickness" Value="1,0,0,1" />
+                        <Setter Property="ContentTemplate" Value="{StaticResource SIAnswerTemplate}" />
+                        <Setter Property="Background" Value="{Binding State, Converter={StaticResource StateConverter}}" />
+
+                        <Setter
+                            Property="Command"
+                            Value="{Binding DataContext.SelectAnswer, RelativeSource={RelativeSource AncestorType=ContentControl}}" />
+
+                        <Setter Property="CommandParameter" Value="{Binding}" />
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}" Value="{x:Static vm:ItemState.Active}">
+                                <Setter Property="Foreground" Value="DarkBlue" />
+                                <Setter Property="BorderBrush" Value="LightYellow" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
                     <Style x:Key="SIThemeExtended" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource SIThemeText}">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Empty}" Value="True">
@@ -230,21 +311,6 @@
                                 </Setter>
                             </DataTrigger>
                         </Style.Triggers>
-                    </Style>
-
-                    <Style x:Key="QuestionText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
-                        <Setter Property="lb:FillManager.Fill" Value="True" />
-                        
-                        <Setter
-                            Property="lb:FillManager.Interlinyage"
-                            Value="{Binding ElementName=root,Path=DataContext.Settings.QuestionLineSpacing}" />
-                        
-                        <Setter
-                            Property="lb:FillManager.MaxFontSize"
-                            Value="{Binding ElementName=root,Path=Zoom,Converter={StaticResource multiplier},ConverterParameter=50}" />
-                        
-                        <Setter Property="TextWrapping" Value="Wrap" />
-                        <Setter Property="Margin" Value="10" />
                     </Style>
 
                     <Style x:Key="RoundText" BasedOn="{StaticResource CenteredText}" TargetType="{x:Type TextBlock}">
@@ -685,6 +751,22 @@
 
                     <localc:LogoConverter x:Key="LogoConverter" />
 
+                    <DataTemplate x:Key="AnswerOptionsTemplate" DataType="{x:Type vm:AnswerOptionsViewModel}">
+                        <ItemsControl ItemsSource="{Binding Options}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="1" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:ItemViewModel}">
+                                    <Button Style="{StaticResource SIAnswerButton}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </DataTemplate>
+
                     <localc:TemplateConverter x:Key="TableSelector">
                         <localc:TemplateConverter.Templates>
                             <DataTemplate x:Key="{x:Static vm:TableStage.Void}" />
@@ -879,12 +961,21 @@
                             
                             <DataTemplate x:Key="{x:Static vm:TableStage.Question}">
                                 <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="3*" />
+                                        <ColumnDefinition x:Name="secondColumn" Width="0" />
+                                    </Grid.ColumnDefinitions>
+                                    
                                     <Grid.RowDefinitions>
                                         <RowDefinition x:Name="firstRow" Height="*" />
                                         <RowDefinition Height="15*" />
                                     </Grid.RowDefinitions>
 
-                                    <Border HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#4C000000">
+                                    <Border
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Background="#4C000000"
+                                        Grid.ColumnSpan="2">
                                         <TextBlock
                                             Text="{Binding Caption}"
                                             HorizontalAlignment="Center"
@@ -906,6 +997,13 @@
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionStyle, Converter={StaticResource DecoratorSelector}}" />
 
+                                    <ContentControl
+                                        Grid.Column="1"
+                                        Grid.Row="1"
+                                        Content="{Binding AnswerOptions}"
+                                        ContentTemplate="{StaticResource AnswerOptionsTemplate}"
+                                        lb:SelectionBehavior.IsSelectable="{Binding Selectable}" />
+
                                     <!-- Hint -->
                                     <ContentControl Content="{Binding}">
                                         <ContentControl.Style>
@@ -913,7 +1011,9 @@
                                                 <Setter Property="ContentTemplate" Value="{StaticResource EmptyDataTemplate}" />
                                                 
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Hint, Converter={StaticResource NotNullOrEmptyConverter}}" Value="true">
+                                                    <DataTrigger
+                                                        Binding="{Binding Hint, Converter={StaticResource NotNullOrEmptyConverter}}"
+                                                        Value="true">
                                                         <Setter Property="ContentTemplate">
                                                             <Setter.Value>
                                                                 <DataTemplate>
@@ -924,7 +1024,10 @@
                                                                         </Grid.RowDefinitions>
                                                                         
                                                                         <Border Grid.Row="1" Background="#88000000">
-                                                                            <TextBlock Text="{Binding Hint}" Style="{StaticResource QuestionText}" Opacity="0.4" />
+                                                                            <TextBlock
+                                                                                Text="{Binding Hint}"
+                                                                                Style="{StaticResource QuestionText}"
+                                                                                Opacity="0.4" />
                                                                         </Border>
                                                                     </Grid>
                                                                 </DataTemplate>
@@ -993,6 +1096,10 @@
                                 <DataTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Caption}" Value="">
                                         <Setter TargetName="firstRow" Property="Height" Value="0" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding LayoutMode}" Value="{x:Static vm:LayoutMode.AnswerOptions}">
+                                        <Setter TargetName="secondColumn" Property="Width" Value="*" />
                                     </DataTrigger>
                                 </DataTemplate.Triggers>
                             </DataTemplate>
