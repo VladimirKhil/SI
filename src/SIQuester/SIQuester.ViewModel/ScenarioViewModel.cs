@@ -36,7 +36,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
 
     public ICommand SelectAtomObject { get; private set; }
 
-    public override QDocument? OwnerDocument => Owner?.OwnerTheme.OwnerRound.OwnerPackage.Document;
+    public override QDocument? OwnerDocument => Owner.OwnerTheme?.OwnerRound?.OwnerPackage?.Document;
 
     private bool _isComplex;
 
@@ -265,13 +265,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
     {
         try
         {
-            var document = Owner.OwnerTheme.OwnerRound?.OwnerPackage?.Document;
-
-            if (document == null)
-            {
-                throw new InvalidOperationException("document is undefined");
-            }
-
+            var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
             var media = document.Document.GetLink(CurrentItem.Model);
 
             if (media.GetStream != null && media.Uri != null)

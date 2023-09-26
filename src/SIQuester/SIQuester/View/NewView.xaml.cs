@@ -5,11 +5,11 @@ using System.Windows.Controls;
 namespace SIQuester;
 
 /// <summary>
-/// Логика взаимодействия для NewView.xaml
+/// Provides interaction logic for NewView.xaml.
 /// </summary>
 public partial class NewView : UserControl
 {
     public NewView() => InitializeComponent();
 
-    private void ListView_DoubleClick(object sender, RoutedEventArgs e) => ((NewViewModel)DataContext).Create.Execute(null);
+    private void ListView_DoubleClick(object sender, RoutedEventArgs e) => ((NewViewModel)DataContext)?.Create.Execute(null);
 }

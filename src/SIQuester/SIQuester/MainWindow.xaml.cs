@@ -147,7 +147,11 @@ public partial class MainWindow : MetroWindow
             }
             catch (COMException exc)
             {
-                MessageBox.Show(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            catch (ArgumentNullException exc)
+            {
+                Trace.TraceError(exc.Message, App.ProductName, MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 

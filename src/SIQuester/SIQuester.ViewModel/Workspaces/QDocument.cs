@@ -488,6 +488,8 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
+    private bool _isDisposed = false;
+
     public SIDocument Document { get; private set; }
 
     public PackageViewModel Package { get; }
@@ -3425,20 +3427,23 @@ public sealed class QDocument : WorkspaceViewModel
 
     protected override void Dispose(bool disposing)
     {
-        if (Document != null)
+        if (_isDisposed)
         {
-            Document.Dispose();
-
-            PlatformManager.Instance.ClearMedia(Document.Images);
-            PlatformManager.Instance.ClearMedia(Document.Audio);
-            PlatformManager.Instance.ClearMedia(Document.Video);
-            PlatformManager.Instance.ClearMedia(Document.Html);
-
-            _logger.LogInformation("Document closed: {path}", _path);
-            Document = null;
+            return;
         }
 
+        Document.Dispose();
+
+        PlatformManager.Instance.ClearMedia(Document.Images);
+        PlatformManager.Instance.ClearMedia(Document.Audio);
+        PlatformManager.Instance.ClearMedia(Document.Video);
+        PlatformManager.Instance.ClearMedia(Document.Html);
+
+        _logger.LogInformation("Document closed: {path}", _path);
+
         ClearTempFolder();
+
+        _isDisposed = true;
 
         base.Dispose(disposing);
     }
