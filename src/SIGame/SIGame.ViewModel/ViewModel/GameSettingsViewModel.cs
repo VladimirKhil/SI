@@ -721,7 +721,6 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
             node,
             _model,
             document,
-            Array.Empty<string>(),
             BackLink.Default,
             fileShare,
             _computerPlayers.ToArray(),

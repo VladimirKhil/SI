@@ -342,11 +342,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.OnRightAnswer();
     }
 
-    public void OnRightAnswerOption(string rightOptionLabel)
+    public bool OnRightAnswerOption(string rightOptionLabel)
     {
         if (GameViewModel == null)
         {
-            return;
+            return false;
         }
 
         PresentationController.SetQuestionSound(false);
@@ -368,6 +368,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                 answerOptions[answerIndex].State = ItemState.Normal;
             }
         }
+
+        return true;
     }
 
     public bool ShouldPlayRound(QuestionSelectionStrategyType questionSelectionStrategyType) => true;

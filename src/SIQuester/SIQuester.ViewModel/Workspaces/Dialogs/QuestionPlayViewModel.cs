@@ -252,8 +252,5 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
 
-    public void OnRightAnswerOption(string rightOptionLabel)
-    {
-        
-    }
+    public bool OnRightAnswerOption(string rightOptionLabel) => false;
 }
