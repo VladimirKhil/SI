@@ -3,6 +3,7 @@
 /// <summary>
 /// Defines files naming modes while extracting.
 /// </summary>
+[Obsolete("Use ZipUtils.ZipExtractor")]
 public enum ExtractedFileNamingModes
 {
     /// <summary>

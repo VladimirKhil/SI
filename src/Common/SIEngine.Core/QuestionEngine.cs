@@ -256,9 +256,15 @@ public sealed class QuestionEngine
 
                                     if (_isAnswerTypeSelect && rightAnswer.Length > 0)
                                     {
-                                        _playHandler.OnRightAnswerOption(rightAnswer);
+                                        var handled = _playHandler.OnRightAnswerOption(rightAnswer);
                                         _stepIndex++;
-                                        return true;
+
+                                        if (handled)
+                                        {
+                                            return true;
+                                        }
+
+                                        continue;
                                     }
 
                                     if (!_options.ShowSimpleRightAnswers)

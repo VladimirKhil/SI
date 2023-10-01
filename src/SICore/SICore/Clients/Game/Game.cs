@@ -2574,7 +2574,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         var currentOrder = ClientData.Order;
 
         ClientData.OrderHistory
-            .Append("Before ")
+            .Append("DropPlayerFromStakes. Before ")
             .Append(playerIndex)
             .Append(' ')
             .Append(string.Join(",", currentOrder))
@@ -2610,17 +2610,21 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         ClientData.Order = newOrder;
 
-        ClientData.OrderHistory.Append("After ").Append(string.Join(",", newOrder)).AppendFormat(" {0}", ClientData.OrderIndex).AppendLine();
+        ClientData.OrderHistory
+            .Append("DropPlayerFromStakes. After ")
+            .Append(string.Join(",", newOrder))
+            .AppendFormat(" {0}", ClientData.OrderIndex)
+            .AppendLine();
 
         if (!ClientData.Players.Any(p => p.StakeMaking))
         {
-            Logic.AddHistory($"Last staker dropped");
+            Logic.AddHistory("Last staker dropped");
             Logic.Engine.SkipQuestion();
             PlanExecution(Tasks.MoveNext, 20, 1);
         }
         else if (ClientData.OrderIndex == -1 || ClientData.Order[ClientData.OrderIndex] == -1)
         {
-            Logic.AddHistory($"Current staker dropped");
+            Logic.AddHistory("Current staker dropped");
 
             if (ClientData.Decision == DecisionType.StakeMaking || ClientData.Decision == DecisionType.NextPersonStakeMaking)
             {
@@ -2765,6 +2769,12 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else
         {
+            if (ClientData.OrderIndex > -1 && ClientData.Decision == DecisionType.NextPersonStakeMaking)
+            {
+                Logic.AddHistory("Rolling order index back");
+                ClientData.OrderIndex--;
+            }
+
             PlanExecution(Tasks.AskStake, 20);
         }
     }

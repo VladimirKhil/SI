@@ -181,7 +181,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="stream">Source stream.</param>
     /// <param name="read">Should the document be read-only.</param>
     public static SIDocument Load(Stream stream, bool read = true) =>
-        LoadInternal(PackageContainerFactory.GetPackageContainer(stream, read));
+        Load(PackageContainerFactory.GetPackageContainer(stream, read));
 
     /// <summary>
     /// Loads document from folder.
@@ -190,7 +190,7 @@ public sealed class SIDocument : IDisposable
     /// <param name="read">Should the document be read-only.</param>
     [Obsolete("Use ExtractToFolderAndLoadAsync")]
     public static SIDocument Load(string folder, bool read = true) =>
-        LoadInternal(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()));
+        Load(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()));
 
     /// <summary>
     /// Extracts document to folder and load from it.
@@ -211,17 +211,18 @@ public sealed class SIDocument : IDisposable
             maxAllowedDataLength,
             cancellationToken);
 
-        return LoadInternal(PackageContainerFactory.GetPackageContainer(folder, extractionMap));
+        return Load(PackageContainerFactory.GetPackageContainer(folder, extractionMap));
     }
 
     /// <summary>
     /// Loads document from stream as XML.
     /// </summary>
     /// <param name="stream">Source stream.</param>
-    public static SIDocument LoadXml(Stream stream)
+    /// <param name="packageContainer">Optional container to store package files.</param>
+    public static SIDocument LoadXml(Stream stream, ISIPackageContainer? packageContainer = null)
     {
-        var ms = new MemoryStream();
-        var document = CreateInternal(ms, "", "", false);
+        packageContainer ??= EmptySIPackageContainer.Instance;
+        var document = CreateInternal(packageContainer, "", "");
 
         using (var reader = XmlReader.Create(stream))
         {
@@ -239,10 +240,13 @@ public sealed class SIDocument : IDisposable
         return document;
     }
 
-    private static SIDocument LoadInternal(ISIPackageContainer source)
+    /// <summary>
+    /// Loads document from custom package container.
+    /// </summary>
+    /// <param name="packageContainer">Custom package container.</param>
+    public static SIDocument Load(ISIPackageContainer packageContainer)
     {
-        var document = new SIDocument(source);
-
+        var document = new SIDocument(packageContainer);
         document.LoadData();
 
         return document;

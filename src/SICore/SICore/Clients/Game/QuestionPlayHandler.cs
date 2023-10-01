@@ -265,8 +265,8 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         GameData.IsAnswerSimple = true;
     }
 
-    public void OnRightAnswerOption(string rightOptionLabel)
+    public bool OnRightAnswerOption(string rightOptionLabel)
     {
-        
+        return false;
     }
 }

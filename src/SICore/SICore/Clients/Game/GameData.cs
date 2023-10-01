@@ -603,11 +603,6 @@ public sealed class GameData : Data
     public bool UseBackgroundAudio { get; internal set; }
 
     /// <summary>
-    /// Package files names.
-    /// </summary>
-    public string[] Files { get; internal set; } = Array.Empty<string>();
-
-    /// <summary>
     /// Current answer mode.
     /// </summary>
     public string AnswerMode { get; internal set; }
@@ -620,38 +615,5 @@ public sealed class GameData : Data
     public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
     {
         _showMan = showman;
-    }
-
-    private bool FileExists(string mediaCategory, string filename) => Files.Contains($"{mediaCategory}/{filename}");
-
-    internal string? FindFile(string mediaCategory, string filename)
-    {
-        if (FileExists(mediaCategory, filename))
-        {
-            return filename;
-        }
-
-        var escapedFileName = Uri.EscapeUriString(filename);
-
-        if (FileExists(mediaCategory, escapedFileName))
-        {
-            return escapedFileName;
-        }
-
-        var hashedFileName = ZipHelper.CalculateHash(filename);
-
-        if (FileExists(mediaCategory, hashedFileName))
-        {
-            return hashedFileName;
-        }
-
-        var hashedEscapedFileName = ZipHelper.CalculateHash(escapedFileName);
-
-        if (FileExists(mediaCategory, hashedEscapedFileName))
-        {
-            return hashedEscapedFileName;
-        }
-
-        return null;
     }
 }

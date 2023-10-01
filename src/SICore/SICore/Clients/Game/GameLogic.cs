@@ -450,6 +450,11 @@ public sealed class GameLogic : Logic<GameData>
             var msg = new MessageBuilder();
             var contentType = contentItem.Type;
 
+            if (contentType == AtomTypes.AudioNew)
+            {
+                contentType = AtomTypes.Audio; // For backward compatibility; remove later
+            }
+
             msg.Add(isBackground ? Messages.Atom_Second : Messages.Atom).Add(contentType);
 
             var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
@@ -477,38 +482,38 @@ public sealed class GameLogic : Logic<GameData>
                 return false;
             }
 
-            var media = _data.PackageDoc.GetLink(contentItem);
+            var media = _data.PackageDoc.TryGetMedia(contentItem);
 
-            var filename = media.Uri;
-            var fileLength = media.StreamLength;
-
-            CheckFileLength(contentType, fileLength);
-
-            if (ClientData.Files.Length > 0)
+            if (!media.HasValue || media.Value.Uri == null)
             {
-                var targetName = ClientData.FindFile(mediaCategory, filename);
+                _gameActions.SendMessageWithArgs(
+                    isBackground ? Messages.Atom_Second : Messages.Atom,
+                    AtomTypes.Text,
+                    string.Format(LO[nameof(R.MediaNotFound)], $"{mediaCategory}/{contentItem.Value}"));
 
-                if (targetName == null)
-                {
-                    _gameActions.SendMessageWithArgs(
-                        isBackground ? Messages.Atom_Second : Messages.Atom,
-                        AtomTypes.Text,
-                        string.Format(LO[nameof(R.MediaNotFound)], $"{mediaCategory}/{filename}"));
-
-                    return false;
-                }
-
-                filename = targetName;
+                return false;
             }
 
-            var uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{filename}", UriKind.Relative));
+            var fullUri = media.Value.Uri;
+            var fileLength = media.Value.StreamLength;
 
-            var localUri = ClientData.Files.Length == 0 && !string.IsNullOrEmpty(ClientData.DocumentPath)
-                ? Path.Combine(ClientData.DocumentPath, mediaCategory, Uri.UnescapeDataString(filename))
-                : null;
-
-            if (localUri != null && !File.Exists(localUri))
+            if (fileLength.HasValue)
             {
+                CheckFileLength(contentType, fileLength.Value);
+            }
+
+            Uri uri;
+            string? localUri;
+
+            if (fullUri.Scheme == "file")
+            {
+                localUri = fullUri.AbsolutePath;
+                var fileName = Path.GetFileName(localUri);
+                uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
+            }
+            else
+            {
+                uri = fullUri;
                 localUri = null;
             }
 
@@ -520,13 +525,11 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (_gameActions.Client.CurrentServer.Contains(person))
                 {
-                    msg2.Append(Message.ArgsSeparatorChar)
-                        .Append(localUri ?? uri.ToString());
+                    msg2.Append(Message.ArgsSeparatorChar).Append(localUri ?? uri.ToString());
                 }
                 else
                 {
-                    msg2.Append(Message.ArgsSeparatorChar)
-                        .Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
+                    msg2.Append(Message.ArgsSeparatorChar).Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
                 }
 
                 _gameActions.SendMessage(msg2.ToString(), person);
@@ -544,7 +547,7 @@ public sealed class GameLogic : Logic<GameData>
     private void CheckFileLength(string contentType, long fileLength)
     {
         int? maxRecommendedFileLength = contentType == AtomTypes.Image ? _data.BackLink.MaxImageSizeKb
-            : (contentType == AtomTypes.Audio ? _data.BackLink.MaxAudioSizeKb
+            : (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? _data.BackLink.MaxAudioSizeKb
             : (contentType == AtomTypes.Video ? _data.BackLink.MaxVideoSizeKb : null));
 
         if (!maxRecommendedFileLength.HasValue || fileLength <= (long)maxRecommendedFileLength * 1024)
@@ -554,7 +557,7 @@ public sealed class GameLogic : Logic<GameData>
 
         // Notify users that the media file is too large and could be downloaded slowly
         var contentName = contentType == AtomTypes.Image ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Image)) :
-            (contentType == AtomTypes.Audio ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
+            (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Audio)) :
             (contentType == AtomTypes.Video ? LO.GetPackagesString(nameof(SIPackages.Properties.Resources.Video)) : R.File));
 
         var fileLocation = $"{_data.Theme?.Name}, {_data.Question?.Price}";
@@ -3315,6 +3318,13 @@ public sealed class GameLogic : Logic<GameData>
 
                     var ind = _data.OrderIndex;
 
+                    if (_data.OrderIndex + candidatesAll.Length > _data.Order.Length)
+                    {
+                        throw new InvalidOperationException(
+                            $"Invalid order index. Order index: {_data.OrderIndex}; " +
+                            $"candidates length: {candidatesAll.Length}; order length: {_data.Order.Length}");
+                    }
+
                     for (var i = 0; i < candidatesAll.Length; i++)
                     {
                         _data.Order[ind + i] = candidatesAll[i];
@@ -3380,6 +3390,7 @@ public sealed class GameLogic : Logic<GameData>
                         msg.Append(Message.ArgsSeparatorChar).Append(_data.Players[i].Flag ? '+' : '-');
                     }
 
+                    _data.OrderHistory.AppendLine("Queuring showman for the next staker");
                     _gameActions.SendMessage(msg.ToString(), _data.ShowMan.Name);
 
                     var time = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
@@ -3620,6 +3631,8 @@ public sealed class GameLogic : Logic<GameData>
         {
             throw new Exception($"{nameof(_data.OrderIndex)} == {nameof(initialOrderIndex)} ({initialOrderIndex})");
         }
+
+        _data.OrderHistory.AppendFormat("New order index: {0}", _data.OrderIndex).AppendLine();
     }
 
     private void PrintAppellation()
@@ -4044,6 +4057,7 @@ public sealed class GameLogic : Logic<GameData>
                 OnStageChanged(GameStages.Round, round.Name);
             }
 
+            // TODO: do not rely on strings
             var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
 
             var skipRoundAnnounce = isRandomPackage &&
@@ -4078,7 +4092,7 @@ public sealed class GameLogic : Logic<GameData>
             // Create random special questions
             if (_data.Settings.RandomSpecials)
             {
-                RandomizeSpecials(round);
+                RoundRandomizer.RandomizeSpecials(round);
             }
         }
         else if (stage == 2)
@@ -4183,118 +4197,6 @@ public sealed class GameLogic : Logic<GameData>
         {
             ScheduleExecution(Tasks.MoveNext, 1);
         }
-    }
-
-    private static void RandomizeSpecials(Round round)
-    {
-        var nonUsedNumbers = new List<int>();
-        var maxQuestionsInTheme = round.Themes.Max(theme => theme.Questions.Count);
-        var leavedSecrets = 1 + Random.Shared.Next(3);
-        var leavedStakes = 1 + Random.Shared.Next(3);
-        var leavedNoRisk = Random.Shared.Next(2);
-
-        for (var ti = 0; ti < round.Themes.Count; ti++)
-        {
-            var theme = round.Themes[ti];
-
-            for (var qi = 0; qi < theme.Questions.Count; qi++)
-            {
-                var quest = theme.Questions[qi];
-
-                if (quest.Type.Name != QuestionTypes.Cat && quest.Type.Name != QuestionTypes.BagCat)
-                {
-                    nonUsedNumbers.Add(ti * maxQuestionsInTheme + qi);
-                    quest.Type.Name = QuestionTypes.Simple;
-                }
-                else
-                {
-                    leavedSecrets--;
-                }
-            }
-        }
-
-        while (nonUsedNumbers.Count > 0 && leavedNoRisk > 0)
-        {
-            var num = Random.Shared.Next(nonUsedNumbers.Count);
-            var val = nonUsedNumbers[num];
-            nonUsedNumbers.RemoveAt(num);
-            leavedNoRisk--;
-            var ti = val / maxQuestionsInTheme;
-            var qi = val % maxQuestionsInTheme;
-            round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Sponsored;
-        }
-
-        while (nonUsedNumbers.Count > 0 && leavedStakes > 0)
-        {
-            var num = Random.Shared.Next(nonUsedNumbers.Count);
-            var val = nonUsedNumbers[num];
-            nonUsedNumbers.RemoveAt(num);
-            leavedStakes--;
-            var ti = val / maxQuestionsInTheme;
-            var qi = val % maxQuestionsInTheme;
-            round.Themes[ti].Questions[qi].Type.Name = QuestionTypes.Auction;
-        }
-
-        while (nonUsedNumbers.Count > 0 && leavedSecrets > 0)
-        {
-            var num = Random.Shared.Next(nonUsedNumbers.Count);
-            var val = nonUsedNumbers[num];
-            nonUsedNumbers.RemoveAt(num);
-            leavedSecrets--;
-
-            var ti = val / maxQuestionsInTheme;
-            var qi = val % maxQuestionsInTheme;
-            var quest = round.Themes[ti].Questions[qi];
-
-            quest.Type.Name = QuestionTypes.BagCat;
-
-            quest.Type[QuestionTypeParams.Cat_Theme] = round.Themes[ti].Name;
-            quest.Type[QuestionTypeParams.Cat_Cost] = GenerateRandomSecretQuestionCost().ToString();
-
-            int var = Random.Shared.Next(2);
-
-            quest.Type[QuestionTypeParams.BagCat_Self] = var == 0
-                ? QuestionTypeParams.BagCat_Self_Value_True
-                : QuestionTypeParams.BagCat_Self_Value_False;
-
-            var = Random.Shared.Next(100);
-
-            quest.Type[QuestionTypeParams.BagCat_Knows] = var switch
-            {
-                < 30 => QuestionTypeParams.BagCat_Knows_Value_Before,
-                < 90 => QuestionTypeParams.BagCat_Knows_Value_After,
-                _ => QuestionTypeParams.BagCat_Knows_Value_Never,
-            };
-        }
-    }
-
-    private static NumberSet GenerateRandomSecretQuestionCost()
-    {
-        var option = Random.Shared.Next(3);
-
-        if (option == 0) // Fixed value
-        {
-            // 100 - 2000
-            var price = (Random.Shared.Next(20) + 1) * 100;
-            return new NumberSet(price);
-        }
-
-        if (option == 1) // Minimum or maximum in round
-        {
-            return new NumberSet(0);
-        }
-
-        // Range value
-
-        var sumMin = (Random.Shared.Next(10) + 1) * 100;
-        var sumMax = sumMin + (Random.Shared.Next(10) + 1) * 100;
-        var maxSteps = (sumMax - sumMin) / 100;
-
-        var possibleSteps = Enumerable.Range(1, maxSteps).Where(step => maxSteps % step == 0).ToArray();
-        var stepIndex = Random.Shared.Next(possibleSteps.Length);
-        var steps = possibleSteps[stepIndex];
-
-        return new NumberSet { Minimum = sumMin, Maximum = sumMax, Step = steps * 100 };
     }
 
     internal void SetAnswererAsActive()

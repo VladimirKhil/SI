@@ -9,6 +9,7 @@ namespace SIPackages.Helpers;
 /// so it is using <see cref="MaxLengthStream" /> and limits maximum extracted file length (protecting from zip bombs).
 /// </remarks>
 /// <see href="https://github.com/dotnet/runtime/blob/release/6.0/src/libraries/System.IO.Compression.ZipFile/src/System/IO/Compression/ZipFileExtensions.ZipArchiveEntry.Extract.cs" />
+[Obsolete("Use ZipUtils.ZipExtractor")]
 internal static class ZipFileExtensionsPatched
 {
     internal static async Task ExtractToFileAsync(

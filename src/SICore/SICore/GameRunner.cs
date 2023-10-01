@@ -30,7 +30,6 @@ public sealed class GameRunner
     private readonly Node _node;
     private readonly IGameSettingsCore<AppSettingsCore> _settings;
     private readonly SIDocument _document;
-    private readonly string[] _files;
     private readonly IGameManager _backLink;
     private readonly IFileShare _fileShare;
     private readonly ComputerAccount[] _defaultPlayers;
@@ -44,7 +43,6 @@ public sealed class GameRunner
         Node node,
         IGameSettingsCore<AppSettingsCore> settings,
         SIDocument document,
-        string[] files,
         IGameManager backLink,
         IFileShare fileShare,
         ComputerAccount[] defaultPlayers,
@@ -57,7 +55,6 @@ public sealed class GameRunner
         _node = node;
         _settings = settings;
         _document = document;
-        _files = files;
         _backLink = backLink;
         _fileShare = fileShare;
         _defaultPlayers = defaultPlayers;
@@ -77,7 +74,6 @@ public sealed class GameRunner
             Settings = _settings,
             HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
             GameName = _gameName ?? "",
-            Files = _files,
         };
 
         var localizer = new Localizer(_settings.AppSettings.Culture);

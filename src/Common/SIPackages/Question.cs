@@ -402,7 +402,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
             return;
         }
 
-        if (Price == -1)
+        if (Price == InvalidPrice)
         {
             Scenario.Clear();
             Type.Params.Clear();

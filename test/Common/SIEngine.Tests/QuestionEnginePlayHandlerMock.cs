@@ -68,8 +68,5 @@ internal sealed class QuestionEnginePlayHandlerMock : IQuestionEnginePlayHandler
 
     }
 
-    public void OnRightAnswerOption(string rightOptionLabel)
-    {
-
-    }
+    public bool OnRightAnswerOption(string rightOptionLabel) => false;
 }

@@ -209,74 +209,63 @@ public sealed class GameActions
         {
             foreach (var question in theme.Questions)
             {
-                // TODO: replace with question.GetContent() later
-                if (question.Parameters != null)
+                foreach (var contentItem in question.GetContent())
                 {
-                    foreach (var parameter in question.Parameters)
+                    var contentType = contentItem.Type;
+
+                    switch (contentType)
                     {
-                        if (parameter.Value.ContentValue == null)
-                        {
-                            continue;
-                        }
-
-                        foreach (var contentItem in parameter.Value.ContentValue)
-                        {
-                            var contentType = contentItem.Type;
-
-                            switch (contentType)
+                        case AtomTypes.Image:
+                        case AtomTypes.Audio:
+                        case AtomTypes.AudioNew:
+                        case AtomTypes.Video:
+                        case AtomTypes.Html:
                             {
-                                case AtomTypes.Image:
-                                case AtomTypes.Audio:
-                                case AtomTypes.AudioNew:
-                                case AtomTypes.Video:
+                                if (!contentItem.IsRef) // External link
+                                {
+                                    if (contentType == AtomTypes.Html)
                                     {
-                                        if (!contentItem.IsRef) // External link
-                                        {
-                                            var link = contentItem.Value;
-
-                                            if (Uri.TryCreate(link, UriKind.Absolute, out _))
-                                            {
-                                                contentUris.Add(link);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var mediaCategory = contentType == AtomTypes.Image
-                                                ? CollectionNames.ImagesStorageName
-                                                : ((contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew)
-                                                    ? CollectionNames.AudioStorageName
-                                                    : (contentType == AtomTypes.Video ? CollectionNames.VideoStorageName : contentType));
-
-                                            string fileName;
-
-                                            if (_gameData.Files.Length > 0)
-                                            {
-                                                var file = _gameData.FindFile(mediaCategory, contentItem.Value);
-
-                                                if (file == null)
-                                                {
-                                                    break;
-                                                }
-
-                                                fileName = file;
-                                            }
-                                            else
-                                            {
-                                                var media = _gameData.PackageDoc.GetLink(new Atom { Text = "@" + contentItem.Value, Type = contentType });
-                                                fileName = media.Uri;
-                                            }
-
-                                            var uri = _fileShare.CreateResourceUri(
-                                                ResourceKind.Package,
-                                                new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
-
-                                            contentUris.Add(uri.ToString().Replace("http://localhost", "http://" + Constants.GameHost));
-                                        }
-
-                                        break;
+                                        continue;
                                     }
+
+                                    var link = contentItem.Value;
+
+                                    if (Uri.TryCreate(link, UriKind.Absolute, out _))
+                                    {
+                                        contentUris.Add(link);
+                                    }
+                                }
+                                else
+                                {
+                                    var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
+                                    var media = _gameData.PackageDoc.TryGetMedia(contentItem);
+
+                                    if (!media.HasValue || media.Value.Uri == null)
+                                    {
+                                        continue;
+                                    }
+
+                                    var mediaUri = media.Value.Uri;
+
+                                    if (mediaUri.Scheme != "file")
+                                    {
+                                        contentUris.Add(mediaUri.ToString());
+                                    }
+                                    else
+                                    {
+                                        var fileName = Path.GetFileName(mediaUri.AbsolutePath);
+
+                                        var resourceUri = _fileShare.CreateResourceUri(
+                                            ResourceKind.Package,
+                                            new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
+
+                                        var externalUri = resourceUri.ToString().Replace("http://localhost", "http://" + Constants.GameHost);
+                                        contentUris.Add(externalUri);
+                                    }
+                                }
+
+                                break;
                             }
-                        }
                     }
                 }
             }

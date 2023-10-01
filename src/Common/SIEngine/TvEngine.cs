@@ -458,7 +458,7 @@ public sealed class TvEngine : EngineBase
     {
         if (CanSelectQuestion)
         {
-            var index = new Random().Next(_questionsTable.Count);
+            var index = Random.Shared.Next(_questionsTable.Count);
             var pair = _questionsTable.Skip(index).First();
 
             SelectQuestion(pair.Item1, pair.Item2);
@@ -467,7 +467,7 @@ public sealed class TvEngine : EngineBase
 
         if (CanSelectTheme)
         {
-            var themeIndex = new Random().Next(_leftFinalThemesIndicies.Count);
+            var themeIndex = Random.Shared.Next(_leftFinalThemesIndicies.Count);
             themeIndex = _leftFinalThemesIndicies.Skip(themeIndex).First();
 
             SelectTheme(themeIndex);

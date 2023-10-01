@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 namespace SIData;
@@ -12,7 +13,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Стиль игры
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public PlayerStyle Style { get; set; }
 
     // Все вероятности лежат в интервале 0 - 100
@@ -22,7 +22,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Вероятность того, что игрок будет выбирать согласно номеру темы
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V1
     {
         get => _v1;
@@ -38,7 +37,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Тема та же, что и была
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V2
     {
         get => _v2;
@@ -46,6 +44,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V2Max => 100 - V3;
 
     private int _v3 = 0;
@@ -54,7 +53,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Тема согласно приоритету тем
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V3
     {
         get => _v3;
@@ -62,6 +60,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V3Max => 100 - V2;
 
     private char[] _p1 = null;
@@ -69,7 +68,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// <summary>
     /// Приоритет тем (например "123456")
     /// </summary>
-    [JsonProperty]
     public char[] P1
     {
         get => _p1;
@@ -78,6 +76,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
 
     // Иначе - случайная тема
     [XmlIgnore]
+    [JsonIgnore]
     public int Rest1 => 100 - V2 - V3;
 
     // Если согласно номеру вопроса
@@ -87,7 +86,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Вопрос дешевле, чем был
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V4
     {
         get => _v4;
@@ -103,6 +101,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V4Max => 100 - V5 - V6 - V7;
 
     private int _v5 = 0;
@@ -111,7 +110,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Вопрос дороже, чем был
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V5
     {
         get => _v5;
@@ -127,6 +125,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V5Max => 100 - V4 - V6 - V7;
 
     private int _v6 = 0;
@@ -135,7 +134,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Вопрос той же цены
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V6
     {
         get => _v6;
@@ -151,6 +149,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V6Max => 100 - V5 - V4 - V7;
 
     private int _v7 = 0;
@@ -159,7 +158,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Вопрос согласно приоритету
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V7
     {
         get => _v7;
@@ -175,6 +173,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     [XmlIgnore]
+    [JsonIgnore]
     public int V7Max => 100 - V5 - V6 - V4;
 
     private char[] _p2 = null;
@@ -182,7 +181,6 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// <summary>
     /// Приоритет вопросов (например "12345")
     /// </summary>
-    [JsonProperty]
     public char[] P2
     {
         get => _p2;
@@ -191,6 +189,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
 
     // Иначе - случайный вопрос
     [XmlIgnore]
+    [JsonIgnore]
     public int Rest2 => 100 - V4 - V5 - V6 - V7;
 
     // Основные игровые характеристики
@@ -199,49 +198,42 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Эрудиция
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int F { get; set; }
 
     /// <summary>
     /// Смелость по умолчанию
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int B0 { get; set; }
 
     /// <summary>
     /// Скорость реакции
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int S { get; set; }
 
     /// <summary>
     /// Вероятность отдать Вопрос с секретом тому, у кого меньше денег
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int V { get; set; }
 
     /// <summary>
     /// Вероятность сказать "Пас" на вопросе первой категории
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int N1 { get; set; }
 
     /// <summary>
     /// Вероятность сказать "Пас" на вопросе пятой категории
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int N5 { get; set; }
 
     /// <summary>
     /// Вероятность сказать "Ва-банк" на вопросе первой категории
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int B1 { get; set; }
 
     /// <summary>
@@ -256,22 +248,18 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     /// Максимальное число вопросов до конца раунда, при котором ситуация может стать критической
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int Nq { get; set; }
 
     /// <summary>
     /// Минимальная доля собственной суммы по отношению к сумме лидера, при которой ситуация может стать критической
     /// </summary>
     [XmlAttribute]
-    [JsonProperty]
     public int Part { get; set; }
 
-    [JsonProperty]
-    public List<int> LoveNumbers { get; set; }
+    public List<int> LoveNumbers { get; set; } = new();
 
     public ComputerAccount()
     {
-        LoveNumbers = new List<int>();
         IsHuman = false;
     }
 
@@ -387,11 +375,11 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
     }
 
     /// <summary>
-    /// Задать компьютерному игроку случайные характеристики
+    /// Randomizes computer account parameters.
     /// </summary>
     public void Randomize()
     {
-        var r = new Random();
+        var r = Random.Shared;
         int var = r.Next(3);
 
         if (var == 0)
@@ -451,7 +439,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
         Part = r.Next(150);
     }
 
-    public int CompareTo(ComputerAccount other)
+    public int CompareTo(ComputerAccount? other)
     {
         var result = -F.CompareTo(other.F);
         if (result != 0)
@@ -460,7 +448,7 @@ public class ComputerAccount : Account, IComparable<ComputerAccount>, IComparabl
         return S.CompareTo(other.S);
     }
 
-    public int CompareTo(object obj) => -1;
+    public int CompareTo(object? obj) => -1;
 
     public void LoadInfo(ComputerAccount item)
     {

@@ -855,7 +855,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         TInfo.QuestionStyle = QuestionStyle.Normal;
 
-        if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.Video)
+        if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.AudioNew || _data.AtomType == AtomTypes.Video)
         {
             TInfo.IsMediaStopped = true;
         }

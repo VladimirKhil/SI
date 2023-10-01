@@ -4,6 +4,7 @@
 /// Defines a stream with limited maximum length.
 /// </summary>
 /// <see href="https://www.meziantou.net/prevent-zip-bombs-in-dotnet.htm" />
+[Obsolete("Use ZipUtils.ZipExtractor")]
 internal sealed class MaxLengthStream : Stream
 {
     private readonly Stream _stream;

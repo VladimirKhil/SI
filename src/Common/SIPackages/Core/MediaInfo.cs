@@ -23,7 +23,7 @@ public readonly struct MediaInfo
     public readonly long? StreamLength { get; }
 
     /// <summary>
-    /// Media uri (if media ould be accessed directly).
+    /// Media uri (if media could be accessed directly).
     /// </summary>
     public readonly Uri? Uri { get; }
 

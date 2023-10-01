@@ -85,7 +85,7 @@ public interface IQuestionEnginePlayHandler
     /// Handles right answer option for select answer type.
     /// </summary>
     /// <param name="rightOptionLabel">Right option label.</param>
-    void OnRightAnswerOption(string rightOptionLabel);
+    bool OnRightAnswerOption(string rightOptionLabel);
 
     /// <summary>
     /// Handles the ending of asking for an answer.

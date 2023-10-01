@@ -11,8 +11,8 @@ public sealed class ZipExtractorTests
         {
             var extractedFiles = await ZipExtractor.ExtractArchiveFileToFolderAsync("SIGameTest.siq", targetFolder);
 
-            Assert.That(extractedFiles.Count, Is.EqualTo(8));
-            Assert.That(extractedFiles, Contains.Item("content.xml"));
+            Assert.That(extractedFiles.Values.Count, Is.EqualTo(8));
+            Assert.That(extractedFiles.Values, Contains.Item("content.xml"));
         }
         finally
         {
