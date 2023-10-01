@@ -721,6 +721,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 break;
 
             case AtomTypes.Audio:
+            case AtomTypes.AudioNew:
                 TInfo.SoundSource = new MediaSource(_data.ExternalUri);
                 TInfo.QuestionContentType = QuestionContentType.Clef;
                 TInfo.Sound = true;
@@ -750,6 +751,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         switch (atomType)
         {
             case AtomTypes.Audio:
+            case AtomTypes.AudioNew:
                 string uri;
 
                 switch (mparams[2])

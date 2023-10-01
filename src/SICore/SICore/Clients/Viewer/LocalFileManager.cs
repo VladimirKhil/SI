@@ -1,6 +1,7 @@
 ﻿using SICore.Properties;
 using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Channels;
 
@@ -9,6 +10,8 @@ namespace SICore.Clients.Viewer;
 /// <inheritdoc cref="ILocalFileManager" />
 internal sealed class LocalFileManager : ILocalFileManager
 {
+    private static readonly MD5 Hash = MD5.Create();
+
     private readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
     private readonly string _rootFolder;
@@ -33,8 +36,8 @@ internal sealed class LocalFileManager : ILocalFileManager
             KeepAlivePingPolicy = HttpKeepAlivePingPolicy.WithActiveRequests,
             PooledConnectionLifetime = TimeSpan.FromMinutes(5),
         };
-        
-        _client = new(socketsHttpHandler) { DefaultRequestVersion = HttpVersion.Version20 };        
+
+        _client = new(socketsHttpHandler) { DefaultRequestVersion = HttpVersion.Version20 };
         _rootFolder = Path.Combine(Path.GetTempPath(), "SIGame", Guid.NewGuid().ToString());
     }
 
@@ -78,7 +81,7 @@ internal sealed class LocalFileManager : ILocalFileManager
         try
         {
             Directory.CreateDirectory(_rootFolder);
-            
+
             using var response = await _client.GetAsync(fileTask.Uri, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -138,8 +141,14 @@ internal sealed class LocalFileManager : ILocalFileManager
         return localFile;
     }
 
-    private static string GetSafeFileName(Uri uri) =>
-        Convert.ToBase64String(Encoding.UTF8.GetBytes(uri.ToString())).Replace('/', '_').Replace('+', '-').Replace("=", "");
+    private static string GetSafeFileName(Uri uri)
+    {
+        var fullUri = uri.ToString();
+        var extension = Path.GetExtension(fullUri);
+        var hashedFileName = Hash.ComputeHash(Encoding.UTF8.GetBytes(fullUri));
+        var escapedFileName = Convert.ToBase64String(hashedFileName).Replace('/', '_').Replace('+', '-').Replace("=", "");
+        return string.IsNullOrEmpty(extension) ? escapedFileName : Path.ChangeExtension(escapedFileName, extension);
+    }
 
     public void Dispose()
     {
