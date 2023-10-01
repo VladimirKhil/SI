@@ -137,7 +137,7 @@ public sealed class SIDocument : IDisposable
         CreateInternal(PackageContainerFactory.CreatePackageContainer(stream, leaveStreamOpen), name, author);
 
     private static SIDocument CreateInternal(string folder, string name, string author) =>
-        CreateInternal(PackageContainerFactory.GetPackageContainer(folder, new Dictionary<string, string>()), name, author);
+        CreateInternal(PackageContainerFactory.CreatePackageContainer(folder), name, author);
 
     private static SIDocument CreateInternal(ISIPackageContainer packageContainer, string name, string author)
     {

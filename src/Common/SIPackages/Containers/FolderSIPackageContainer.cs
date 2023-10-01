@@ -26,6 +26,8 @@ internal sealed class FolderSIPackageContainer : ISIPackageContainer
     internal static ISIPackageContainer Open(string folder, IReadOnlyDictionary<string, string> fileNameMap) =>
         new FolderSIPackageContainer(folder, fileNameMap);
 
+    internal static ISIPackageContainer Create(string folder) => new FolderSIPackageContainer(folder, new Dictionary<string, string>(), false);
+
     public void CreateStream(string name, string contentType)
     {
         using (File.Create(Path.Combine(_folder, name))) { }
