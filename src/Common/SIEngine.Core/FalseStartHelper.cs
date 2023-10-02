@@ -107,16 +107,23 @@ public static class FalseStartHelper
             return false;
         }
 
+        if (falseStartMode == FalseStartMode.Disabled)
+        {
+            return true;
+        }
+
+        // FalseStartMode.TextContentOnly
+
         for (var k = 0; k < content.ContentValue.Count; k++)
         {
             var contentItem = content.ContentValue[k];
 
-            if (contentItem.Type == AtomTypes.Text && falseStartMode == FalseStartMode.TextContentOnly)
+            if (contentItem.Type != AtomTypes.Text)
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }
