@@ -66,7 +66,46 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
+    private PlayerInfo? _chooser = null;
     private PlayerInfo? _selectedPlayer = null;
+
+    private int _chooserIndex = -1;
+
+    /// <summary>
+    /// Index of player having turn.
+    /// </summary>
+    public int ChooserIndex
+    {
+        get => _chooserIndex;
+        set
+        {
+            if (_chooserIndex != value)
+            {
+                _chooserIndex = value;
+                _chooser = _chooserIndex >= 0 && _chooserIndex < LocalInfo.Players.Count ? (PlayerInfo)LocalInfo.Players[_chooserIndex] : null;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Chooser));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Player that has turn.
+    /// </summary>
+    public PlayerInfo? Chooser
+    {
+        get => _chooser;
+        set
+        {
+            if (_chooser != value)
+            {
+                _chooser = value;
+                _chooserIndex = value != null ? LocalInfo.Players.IndexOf(value) : -1;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ChooserIndex));
+            }
+        }
+    }
 
     private readonly List<PlayerInfo> _selectedPlayers = new();
     private readonly Dictionary<string, PlayerInfo> _playersTable = new();
@@ -101,6 +140,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public ICommand AddPlayer { get; private set; }
     public ICommand RemovePlayer { get; private set; }
     public ICommand ClearPlayers { get; private set; }
+
+    public ICommand GiveTurn { get; private set; }
+
+    public SimpleCommand Pass { get; private set; }
+
+    public ICommand MakeStake { get; private set; }
 
     public ICommand AddRight => _addRight;
     public ICommand AddWrong => _addWrong;
@@ -180,6 +225,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             }
         }
     }
+
+    /// <summary>
+    /// Amount to subtract on player wrong answer.
+    /// </summary>
+    public int? NegativePrice { get; private set; } = null;
 
     private int _rountTime = 0;
 
@@ -335,6 +385,94 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private int _selectedAnswerIndex = -1;
 
+    private DecisionMode _decisionMode = DecisionMode.None;
+
+    /// <summary>
+    /// Player decision mode.
+    /// </summary>
+    public DecisionMode DecisionMode
+    {
+        get => _decisionMode;
+        set
+        {
+            if (_decisionMode != value)
+            {
+                _decisionMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _canSelectChooser;
+
+    /// <summary>
+    /// Can current chooser be selected.
+    /// </summary>
+    public bool CanSelectChooser
+    {
+        get => _canSelectChooser;
+        set
+        {
+            if (_canSelectChooser != value)
+            {
+                _canSelectChooser = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private NumberSet _stakeInfo;
+
+    /// <summary>
+    /// Player possible stakes info.
+    /// </summary>
+    public NumberSet StakeInfo
+    {
+        get => _stakeInfo;
+        set 
+        {
+            if (_stakeInfo != value)
+            {
+                _stakeInfo = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private readonly List<int> _stakers = new();
+    private int _stakersIterator = -1;
+    private int _stakerIndex = -1;
+
+    public int StakerIndex
+    {
+        get => _stakerIndex;
+        set
+        {
+            _stakerIndex = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Staker));
+        }
+    }
+
+    private int _stake;
+
+    public int Stake
+    {
+        get => _stake;
+        set
+        {
+            if (_stake != value)
+            {
+                _stake = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _isAllIn = false;
+
+    public PlayerInfo Staker => (PlayerInfo)LocalInfo.Players[_stakerIndex];
+
     #endregion
 
     public GameViewModel(
@@ -370,6 +508,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         AddPlayer = new SimpleCommand(AddPlayer_Executed);
         RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
         ClearPlayers = new SimpleCommand(ClearPlayers_Executed);
+        GiveTurn = new SimpleCommand(GiveTurn_Executed);
+        Pass = new SimpleCommand(Pass_Executed);
+        MakeStake = new SimpleCommand(MakeStake_Executed);
         _addRight = new SimpleCommand(AddRight_Executed) { CanBeExecuted = false };
         _addWrong = new SimpleCommand(AddWrong_Executed) { CanBeExecuted = false };
 
@@ -609,7 +750,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     return;
                 }
 
-                PresentationController.SetSound(Settings.Model.Sounds.NoAnswer);
+                SetSound(Settings.Model.Sounds.NoAnswer);
                 StopQuestionTimer_Executed(null);
                 ActiveQuestionCommand = null;
 
@@ -619,6 +760,16 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
             },
             exc => OnError(exc.ToString()));
+
+    private void SetSound(string soundName)
+    {
+        if (!Settings.Model.PlaySounds)
+        {
+            return;
+        }
+
+        PresentationController.SetSound(soundName);
+    }
 
     private void RoundTimer_Elapsed(object? state) => UI.Execute(
         () =>
@@ -826,6 +977,27 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.ClearPlayers();
     }
 
+    private void GiveTurn_Executed(object? arg)
+    {
+        if (arg is not PlayerInfo player)
+        {
+            return;
+        }
+
+        Chooser = player;
+
+        if (DecisionMode == DecisionMode.StarterChoosing)
+        {
+            DecisionMode = DecisionMode.None;
+        }
+        else if (DecisionMode == DecisionMode.AnswererChoosing)
+        {
+            DecisionMode = DecisionMode.None;
+            Chooser.IsSelected = true;
+            _selectedPlayer = Chooser;
+        }
+    }
+
     private void AddRight_Executed(object? arg)
     {
         if (arg is not PlayerInfo player)
@@ -841,7 +1013,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         player.Right++;
         player.Sum += Price;
 
-        PresentationController.SetSound(Settings.Model.Sounds.AnswerRight);
+        Chooser = player;
+
+        SetSound(Settings.Model.Sounds.AnswerRight);
 
         _logger.Write("{0} +{1}", player.Name, Price);
 
@@ -872,10 +1046,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         player.Wrong++;
 
-        var substract = Settings.Model.SubstractOnWrong ? Price : 0;
+        var substract = Settings.Model.SubstractOnWrong ? (NegativePrice ?? Price) : 0;
         player.Sum -= substract;
 
-        PresentationController.SetSound(Settings.Model.Sounds.AnswerWrong);
+        SetSound(Settings.Model.Sounds.AnswerWrong);
 
         if (LocalInfo.LayoutMode == LayoutMode.AnswerOptions && _selectedAnswerIndex > -1)
         {
@@ -1044,20 +1218,20 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             case QuestionTypes.Secret:
             case QuestionTypes.SecretPublicPrice:
             case QuestionTypes.SecretNoQuestion:
-                PresentationController.SetSound(Settings.Model.Sounds.SecretQuestion);
+                SetSound(Settings.Model.Sounds.SecretQuestion);
                 PrintQuestionType(Resources.SecretQuestion.ToUpper(), Settings.Model.SpecialsAliases.SecretQuestionAlias);
                 highlightTheme = false;
                 break;
 
             case QuestionTypes.Auction:
             case QuestionTypes.Stake:
-                PresentationController.SetSound(Settings.Model.Sounds.StakeQuestion);
+                SetSound(Settings.Model.Sounds.StakeQuestion);
                 PrintQuestionType(Resources.StakeQuestion.ToUpper(), Settings.Model.SpecialsAliases.StakeQuestionAlias);
                 break;
 
             case QuestionTypes.Sponsored:
             case QuestionTypes.NoRisk:
-                PresentationController.SetSound(Settings.Model.Sounds.NoRiskQuestion);
+                SetSound(Settings.Model.Sounds.NoRiskQuestion);
                 PrintQuestionType(Resources.NoRiskQuestion.ToUpper(), Settings.Model.SpecialsAliases.NoRiskQuestionAlias);
                 highlightTheme = false;
                 break;
@@ -1104,7 +1278,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
             }
 
-            PresentationController.SetSound(Settings.Model.Sounds.BeginGame);
+            SetSound(Settings.Model.Sounds.BeginGame);
         }
 
         LocalInfo.TStage = TableStage.Sign;
@@ -1115,7 +1289,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         PresentationController.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;
 
-        PresentationController.SetSound(Settings.Model.Sounds.GameThemes);
+        SetSound(Settings.Model.Sounds.GameThemes);
     }
 
     private void Engine_Round(Round round)
@@ -1129,7 +1303,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.SetText(round.Name);
         PresentationController.SetStage(TableStage.Round);
-        PresentationController.SetSound(Settings.Model.Sounds.RoundBegin);
+        SetSound(Settings.Model.Sounds.RoundBegin);
         LocalInfo.TStage = TableStage.Round;
 
         _logger.Write("\r\n{0} {1}", Resources.Round, round.Name);
@@ -1165,7 +1339,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), false);
-        PresentationController.SetSound(Settings.Model.Sounds.RoundThemes);
+        SetSound(Settings.Model.Sounds.RoundThemes);
         LocalInfo.TStage = TableStage.RoundTable;
         Continuation = AfterRoundThemes;
     }
@@ -1173,6 +1347,20 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool AfterRoundThemes()
     {
         PresentationController.SetStage(TableStage.RoundTable);
+        var minSum = LocalInfo.Players.Min(p => p.Sum);
+        var playersWithMinSum = LocalInfo.Players.Select((p, i) => (p, i)).Where(pair => pair.p.Sum == minSum).ToArray();
+        var playersWithMinSumCount = playersWithMinSum.Length;
+
+        if (playersWithMinSumCount == 1)
+        {
+            ChooserIndex = playersWithMinSum[0].i;
+            return false;
+        }
+        else if (playersWithMinSumCount > 1)
+        {
+            DecisionMode = DecisionMode.StarterChoosing;
+        }
+
         return true;
     }
 
@@ -1192,7 +1380,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         if (ActiveRound?.Type == RoundTypes.Final)
         {
-            PresentationController.SetSound(Settings.Model.Sounds.FinalThink);
+            SetSound(Settings.Model.Sounds.FinalThink);
 
             var time = Settings.Model.FinalQuestionThinkingTime;
 
@@ -1241,7 +1429,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void Engine_RoundTimeout()
     {
-        PresentationController?.SetSound(Settings.Model.Sounds.RoundTimeout);
+        SetSound(Settings.Model.Sounds.RoundTimeout);
         _logger?.Write(Resources.RoundTimeout);
     }
 
@@ -1286,6 +1474,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _selectedAnswerIndex = -1;
         LocalInfo.LayoutMode = LayoutMode.Simple;
         LocalInfo.AnswerOptions.Options = Array.Empty<ItemViewModel>();
+
+        DecisionMode = DecisionMode.None;
+        NegativePrice = null;
     }
 
     private void Engine_FinalThemes(Theme[] finalThemes, bool willPlayAllThemes, bool isFirstPlay)
@@ -1304,7 +1495,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         PresentationController.SetRoundThemes(LocalInfo.RoundInfo.ToArray(), true);
-        PresentationController.SetSound("");
+        PresentationController.SetSound();
         LocalInfo.TStage = TableStage.Final;
     }
 
@@ -1335,6 +1526,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _buttonManager?.Stop();
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+
+        DecisionMode = DecisionMode.None;
 
         UnselectPlayer();
         _selectedPlayers.Clear();
@@ -1378,7 +1571,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Engine_ThemeSelected(int themeIndex)
     {
         PresentationController.PlaySelection(themeIndex);
-        PresentationController.SetSound(Settings.Model.Sounds.FinalDelete);
+        SetSound(Settings.Model.Sounds.FinalDelete);
     }
 
     private void UpdateNextCommand() => _next.CanBeExecuted = _continuation != null || _engine != null && _engine.CanMoveNext;
@@ -1449,7 +1642,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 _logger.Dispose();
 
-                PresentationController.SetSound("");
+                PresentationController.SetSound();
 
                 PlatformManager.Instance.ClearMedia();
             }
@@ -1465,7 +1658,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveTheme = theme;
         ActiveQuestion = question;
 
-        PresentationController.SetSound("");
+        PresentationController.SetSound();
         SetCaption(theme.Name);
     }
 
@@ -1499,7 +1692,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Engine_NextRound(bool showSign)
     {
         ActiveRoundCommand = null;
-        PresentationController.SetSound("");
+        PresentationController.SetSound();
 
         if (showSign)
         {
@@ -1565,7 +1758,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         if (!played)
         {
-            PresentationController.SetSound(Settings.Model.Sounds.QuestionSelected);
+            SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
 
             try
@@ -1691,7 +1884,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _selectedPlayer = player;
         _selectedPlayers.Add(_selectedPlayer);
 
-        PresentationController.SetSound(Settings.Model.Sounds.PlayerPressed);
+        SetSound(Settings.Model.Sounds.PlayerPressed);
         PresentationController.SetActivePlayerIndex(index);
 
         _previousState = State;
@@ -1773,5 +1966,240 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _previousState = QuestionState.Normal;
 
         LocalInfo.TStage = TableStage.Question;
+    }
+
+    internal bool SelectStake(NumberSet availableRange)
+    {
+        if (availableRange.Maximum == availableRange.Minimum && availableRange.Minimum == 0)
+        {
+            // Minimum or maximum in round
+            if (_activeRound == null || _activeRound.Themes.Max(t => t.Questions.Count) == 0)
+            {
+                return false;
+            }
+
+            var minimum = _activeRound.Themes[0].Questions[0].Price;
+            var maximum = 0;
+
+            foreach (var theme in _activeRound.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    if (question.Price == Question.InvalidPrice)
+                    {
+                        continue;
+                    }
+
+                    minimum = Math.Min(minimum, question.Price);
+                    maximum = Math.Max(maximum, question.Price);
+                }
+            }
+
+            availableRange = new NumberSet { Minimum = minimum, Maximum = maximum, Step = maximum - minimum };
+        }
+
+        DecisionMode = DecisionMode.SimpleStake;
+        StakeInfo = availableRange;
+        Price = availableRange.Minimum;
+        return true;
+    }
+
+    internal void OnSetNoRiskPrice()
+    {
+        Price = _activeQuestion.Price * 2;
+        NegativePrice = 0;
+    }
+
+    internal bool OnSetAnswererDirectly(bool canSelectChooser)
+    {
+        var playerCount = LocalInfo.Players.Count;
+
+        if (playerCount == 0)
+        {
+            return false;
+        }
+
+        if (playerCount == 1 && LocalInfo.Players[0] == Chooser)
+        {
+            if (canSelectChooser)
+            {
+                Chooser.IsSelected = true;
+                _selectedPlayer = Chooser;
+            }
+
+            return false;
+        }
+
+        if (playerCount == 2 && !canSelectChooser && Chooser != null && LocalInfo.Players.Contains(Chooser))
+        {
+            var activePlayer = (PlayerInfo)(LocalInfo.Players[0] == Chooser ? LocalInfo.Players[1] : LocalInfo.Players[0]);
+            activePlayer.IsSelected = true;
+            _selectedPlayer = activePlayer;
+
+            return false;
+        }
+
+        CanSelectChooser = canSelectChooser;
+        DecisionMode = DecisionMode.AnswererChoosing;
+
+        return true;
+    }
+
+    internal void Accept()
+    {
+        if (_selectedPlayer != null)
+        {
+            _selectedPlayer.Sum += Price;
+        }
+    }
+
+    internal bool OnSetAnswererByHighestStake()
+    {
+        if (Chooser == null)
+        {
+            return false;
+        }
+
+        var chooserIndex = LocalInfo.Players.IndexOf(Chooser);
+
+        if (chooserIndex == -1)
+        {
+            return false;
+        }
+
+        InitStakers(chooserIndex);
+
+        if (_stakers.Count == 1)
+        {
+            SetStakerToAnswer();
+            return false;
+        }
+
+        _isAllIn = false;
+        AskNextStake(true);
+        Pass.CanBeExecuted = false;
+        DecisionMode = DecisionMode.Stake;
+
+        return true;
+    }
+
+    private void InitStakers(int chooserIndex)
+    {
+        Stake = Price;
+
+        _stakers.Clear();
+
+        _stakers.Add(chooserIndex);
+
+        var orderedPlayerIndicies = LocalInfo.Players
+            .Select((p, i) => (p, i))
+            .Where(pair => pair.p.Sum > Stake && pair.i != chooserIndex)
+            .OrderBy(pair => pair.p.Sum)
+            .Select(pair => pair.i);
+
+        _stakers.AddRange(orderedPlayerIndicies);
+        _stakersIterator = 0;
+    }
+
+    private void Pass_Executed(object? arg)
+    {
+        _stakers.RemoveAt(_stakersIterator);
+
+        if (_stakersIterator == _stakers.Count)
+        {
+            _stakersIterator = 0;
+        }
+
+        if (_stakers.Count == 1)
+        {
+            SetStakerToAnswer();
+            return;
+        }
+
+        AskNextStake();
+    }
+
+    private void MakeStake_Executed(object? arg)
+    {
+        Price = Stake;
+
+        for (var i = 0; i < _stakers.Count; )
+        {
+            if (i == _stakersIterator)
+            {
+                i++;
+                continue;
+            }
+
+            if (LocalInfo.Players[_stakers[i]].Sum <= Stake)
+            {
+                _stakers.RemoveAt(i);
+
+                if (_stakersIterator > i)
+                {
+                    _stakersIterator--;
+                }
+
+                continue;
+            }
+
+            i++;
+        }
+
+        if (_stakers.Count == 1)
+        {
+            SetStakerToAnswer();
+            return;
+        }
+
+        _isAllIn = Staker.Sum == Stake;
+
+        _stakersIterator++;
+
+        if (_stakersIterator == _stakers.Count)
+        {
+            _stakersIterator = 0;
+        }
+
+        AskNextStake();
+        Pass.CanBeExecuted = true;
+    }
+
+    private void AskNextStake(bool firstTime = false)
+    {
+        StakerIndex = _stakers[_stakersIterator];
+        var staker = Staker;
+
+        if (_isAllIn)
+        {
+            Stake = staker.Sum;
+        }
+        else if (!firstTime)
+        {
+            Stake = Math.Min(staker.Sum, Stake + 100);
+        }
+
+        StakeInfo = new NumberSet { Minimum = Stake, Maximum = staker.Sum, Step = 100 };
+    }
+
+    private void SetStakerToAnswer()
+    {
+        StakerIndex = _stakers[0];
+        var staker = Staker;
+        staker.IsSelected = true;
+        _selectedPlayer = staker;
+        Chooser = _selectedPlayer;
+        DecisionMode = DecisionMode.None;
+    }
+
+    internal bool OnSetAnswererAsCurrent()
+    {
+        if (Chooser != null)
+        {
+            Chooser.IsSelected = true;
+            _selectedPlayer = Chooser;
+        }
+
+        return false;
     }
 }

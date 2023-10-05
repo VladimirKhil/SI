@@ -267,6 +267,10 @@ public partial class App : Application
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
+        else if (e.Exception is InvalidOperationException && e.Exception.Message.Contains("Cannot set Visibility to Visible"))
+        {
+            // Do nothing
+        }
         else if (_useAppService
             && _host != null
             && MessageBox.Show(

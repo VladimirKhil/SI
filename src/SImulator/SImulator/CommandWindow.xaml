@@ -51,7 +51,6 @@
             <my:PlayersConverter x:Key="PlayersConverter" />
             
             <my:EqualityConverter x:Key="Equality" />
-            <my:EqualMultiConverter x:Key="EqualMultiConverter" />
 
             <my:KeyConverter x:Key="KeyConverter" />
 
@@ -1680,6 +1679,8 @@
         <TabItem Header="Звуки">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">
+                    <CheckBox Margin="0,5" IsChecked="{Binding SettingsViewModel.Model.PlaySounds}" Content="{x:Static lp:Resources.PlaySounds}" />
+
                     <TextBlock Style="{StaticResource Header}" Text="Начало игры" />
                     
                     <DockPanel>

@@ -151,6 +151,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Выберите игрока для ответа.
+        /// </summary>
+        public static string ChoosePlayerToAnswer {
+            get {
+                return ResourceManager.GetString("ChoosePlayerToAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Выберите игрока, начинающего игру.
+        /// </summary>
+        public static string ChoosePlayerToStart {
+            get {
+                return ResourceManager.GetString("ChoosePlayerToStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Очистить список.
         /// </summary>
         public static string ClearList {
@@ -277,6 +295,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Передать ход.
+        /// </summary>
+        public static string GiveTurn {
+            get {
+                return ResourceManager.GetString("GiveTurn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Скрыть.
         /// </summary>
         public static string Hide {
@@ -385,6 +412,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Пас.
+        /// </summary>
+        public static string Pass {
+            get {
+                return ResourceManager.GetString("Pass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Фон.
         /// </summary>
         public static string PlacementBackground {
@@ -417,6 +453,15 @@ namespace SImulator.Properties {
         public static string PlayersTable {
             get {
                 return ResourceManager.GetString("PlayersTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Играть звуки.
+        /// </summary>
+        public static string PlaySounds {
+            get {
+                return ResourceManager.GetString("PlaySounds", resourceCulture);
             }
         }
         
@@ -759,6 +804,15 @@ namespace SImulator.Properties {
         public static string SpecialThinkingTime {
             get {
                 return ResourceManager.GetString("SpecialThinkingTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ставка.
+        /// </summary>
+        public static string Stake {
+            get {
+                return ResourceManager.GetString("Stake", resourceCulture);
             }
         }
         

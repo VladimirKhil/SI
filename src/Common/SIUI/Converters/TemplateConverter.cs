@@ -4,6 +4,10 @@ using System.Windows.Data;
 
 namespace SIUI.Converters;
 
+/// <summary>
+/// Convertes key value to a data template.
+/// </summary>
+[ValueConversion(typeof(object), typeof(DataTemplate))]
 public sealed class TemplateConverter : IValueConverter
 {
     public DataTemplate? DefaultTemplate { get; set; }

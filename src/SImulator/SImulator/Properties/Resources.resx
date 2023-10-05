@@ -147,6 +147,12 @@
   <data name="ByDefault" xml:space="preserve">
     <value>По умолчанию</value>
   </data>
+  <data name="ChoosePlayerToAnswer" xml:space="preserve">
+    <value>Выберите игрока для ответа</value>
+  </data>
+  <data name="ChoosePlayerToStart" xml:space="preserve">
+    <value>Выберите игрока, начинающего игру</value>
+  </data>
   <data name="ClearList" xml:space="preserve">
     <value>Очистить список</value>
   </data>
@@ -189,6 +195,9 @@
   <data name="GameType" xml:space="preserve">
     <value>Тип игры</value>
   </data>
+  <data name="GiveTurn" xml:space="preserve">
+    <value>Передать ход</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Скрыть</value>
   </data>
@@ -225,6 +234,9 @@
   <data name="OutOfMemoryError" xml:space="preserve">
     <value>Недостаточно памяти для выполнения программы!</value>
   </data>
+  <data name="Pass" xml:space="preserve">
+    <value>Пас</value>
+  </data>
   <data name="PlacementBackground" xml:space="preserve">
     <value>Фон</value>
   </data>
@@ -236,6 +248,9 @@
   </data>
   <data name="PlayersTable" xml:space="preserve">
     <value>Таблица игроков</value>
+  </data>
+  <data name="PlaySounds" xml:space="preserve">
+    <value>Играть звуки</value>
   </data>
   <data name="PresentationExitHint" xml:space="preserve">
     <value>Для выхода нажмите Escape, правую кнопку мыши или немного надавите пальцем</value>
@@ -350,6 +365,9 @@
   </data>
   <data name="SpecialThinkingTime" xml:space="preserve">
     <value>Время на размышление над спецвопросом (с)</value>
+  </data>
+  <data name="Stake" xml:space="preserve">
+    <value>Ставка</value>
   </data>
   <data name="Start" xml:space="preserve">
     <value>Старт</value>

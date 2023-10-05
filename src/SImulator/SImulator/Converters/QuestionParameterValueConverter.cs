@@ -8,6 +8,9 @@ using System.Windows.Data;
 
 namespace SImulator.Converters;
 
+/// <summary>
+/// Produces localized version of question parameter value.
+/// </summary>
 public sealed class QuestionParameterValueConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)

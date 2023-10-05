@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace SImulator.Converters;
 
+/// <summary>
+/// Compares two values for equality.
+/// </summary>
 internal sealed class EqualMultiConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

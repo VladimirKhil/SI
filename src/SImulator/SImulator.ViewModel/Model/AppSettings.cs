@@ -279,6 +279,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _playSounds = true;
+
+    /// <summary>
+    /// Play application sounds.
+    /// </summary>
+    [DefaultValue(true)]
+    public bool PlaySounds
+    {
+        get => _playSounds;
+        set
+        {
+            if (_playSounds != value)
+            {
+                _playSounds = value;
+                OnPropertyChanged();
+            }
+        }
+    }    
+
     private GameModes _gameMode = GameModes.Tv;
 
     /// <summary>
@@ -376,7 +395,7 @@ public sealed class AppSettings : INotifyPropertyChanged
     private bool _falseStartMultimedia = true;
 
     /// <summary>
-    /// Мультимедиа с фальстартами
+    /// Use false starts while playing multimedia questions.
     /// </summary>
     [DefaultValue(true)]
     public bool FalseStartMultimedia

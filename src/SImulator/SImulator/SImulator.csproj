@@ -37,6 +37,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Images\active_player.png" />
+  </ItemGroup>
     <ItemGroup>
       <Content Update="ru-RU\SIUI.resources.dll">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -44,6 +47,7 @@
       </Content>
     </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\active_player.png" />
     <Resource Include="Images\logo.png" />
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>

@@ -2,6 +2,7 @@
 using SIEngine.Core;
 using SIEngine.Rules;
 using SImulator.ViewModel.Contracts;
+using SImulator.ViewModel.Model;
 using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
@@ -75,7 +76,11 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         return false;
     }
 
-    public bool OnAccept() => false;
+    public bool OnAccept()
+    {
+        GameViewModel?.Accept();
+        return false;
+    }
 
     public void OnAskAnswer(string mode)
     {
@@ -235,7 +240,30 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         GameViewModel.ActiveContent = content;
     }
 
-    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
+    public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility)
+    {
+        if (GameViewModel == null)
+        {
+            return false;
+        }
+
+        if (mode == StepParameterValues.SetAnswererMode_Stake
+            && select == StepParameterValues.SetAnswererSelect_Highest
+            && stakeVisibility == StepParameterValues.SetAnswererStakeVisibility_Visible)
+        {
+            return GameViewModel.OnSetAnswererByHighestStake();
+        }
+        else if (mode == StepParameterValues.SetAnswererMode_ByCurrent)
+        {
+            return GameViewModel.OnSetAnswererDirectly(select == StepParameterValues.SetAnswererSelect_Any);
+        }
+        else if (mode == StepParameterValues.SetAnswererMode_Current)
+        {
+            return GameViewModel.OnSetAnswererAsCurrent();
+        }
+
+        return false;
+    }
 
     public bool OnAnnouncePrice(NumberSet? availableRange) => false;
 
@@ -249,16 +277,21 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         switch (mode)
         {
             case StepParameterValues.SetPriceMode_Select:
-                if (availableRange != null
-                    && availableRange.Maximum == availableRange.Minimum
-                    && availableRange.Minimum > 0)
+                if (availableRange != null)
                 {
-                    GameViewModel.Price = availableRange.Maximum;
+                    if (availableRange.Maximum == availableRange.Minimum && availableRange.Minimum > 0)
+                    {
+                        GameViewModel.Price = availableRange.Maximum;
+                    }
+                    else
+                    {
+                        return GameViewModel.SelectStake(availableRange);
+                    }
                 }
                 break;
 
             case StepParameterValues.SetPriceMode_NoRisk:
-                // Do nothing
+                GameViewModel.OnSetNoRiskPrice();
                 break;
 
             default:
@@ -292,12 +325,6 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        GameViewModel.OnQuestionStart();
-        PresentationController.SetQuestionSound(false);
-        PresentationController.SetQuestionContentType(QuestionContentType.Void);
-        PresentationController.SetStage(TableStage.Question);
-        PresentationController.SetSound();
-
         if (buttonsRequired)
         {
             GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
@@ -313,7 +340,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        GameViewModel.State = Model.QuestionState.Normal;
+        GameViewModel.State = QuestionState.Normal;
         PresentationController.SetSound();
     }
 
@@ -324,8 +351,15 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
+        GameViewModel.OnQuestionStart();
+        PresentationController.SetQuestionSound(false);
+        PresentationController.SetQuestionContentType(QuestionContentType.Void);
+        PresentationController.SetStage(TableStage.Question);
+        PresentationController.SetSound();
+
         GameViewModel.ContentItems = contentItems;
         GameViewModel.ActiveMediaCommand = null;
+        GameViewModel.DecisionMode = DecisionMode.None;
     }
 
     public void OnSimpleRightAnswerStart()

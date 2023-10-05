@@ -75,6 +75,7 @@ public sealed class AppSettingsViewModel
             Model.AutomaticGame = defaultSettings.AutomaticGame;
             Model.SubstractOnWrong = defaultSettings.SubstractOnWrong;
             Model.PlaySpecials = defaultSettings.PlaySpecials;
+            Model.PlaySounds = defaultSettings.PlaySounds;
             Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
             Model.GameMode = defaultSettings.GameMode;
 
