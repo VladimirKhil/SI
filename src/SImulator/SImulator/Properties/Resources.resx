@@ -291,6 +291,9 @@
   <data name="RemovePlayer" xml:space="preserve">
     <value>Удалить игрока</value>
   </data>
+  <data name="ResetSums" xml:space="preserve">
+    <value>Удалить суммы и статистику</value>
+  </data>
   <data name="RightAnswers" xml:space="preserve">
     <value>Верных</value>
   </data>

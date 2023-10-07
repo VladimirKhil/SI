@@ -583,6 +583,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Удалить суммы и статистику.
+        /// </summary>
+        public static string ResetSums {
+            get {
+                return ResourceManager.GetString("ResetSums", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Верных.
         /// </summary>
         public static string RightAnswers {

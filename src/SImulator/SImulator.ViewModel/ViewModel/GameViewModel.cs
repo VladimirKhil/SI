@@ -141,6 +141,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public ICommand RemovePlayer { get; private set; }
     public ICommand ClearPlayers { get; private set; }
 
+    public ICommand ResetSums { get; private set; }
+
     public ICommand GiveTurn { get; private set; }
 
     public SimpleCommand Pass { get; private set; }
@@ -508,6 +510,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         AddPlayer = new SimpleCommand(AddPlayer_Executed);
         RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
         ClearPlayers = new SimpleCommand(ClearPlayers_Executed);
+        ResetSums = new SimpleCommand(ResetSums_Executed);
         GiveTurn = new SimpleCommand(GiveTurn_Executed);
         Pass = new SimpleCommand(Pass_Executed);
         MakeStake = new SimpleCommand(MakeStake_Executed);
@@ -975,6 +978,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         LocalInfo.Players.Clear();
         PresentationController.ClearPlayers();
+    }
+
+    private void ResetSums_Executed(object? arg)
+    {
+        foreach (var player in LocalInfo.Players.Cast<PlayerInfo>())
+        {
+            player.Sum = 0;
+            player.State = PlayerState.None;
+            player.Right = 0;
+            player.Wrong = 0;
+        }
     }
 
     private void GiveTurn_Executed(object? arg)
