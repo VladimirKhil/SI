@@ -1,9 +1,7 @@
-﻿using SIEngine.Core;
-using SImulator.ViewModel.Contracts;
+﻿using SImulator.ViewModel.Contracts;
 using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
 using SImulator.ViewModel.PlatformSpecific;
-using SIPackages;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
 using System.Collections.ObjectModel;

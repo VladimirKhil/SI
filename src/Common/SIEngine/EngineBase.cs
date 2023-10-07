@@ -100,6 +100,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             {
                 _canMoveBack = value;
                 OnPropertyChanged();
+                UpdateCanMoveNextRound();
             }
         }
     }
@@ -344,9 +345,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             }
         } while (_stage == GameStage.Round && !AcceptRound(_activeRound));
 
-        CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
-        CanMoveBackRound = _roundIndex > 0;
-
+        CanMoveBack = false;
+        UpdateCanMoveNextRound();
         UpdateCanNext();
 
         if (moved)
@@ -354,14 +354,26 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             OnNextRound(showSign);
         }
 
-        CanMoveBack = false;
         return moved;
     }
 
+    protected void UpdateCanMoveNextRound() => CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
+
+    protected void UpdateCanMoveBackRound() => CanMoveBackRound = _roundIndex > 0 || CanMoveBack;
+
     public virtual bool MoveToRound(int roundIndex, bool showSign = true)
     {
-        if (_roundIndex == roundIndex ||
-            roundIndex < 0 ||
+        if (_roundIndex == roundIndex)
+        {
+            if (CanMoveBack)
+            {
+                return MoveBackRound();
+            }
+
+            return false;
+        }
+
+        if (roundIndex < 0 ||
             roundIndex >= _document.Package.Rounds.Count ||
             !AcceptRound(_document.Package.Rounds[roundIndex]))
         {
@@ -372,13 +384,11 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         SetActiveRound();
         Stage = GameStage.Round;
 
-        CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
-        CanMoveBackRound = _roundIndex > 0;
-
+        CanMoveBack = false;
+        UpdateCanMoveNextRound();
         UpdateCanNext();
         OnNextRound(showSign);
 
-        CanMoveBack = false;
         return true;
     }
 
@@ -395,25 +405,31 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
         }
 
         var moved = true;
-        do
+
+        if (CanMoveBack)
         {
-            if (_roundIndex == 0)
-            {
-                // Cannot find suitable round while moving back. So returning forward to the first matching round
-                return MoveNextRound();
-            }
-
-            _roundIndex--;
-            SetActiveRound();
-
             Stage = GameStage.Round;
-        } while (!AcceptRound(_activeRound));
+        }
+        else
+        {
+            do
+            {
+                if (_roundIndex == 0)
+                {
+                    // Cannot find suitable round while moving back. So returning forward to the first matching round
+                    return MoveNextRound();
+                }
 
-        CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
-        CanMoveBackRound = _roundIndex > 0;
-        UpdateCanNext();
+                _roundIndex--;
+                SetActiveRound();
+
+                Stage = GameStage.Round;
+            } while (!AcceptRound(_activeRound));
+        }
 
         CanMoveBack = false;
+        UpdateCanNext();
+
         return moved;
     }
 

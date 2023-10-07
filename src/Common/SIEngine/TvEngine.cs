@@ -61,6 +61,7 @@ public sealed class TvEngine : EngineBase
                 OnSound();
 
                 var themes = new List<string>();
+
                 foreach (var round in _document.Package.Rounds.Where(round => round.Type != RoundTypes.Final))
                 {
                     foreach (var theme in round.Themes.Where(theme => theme.Questions.Any()))
@@ -282,15 +283,6 @@ public sealed class TvEngine : EngineBase
 
         var theme = data.Item1;
         var question = data.Item2;
-
-        if (_stage == GameStage.Round)
-        {
-            _roundIndex--;
-            SetActiveRound();
-
-            CanMoveNextRound = _roundIndex + 1 < _document.Package.Rounds.Count;
-            CanMoveBackRound = _roundIndex > 0;
-        }
 
         _questionsTable.Add(data);
         Stage = GameStage.RoundTable;

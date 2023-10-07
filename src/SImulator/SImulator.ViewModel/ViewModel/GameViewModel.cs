@@ -1347,6 +1347,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool AfterRoundThemes()
     {
         PresentationController.SetStage(TableStage.RoundTable);
+
+        if (!LocalInfo.Players.Any())
+        {
+            return false;
+        }
+
         var minSum = LocalInfo.Players.Min(p => p.Sum);
         var playersWithMinSum = LocalInfo.Players.Select((p, i) => (p, i)).Where(pair => pair.p.Sum == minSum).ToArray();
         var playersWithMinSumCount = playersWithMinSum.Length;
