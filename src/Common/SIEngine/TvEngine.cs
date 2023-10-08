@@ -1,4 +1,5 @@
-﻿using SIEngine.Rules;
+﻿using SIEngine.QuestionSelectionStrategies;
+using SIEngine.Rules;
 using SIPackages;
 using SIPackages.Core;
 
@@ -22,6 +23,7 @@ public sealed class TvEngine : EngineBase
     private readonly List<Theme> _finalThemes = new();
 
     protected override GameRules GameRules => WellKnownGameRules.Classic;
+    private readonly ISelectionStrategy _selectionStrategy = new SelectByPlayerStrategy();
 
     private void SetActiveThemeQuestion()
     {
@@ -51,27 +53,33 @@ public sealed class TvEngine : EngineBase
         {
             case GameStage.Begin:
                 #region Begin
-                Stage = GameStage.GameThemes;
                 OnPackage(_document.Package);
+
+                if (GameRules.ShowGameThemes)
+                {
+                    Stage = GameStage.GameThemes;
+                }
+                else
+                {
+                    MoveNextRound(false);
+                    AutoNext(1000);
+                }
                 break;
                 #endregion
 
             case GameStage.GameThemes:
                 #region GameThemes
-                OnSound();
+                var themes = new SortedSet<string>();
 
-                var themes = new List<string>();
-
-                foreach (var round in _document.Package.Rounds.Where(round => round.Type != RoundTypes.Final))
+                foreach (var round in _document.Package.Rounds)
                 {
-                    foreach (var theme in round.Themes.Where(theme => theme.Questions.Any()))
+                    foreach (var theme in round.Themes.Where(theme => theme.Questions.Any(q => q.Price != SIPackages.Question.InvalidPrice)))
                     {
                         themes.Add(theme.Name);
                     }
                 }
 
-                themes.Sort();
-                OnGameThemes(themes.ToArray());
+                OnGameThemes(themes);
 
                 MoveNextRound(false);
                 AutoNext(1000 + Math.Max(3, themes.Count) * 15000 / 18);
@@ -80,7 +88,6 @@ public sealed class TvEngine : EngineBase
 
             case GameStage.Round:
                 #region Round
-                OnSound("beginround.mp3");
                 _history.Clear();
                 CanMoveBack = false;
 
@@ -102,8 +109,6 @@ public sealed class TvEngine : EngineBase
 
             case GameStage.RoundThemes:
                 #region RoundThemes
-                OnSound("cathegories.mp3");
-
                 _questionsTable.Clear();
 
                 for (int i = 0; i < _activeRound.Themes.Count; i++)
@@ -159,7 +164,6 @@ public sealed class TvEngine : EngineBase
 
                 if (_timeout) // Round timeout
                 {
-                    OnSound("timeout.wav");
                     OnRoundTimeout();
                     DoFinishRound();
                 }
@@ -181,8 +185,6 @@ public sealed class TvEngine : EngineBase
 
             case GameStage.FinalThemes:
                 #region FinalThemes
-                OnSound();
-
                 var finalThemes = _activeRound.Themes;
                 _finalThemes.Clear();
 
@@ -215,8 +217,6 @@ public sealed class TvEngine : EngineBase
                 break;
 
             case GameStage.AfterFinalThink:
-                OnSound();
-
                 if (OptionsProvider().PlayAllQuestionsInFinalRound)
                 {
                     _finalThemes.RemoveAt(_themeIndex);
@@ -326,7 +326,6 @@ public sealed class TvEngine : EngineBase
         _questionIndex = 0;
 
         OnThemeSelected(themeIndex);
-        OnSound("shrink.mp3");
         UpdateCanNext();
     }
 
@@ -395,7 +394,6 @@ public sealed class TvEngine : EngineBase
                 more = true;
             }
 
-            OnSound();
             AutoNext(4000);
         }
 

@@ -38,7 +38,6 @@ public sealed class SportEngine : EngineBase
 
             case GameStage.Round:
                 #region Round
-                OnSound("beginround.mp3");
                 CanMoveBack = false;
 
                 OnRound(_activeRound);
@@ -105,7 +104,6 @@ public sealed class SportEngine : EngineBase
 
                 if (_timeout) // Round timeout
                 {
-                    OnSound("timeout.wav");
                     OnRoundTimeout();
                     DoFinishRound();
                 }

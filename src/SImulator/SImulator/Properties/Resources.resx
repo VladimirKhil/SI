@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>О программе</value>
+  </data>
   <data name="AddPlayer" xml:space="preserve">
     <value>Добавить игрока</value>
   </data>
@@ -129,6 +132,9 @@
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
   </data>
+  <data name="AnswererBackgroundColor" xml:space="preserve">
+    <value>Цвет фона отвечающего игрока</value>
+  </data>
   <data name="AnswerOptions" xml:space="preserve">
     <value>Варианты ответа</value>
   </data>
@@ -138,11 +144,17 @@
   <data name="Back" xml:space="preserve">
     <value>Назад</value>
   </data>
+  <data name="BackgroundColor" xml:space="preserve">
+    <value>Цвет фона</value>
+  </data>
   <data name="BackgroundImage" xml:space="preserve">
     <value>Изображение-фон</value>
   </data>
   <data name="BackgroundVideo" xml:space="preserve">
     <value>Видеофайл-фон</value>
+  </data>
+  <data name="Buttons" xml:space="preserve">
+    <value>Кнопки</value>
   </data>
   <data name="ByDefault" xml:space="preserve">
     <value>По умолчанию</value>
@@ -177,6 +189,9 @@
   <data name="FinishGameQuestion" xml:space="preserve">
     <value>Завершить игру?</value>
   </data>
+  <data name="FontFamily" xml:space="preserve">
+    <value>Шрифт</value>
+  </data>
   <data name="Game" xml:space="preserve">
     <value>Игра</value>
   </data>
@@ -198,8 +213,20 @@
   <data name="GiveTurn" xml:space="preserve">
     <value>Передать ход</value>
   </data>
+  <data name="GridColor" xml:space="preserve">
+    <value>Цвет сетки</value>
+  </data>
   <data name="Hide" xml:space="preserve">
     <value>Скрыть</value>
+  </data>
+  <data name="HintBeforeStart" xml:space="preserve">
+    <value>Для управления ходом игры нажимайте кнопку "Дальше"</value>
+  </data>
+  <data name="HintGameThemes" xml:space="preserve">
+    <value>(Темы игры)</value>
+  </data>
+  <data name="HintIntro" xml:space="preserve">
+    <value>(Заставка)</value>
   </data>
   <data name="Html" xml:space="preserve">
     <value>HTML</value>
@@ -216,6 +243,9 @@
   <data name="KeyboardListeningError" xml:space="preserve">
     <value>Ошибка прослушивания клавиатуры</value>
   </data>
+  <data name="License" xml:space="preserve">
+    <value>Лицензия</value>
+  </data>
   <data name="LogsFolderNotFound" xml:space="preserve">
     <value>Папка для записи логов "{0}" не найдена</value>
   </data>
@@ -227,6 +257,9 @@
   </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
+  </data>
+  <data name="NotSelected" xml:space="preserve">
+    <value>Не выбран</value>
   </data>
   <data name="Oral" xml:space="preserve">
     <value>Устный текст</value>
@@ -363,6 +396,9 @@
   <data name="SIStorageError" xml:space="preserve">
     <value>Ошибка работы с библиотекой вопросов: {0}</value>
   </data>
+  <data name="Sounds" xml:space="preserve">
+    <value>Звуки</value>
+  </data>
   <data name="Source" xml:space="preserve">
     <value>Источник</value>
   </data>
@@ -392,6 +428,9 @@
   </data>
   <data name="TestPackage" xml:space="preserve">
     <value>Пакет тест</value>
+  </data>
+  <data name="TextColor" xml:space="preserve">
+    <value>Цвет текста</value>
   </data>
   <data name="ThemeComments" xml:space="preserve">
     <value>Комментарии темы</value>

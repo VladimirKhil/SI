@@ -20,6 +20,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using Utils;
+using Utils.Timers;
+using Utils.Wpf;
 using Screen = System.Windows.Forms.Screen;
 
 namespace SImulator.Implementation;
@@ -378,4 +380,6 @@ internal sealed class DesktopManager : PlatformManager
     {
         
     }
+
+    public override IAnimatableTimer CreateAnimatableTimer() => new AnimatableTimer();
 }

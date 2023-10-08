@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>SImulator</AssemblyTitle>
-    <Company>Khil-soft</Company>
     <Product>SImulator</Product>
     <Description>SIGame emulator</Description>
     <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
-    <Version>2.13.0</Version>
+    <Version>$(SImulatorVersion)</Version>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -66,6 +65,7 @@
     <ProjectReference Include="..\..\Common\SIStorageService.ViewModel\SIStorageService.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
+    <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />
     <ProjectReference Include="..\SImulator.ViewModel\SImulator.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>

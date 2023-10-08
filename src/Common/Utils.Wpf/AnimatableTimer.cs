@@ -1,18 +1,21 @@
-﻿using SIGame.ViewModel.PlatformSpecific;
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media.Animation;
+using Utils.Timers;
 
-namespace SIGame.Implementation;
+namespace Utils.Wpf;
 
-internal sealed class AnimatableTimer : Animatable, IAnimatableTimer
+/// <inheritdoc cref="IAnimatableTimer" />.
+public sealed class AnimatableTimer : Animatable, IAnimatableTimer
 {
     public static readonly DependencyProperty TimeProperty =
         DependencyProperty.Register(nameof(Time), typeof(double), typeof(AnimatableTimer), new PropertyMetadata(0.0));
 
     public static DependencyPropertyDescriptor TimeDescriptor = DependencyPropertyDescriptor.FromProperty(TimeProperty, typeof(AnimatableTimer));
 
+    /// <summary>
+    /// Current timer time, animated from 0.0 to 100.0.
+    /// </summary>
     public double Time
     {
         get => (double)GetValue(TimeProperty);
@@ -23,10 +26,19 @@ internal sealed class AnimatableTimer : Animatable, IAnimatableTimer
 
     private bool _isSystemPaused;
 
+    /// <summary>
+    /// Maximum running time, 0.1 s.
+    /// </summary>
     public int MaxTime { get; set; }
 
+    /// <summary>
+    /// Current timer state.
+    /// </summary>
     public TimerState State { get; private set; } = TimerState.Stopped;
 
+    /// <summary>
+    /// Time changed event.
+    /// </summary>
     public event Action<IAnimatableTimer>? TimeChanged;
 
     public AnimatableTimer() => TimeDescriptor.AddValueChanged(this, OnTimeChanged);
@@ -100,6 +112,11 @@ internal sealed class AnimatableTimer : Animatable, IAnimatableTimer
         Time = 0.0;
     }
 
+    /// <summary>
+    /// Pauses timer and adjustes its current time.
+    /// </summary>
+    /// <param name="currentTime">Current time value, 0.1 s.</param>
+    /// <param name="byUser">Has pause been caused by user (not by system).</param>
     public void Pause(int currentTime, bool byUser)
     {
         if (Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)

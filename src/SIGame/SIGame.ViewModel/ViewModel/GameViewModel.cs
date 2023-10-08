@@ -11,10 +11,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
+using Utils.Timers;
 
 namespace SIGame.ViewModel;
 

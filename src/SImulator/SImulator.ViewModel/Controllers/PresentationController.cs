@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Utils;
 using Utils.Commands;
+using Utils.Timers;
 
 namespace SImulator.ViewModel.Controllers;
 
@@ -18,6 +19,8 @@ namespace SImulator.ViewModel.Controllers;
 public sealed class PresentationController : IPresentationController, INotifyPropertyChanged
 {
     private int _previousCode = -1;
+
+    private IAnimatableTimer _animatableTimer = PlatformManager.Instance.CreateAnimatableTimer();
 
     private IPresentationListener? _listener;
 
@@ -112,7 +115,12 @@ public sealed class PresentationController : IPresentationController, INotifyPro
                 UI.Execute(() => _listener.AskStop(), exc => Error?.Invoke(exc));
             }
         });
+
+        _animatableTimer.TimeChanged += AnimatableTimer_TimeChanged;
     }
+
+    private void AnimatableTimer_TimeChanged(IAnimatableTimer timer) =>
+        TInfo.TimeLeft = timer.Time < 0.001 ? 0.0 : 1.0 - timer.Time / 100;
 
     private void TInfo_AnswerSelected(ItemViewModel answer)
     {
@@ -188,7 +196,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
         }
     }
 
-    public void SetGameThemes(string[] themes)
+    public void SetGameThemes(IEnumerable<string> themes)
     {
         TInfo.GameThemes.Clear();
         TInfo.GameThemes.AddRange(themes);
@@ -258,49 +266,35 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void AddPlayer()
     {
-        TInfo.Players.Add(new SimplePlayerInfo()); // deprecated
         Players.Add(new SimplePlayerInfo());
     }
 
     public void RemovePlayer(string playerName)
     {
-        var player = TInfo.Players.FirstOrDefault(info => info.Name == playerName);
+        var player = Players.FirstOrDefault(p => p.Name == playerName);
 
         if (player != null)
         {
-            TInfo.Players.Remove(player);
-        }
-
-        var player2 = Players.FirstOrDefault(p => p.Name == playerName);
-
-        if (player2 != null)
-        {
-            Players.Remove(player2);
+            Players.Remove(player);
         }
     }
 
     public void ClearPlayers()
     {
-        TInfo.Players.Clear();
         Players.Clear();
     }
 
     public void UpdatePlayerInfo(int index, PlayerInfo player)
     {
-        if (index > -1 && index < TInfo.Players.Count)
+        if (index <= -1 || index >= Players.Count)
         {
-            var p = TInfo.Players[index];
-            p.Sum = player.Sum;
-            p.Name = player.Name;
+            return;
         }
 
-        if (index > -1 && index < Players.Count)
-        {
-            var p = Players[index];
-            p.Sum = player.Sum;
-            p.Name = player.Name;
-            p.State = player.State;
-        }
+        var p = Players[index];
+        p.Sum = player.Sum;
+        p.Name = player.Name;
+        p.State = player.State;
     }
 
     public void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal)
@@ -516,7 +510,13 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
 
-    public void SetLeftTime(double leftTime) => TInfo.TimeLeft = leftTime;
+    public void SetTimerMaxTime(int maxTime) => _animatableTimer.MaxTime = maxTime;
+
+    public void RunTimer() => _animatableTimer.Run(-1, false);
+
+    public void PauseTimer(int currentTime) => _animatableTimer.Pause(currentTime, false);
+
+    public void StopTimer() => _animatableTimer.Stop();
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -565,6 +565,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
         answerOptions[answerIndex].State = state;
     }
+
+    public void Dispose() => _animatableTimer.Dispose();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }

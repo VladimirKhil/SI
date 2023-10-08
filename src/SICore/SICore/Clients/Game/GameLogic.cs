@@ -201,12 +201,13 @@ public sealed class GameLogic : Logic<GameData>
         OnPackage(package, 1);
     }
 
-    private void Engine_GameThemes(string[] gameThemes)
+    private void Engine_GameThemes(IEnumerable<string> gameThemes)
     {
         _gameActions.ShowmanReplic(GetRandomString(LO[nameof(R.GameThemes)]));
         var msg = new MessageBuilder(Messages.GameThemes).AddRange(gameThemes);
         _gameActions.SendMessage(msg.Build());
-        ScheduleExecution(Tasks.MoveNext, Math.Max(40, 11 + 150 * gameThemes.Length / 18));
+        _ = gameThemes.TryGetNonEnumeratedCount(out var count);
+        ScheduleExecution(Tasks.MoveNext, Math.Max(40, 10 + 10 * count));
     }
 
     private void Engine_Round(Round round)

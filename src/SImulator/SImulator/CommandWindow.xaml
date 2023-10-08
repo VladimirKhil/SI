@@ -406,7 +406,7 @@
                 <uic:TemplateConverter.DefaultTemplate>
                     <DataTemplate>
                         <TextBlock
-                            Text="Для управления ходом игры нажимайте кнопку &quot;Дальше&quot;"
+                            Text="{x:Static lp:Resources.HintBeforeStart}"
                             TextWrapping="Wrap"
                             TextAlignment="Center"
                             VerticalAlignment="Center"
@@ -416,11 +416,11 @@
                 
                 <uic:TemplateConverter.Templates>
                     <DataTemplate x:Key="{x:Static uim:TableStage.Sign}">
-                        <TextBlock Text="(Заставка)" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static lp:Resources.HintIntro}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.GameThemes}">
-                        <TextBlock Text="(Темы игры)" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static lp:Resources.HintGameThemes}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.Round}">
@@ -580,6 +580,308 @@
             </uic:TemplateConverter>
 
             <CollectionViewSource x:Key="DemonstrationScreens" Source="{Binding Screens}" />
+
+            <DataTemplate x:Key="Game">
+                <Grid Margin="2,2,0,0" DataContext="{Binding Game}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition x:Name="playersRow" Height="0" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
+                    <Separator Grid.Row="1" Width="250" />
+
+                    <DockPanel Grid.Row="2">
+                        <Button
+                            DockPanel.Dock="Left"
+                            Style="{StaticResource CommandButton}"
+                            ToolTip="{x:Static lp:Resources.Back}"
+                            Margin="0,0,8,0"
+                            Command="{Binding Back}">
+                            <Path Data="M5,0L0,5L5,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
+                        </Button>
+
+                        <Button
+                            DockPanel.Dock="Right"
+                            Style="{StaticResource CommandButton}"
+                            ToolTip="{x:Static lp:Resources.Next}"
+                            Margin="8,0,0,0"
+                            Command="{Binding Next}">
+                            <Path Data="M0,0L5,5L0,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
+                        </Button>
+
+                        <ContentControl
+                            Name="main"
+                            Content="{Binding LocalInfo}"
+                            ContentTemplate="{Binding LocalInfo.TStage, Converter={StaticResource Selector}}"
+                            Margin="0,2,0,2"
+                            FontSize="14" />
+                    </DockPanel>
+
+                    <Separator Grid.Row="3" Width="250" />
+
+                    <StackPanel Grid.Row="4" Margin="1,4,5,1" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="RadioButton">
+                                <Setter Property="Height" Value="25" />
+                                <Setter Property="Padding" Value="4" />
+                                <Setter Property="Margin" Value="0" />
+
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="RadioButton">
+                                            <Border Name="Bd" BorderThickness="1" Background="Transparent">
+                                                <ContentPresenter
+                                                    Margin="{TemplateBinding Padding}"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center" />
+                                            </Border>
+
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="Bd" Property="BorderBrush" Value="Gray" />
+                                                </Trigger>
+
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="LightGray" />
+                                                </Trigger>
+
+                                                <MultiTrigger>
+                                                    <MultiTrigger.Conditions>
+                                                        <Condition Property="IsChecked" Value="False" />
+                                                        <Condition Property="IsMouseOver" Value="True" />
+                                                    </MultiTrigger.Conditions>
+
+                                                    <Setter TargetName="Bd" Property="BorderBrush" Value="#FFA9A9A9" />
+                                                </MultiTrigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <TextBlock Text="{x:Static lp:Resources.Players}" Style="{StaticResource Title}" Margin="0,0,10,0" />
+
+                        <RadioButton
+                            GroupName="2"
+                            ToolTip="{x:Static lp:Resources.Hide}"
+                            IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Hidden}}">
+                            <Image>
+                                <Image.Source>
+                                    <DrawingImage>
+                                        <DrawingImage.Drawing>
+                                            <GeometryDrawing Geometry="M0,0L0,15L15,15L15,0z" Pen="{StaticResource NormalPen}" />
+                                        </DrawingImage.Drawing>
+                                    </DrawingImage>
+                                </Image.Source>
+                            </Image>
+                        </RadioButton>
+
+                        <RadioButton
+                            GroupName="1"
+                            ToolTip="{x:Static lp:Resources.Show}"
+                            IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}">
+                            <Image>
+                                <Image.Source>
+                                    <DrawingImage>
+                                        <DrawingImage.Drawing>
+                                            <GeometryDrawing Geometry="M0,0L0,15L15,15L15,0z" Brush="{StaticResource ImageBrush}" />
+                                        </DrawingImage.Drawing>
+                                    </DrawingImage>
+                                </Image.Source>
+                            </Image>
+                        </RadioButton>
+
+                        <RadioButton
+                            GroupName="0"
+                            ToolTip="В отдельном окне"
+                            IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Separate}}">
+                            <Image>
+                                <Image.Source>
+                                    <DrawingImage>
+                                        <DrawingImage.Drawing>
+                                            <GeometryDrawing Geometry="M0,16L11,5L6,0L20,0L20,14L15,9L4,20z" Brush="{StaticResource ImageBrush}" />
+                                        </DrawingImage.Drawing>
+                                    </DrawingImage>
+                                </Image.Source>
+                            </Image>
+                        </RadioButton>
+                    </StackPanel>
+
+                    <Border Margin="0,5,0,0" Grid.Row="5">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.Model.PlayersView}" Value="{x:Static vmc:PlayersViewMode.Visible}">
+                                        <Setter Property="Background" Value="{StaticResource AreaBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <ContentControl Margin="2,0,0,0">
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Settings.Model.PlayersView}" Value="{x:Static vmc:PlayersViewMode.Visible}">
+                                            <Setter Property="Content" Value="{Binding}" />
+                                            <Setter Property="ContentTemplate" Value="{StaticResource PlayersTable}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </Border>
+
+                    <Grid
+                        VerticalAlignment="Bottom"
+                        Margin="0,5,4,5"
+                        HorizontalAlignment="Center"
+                        Background="{StaticResource AreaBrush}"
+                        Grid.Row="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
+                            <Button
+                                Style="{StaticResource ToolButton}"
+                                Padding="7,5,9,5"
+                                ToolTip="{x:Static lp:Resources.PreviousRound}"
+                                Command="{Binding PreviousRound}">
+                                <Image Stretch="Uniform">
+                                    <Image.Source>
+                                        <DrawingImage>
+                                            <DrawingImage.Drawing>
+                                                <DrawingGroup>
+                                                    <DrawingGroup.Children>
+                                                        <GeometryDrawing
+                                                            Geometry="M0,0L-11.6,6.7L0,13.4z"
+                                                            Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                                                        <GeometryDrawing
+                                                            Geometry="M14,0L2.4,6.7L14,13.4z"
+                                                            Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                                    </DrawingGroup.Children>
+                                                </DrawingGroup>
+                                            </DrawingImage.Drawing>
+                                        </DrawingImage>
+                                    </Image.Source>
+                                </Image>
+                            </Button>
+
+                            <TextBlock Margin="5,0,0,0" Text="{x:Static lp:Resources.Round}" VerticalAlignment="Center" Width="100" />
+
+                            <ProgressBar
+                                Foreground="{StaticResource ImageBrush}"
+                                Width="120"
+                                Margin="5,3,0,3"
+                                Minimum="0"
+                                Maximum="{Binding Settings.Model.RoundTime}"
+                                Value="{Binding RoundTime}" />
+
+                            <Button
+                                BorderThickness="0"
+                                Style="{StaticResource TimeButton}"
+                                Margin="5,0,0,0"
+                                DataContext="{Binding ActiveRoundCommand}" />
+
+                            <Button
+                                Style="{StaticResource ToolButton}"
+                                Margin="5,0,0,0"
+                                Padding="9,5,7,5"
+                                ToolTip="Следующий раунд"
+                                Command="{Binding NextRound}">
+                                <Image Stretch="Uniform">
+                                    <Image.Source>
+                                        <DrawingImage>
+                                            <DrawingImage.Drawing>
+                                                <DrawingGroup>
+                                                    <DrawingGroup.Children>
+                                                        <GeometryDrawing
+                                                            Geometry="M0,0L11.6,6.7L0,13.4z"
+                                                            Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                                                        <GeometryDrawing
+                                                            Geometry="M14,0L25.6,6.7L14,13.4z"
+                                                            Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                                    </DrawingGroup.Children>
+                                                </DrawingGroup>
+                                            </DrawingImage.Drawing>
+                                        </DrawingImage>
+                                    </Image.Source>
+                                </Image>
+                            </Button>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
+                            <TextBlock Text="{x:Static lp:Resources.Question}" VerticalAlignment="Center" Width="100" />
+
+                            <ProgressBar
+                                Foreground="{StaticResource ImageBrush}"
+                                Width="120"
+                                Margin="5,3,0,3"
+                                Minimum="0"
+                                Maximum="{Binding QuestionTimeMax}"
+                                Value="{Binding QuestionTime}" />
+
+                            <Button
+                                BorderThickness="0"
+                                Style="{StaticResource TimeButton}"
+                                Margin="5,0,0,0"
+                                DataContext="{Binding ActiveQuestionCommand}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
+                            <TextBlock Text="{x:Static lp:Resources.Thinking}" VerticalAlignment="Center" Width="100" />
+
+                            <ProgressBar
+                                Foreground="{StaticResource ImageBrush}"
+                                Width="120"
+                                Margin="5,3,40,3"
+                                Minimum="0"
+                                Maximum="{Binding ThinkingTimeMax}"
+                                Value="{Binding ThinkingTime}" />
+                        </StackPanel>
+
+                        <Button
+                            Style="{StaticResource ToolButton}"
+                            Grid.Column="1"
+                            Grid.RowSpan="3"
+                            BorderThickness="0"
+                            HorizontalAlignment="Center"
+                            ToolTip="{x:Static lp:Resources.StopGame}"
+                            Margin="5,0,5,0"
+                            Height="30"
+                            Width="30"
+                            Padding="8"
+                            Command="{Binding Stop}">
+                            <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <DataTemplate.Triggers>
+                    <DataTrigger
+                        Binding="{Binding Game.Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}"
+                        Value="True">
+                        <Setter TargetName="playersRow" Property="Height" Value="*" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
         </ResourceDictionary>        
     </Window.Resources>
 
@@ -654,7 +956,7 @@
                                 
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding PackageSource}" Value="{x:Null}">
-                                        <Setter Property="Text" Value="Не выбран" />
+                                        <Setter Property="Text" Value="{x:Static lp:Resources.NotSelected}" />
                                         <Setter Property="FontWeight" Value="Normal" />
                                         <Setter Property="Foreground" Value="Red" />
                                     </DataTrigger>
@@ -810,292 +1112,11 @@
         </TabItem>
 
         <TabItem
-            Header="Игра"
+            Header="{x:Static lp:Resources.Game}"
             IsSelected="{Binding Mode, Converter={StaticResource IsModerator}, Mode=OneWay}"
-            Visibility="{Binding Mode, Converter={StaticResource ModeratorView}}">
-            <DockPanel Margin="2,2,0,0" DataContext="{Binding Game}">
-                <Grid
-                    DockPanel.Dock="Bottom"
-                    VerticalAlignment="Bottom"
-                    Margin="0,5,4,5"
-                    HorizontalAlignment="Center"
-                    Background="{StaticResource AreaBrush}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <Button
-                            Style="{StaticResource ToolButton}"
-                            Padding="7,5,9,5"
-                            ToolTip="{x:Static lp:Resources.PreviousRound}"
-                            Command="{Binding PreviousRound}">
-                            <Image Stretch="Uniform">
-                                <Image.Source>
-                                    <DrawingImage>
-                                        <DrawingImage.Drawing>
-                                            <DrawingGroup>
-                                                <DrawingGroup.Children>
-                                                    <GeometryDrawing
-                                                        Geometry="M0,0L-11.6,6.7L0,13.4z"
-                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                    
-                                                    <GeometryDrawing
-                                                        Geometry="M14,0L2.4,6.7L14,13.4z"
-                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                </DrawingGroup.Children>
-                                            </DrawingGroup>
-                                        </DrawingImage.Drawing>
-                                    </DrawingImage>
-                                </Image.Source>
-                            </Image>
-                        </Button>
-
-                        <TextBlock Margin="5,0,0,0" Text="{x:Static lp:Resources.Round}" VerticalAlignment="Center" Width="100" />
-                        
-                        <ProgressBar
-                            Foreground="{StaticResource ImageBrush}"
-                            Width="120"
-                            Margin="5,3,0,3"
-                            Minimum="0"
-                            Maximum="{Binding Settings.Model.RoundTime}"
-                            Value="{Binding RoundTime}" />
-                        
-                        <Button
-                            BorderThickness="0"
-                            Style="{StaticResource TimeButton}"
-                            Margin="5,0,0,0"
-                            DataContext="{Binding ActiveRoundCommand}" />
-
-                        <Button
-                            Style="{StaticResource ToolButton}"
-                            Margin="5,0,0,0"
-                            Padding="9,5,7,5"
-                            ToolTip="Следующий раунд"
-                            Command="{Binding NextRound}">
-                            <Image Stretch="Uniform">
-                                <Image.Source>
-                                    <DrawingImage>
-                                        <DrawingImage.Drawing>
-                                            <DrawingGroup>
-                                                <DrawingGroup.Children>
-                                                    <GeometryDrawing
-                                                        Geometry="M0,0L11.6,6.7L0,13.4z"
-                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-
-                                                    <GeometryDrawing
-                                                        Geometry="M14,0L25.6,6.7L14,13.4z"
-                                                        Brush="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
-                                                </DrawingGroup.Children>
-                                            </DrawingGroup>
-                                        </DrawingImage.Drawing>
-                                    </DrawingImage>
-                                </Image.Source>
-                            </Image>
-                        </Button>
-                    </StackPanel>
-                    
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <TextBlock Text="{x:Static lp:Resources.Question}" VerticalAlignment="Center" Width="100" />
-                        
-                        <ProgressBar
-                            Foreground="{StaticResource ImageBrush}"
-                            Width="120"
-                            Margin="5,3,0,3"
-                            Minimum="0"
-                            Maximum="{Binding QuestionTimeMax}"
-                            Value="{Binding QuestionTime}" />
-                        
-                        <Button
-                            BorderThickness="0"
-                            Style="{StaticResource TimeButton}"
-                            Margin="5,0,0,0"
-                            DataContext="{Binding ActiveQuestionCommand}" />
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" Height="23">
-                        <TextBlock Text="{x:Static lp:Resources.Thinking}" VerticalAlignment="Center" Width="100" />
-                        
-                        <ProgressBar
-                            Foreground="{StaticResource ImageBrush}"
-                            Width="120"
-                            Margin="5,3,40,3"
-                            Minimum="0"
-                            Maximum="{Binding ThinkingTimeMax}"
-                            Value="{Binding ThinkingTime}" />
-                    </StackPanel>
-
-                    <Button
-                        Style="{StaticResource ToolButton}"
-                        Grid.Column="1"
-                        Grid.RowSpan="3"
-                        BorderThickness="0"
-                        HorizontalAlignment="Center"
-                        ToolTip="{x:Static lp:Resources.StopGame}"
-                        Margin="5,0,5,0"
-                        Height="30"
-                        Width="30"
-                        Padding="8"
-                        Command="{Binding Stop}">
-                        <Path Data="M0,0L10,0L10,10L0,10z" Fill="#FF3C0000" Stretch="Uniform" />
-                    </Button>
-                </Grid>
-
-                <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title}" Text="{x:Static lp:Resources.Game}" />
-                <Separator DockPanel.Dock="Top" Width="250" />
-                
-                <DockPanel DockPanel.Dock="Top">
-                    <Button
-                        DockPanel.Dock="Left"
-                        Style="{StaticResource CommandButton}"
-                        ToolTip="{x:Static lp:Resources.Back}"
-                        Margin="0,0,8,0"
-                        Command="{Binding Back}">
-                        <Path Data="M5,0L0,5L5,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
-                    </Button>
-
-                    <Button
-                        DockPanel.Dock="Right"
-                        Style="{StaticResource CommandButton}"
-                        ToolTip="{x:Static lp:Resources.Next}"
-                        Margin="8,0,0,0"
-                        Command="{Binding Next}">
-                        <Path Data="M0,0L5,5L0,10" Stretch="Uniform" Stroke="{StaticResource ImageBrush}" StrokeThickness="3" />
-                    </Button>
-                    
-                    <ContentControl
-                        Height="200"
-                        Name="main"
-                        Content="{Binding LocalInfo}"
-                        ContentTemplate="{Binding LocalInfo.TStage, Converter={StaticResource Selector}}"
-                        Margin="0,2,0,2"
-                        FontSize="14" />
-                </DockPanel>
-                
-                <Separator DockPanel.Dock="Top" Width="250" />
-                
-                <StackPanel DockPanel.Dock="Top" Margin="1,4,5,1" Orientation="Horizontal">
-                    <StackPanel.Resources>
-                        <Style TargetType="RadioButton">
-                            <Setter Property="Height" Value="25" />
-                            <Setter Property="Padding" Value="4" />
-                            <Setter Property="Margin" Value="0" />
-                            
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="RadioButton">
-                                        <Border Name="Bd" BorderThickness="1" Background="Transparent">
-                                            <ContentPresenter
-                                                Margin="{TemplateBinding Padding}"
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Center" />
-                                        </Border>
-                                        
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="Bd" Property="BorderBrush" Value="Gray" />
-                                            </Trigger>
-                                            
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="Bd" Property="Background" Value="LightGray" />
-                                            </Trigger>
-                                            
-                                            <MultiTrigger>
-                                                <MultiTrigger.Conditions>
-                                                    <Condition Property="IsChecked" Value="False" />
-                                                    <Condition Property="IsMouseOver" Value="True" />
-                                                </MultiTrigger.Conditions>
-                                                
-                                                <Setter TargetName="Bd" Property="BorderBrush" Value="#FFA9A9A9" />
-                                            </MultiTrigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </StackPanel.Resources>
-
-                    <TextBlock Text="{x:Static lp:Resources.Players}" Style="{StaticResource Title}" Margin="0,0,10,0" />
-
-                    <RadioButton
-                        GroupName="2"
-                        ToolTip="{x:Static lp:Resources.Hide}"
-                        IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Hidden}}">
-                        <Image>
-                            <Image.Source>
-                                <DrawingImage>
-                                    <DrawingImage.Drawing>
-                                        <GeometryDrawing Geometry="M0,0L0,15L15,15L15,0z" Pen="{StaticResource NormalPen}" />
-                                    </DrawingImage.Drawing>
-                                </DrawingImage>
-                            </Image.Source>
-                        </Image>
-                    </RadioButton>
-
-                    <RadioButton
-                        GroupName="1"
-                        ToolTip="{x:Static lp:Resources.Show}"
-                        IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Visible}}">
-                        <Image>
-                            <Image.Source>
-                                <DrawingImage>
-                                    <DrawingImage.Drawing>
-                                        <GeometryDrawing Geometry="M0,0L0,15L15,15L15,0z" Brush="{StaticResource ImageBrush}" />
-                                    </DrawingImage.Drawing>
-                                </DrawingImage>
-                            </Image.Source>
-                        </Image>
-                    </RadioButton>
-                    
-                    <RadioButton
-                        GroupName="0"
-                        ToolTip="В отдельном окне"
-                        IsChecked="{Binding Settings.Model.PlayersView, Converter={StaticResource Equality}, ConverterParameter={x:Static vmc:PlayersViewMode.Separate}}">
-                        <Image>
-                            <Image.Source>
-                                <DrawingImage>
-                                    <DrawingImage.Drawing>
-                                        <GeometryDrawing Geometry="M0,16L11,5L6,0L20,0L20,14L15,9L4,20z" Brush="{StaticResource ImageBrush}" />
-                                    </DrawingImage.Drawing>
-                                </DrawingImage>
-                            </Image.Source>
-                        </Image>
-                    </RadioButton>
-                </StackPanel>
-                
-                <Border Margin="0,5,0,0">
-                    <Border.Style>
-                        <Style TargetType="Border">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Settings.Model.PlayersView}" Value="{x:Static vmc:PlayersViewMode.Visible}">
-                                    <Setter Property="Background" Value="{StaticResource AreaBrush}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Border.Style>
-                    
-                    <ContentControl Margin="2,0,0,0">
-                        <ContentControl.Style>
-                            <Style TargetType="ContentControl">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Settings.Model.PlayersView}" Value="{x:Static vmc:PlayersViewMode.Visible}">
-                                        <Setter Property="Content" Value="{Binding}" />
-                                        <Setter Property="ContentTemplate" Value="{StaticResource PlayersTable}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContentControl.Style>
-                    </ContentControl>
-                </Border>
-            </DockPanel>
-        </TabItem>
+            Visibility="{Binding Mode, Converter={StaticResource ModeratorView}}"
+            Content="{Binding}"
+            ContentTemplate="{StaticResource Game}" />
 
         <TabItem Header="{x:Static lp:Resources.Design}">
             <StackPanel Margin="2,2,0,0">
@@ -1103,7 +1124,7 @@
 
                 <UniformGrid Columns="2" Margin="0,0,4,0">
                     <StackPanel Margin="0,0,5,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Цвет текста" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.TextColor}" />
                         
                         <Button
                             Padding="3"
@@ -1121,7 +1142,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="5,0,0,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Цвет фона" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.BackgroundColor}" />
                         
                         <Button
                             Padding="3"
@@ -1139,7 +1160,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="0,0,5,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Цвет сетки" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.GridColor}" />
                         
                         <Button
                             Padding="3"
@@ -1160,7 +1181,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="5,0,0,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Цвет фона отвечающего игрока" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.AnswererBackgroundColor}" />
                         
                         <Button
                             Padding="3"
@@ -1178,7 +1199,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="0,0,5,0">
-                        <TextBlock Style="{StaticResource Header}" Text="Шрифт" />
+                        <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FontFamily}" />
                         
                         <ComboBox
                             HorizontalAlignment="Stretch"
@@ -1499,8 +1520,8 @@
                     HorizontalAlignment="Left" />
             </StackPanel>
         </TabItem>
-        
-        <TabItem Header="Кнопки">
+
+        <TabItem Header="{x:Static lp:Resources.Buttons}">
             <StackPanel Margin="2,2,0,0">
                 <TextBlock Style="{StaticResource Title}">Кнопки</TextBlock>
                 <TextBlock FontStyle="Italic" TextWrapping="Wrap">Горячие клавиши игрового табло:<LineBreak />Пробел (левая кнопка мыши) - перейти дальше<LineBreak />Backspace - перейти назад<LineBreak />Escape (правая кнопка мыши) - завершить игру</TextBlock>
@@ -1675,8 +1696,8 @@
                 </StackPanel>
             </StackPanel>
         </TabItem>
-        
-        <TabItem Header="Звуки">
+
+        <TabItem Header="{x:Static lp:Resources.Sounds}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">
                     <CheckBox Margin="0,5" IsChecked="{Binding SettingsViewModel.Model.PlaySounds}" Content="{x:Static lp:Resources.PlaySounds}" />
@@ -1918,8 +1939,8 @@
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
-        
-        <TabItem Header="О программе">
+
+        <TabItem Header="{x:Static lp:Resources.About}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="2,2,0,0">
                     <DockPanel>
@@ -1942,8 +1963,8 @@
                             <TextBlock Margin="1,1,5,1">
                                 Владимир Хиль (<Hyperlink NavigateUri="https://vladimirkhil.com" Command="{Binding NavigateToSite}">Сайт</Hyperlink>)
                             </TextBlock>
-                            
-                            <TextBlock Style="{StaticResource Header}">Лицензия</TextBlock>
+
+                            <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.License}" />
                         </StackPanel>
                     </DockPanel>
                     

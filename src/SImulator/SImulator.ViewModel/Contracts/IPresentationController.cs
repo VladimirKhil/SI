@@ -7,7 +7,7 @@ namespace SImulator.ViewModel.Contracts;
 /// <summary>
 /// Represents a game presentation controller.
 /// </summary>
-public interface IPresentationController
+public interface IPresentationController : IDisposable
 {
     /// <summary>
     /// Starts new game.
@@ -19,7 +19,7 @@ public interface IPresentationController
     /// </summary>
     void StopGame();
 
-    void SetGameThemes(string[] themes);
+    void SetGameThemes(IEnumerable<string> themes);
 
     void SetRoundThemes(ThemeInfoViewModel[] themes, bool isFinal);
 
@@ -76,8 +76,14 @@ public interface IPresentationController
     void RestoreQuestion(int themeIndex, int questionIndex, int price);
 
     void SetCaption(string caption);
+    
+    void SetTimerMaxTime(int maxTime);
 
-    void SetLeftTime(double leftTime);
+    void RunTimer();
+
+    void PauseTimer(int currentTime);
+
+    void StopTimer();
 
     /// <summary>
     /// Sets answer options (invisible by default) and corresponding table layout.

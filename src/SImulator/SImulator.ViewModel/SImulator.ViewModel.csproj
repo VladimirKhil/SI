@@ -3,11 +3,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <Authors>Vladimir Khil</Authors>
     <Product>SImulator.ViewModel</Product>
     <Description>SImulator view model</Description>
-    <Company>Khil-soft</Company>
-    <Version>2.13.0</Version>
+    <Version>$(SImulatorVersion)</Version>
     <Copyright>Copyright © Khil-soft 2010 - 2023</Copyright>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

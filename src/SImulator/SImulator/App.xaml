@@ -130,6 +130,7 @@
                         FontWeight="Bold"
                         Background="Orange"
                         VerticalAlignment="Center"
+                        TextAlignment="Center"
                         Padding="10" />
                 </DataTemplate>
 
@@ -139,11 +140,12 @@
                         FontWeight="Bold"
                         Background="Orange"
                         VerticalAlignment="Center"
+                        TextAlignment="Center"
                         Padding="10" />
                 </DataTemplate>
                 
                 <DataTemplate x:Key="{x:Static m:DecisionMode.SimpleStake}" DataType="vm:GameViewModel">
-                    <StackPanel Orientation="Horizontal" Background="Orange">
+                    <DockPanel Background="Orange">
                         <TextBlock Text="{x:Static lp:Resources.Stake}" VerticalAlignment="Center" Margin="10,0,0,0" />
 
                         <Slider
@@ -156,19 +158,28 @@
                             IsSnapToTickEnabled="True"
                             IsMoveToPointEnabled="True"
                             VerticalAlignment="Center"
-                            Width="200"
                             Margin="10,0" />
-                    </StackPanel>
+                    </DockPanel>
                 </DataTemplate>
 
                 <DataTemplate x:Key="{x:Static m:DecisionMode.Stake}" DataType="vm:GameViewModel">
-                    <StackPanel Orientation="Horizontal" Background="Orange">
+                    <DockPanel Background="Orange">
                         <Button
                             Style="{StaticResource ToolButton}"
                             Content="{x:Static lp:Resources.Pass}"
                             Command="{Binding Pass}"
                             Padding="10"
                             FontWeight="Bold" />
+
+                        <Button
+                            Style="{StaticResource ToolButton}"
+                            Content="{x:Static lp:Resources.Stake}"
+                            Command="{Binding MakeStake}"
+                            Padding="10"
+                            FontWeight="Bold"
+                            DockPanel.Dock="Right" />
+
+                        <TextBox Text="{Binding Stake}" VerticalAlignment="Center" Width="50" DockPanel.Dock="Right" />
 
                         <Slider
                             Minimum="{Binding StakeInfo.Minimum}"
@@ -180,18 +191,8 @@
                             IsSnapToTickEnabled="True"
                             IsMoveToPointEnabled="True"
                             VerticalAlignment="Center"
-                            Width="200"
                             Margin="10,0" />
-
-                        <TextBox Text="{Binding Stake}" VerticalAlignment="Center" Width="50" />
-
-                        <Button
-                            Style="{StaticResource ToolButton}"
-                            Content="{x:Static lp:Resources.Stake}"
-                            Command="{Binding MakeStake}"
-                            Padding="10"
-                            FontWeight="Bold" />
-                    </StackPanel>
+                    </DockPanel>
                 </DataTemplate>
             </uic:TemplateConverter.Templates>
         </uic:TemplateConverter>
@@ -205,7 +206,7 @@
                     </Style>
                 </DockPanel.Resources>
 
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Height="40">
+                <DockPanel DockPanel.Dock="Top" Height="40">
                     <Button
                         Style="{StaticResource ToolButton}"
                         Height="23"
@@ -283,7 +284,7 @@
                     </Button>
 
                     <ContentControl Content="{Binding}" ContentTemplate="{Binding DecisionMode, Converter={StaticResource DecisionSelector}}" />
-                </StackPanel>
+                </DockPanel>
 
                 <Grid DockPanel.Dock="Top">
                     <Grid.ColumnDefinitions>
@@ -322,7 +323,7 @@
                 </Grid>
 
                 <ScrollViewer Margin="0,3" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding LocalInfo.Players}">
+                    <ItemsControl ItemsSource="{Binding Players}">
                         <ItemsControl.Resources>
                             <Style TargetType="TextBox">
                                 <Setter Property="Width" Value="Auto" />

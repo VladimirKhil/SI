@@ -130,6 +130,7 @@
     <ProjectReference Include="..\..\Common\SIPackages.Providers\SIPackages.Providers.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
     <ProjectReference Include="..\..\Common\SIUI\SIUI.csproj" />
+    <ProjectReference Include="..\..\Common\Utils.Wpf\Utils.Wpf.csproj" />
     <ProjectReference Include="..\..\SICore\SICore.Connections\SICore.Connections.csproj" />
     <ProjectReference Include="..\..\SICore\SICore.Network\SICore.Network.csproj" />
     <ProjectReference Include="..\..\SICore\SICore\SICore.csproj" />

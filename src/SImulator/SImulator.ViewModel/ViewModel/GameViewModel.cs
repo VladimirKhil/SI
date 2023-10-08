@@ -9,6 +9,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -82,7 +83,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (_chooserIndex != value)
             {
                 _chooserIndex = value;
-                _chooser = _chooserIndex >= 0 && _chooserIndex < LocalInfo.Players.Count ? (PlayerInfo)LocalInfo.Players[_chooserIndex] : null;
+                _chooser = _chooserIndex >= 0 && _chooserIndex < Players.Count ? Players[_chooserIndex] : null;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Chooser));
             }
@@ -100,7 +101,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             if (_chooser != value)
             {
                 _chooser = value;
-                _chooserIndex = value != null ? LocalInfo.Players.IndexOf(value) : -1;
+                _chooserIndex = value != null ? Players.IndexOf(value) : -1;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ChooserIndex));
             }
@@ -195,6 +196,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// Table info view model.
     /// </summary>
     public TableInfoViewModel LocalInfo { get; set; }
+
+    /// <summary>
+    /// Game players.
+    /// </summary>
+    public IList<PlayerInfo> Players { get; }
 
     private Func<bool>? _continuation = null;
 
@@ -423,12 +429,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
-    private NumberSet _stakeInfo;
+    private NumberSet? _stakeInfo;
 
     /// <summary>
     /// Player possible stakes info.
     /// </summary>
-    public NumberSet StakeInfo
+    public NumberSet? StakeInfo
     {
         get => _stakeInfo;
         set 
@@ -456,6 +462,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
+    public PlayerInfo Staker => Players[_stakerIndex];
+
     private int _stake;
 
     public int Stake
@@ -473,8 +481,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private bool _isAllIn = false;
 
-    public PlayerInfo Staker => (PlayerInfo)LocalInfo.Players[_stakerIndex];
-
     #endregion
 
     public GameViewModel(
@@ -491,12 +497,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _logger = logger;
         PresentationController = presentationController;
 
-        LocalInfo = new TableInfoViewModel(players);
+        LocalInfo = new TableInfoViewModel();
+        Players = new ObservableCollection<PlayerInfo>(players.Cast<PlayerInfo>());
 
-        foreach (var playerInfo in LocalInfo.Players.Cast<PlayerInfo>())
+        foreach (var player in Players)
         {
-            playerInfo.IsRegistered = false;
-            playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
+            player.IsRegistered = false;
+            player.PropertyChanged += PlayerInfo_PropertyChanged;
         }
 
         LocalInfo.QuestionSelected += QuestionInfo_Selected;
@@ -726,11 +733,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             if (player.WaitForRegistration)
             {
-                foreach (PlayerInfo item in LocalInfo.Players.Cast<PlayerInfo>())
+                foreach (var playerInfo in Players)
                 {
-                    if (item != sender)
+                    if (playerInfo != sender)
                     {
-                        item.WaitForRegistration = false;
+                        playerInfo.WaitForRegistration = false;
                     }
                 }
             }
@@ -738,7 +745,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        PresentationController?.UpdatePlayerInfo(LocalInfo.Players.IndexOf(player), player);
+        PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player);
     }
 
     private void QuestionTimer_Elapsed(object? state) =>
@@ -746,7 +753,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             () =>
             {
                 QuestionTime++;
-                PresentationController.SetLeftTime(1.0 - (double)QuestionTime / QuestionTimeMax);
 
                 if (QuestionTime < QuestionTimeMax)
                 {
@@ -754,7 +760,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 }
 
                 SetSound(Settings.Model.Sounds.NoAnswer);
-                StopQuestionTimer_Executed(null);
+                StopQuestionTimer_Executed(1);
                 ActiveQuestionCommand = null;
 
                 if (!Settings.Model.SignalsAfterTimer && _buttonManager != null)
@@ -901,8 +907,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         if (arg != null)
         {
             QuestionTime = 0;
-            PresentationController.SetLeftTime(1.0);
         }
+
+        PresentationController.RunTimer();
 
         _questionTimer.Change(1000, 1000);
 
@@ -911,10 +918,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void StopQuestionTimer_Executed(object? arg)
     {
-        if (arg != null)
+        if ((int?)arg == 0)
         {
             QuestionTime = 0;
-            PresentationController.SetLeftTime(1.0);
+            PresentationController.StopTimer();
+        }
+        else if (arg == null)
+        {
+            PresentationController.PauseTimer(QuestionTime * 10);
         }
 
         _questionTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -958,31 +969,31 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         var playerInfo = new PlayerInfo();
         playerInfo.PropertyChanged += PlayerInfo_PropertyChanged;
 
-        LocalInfo.Players.Add(playerInfo);
+        Players.Add(playerInfo);
         PresentationController.AddPlayer();
     }
 
     private void RemovePlayer_Executed(object? arg)
     {
-        if (arg is not SimplePlayerInfo player)
+        if (arg is not PlayerInfo player)
         {
             return;
         }
 
         player.PropertyChanged -= PlayerInfo_PropertyChanged;
-        LocalInfo.Players.Remove(player);
+        Players.Remove(player);
         PresentationController.RemovePlayer(player.Name);
     }
 
     private void ClearPlayers_Executed(object? arg)
     {
-        LocalInfo.Players.Clear();
+        Players.Clear();
         PresentationController.ClearPlayers();
     }
 
     private void ResetSums_Executed(object? arg)
     {
-        foreach (var player in LocalInfo.Players.Cast<PlayerInfo>())
+        foreach (var player in Players)
         {
             player.Sum = 0;
             player.State = PlayerState.None;
@@ -1088,10 +1099,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         PresentationController.ClearPlayers();
 
-        for (int i = 0; i < LocalInfo.Players.Count; i++)
+        for (int i = 0; i < Players.Count; i++)
         {
             PresentationController.AddPlayer();
-            PresentationController.UpdatePlayerInfo(i, (PlayerInfo)LocalInfo.Players[i]);
+            PresentationController.UpdatePlayerInfo(i, Players[i]);
         }
 
         PresentationController.Start();
@@ -1298,7 +1309,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.TStage = TableStage.Sign;
     }
 
-    private void Engine_GameThemes(string[] themes)
+    private void Engine_GameThemes(IEnumerable<string> themes)
     {
         PresentationController.SetGameThemes(themes);
         LocalInfo.TStage = TableStage.GameThemes;
@@ -1362,13 +1373,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         PresentationController.SetStage(TableStage.RoundTable);
 
-        if (!LocalInfo.Players.Any())
+        if (!Players.Any())
         {
             return false;
         }
 
-        var minSum = LocalInfo.Players.Min(p => p.Sum);
-        var playersWithMinSum = LocalInfo.Players.Select((p, i) => (p, i)).Where(pair => pair.p.Sum == minSum).ToArray();
+        var minSum = Players.Min(p => p.Sum);
+        var playersWithMinSum = Players.Select((p, i) => (p, i)).Where(pair => pair.p.Sum == minSum).ToArray();
         var playersWithMinSumCount = playersWithMinSum.Length;
 
         if (playersWithMinSumCount == 1)
@@ -1393,6 +1404,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         // Runs timer in game with false starts
         QuestionTimeMax = Settings.Model.ThinkingTime;
+        PresentationController.SetTimerMaxTime(QuestionTimeMax * 10);
         RunQuestionTimer_Executed(0);
     }
 
@@ -1476,9 +1488,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         UnselectPlayer();
         _selectedPlayers.Clear();
 
-        foreach (var player in LocalInfo.Players)
+        foreach (var player in Players)
         {
-            ((PlayerInfo)player).BlockedTime = null;
+            player.BlockedTime = null;
         }
 
         ActiveQuestionCommand = null;
@@ -1552,9 +1564,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         UnselectPlayer();
         _selectedPlayers.Clear();
 
-        foreach (var player in LocalInfo.Players)
+        foreach (var player in Players)
         {
-            ((PlayerInfo)player).BlockedTime = null;
+            player.BlockedTime = null;
         }
 
         ActiveQuestionCommand = null;
@@ -1628,6 +1640,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         try
         {
+            PresentationController.Dispose();
+
             StopRoundTimer_Executed(null);
             _roundTimer.Dispose();
 
@@ -1687,7 +1701,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     private void LogScore()
     {
-        if (!Settings.Model.SaveLogs || LocalInfo.Players.Count <= 0)
+        if (!Settings.Model.SaveLogs || Players.Count <= 0)
         {
             return;
         }
@@ -1695,7 +1709,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         var sb = new StringBuilder("\r\n").Append(Resources.Score).Append(": ");
         var first = true;
 
-        foreach (var player in LocalInfo.Players)
+        foreach (var player in Players)
         {
             if (!first)
             {
@@ -1825,7 +1839,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             if (!strict)
             {
-                foreach (PlayerInfo playerInfo in LocalInfo.Players.Cast<PlayerInfo>())
+                foreach (var playerInfo in Players)
                 {
                     if (playerInfo.WaitForRegistration)
                     {
@@ -1847,18 +1861,18 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         var index = Settings.Model.PlayerKeys2.IndexOf(key);
 
-        if (index == -1 || index >= LocalInfo.Players.Count)
+        if (index == -1 || index >= Players.Count)
         {
             return false;
         }
 
-        var player = (PlayerInfo)LocalInfo.Players[index];
+        var player = Players[index];
         return ProcessPlayerPress(index, player);
     }
 
     public bool OnPlayerPressed(PlayerInfo player)
     {
-        var index = LocalInfo.Players.IndexOf(player);
+        var index = Players.IndexOf(player);
 
         if (index == -1)
         {
@@ -1893,13 +1907,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return false;
         }
 
-        // Заблокирован
+        // Player is blocked
         if (player.BlockedTime.HasValue && DateTime.Now.Subtract(player.BlockedTime.Value).TotalSeconds < Settings.Model.BlockingTime)
         {
             return false;
         }
 
-        // Все проверки пройдены, фиксируем нажатие
+        // All checks passed, confirming press
         player.IsSelected = true;
         _selectedPlayer = player;
         _selectedPlayers.Add(_selectedPlayer);
@@ -2032,14 +2046,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal bool OnSetAnswererDirectly(bool canSelectChooser)
     {
-        var playerCount = LocalInfo.Players.Count;
+        var playerCount = Players.Count;
 
         if (playerCount == 0)
         {
             return false;
         }
 
-        if (playerCount == 1 && LocalInfo.Players[0] == Chooser)
+        if (playerCount == 1 && Players[0] == Chooser)
         {
             if (canSelectChooser)
             {
@@ -2050,9 +2064,9 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return false;
         }
 
-        if (playerCount == 2 && !canSelectChooser && Chooser != null && LocalInfo.Players.Contains(Chooser))
+        if (playerCount == 2 && !canSelectChooser && Chooser != null && Players.Contains(Chooser))
         {
-            var activePlayer = (PlayerInfo)(LocalInfo.Players[0] == Chooser ? LocalInfo.Players[1] : LocalInfo.Players[0]);
+            var activePlayer = Players[0] == Chooser ? Players[1] : Players[0];
             activePlayer.IsSelected = true;
             _selectedPlayer = activePlayer;
 
@@ -2080,7 +2094,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return false;
         }
 
-        var chooserIndex = LocalInfo.Players.IndexOf(Chooser);
+        var chooserIndex = Players.IndexOf(Chooser);
 
         if (chooserIndex == -1)
         {
@@ -2111,7 +2125,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         _stakers.Add(chooserIndex);
 
-        var orderedPlayerIndicies = LocalInfo.Players
+        var orderedPlayerIndicies = Players
             .Select((p, i) => (p, i))
             .Where(pair => pair.p.Sum > Stake && pair.i != chooserIndex)
             .OrderBy(pair => pair.p.Sum)
@@ -2151,7 +2165,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 continue;
             }
 
-            if (LocalInfo.Players[_stakers[i]].Sum <= Stake)
+            if (Players[_stakers[i]].Sum <= Stake)
             {
                 _stakers.RemoveAt(i);
 

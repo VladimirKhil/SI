@@ -1,5 +1,6 @@
 ﻿using SImulator.ViewModel.Core;
 using SImulator.ViewModel.Model;
+using Utils.Timers;
 
 namespace SImulator.ViewModel.PlatformSpecific;
 
@@ -56,4 +57,6 @@ public abstract class PlatformManager
     public abstract void ClearMedia();
 
     public abstract void InitSettings(AppSettings defaultSettings);
+
+    public abstract IAnimatableTimer CreateAnimatableTimer();
 }

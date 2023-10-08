@@ -6,10 +6,3 @@ public enum MessageType
     Warning,
     Error
 }
-
-public enum TimerState
-{
-    Running,
-    Stopped,
-    Paused
-}

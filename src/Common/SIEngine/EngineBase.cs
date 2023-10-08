@@ -153,7 +153,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     #region Events
 
     public event Action<Package>? Package;
-    public event Action<string[]>? GameThemes;
+    public event Action<IEnumerable<string>>? GameThemes;
     public event Action<bool>? NextRound;
     public event Action<Round>? Round;
     public event Action? RoundSkip;
@@ -209,7 +209,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
     protected void OnPackage(Package package) => Package?.Invoke(package);
 
-    protected void OnGameThemes(string[] gameThemes) => GameThemes?.Invoke(gameThemes);
+    protected void OnGameThemes(IEnumerable<string> gameThemes) => GameThemes?.Invoke(gameThemes);
 
     protected void OnNextRound(bool showSign = true) => NextRound?.Invoke(showSign);
 
@@ -250,9 +250,6 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     protected void OnThemeSelected(int themeIndex) => ThemeSelected?.Invoke(themeIndex);
 
     protected void OnPrepareFinalQuestion(Theme theme, Question question) => PrepareFinalQuestion?.Invoke(theme, question);
-
-    [Obsolete]
-    protected void OnSound(string name = "") => Sound?.Invoke(name);
 
     protected void OnError(string error) => Error?.Invoke(error);
 
@@ -329,6 +326,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
     public virtual bool MoveNextRound(bool showSign = true)
     {
         var moved = true;
+
         do
         {
             if (_roundIndex + 1 < _document.Package.Rounds.Count)

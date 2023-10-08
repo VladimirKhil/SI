@@ -1,6 +1,7 @@
 ﻿using SICore;
 using SIGame.ViewModel.PlatformSpecific;
 using System.Windows.Input;
+using Utils.Timers;
 
 namespace SIGame.Tests;
 
@@ -23,7 +24,7 @@ internal sealed class TestManager : PlatformManager
 
 	public override string SelectHumanAvatar() => throw new NotImplementedException();
 
-	public override string SelectLocalPackage(long? maxPackageSize) => System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SIGameTest.siq");
+	public override string SelectLocalPackage(long? maxPackageSize) => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SIGameTest.siq");
 
 	public override string SelectLogsFolder(string initialFolder) => throw new NotImplementedException();
 
@@ -82,13 +83,13 @@ internal sealed class TestManager : PlatformManager
 		action();
 	}
 
-        public override void ShowDialogWindow(object dataContext, Action onClose)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void CloseDialogWindow()
-        {
-            throw new NotImplementedException();
-        }
+    public override void ShowDialogWindow(object dataContext, Action onClose)
+    {
+        throw new NotImplementedException();
     }
+
+    public override void CloseDialogWindow()
+    {
+        throw new NotImplementedException();
+    }
+}

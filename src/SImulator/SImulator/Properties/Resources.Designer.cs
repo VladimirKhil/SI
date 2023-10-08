@@ -61,6 +61,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на О программе.
+        /// </summary>
+        public static string About {
+            get {
+                return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Добавить игрока.
         /// </summary>
         public static string AddPlayer {
@@ -97,6 +106,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Цвет фона отвечающего игрока.
+        /// </summary>
+        public static string AnswererBackgroundColor {
+            get {
+                return ResourceManager.GetString("AnswererBackgroundColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Варианты ответа.
         /// </summary>
         public static string AnswerOptions {
@@ -124,6 +142,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Цвет фона.
+        /// </summary>
+        public static string BackgroundColor {
+            get {
+                return ResourceManager.GetString("BackgroundColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Изображение-фон.
         /// </summary>
         public static string BackgroundImage {
@@ -138,6 +165,15 @@ namespace SImulator.Properties {
         public static string BackgroundVideo {
             get {
                 return ResourceManager.GetString("BackgroundVideo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Кнопки.
+        /// </summary>
+        public static string Buttons {
+            get {
+                return ResourceManager.GetString("Buttons", resourceCulture);
             }
         }
         
@@ -241,6 +277,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Шрифт.
+        /// </summary>
+        public static string FontFamily {
+            get {
+                return ResourceManager.GetString("FontFamily", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Игра.
         /// </summary>
         public static string Game {
@@ -304,11 +349,47 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Цвет сетки.
+        /// </summary>
+        public static string GridColor {
+            get {
+                return ResourceManager.GetString("GridColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Скрыть.
         /// </summary>
         public static string Hide {
             get {
                 return ResourceManager.GetString("Hide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Для управления ходом игры нажимайте кнопку &quot;Дальше&quot;.
+        /// </summary>
+        public static string HintBeforeStart {
+            get {
+                return ResourceManager.GetString("HintBeforeStart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на (Темы игры).
+        /// </summary>
+        public static string HintGameThemes {
+            get {
+                return ResourceManager.GetString("HintGameThemes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на (Заставка).
+        /// </summary>
+        public static string HintIntro {
+            get {
+                return ResourceManager.GetString("HintIntro", resourceCulture);
             }
         }
         
@@ -358,6 +439,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Лицензия.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Папка для записи логов &quot;{0}&quot; не найдена.
         /// </summary>
         public static string LogsFolderNotFound {
@@ -390,6 +480,15 @@ namespace SImulator.Properties {
         public static string Next {
             get {
                 return ResourceManager.GetString("Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Не выбран.
+        /// </summary>
+        public static string NotSelected {
+            get {
+                return ResourceManager.GetString("NotSelected", resourceCulture);
             }
         }
         
@@ -799,6 +898,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Звуки.
+        /// </summary>
+        public static string Sounds {
+            get {
+                return ResourceManager.GetString("Sounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Источник.
         /// </summary>
         public static string Source {
@@ -885,6 +993,15 @@ namespace SImulator.Properties {
         public static string TestPackage {
             get {
                 return ResourceManager.GetString("TestPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Цвет текста.
+        /// </summary>
+        public static string TextColor {
+            get {
+                return ResourceManager.GetString("TextColor", resourceCulture);
             }
         }
         

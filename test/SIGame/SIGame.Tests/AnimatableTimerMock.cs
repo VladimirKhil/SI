@@ -1,21 +1,20 @@
-﻿using SIGame.ViewModel.PlatformSpecific;
-using System;
+﻿using Utils.Timers;
 
-namespace SIGame.Tests
+namespace SIGame.Tests;
+
+internal sealed class AnimatableTimerMock : IAnimatableTimer
 {
-	internal sealed class AnimatableTimerMock : IAnimatableTimer
+	public int MaxTime { get => 100; set { } }
+
+	public double Time => throw new NotImplementedException();
+
+	public TimerState State => throw new NotImplementedException();
+
+	public event Action<IAnimatableTimer> TimeChanged
 	{
-		public int MaxTime { get => 100; set { } }
-
-		public double Time => throw new NotImplementedException();
-
-		public TimerState State => throw new NotImplementedException();
-
-		public event Action<IAnimatableTimer> TimeChanged
-		{
-			add { }
-			remove { }
-		}
+		add { }
+		remove { }
+	}
 
         public void Dispose()
         {
@@ -23,12 +22,11 @@ namespace SIGame.Tests
         }
 
         public void Pause(int currentTime, bool byUser)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void Run(int maxTime, bool byUser, double? fromValue = null) { }
-
-		public void Stop() { }
+	{
+		throw new NotImplementedException();
 	}
+
+	public void Run(int maxTime, bool byUser, double? fromValue = null) { }
+
+	public void Stop() { }
 }

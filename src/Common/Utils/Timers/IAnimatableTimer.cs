@@ -1,4 +1,4 @@
-﻿namespace SIGame.ViewModel.PlatformSpecific;
+﻿namespace Utils.Timers;
 
 /// <summary>
 /// Defines a game timer.

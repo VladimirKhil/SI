@@ -12,6 +12,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Utils;
+using Utils.Timers;
+using Utils.Wpf;
 
 namespace SIGame.Implementation;
 
