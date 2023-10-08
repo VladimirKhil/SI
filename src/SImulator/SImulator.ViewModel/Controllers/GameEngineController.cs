@@ -331,6 +331,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
 
         _optionsShown = null;
+        PresentationController.OnQuestionStart();
     }
 
     public void OnAskAnswerStop()

@@ -225,11 +225,6 @@ public sealed class PresentationController : IPresentationController, INotifyPro
             _previousCode = -1;
             TInfo.QuestionStyle = QuestionStyle.Normal;
         }
-
-        if (stage == TableStage.Question)
-        {
-            TInfo.LayoutMode = LayoutMode.Simple;
-        }
     }
 
     public void SetText(string text) => TInfo.Text = text;
@@ -565,6 +560,8 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
         answerOptions[answerIndex].State = state;
     }
+
+    public void OnQuestionStart() => TInfo.LayoutMode = LayoutMode.Simple;
 
     public void Dispose() => _animatableTimer.Dispose();
 

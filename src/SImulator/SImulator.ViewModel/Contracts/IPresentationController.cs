@@ -102,4 +102,6 @@ public interface IPresentationController : IDisposable
     /// <param name="answerIndex">Answer index.</param>
     /// <param name="state">Answer state.</param>
     void SetAnswerState(int answerIndex, ItemState state);
+
+    void OnQuestionStart();
 }
