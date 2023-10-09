@@ -466,6 +466,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Сделать ставку.
+        /// </summary>
+        public static string MakeStake {
+            get {
+                return ResourceManager.GetString("MakeStake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}.
         /// </summary>
         public static string NavigateToSiteError {

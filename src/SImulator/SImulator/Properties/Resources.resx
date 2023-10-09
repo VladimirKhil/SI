@@ -252,6 +252,9 @@
   <data name="MainScreen" xml:space="preserve">
     <value>Основной</value>
   </data>
+  <data name="MakeStake" xml:space="preserve">
+    <value>Сделать ставку</value>
+  </data>
   <data name="NavigateToSiteError" xml:space="preserve">
     <value>Возникла ошибка при переходе на сайт программы ({0}). Убедитесь, что у вас настроен браузер по умолчанию: {1}</value>
   </data>

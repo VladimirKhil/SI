@@ -311,17 +311,6 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         set { _activeTheme = value; OnPropertyChanged(); }
     }
 
-    private Atom? _activeAtom;
-
-    /// <summary>
-    /// Current active question atom.
-    /// </summary>
-    public Atom? ActiveAtom
-    {
-        get => _activeAtom;
-        set { if (_activeAtom != value) { _activeAtom = value; OnPropertyChanged(); } }
-    }
-
     private IEnumerable<ContentItem>? _contentItems = null;
 
     /// <summary>
@@ -860,22 +849,33 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void NextRound_Executed(object? arg)
     {
-        StopRoundTimer_Executed(0);
-        StopQuestionTimer_Executed(0);
-        StopThinkingTimer_Executed(0);
-        _engine.MoveNextRound();
-        Continuation = null;
+        if (!_engine.MoveNextRound())
+        {
+            return;
+        }
+
+        DropCurrentRound();
     }
 
     private void PreviousRound_Executed(object? arg)
+    {
+        if (!_engine.MoveBackRound())
+        {
+            return;
+        }
+
+        DropCurrentRound();
+    }
+
+    private void DropCurrentRound()
     {
         StopRoundTimer_Executed(0);
         StopQuestionTimer_Executed(0);
         StopThinkingTimer_Executed(0);
         ActiveRoundCommand = null;
         PresentationController.SetStage(TableStage.Sign);
-
-        _engine.MoveBackRound();
+        LocalInfo.TStage = TableStage.Sign;
+        Continuation = null;
     }
 
     private void RunRoundTimer_Executed(object? arg)
@@ -1040,9 +1040,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         Chooser = player;
 
-        SetSound(Settings.Model.Sounds.AnswerRight);
-
         _logger.Write("{0} +{1}", player.Name, Price);
+
+        if (_activeQuestion == null)
+        {
+            return;
+        }
+
+        SetSound(Settings.Model.Sounds.AnswerRight);
 
         _answeringHistory.Push(Tuple.Create(player, Price, true));
 
@@ -1320,6 +1325,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void Engine_Round(Round round)
     {
         _activeRound = round ?? throw new ArgumentNullException(nameof(round));
+        OnPropertyChanged(nameof(ActiveRound));
 
         if (PresentationController == null)
         {
@@ -1998,7 +2004,10 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+    }
 
+    internal void OnContentStart()
+    {
         LocalInfo.TStage = TableStage.Question;
     }
 

@@ -325,6 +325,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
+        GameViewModel.OnQuestionStart();
+
         if (buttonsRequired)
         {
             GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work
@@ -352,7 +354,7 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        GameViewModel.OnQuestionStart();
+        GameViewModel.OnContentStart();
         PresentationController.SetQuestionSound(false);
         PresentationController.SetQuestionContentType(QuestionContentType.Void);
         PresentationController.SetStage(TableStage.Question);

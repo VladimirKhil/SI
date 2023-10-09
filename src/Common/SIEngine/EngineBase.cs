@@ -100,7 +100,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
             {
                 _canMoveBack = value;
                 OnPropertyChanged();
-                UpdateCanMoveNextRound();
+                UpdateCanMoveBackRound();
             }
         }
     }
@@ -345,6 +345,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         CanMoveBack = false;
         UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
         UpdateCanNext();
 
         if (moved)
@@ -384,6 +385,7 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         CanMoveBack = false;
         UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
         UpdateCanNext();
         OnNextRound(showSign);
 
@@ -427,6 +429,8 @@ public abstract class EngineBase : ISIEngine, IDisposable, INotifyPropertyChange
 
         CanMoveBack = false;
         UpdateCanNext();
+        UpdateCanMoveNextRound();
+        UpdateCanMoveBackRound();
 
         return moved;
     }

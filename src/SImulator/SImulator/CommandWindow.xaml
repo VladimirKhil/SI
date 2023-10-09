@@ -424,7 +424,10 @@
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.Round}">
-                        <TextBlock Text="(Раунд)" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock
+                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:CommandWindow, AncestorLevel=1}, Path=DataContext.Game.ActiveRound.Name}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
                     </DataTemplate>
                     
                     <DataTemplate x:Key="{x:Static uim:TableStage.RoundThemes}">

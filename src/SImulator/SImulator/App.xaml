@@ -67,6 +67,11 @@
             <Setter Property="BorderThickness" Value="0" />
         </Style>
 
+        <Style x:Key="ActionButton" TargetType="{x:Type ButtonBase}" BasedOn="{StaticResource FlatButton}">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Silver" />
+        </Style>
+
         <Style x:Key="SetPlayerButtonWeb" TargetType="ToggleButton" BasedOn="{StaticResource ToolButton}">
             <Setter Property="Width" Value="23" />
             <Setter Property="Height" Value="23" />
@@ -165,17 +170,18 @@
                 <DataTemplate x:Key="{x:Static m:DecisionMode.Stake}" DataType="vm:GameViewModel">
                     <DockPanel Background="Orange">
                         <Button
-                            Style="{StaticResource ToolButton}"
+                            Style="{StaticResource ActionButton}"
                             Content="{x:Static lp:Resources.Pass}"
                             Command="{Binding Pass}"
                             Padding="10"
                             FontWeight="Bold" />
 
                         <Button
-                            Style="{StaticResource ToolButton}"
-                            Content="{x:Static lp:Resources.Stake}"
+                            Style="{StaticResource ActionButton}"
+                            Content="{x:Static lp:Resources.MakeStake}"
                             Command="{Binding MakeStake}"
                             Padding="10"
+                            Margin="10,0,0,0"
                             FontWeight="Bold"
                             DockPanel.Dock="Right" />
 
