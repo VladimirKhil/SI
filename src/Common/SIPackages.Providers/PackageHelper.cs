@@ -26,7 +26,7 @@ public static class PackageHelper
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, stream);
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, cancellationToken);
+        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, int.MaxValue, cancellationToken);
     }
 
     public static Task<SIDocument> GenerateRandomPackageAsync(
@@ -39,32 +39,39 @@ public static class PackageHelper
         int roundsCount = 3,
         int themesCount = 6,
         int baseCost = 100,
+        int maxPackageCount = int.MaxValue,
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, folder);
 
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, cancellationToken);
+        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, maxPackageCount, cancellationToken);
     }
 
     private static async Task<SIDocument> GenerateCoreAsync(
         IPackagesProvider provider,
-        int roundsCount,
-        int themesCount,
+        int roundCount,
+        int themeCount,
         int baseCost,
         SIDocument doc,
         string roundNameFormat,
         string finalName,
+        int maxPackageCount = int.MaxValue,
         CancellationToken cancellationToken = default)
     {
         var files = (await provider.GetPackagesAsync(cancellationToken)).ToList();
 
+        if (maxPackageCount < int.MaxValue)
+        {
+            files = GetRandomValues(files, maxPackageCount).ToList();
+        }
+
         var packageComments = new StringBuilder(RandomIndicator); // Used in game reports
 
-        for (var i = 0; i < roundsCount; i++)
+        for (var i = 0; i < roundCount; i++)
         {
             doc.Package.Rounds.Add(new Round { Type = RoundTypes.Standart, Name = string.Format(roundNameFormat, i + 1) });
 
-            for (int j = 0; j < themesCount; j++)
+            for (int j = 0; j < themeCount; j++)
             {
                 if (files.Count == 0)
                 {
@@ -105,7 +112,7 @@ public static class PackageHelper
                 provider,
                 doc,
                 files,
-                roundsCount,
+                roundCount,
                 round => round.Type == RoundTypes.Final && round.Themes.Count > 0,
                 packageComments,
                 0,
@@ -118,9 +125,13 @@ public static class PackageHelper
 
         // В пакете могут быть и свои комментарии; допишем туда
         doc.Package.Info.Comments.Text += packageComments.ToString();
+        doc.Upgrade();
 
         return doc;
     }
+
+    private static IEnumerable<T> GetRandomValues<T>(IEnumerable<T> array, int n) =>
+        array.OrderBy(x => Random.Shared.Next()).Take(n);
 
     private static async Task<bool> ExtractThemeAsync(
         IPackagesProvider provider,
@@ -137,8 +148,6 @@ public static class PackageHelper
 
         using (doc2)
         {
-            doc2.Upgrade();
-
             var normal = doc2.Package.Rounds.Where(predicate).ToList();
             var count = normal.Count;
 

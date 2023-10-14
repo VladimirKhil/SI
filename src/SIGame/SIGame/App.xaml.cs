@@ -97,7 +97,7 @@ public partial class App : Application
         services.AddSIStorageServiceClient(configuration);
         services.AddSIContentServiceClient(configuration);
 
-        services.AddTransient(typeof(SIStorage));
+        services.AddTransient(typeof(SIStorageService.ViewModel.SIStorage));
 
         services.AddSingleton(_appState);
 

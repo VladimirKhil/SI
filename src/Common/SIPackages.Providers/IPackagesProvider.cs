@@ -1,7 +1,7 @@
 ﻿namespace SIPackages.Providers;
 
 /// <summary>
-/// Represents a package provider.
+/// Represents a packages provider.
 /// </summary>
 public interface IPackagesProvider
 {

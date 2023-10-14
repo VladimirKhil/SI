@@ -166,6 +166,12 @@ public sealed class GameServerClient : IGameServerClient
         _httpClientHandler?.Dispose();
     }
 
+    public Task JoinLobbyAsync(CancellationToken cancellationToken = default) =>
+        _connection.InvokeAsync("JoinLobby", cancellationToken);
+
+    public Task LeaveLobbyAsync(CancellationToken cancellationToken = default) =>
+        _connection.InvokeAsync("LeaveLobby", cancellationToken);
+
     public Task<Slice<GameInfo>> GetGamesAsync(int fromId, CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync<Slice<GameInfo>>("GetGamesSlice", fromId, cancellationToken);
 

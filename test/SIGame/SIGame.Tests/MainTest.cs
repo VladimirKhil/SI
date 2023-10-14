@@ -57,7 +57,7 @@ public class MainTest
         services.AddSIGameServerClient(configuration);
         services.AddSingleton<IUIThreadExecutor>(manager);
         services.AddSIStorageServiceClient(configuration);
-        services.AddTransient(typeof(SIStorage));
+        services.AddTransient(typeof(SIStorageService.ViewModel.SIStorage));
 
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
@@ -67,9 +67,9 @@ public class MainTest
         await mainViewModel.Open.ExecuteAsync(null);
 
         var contentBox = mainViewModel.ActiveView as ContentBox;
-        Assert.IsNull(contentBox, ((LoginViewModel)contentBox?.Data)?.Error);
+        Assert.IsNull(contentBox, ((LoginViewModel?)contentBox?.Data)?.Error);
 
-        var siOnline = (SIOnlineViewModel)mainViewModel.ActiveView;
+        var siOnline = (SIOnlineViewModel?)mainViewModel.ActiveView;
 
         Assert.IsNotNull(siOnline);
 

@@ -582,10 +582,10 @@
     <value>Себя выгнать нельзя!</value>
   </data>
   <data name="Connected_Female" xml:space="preserve">
-    <value>Подключилась</value>
+    <value>Подключилась {0}</value>
   </data>
   <data name="Connected_Male" xml:space="preserve">
-    <value>Подключился</value>
+    <value>Подключился {0}</value>
   </data>
   <data name="Disconnected_Female" xml:space="preserve">
     <value>Отключилась</value>

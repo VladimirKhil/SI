@@ -20,4 +20,5 @@ public enum GameCreationResultCode
     TooManyGamesByAddress,
     UnsupportedPackageType,
     UnsupportedContentUri,
+    TaskCancelled,
 }

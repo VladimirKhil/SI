@@ -8,6 +8,11 @@ namespace SI.GameServer.Contract;
 public sealed class GameInfo : SimpleGameInfo
 {
     /// <summary>
+    /// Game host uri.
+    /// </summary>
+    public Uri? HostUri { get; set; }
+
+    /// <summary>
     /// Game owner.
     /// </summary>
     public string Owner { get; set; } = "";

@@ -1,11 +1,10 @@
 ﻿using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
-using SIStorageService.ViewModel;
 using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
-public sealed class SIStorageViewModel : ViewModel<SIStorage>, INavigationNode
+public sealed class SIStorageViewModel : ViewModel<SIStorageService.ViewModel.SIStorage>, INavigationNode
 {
     public AsyncCommand LoadStorePackage { get; internal set; }
 
@@ -21,7 +20,7 @@ public sealed class SIStorageViewModel : ViewModel<SIStorage>, INavigationNode
         set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsProgress)); } }
     }
 
-    public SIStorageViewModel(SIStorage siStorage, UserSettings userSettings)
+    public SIStorageViewModel(SIStorageService.ViewModel.SIStorage siStorage, UserSettings userSettings)
         : base(siStorage)
     {
         _model.CurrentRestriction = userSettings.Restriction;
@@ -33,27 +32,27 @@ public sealed class SIStorageViewModel : ViewModel<SIStorage>, INavigationNode
         {
             switch (e.PropertyName)
             {
-                case nameof(SIStorage.CurrentRestriction):
+                case nameof(SIStorageService.ViewModel.SIStorage.CurrentRestriction):
                     userSettings.Restriction = Model.CurrentRestriction;
                     break;
 
-                case nameof(SIStorage.CurrentPublisher):
+                case nameof(SIStorageService.ViewModel.SIStorage.CurrentPublisher):
                     userSettings.Publisher = Model.CurrentPublisher.Name;
                     break;
 
-                case nameof(SIStorage.CurrentTag):
+                case nameof(SIStorageService.ViewModel.SIStorage.CurrentTag):
                     userSettings.Tag = Model.CurrentTag.Name;
                     break;
 
-                case nameof(SIStorage.CurrentPackage):
+                case nameof(SIStorageService.ViewModel.SIStorage.CurrentPackage):
                     LoadStorePackage.CanBeExecuted = Model.CurrentPackage != null;
                     break;
 
-                case nameof(SIStorage.IsLoading):
+                case nameof(SIStorageService.ViewModel.SIStorage.IsLoading):
                     OnPropertyChanged(nameof(IsProgress));
                     break;
 
-                case nameof(SIStorage.IsLoadingPackages):
+                case nameof(SIStorageService.ViewModel.SIStorage.IsLoadingPackages):
                     OnPropertyChanged(nameof(IsProgress));
                     break;
             }

@@ -331,7 +331,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         string name,
         bool isMale,
         GameRole role,
-        string password,
+        string? password,
         Action connectionAuthenticator) =>
         ClientData.TaskLock.WithLock(() =>
         {
@@ -3323,7 +3323,8 @@ public sealed class Game : Actor<GameData, GameLogic>
                 ClientData.EndUpdatePersons();
             }
 
-            _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
+            var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
+            _gameActions.SpecialReplic(string.Format(connectedMessage, name));
 
             _gameActions.SendMessage(Messages.Accepted, name);
             _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
@@ -3376,7 +3377,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             ClientData.EndUpdatePersons();
         }
 
-        _gameActions.SpecialReplic($"{LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)]} {name}");
+        var connectedMessage = LO[account.IsMale ? nameof(R.Connected_Male) : nameof(R.Connected_Female)];
+        _gameActions.SpecialReplic(string.Format(connectedMessage, name));
         _gameActions.SendMessageWithArgs(Messages.Connected, role, index, name, sex, "");
 
         if (ClientData.HostName == null && !ClientData.Settings.IsAutomatic)

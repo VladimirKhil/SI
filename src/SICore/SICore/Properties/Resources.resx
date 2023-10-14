@@ -184,10 +184,10 @@
     <value>Computer</value>
   </data>
   <data name="Connected_Female" xml:space="preserve">
-    <value>Has connected</value>
+    <value>{0} connected</value>
   </data>
   <data name="Connected_Male" xml:space="preserve">
-    <value>Has connected</value>
+    <value>{0} connected</value>
   </data>
   <data name="Cost" xml:space="preserve">
     <value>Cost</value>

@@ -34,6 +34,11 @@ public sealed class HostInfo
     public SIContentInfo[] ContentInfos { get; set; } = Array.Empty<SIContentInfo>();
 
     /// <summary>
+    /// Contains information about well-known SIStorage services.
+    /// </summary>
+    public SIStorageInfo[] StorageInfos { get; set; } = Array.Empty<SIStorageInfo>();
+
+    /// <summary>
     /// Server license text.
     /// </summary>
     public string License { get; set; } = "";

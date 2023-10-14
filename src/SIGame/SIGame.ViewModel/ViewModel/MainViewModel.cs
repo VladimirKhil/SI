@@ -258,7 +258,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         await Task.Delay(500);
 
-        var siStorage = _serviceProvider.GetRequiredService<SIStorage>();
+        var siStorage = _serviceProvider.GetRequiredService<SIStorageService.ViewModel.SIStorage>();
 
         var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage)
         {

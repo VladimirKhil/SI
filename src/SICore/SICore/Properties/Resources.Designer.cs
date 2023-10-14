@@ -331,7 +331,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Has connected.
+        ///   Ищет локализованную строку, похожую на {0} connected.
         /// </summary>
         public static string Connected_Female {
             get {
@@ -340,7 +340,7 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Has connected.
+        ///   Ищет локализованную строку, похожую на {0} connected.
         /// </summary>
         public static string Connected_Male {
             get {
