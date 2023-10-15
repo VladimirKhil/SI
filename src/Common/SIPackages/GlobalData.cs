@@ -1,6 +1,6 @@
-﻿using System.Xml;
+﻿using SIPackages.Models;
+using System.Xml;
 using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
@@ -9,7 +9,7 @@ namespace SIPackages;
 /// <summary>
 /// Contains global package data.
 /// </summary>
-public sealed class GlobalData : IXmlSerializable
+public sealed class GlobalData
 {
     /// <summary>
     /// Global authors.
@@ -21,11 +21,12 @@ public sealed class GlobalData : IXmlSerializable
     /// </summary>
     public SourceInfoList Sources { get; } = new();
 
-    /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    /// <summary>
+    /// Reads data from XML reader.
+    /// </summary>
+    /// <param name="reader">XML reader.</param>
+    /// <param name="limits">Package limits.</param>
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         var read = true;
 
@@ -39,12 +40,12 @@ public sealed class GlobalData : IXmlSerializable
                     switch (reader.LocalName)
                     {
                         case "Authors":
-                            Authors.ReadXml(reader);
+                            Authors.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "Sources":
-                            Sources.ReadXml(reader);
+                            Sources.ReadXml(reader, limits);
                             read = false;
                             break;
                     }

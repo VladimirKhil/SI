@@ -846,9 +846,25 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
+        var review = new StringBuilder();
+
+        for (var i = 2; i < args.Length; i++)
+        {
+            review.AppendLine(args[i]);
+        }
+
+        if (args[1] == MessageParams.Report_Log)
+        {
+            ClientData.BackLink.LogWarning("Player error: " + review);
+            return;
+        }
+
         ClientData.ReportsCount--;
 
-        ClientData.GameResultInfo.Reviews[message.Sender] = args.Length > 2 ? args[2] : "";
+        if (review.Length > 0)
+        {
+            ClientData.GameResultInfo.Reviews[message.Sender] = review.ToString();
+        }
 
         if (ClientData.ReportsCount == 0)
         {

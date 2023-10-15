@@ -1,5 +1,7 @@
-﻿using System.Runtime.Serialization;
-using System.Xml.Serialization;
+﻿using SIPackages.Helpers;
+using SIPackages.Models;
+using System.Runtime.Serialization;
+using System.Xml;
 
 namespace SIPackages;
 
@@ -7,13 +9,14 @@ namespace SIPackages;
 /// Defines a collection of sources.
 /// </summary>
 [CollectionDataContract(Name = "Sources", Namespace = "")]
-public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
+public sealed class SourceInfoList : List<SourceInfo>
 {
-    /// <inheritdoc />
-    public System.Xml.Schema.XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(System.Xml.XmlReader reader)
+    /// <summary>
+    /// Loads data from XML reader.
+    /// </summary>
+    /// <param name="reader">Reader to use.</param>
+    /// <param name="limits">Package limits.</param>
+    public void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
         SourceInfo? sourceInfo = null;
 
@@ -25,20 +28,27 @@ public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
 
             switch (reader.NodeType)
             {
-                case System.Xml.XmlNodeType.Element:
+                case XmlNodeType.Element:
                     switch (reader.LocalName)
                     {
                         case "Source":
-                            sourceInfo = new SourceInfo
+                            if (limits == null || Count < limits.CollectionCount)
                             {
-                                Id = reader["id"]
-                            };
+                                sourceInfo = new SourceInfo
+                                {
+                                    Id = reader["id"]
+                                };
 
-                            Add(sourceInfo);
+                                Add(sourceInfo);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
                             break;
 
                         case "Author":
-                            var author = reader.ReadElementContentAsString();
+                            var author = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
 
                             if (sourceInfo != null)
                             {
@@ -49,7 +59,7 @@ public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
                             break;
 
                         case "Title":
-                            sourceInfo.Title = reader.ReadElementContentAsString();
+                            sourceInfo.Title = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
@@ -59,19 +69,19 @@ public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
                             break;
 
                         case "Publish":
-                            sourceInfo.Publish = reader.ReadElementContentAsString();
+                            sourceInfo.Publish = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case "City":
-                            sourceInfo.City = reader.ReadElementContentAsString();
+                            sourceInfo.City = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
                     }
 
                     break;
 
-                case System.Xml.XmlNodeType.EndElement:
+                case XmlNodeType.EndElement:
                     if (reader.LocalName == "Sources")
                     {
                         reader.Read();
@@ -84,7 +94,7 @@ public sealed class SourceInfoList : List<SourceInfo>, IXmlSerializable
     }
 
     /// <inheritdoc />
-    public void WriteXml(System.Xml.XmlWriter writer)
+    public void WriteXml(XmlWriter writer)
     {
         writer.WriteStartElement("Sources");
 

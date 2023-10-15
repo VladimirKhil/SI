@@ -1,4 +1,6 @@
 ﻿using SIPackages.Core;
+using SIPackages.Helpers;
+using SIPackages.Models;
 using SIPackages.TypeConverters;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -148,14 +150,14 @@ public sealed class Question : InfoOwner, IEquatable<Question>
     }
 
     /// <inheritdoc />
-    public override void ReadXml(XmlReader reader)
+    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
         var priceStr = reader.GetAttribute("price");
         _ = int.TryParse(priceStr, out _price);
 
         if (reader.MoveToAttribute("type"))
         {
-            _typeName = reader.Value;
+            _typeName = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         var right = true;
@@ -171,58 +173,64 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader);
+                            base.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "type":
-                            Type.Name = reader.GetAttribute("name");
+                            Type.Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
                             break;
 
                         case "param":
-                            var param = new QuestionTypeParam
+                            if (limits == null || Type.Params.Count < limits.CollectionCount)
                             {
-                                Name = reader.GetAttribute("name"),
-                                Value = reader.ReadElementContentAsString()
-                            };
+                                var param = new QuestionTypeParam
+                                {
+                                    Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength),
+                                    Value = reader.ReadElementContentAsString()
+                                };
 
-                            Type.Params.Add(param);
-                            read = false;
+                                Type.Params.Add(param);
+                                read = false;
+                            }
                             break;
 
                         case "script":
                             Script = new();
-                            Script.ReadXml(reader);
+                            Script.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "params":
                             Parameters = new();
-                            Parameters.ReadXml(reader);
+                            Parameters.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "atom":
-                            var atom = new Atom();
-
-                            if (reader.MoveToAttribute("time"))
+                            if (limits == null || Scenario.Count < limits.ContentItemCount)
                             {
-                                if (int.TryParse(reader.Value, out int time))
+                                var atom = new Atom();
+
+                                if (reader.MoveToAttribute("time"))
                                 {
-                                    atom.AtomTime = time;
+                                    if (int.TryParse(reader.Value, out int time))
+                                    {
+                                        atom.AtomTime = time;
+                                    }
                                 }
+
+                                if (reader.MoveToAttribute("type"))
+                                {
+                                    atom.Type = reader.Value.LimitLengthBy(limits?.TextLength);
+                                }
+
+                                reader.MoveToElement();
+                                atom.Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.ContentValueLength);
+
+                                Scenario.Add(atom);
+                                read = false;
                             }
-
-                            if (reader.MoveToAttribute("type"))
-                            {
-                                atom.Type = reader.Value;
-                            }
-
-                            reader.MoveToElement();
-                            atom.Text = reader.ReadElementContentAsString();
-
-                            Scenario.Add(atom);
-                            read = false;
                             break;
 
                         case "right":
@@ -234,7 +242,7 @@ public sealed class Question : InfoOwner, IEquatable<Question>
                             break;
 
                         case "answer":
-                            var answer = reader.ReadElementContentAsString();
+                            var answer = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
 
                             if (right)
                             {

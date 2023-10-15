@@ -92,7 +92,17 @@ public sealed class Player : Viewer<IPlayerLogic>
         ClientData.PlayerDataExtensions.Report.Title = LO[nameof(R.ReportTitle)];
         ClientData.PlayerDataExtensions.Report.Subtitle = LO[nameof(R.ReportTip)];
 
-        ClientData.PlayerDataExtensions.Report.SendReport = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Report, "ACCEPT", ClientData.SystemLog.ToString() + ClientData.PlayerDataExtensions.Report.Comment); Clear(); });
+        ClientData.PlayerDataExtensions.Report.SendReport = new CustomCommand(arg => 
+        {
+            if (ClientData.SystemLog.Length > 0)
+            {
+                _viewerActions.SendMessage(Messages.Report, MessageParams.Report_Log, ClientData.SystemLog.ToString());
+            }
+
+            _viewerActions.SendMessage(Messages.Report, "ACCEPT", ClientData.PlayerDataExtensions.Report.Comment);
+            Clear();
+        });
+
         ClientData.PlayerDataExtensions.Report.SendNoReport = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Report, "DECLINE"); Clear(); });
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;

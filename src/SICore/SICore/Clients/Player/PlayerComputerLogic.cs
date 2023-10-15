@@ -1611,7 +1611,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
         }
         catch (Exception exc)
         {
-            _data.SystemLog.AppendFormat("Ошибка при выборе вопроса. Описание ошибки: {0}", exc.ToString()).AppendLine();
+            _data.SystemLog.AppendFormat("Question selection error: {0}", exc.ToString()).AppendLine();
         }
     }
 

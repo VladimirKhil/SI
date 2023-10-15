@@ -352,7 +352,7 @@ public static class StringExtensions
     /// <param name="str">Входная строка</param>
     /// <param name="n">Пределная длина</param>
     /// <returns>Результирующая обрезанная строка</returns>
-    public static string LeaveFirst(this string str, int n) => (str.Length > n) ? string.Concat(str.AsSpan(n - 1), "…") : str;
+    public static string LeaveFirst(this string str, int n) => (str.Length > n) ? string.Concat(str.AsSpan(0, n - 1), "…") : str;
 
     public static string FormatNumber(this string s, bool format = false)
     {

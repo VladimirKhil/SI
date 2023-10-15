@@ -3,6 +3,7 @@
 /// <summary>
 /// Defines well-known atom types.
 /// </summary>
+[Obsolete("Use ContentTypes class")]
 public static class AtomTypes
 {
     /// <summary>

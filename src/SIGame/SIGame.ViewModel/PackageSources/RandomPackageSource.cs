@@ -7,7 +7,7 @@ namespace SIGame.ViewModel.PackageSources;
 /// <summary>
 /// Случайный набор тем
 /// </summary>
-internal sealed class RandomPackageSource: PackageSource
+internal sealed class RandomPackageSource : PackageSource
 {
     private readonly int _packageId = new Random().Next(int.MaxValue);
 

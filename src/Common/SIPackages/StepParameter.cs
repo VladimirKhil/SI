@@ -1,17 +1,16 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Defines a question script step parameter.
 /// </summary>
-public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<StepParameter>, IXmlSerializable
+public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<StepParameter>
 {
     private const string DefaultType = StepParameterTypes.Simple;
 
@@ -248,14 +247,11 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         HashCode.Combine(Type, SimpleValue, IsRef, ContentValue?.GetCollectionHashCode(), GroupValue, NumberSetValue);
 
     /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value;
+            _type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("isRef"))
@@ -266,18 +262,18 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         if (_isRef != DefaultIsRef)
         {
             reader.MoveToElement();
-            _simpleValue = reader.ReadElementContentAsString();
+            _simpleValue = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
         }
         else
         {
             switch (_type)
             {
                 case StepParameterTypes.Content:
-                    ReadContent(reader);
+                    ReadContent(reader, limits);
                     break;
 
                 case StepParameterTypes.Group:
-                    ReadGroup(reader);
+                    ReadGroup(reader, limits);
                     break;
 
                 case StepParameterTypes.NumberSet:
@@ -285,13 +281,13 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
                     break;
 
                 default:
-                    ReadValue(reader);
+                    ReadValue(reader, limits);
                     break;
             }
         }
     }
 
-    private void ReadContent(XmlReader reader)
+    private void ReadContent(XmlReader reader, PackageLimits? limits)
     {
         var read = true;
         _contentValue = new();
@@ -306,9 +302,17 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
                     switch (reader.LocalName)
                     {
                         case "item":
-                            var item = new ContentItem();
-                            item.ReadXml(reader);
-                            _contentValue.Add(item);
+                            if (limits == null || _contentValue.Count < limits.ContentItemCount)
+                            {
+                                var item = new ContentItem();
+                                item.ReadXml(reader, limits);
+                                _contentValue.Add(item);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
+
                             read = false;
                             break;
                     }
@@ -326,11 +330,11 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         }
     }
 
-    private void ReadGroup(XmlReader reader)
+    private void ReadGroup(XmlReader reader, PackageLimits? limits)
     {
         _groupValue = new();
         reader.MoveToElement();
-        _groupValue.ReadXml(reader);
+        _groupValue.ReadXml(reader, limits);
     }
 
     private void ReadNumberSet(XmlReader reader)
@@ -359,10 +363,10 @@ public sealed class StepParameter : PropertyChangedNotifier, ITyped, IEquatable<
         reader.Read(); // param
     }
 
-    private void ReadValue(XmlReader reader)
+    private void ReadValue(XmlReader reader, PackageLimits? limits)
     {
         reader.MoveToElement();
-        _simpleValue = reader.ReadElementContentAsString();
+        _simpleValue = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
     }
 
     /// <inheritdoc />

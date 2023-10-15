@@ -1,17 +1,17 @@
 ﻿using SIPackages.Core;
+using SIPackages.Helpers;
+using SIPackages.Models;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Defines a package content item.
 /// </summary>
-public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<ContentItem>, IXmlSerializable
+public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<ContentItem>
 {
     private const string DefaultType = AtomTypes.Text;
     private const bool DefaultIsRef = false;
@@ -185,14 +185,11 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     public override int GetHashCode() => HashCode.Combine(Type, Value, IsRef, Placement, Duration, WaitForFinish);
 
     /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value;
+            _type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("isRef"))
@@ -202,7 +199,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
 
         if (reader.MoveToAttribute("placement"))
         {
-            _placement = reader.Value;
+            _placement = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("duration"))
@@ -216,7 +213,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
         }
 
         reader.MoveToElement();
-        _value = reader.ReadElementContentAsString();
+        _value = reader.ReadElementContentAsString().LimitLengthBy(limits?.ContentValueLength);
     }
 
     /// <inheritdoc />

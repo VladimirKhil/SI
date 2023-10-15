@@ -1,15 +1,16 @@
 ﻿using SIPackages.Core;
+using SIPackages.Helpers;
+using SIPackages.Models;
 using System.ComponentModel;
 using System.Xml;
 using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Represents an object having common information attached to it.
 /// </summary>
-public abstract class InfoOwner : Named, IXmlSerializable
+public abstract class InfoOwner : Named
 {
     private const string ShowmanCommentsTag = "showmanComments";
 
@@ -88,11 +89,12 @@ public abstract class InfoOwner : Named, IXmlSerializable
         }
     }
 
-    /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public virtual void ReadXml(XmlReader reader)
+    /// <summary>
+    /// Reads data from XML reader.
+    /// </summary>
+    /// <param name="reader">XML reader.</param>
+    /// <param name="limits">Package limits.</param>
+    public virtual void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
         var read = true;
 
@@ -106,25 +108,32 @@ public abstract class InfoOwner : Named, IXmlSerializable
                     switch (reader.LocalName)
                     {
                         case "author":
-                            Info.Authors.Add(reader.ReadElementContentAsString());
-                            read = false;
+                            if (limits == null || Info.Authors.Count < limits.CollectionCount)
+                            {
+                                Info.Authors.Add(reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength));
+                                read = false;
+                            }
                             break;
 
                         case "source":
-                            Info.Sources.Add(reader.ReadElementContentAsString());
-                            read = false;
+                            if (limits == null || Info.Sources.Count < limits.CollectionCount)
+                            {
+                                Info.Sources.Add(reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength));
+                                read = false;
+                            }
                             break;
 
                         case "comments":
-                            Info.Comments.Text = reader.ReadElementContentAsString();
+                            Info.Comments.Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case ShowmanCommentsTag:
                             Info.ShowmanComments = new Comments
                             {
-                                Text = reader.ReadElementContentAsString()
+                                Text = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength)
                             };
+
                             read = false;
                             break;
                     }

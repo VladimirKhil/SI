@@ -56,6 +56,11 @@ public static class MessageParams
     public const string Info_Update = "UPDATE";
 
     /// <summary>
+    /// Report log.
+    /// </summary>
+    public const string Report_Log = "LOG";
+
+    /// <summary>
     /// Запуск таймера
     /// </summary>
     public const string Timer_Go = "GO";

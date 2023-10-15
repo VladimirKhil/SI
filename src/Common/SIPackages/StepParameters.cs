@@ -1,15 +1,14 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Defines a collection of step parameters.
 /// </summary>
-public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatable<StepParameters>, IXmlSerializable
+public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatable<StepParameters>
 {
     /// <summary>
     /// Does any of parameters contain specified value.
@@ -43,10 +42,7 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
     public override int GetHashCode() => this.GetCollectionHashCode();
 
     /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         var read = true;
         var parentTagName = reader.LocalName;
@@ -61,16 +57,24 @@ public sealed class StepParameters : Dictionary<string, StepParameter>, IEquatab
                     switch (reader.LocalName)
                     {
                         case "param":
-                            var name = "";
-
-                            if (reader.MoveToAttribute("name"))
+                            if (limits == null || Count < limits.ParameterCount)
                             {
-                                name = reader.Value;
+                                var name = "";
+
+                                if (reader.MoveToAttribute("name"))
+                                {
+                                    name = reader.Value.LimitLengthBy(limits?.TextLength);
+                                }
+
+                                var parameter = new StepParameter();
+                                parameter.ReadXml(reader, limits);
+                                this[name] = parameter;
+                            }
+                            else
+                            {
+                                reader.Skip();
                             }
 
-                            var parameter = new StepParameter();
-                            parameter.ReadXml(reader);
-                            this[name] = parameter;
                             read = false;
                             break;
                     }

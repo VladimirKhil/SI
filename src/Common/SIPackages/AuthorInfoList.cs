@@ -1,5 +1,7 @@
-﻿using System.Runtime.Serialization;
-using System.Xml.Serialization;
+﻿using SIPackages.Helpers;
+using SIPackages.Models;
+using System.Runtime.Serialization;
+using System.Xml;
 
 namespace SIPackages;
 
@@ -7,20 +9,16 @@ namespace SIPackages;
 /// Defines a list of package authors.
 /// </summary>
 [CollectionDataContract(Name = "Authors", Namespace = "")]
-public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
+public sealed class AuthorInfoList : List<AuthorInfo>
 {
-    /// <summary>
-    /// Gets XML schema to use.
-    /// </summary>
-    public System.Xml.Schema.XmlSchema? GetSchema() => null;
-
     /// <summary>
     /// Loads data from XML reader.
     /// </summary>
     /// <param name="reader">Reader to use.</param>
-    public void ReadXml(System.Xml.XmlReader reader)
+    /// <param name="limits">Package limits.</param>
+    public void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
-        AuthorInfo authorInfo = null;
+        AuthorInfo? authorInfo = null;
 
         var read = true;
 
@@ -30,47 +28,54 @@ public sealed class AuthorInfoList : List<AuthorInfo>, IXmlSerializable
 
             switch (reader.NodeType)
             {
-                case System.Xml.XmlNodeType.Element:
+                case XmlNodeType.Element:
                     switch (reader.LocalName)
                     {
                         case "Author":
-                            authorInfo = new AuthorInfo
+                            if (limits == null || Count < limits.CollectionCount)
                             {
-                                Id = reader["id"]
-                            };
+                                authorInfo = new AuthorInfo
+                                {
+                                    Id = reader["id"]
+                                };
 
-                            Add(authorInfo);
+                                Add(authorInfo);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
                             break;
 
                         case "Name":
-                            authorInfo.Name = reader.ReadElementContentAsString();
+                            authorInfo.Name = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case "SecondName":
-                            authorInfo.SecondName = reader.ReadElementContentAsString();
+                            authorInfo.SecondName = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case "Surname":
-                            authorInfo.Surname = reader.ReadElementContentAsString();
+                            authorInfo.Surname = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case "Country":
-                            authorInfo.Country = reader.ReadElementContentAsString();
+                            authorInfo.Country = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
 
                         case "City":
-                            authorInfo.City = reader.ReadElementContentAsString();
+                            authorInfo.City = reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength);
                             read = false;
                             break;
                     }
 
                     break;
 
-                case System.Xml.XmlNodeType.EndElement:
+                case XmlNodeType.EndElement:
                     if (reader.LocalName == "Authors")
                     {
                         reader.Read();

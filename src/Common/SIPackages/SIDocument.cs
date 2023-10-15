@@ -2,6 +2,7 @@
 using SIPackages.Containers;
 using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using SIPackages.Properties;
 using System.Diagnostics;
 using System.Xml;
@@ -180,8 +181,9 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     /// <param name="stream">Source stream.</param>
     /// <param name="read">Should the document be read-only.</param>
-    public static SIDocument Load(Stream stream, bool read = true) =>
-        Load(PackageContainerFactory.GetPackageContainer(stream, read));
+    /// <param name="limits">Package limits.</param>
+    public static SIDocument Load(Stream stream, bool read = true, PackageLimits? limits = null) =>
+        Load(PackageContainerFactory.GetPackageContainer(stream, read), limits);
 
     /// <summary>
     /// Loads document from folder.
@@ -244,15 +246,16 @@ public sealed class SIDocument : IDisposable
     /// Loads document from custom package container.
     /// </summary>
     /// <param name="packageContainer">Custom package container.</param>
-    public static SIDocument Load(ISIPackageContainer packageContainer)
+    /// <param name="limits">Package limits.</param>
+    public static SIDocument Load(ISIPackageContainer packageContainer, PackageLimits? limits = null)
     {
         var document = new SIDocument(packageContainer);
-        document.LoadData();
+        document.LoadData(limits);
 
         return document;
     }
 
-    private void LoadData()
+    private void LoadData(PackageLimits? limits = null)
     {
         var streamInfo = _packageContainer.GetStream(ContentFileName);
 
@@ -266,7 +269,7 @@ public sealed class SIDocument : IDisposable
                 {
                     if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                     {
-                        _package.ReadXml(reader);
+                        _package.ReadXml(reader, limits);
                         break;
                     }
                 }
@@ -610,6 +613,7 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     /// <param name="atom">Atom containing the link.</param>
     /// <returns>Linked resource.</returns>
+    [Obsolete]
     public IMedia GetLink(Atom atom)
     {
         var link = atom.Text.ExtractLink();
@@ -628,6 +632,7 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     /// <param name="contentItem">Content item.</param>
     /// <returns>Linked resource.</returns>
+    [Obsolete("Use TryGetMedia")]
     public IMedia GetLink(ContentItem contentItem)
     {
         var link = contentItem.Value;
@@ -681,6 +686,7 @@ public sealed class SIDocument : IDisposable
     public DataCollection GetCollection(string mediaType) => TryGetCollection(mediaType)
         ?? throw new ArgumentException($"Invalid media type {mediaType}", nameof(mediaType));
 
+    [Obsolete]
     private static IMedia GetLinkFromCollection(string link, DataCollection collection)
     {
         // TODO: make deterministic choice

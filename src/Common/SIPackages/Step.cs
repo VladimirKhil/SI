@@ -1,17 +1,16 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Defines a question script step.
 /// </summary>
-public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>, IXmlSerializable
+public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>
 {
     private const string DefaultType = StepTypes.ShowContent;
 
@@ -76,17 +75,14 @@ public sealed class Step : PropertyChangedNotifier, ITyped, IEquatable<Step>, IX
     public override int GetHashCode() => HashCode.Combine(Type, Parameters.GetCollectionHashCode());
 
     /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value;
+            _type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
-        Parameters.ReadXml(reader);
+        Parameters.ReadXml(reader, limits);
     }
 
     /// <inheritdoc />

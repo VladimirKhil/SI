@@ -1,5 +1,6 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -245,13 +246,10 @@ public sealed class Package : InfoOwner, IEquatable<Package>
         return round;
     }
 
-    /// <summary>
-    /// Reads data from XML reader.
-    /// </summary>
-    /// <param name="reader">XML reader.</param>
-    public override void ReadXml(XmlReader reader)
+    /// <inheritdoc />
+    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
-        Name = reader.GetAttribute("name") ?? "";
+        Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
         var versionString = reader.GetAttribute("version");
 
@@ -272,22 +270,22 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
         if (reader.MoveToAttribute("restriction"))
         {
-            _restriction = reader.Value;
+            _restriction = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("date"))
         {
-            _date = reader.Value;
+            _date = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("publisher"))
         {
-            _publisher = reader.Value;
+            _publisher = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("contactUri"))
         {
-            _contactUri = reader.Value;
+            _contactUri = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.MoveToAttribute("difficulty"))
@@ -302,7 +300,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
 
         if (reader.MoveToAttribute("language"))
         {
-            _language = reader.Value;
+            _language = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.IsEmptyElement)
@@ -323,24 +321,35 @@ public sealed class Package : InfoOwner, IEquatable<Package>
                     switch (reader.LocalName)
                     {
                         case "tag":
-                            Tags.Add(reader.ReadElementContentAsString());
-                            read = false;
+                            if (limits == null || Tags.Count < limits.CollectionCount)
+                            {
+                                Tags.Add(reader.ReadElementContentAsString().LimitLengthBy(limits?.TextLength));
+                                read = false;
+                            }
                             break;
 
                         case "info":
-                            base.ReadXml(reader);
+                            base.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "global":
                             Global = new GlobalData();
-                            Global.ReadXml(reader);
+                            Global.ReadXml(reader, limits);
                             break;
 
                         case "round":
-                            var round = new Round();
-                            round.ReadXml(reader);
-                            Rounds.Add(round);
+                            if (limits == null || Rounds.Count < limits.RoundCount)
+                            {
+                                var round = new Round();
+                                round.ReadXml(reader, limits);
+                                Rounds.Add(round);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
+
                             read = false;
                             break;
                     }

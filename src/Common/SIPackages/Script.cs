@@ -1,14 +1,13 @@
 ﻿using SIPackages.Helpers;
+using SIPackages.Models;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace SIPackages;
 
 /// <summary>
 /// Defines a question script as a sequence of steps.
 /// </summary>
-public sealed class Script : IEquatable<Script>, IXmlSerializable
+public sealed class Script : IEquatable<Script>
 {
     /// <summary>
     /// Script steps which are executed sequentially.
@@ -28,10 +27,7 @@ public sealed class Script : IEquatable<Script>, IXmlSerializable
     public override int GetHashCode() => Steps.GetCollectionHashCode();
 
     /// <inheritdoc />
-    public XmlSchema? GetSchema() => null;
-
-    /// <inheritdoc />
-    public void ReadXml(XmlReader reader)
+    public void ReadXml(XmlReader reader, PackageLimits? limits)
     {
         var read = true;
 
@@ -45,9 +41,17 @@ public sealed class Script : IEquatable<Script>, IXmlSerializable
                     switch (reader.LocalName)
                     {
                         case "step":
-                            var step = new Step();
-                            step.ReadXml(reader);
-                            Steps.Add(step);
+                            if (limits == null || Steps.Count < limits.StepCount)
+                            {
+                                var step = new Step();
+                                step.ReadXml(reader, limits);
+                                Steps.Add(step);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
+
                             read = false;
                             break;
                     }

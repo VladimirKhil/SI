@@ -1,5 +1,6 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using SIPackages.Properties;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -46,13 +47,13 @@ public sealed class Round : InfoOwner, IEquatable<Round>
     }
 
     /// <inheritdoc/>
-    public override void ReadXml(XmlReader reader)
+    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
-        Name = reader.GetAttribute("name") ?? "";
+        Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
         if (reader.MoveToAttribute("type"))
         {
-            _type = reader.Value;
+            _type = reader.Value.LimitLengthBy(limits?.TextLength);
         }
 
         if (reader.IsEmptyElement)
@@ -62,6 +63,7 @@ public sealed class Round : InfoOwner, IEquatable<Round>
         }
 
         var read = true;
+
         while (!read || reader.Read())
         {
             read = true;
@@ -72,14 +74,22 @@ public sealed class Round : InfoOwner, IEquatable<Round>
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader);
+                            base.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "theme":
-                            var theme = new Theme();
-                            theme.ReadXml(reader);
-                            Themes.Add(theme);
+                            if (limits == null || Themes.Count < limits.ThemeCount)
+                            {
+                                var theme = new Theme();
+                                theme.ReadXml(reader, limits);
+                                Themes.Add(theme);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
+
                             read = false;
                             break;
                     }

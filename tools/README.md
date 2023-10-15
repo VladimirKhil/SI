@@ -1,0 +1,1 @@
+Call these scripts from root folder.

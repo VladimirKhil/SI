@@ -1,6 +1,8 @@
 ﻿using SIPackages.Core;
 using SIPackages.Helpers;
+using SIPackages.Models;
 using SIPackages.Properties;
+using System.Xml;
 
 namespace SIPackages;
 
@@ -87,13 +89,10 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
         return 100;
     }
 
-    /// <summary>
-    /// Reades data from XML reader.
-    /// </summary>
-    /// <param name="reader">XML Reader.</param>
-    public override void ReadXml(System.Xml.XmlReader reader)
+    /// <inheritdoc />
+    public override void ReadXml(XmlReader reader, PackageLimits? limits = null)
     {
-        Name = reader.GetAttribute("name") ?? "";
+        Name = (reader.GetAttribute("name") ?? "").LimitLengthBy(limits?.TextLength);
 
         if (reader.IsEmptyElement)
         {
@@ -109,25 +108,33 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
 
             switch (reader.NodeType)
             {
-                case System.Xml.XmlNodeType.Element:
+                case XmlNodeType.Element:
                     switch (reader.LocalName)
                     {
                         case "info":
-                            base.ReadXml(reader);
+                            base.ReadXml(reader, limits);
                             read = false;
                             break;
 
                         case "question":
-                            var question = new Question();
-                            question.ReadXml(reader);
-                            Questions.Add(question);
+                            if (limits == null || Questions.Count < limits.QuestionCount)
+                            {
+                                var question = new Question();
+                                question.ReadXml(reader, limits);
+                                Questions.Add(question);
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
+
                             read = false;
                             break;
                     }
 
                     break;
 
-                case System.Xml.XmlNodeType.EndElement:
+                case XmlNodeType.EndElement:
                     if (reader.LocalName == "theme")
                     {
                         reader.Read();
@@ -142,7 +149,7 @@ public sealed class Theme : InfoOwner, IEquatable<Theme>
     /// Writes data to XML writer.
     /// </summary>
     /// <param name="writer">XML writer.</param>
-    public override void WriteXml(System.Xml.XmlWriter writer)
+    public override void WriteXml(XmlWriter writer)
     {
         writer.WriteStartElement("theme");
         writer.WriteAttributeString("name", Name);
