@@ -18,12 +18,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public override string Header => Properties.Resources.QuestionPlay;
 
-    private ContentTypes _contentType = ContentTypes.None;
+    private Play.ContentTypes _contentType = Dialogs.Play.ContentTypes.None;
 
     /// <summary>
     /// Current question content type.
     /// </summary>
-    public ContentTypes ContentType
+    public Play.ContentTypes ContentType
     {
         get => _contentType;
         set
@@ -173,22 +173,22 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
                 {
                     case AtomTypes.Text:
                         Content = contentItem.Value;
-                        ContentType = ContentTypes.Text;
+                        ContentType = Dialogs.Play.ContentTypes.Text;
                         break;
 
                     case AtomTypes.Image:
                         Content = contentItem.IsRef ? _qDocument.Images.Wrap(contentItem.Value).Uri : contentItem.Value;
-                        ContentType = ContentTypes.Image;
+                        ContentType = Dialogs.Play.ContentTypes.Image;
                         break;
 
                     case AtomTypes.Video:
                         Content = contentItem.IsRef ? _qDocument.Video.Wrap(contentItem.Value).Uri : contentItem.Value;
-                        ContentType = ContentTypes.Video;
+                        ContentType = Dialogs.Play.ContentTypes.Video;
                         break;
 
                     case AtomTypes.Html:
                         Content = contentItem.Value;
-                        ContentType = ContentTypes.Html;
+                        ContentType = Dialogs.Play.ContentTypes.Html;
                         break;
 
                     default:
@@ -199,9 +199,9 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             case ContentPlacements.Background:
                 Sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
 
-                if (ContentType == ContentTypes.None)
+                if (ContentType == Dialogs.Play.ContentTypes.None)
                 {
-                    ContentType = ContentTypes.Audio;
+                    ContentType = Dialogs.Play.ContentTypes.Audio;
                 }
                 break;
 
