@@ -7,8 +7,8 @@ using NLog.Extensions.Logging;
 using NLog.Web;
 using SImulator.Implementation;
 using SImulator.ViewModel;
-using SIStorageService.Client;
-using SIStorageService.Client.Models;
+using SIStorage.Service.Client;
+using SIStorage.Service.Contract.Models;
 using SIStorageService.ViewModel;
 using System;
 using System.ComponentModel;
@@ -80,7 +80,7 @@ public partial class App : Application
         services.AddAppServiceClient(configuration);
         services.AddSIStorageServiceClient(configuration);
 
-        services.AddTransient(typeof(SIStorage));
+        services.AddSingleton(typeof(StorageViewModel));
 
         services.AddTransient<CommandWindow>();
 
@@ -105,11 +105,11 @@ public partial class App : Application
 
 #if DEBUG
         main.PackageSource = new SIStoragePackageSource(
-            new PackageInfo
+            new Package
             {
-                Description = SImulator.Properties.Resources.TestPackage
-            },
-            new Uri("https://vladimirkhil.com/sistorage/Основные/1.siq"));
+                Name = SImulator.Properties.Resources.TestPackage,
+                ContentUri = new Uri("https://vladimirkhil.com/sistorage/packages/98658de3-5992-43ed-9655-4ed3c02672a2.siq")
+            });
 #else
         ProcessAsync();
 #endif

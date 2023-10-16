@@ -381,7 +381,7 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         GameSettings gameSettings,
         CommonSettings commonSettings,
         UserSettings userSettings,
-        SIStorageService.ViewModel.SIStorage siStorage,
+        SIStorageService.ViewModel.StorageViewModel siStorage,
         bool isNetworkGame = false,
         long? maxPackageSize = null)
         : base(gameSettings)

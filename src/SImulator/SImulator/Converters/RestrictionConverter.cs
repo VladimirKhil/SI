@@ -6,12 +6,12 @@ using System.Windows.Data;
 
 namespace SImulator.Converters;
 
-public sealed class NameConverter : IValueConverter
+public sealed class RestrictionConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var publisher = (Publisher)value;
-        return publisher.Id == -2 ? Resources.All : (publisher.Id == -1 ? Resources.NotSet : publisher.Name);
+        var restriction = (Restriction)value;
+        return restriction.Id == -2 ? Resources.All : (restriction.Id == -1 ? Resources.NotSet : restriction.Value);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => 

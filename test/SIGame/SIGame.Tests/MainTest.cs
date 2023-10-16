@@ -8,8 +8,7 @@ using SIData;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Settings;
-using SIStorageService.Client;
-using SIStorageService.ViewModel;
+using SIStorage.Service.Client;
 using SIUI.ViewModel;
 using System.ComponentModel;
 using System.Net;
@@ -57,7 +56,7 @@ public class MainTest
         services.AddSIGameServerClient(configuration);
         services.AddSingleton<IUIThreadExecutor>(manager);
         services.AddSIStorageServiceClient(configuration);
-        services.AddTransient(typeof(SIStorageService.ViewModel.SIStorage));
+        services.AddTransient(typeof(SIStorageService.ViewModel.StorageViewModel));
 
         var serviceProvider = services.BuildServiceProvider();
         manager.ServiceProvider = serviceProvider;
@@ -99,13 +98,16 @@ public class MainTest
                 Assert.Fail("Could not load storage packages");
             }
 
-            var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(p => p.ID == 300);
+            var packageId = Guid.Parse("d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6");
+
+            var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(
+                p => p.Model.Id == packageId);
 
             Assert.IsNotNull(package);
 
             var storage = gameSettings.StorageInfo.Model.CurrentPackage = package;
 
-            await gameSettings.StorageInfo.LoadStorePackage.ExecuteAsync(null);
+            gameSettings.StorageInfo.LoadStorePackage.Execute(null);
         }
 
         await gameSettings.BeginGame.ExecuteAsync(null);

@@ -1,4 +1,4 @@
-﻿using SIStorageService.Client;
+﻿using SIStorage.Service.Contract;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -9,7 +9,7 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
 {
     private readonly ISIStorageServiceClient _siStorageServiceClient;
 
-    private string[] _publishers;
+    private string[] _publishers = Array.Empty<string>();
 
     public string[] Publishers
     {
@@ -21,7 +21,7 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
         }
     }
 
-    private string[] _authors;
+    private string[] _authors = Array.Empty<string>();
 
     public string[] Authors
     {
@@ -33,7 +33,7 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
         }
     }
 
-    private string[] _tags;
+    private string[] _tags = Array.Empty<string>();
 
     public string[] Tags
     {
@@ -47,17 +47,21 @@ public sealed class StorageContextViewModel : INotifyPropertyChanged
 
     public string[] Languages { get; } = new string[] { "ru-RU", "en-US" };
 
-    public StorageContextViewModel(ISIStorageServiceClient siStorageService)
-    {
-        _siStorageServiceClient = siStorageService;
-    }
+    public StorageContextViewModel(ISIStorageServiceClient siStorageService) => _siStorageServiceClient = siStorageService;
 
     public async void Load()
     {
         try
         {
-            Publishers = (await _siStorageServiceClient.GetPublishersAsync()).Select(named => named.Name).ToArray();
-            Tags = (await _siStorageServiceClient.GetTagsAsync()).Select(named => named.Name).ToArray();
+            Publishers = (await _siStorageServiceClient.Facets.GetPublishersAsync())
+                .Select(publisher => publisher.Name)
+                .OrderBy(n => n)
+                .ToArray();
+
+            Tags = (await _siStorageServiceClient.Facets.GetTagsAsync())
+                .Select(tag => tag.Name)
+                .OrderBy(n => n)
+                .ToArray();
         }
         catch (Exception exc)
         {

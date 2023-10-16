@@ -153,40 +153,40 @@ public sealed class UserSettings : INotifyPropertyChanged
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string _restriction = "12+";
+    private string? _restriction = "12+";
 
     /// <summary>
     /// Ограничение на пакеты
     /// </summary>
     [XmlAttribute]
     [DefaultValue("12+")]
-    public string Restriction
+    public string? Restriction
     {
         get => _restriction;
         set { _restriction = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string _publisher = null;
+    private string? _publisher = null;
 
     /// <summary>
     /// Издатель
     /// </summary>
     [XmlAttribute]
-    public string Publisher
+    public string? Publisher
     {
         get => _publisher;
         set { _publisher = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string _tag = null;
+    private string? _tag = null;
 
     /// <summary>
     /// Тематика
     /// </summary>
     [XmlAttribute]
-    public string Tag
+    public string? Tag
     {
         get => _tag;
         set { _tag = value; OnPropertyChanged(); }

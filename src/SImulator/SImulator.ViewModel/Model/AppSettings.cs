@@ -336,13 +336,13 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
-    private string _restriction = "12+";
+    private string? _restriction = "12+";
 
     /// <summary>
     /// Default package age restriction.
     /// </summary>
     [DefaultValue("12+")]
-    public string Restriction
+    public string? Restriction
     {
         get => _restriction;
         set

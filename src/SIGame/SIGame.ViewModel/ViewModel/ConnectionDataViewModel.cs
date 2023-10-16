@@ -148,7 +148,7 @@ public abstract class ConnectionDataViewModel : ViewModelWithNewAccount<Connecti
     {
         _userSettings.GameSettings.HumanPlayerName = Human.Name;
 
-        var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorageService.ViewModel.SIStorage>();
+        var siStorage = PlatformManager.Instance.ServiceProvider.GetRequiredService<SIStorageService.ViewModel.StorageViewModel>();
 
         GameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage, true, MaxPackageSize)
         {

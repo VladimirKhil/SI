@@ -11,7 +11,7 @@ using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Serializers;
 using SIQuester.ViewModel.Services;
-using SIStorageService.Client;
+using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -636,7 +636,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     {
         var importViewModel = new ImportSIStorageViewModel(
             _storageContextViewModel,
-            _serviceProvider.GetRequiredService<SIStorage>(),
+            _serviceProvider.GetRequiredService<StorageViewModel>(),
             _appOptions,
             _loggerFactory);
 

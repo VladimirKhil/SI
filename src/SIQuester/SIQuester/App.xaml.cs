@@ -16,7 +16,9 @@ using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Services;
-using SIStorageService.Client;
+using SIStorage.Service.Client;
+using SIStorage.Service.Contract;
+using SIStorage.Service.Contract.Requests;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -198,7 +200,7 @@ public partial class App : Application
         services.AddSingleton(AppSettings.Default);
         services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepository>();
         services.AddSingleton<IClipboardService, ClipboardService>();
-        services.AddTransient<SIStorage>();
+        services.AddSingleton<StorageViewModel>();
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
     }
 
@@ -220,16 +222,25 @@ public partial class App : Application
             }
 
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
-            var packages = await siStorageClient.GetPackagesAsync();
+
+            var packages = await siStorageClient.Packages.GetPackagesAsync(
+                new PackageFilters(),
+                new PackageSelectionParameters { Count = 1000 });
+
             using var client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
 
-            foreach (var package in packages)
+            foreach (var package in packages.Packages)
             {
-                var link = await siStorageClient.GetPackageByGuid2Async(package.Guid);
-                var fileName = Path.GetFileName(link.Name);
+                if (package.DirectContentUri == null)
+                {
+                    continue;
+                }
+
+                var link = package.DirectContentUri.AbsolutePath;
+                var fileName = Path.GetFileName(link);
 
                 var targetFile = Path.Combine(folder, fileName);
-                using var stream = await client.GetStreamAsync(link.Uri);
+                using var stream = await client.GetStreamAsync(package.DirectContentUri);
                 using var fileStream = File.Create(targetFile);
                 await stream.CopyToAsync(fileStream);
             }

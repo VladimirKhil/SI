@@ -7,11 +7,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:lp="clr-namespace:SIQuester.Properties"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
+    xmlns:uwc="clr-namespace:Utils.Wpf.Converters;assembly=Utils.Wpf"
     mc:Ignorable="d"
     d:DesignWidth="564"
     d:DesignHeight="708.29"
     d:DataContext="{d:DesignInstance vm:ImportSIStorageViewModel}">
     <UserControl.Resources>
+        <uwc:StringJoinConverter x:Key="StringJoinConverter" />
+        
         <Style TargetType="{x:Type ListBoxItem}">
             <Setter Property="Padding" Value="10,15" />
             
@@ -105,7 +108,7 @@
             Grid.Row="2"
             Grid.Column="1"
             Margin="0,5,0,0"
-            ItemsSource="{Binding Storage.FilteredPackages}"
+            ItemsSource="{Binding Storage.Packages}"
             SelectedItem="{Binding Storage.CurrentPackage}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -121,15 +124,13 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Width="275" Height="110">
-                        <Run Text="{Binding Description}" FontSize="19" />
+                        <Run Text="{Binding Model.Name, Mode=OneWay}" FontSize="19" />
                         <LineBreak />
-                        <Run Foreground="DarkGray" Text="Авторы:"/>
-                        <Run Text=" "/>
-                        <Run Text="{Binding Authors}" />
+                        <Run Foreground="DarkGray" Text="{x:Static lp:Resources.Authors}"/><Run Text=": "/>
+                        <Run Text="{Binding Authors, Mode=OneWay, Converter={StaticResource StringJoinConverter}}" />
                         <LineBreak />
-                        <Run Foreground="DarkGray" Text="Тема:"/>
-                        <Run Text=" "/>
-                        <Run Text="{Binding Tags}" />
+                        <Run Foreground="DarkGray" Text="{x:Static lp:Resources.Theme}"/><Run Text=": "/>
+                        <Run Text="{Binding Tags, Mode=OneWay, Converter={StaticResource StringJoinConverter}}" />
                     </TextBlock>
                 </DataTemplate>
             </ListView.ItemTemplate>

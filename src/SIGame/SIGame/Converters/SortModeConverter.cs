@@ -1,5 +1,5 @@
 ﻿using SIGame.Properties;
-using SIStorageService.Client.Models;
+using SIStorage.Service.Contract.Requests;
 using System;
 using System.Globalization;
 using System.Windows;

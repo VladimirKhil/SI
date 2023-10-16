@@ -129,6 +129,9 @@
   <data name="AddSumForActivePlayer" xml:space="preserve">
     <value>Добавить активному игроку</value>
   </data>
+  <data name="All" xml:space="preserve">
+    <value>(все)</value>
+  </data>
   <data name="Answer" xml:space="preserve">
     <value>Ответ</value>
   </data>
@@ -263,6 +266,9 @@
   </data>
   <data name="NotSelected" xml:space="preserve">
     <value>Не выбран</value>
+  </data>
+  <data name="NotSet" xml:space="preserve">
+    <value>(не задано)</value>
   </data>
   <data name="Oral" xml:space="preserve">
     <value>Устный текст</value>

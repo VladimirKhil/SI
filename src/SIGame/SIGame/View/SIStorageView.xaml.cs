@@ -6,14 +6,11 @@ using System.Windows.Input;
 namespace SIGame;
 
 /// <summary>
-/// Логика взаимодействия для SIStorageView.xaml
+/// Implements interaction logic for SIStorageView.xaml.
 /// </summary>
 public partial class SIStorageView : UserControl
 {
-    public SIStorageView()
-    {
-        InitializeComponent();
-    }
+    public SIStorageView() => InitializeComponent();
 
     private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
@@ -26,9 +23,9 @@ public partial class SIStorageView : UserControl
 
         var cmd = ((SIStorageViewModel)DataContext).LoadStorePackage;
 
-        if (cmd != null && cmd.CanExecute(item))
+        if (cmd.CanExecute(item))
         {
-            cmd.ExecuteAsync(item);
+            cmd.Execute(item);
         }
     }
 }

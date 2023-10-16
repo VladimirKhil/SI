@@ -1,14 +1,17 @@
 ﻿using SIGame.ViewModel.PackageSources;
 using SIGame.ViewModel.Properties;
+using SIStorageService.ViewModel;
 using Utils.Commands;
 
 namespace SIGame.ViewModel;
 
-public sealed class SIStorageViewModel : ViewModel<SIStorageService.ViewModel.SIStorage>, INavigationNode
+public sealed class SIStorageViewModel : ViewModel<StorageViewModel>, INavigationNode
 {
-    public AsyncCommand LoadStorePackage { get; internal set; }
+    private bool _isInitialized = false;
 
-    internal event Action<PackageSource> AddPackage;
+    public SimpleCommand LoadStorePackage { get; }
+
+    internal event Action<PackageSource>? AddPackage;
 
     public bool IsProgress => Model.IsLoading || Model.IsLoadingPackages || IsLoading;
 
@@ -20,39 +23,40 @@ public sealed class SIStorageViewModel : ViewModel<SIStorageService.ViewModel.SI
         set { if (_isLoading != value) { _isLoading = value; OnPropertyChanged(nameof(IsProgress)); } }
     }
 
-    public SIStorageViewModel(SIStorageService.ViewModel.SIStorage siStorage, UserSettings userSettings)
+    public SIStorageViewModel(StorageViewModel siStorage, UserSettings userSettings)
         : base(siStorage)
     {
-        _model.CurrentRestriction = userSettings.Restriction;
-
+        _model.DefaultRestriction =  userSettings.Restriction;
         _model.DefaultPublisher = userSettings.Publisher;
         _model.DefaultTag = userSettings.Tag;
+
+        LoadStorePackage = new SimpleCommand(LoadStorePackage_Executed) { CanBeExecuted = false };
 
         Model.PropertyChanged += (s, e) =>
         {
             switch (e.PropertyName)
             {
-                case nameof(SIStorageService.ViewModel.SIStorage.CurrentRestriction):
-                    userSettings.Restriction = Model.CurrentRestriction;
+                case nameof(StorageViewModel.CurrentRestriction):
+                    userSettings.Restriction = Model.CurrentRestriction?.Value;
                     break;
 
-                case nameof(SIStorageService.ViewModel.SIStorage.CurrentPublisher):
-                    userSettings.Publisher = Model.CurrentPublisher.Name;
+                case nameof(StorageViewModel.CurrentPublisher):
+                    userSettings.Publisher = Model.CurrentPublisher?.Name;
                     break;
 
-                case nameof(SIStorageService.ViewModel.SIStorage.CurrentTag):
-                    userSettings.Tag = Model.CurrentTag.Name;
+                case nameof(StorageViewModel.CurrentTag):
+                    userSettings.Tag = Model.CurrentTag?.Name;
                     break;
 
-                case nameof(SIStorageService.ViewModel.SIStorage.CurrentPackage):
+                case nameof(StorageViewModel.CurrentPackage):
                     LoadStorePackage.CanBeExecuted = Model.CurrentPackage != null;
                     break;
 
-                case nameof(SIStorageService.ViewModel.SIStorage.IsLoading):
+                case nameof(StorageViewModel.IsLoading):
                     OnPropertyChanged(nameof(IsProgress));
                     break;
 
-                case nameof(SIStorageService.ViewModel.SIStorage.IsLoadingPackages):
+                case nameof(StorageViewModel.IsLoadingPackages):
                     OnPropertyChanged(nameof(IsProgress));
                     break;
             }
@@ -64,20 +68,22 @@ public sealed class SIStorageViewModel : ViewModel<SIStorageService.ViewModel.SI
                 $"{message ?? Resources.SIStorageError}: {exc.Message}",
                 PlatformSpecific.MessageType.Warning);
         };
-
-        LoadStorePackage = new AsyncCommand(LoadStorePackage_Executed) { CanBeExecuted = false };
     }
 
-    private async Task LoadStorePackage_Executed(object arg)
+    private void LoadStorePackage_Executed(object? arg)
     {
         try
         {
             IsLoading = true;
 
-            var packageInfo = Model.CurrentPackage;
-            var link = await Model.LoadSelectedPackageUriAsync();
+            var packageInfo = Model.CurrentPackage?.Model;
 
-            var packageSource = new SIStoragePackageSource(link.Uri, packageInfo.ID, packageInfo.Description, packageInfo.Guid);
+            if (packageInfo == null || packageInfo.ContentUri == null)
+            {
+                return;
+            }
+
+            var packageSource = new SIStoragePackageSource(packageInfo.ContentUri, 0, packageInfo.Name ?? "", packageInfo.Id.ToString());
 
             AddPackage?.Invoke(packageSource);
             
@@ -94,14 +100,9 @@ public sealed class SIStorageViewModel : ViewModel<SIStorageService.ViewModel.SI
         }
     }
 
-    public event Action Close;
+    public event Action? Close;
 
-    private void OnClose()
-    {
-        Close?.Invoke();
-    }
-
-    private bool _isInitialized = false;
+    private void OnClose() => Close?.Invoke();
 
     internal async Task InitAsync()
     {

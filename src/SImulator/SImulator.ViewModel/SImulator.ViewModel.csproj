@@ -16,7 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Common\SIEngine\SIEngine.csproj" />
-    <ProjectReference Include="..\..\Common\SIStorageService.Client\SIStorageService.Client.csproj" />
     <ProjectReference Include="..\..\Common\SIUI.ViewModel\SIUI.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>

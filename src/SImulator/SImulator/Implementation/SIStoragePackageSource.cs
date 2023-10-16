@@ -1,6 +1,5 @@
 ﻿using SImulator.ViewModel.PlatformSpecific;
-using SIStorageService.Client.Models;
-using System;
+using SIStorage.Service.Contract.Models;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -14,24 +13,19 @@ namespace SImulator.Implementation;
 /// </summary>
 internal sealed class SIStoragePackageSource : IPackageSource
 {
-    private readonly PackageInfo _package;
-    private readonly Uri _packageUri;
+    private readonly Package _package;
 
     private static readonly HttpClient _client = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
-    public string Name => _package.Description ?? "";
+    public string Name => _package.Name ?? "";
 
     public string Token => "";
 
-    public SIStoragePackageSource(PackageInfo package, Uri packageUri)
-    {
-        _package = package;
-        _packageUri = packageUri;
-    }
+    public SIStoragePackageSource(Package package) => _package = package;
 
     public async Task<(string filePath, bool isTemporary)> GetPackageFileAsync(CancellationToken cancellationToken = default)
     {
-        using var response = await _client.GetAsync(_packageUri, cancellationToken);
+        using var response = await _client.GetAsync(_package.ContentUri, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 

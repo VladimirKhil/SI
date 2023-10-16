@@ -7,16 +7,30 @@
     xmlns:lctrl="clr-namespace:SIGame.Controls"
     xmlns:lc="clr-namespace:SIGame.Converters"
     xmlns:lp="clr-namespace:SIGame.Properties"
-    xmlns:ss="clr-namespace:SIStorageService.Client.Models;assembly=SIStorageService.Client"
+    xmlns:uwc="clr-namespace:Utils.Wpf.Converters;assembly=Utils.Wpf"
+    xmlns:sscm="clr-namespace:SIStorage.Service.Contract.Models;assembly=SIStorage.Service.Contract"
+    xmlns:viewmodel="clr-namespace:SIGame.ViewModel;assembly=SIGame.ViewModel"
+    d:DataContext="{d:DesignInstance Type=viewmodel:SIStorageViewModel}"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <lc:NotSetConverter x:Key="NotSetConverter" />
+        <lc:NotSetTagConverter x:Key="NotSetTagConverter" />
+        <lc:NotSetPublisherConverter x:Key="NotSetPublisherConverter" />
+        <lc:NotSetRestrictionConverter x:Key="NotSetRestrictionConverter" />
         <lc:PlayedPackageConverter x:Key="PlayedPackageConverter" />
         <lc:SortModeConverter x:Key="SortModeConverter" />
         <lc:SortDirectionConverter x:Key="SortDirectionConverter" />
+        <uwc:StringJoinConverter x:Key="StringJoinConverter" />
 
-        <DataTemplate DataType="{x:Type ss:NamedObject}">
-            <TextBlock Text="{Binding Converter={StaticResource NotSetConverter}}" Padding="2,3" />
+        <DataTemplate DataType="{x:Type sscm:Tag}">
+            <TextBlock Text="{Binding Converter={StaticResource NotSetTagConverter}}" Padding="2,3" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type sscm:Publisher}">
+            <TextBlock Text="{Binding Converter={StaticResource NotSetPublisherConverter}}" Padding="2,3" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type sscm:Restriction}">
+            <TextBlock Text="{Binding Converter={StaticResource NotSetRestrictionConverter}}" Padding="2,3" />
         </DataTemplate>
         
         <DataTemplate x:Key="HeaderTemplate">
@@ -138,7 +152,13 @@
                 Text="{x:Static lp:Resources.Sort}" />
             
             <UniformGrid Columns="2">
-                <ComboBox FontSize="16" Background="#FF71A2E2" Style="{StaticResource ComboBoxStyle}" Margin="10,0,0,0" ItemsSource="{Binding Model.SortModes}" SelectedItem="{Binding Model.CurrentSortMode}">
+                <ComboBox
+                    FontSize="16"
+                    Background="#FF71A2E2"
+                    Style="{StaticResource ComboBoxStyle}"
+                    Margin="10,0,0,0"
+                    ItemsSource="{Binding Model.SortModes}"
+                    SelectedItem="{Binding Model.CurrentSortMode}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource SortModeConverter}}" />
@@ -146,7 +166,13 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 
-                <ComboBox FontSize="16" Background="#FF71A2E2" Style="{StaticResource ComboBoxStyle}" Margin="10,0,0,0" ItemsSource="{Binding Model.SortDirections}" SelectedItem="{Binding Model.CurrentSortDirection}">
+                <ComboBox
+                    FontSize="16"
+                    Background="#FF71A2E2"
+                    Style="{StaticResource ComboBoxStyle}"
+                    Margin="10,0,0,0"
+                    ItemsSource="{Binding Model.SortDirections}"
+                    SelectedItem="{Binding Model.CurrentSortDirection}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource SortDirectionConverter}}" />
@@ -157,7 +183,14 @@
         </DockPanel>
         
         <StackPanel Grid.Row="3" Grid.ColumnSpan="3">
-            <Button Style="{StaticResource SIButton}" Padding="30,6" FontSize="25" Content="{x:Static lp:Resources.Select}" HorizontalAlignment="Right" Command="{Binding LoadStorePackage}" CommandParameter="{Binding Model.CurrentPackage}" />
+            <Button
+                Style="{StaticResource SIButton}"
+                Padding="30,6"
+                FontSize="25"
+                Content="{x:Static lp:Resources.Select}"
+                HorizontalAlignment="Right"
+                Command="{Binding LoadStorePackage}"
+                CommandParameter="{Binding Model.CurrentPackage}" />
         </StackPanel>
         
         <DataGrid
@@ -165,7 +198,7 @@
             Grid.ColumnSpan="2"
             Background="Transparent"
             AutoGenerateColumns="False"
-            ItemsSource="{Binding Model.FilteredPackages}"
+            ItemsSource="{Binding Model.Packages}"
             RowHeaderWidth="0"
             IsReadOnly="True"
             GridLinesVisibility="None"
@@ -182,20 +215,20 @@
                 <DataGridTemplateColumn Width="50">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image Source="{Binding Logo, FallbackValue={StaticResource DefaultImage}, TargetNullValue={StaticResource DefaultImage}}" />
+                            <Image Source="{Binding Model.LogoUri, FallbackValue={StaticResource DefaultImage}, TargetNullValue={StaticResource DefaultImage}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 
                 <DataGridTextColumn
-                    Binding="{Binding Description}"
+                    Binding="{Binding Model.Name}"
                     ElementStyle="{StaticResource CellText}"
                     Header="{x:Static lp:Resources.Package}"
                     HeaderTemplate="{StaticResource HeaderTemplate}"
                     Width="*" />
                 
                 <DataGridTextColumn
-                    Binding="{Binding Authors}"
+                    Binding="{Binding Authors, Converter={StaticResource StringJoinConverter}}"
                     ElementStyle="{StaticResource CellText}"
                     Header="{x:Static lp:Resources.Authors}"
                     HeaderTemplate="{StaticResource HeaderTemplate}"
@@ -240,6 +273,7 @@
                     <Setter Property="TextBlock.FontSize" Value="16" />
                     <Setter Property="VerticalAlignment" Value="Stretch" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
+                    
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -252,6 +286,7 @@
                 </Style>
             </DataGrid.CellStyle>
         </DataGrid>
+        
         <StackPanel Grid.Row="2" Grid.Column="3" DataContext="{Binding Model.CurrentPackage}" Margin="15,30,10,10" TextBlock.FontSize="15">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type TextBlock}">
@@ -264,6 +299,7 @@
                     <Setter Property="Margin" Value="0,9,0,0" />
                 </Style>
             </StackPanel.Resources>
+            
             <StackPanel.Style>
                 <Style TargetType="{x:Type StackPanel}">
                     <Style.Triggers>
@@ -273,21 +309,28 @@
                     </Style.Triggers>
                 </Style>
             </StackPanel.Style>
-            <Image HorizontalAlignment="Left" Source="{Binding Logo, FallbackValue={StaticResource DefaultImage}, TargetNullValue={StaticResource DefaultImage}}" MaxWidth="100" />
-            <TextBlock Text="{Binding Description}" FontSize="26" FontWeight="Bold" Margin="0,10,0,0" />
+            
+            <Image
+                HorizontalAlignment="Left"
+                Source="{Binding Model.LogoUri, FallbackValue={StaticResource DefaultImage}, TargetNullValue={StaticResource DefaultImage}}"
+                MaxWidth="100" />
+            
+            <TextBlock Text="{Binding Model.Name}" FontSize="26" FontWeight="Bold" Margin="0,10,0,0" />
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Publisher}" />
             <TextBlock Text="{Binding Publisher}" />
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.Categories}" />
-            <TextBlock Text="{Binding Tags}" />
+            <ItemsControl ItemsSource="{Binding Tags}" />
             <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.PublishedDate}" />
-            <TextBlock Text="{Binding PublishedDate, StringFormat=d}" />
+            <TextBlock Text="{Binding Model.CreateDate, StringFormat=d}" />
         </StackPanel>
+        
         <Grid
             Background="#77000000"
             Grid.Row="2"
             Grid.RowSpan="2"
             Grid.ColumnSpan="3"
             Visibility="{Binding IsProgress, Converter={StaticResource BooleanToVisibilityConverter1}}">
+            
             <ProgressBar
                 Foreground="Blue"
                 Width="200"

@@ -3,19 +3,19 @@
 namespace SIGame.ViewModel.PackageSources;
 
 /// <summary>
-/// Источник пакета, использующий поток данных
+/// Provides package from SI Storage.
 /// </summary>
 internal sealed class SIStoragePackageSource : PackageSource
 {
-    private readonly Uri _packageUri = null;
+    private readonly Uri _packageUri;
     private readonly int _id;
     private readonly string _name;
     private readonly string _packageId;
 
-    private static readonly HttpClient Client = new HttpClient { DefaultRequestVersion = HttpVersion.Version20 };
+    private static readonly HttpClient Client = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
     public override PackageSourceKey Key =>
-        new PackageSourceKey
+        new()
         {
             Type = PackageSourceTypes.SIStorage,
             Data = _packageUri.AbsoluteUri,
@@ -50,7 +50,7 @@ internal sealed class SIStoragePackageSource : PackageSource
         return (fileName, true);
     }
 
-    public override string GetPackageName() => null;
+    public override string GetPackageName() => _name;
 
     public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(Array.Empty<byte>());

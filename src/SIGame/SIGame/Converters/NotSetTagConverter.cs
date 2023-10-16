@@ -1,22 +1,20 @@
 ﻿using SIGame.Properties;
-using SIStorage.Service.Contract.Requests;
+using SIStorage.Service.Contract.Models;
 using System;
 using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
 
 namespace SIGame.Converters;
 
-public sealed class SortDirectionConverter : IValueConverter
+public sealed class NotSetTagConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is not PackageSortDirection sortDirection)
-        {
-            return DependencyProperty.UnsetValue;
-        }
+        var tag = (Tag)value;
 
-        return sortDirection == PackageSortDirection.Ascending ? Resources.Ascending : Resources.Descending;
+        return !string.IsNullOrEmpty(tag.Name)
+            ? tag.Name
+            : (tag.Id == -1 ? Resources.Filter_NotSet : Resources.Filter_All);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

@@ -189,14 +189,14 @@ internal sealed class DesktopManager : PlatformManager
         }
         else if (arg.ToString() == "1")
         {
-            var storage = ServiceProvider.GetRequiredService<SIStorage>();
-            storage.CurrentRestriction = ((App)Application.Current).Settings.Restriction;
+            var storage = ServiceProvider.GetRequiredService<StorageViewModel>();
+            storage.DefaultRestriction = ((App)Application.Current).Settings.Restriction;
 
             storage.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(SIStorage.CurrentRestriction))
+                if (e.PropertyName == nameof(StorageViewModel.CurrentRestriction))
                 {
-                    ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction;
+                    ((App)Application.Current).Settings.Restriction = storage.CurrentRestriction?.Value;
                 }
             };
 
@@ -219,8 +219,7 @@ internal sealed class DesktopManager : PlatformManager
                     return null;
                 }
 
-                var link = await storage.LoadSelectedPackageUriAsync();
-                return new SIStoragePackageSource(package, link.Uri);
+                return new SIStoragePackageSource(package.Model);
             }
             catch (Exception exc)
             {

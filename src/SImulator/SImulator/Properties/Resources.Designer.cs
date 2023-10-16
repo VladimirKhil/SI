@@ -97,6 +97,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на (все).
+        /// </summary>
+        public static string All {
+            get {
+                return ResourceManager.GetString("All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ответ.
         /// </summary>
         public static string Answer {
@@ -498,6 +507,15 @@ namespace SImulator.Properties {
         public static string NotSelected {
             get {
                 return ResourceManager.GetString("NotSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на (не задано).
+        /// </summary>
+        public static string NotSet {
+            get {
+                return ResourceManager.GetString("NotSet", resourceCulture);
             }
         }
         

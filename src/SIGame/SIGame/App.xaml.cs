@@ -14,8 +14,7 @@ using SIGame.Implementation;
 using SIGame.ViewModel;
 using SIGame.ViewModel.Settings;
 using SIStatisticsService.Client;
-using SIStorageService.Client;
-using SIStorageService.ViewModel;
+using SIStorage.Service.Client;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -97,7 +96,7 @@ public partial class App : Application
         services.AddSIStorageServiceClient(configuration);
         services.AddSIContentServiceClient(configuration);
 
-        services.AddTransient(typeof(SIStorageService.ViewModel.SIStorage));
+        services.AddTransient(typeof(SIStorageService.ViewModel.StorageViewModel));
 
         services.AddSingleton(_appState);
 

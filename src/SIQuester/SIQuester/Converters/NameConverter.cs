@@ -1,5 +1,5 @@
 ﻿using SIQuester.Properties;
-using SIStorageService.Client.Models;
+using SIStorage.Service.Contract.Models;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -9,11 +9,11 @@ public sealed class NameConverter : IValueConverter
 {
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var namedObject = (NamedObject)value;
+        var namedObject = (Publisher)value;
 
-        return namedObject == null || namedObject.ID == -1
+        return namedObject == null || namedObject.Id == -1
             ? Resources.PublishersNotSet
-            : namedObject.ID == -2 ? Resources.PublishersAll : namedObject.Name;
+            : namedObject.Id == -2 ? Resources.PublishersAll : namedObject.Name;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

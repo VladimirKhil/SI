@@ -11,7 +11,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 {
     private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
-    public SIStorage Storage { get; }
+    public StorageViewModel Storage { get; }
 
     public override string Header => Resources.SIStorage;
 
@@ -26,7 +26,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
     public ImportSIStorageViewModel(
         StorageContextViewModel storageContextViewModel,
-        SIStorage siStorage,
+        StorageViewModel siStorage,
         AppOptions appOptions,
         ILoggerFactory loggerFactory)
     {
@@ -44,7 +44,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
     private void Storage_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(SIStorage.IsLoading) || e.PropertyName == nameof(SIStorage.IsLoadingPackages))
+        if (e.PropertyName == nameof(StorageViewModel.IsLoading) || e.PropertyName == nameof(StorageViewModel.IsLoadingPackages))
         {
             OnPropertyChanged(nameof(IsProgress));
         }
@@ -57,13 +57,11 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
             return;
         }
 
-        async Task<QDocument> loader(CancellationToken cancellationToken)
+        async Task<QDocument> loader(Uri uri, CancellationToken cancellationToken)
         {
-            var packageLink = await Storage.LoadSelectedPackageUriAsync(cancellationToken);
-
             var ms = new MemoryStream();
 
-            using var response = await HttpClient.GetAsync(packageLink.Uri, cancellationToken);
+            using var response = await HttpClient.GetAsync(uri, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -83,12 +81,26 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
             return new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name };
         };
 
-        var loaderViewModel = new DocumentLoaderViewModel(Storage.CurrentPackage.Description ?? "");
+        var package = Storage.CurrentPackage;
+
+        if (package == null)
+        {
+            return;
+        }
+
+        var uri = package.Model.ContentUri;
+
+        if (uri == null)
+        {
+            return;
+        }
+
+        var loaderViewModel = new DocumentLoaderViewModel(package.Model.Name ?? "");
         OnNewItem(loaderViewModel);
 
         try
         {
-            await loaderViewModel.LoadAsync(loader);
+            await loaderViewModel.LoadAsync(token => loader(uri, token));
         }
         catch (TaskCanceledException)
         {
