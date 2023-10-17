@@ -54,6 +54,21 @@ public sealed class GameLogic : Logic<GameData>
     /// </summary>
     private const double PartialPrintFrequencyPerSecond = 0.5;
 
+    /// <summary>
+    /// Minimum price in round.
+    /// </summary>
+    private int _minRoundPrice = 1;
+
+    /// <summary>
+    /// Maximum price in round.
+    /// </summary>
+    private int _maxRoundPrice = 1;
+
+    /// <summary>
+    /// Minimum stake step value in current round.
+    /// </summary>
+    private int _stakeStep = 100;
+
     public object? UserState { get; set; }
 
     private readonly GameActions _gameActions;
@@ -223,11 +238,39 @@ public sealed class GameLogic : Logic<GameData>
         _data.ThemeDeleters = null;
 
         OnRound(round, 1);
+        SetRoundPrices(round);
 
         if (_data.Settings.AppSettings.GameMode == GameModes.Sport)
         {
             RunRoundTimer();
         }
+    }
+
+    private void SetRoundPrices(Round round)
+    {
+        _minRoundPrice = -1;
+        _maxRoundPrice = 1;
+
+        foreach (var theme in round.Themes)
+        {
+            foreach (var quest in theme.Questions)
+            {
+                var price = quest.Price;
+
+                if (price > 0 && (price < _minRoundPrice || _minRoundPrice == -1))
+                {
+                    _minRoundPrice = price;
+                }
+
+                if (price > _maxRoundPrice)
+                {
+                    _maxRoundPrice = price;
+                }
+            }
+        }
+
+        _minRoundPrice = Math.Max(1, _minRoundPrice);
+        _stakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
     private void InitThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
@@ -3542,7 +3585,7 @@ public sealed class GameLogic : Logic<GameData>
 
             // TODO: enum StakeMode, StakeVariants -> HashSet<StakeMode> ?
             _data.StakeVariants[0] = _data.StakerIndex == -1;
-            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + 100;
+            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + _stakeStep;
             _data.StakeVariants[2] = !_data.StakeVariants[0];
             _data.StakeVariants[3] = true;
 
@@ -3563,10 +3606,10 @@ public sealed class GameLogic : Logic<GameData>
                 stakeMsg.Add(_data.StakeVariants[i] ? '+' : '-');
             }
 
-            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + 100;
-            var minimumStakeByBase = (int)Math.Ceiling((double)minimumStake / 100) * 100; // TODO: support the ability to configure stake base
+            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + _stakeStep;
+            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _stakeStep) * _stakeStep;
 
-            stakeMsg.Add(minimumStakeByBase);
+            stakeMsg.Add(minimumStakeAligned);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
@@ -4335,27 +4378,8 @@ public sealed class GameLogic : Logic<GameData>
         {
             var possiblePrices = _data.CatInfo;
 
-            possiblePrices.Minimum = -1;
-            possiblePrices.Maximum = 0;
-
-            foreach (var theme in _data.Round.Themes)
-            {
-                foreach (var quest in theme.Questions)
-                {
-                    var price = quest.Price;
-
-                    if (price > -1 && (price < possiblePrices.Minimum || possiblePrices.Minimum == -1))
-                    {
-                        possiblePrices.Minimum = price;
-                    }
-
-                    if (price > possiblePrices.Maximum)
-                    {
-                        possiblePrices.Maximum = price;
-                    }
-                }
-            }
-
+            possiblePrices.Minimum = _minRoundPrice;
+            possiblePrices.Maximum = _maxRoundPrice;
             possiblePrices.Step = possiblePrices.Maximum - possiblePrices.Minimum;
 
             if (possiblePrices.Step == 0)

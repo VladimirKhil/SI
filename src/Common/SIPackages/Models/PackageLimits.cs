@@ -13,7 +13,7 @@ public sealed class PackageLimits
     /// <summary>
     /// Package round count.
     /// </summary>
-    public int RoundCount { get; set; } = 30;
+    public int RoundCount { get; set; } = 50;
 
     /// <summary>
     /// Round theme count.
