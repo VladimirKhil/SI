@@ -1,5 +1,4 @@
-﻿using SIPackages;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
 namespace SIGame.ViewModel.PackageSources;
 
@@ -42,12 +41,5 @@ internal sealed class CustomPackageSource : PackageSource
         sha1.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
         return sha1.Hash;
-    }
-
-    public override string GetPackageId()
-    {
-        using var stream = File.OpenRead(_file);
-        using var doc = SIDocument.Load(stream);
-        return doc.Package.ID;
     }
 }

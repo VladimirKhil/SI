@@ -55,5 +55,5 @@ internal sealed class SIStoragePackageSource : PackageSource
     public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(Array.Empty<byte>());
 
-    public override string GetPackageId() => _packageId;
+    public override Uri? GetPackageUri() => _packageUri;
 }

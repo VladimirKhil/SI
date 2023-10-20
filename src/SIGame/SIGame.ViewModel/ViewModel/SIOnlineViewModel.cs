@@ -797,7 +797,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         {
             Name = packageSource.GetPackageName(),
             Hash = hash,
-            ID = packageSource.GetPackageId()
+            Uri = packageSource.GetPackageUri()
         };
 
         if (!string.IsNullOrEmpty(packageKey.Name) && _gamesHostInfo?.ContentInfos?.Length > 0)
@@ -881,43 +881,31 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         using var contentServiceClient = GetContentClient();
 
-        var key = new SIContentService.Contract.Models.FileKey
+        SI.GameServer.Contract.PackageInfo packageInfo;
+
+        if (IsCustomPackage(packageKey))
         {
-            Name = packageKey.Name,
-            Hash = packageKey.Hash
-        };
+            var customPackageInfo = await ProcessCustomPackageAsync(packageKey, packageSource, contentServiceClient, cancellationToken);
 
-        var packageUri = await contentServiceClient.TryGetPackageUriAsync(key, cancellationToken);
-
-        if (packageUri == null)
-        {
-            var packageStream = await packageSource.GetPackageDataAsync(cancellationToken) ?? throw new Exception(Resources.BadPackage);
-
-            using (packageStream)
+            if (customPackageInfo == null)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
-
-                if (packageStream.Length > _gamesHostInfo?.MaxPackageSizeMb * 1024 * 1024)
-                {
-                    throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo.MaxPackageSizeMb)}");
-                }
-
-                GameSettings.Message = Resources.SendingPackageToServer;
-                UploadProgress = 0;
-                ShowProgress = true;
-
-                try
-                {
-                    packageUri = await contentServiceClient.UploadPackageAsync(key, packageStream, cancellationToken);
-                }
-                finally
-                {
-                    ShowProgress = false;
-                }
+                return null;
             }
+
+            packageInfo = customPackageInfo;
+        }
+        else // Library package
+        {
+            if (packageKey.Uri == null)
+            {
+                return null;
+            }
+
+            packageInfo = new SI.GameServer.Contract.PackageInfo
+            {
+                Type = SI.GameServer.Contract.PackageType.LibraryItem,
+                Uri = packageKey.Uri,
+            };
         }
 
         GameSettings.Message = Resources.Preparing;
@@ -925,14 +913,6 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         var computerAccounts = await ProcessCustomPersonsAsync(contentServiceClient, settings, cancellationToken);
 
         GameSettings.Message = Resources.Creating;
-
-        var packageInfo = new SI.GameServer.Contract.PackageInfo
-        {
-            Type = SI.GameServer.Contract.PackageType.Content,
-            Uri = packageUri,
-            ContentServiceUri = contentServiceClient.ServiceUri,
-            Secret = _defaultSIContentClientOptions?.ClientSecret,
-        };
 
         if (_userSettings.UseSignalRConnection)
         {
@@ -983,6 +963,62 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         }
 
         return (_node, _host);
+    }
+
+    private static bool IsCustomPackage(PackageKey packageKey) => packageKey.Hash.Length > 0; // Does not look nice, but will work for now
+
+    private async Task<SI.GameServer.Contract.PackageInfo?> ProcessCustomPackageAsync(
+        PackageKey packageKey,
+        PackageSource packageSource,
+        ISIContentServiceClient contentServiceClient,
+        CancellationToken cancellationToken)
+    {
+        var key = new SIContentService.Contract.Models.FileKey
+        {
+            Name = packageKey.Name,
+            Hash = packageKey.Hash
+        };
+
+        var packageUri = await contentServiceClient.TryGetPackageUriAsync(key, cancellationToken);
+
+        if (packageUri == null)
+        {
+            var packageStream = await packageSource.GetPackageDataAsync(cancellationToken) ?? throw new Exception(Resources.BadPackage);
+
+            using (packageStream)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return null;
+                }
+
+                if (packageStream.Length > _gamesHostInfo?.MaxPackageSizeMb * 1024 * 1024)
+                {
+                    throw new Exception($"{Resources.FileTooLarge}. {string.Format(Resources.MaximumFileSize, _gamesHostInfo?.MaxPackageSizeMb)}");
+                }
+
+                GameSettings.Message = Resources.SendingPackageToServer;
+                UploadProgress = 0;
+                ShowProgress = true;
+
+                try
+                {
+                    packageUri = await contentServiceClient.UploadPackageAsync(key, packageStream, cancellationToken);
+                }
+                finally
+                {
+                    ShowProgress = false;
+                }
+            }
+        }
+
+        return new SI.GameServer.Contract.PackageInfo
+        {
+            Type = SI.GameServer.Contract.PackageType.Content,
+            Uri = packageUri,
+            ContentServiceUri = contentServiceClient.ServiceUri,
+            Secret = _defaultSIContentClientOptions?.ClientSecret,
+        };
     }
 
     private ISIContentServiceClient GetContentClient() =>

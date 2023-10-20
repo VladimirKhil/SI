@@ -32,9 +32,9 @@ public abstract class PackageSource
     public abstract string GetPackageName();
 
     /// <summary>
-    /// Получить идентификатор пакета
+    /// Gets optional package uri.
     /// </summary>
-    public virtual string GetPackageId() => null;
+    public virtual Uri? GetPackageUri() => null;
 
     /// <summary>
     /// Получить уникальный хэш игрового пакета

@@ -104,12 +104,4 @@ internal sealed class NextPackageSource : PackageSource
 
         return sha1.Hash ?? Array.Empty<byte>();
     }
-
-    public override string GetPackageId()
-    {
-        using var stream = File.OpenRead(FileName);
-        using var doc = SIDocument.Load(stream);
-
-        return doc.Package.ID;
-    }
 }

@@ -8,7 +8,13 @@ public sealed class PackageKey : FileKey
     /// <summary>
     /// Package unique identifier.
     /// </summary>
+    [Obsolete("For backward compatibility")]
     public string? ID { get; set; }
+
+    /// <summary>
+    /// Package uri.
+    /// </summary>
+    public Uri? Uri { get; set; }
 
     public override bool Equals(object obj)
     {
@@ -17,10 +23,10 @@ public sealed class PackageKey : FileKey
             return base.Equals(obj);
         }
 
-        return Name == other.Name && ID == other.ID;
+        return Name == other.Name && Uri == other.Uri;
     }
 
-    public override int GetHashCode() => base.GetHashCode() * (ID == null ? -1 : ID.GetHashCode());
+    public override int GetHashCode() => base.GetHashCode() * (Uri == null ? -1 : Uri.GetHashCode());
 
-    public override string ToString() => $"{Name}_{BitConverter.ToString(Hash ?? Array.Empty<byte>())}_{ID}";
+    public override string ToString() => $"{Name}_{BitConverter.ToString(Hash ?? Array.Empty<byte>())}_{Uri}";
 }

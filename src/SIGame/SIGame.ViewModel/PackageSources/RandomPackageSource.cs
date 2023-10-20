@@ -51,8 +51,6 @@ internal sealed class RandomPackageSource : PackageSource
     public override Task<byte[]> GetPackageHashAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(BitConverter.GetBytes(_packageId));
 
-    public override string GetPackageId() => _packageId.ToString();
-
     public override async Task<Stream> GetPackageDataAsync(CancellationToken cancellationToken = default)
     {
         byte[] data;
