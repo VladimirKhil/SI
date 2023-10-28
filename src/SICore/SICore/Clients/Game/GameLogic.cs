@@ -2631,7 +2631,7 @@ public sealed class GameLogic : Logic<GameData>
 
                     _gameActions.ShowmanReplic(replic.ToString());
                     s.Append(MakeCompatibleQuestionTypeName(typeName));
-                    delay = 16;
+                    delay = 10;
                     break;
 
                 case QuestionTypes.Sponsored:
@@ -4320,7 +4320,7 @@ public sealed class GameLogic : Logic<GameData>
 
         _gameActions.ShowmanReplic(s.ToString());
 
-        ScheduleExecution(Tasks.MoveNext, 20);
+        ScheduleExecution(Tasks.MoveNext, 15);
     }
 
     internal void OnSimpleAnswer(string answer)
@@ -4367,7 +4367,7 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _gameActions.ShowmanReplic(s.ToString());
-        ScheduleExecution(Tasks.MoveNext, 20);
+        ScheduleExecution(Tasks.MoveNext, 10);
     }
 
     internal void OnSelectPrice(NumberSet availableRange)
