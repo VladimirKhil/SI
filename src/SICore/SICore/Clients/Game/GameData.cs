@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Game;
+using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
 using SIData;
@@ -87,12 +88,17 @@ public sealed class GameData : Data
     /// <summary>
     /// Question play state.
     /// </summary>
-    internal QuestionPlayState QuestionPlayState { get; set; } = new();
+    internal QuestionPlayState QuestionPlayState { get; } = new();
 
     /// <summary>
     /// Index of possible answerer.
     /// </summary>
     public int PendingAnswererIndex { get; set; }
+
+    /// <summary>
+    /// Indicies of possible answerers.
+    /// </summary>
+    public List<int> PendingAnswererIndicies { get; } = new();
 
     /// <summary>
     /// Player having a turn.
@@ -515,9 +521,9 @@ public sealed class GameData : Data
     public bool IsOralNow { get; set; }
 
     /// <summary>
-    /// Штраф за хороший пинг
+    /// Wait interval in 0.1 s.
     /// </summary>
-    public int Penalty { get; internal set; }
+    public int WaitInterval { get; internal set; }
 
     public DateTime PenaltyStartTime { get; internal set; }
 
@@ -612,7 +618,7 @@ public sealed class GameData : Data
     /// </summary>
     public JoinMode JoinMode { get; internal set; }
 
-    public GameData(IGameManager gameManager, GamePersonAccount showman) : base(gameManager)
+    public GameData(IGameHost gameManager, GamePersonAccount showman) : base(gameManager)
     {
         _showMan = showman;
     }

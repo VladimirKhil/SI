@@ -394,7 +394,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     break;
 
                 case Messages.Report:
-                    if (!ClientData.BackLink.SendReport)
+                    if (!ClientData.Host.SendReport)
                     {
                         ClientData.PlayerDataExtensions.Report.SendNoReport.Execute(null);
                         break;

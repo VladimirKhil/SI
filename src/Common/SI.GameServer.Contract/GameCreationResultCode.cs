@@ -21,4 +21,6 @@ public enum GameCreationResultCode
     UnsupportedPackageType,
     UnsupportedContentUri,
     TaskCancelled,
+    BadContentService,
+    ContentXmlTooBig,
 }

@@ -94,7 +94,6 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
     private void FinalStakeTask()
     {
-        // Раздел модернизирован
         var myIndex2 = _data.Players.IndexOf((PlayerAccount)_data.Me);
         var sums = _data.Players.Select(p => p.Sum).ToArray();
 
@@ -134,7 +133,6 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
     private void StakeTask()
     {
-        // Раздел модернизирован
         var myIndex = _data.Players.IndexOf((PlayerAccount)_data.Me);
         var isCritical = IsCritical();
 
@@ -1752,7 +1750,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
             if (acc != null)
             {
                 _account = new ComputerAccount(_viewerActions.Client.Name, acc.IsMale);
-                _account.SetPicture(_data.BackLink.PhotoUri);
+                _account.SetPicture(_data.Host.PhotoUri);
             }
         }
 

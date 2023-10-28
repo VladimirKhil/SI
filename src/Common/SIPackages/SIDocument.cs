@@ -221,7 +221,8 @@ public sealed class SIDocument : IDisposable
     /// </summary>
     /// <param name="stream">Source stream.</param>
     /// <param name="packageContainer">Optional container to store package files.</param>
-    public static SIDocument LoadXml(Stream stream, ISIPackageContainer? packageContainer = null)
+    /// <param name="packageLimits">Package limits.</param>
+    public static SIDocument LoadXml(Stream stream, ISIPackageContainer? packageContainer = null, PackageLimits? packageLimits = null)
     {
         packageContainer ??= EmptySIPackageContainer.Instance;
         var document = CreateInternal(packageContainer, "", "");
@@ -233,7 +234,7 @@ public sealed class SIDocument : IDisposable
                 if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "package")
                 {
                     document.Package.Info.Authors.Clear();
-                    document.Package.ReadXml(reader);
+                    document.Package.ReadXml(reader, packageLimits);
                     break;
                 }
             }

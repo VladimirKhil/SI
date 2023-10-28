@@ -1,10 +1,21 @@
-﻿using SICore.PlatformSpecific;
+﻿using SICore.Models;
+using SICore.PlatformSpecific;
 using SIUI.ViewModel;
 
-namespace SICore;
+namespace SICore.Contracts;
 
-public interface IGameManager : IPlatformManager
+// TODO: move option properties into Options
+
+/// <summary>
+/// Defines a host that runs the game.
+/// </summary>
+public interface IGameHost : IPlatformManager
 {
+    /// <summary>
+    /// Gets host options.
+    /// </summary>
+    HostOptions Options { get; }
+
     void OnFlash(bool flash = true);
 
     void OnError(Exception exc);

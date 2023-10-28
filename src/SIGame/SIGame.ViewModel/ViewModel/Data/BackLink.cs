@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Notions;
 using SICore;
+using SICore.Models;
 using SICore.PlatformSpecific;
 using SICore.Results;
 using SIGame.ViewModel.Helpers;
@@ -13,8 +14,10 @@ using System.Diagnostics;
 
 namespace SIGame.ViewModel;
 
-public sealed class BackLink : BackLinkCore
+public sealed class BackLink : GameHostBase
 {
+    public override HostOptions Options { get; } = new();
+
     internal static BackLink Default { get; set; }
 
     private readonly AppSettingsViewModel _settings;

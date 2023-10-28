@@ -30,7 +30,7 @@ public sealed class GameRunner
     private readonly Node _node;
     private readonly IGameSettingsCore<AppSettingsCore> _settings;
     private readonly SIDocument _document;
-    private readonly IGameManager _backLink;
+    private readonly IGameHost _gameHost;
     private readonly IFileShare _fileShare;
     private readonly ComputerAccount[] _defaultPlayers;
     private readonly ComputerAccount[] _defaultShowmans;
@@ -43,7 +43,7 @@ public sealed class GameRunner
         Node node,
         IGameSettingsCore<AppSettingsCore> settings,
         SIDocument document,
-        IGameManager backLink,
+        IGameHost gameHost,
         IFileShare fileShare,
         ComputerAccount[] defaultPlayers,
         ComputerAccount[] defaultShowmans,
@@ -55,7 +55,7 @@ public sealed class GameRunner
         _node = node;
         _settings = settings;
         _document = document;
-        _backLink = backLink;
+        _gameHost = gameHost;
         _fileShare = fileShare;
         _defaultPlayers = defaultPlayers;
         _defaultShowmans = defaultShowmans;
@@ -69,7 +69,7 @@ public sealed class GameRunner
     {
         _document.Upgrade();
 
-        var gameData = new GameData(_backLink, new GamePersonAccount(_settings.Showman))
+        var gameData = new GameData(_gameHost, new GamePersonAccount(_settings.Showman))
         {
             Settings = _settings,
             HostName = _settings.IsAutomatic ? null : _settings.HumanPlayerName,
@@ -88,7 +88,7 @@ public sealed class GameRunner
             if (!_settings.Showman.IsHuman || isHost)
             {
                 var showmanClient = new Client(_settings.Showman.Name);
-                var showman = new Showman(showmanClient, _settings.Showman, isHost, localizer, new ViewerData(_backLink));
+                var showman = new Showman(showmanClient, _settings.Showman, isHost, localizer, new ViewerData(_gameHost));
                 showmanClient.ConnectTo(_node);
 
                 if (isHost)
@@ -109,7 +109,7 @@ public sealed class GameRunner
                 if (!human || isHost)
                 {
                     var playerClient = new Client(_settings.Players[i].Name);
-                    var player = new Player(playerClient, _settings.Players[i], isHost, localizer, new ViewerData(_backLink));
+                    var player = new Player(playerClient, _settings.Players[i], isHost, localizer, new ViewerData(_gameHost));
                     playerClient.ConnectTo(_node);
 
                     if (isHost)
@@ -131,7 +131,7 @@ public sealed class GameRunner
                     gameData.Viewers.Add(new ViewerAccount(_settings.Viewers[i]));
                     
                     var viewerClient = new Client(_settings.Viewers[i].Name);
-                    var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData(_backLink));
+                    var viewer = new SimpleViewer(viewerClient, _settings.Viewers[i], isHost, localizer, new ViewerData(_gameHost));
                     viewerClient.ConnectTo(_node);
                     host = viewer;
 

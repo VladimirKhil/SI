@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.Contracts;
+using SIData;
 using SIUI.Model;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,7 +12,10 @@ namespace SICore;
 /// </summary>
 public abstract class Data : ITimeProvider, INotifyPropertyChanged
 {
-    public IGameManager BackLink { get; }
+    /// <summary>
+    /// Game host.
+    /// </summary>
+    public IGameHost Host { get; }
 
     /// <summary>
     /// Game table info.
@@ -95,9 +99,9 @@ public abstract class Data : ITimeProvider, INotifyPropertyChanged
 
     public StringBuilder EventLog { get; } = new();
 
-    public Data(IGameManager gameManager)
+    public Data(IGameHost gameManager)
     {
-        BackLink = gameManager;
+        Host = gameManager;
     }
 
     protected static string PrintAccount(ViewerAccount viewerAccount) =>

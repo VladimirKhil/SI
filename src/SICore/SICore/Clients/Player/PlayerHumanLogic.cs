@@ -50,7 +50,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void PersonAnswered(int playerIndex, bool isRight)
@@ -68,7 +68,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
     public void Answer()
     {
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
 
         StartSendingVersion(_cancellationTokenSource.Token);
     }
@@ -99,14 +99,14 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         }
     }
 
-    public void Cat() => _data.BackLink.OnFlash();
+    public void Cat() => _data.Host.OnFlash();
 
     public void Stake()
     {
         _data.DialogMode = DialogModes.Stake;
         _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
         ((PlayerAccount)_data.Me).IsDeciding = false;
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void ChooseFinalTheme()
@@ -116,12 +116,12 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
 
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void FinalStake()
     {
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void CatCost()
@@ -130,19 +130,19 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         _data.DialogMode = DialogModes.CatCost;
         ((PlayerAccount)_data.Me).IsDeciding = false;
 
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void IsRight(bool voteForRight)
     {
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     #endregion
 
     public void Report()
     {
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     private async void Greet()
@@ -151,7 +151,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         {
             await Task.Delay(2000);
 
-            AddLog(string.Format(_viewerActions.LO[nameof(R.Hint)], _data.BackLink.GameButtonKey));
+            AddLog(string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey));
             AddLog(_viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine);
         }
         catch (ObjectDisposedException)
@@ -217,7 +217,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
             _data.Players[i].CanBeSelected = false;
         }
 
-        _data.BackLink.OnFlash(false);
+        _data.Host.OnFlash(false);
     }
 
     public void StartThink()

@@ -83,7 +83,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
 
-        ClientData.PersonDataExtensions.AreAnswersShown = data.BackLink.AreAnswersShown;
+        ClientData.PersonDataExtensions.AreAnswersShown = data.Host.AreAnswersShown;
         ClientData.PropertyChanged += ClientData_PropertyChanged;
 
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
@@ -126,7 +126,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
     {
         if (e.PropertyName == nameof(PersonData.AreAnswersShown))
         {
-            ClientData.BackLink.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
+            ClientData.Host.AreAnswersShown = ClientData.PersonDataExtensions.AreAnswersShown;
         }
     }
 

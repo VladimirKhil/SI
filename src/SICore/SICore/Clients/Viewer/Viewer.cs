@@ -331,7 +331,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
             ClientData.Players[i].CanBeSelected = false;
         }
 
-        ClientData.BackLink.OnFlash(false);
+        ClientData.Host.OnFlash(false);
     }
 
     /// <summary>
@@ -663,7 +663,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                                 break;
 
                             case GameStage.After:
-                                ClientData.BackLink.OnGameFinished(ClientData.PackageId);
+                                ClientData.Host.OnGameFinished(ClientData.PackageId);
                                 ClientData.StageName = "";
                                 break;
                         }
@@ -831,7 +831,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                         if (mparams.Length > 1 && mparams[1] == MessageParams.Try_NotFinished)
                         {
                             // Здесь можно не показывать рамку
-                            if (!ClientData.BackLink.ShowBorderOnFalseStart)
+                            if (!ClientData.Host.ShowBorderOnFalseStart)
                             {
                                 return;
                             }
@@ -1288,7 +1288,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
         }
         catch (InvalidProgramException exc)
         {
-            ClientData.BackLink.SendError(exc, true);
+            ClientData.Host.SendError(exc, true);
         }
 
         OnAd();
@@ -2125,7 +2125,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
     }
 
     private Account[] GetDefaultComputerPlayers() => MyData.DefaultComputerPlayers
-        ?? StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.BackLink.PhotoUri);
+        ?? StoredPersonsRegistry.GetDefaultPlayers(LO, MyData.Host.PhotoUri);
 
     private void UpdateOthers(PlayerAccount player)
     {
@@ -2330,7 +2330,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                 }
                 catch (Exception exc)
                 {
-                    ClientData.BackLink.SendError(exc, false);
+                    ClientData.Host.SendError(exc, false);
                     return;
                 }
 

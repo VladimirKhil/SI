@@ -72,7 +72,7 @@ public abstract class Logic<D> : ILogic
         }
         catch (Exception exc)
         {
-            _data.BackLink.SendError(exc);
+            _data.Host.SendError(exc);
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using SICore.Clients.Viewer;
+using SICore.Contracts;
 using SICore.Models;
 using SIData;
 using System.Collections.ObjectModel;
@@ -267,7 +268,7 @@ public sealed class ViewerData : Data
         set { _iReady = value; OnPropertyChanged(); }
     }
 
-    internal string Sound { set => BackLink.PlaySound(value); }
+    internal string Sound { set => Host.PlaySound(value); }
 
     internal bool FalseStart { get; set; } = true;
 
@@ -517,7 +518,7 @@ public sealed class ViewerData : Data
 
     private void OnJoinModeChanged(JoinMode joinMode) => JoinModeChanged?.Invoke(joinMode);
 
-    public ViewerData(IGameManager gameManager) : base(gameManager)
+    public ViewerData(IGameHost gameHost) : base(gameHost)
     {
         Winner = -1;
 

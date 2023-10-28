@@ -43,10 +43,10 @@ public sealed class PackageLimits
     /// <summary>
     /// Common text length.
     /// </summary>
-    public int TextLength { get; set; } = 250;
+    public int TextLength { get; set; } = 350;
 
     /// <summary>
     /// Content value length.
     /// </summary>
-    public int ContentValueLength { get; set; } = 1000;
+    public int ContentValueLength { get; set; } = 1500;
 }

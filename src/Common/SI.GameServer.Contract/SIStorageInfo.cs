@@ -9,4 +9,9 @@ public sealed class SIStorageInfo
     /// Storage service uri.
     /// </summary>
     public Uri? ServiceUri { get; set; }
+
+    /// <summary>
+    /// Storage name.
+    /// </summary>
+    public string Name { get; set; } = "";
 }

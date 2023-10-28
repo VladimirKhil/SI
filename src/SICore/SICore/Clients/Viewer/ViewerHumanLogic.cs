@@ -45,7 +45,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _viewerActions = viewerActions;
         _localizer = localizer;
 
-        TInfo = new TableInfoViewModel(_data.TInfo, _data.BackLink.GetSettings()) { AnimateText = true, Enabled = true };
+        TInfo = new TableInfoViewModel(_data.TInfo, _data.Host.GetSettings()) { AnimateText = true, Enabled = true };
 
         TInfo.PropertyChanged += TInfo_PropertyChanged;
         TInfo.MediaLoad += TInfo_MediaLoad;
@@ -88,7 +88,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             if (TInfo.TStage == TableStage.RoundTable)
             {
-                _data.BackLink.PlaySound();
+                _data.Host.PlaySound();
             }
         }
     }
@@ -99,7 +99,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         _data.AddToChat(m);
 
-        if (_data.BackLink.MakeLogs)
+        if (_data.Host.MakeLogs)
         {
             AddToFileLog(m);
         }
@@ -161,12 +161,12 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
         }
 
-        if (_data.BackLink.TranslateGameToChat || special)
+        if (_data.Host.TranslateGameToChat || special)
         {
             _data.OnAddString(null, toFormStr.Trim(), LogMode.Protocol);
         }
 
-        if (_data.BackLink.MakeLogs)
+        if (_data.Host.MakeLogs)
         {
             AddToFileLog(logMessageBuilder.ToString());
         }
@@ -200,7 +200,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
             logString = $"<span class=\"sh\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
-            if (_data.BackLink.TranslateGameToChat)
+            if (_data.Host.TranslateGameToChat)
             {
                 _data.AddToChat(new Message(text, _data.Speaker.Name));
             }
@@ -221,7 +221,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                 logString = $"<span class=\"sr n{index}\">{_data.Speaker.Name}: </span><span class=\"r\">{text}</span>";
 
-                if (_data.BackLink.TranslateGameToChat)
+                if (_data.Host.TranslateGameToChat)
                 {
                     _data.AddToChat(new Message(text, _data.Speaker.Name));
                 }
@@ -234,7 +234,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
         else
         {
-            if (_data.BackLink.TranslateGameToChat)
+            if (_data.Host.TranslateGameToChat)
             {
                 _data.OnAddString(null, text, LogMode.Protocol);
             }
@@ -243,14 +243,14 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             logString = $"<span class=\"s\">{text}</span>";
         }
 
-        if (logString != null && _data.BackLink.MakeLogs)
+        if (logString != null && _data.Host.MakeLogs)
         {
             logString += "<br/>";
             AddToFileLog(logString);
         }
     }
 
-    private string TrimReplic(string text) => text.Shorten(_data.BackLink.MaximumReplicTextLength, "…");
+    private string TrimReplic(string text) => text.Shorten(_data.Host.MaximumReplicTextLength, "…");
 
     internal void AddToFileLog(Message message) =>
         AddToFileLog(
@@ -265,7 +265,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             {
                 try
                 {
-                    var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out var path);
+                    var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out var path);
                     _data.ProtocolPath = path;
                     _data.ProtocolWriter = new StreamWriter(stream);
                     _data.ProtocolWriter.Write(text);
@@ -375,11 +375,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             case GameStage.Begin:
                 TInfo.TStage = TableStage.Sign;
 
-                if (_data.BackLink.MakeLogs && _data.ProtocolWriter == null)
+                if (_data.Host.MakeLogs && _data.ProtocolWriter == null)
                 {
                     try
                     {
-                        var stream = _data.BackLink.CreateLog(_viewerActions.Client.Name, out string path);
+                        var stream = _data.Host.CreateLog(_viewerActions.Client.Name, out string path);
                         _data.ProtocolPath = path;
                         _data.ProtocolWriter = new StreamWriter(stream);
                         _data.ProtocolWriter.Write("<!DOCTYPE html><html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>" + _localizer[nameof(R.LogTitle)] + "</title>");
@@ -392,11 +392,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     }
                     catch (ArgumentException exc)
                     {
-                        _data.BackLink.OnError(exc);
+                        _data.Host.OnError(exc);
                     }
                     catch (UnauthorizedAccessException exc)
                     {
-                        _data.BackLink.OnError(exc);
+                        _data.Host.OnError(exc);
                     }
                 }
 
@@ -449,7 +449,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.EnableMediaLoadButton = false;
     }
 
-    virtual public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.BackLink.SendError(exc));
+    virtual public void RoundThemes(bool print) => UI.Execute(() => RoundThemesUI(print), exc => _data.Host.SendError(exc));
 
     private void RoundThemesUI(bool print)
     {
@@ -469,7 +469,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             if (_data.Stage == GameStage.Round)
             {
                 TInfo.TStage = TableStage.RoundThemes;
-                _data.BackLink.PlaySound(Sounds.RoundThemes);
+                _data.Host.PlaySound(Sounds.RoundThemes);
             }
             else
             {
@@ -615,7 +615,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 }
                 else
                 {
-                    TInfo.Text = text.ToString().Shorten(_data.BackLink.MaximumTableTextLength, "…");
+                    TInfo.Text = text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…");
                 }
 
                 TInfo.QuestionContentType = QuestionContentType.Text;
@@ -653,7 +653,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         }
                         else if (_data.AtomType != AtomTypes.Html
                             && !uri.StartsWith("http://localhost")
-                            && !Data.BackLink.LoadExternalMedia
+                            && !Data.Host.LoadExternalMedia
                             && !ExternalUrlOk(uri))
                         {
                             TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
@@ -775,7 +775,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         {
                             uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
                         }
-                        else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
+                        else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
                         {
                             TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
                             TInfo.QuestionContentType = QuestionContentType.SpecialText;
@@ -825,7 +825,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
             catch (Exception exc)
             {
-                _data.BackLink.SendError(exc);
+                _data.Host.SendError(exc);
             }
         });
     }
@@ -841,7 +841,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         catch (NullReferenceException exc)
         {
             // Странная ошибка в привязках WPF иногда возникает
-            _data.BackLink.SendError(exc);
+            _data.Host.SendError(exc);
         }
     }
 
@@ -1011,7 +1011,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.Sound = Sounds.FinalDelete;
     }
 
-    public void Winner() => UI.Execute(WinnerUI, exc => _data.BackLink.SendError(exc));
+    public void Winner() => UI.Execute(WinnerUI, exc => _data.Host.SendError(exc));
 
     private void WinnerUI()
     {
@@ -1021,7 +1021,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
 
         // Лучшие игроки
-        _data.BackLink.SaveBestPlayers(_data.Players);
+        _data.Host.SaveBestPlayers(_data.Players);
     }
 
     public void TimeOut() => _data.Sound = Sounds.RoundTimeout;
@@ -1051,7 +1051,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         await base.DisposeAsync(disposing);
     }
 
-    public void FinalThink() => _data.BackLink.PlaySound(Sounds.FinalThink);
+    public void FinalThink() => _data.Host.PlaySound(Sounds.FinalThink);
 
     public void UpdatePicture(Account account, string path)
     {
@@ -1068,7 +1068,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 else
                 {
                     // Блок для отлавливания специфической ошибки
-                    _data.BackLink.OnPictureError(remoteUri);
+                    _data.Host.OnPictureError(remoteUri);
                 }
             }
         }
@@ -1123,7 +1123,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
         catch (Exception exc)
         {
-            try { _data.BackLink.OnError(exc); }
+            try { _data.Host.OnError(exc); }
             catch { }
         }
     }
@@ -1159,7 +1159,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
     public void OnPauseChanged(bool isPaused) => TInfo.Pause = isPaused;
 
-    public void TableLoaded() => UI.Execute(TableLoadedUI, exc => _data.BackLink.SendError(exc));
+    public void TableLoaded() => UI.Execute(TableLoadedUI, exc => _data.Host.SendError(exc));
 
     private void TableLoadedUI()
     {
@@ -1325,7 +1325,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             {
                 uri = uri.Replace(Constants.ServerHost, ClientData.ServerPublicUrl ?? ClientData.ServerAddress);
             }
-            else if (!uri.StartsWith("http://localhost") && !Data.BackLink.LoadExternalMedia && !ExternalUrlOk(uri))
+            else if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
             {
                 continue;
             }
@@ -1353,7 +1353,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     OnSpecialReplic(string.Format(_localizer[nameof(R.UserUnbanned)], banned.UserName));
                 }
             },
-            exc => ClientData.BackLink.OnError(exc));
+            exc => ClientData.Host.OnError(exc));
 
     public void OnBanned(BannedInfo bannedInfo) =>
         UI.Execute(
@@ -1361,7 +1361,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             {
                 ClientData.Banned.Add(bannedInfo);
             },
-            exc => ClientData.BackLink.OnError(exc));
+            exc => ClientData.Host.OnError(exc));
 
     public void OnBannedList(IEnumerable<BannedInfo> banned) =>
         UI.Execute(() =>
@@ -1373,7 +1373,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 ClientData.Banned.Add(item);
             }
         },
-        exc => ClientData.BackLink.OnError(exc));
+        exc => ClientData.Host.OnError(exc));
 
     public void SetCaption(string caption) => TInfo.Caption = caption;
 
@@ -1401,14 +1401,14 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             ClientData.PlayersObservable.Add(account);
         },
-        ClientData.BackLink.OnError);
+        ClientData.Host.OnError);
 
     public void RemovePlayerAt(int index) => UI.Execute(
         () =>
         {
             ClientData.PlayersObservable.RemoveAt(index);
         },
-        ClientData.BackLink.OnError);
+        ClientData.Host.OnError);
 
     public void ResetPlayers() => UI.Execute(
         () =>
@@ -1420,5 +1420,5 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 ClientData.PlayersObservable.Add(player);
             }
         },
-        ClientData.BackLink.OnError);
+        ClientData.Host.OnError);
 }

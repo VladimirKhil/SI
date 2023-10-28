@@ -35,13 +35,13 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
         TInfo.SelectTheme.CanBeExecuted = false;
     }
 
-    public void StarterChoose() => _data.BackLink.OnFlash();
+    public void StarterChoose() => _data.Host.OnFlash();
 
-    public void FirstStake() => _data.BackLink.OnFlash();
+    public void FirstStake() => _data.Host.OnFlash();
 
-    public void IsRight() => _data.BackLink.OnFlash();
+    public void IsRight() => _data.Host.OnFlash();
 
-    public void FirstDelete() => _data.BackLink.OnFlash();
+    public void FirstDelete() => _data.Host.OnFlash();
 
     public void OnInitialized()
     {
@@ -65,7 +65,7 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
             _data.Players[i].CanBeSelected = false;
         }
 
-        _data.BackLink.OnFlash(false);
+        _data.Host.OnFlash(false);
     }
 
     public void ChooseQuest()
@@ -77,16 +77,16 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
 
         TInfo.Selectable = true;
         TInfo.SelectQuestion.CanBeExecuted = true;
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
-    public void Cat() => _data.BackLink.OnFlash();
+    public void Cat() => _data.Host.OnFlash();
 
     public void Stake()
     {
         _data.DialogMode = DialogModes.Stake;
         _data.Hint = _viewerActions.LO[nameof(R.HintMakeAStake)];
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
 
         foreach (var player in _data.Players)
         {
@@ -101,7 +101,7 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
         TInfo.Selectable = true;
         TInfo.SelectTheme.CanBeExecuted = true;
 
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     public void FinalStake()
@@ -119,7 +119,7 @@ internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
             player.IsDeciding = false;
         }
 
-        _data.BackLink.OnFlash();
+        _data.Host.OnFlash();
     }
 
     private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)

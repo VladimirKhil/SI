@@ -21,6 +21,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     public const bool DefaultIgnoreWrong = false;
     public const bool DefaultDisplaySources = false;
     public const bool DefaultUsePingPenalty = false;
+    public const ButtonPressMode DefaultButtonPressMode = ButtonPressMode.RandomWithinInterval;
     public const bool DefaultPreloadRoundContent = true;
     public const GameModes DefaultGameMode = GameModes.Tv;
     public const int DefaultRandomRoundsCount = 3;
@@ -31,7 +32,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     /// <summary>
     /// Time settings.
     /// </summary>
-    public TimeSettings TimeSettings { get; set; }
+    public TimeSettings TimeSettings { get; set; } = new();
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private int _multimediaPort = DefaultMultimediaPort;
@@ -220,10 +221,32 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultUsePingPenalty)]
+    [Obsolete("Replaced with ButtonPressMode property")]
     public bool UsePingPenalty
     {
         get => _usePingPenalty;
         set { _usePingPenalty = value; OnPropertyChanged(); }
+    }
+
+    private ButtonPressMode _buttonPressMode = DefaultButtonPressMode;
+
+    /// <summary>
+    /// Button press mode.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultButtonPressMode)]
+    public ButtonPressMode ButtonPressMode
+    {
+        get => _buttonPressMode;
+
+        set
+        {
+            if (_buttonPressMode != value)
+            {
+                _buttonPressMode = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -317,10 +340,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     [DefaultValue("en-US")]
     public string? Culture { get; set; }
 
-    public AppSettingsCore()
-    {
-        TimeSettings = new TimeSettings();
-    }
+    public AppSettingsCore() { } // For serializers
 
     public AppSettingsCore(AppSettingsCore origin)
     {
@@ -335,6 +355,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         _oral = origin._oral;
         _ignoreWrong = origin._ignoreWrong;
         _usePingPenalty = origin.UsePingPenalty;
+        ButtonPressMode = origin.ButtonPressMode;
         _preloadRoundContent = origin.PreloadRoundContent;
         _gameMode = origin._gameMode;
 
@@ -362,6 +383,7 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
         OralPlayersActions = settings.OralPlayersActions;
         _ignoreWrong = settings._ignoreWrong;
         _usePingPenalty = settings.UsePingPenalty;
+        ButtonPressMode = settings.ButtonPressMode;
         _preloadRoundContent = settings.PreloadRoundContent;
         _gameMode = settings._gameMode;
 

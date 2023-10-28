@@ -359,52 +359,28 @@ public sealed class GameLogic : Logic<GameData>
     private void Engine_Question(Question question)
     {
         _data.Question = question;
-        _data.IsQuestionPlaying = true;
-        _data.IsAnswer = false;
-        _data.CurPriceRight = _data.CurPriceWrong = question.Price;
-        _data.IsPlayingMedia = false;
-        _data.IsPlayingMediaPaused = false;
 
         _gameActions.ShowmanReplic($"{_data.Theme.Name}, {question.Price}");
         _gameActions.SendMessageWithArgs(Messages.Question, question.Price);
 
-        _data.QuestionHistory.Clear();
+        InitQuestionState(question);
 
-        if (_data.Settings.AppSettings.HintShowman)
-        {
-            var rightAnswers = question.Right;
-            var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
-
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
-        }
-
-        ScheduleExecution(Tasks.QuestionType, 10, 1, force: true);
+        ScheduleExecution(Tasks.QuestionType, 10, 1, true);
     }
 
     private void Engine_QuestionSelected(int themeIndex, int questionIndex, Theme theme, Question question)
     {
         _gameActions.SendMessageWithArgs(Messages.Choice, themeIndex, questionIndex);
 
-        if (_data.Settings.AppSettings.HintShowman)
-        {
-            var rightAnswers = question.Right;
-            var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
-
-            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
-        }
-
         _data.Theme = theme;
         _data.Question = question;
 
-        _data.CurPriceRight = _data.CurPriceWrong = question.Price;
         _data.TInfo.RoundInfo[themeIndex].Questions[questionIndex].Price = Question.InvalidPrice;
 
-        _data.IsAnswer = false;
-
-        _data.QuestionHistory.Clear();
+        InitQuestionState(question);
 
         // Если информация о теме ещё не выводилась
-        if (_data.Settings.AppSettings.GameMode == GameModes.Tv && !_data.ThemeInfoShown[themeIndex])
+        if (!_data.ThemeInfoShown[themeIndex])
         {
             _data.ThemeInfoShown[themeIndex] = true;
             ScheduleExecution(Tasks.Theme, 10, 1, true);
@@ -412,6 +388,25 @@ public sealed class GameLogic : Logic<GameData>
         else
         {
             ScheduleExecution(Tasks.QuestionType, 10, 1, true);
+        }
+    }
+
+    private void InitQuestionState(Question question)
+    {
+        _data.IsAnswer = false;
+        _data.QuestionHistory.Clear();
+        _data.PendingAnswererIndicies.Clear();
+        _data.IsQuestionPlaying = true;
+        _data.IsPlayingMedia = false;
+        _data.IsPlayingMediaPaused = false;
+        _data.CurPriceRight = _data.CurPriceWrong = question.Price;
+
+        if (_data.Settings.AppSettings.HintShowman)
+        {
+            var rightAnswers = question.Right;
+            var rightAnswer = rightAnswers.FirstOrDefault() ?? LO[nameof(R.NotSet)];
+
+            _gameActions.SendMessage(string.Join(Message.ArgsSeparator, Messages.Hint, rightAnswer), _data.ShowMan.Name);
         }
     }
 
@@ -583,16 +578,16 @@ public sealed class GameLogic : Logic<GameData>
         }
         catch (Exception exc)
         {
-            ClientData.BackLink.OnError(exc);
+            ClientData.Host.OnError(exc);
             return false;
         }
     }
 
     private void CheckFileLength(string contentType, long fileLength)
     {
-        int? maxRecommendedFileLength = contentType == AtomTypes.Image ? _data.BackLink.MaxImageSizeKb
-            : (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? _data.BackLink.MaxAudioSizeKb
-            : (contentType == AtomTypes.Video ? _data.BackLink.MaxVideoSizeKb : null));
+        int? maxRecommendedFileLength = contentType == AtomTypes.Image ? _data.Host.MaxImageSizeKb
+            : (contentType == AtomTypes.Audio || contentType == AtomTypes.AudioNew ? _data.Host.MaxAudioSizeKb
+            : (contentType == AtomTypes.Video ? _data.Host.MaxVideoSizeKb : null));
 
         if (!maxRecommendedFileLength.HasValue || fileLength <= (long)maxRecommendedFileLength * 1024)
         {
@@ -906,7 +901,7 @@ public sealed class GameLogic : Logic<GameData>
             }
         }
 
-        _data.BackLink.SaveReport(_data.GameResultInfo);
+        _data.Host.SaveReport(_data.GameResultInfo);
         _data.ReportSent = true;
     }
 
@@ -1585,7 +1580,7 @@ public sealed class GameLogic : Logic<GameData>
                 {
                     static string oldTaskPrinter(Tuple<int, int, int> t) => $"{(Tasks)t.Item1}:{t.Item2}";
 
-                    ClientData.BackLink.SendError(
+                    ClientData.Host.SendError(
                         new Exception(
                             $"Hanging old tasks: {string.Join(", ", OldTasks.Select(oldTaskPrinter))};" +
                             $" Task: {task}, param: {arg}, history: {_tasksHistory}"),
@@ -1772,7 +1767,7 @@ public sealed class GameLogic : Logic<GameData>
             }
             catch (Exception exc)
             {
-                _data.BackLink.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
+                _data.Host.SendError(new Exception($"Task: {task}, param: {arg}, history: {_tasksHistory}", exc));
                 ScheduleExecution(Tasks.NoTask, 10);
                 ClientData.MoveNextBlocked = true;
                 _gameActions.SpecialReplic("Game ERROR");
@@ -1974,7 +1969,7 @@ public sealed class GameLogic : Logic<GameData>
 
             case StopReason.Wait:
                 _data.IsDeferringAnswer = true;
-                ScheduleExecution(Tasks.AskAnswerDeferred, _data.Penalty, force: true);
+                ScheduleExecution(Tasks.AskAnswerDeferred, _data.WaitInterval, force: true);
                 break;
         }
 
@@ -2330,7 +2325,7 @@ public sealed class GameLogic : Logic<GameData>
         }
         catch (Exception exc)
         {
-            _data.BackLink.SendError(exc);
+            _data.Host.SendError(exc);
         }
     }
 
@@ -2820,6 +2815,19 @@ public sealed class GameLogic : Logic<GameData>
 
     internal bool PrepareForAskAnswer()
     {
+        var buttonPressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+
+        if (buttonPressMode == ButtonPressMode.RandomWithinInterval)
+        {
+            if (ClientData.PendingAnswererIndicies.Count == 0)
+            {
+                return false;
+            }
+
+            var index = ClientData.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(ClientData.PendingAnswererIndicies.Count);
+            ClientData.PendingAnswererIndex = ClientData.PendingAnswererIndicies[index];
+        }
+
         if (ClientData.PendingAnswererIndex < 0 || ClientData.PendingAnswererIndex >= ClientData.Players.Count)
         {
             return false;
@@ -2946,8 +2954,6 @@ public sealed class GameLogic : Logic<GameData>
 
     private void AskToChoose()
     {
-        _data.IsQuestionPlaying = true;
-
         _gameActions.InformSums();
         _gameActions.AnnounceSums();
         _gameActions.SendMessage(Messages.ShowTable);
@@ -3270,7 +3276,7 @@ public sealed class GameLogic : Logic<GameData>
         }
         catch (Exception exc)
         {
-            _data.BackLink.SendError(new Exception(string.Format("AskToDelete {0}/{1}/{2}", _data.ThemeDeleters.Current.PlayerIndex, playerIndex, _data.Players.Count), exc));
+            _data.Host.SendError(new Exception(string.Format("AskToDelete {0}/{1}/{2}", _data.ThemeDeleters.Current.PlayerIndex, playerIndex, _data.Players.Count), exc));
         }
     }
 
@@ -3400,7 +3406,7 @@ public sealed class GameLogic : Logic<GameData>
 
                         if (_data.AnswererIndex == -1)
                         {
-                            _data.BackLink.SendError(new Exception("this.data.AnswererIndex == -1"), true);
+                            _data.Host.SendError(new Exception("this.data.AnswererIndex == -1"), true);
                         }
 
                         _gameActions.SendMessageWithArgs(Messages.SetChooser, ClientData.ChooserIndex, "+");
@@ -4197,7 +4203,7 @@ public sealed class GameLogic : Logic<GameData>
             // Showing advertisement
             try
             {
-                var ad = ClientData.BackLink.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
+                var ad = ClientData.Host.GetAd(LO.Culture.TwoLetterISOLanguageName, out int adId);
 
                 if (!string.IsNullOrEmpty(ad))
                 {
@@ -4224,7 +4230,7 @@ public sealed class GameLogic : Logic<GameData>
             }
             catch (Exception exc)
             {
-                _data.BackLink.SendError(exc);
+                _data.Host.SendError(exc);
                 stage++;
             }
         }

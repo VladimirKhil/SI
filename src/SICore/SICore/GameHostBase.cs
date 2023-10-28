@@ -1,10 +1,17 @@
-﻿using SIUI.ViewModel;
+﻿using SICore.Contracts;
+using SICore.Models;
+using SIUI.ViewModel;
 using System.Text.RegularExpressions;
 
 namespace SICore.PlatformSpecific;
 
-public abstract class BackLinkCore : IGameManager
+/// <summary>
+/// Defines base class for game hosts.
+/// </summary>
+public abstract class GameHostBase : IGameHost
 {
+    public abstract HostOptions Options { get; }
+
     public abstract void OnFlash(bool flash = true);
 
     public abstract void OnError(Exception exc);

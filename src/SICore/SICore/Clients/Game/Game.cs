@@ -249,7 +249,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             if (!viewer.IsConnected)
             {
-                ClientData.BackLink.LogWarning($"Viewer {viewer.Name} not connected\n" + ClientData.PersonsUpdateHistory);
+                ClientData.Host.LogWarning($"Viewer {viewer.Name} not connected\n" + ClientData.PersonsUpdateHistory);
                 continue;
             }
 
@@ -855,7 +855,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (args[1] == MessageParams.Report_Log)
         {
-            ClientData.BackLink.LogWarning("Player error: " + review);
+            ClientData.Host.LogWarning("Player error: " + review);
             return;
         }
 
@@ -1111,7 +1111,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (args.Length > 2)
         {
-            if (!ClientData.BackLink.AreCustomAvatarsSupported)
+            if (!ClientData.Host.AreCustomAvatarsSupported)
             {
                 return;
             }
@@ -2186,20 +2186,42 @@ public sealed class Game : Actor<GameData, GameLogic>
             return;
         }
 
-        if (!ClientData.Settings.AppSettings.UsePingPenalty) // Default mode without penalties
+        var pressMode = ClientData.Settings.AppSettings.ButtonPressMode;
+
+        switch (pressMode)
         {
-            ClientData.PendingAnswererIndex = answererIndex;
+            case ButtonPressMode.FirstWins:
+                ClientData.PendingAnswererIndex = answererIndex;
 
-            if (_logic.Stop(StopReason.Answer))
-            {
-                ClientData.Decision = DecisionType.None;
-            }
+                if (_logic.Stop(StopReason.Answer))
+                {
+                    ClientData.Decision = DecisionType.None;
+                }
+                break;
 
-            return;
+            case ButtonPressMode.UsePingPenalty:
+                // Special mode when answerer with penalty waits a little bit while other players with less penalty could try to press
+                ProcessPenalizedAnswerer(answererIndex);
+                break;
+
+            default:
+                ProcessAnswererWithinInterval(answererIndex);
+                break;
+        }
+    }
+
+    private void ProcessAnswererWithinInterval(int answererIndex)
+    {
+        if (!ClientData.PendingAnswererIndicies.Contains(answererIndex))
+        {
+            ClientData.PendingAnswererIndicies.Add(answererIndex);
         }
 
-        // Special mode when answerer with penalty waits a little bit while other players with less penalty could try to press
-        ProcessPenalizedAnswerer(answererIndex);
+        if (!ClientData.IsDeferringAnswer)
+        {            
+            ClientData.WaitInterval = (int)(ClientData.Host.Options.ButtonsAcceptInterval.TotalMilliseconds / 100);
+            _logic.Stop(StopReason.Wait);
+        }
     }
 
     private void ProcessPenalizedAnswerer(int answererIndex)
@@ -2210,7 +2232,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         if (ClientData.IsDeferringAnswer)
         {
             var futureTime = penaltyStartTime.AddMilliseconds(penalty * 100);
-            var currentFutureTime = ClientData.PenaltyStartTime.AddMilliseconds(ClientData.Penalty * 100);
+            var currentFutureTime = ClientData.PenaltyStartTime.AddMilliseconds(ClientData.WaitInterval * 100);
 
             if (futureTime >= currentFutureTime) // New answerer candidate has bigger penalized time so he looses the hit
             {
@@ -2230,7 +2252,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         else
         {
             ClientData.PenaltyStartTime = penaltyStartTime;
-            ClientData.Penalty = penalty;
+            ClientData.WaitInterval = penalty;
 
             _logic.Stop(StopReason.Wait);
         }
@@ -3099,7 +3121,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
         if (account == null)
         {
-            ClientData.BackLink.LogWarning("ChangePersonType: account == null");
+            ClientData.Host.LogWarning("ChangePersonType: account == null");
             return;
         }
 
@@ -3234,7 +3256,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         ClientData.Players[index] = newAccount;
 
         var playerClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        _ = new Player(playerClient, account, false, LO, new ViewerData(ClientData.BackLink));
+        _ = new Player(playerClient, account, false, LO, new ViewerData(ClientData.Host));
         Inform(newAccount.Name);
 
         return newAccount;
@@ -3242,7 +3264,7 @@ public sealed class Game : Actor<GameData, GameLogic>
 
     private GamePersonAccount CreateNewComputerShowman(ComputerAccount account)
     {
-        if (ClientData.BackLink == null)
+        if (ClientData.Host == null)
         {
             throw new InvalidOperationException($"{nameof(CreateNewComputerShowman)}: this.ClientData.BackLink == null");
         }
@@ -3259,7 +3281,7 @@ public sealed class Game : Actor<GameData, GameLogic>
         ClientData.ShowMan = newAccount;
 
         var showmanClient = Network.Clients.Client.Create(newAccount.Name, _client.Node);
-        var showman = new Showman(showmanClient, account, false, LO, new ViewerData(ClientData.BackLink));
+        var showman = new Showman(showmanClient, account, false, LO, new ViewerData(ClientData.Host));
 
         Inform(newAccount.Name);
 
@@ -3464,7 +3486,7 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
-                if (!ClientData.BackLink.AreCustomAvatarsSupported)
+                if (!ClientData.Host.AreCustomAvatarsSupported)
                 {
                     return null;
                 }
