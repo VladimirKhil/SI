@@ -173,4 +173,8 @@ public interface IViewerLogic : ILogic
     void RemovePlayerAt(int index) { }
 
     void ResetPlayers() { }
+
+    void OnAnswerOptions(int optionCount) { }
+
+    void OnContent(string[] mparams) { }
 }

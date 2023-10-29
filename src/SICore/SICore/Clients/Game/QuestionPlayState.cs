@@ -1,4 +1,6 @@
-﻿namespace SICore.Clients.Game;
+﻿using SIEngine.Core;
+
+namespace SICore.Clients.Game;
 
 /// <summary>
 /// Contains question play state.
@@ -10,7 +12,22 @@ internal sealed class QuestionPlayState
     /// </summary>
     internal HashSet<int> AnswererIndicies { get; } = new();
 
-    internal void Clear() => AnswererIndicies.Clear();
+    /// <summary>
+    /// Answer options.
+    /// </summary>
+    internal AnswerOption[]? AnswerOptions { get; set; }
+
+    /// <summary>
+    /// Are answer options shown.
+    /// </summary>
+    internal bool AnswerOptionsShown { get; set; }
+
+    internal void Clear()
+    {
+        AnswererIndicies.Clear();
+        AnswerOptions = null;
+        AnswerOptionsShown = false;
+    }
 
     internal void RemovePlayer(int playerIndex)
     {

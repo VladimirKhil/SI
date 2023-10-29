@@ -1137,4 +1137,13 @@
   <data name="HasMove" xml:space="preserve">
     <value>Право хода</value>
   </data>
+  <data name="ButtonPressMode" xml:space="preserve">
+    <value>Режим нажатия кнопки</value>
+  </data>
+  <data name="ButtonPressMode_FirstWins" xml:space="preserve">
+    <value>Кто первым нажал</value>
+  </data>
+  <data name="ButtonPressMode_RandomWithinInterval" xml:space="preserve">
+    <value>Рандом из ранних нажавших</value>
+  </data>
 </root>

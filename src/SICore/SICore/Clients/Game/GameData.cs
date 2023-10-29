@@ -3,6 +3,7 @@ using SICore.Contracts;
 using SICore.Models;
 using SICore.Results;
 using SIData;
+using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Helpers;
@@ -35,8 +36,6 @@ public sealed class GameData : Data
     /// Currently playing round.
     /// </summary>
     public Round? Round { get; set; }
-
-    internal int QLength { get; set; }
 
     /// <summary>
     /// Currently playing theme.
@@ -618,7 +617,7 @@ public sealed class GameData : Data
     /// </summary>
     public JoinMode JoinMode { get; internal set; }
 
-    public GameData(IGameHost gameManager, GamePersonAccount showman) : base(gameManager)
+    public GameData(IGameHost gameHost, GamePersonAccount showman) : base(gameHost)
     {
         _showMan = showman;
     }

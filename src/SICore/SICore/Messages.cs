@@ -125,6 +125,11 @@ public static class Messages
     public const string Connected = "CONNECTED";
 
     /// <summary>
+    /// Table content. Replaces <see cref="Atom" /> message.
+    /// </summary>
+    public const string Content = "CONTENT";
+
+    /// <summary>
     /// Удаление темы
     /// </summary>
     public const string Delete = "DELETE";
@@ -232,6 +237,11 @@ public static class Messages
     /// Выгнать участника
     /// </summary>
     public const string Kick = "KICK";
+
+    /// <summary>
+    /// Table layout.
+    /// </summary>
+    public const string Layout = "LAYOUT";
 
     /// <summary>
     /// Пометить вопрос

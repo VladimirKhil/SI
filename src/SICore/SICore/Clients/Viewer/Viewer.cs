@@ -23,6 +23,8 @@ namespace SICore;
 public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPropertyChanged
     where L : class, IViewerLogic
 {
+    private bool _ignoreAtoms = false;
+
     protected readonly ViewerActions _viewerActions;
 
     public event Action? IsHostChanged;
@@ -790,15 +792,27 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                     break;
 
                 case Messages.QType:
-                    OnQType(mparams);
+                    OnQuestionType(mparams);
+                    break;
+
+                case Messages.Layout:
+                    OnLayout(mparams);
                     break;
 
                 case Messages.TextShape:
                     _logic.TextShape(mparams);
                     break;
 
-                case Messages.Atom:
-                    _logic.OnScreenContent(mparams);
+                case Messages.Atom: // deprecated
+                    if (!_ignoreAtoms)
+                    {
+                        _logic.OnScreenContent(mparams);
+                    }
+                    break;
+
+                case Messages.Content:
+                    _ignoreAtoms = true;
+                    _logic.OnContent(mparams);
                     break;
 
                 case Messages.Atom_Hint:
@@ -808,8 +822,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                     }
                     break;
 
-                case Messages.Atom_Second:
-                    _logic.OnBackgroundContent(mparams);
+                case Messages.Atom_Second: // deprecated
+                    if (!_ignoreAtoms)
+                    {
+                        _logic.OnBackgroundContent(mparams);
+                    }
                     break;
 
                 case Messages.MediaLoaded:
@@ -1062,6 +1079,26 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
         }
     }
 
+    private void OnLayout(string[] mparams)
+    {
+        if (mparams.Length < 3)
+        {
+            return;
+        }
+        
+        if (mparams[1] != MessageParams.Layout_AnswerOptions)
+        {
+            return;
+        }
+
+        if (!int.TryParse(mparams[2], out var optionCount) || optionCount < 2)
+        {
+            return;
+        }
+
+        Logic.OnAnswerOptions(optionCount);
+    }
+
     private void OnSetJoinMode(string[] mparams)
     {
         if (mparams.Length < 2 || !Enum.TryParse<JoinMode>(mparams[1], out var joinMode))
@@ -1072,7 +1109,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
         MyData.JoinMode = joinMode;
     }
 
-    private void OnQType(string[] mparams)
+    private void OnQuestionType(string[] mparams)
     {
         ClientData.AtomType = AtomTypes.Text;
         ClientData.AtomIndex = -1;

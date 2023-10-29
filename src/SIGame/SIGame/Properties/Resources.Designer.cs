@@ -412,6 +412,33 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Button press mode.
+        /// </summary>
+        public static string ButtonPressMode {
+            get {
+                return ResourceManager.GetString("ButtonPressMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Who pressed first.
+        /// </summary>
+        public static string ButtonPressMode_FirstWins {
+            get {
+                return ResourceManager.GetString("ButtonPressMode_FirstWins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Random from early pressers.
+        /// </summary>
+        public static string ButtonPressMode_RandomWithinInterval {
+            get {
+                return ResourceManager.GetString("ButtonPressMode_RandomWithinInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel readiness.
         /// </summary>
         public static string CancelReady {

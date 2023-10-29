@@ -10,7 +10,18 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     private GameData? GameData => GameLogic?.ClientData;
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    {
+        if (GameLogic == null || GameData == null)
+        {
+            return false;
+        }
+
+        GameData.QuestionPlayState.AnswerOptions = answerOptions;
+        GameLogic.OnAnswerOptions(answerOptions);
+
+        return false;
+    }
 
     public bool OnAccept()
     {
@@ -22,6 +33,13 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
     {
         if (GameLogic == null || GameData == null)
         {
+            return;
+        }
+
+        if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.AnswerOptionsShown)
+        {
+            GameLogic.ShowAnswerOptions(() => OnAskAnswer(mode));
+            GameData.QuestionPlayState.AnswerOptionsShown = true;
             return;
         }
 
@@ -81,10 +99,80 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
+        if (GameLogic == null || GameData == null)
+        {
+            return;
+        }
+
+        if (content.Count == 0)
+        {
+            GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
+            return;
+        }
+
+        if (content.Count == 1)
+        {
+            OnQuestionContentItem(content.First());
+            return;
+        }
+
+        OnQuestionComplexContent(content);
+    }
+
+    private void OnQuestionComplexContent(IReadOnlyCollection<ContentItem> content)
+    {
+        if (GameLogic == null || GameData == null)
+        {
+            return;
+        }
+
+        var contentTable = new Dictionary<string, List<ContentItem>>();
+
         foreach (var contentItem in content)
         {
-            OnQuestionContentItem(contentItem);
+            switch (contentItem.Placement)
+            {
+                case ContentPlacements.Screen:
+                    switch (contentItem.Type)
+                    {
+                        case ContentTypes.Text:
+                        case ContentTypes.Image:
+                        case ContentTypes.Video:
+                        case ContentTypes.Html:
+                            break;
+
+                        default:
+                            continue;
+                    }
+                    break;
+
+                case ContentPlacements.Replic:
+                    if (contentItem.Type != ContentTypes.Text)
+                    {
+                        continue;
+                    }
+                    break;
+
+                case ContentPlacements.Background:
+                    if (contentItem.Type != ContentTypes.Audio)
+                    {
+                        continue;
+                    }
+                    break;
+
+                default:
+                    continue;
+            }
+
+            if (!contentTable.TryGetValue(contentItem.Placement, out var contentList))
+            {
+                contentList = contentTable[contentItem.Placement] = new List<ContentItem>();
+            }
+
+            contentList.Add(contentItem);
         }
+
+        GameLogic.OnComplexContent(contentTable);
     }
 
     public void OnQuestionContentItem(ContentItem contentItem)
@@ -99,58 +187,58 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
             case ContentPlacements.Screen:
                 switch (contentItem.Type)
                 {
-                    case AtomTypes.Text:
+                    case ContentTypes.Text:
                         if (GameData.IsAnswerSimple)
                         {
-                            GameLogic?.OnSimpleAnswer(contentItem.Value);
+                            GameLogic.OnSimpleAnswer(contentItem.Value);
                             break;
                         }
 
-                        GameLogic?.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
+                        GameLogic.OnContentScreenText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
                         break;
 
-                    case AtomTypes.Image:
-                        GameLogic?.OnContentScreenImage(contentItem);
+                    case ContentTypes.Image:
+                        GameLogic.OnContentScreenImage(contentItem);
                         break;
 
-                    case AtomTypes.Video:
-                        GameLogic?.OnContentScreenVideo(contentItem);
+                    case ContentTypes.Video:
+                        GameLogic.OnContentScreenVideo(contentItem);
                         break;
 
-                    case AtomTypes.Html:
-                        GameLogic?.OnContentScreenHtml(contentItem);
+                    case ContentTypes.Html:
+                        GameLogic.OnContentScreenHtml(contentItem);
                         break;
 
                     default:
-                        GameLogic?.ScheduleExecution(Tasks.MoveNext, 1);
+                        GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
                         break;
                 }
                 break;
 
             case ContentPlacements.Replic:
-                if (contentItem.Type == AtomTypes.Text)
+                if (contentItem.Type == ContentTypes.Text)
                 {
-                    GameLogic?.OnContentReplicText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
+                    GameLogic.OnContentReplicText(contentItem.Value, contentItem.WaitForFinish, contentItem.Duration);
                 }
                 else
                 {
-                    GameLogic?.ScheduleExecution(Tasks.MoveNext, 1);
+                    GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
                 }
                 break;
 
             case ContentPlacements.Background:
-                if (contentItem.Type == AtomTypes.AudioNew)
+                if (contentItem.Type == ContentTypes.Audio)
                 {
-                    GameLogic?.OnContentBackgroundAudio(contentItem);
+                    GameLogic.OnContentBackgroundAudio(contentItem);
                 }
                 else
                 {
-                    GameLogic?.ScheduleExecution(Tasks.MoveNext, 1);
+                    GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
                 }
                 break;
 
             default:
-                GameLogic?.ScheduleExecution(Tasks.MoveNext, 1);
+                GameLogic.ScheduleExecution(Tasks.MoveNext, 1);
                 break;
         }
     }

@@ -257,7 +257,20 @@ public sealed class Player : Viewer<IPlayerLogic>
                     ClientData.PlayerDataExtensions.IsQuestionInProgress = true;
                     break;
 
-                case Messages.Atom:
+                case Messages.Atom: // deprecated
+                    _logic.OnPlayerAtom(mparams);
+
+                    if (ClientData.QuestionType == QuestionTypes.Simple)
+                    {
+                        _buttonDisabledByGame = false;
+                        EnableGameButton();
+
+                        if (!ClientData.FalseStart)
+                            ClientData.PlayerDataExtensions.MyTry = true;
+                    }
+                    break;
+
+                case Messages.Content:
                     _logic.OnPlayerAtom(mparams);
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)

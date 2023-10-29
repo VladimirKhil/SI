@@ -93,8 +93,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    #region ViewerInterface Members
-
     public virtual void ReceiveText(Message m)
     {
         _data.AddToChat(m);
@@ -547,7 +545,200 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.TStage = TableStage.Question;
     }
 
-    virtual public void OnScreenContent(string[] mparams)
+    public void OnContent(string[] mparams)
+    {
+        if (mparams.Length < 5)
+        {
+            return;
+        }
+
+        var placement = mparams[1];
+        var layoutId = mparams[2]; // Not used for now
+        var contentType = mparams[3];
+        var contentValue = mparams[4];
+
+        switch (placement)
+        {
+            case ContentPlacements.Screen:
+                OnScreenContent(contentType, contentValue);
+                break;
+
+            case ContentPlacements.Replic:
+                if (contentType == ContentTypes.Audio)
+                {
+                    OnReplicText(contentValue);
+                }
+                break;
+
+            case ContentPlacements.Background:
+                if (contentType == ContentTypes.Audio)
+                {
+                    OnBackgroundAudio(contentValue);
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void OnScreenContent(string contentType, string contentValue)
+    {
+        if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
+        {
+            _data.Speaker.Replic = "";
+        }
+
+        _data.AtomType = contentType;
+
+        var isPartial = _data.AtomType == Constants.PartialText;
+
+        if (isPartial)
+        {
+            if (!_data.IsPartial)
+            {
+                _data.IsPartial = true;
+                _data.AtomIndex++;
+            }
+        }
+        else
+        {
+            _data.IsPartial = false;
+            _data.AtomIndex++;
+            TInfo.Text = "";
+            TInfo.PartialText = false;
+        }
+
+        TInfo.TStage = TableStage.Question;
+        TInfo.IsMediaStopped = false;
+
+        _data.EnableMediaLoadButton = false;
+
+        switch (_data.AtomType)
+        {
+            case ContentTypes.Text:
+            case Constants.PartialText:
+                var text = contentValue.UnescapeNewLines();
+
+                if (isPartial)
+                {
+                    var currentText = TInfo.Text ?? "";
+                    var newTextLength = text.Length;
+
+                    var tailIndex = TInfo.TextLength + newTextLength;
+
+                    TInfo.Text = currentText[..TInfo.TextLength]
+                        + text
+                        + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
+
+                    TInfo.TextLength += newTextLength;
+                }
+                else
+                {
+                    TInfo.Text = text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…");
+                }
+
+                TInfo.QuestionContentType = QuestionContentType.Text;
+                TInfo.Sound = false;
+                _data.EnableMediaLoadButton = false;
+                break;
+
+            case ContentTypes.Video:
+            case ContentTypes.Audio:
+            case ContentTypes.Image:
+            case ContentTypes.Html:
+                string uri;
+
+                uri = contentValue;
+
+                if (_data.AtomType != AtomTypes.Html
+                    && !uri.StartsWith("http://localhost")
+                    && !Data.Host.LoadExternalMedia
+                    && !ExternalUrlOk(uri))
+                {
+                    TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
+                    TInfo.QuestionContentType = QuestionContentType.SpecialText;
+                    TInfo.Sound = false;
+
+                    _data.EnableMediaLoadButton = true;
+                    _data.ExternalUri = uri;
+                    return;
+                }
+
+                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
+                {
+                    return;
+                }
+
+                uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+
+                if (_data.AtomType == ContentTypes.Image)
+                {
+                    TInfo.MediaSource = new MediaSource(uri);
+                    TInfo.QuestionContentType = QuestionContentType.Image;
+                    TInfo.Sound = false;
+                }
+                else if (_data.AtomType == ContentTypes.Audio)
+                {
+                    TInfo.SoundSource = new MediaSource(uri);
+                    TInfo.QuestionContentType = QuestionContentType.Clef;
+                    TInfo.Sound = true;
+                }
+                else if (_data.AtomType == ContentTypes.Video)
+                {
+                    TInfo.MediaSource = new MediaSource(uri);
+                    TInfo.QuestionContentType = QuestionContentType.Video;
+                    TInfo.Sound = false;
+                }
+                else // ContentTypes.Html
+                {
+                    TInfo.MediaSource = new MediaSource(uri);
+                    TInfo.QuestionContentType = QuestionContentType.Html;
+                    TInfo.Sound = false;
+                }
+
+                _data.EnableMediaLoadButton = false;
+                break;
+        }
+    }
+
+    private void OnReplicText(string text) => OnReplic(ReplicCodes.Showman.ToString(), text.UnescapeNewLines());
+
+    private void OnBackgroundAudio(string uri)
+    {
+        if (TInfo.TStage != TableStage.Question)
+        {
+            TInfo.TStage = TableStage.Question;
+            TInfo.QuestionContentType = QuestionContentType.Clef;
+        }
+
+        if (!uri.StartsWith("http://localhost") && !Data.Host.LoadExternalMedia && !ExternalUrlOk(uri))
+        {
+            TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
+            TInfo.QuestionContentType = QuestionContentType.SpecialText;
+            TInfo.Sound = false;
+
+            _data.EnableMediaLoadButton = true;
+            _data.ExternalUri = uri;
+        }
+
+        if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
+        {
+            return;
+        }
+
+        uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+
+        TInfo.SoundSource = new MediaSource(uri);
+        TInfo.Sound = true;
+
+        if (TInfo.QuestionContentType == QuestionContentType.Void)
+        {
+            TInfo.QuestionContentType = QuestionContentType.Clef;
+        }
+    }
+
+    public void OnScreenContent(string[] mparams)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
         {
@@ -738,7 +929,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     private bool ExternalUrlOk(string uri) =>
         ClientData.ContentPublicUrls != null && ClientData.ContentPublicUrls.Any(publicUrl => uri.StartsWith(publicUrl));
 
-    virtual public void OnBackgroundContent(string[] mparams)
+    public void OnBackgroundContent(string[] mparams)
     {
         if (TInfo.TStage != TableStage.Question)
         {
@@ -930,6 +1121,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
+        TInfo.LayoutMode = LayoutMode.Simple;
 
         switch (_data.QuestionType)
         {
@@ -1145,8 +1337,6 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             Trace.TraceError("AnotherTry error: " + exc);
         }
     }
-
-    #endregion
 
     public void OnTextSpeed(double speed) => TInfo.TextSpeed = speed;
 
@@ -1421,4 +1611,10 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
         },
         ClientData.Host.OnError);
+
+    public void OnAnswerOptions(int optionCount)
+    {
+        TInfo.AnswerOptions.Options = Enumerable.Range(0, optionCount).Select(i => new ItemViewModel()).ToArray();
+        TInfo.LayoutMode = LayoutMode.AnswerOptions;
+    }
 }

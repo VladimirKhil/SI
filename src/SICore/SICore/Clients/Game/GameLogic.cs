@@ -6,6 +6,7 @@ using SICore.Contracts;
 using SICore.Results;
 using SICore.Utils;
 using SIData;
+using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
@@ -53,6 +54,11 @@ public sealed class GameLogic : Logic<GameData>
     /// Frequency of partial prints per second.
     /// </summary>
     private const double PartialPrintFrequencyPerSecond = 0.5;
+
+    /// <summary>
+    /// Execution continuation.
+    /// </summary>
+    private Action? _continuation;
 
     /// <summary>
     /// Minimum price in round.
@@ -412,7 +418,12 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void OnContentScreenText(string text, bool waitForFinish, TimeSpan duration)
     {
-        _data.QLength = text.Length;
+        var atomTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length);
+
+        _data.AtomTime = atomTime;
+        _data.AtomStart = DateTime.UtcNow;
+        _data.UseBackgroundAudio = !waitForFinish;
+
         _data.IsPartial = waitForFinish && IsPartial();
 
         if (_data.IsPartial)
@@ -427,23 +438,12 @@ public sealed class GameLogic : Logic<GameData>
             _data.Text = text;
             _data.TextLength = 0;
             ScheduleExecution(Tasks.PrintPartial, 1);
-        }
-        else
-        {
-            _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
-            _gameActions.SystemReplic(text);
-        }
-
-        var atomTime = duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(_data.QLength);
-
-        _data.AtomTime = atomTime;
-        _data.AtomStart = DateTime.UtcNow;
-        _data.UseBackgroundAudio = !waitForFinish;
-
-        if (_data.IsPartial)
-        {
             return;
         }
+
+        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, text.EscapeNewLines());
+        _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Text, text);
+        _gameActions.SystemReplic(text);
 
         var nextTime = !waitForFinish ? 1 : atomTime;
 
@@ -467,11 +467,11 @@ public sealed class GameLogic : Logic<GameData>
     internal void OnContentReplicText(string text, bool waitForFinish, TimeSpan duration)
     {
         _data.IsPartial = false;
+        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Replic, 0, ContentTypes.Text, text.EscapeNewLines());
         _gameActions.SendMessageWithArgs(Messages.Atom, AtomTypes.Oral, text);
         _gameActions.ShowmanReplic(text);
-        _data.QLength = text.Length;
 
-        var atomTime = !waitForFinish ? 1 : (duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(_data.QLength));
+        var atomTime = !waitForFinish ? 1 : (duration > TimeSpan.Zero ? (int)(duration.TotalMilliseconds / 100) : GetReadingDurationForTextLength(text.Length));
 
         _data.AtomTime = atomTime;
         _data.AtomStart = DateTime.UtcNow;
@@ -482,11 +482,81 @@ public sealed class GameLogic : Logic<GameData>
         _data.UseBackgroundAudio = !waitForFinish;
     }
 
+    private (bool success, string? globalUri, string? localUri) TryShareContent(ContentItem contentItem)
+    {
+        if (!contentItem.IsRef) // External link
+        {
+            var link = contentItem.Value;
+
+            if (Uri.TryCreate(link, UriKind.Absolute, out _))
+            {
+                return (true, link, null);
+            }
+
+            // There is no file in the package and it's name is not a valid absolute uri.
+            // So, considering that the file is missing
+
+            return (false, link, null);
+        }
+
+        var contentType = contentItem.Type;
+        var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
+        var media = _data.PackageDoc.TryGetMedia(contentItem);
+
+        if (!media.HasValue || media.Value.Uri == null)
+        {
+            return (false, $"{mediaCategory}/{contentItem.Value}", null);
+        }
+
+        var fullUri = media.Value.Uri;
+        var fileLength = media.Value.StreamLength;
+
+        if (fileLength.HasValue)
+        {
+            CheckFileLength(contentType, fileLength.Value);
+        }
+
+        Uri uri;
+        string? localUri;
+
+        if (fullUri.Scheme == "file")
+        {
+            localUri = fullUri.AbsolutePath;
+            var fileName = Path.GetFileName(localUri);
+            uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
+        }
+        else
+        {
+            uri = fullUri;
+            localUri = null;
+        }
+
+        return (true, uri.ToString(), localUri);
+    }
+
     private bool ShareMedia(ContentItem contentItem, bool isBackground = false)
     {
         try
         {
-            var msg = new MessageBuilder();
+            var (success, globalUri, localUri) = TryShareContent(contentItem);
+            var messageType = isBackground ? Messages.Atom_Second : Messages.Atom;
+
+            if (!success || globalUri == null)
+            {
+                var errorText = string.Format(LO[nameof(R.MediaNotFound)], globalUri);
+
+                _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, ContentTypes.Text, errorText);
+                _gameActions.SendMessageWithArgs(messageType, AtomTypes.Text, errorText);
+
+                return false;
+            }
+
+            _gameActions.SendMessageWithArgs(Messages.Content, contentItem.Placement, 0, contentItem.Type, globalUri);
+
+            // TODO: remove after complete switching to Content message
+            // {
+            var msg = new MessageBuilder(messageType);
+
             var contentType = contentItem.Type;
 
             if (contentType == AtomTypes.AudioNew)
@@ -494,69 +564,7 @@ public sealed class GameLogic : Logic<GameData>
                 contentType = AtomTypes.Audio; // For backward compatibility; remove later
             }
 
-            msg.Add(isBackground ? Messages.Atom_Second : Messages.Atom).Add(contentType);
-
-            var mediaCategory = CollectionNames.TryGetCollectionName(contentType) ?? contentType;
-
-            if (!contentItem.IsRef) // External link
-            {
-                var link = contentItem.Value;
-
-                if (Uri.TryCreate(link, UriKind.Absolute, out _))
-                {
-                    msg.Add(MessageParams.Atom_Uri).Add(link);
-                    _gameActions.SendMessage(msg.ToString());
-
-                    return true;
-                }
-
-                // There is no file in the package and it's name is not a valid absolute uri.
-                // So, considering that the file is missing
-
-                _gameActions.SendMessageWithArgs(
-                    isBackground ? Messages.Atom_Second : Messages.Atom,
-                    AtomTypes.Text,
-                    string.Format(LO[nameof(R.MediaNotFound)], link));
-
-                return false;
-            }
-
-            var media = _data.PackageDoc.TryGetMedia(contentItem);
-
-            if (!media.HasValue || media.Value.Uri == null)
-            {
-                _gameActions.SendMessageWithArgs(
-                    isBackground ? Messages.Atom_Second : Messages.Atom,
-                    AtomTypes.Text,
-                    string.Format(LO[nameof(R.MediaNotFound)], $"{mediaCategory}/{contentItem.Value}"));
-
-                return false;
-            }
-
-            var fullUri = media.Value.Uri;
-            var fileLength = media.Value.StreamLength;
-
-            if (fileLength.HasValue)
-            {
-                CheckFileLength(contentType, fileLength.Value);
-            }
-
-            Uri uri;
-            string? localUri;
-
-            if (fullUri.Scheme == "file")
-            {
-                localUri = fullUri.AbsolutePath;
-                var fileName = Path.GetFileName(localUri);
-                uri = _fileShare.CreateResourceUri(ResourceKind.Package, new Uri($"{mediaCategory}/{fileName}", UriKind.Relative));
-            }
-            else
-            {
-                uri = fullUri;
-                localUri = null;
-            }
-
-            msg.Add(MessageParams.Atom_Uri);
+            msg.Add(contentType).Add(MessageParams.Atom_Uri);
 
             foreach (var person in _data.AllPersons.Keys)
             {
@@ -564,15 +572,17 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (_gameActions.Client.CurrentServer.Contains(person))
                 {
-                    msg2.Append(Message.ArgsSeparatorChar).Append(localUri ?? uri.ToString());
+                    msg2.Append(Message.ArgsSeparatorChar).Append(localUri ?? globalUri);
                 }
                 else
                 {
-                    msg2.Append(Message.ArgsSeparatorChar).Append(uri.ToString().Replace("http://localhost", $"http://{Constants.GameHost}"));
+                    msg2.Append(Message.ArgsSeparatorChar).Append(globalUri.Replace("http://localhost", $"http://{Constants.GameHost}"));
                 }
 
                 _gameActions.SendMessage(msg2.ToString(), person);
             }
+
+            // }
 
             return true;
         }
@@ -1904,6 +1914,7 @@ public sealed class GameLogic : Logic<GameData>
                         {
                             var subText = _data.Text[_data.TextLength..];
 
+                            _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, Constants.PartialText, subText.EscapeNewLines());
                             _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
                             _gameActions.SystemReplic(subText);
 
@@ -2075,6 +2086,13 @@ public sealed class GameLogic : Logic<GameData>
 
     private void MoveNext()
     {
+        if (_continuation != null)
+        {
+            _continuation();
+            _continuation = null;
+            return;
+        }
+
         Engine?.MoveNext();
         ClientData.MoveNextBlocked = false;
 
@@ -2709,6 +2727,7 @@ public sealed class GameLogic : Logic<GameData>
 
         var subText = text.Substring(_data.TextLength, printingLength);
 
+        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, Constants.PartialText, subText.EscapeNewLines());
         _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
         _gameActions.SystemReplic(subText);
 
@@ -2716,12 +2735,13 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.TextLength < text.Length)
         {
+            _data.AtomTime -= (int)(10 * PartialPrintFrequencyPerSecond);
             ScheduleExecution(Tasks.PrintPartial, 10 * PartialPrintFrequencyPerSecond, force: true);
         }
         else
         {
             _data.TimeThinking = 0.0;
-            ScheduleExecution(Tasks.MoveNext, 10, force: true);
+            ScheduleExecution(Tasks.MoveNext, Math.Max(_data.AtomTime, 10), force: true);
         }
     }
 
@@ -4528,4 +4548,135 @@ public sealed class GameLogic : Logic<GameData>
             _gameActions.ShowmanReplic(printedAnswer);
         }
     }
+
+    internal void OnAnswerOptions(AnswerOption[] answerOptions) =>
+        _gameActions.SendMessageWithArgs(Messages.Layout, MessageParams.Layout_AnswerOptions, answerOptions.Length);
+
+    internal void ShowAnswerOptions(Action continuation)
+    {
+        if (ClientData.QuestionPlayState.AnswerOptions == null)
+        {
+            throw new InvalidOperationException("AnswerOptions == null");
+        }
+
+        var nextTask = ClientData.QuestionPlayState.AnswerOptions.Length > 0 ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        ScheduleExecution(nextTask, 1, 0);
+        _continuation = continuation;
+    }
+
+    internal void ShowNextAnswerOption(int optionIndex)
+    {
+        if (ClientData.QuestionPlayState.AnswerOptions == null)
+        {
+            throw new InvalidOperationException("AnswerOptions == null");
+        }
+
+        var answerOption = ClientData.QuestionPlayState.AnswerOptions[optionIndex];        
+
+        var messageBuilder = new MessageBuilder(Messages.Content)
+            .Add(ContentPlacements.Screen)
+            .Add(optionIndex + 1)
+            .Add(answerOption.Label);
+
+        if (answerOption.Content.Type == ContentTypes.Text)
+        {
+            messageBuilder.Add(ContentTypes.Text).Add(answerOption.Content.Value.EscapeNewLines());
+        }
+        else
+        {
+            var (success, globalUri, _) = TryShareContent(answerOption.Content);
+
+            if (!success || globalUri == null)
+            {
+                messageBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+            }
+            else
+            {
+                messageBuilder.Add(answerOption.Content.Type).Add(globalUri);
+            }
+        }
+
+        _gameActions.SendMessage(messageBuilder.ToString());
+
+        var nextTask = optionIndex + 1 < ClientData.QuestionPlayState.AnswerOptions.Length ? Tasks.ShowNextAnswerOption : Tasks.MoveNext;
+        ScheduleExecution(nextTask, 10, optionIndex + 1);
+    }
+
+    internal void OnComplexContent(Dictionary<string, List<ContentItem>> contentTable)
+    {
+        var contentTime = -1;
+        var registeredMediaPlay = false;
+
+        foreach (var (placement, contentList) in contentTable)
+        {
+            var contentListDuration = 0;
+
+            var messageBuilder = new MessageBuilder(Messages.Content).Add(placement);
+
+            foreach (var contentItem in contentList)
+            {
+                messageBuilder.Add(0); // LayoutId = 0 for this content
+
+                int duration;
+
+                if (contentItem.Type == ContentTypes.Text)
+                {
+                    messageBuilder.Add(contentItem.Type).Add(contentItem.Value.EscapeNewLines());
+
+                    duration = contentItem.Duration > TimeSpan.Zero
+                        ? (int)(contentItem.Duration.TotalMilliseconds / 100)
+                        : GetContentItemDefaultDuration(contentItem);
+                }
+                else
+                {
+                    var (success, globalUri, _) = TryShareContent(contentItem);
+
+                    if (!success || globalUri == null)
+                    {
+                        messageBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+                        duration = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
+                    }
+                    else
+                    {
+                        messageBuilder.Add(contentItem.Type).Add(globalUri);
+
+                        if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
+                        {
+                            registeredMediaPlay = true;
+                            _data.IsPlayingMedia = true;
+                            _data.IsPlayingMediaPaused = false;
+
+                            _data.InitialMediaContentCompletionCount = _data.HaveViewedAtom = _data.Viewers.Count
+                                + _data.Players.Where(pa => pa.IsHuman && pa.IsConnected).Count()
+                                + (_data.ShowMan.IsHuman && _data.ShowMan.IsConnected ? 1 : 0);
+                        }
+
+                        duration = contentItem.Duration > TimeSpan.Zero
+                            ? (int)(contentItem.Duration.TotalMilliseconds / 100)
+                            : GetContentItemDefaultDuration(contentItem);
+                    }
+                }
+
+                contentListDuration += duration;
+            }
+
+            _gameActions.SendMessage(messageBuilder.ToString());
+
+            contentTime = Math.Max(contentTime, contentListDuration);
+        }
+
+        _data.IsPartial = false;
+        _data.AtomStart = DateTime.UtcNow;
+        _data.AtomTime = contentTime;
+        ScheduleExecution(Tasks.MoveNext, contentTime);
+        _data.TimeThinking = 0.0;
+    }
+
+    private int GetContentItemDefaultDuration(ContentItem contentItem) => contentItem.Type switch
+    {
+        ContentTypes.Text => GetReadingDurationForTextLength(contentItem.Value.Length),
+        ContentTypes.Image or ContentTypes.Html => DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10,
+        ContentTypes.Audio or ContentTypes.Video => DefaultAudioVideoTime,
+        _ => 0,
+    };
 }

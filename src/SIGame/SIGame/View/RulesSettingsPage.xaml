@@ -23,8 +23,17 @@
                 <x:Type TypeName="data:GameModes"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        
+
+        <ObjectDataProvider x:Key="ButtonPressMode" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="data:ButtonPressMode" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+
+        <CollectionViewSource x:Key="ButtonPressModeFiltered" Source="{StaticResource ButtonPressMode}" Filter="ButtonPressMode_Filter" />
+
         <localc:EnumConverter x:Key="GameModesConverter" EnumType="{x:Type data:GameModes}" />
+        <localc:EnumConverter x:Key="ButtonPressModeConverter" EnumType="{x:Type data:ButtonPressMode}" />
 
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0,3" />
@@ -161,6 +170,21 @@
         <CheckBox IsChecked="{Binding Model.UsePingPenalty}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.UsePingPenalty}" />
         </CheckBox>
+
+        <TextBlock Text="{x:Static lp:Resources.ButtonPressMode}" Style="{StaticResource Header}" />
+
+        <ComboBox
+            Style="{StaticResource ComboBoxStyle}"
+            Foreground="White"
+            FontWeight="Light"
+            ItemsSource="{Binding Source={StaticResource ButtonPressModeFiltered}}"
+            SelectedValue="{Binding Model.ButtonPressMode}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ButtonPressModeConverter}}" FontWeight="Light" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <CheckBox IsChecked="{Binding Model.PreloadRoundContent}" Style="{StaticResource HeaderBox}">
             <TextBlock Style="{StaticResource CheckText}" Margin="5,0,0,0" Text="{x:Static lp:Resources.PreloadRoundContent}" />

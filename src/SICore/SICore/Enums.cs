@@ -49,6 +49,12 @@ public enum Tasks
     /// Объявление типа вопроса
     /// </summary>
     QuestionType,
+
+    /// <summary>
+    /// Show next answer option.
+    /// </summary>
+    ShowNextAnswerOption,
+
     /// <summary>
     /// Предложение жать на кнопку
     /// </summary>

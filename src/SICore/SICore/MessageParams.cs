@@ -56,6 +56,11 @@ public static class MessageParams
     public const string Info_Update = "UPDATE";
 
     /// <summary>
+    /// Answer options layout.
+    /// </summary>
+    public const string Layout_AnswerOptions = "ANSWER_OPTIONS";
+
+    /// <summary>
     /// Report log.
     /// </summary>
     public const string Report_Log = "LOG";

@@ -450,4 +450,17 @@ public static class StringExtensions
         // Surrogates have high component first
         return s[..(maxLength - (char.IsHighSurrogate(s[maxLength - 1]) ? 1 : 0))] + ellipsis;
     }
+
+    /// <summary>
+    /// Escapes new line character in text.
+    /// </summary>
+    /// <param name="value">Text to escape.</param>
+    public static string EscapeNewLines(this string value) => value.Replace("\\", "\\\\").Replace("\n", "\\n");
+
+
+    /// <summary>
+    /// Unescapes new line character in text.
+    /// </summary>
+    /// <param name="value">Text to unescape.</param>
+    public static string UnescapeNewLines(this string value) => value.Replace("\\n", "\n").Replace("\\\\", "\\");
 }
