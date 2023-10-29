@@ -8,6 +8,7 @@ using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
+using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
 using SIQuester.ViewModel.Model;
 using SIQuester.ViewModel.PlatformSpecific;
@@ -58,6 +59,21 @@ public sealed class QDocument : WorkspaceViewModel
     internal Lock Lock { get; }
 
     private bool _changed = false;
+
+    /// <summary>
+    /// Saves document under different name.
+    /// </summary>
+    public IAsyncCommand SaveAs { get; private set; }
+
+    /// <summary>
+    /// Copies document item.
+    /// </summary>
+    public ICommand Copy { get; private set; }
+
+    /// <summary>
+    /// Pastes document item.
+    /// </summary>
+    public ICommand Paste { get; private set; }
 
     public OperationsManager OperationsManager { get; } = new();
 
@@ -1202,11 +1218,13 @@ public sealed class QDocument : WorkspaceViewModel
 
     private bool _isLinksClearingBlocked;
 
+    private readonly IClipboardService _clipboardService;
     private readonly ILoggerFactory _loggerFactory;
 
     internal QDocument(
         SIDocument document,
         StorageContextViewModel storageContextViewModel,
+        IClipboardService clipboardService,
         ILoggerFactory loggerFactory)
     {
         Lock = new Lock(document.Package.Name);
@@ -1214,6 +1232,7 @@ public sealed class QDocument : WorkspaceViewModel
         OperationsManager.Changed += OperationsManager_Changed;
         OperationsManager.Error += OperationsManager_Error;
 
+        _clipboardService = clipboardService;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<QDocument>();
 
@@ -1222,6 +1241,7 @@ public sealed class QDocument : WorkspaceViewModel
         ImportSiq = new SimpleCommand(ImportSiq_Executed);
         
         Save = new AsyncCommand(Save_Executed);
+        SaveAs = new AsyncCommand(SaveAs_Executed);
         SaveAsTemplate = new AsyncCommand(SaveAsTemplate_Executed);
 
         ExportHtml = new SimpleCommand(ExportHtml_Executed);
@@ -1255,6 +1275,9 @@ public sealed class QDocument : WorkspaceViewModel
         SendToGame = new SimpleCommand(SendToGame_Executed);
 
         Delete = new SimpleCommand(Delete_Executed);
+
+        Copy = new SimpleCommand(Copy_Executed);
+        Paste = new SimpleCommand(Paste_Executed);
 
         NextSearchResult = new SimpleCommand(NextSearchResult_Executed) { CanBeExecuted = false };
         PreviousSearchResult = new SimpleCommand(PreviousSearchResult_Executed) { CanBeExecuted = false };
@@ -1545,7 +1568,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    internal void Copy_Executed()
+    internal void Copy_Executed(object? arg)
     {
         if (_activeNode == null)
         {
@@ -1555,7 +1578,7 @@ public sealed class QDocument : WorkspaceViewModel
         try
         {
             var itemData = new InfoOwnerData(this, _activeNode);
-            Clipboard.SetData(ClipboardKey, itemData);
+            _clipboardService.SetData(ClipboardKey, itemData);
         }
         catch (Exception exc)
         {
@@ -1563,14 +1586,14 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    internal void Paste_Executed()
+    internal void Paste_Executed(object? arg)
     {
         if (_activeNode == null)
         {
             return;
         }
 
-        if (!Clipboard.ContainsData(ClipboardKey))
+        if (!_clipboardService.ContainsData(ClipboardKey))
         {
             return;
         }
@@ -1579,7 +1602,7 @@ public sealed class QDocument : WorkspaceViewModel
         {
             using var change = OperationsManager.BeginComplexChange();
 
-            var itemData = (InfoOwnerData)Clipboard.GetData(ClipboardKey);
+            var itemData = (InfoOwnerData)_clipboardService.GetData(ClipboardKey);
             var level = itemData.ItemLevel;
 
             if (level == InfoOwnerData.Level.Round)
@@ -2607,7 +2630,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    internal async void SaveAs_Executed() => await SaveAsAsync();
+    internal Task SaveAs_Executed(object? arg) => SaveAsAsync();
 
     private async Task SaveAsAsync()
     {
@@ -3258,7 +3281,7 @@ public sealed class QDocument : WorkspaceViewModel
         var selectThemesViewModel = new SelectThemesViewModel(
             this,
             PlatformManager.Instance.ServiceProvider.GetRequiredService<IOptions<AppOptions>>().Value,
-            _loggerFactory);
+            PlatformManager.Instance.ServiceProvider.GetRequiredService<IDocumentViewModelFactory>());
 
         selectThemesViewModel.NewItem += OnNewItem;
         Dialog = selectThemesViewModel;

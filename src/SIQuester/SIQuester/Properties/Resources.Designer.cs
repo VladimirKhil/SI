@@ -907,6 +907,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Копировать шаблон.
+        /// </summary>
+        public static string CopyTemplate {
+            get {
+                return ResourceManager.GetString("CopyTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Страна.
         /// </summary>
         public static string Country {
@@ -957,6 +966,15 @@ namespace SIQuester.Properties {
         public static string Cut {
             get {
                 return ResourceManager.GetString("Cut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вырезать шаблон.
+        /// </summary>
+        public static string CutTemplate {
+            get {
+                return ResourceManager.GetString("CutTemplate", resourceCulture);
             }
         }
         
@@ -1790,6 +1808,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Необязательный фрагмент.
+        /// </summary>
+        public static string OptionalFragment {
+            get {
+                return ResourceManager.GetString("OptionalFragment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на или.
         /// </summary>
         public static string Or {
@@ -1867,6 +1894,15 @@ namespace SIQuester.Properties {
         public static string Paste {
             get {
                 return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Вставить шаблон.
+        /// </summary>
+        public static string PasteTemplate {
+            get {
+                return ResourceManager.GetString("PasteTemplate", resourceCulture);
             }
         }
         

@@ -60,6 +60,11 @@ public partial class MainWindow : MetroWindow
                 };
 
                 tabControl1.Items.Add(tabItem);
+
+                if (sender != null)
+                {
+                    CollectionViewSource.GetDefaultView(sender).MoveCurrentToLast();
+                }
                 break;
 
             case NotifyCollectionChangedAction.Remove:
@@ -358,4 +363,18 @@ public partial class MainWindow : MetroWindow
 
         protected override List<AutomationPeer> GetChildrenCore() => new();
     }
+
+    private void New_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).New.Execute(null);
+
+    private void Open_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel) DataContext).Open.Execute(e.Parameter);
+
+    private void Help_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).Help.Execute(null);
+
+    private void Close_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).Close.ExecuteAsync(null);
+
+    private void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).ActiveDocument?.SaveAs.ExecuteAsync(null);
+
+    private void Copy_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).ActiveDocument?.Copy.Execute(null);
+
+    private void Paste_Executed(object sender, ExecutedRoutedEventArgs e) => ((MainViewModel)DataContext).ActiveDocument?.Paste.Execute(null);
 }

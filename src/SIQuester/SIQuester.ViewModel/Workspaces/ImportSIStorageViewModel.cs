@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using SIQuester.ViewModel.Configuration;
+﻿using SIQuester.ViewModel.Configuration;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Properties;
 using SIStorageService.ViewModel;
 using System.ComponentModel;
@@ -7,6 +7,9 @@ using System.Net;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Allows to import package from SIStorage.
+/// </summary>
 public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 {
     private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
@@ -15,24 +18,20 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
 
     public override string Header => Resources.SIStorage;
 
-    private readonly StorageContextViewModel _storageContextViewModel;
-
     public bool IsProgress => Storage.IsLoading || Storage.IsLoadingPackages;
 
     private readonly AppOptions _appOptions;
-    private readonly ILoggerFactory _loggerFactory;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public ImportSIStorageViewModel(
-        StorageContextViewModel storageContextViewModel,
         StorageViewModel siStorage,
         AppOptions appOptions,
-        ILoggerFactory loggerFactory)
+        IDocumentViewModelFactory documentViewModelFactory)
     {
-        _storageContextViewModel = storageContextViewModel;
         _appOptions = appOptions;
-        _loggerFactory = loggerFactory;
+        _documentViewModelFactory = documentViewModelFactory;
 
         Storage = siStorage;
 
@@ -78,7 +77,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
                 doc.Upgrade();
             }
 
-            return new QDocument(doc, _storageContextViewModel, _loggerFactory) { FileName = doc.Package.Name };
+            return _documentViewModelFactory.CreateViewModelFor(doc);
         };
 
         var package = Storage.CurrentPackage;

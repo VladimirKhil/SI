@@ -1,4 +1,5 @@
 ﻿using SIQuester.Model;
+using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 using Utils.Commands;
@@ -14,7 +15,7 @@ public sealed class SettingsViewModel : WorkspaceViewModel
 
     public override string Header => Resources.Options;
 
-    public string[] Fonts => System.Windows.Media.Fonts.SystemFontFamilies.Select(ff => ff.Source).OrderBy(f => f).ToArray();
+    public string[] Fonts => PlatformManager.Instance.FontFamilies;
 
     public bool SpellCheckingEnabled => Environment.OSVersion.Version > new Version(6, 2);
 

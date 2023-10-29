@@ -399,6 +399,9 @@
   <data name="Copy" xml:space="preserve">
     <value>Копировать</value>
   </data>
+  <data name="CopyTemplate" xml:space="preserve">
+    <value>Копировать шаблон</value>
+  </data>
   <data name="Country" xml:space="preserve">
     <value>Страна</value>
   </data>
@@ -416,6 +419,9 @@
   </data>
   <data name="Cut" xml:space="preserve">
     <value>Вырезать</value>
+  </data>
+  <data name="CutTemplate" xml:space="preserve">
+    <value>Вырезать шаблон</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
@@ -694,6 +700,9 @@
   <data name="OpenRecent" xml:space="preserve">
     <value>Открыть недавние</value>
   </data>
+  <data name="OptionalFragment" xml:space="preserve">
+    <value>Необязательный фрагмент</value>
+  </data>
   <data name="Or" xml:space="preserve">
     <value>или</value>
   </data>
@@ -720,6 +729,9 @@
   </data>
   <data name="Paste" xml:space="preserve">
     <value>Вставить</value>
+  </data>
+  <data name="PasteTemplate" xml:space="preserve">
+    <value>Вставить шаблон</value>
   </data>
   <data name="PlayQuestion" xml:space="preserve">
     <value>Запустить вопрос</value>

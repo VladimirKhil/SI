@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Notions;
+﻿using Notions;
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Configuration;
@@ -71,29 +70,29 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         }
     }
 
-    private readonly StorageContextViewModel _storageContextViewModel;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
     private readonly AppOptions _appOptions;
     private readonly IChgkDbClient _chgkDbClient;
-    private readonly ILoggerFactory _loggerFactory;
 
     public ImportDBStorageViewModel(
-        StorageContextViewModel storageContextViewModel,
+        IDocumentViewModelFactory documentViewModelFactory,
         IChgkDbClient chgkDbClient,
-        AppOptions appOptions,
-        ILoggerFactory loggerFactory)
+        AppOptions appOptions)
     {
-        _storageContextViewModel = storageContextViewModel;
+        _documentViewModelFactory = documentViewModelFactory;
         _appOptions = appOptions;
         _chgkDbClient = chgkDbClient;
-        _loggerFactory = loggerFactory;
     }
 
     public async Task SelectNodeAsync(DBNode item)
     {
         async Task<QDocument> loader(CancellationToken cancellationToken)
         {
-            var siDoc = await SelectAsync(item, cancellationToken);
-            return new QDocument(siDoc, _storageContextViewModel, _loggerFactory) { FileName = siDoc.Package.Name, Changed = true };
+            var siDocument = await SelectAsync(item, cancellationToken);
+            var documentViewModel = _documentViewModelFactory.CreateViewModelFor(siDocument);
+            documentViewModel.Changed = true;
+
+            return documentViewModel;
         };
 
         var loaderViewModel = new DocumentLoaderViewModel(item.Name);

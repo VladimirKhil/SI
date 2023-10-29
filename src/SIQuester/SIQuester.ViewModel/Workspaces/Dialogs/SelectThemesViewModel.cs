@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using SIPackages;
+﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.Model;
 using SIQuester.ViewModel.Configuration;
+using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Properties;
 using System.Windows.Input;
 using Utils.Commands;
@@ -57,13 +57,13 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
     public ICommand Select2 { get; private set; }
 
-    private readonly ILoggerFactory _loggerFactory;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
-    public SelectThemesViewModel(QDocument document, AppOptions appOptions, ILoggerFactory loggerFactory)
+    public SelectThemesViewModel(QDocument document, AppOptions appOptions, IDocumentViewModelFactory documentViewModelFactory)
     {
         _document = document;
         _appOptions = appOptions;
-        _loggerFactory = loggerFactory;
+        _documentViewModelFactory = documentViewModelFactory;
 
         Themes = _document.Document.Package.Rounds
             .SelectMany(round => round.Themes)
@@ -86,7 +86,7 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
             var allthemes = new List<Theme>();
             _document.Document.Package.Rounds.ForEach(round => round.Themes.ForEach(allthemes.Add));
 
-            var targetDocument = new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name };
+            var targetDocument = _documentViewModelFactory.CreateViewModelFor(newDocument);
 
             for (var index = _from; index <= _to; index++)
             {
@@ -120,7 +120,7 @@ public sealed class SelectThemesViewModel : WorkspaceViewModel
 
             var allthemes = Themes.Where(st => st.IsSelected).Select(st => st.Theme);
 
-            var targetDocument = new QDocument(newDocument, _document.StorageContext, _loggerFactory) { FileName = newDocument.Package.Name };
+            var targetDocument = _documentViewModelFactory.CreateViewModelFor(newDocument);
 
             foreach (var theme in allthemes)
             {

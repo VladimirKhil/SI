@@ -6,6 +6,12 @@
 public interface IClipboardService
 {
     /// <summary>
+    /// Queries the Clipboard for the presence of data in a specified data format.
+    /// </summary>
+    /// <param name="format">Data format.</param>
+    bool ContainsData(string format);
+
+    /// <summary>
     /// Retrieves data in a specified format from the Clipboard.
     /// </summary>
     /// <param name="format">Data format.</param>

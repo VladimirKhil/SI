@@ -32,6 +32,8 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
 
     private const int MAX_PATH = 260;
 
+    public override string[] FontFamilies => System.Windows.Media.Fonts.SystemFontFamilies.Select(ff => ff.Source).OrderBy(f => f).ToArray();
+
     public override Tuple<int, int, int>? GetCurrentItemSelectionArea() =>
         ActionMenuViewModel.Instance.PlacementTarget is TextList box ? box.GetSelectionInfo() : null;
 

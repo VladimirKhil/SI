@@ -260,7 +260,6 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     private readonly CancellationTokenSource _tokenSource = new();
     private readonly TaskScheduler _scheduler;
 
-    private readonly StorageContextViewModel _storageContextViewModel;
     private readonly AppOptions _appOptions;
     private string _badTextCopy = "";
 
@@ -352,7 +351,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
 
     public event Action<int, int, string?, bool>? HighlightText;
 
-    private readonly ILoggerFactory _loggerFactory;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
 
     private Encoding _textEncoding = Encoding.UTF8;
 
@@ -377,15 +376,13 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
     /// <summary>
     /// Initializes a new instance of <see cref="ImportTextViewModel" /> class.
     /// </summary>
-    /// <param name="storageContextViewModel">Well-known SIStorage facets holder.</param>
     /// <param name="appOptions">Application options.</param>
     /// <param name="clipboardService">Clipboard access service.</param>
-    /// <param name="loggerFactory">Factory to create loggers.</param>
-    public ImportTextViewModel(StorageContextViewModel storageContextViewModel, AppOptions appOptions, IClipboardService clipboardService, ILoggerFactory loggerFactory)
+    /// <param name="documentViewModelFactory">Factory to create documents.</param>
+    public ImportTextViewModel(AppOptions appOptions, IClipboardService clipboardService, IDocumentViewModelFactory documentViewModelFactory)
     {
-        _storageContextViewModel = storageContextViewModel;
         _appOptions = appOptions;
-        _loggerFactory = loggerFactory;
+        _documentViewModelFactory = documentViewModelFactory;
         _scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
         var trashAlias = new EditAlias(Resources.Trash, "#FFD3D3D3");
@@ -569,10 +566,10 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
             var themesNum = task.Result.Item2;
             if (task.Result.Item1)
             {
-                if (!task.IsCanceled)
+                if (!task.IsCanceled && _existing != null)
                 {
                     PlatformManager.Instance.Inform($"{Resources.Success} {themesNum}.");
-                    OnNewItem(new QDocument(_existing, _storageContextViewModel, _loggerFactory) { FileName = _existing.Package.Name });
+                    OnNewItem(_documentViewModelFactory.CreateViewModelFor(_existing));
                 }
             }
         }
@@ -825,7 +822,7 @@ public sealed class ImportTextViewModel : WorkspaceViewModel
                     exc => OnError(exc, ""),
                     CancellationToken.None);
 
-                OnNewItem(new QDocument(_existing, _storageContextViewModel, _loggerFactory) { FileName = _existing.Package.Name });
+                OnNewItem(_documentViewModelFactory.CreateViewModelFor(_existing));
             }
         }
 

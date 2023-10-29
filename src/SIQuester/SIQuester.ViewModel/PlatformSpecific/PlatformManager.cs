@@ -16,6 +16,11 @@ public abstract class PlatformManager
 
     public IServiceProvider ServiceProvider { get; set; }
 
+    /// <summary>
+    /// Gets well-known font family names.
+    /// </summary>
+    public abstract string[] FontFamilies { get; }
+
     protected PlatformManager()
     {
         Instance = this;

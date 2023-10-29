@@ -88,21 +88,21 @@ public sealed class NewViewModel : WorkspaceViewModel
     /// </summary>
     public List<string> Errors { get; } = new();
 
-    private readonly StorageContextViewModel _storageContextViewModel;
     private readonly IPackageTemplatesRepository _packageTemplatesRepository;
     private readonly AppOptions _appOptions;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
     private readonly ILogger<NewViewModel> _logger;
 
     public NewViewModel(
-        StorageContextViewModel storageContextViewModel,
         IPackageTemplatesRepository packageTemplatesRepository,
         AppOptions appOptions,
+        IDocumentViewModelFactory documentViewModelFactory,
         ILoggerFactory loggerFactory)
     {
-        _storageContextViewModel = storageContextViewModel;
         _packageTemplatesRepository = packageTemplatesRepository;
         _appOptions = appOptions;
+        _documentViewModelFactory = documentViewModelFactory;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<NewViewModel>();
 
@@ -167,7 +167,7 @@ public sealed class NewViewModel : WorkspaceViewModel
                 siDocument.Upgrade();
             }
 
-            OnNewItem(new QDocument(siDocument, _storageContextViewModel, _loggerFactory) { FileName = siDocument.Package.Name });
+            OnNewItem(_documentViewModelFactory.CreateViewModelFor(siDocument));
             _logger.LogInformation("New document created. Name: {name}", siDocument.Package.Name);
             OnClosed();
         }

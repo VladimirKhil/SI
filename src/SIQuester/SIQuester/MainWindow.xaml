@@ -69,7 +69,7 @@
                 </DataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
-        
+
         <Style x:Key="TabControlStyle1" TargetType="{x:Type TabControl}">
             <Setter Property="Padding" Value="0" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -79,17 +79,17 @@
             <Setter Property="BorderBrush" Value="#FFACACAC" />
             <Setter Property="BorderThickness" Value="0,1,0,0" />
             <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
-            
+
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabControl}">
                         <Grid x:Name="templateRoot" ClipToBounds="True" SnapsToDevicePixels="True" KeyboardNavigation.TabNavigation="Local">
-                            
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="ColumnDefinition0"/>
                                 <ColumnDefinition x:Name="ColumnDefinition1" Width="0"/>
                             </Grid.ColumnDefinitions>
-                            
+
                             <Grid.RowDefinitions>
                                 <RowDefinition x:Name="RowDefinition0" Height="Auto"/>
                                 <RowDefinition x:Name="RowDefinition1" Height="*"/>
@@ -126,7 +126,7 @@
                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                             </Border>
                         </Grid>
-                        
+
                         <ControlTemplate.Triggers>
                             <Trigger Property="TabStripPlacement" Value="Bottom">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="1"/>
@@ -135,7 +135,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="Auto"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="2,0,2,2"/>
                             </Trigger>
-                            
+
                             <Trigger Property="TabStripPlacement" Value="Left">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
                                 <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
@@ -147,7 +147,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="2,2,0,2"/>
                             </Trigger>
-                            
+
                             <Trigger Property="TabStripPlacement" Value="Right">
                                 <Setter Property="Grid.Row" TargetName="HeaderPanel" Value="0"/>
                                 <Setter Property="Grid.Row" TargetName="ContentPanel" Value="0"/>
@@ -159,7 +159,7 @@
                                 <Setter Property="Height" TargetName="RowDefinition1" Value="0"/>
                                 <Setter Property="Margin" TargetName="HeaderPanel" Value="0,2,2,2"/>
                             </Trigger>
-                            
+
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter
                                     Property="TextElement.Foreground"
@@ -170,11 +170,11 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            
+
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self},Path=Items.Count}" Value="0">
                     <Setter Property="BorderThickness" Value="0" />
-                    
+
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="TabControl">
@@ -184,14 +184,14 @@
                                         DataContext="{Binding Settings.History.Files}"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center">
-                                        
+
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
-                                        
+
                                         <TextBlock FontSize="24" HorizontalAlignment="Center" Text="{x:Static lp:Resources.RecentFiles}" />
-                                        
+
                                         <ItemsControl Grid.Row="1" ItemsSource="{Binding}" Margin="0,20,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
@@ -219,7 +219,7 @@
                                                                 Height="20">
                                                                 <Path Data="M0,0L1,1M0,1L1,0" Stroke="Gray" Stretch="Fill" Margin="3" />
                                                             </Button>
-                                                            
+
                                                             <TextBlock TextTrimming="CharacterEllipsis" Foreground="#FF040629" TextAlignment="Left">
                                                                 <Run Text="{Binding Mode=OneWay, Converter={StaticResource FileNameConverter}}" FontSize="18" />
                                                                 <LineBreak />
@@ -227,7 +227,7 @@
                                                             </TextBlock>
                                                         </DockPanel>
                                                     </Button>
-                                                    
+
                                                     <DataTemplate.Triggers>
                                                         <Trigger SourceName="open" Property="IsMouseOver" Value="True">
                                                             <Setter TargetName="remove" Property="Visibility" Value="Visible" />
@@ -255,14 +255,17 @@
             <Setter Property="Margin" Value="0" />
         </Style>
     </Window.Resources>
-    
-    <vm1:CommandBindingsManager.RegisterCommandBindings>
-        <MultiBinding Converter="{StaticResource UnionConverter}">
-            <Binding Path="CommandBindings" />
-            <Binding Path="ActiveDocument.CommandBindings" />
-        </MultiBinding>
-    </vm1:CommandBindingsManager.RegisterCommandBindings>
-    
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="New_Executed" />
+        <CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed" />
+        <CommandBinding Command="ApplicationCommands.Help" Executed="Help_Executed" />
+        <CommandBinding Command="ApplicationCommands.Close" Executed="Close_Executed" />
+        <CommandBinding Command="ApplicationCommands.SaveAs" Executed="SaveAs_Executed" />
+        <CommandBinding Command="ApplicationCommands.Copy" Executed="Copy_Executed" />
+        <CommandBinding Command="ApplicationCommands.Paste" Executed="Paste_Executed" />
+    </Window.CommandBindings>
+
     <Window.InputBindings>
         <KeyBinding Gesture="CTRL+N" Command="ApplicationCommands.New" />
         <KeyBinding Gesture="CTRL+S" Command="{Binding ActiveDocument.Save}" />

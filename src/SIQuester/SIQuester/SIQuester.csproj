@@ -55,6 +55,7 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.2.0" />
     <PackageReference Include="WindowsAPICodePackShell" Version="7.0.4" />
+	<PackageReference Include="MahApps.Metro" Version="2.4.10" />
   </ItemGroup>
   <ItemGroup>
     <None Include="licenses\MahApps.Metro.LICENSE">

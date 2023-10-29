@@ -11,13 +11,11 @@ using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Serializers;
 using SIQuester.ViewModel.Services;
-using SIStorage.Service.Contract;
 using SIStorageService.ViewModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Text;
-using System.Windows.Data;
 using System.Windows.Input;
 using Utils;
 using Utils.Commands;
@@ -37,6 +35,11 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     public ILogger Logger => _logger;
 
     #region Commands
+
+    /// <summary>
+    /// Creates a new workspace.
+    /// </summary>
+    public ICommand New { get; private set; }
 
     /// <summary>
     /// Opens a file.
@@ -93,6 +96,16 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     public ICommand SearchFolder { get; private set; }
 
+    /// <summary>
+    /// Opens a help file.
+    /// </summary>
+    public ICommand Help { get; private set; }
+
+    /// <summary>
+    /// Closes main view.
+    /// </summary>
+    public IAsyncCommand Close { get; private set; }
+
     #endregion
 
     /// <summary>
@@ -122,8 +135,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private readonly string[] _args;
     private readonly AppOptions _appOptions;
-    private readonly StorageContextViewModel _storageContextViewModel;
     private readonly IClipboardService _clipboardService;
+    private readonly IDocumentViewModelFactory _documentViewModelFactory;
     private readonly IServiceProvider _serviceProvider;
 
     public AppOptions AppOptions => _appOptions;
@@ -131,18 +144,18 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     public MainViewModel(
         string[] args,
         AppOptions appOptions,
-        ISIStorageServiceClient siStorageServiceClient,
         IClipboardService clipboardService,
         IServiceProvider serviceProvider,
+        IDocumentViewModelFactory documentViewModelFactory,
         ILoggerFactory loggerFactory)
     {
         _loggerFactory = loggerFactory;
         _clipboardService = clipboardService;
+        _documentViewModelFactory = documentViewModelFactory;
         _logger = loggerFactory.CreateLogger<MainViewModel>();
         _appOptions = appOptions;
 
         DocList.CollectionChanged += DocList_CollectionChanged;
-        CollectionViewSource.GetDefaultView(DocList).CurrentChanged += MainViewModel_CurrentChanged;
 
         Open = new SimpleCommand(Open_Executed);
         OpenRecent = new SimpleCommand(OpenRecent_Executed);
@@ -163,27 +176,16 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
         SetSettings = new SimpleCommand(SetSettings_Executed);
         SearchFolder = new SimpleCommand(SearchFolder_Executed);
 
-        _storageContextViewModel = new StorageContextViewModel(siStorageServiceClient);
-        _storageContextViewModel.Load();
-
         _serviceProvider = serviceProvider;
 
-        AddCommandBinding(ApplicationCommands.New, New_Executed);
-        AddCommandBinding(ApplicationCommands.Open, (sender, e) => Open_Executed(e.Parameter));
-        AddCommandBinding(ApplicationCommands.Help, Help_Executed);
-        AddCommandBinding(ApplicationCommands.Close, Close_Executed);
-
-        AddCommandBinding(ApplicationCommands.SaveAs, (s, e) => ActiveDocument?.SaveAs_Executed(), CanExecuteDocumentCommand);
-
-        AddCommandBinding(ApplicationCommands.Copy, (s, e) => ActiveDocument?.Copy_Executed(), CanExecuteDocumentCommand);
-        AddCommandBinding(ApplicationCommands.Paste, (s, e) => ActiveDocument?.Paste_Executed(), CanExecuteDocumentCommand);
+        New = new SimpleCommand(New_Executed);
+        Help = new SimpleCommand(Help_Executed);
+        Close = new AsyncCommand(Close_Executed);
 
         _args = args;
 
         UI.Initialize();
     }
-
-    private void CanExecuteDocumentCommand(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = ActiveDocument != null;
 
     public async Task InitializeAsync()
     {
@@ -244,9 +246,9 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private void SetSettings_Executed(object? arg) => DocList.Add(new SettingsViewModel());
 
-    private void Help_Executed(object? sender, ExecutedRoutedEventArgs e) => PlatformManager.Instance.ShowHelp();
+    private void Help_Executed(object? arg) => PlatformManager.Instance.ShowHelp();
 
-    private async void Close_Executed(object? sender, ExecutedRoutedEventArgs e)
+    private async Task Close_Executed(object? arg)
     {
         _logger.LogInformation("Close_Executed");
 
@@ -294,9 +296,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
     private void About_Executed(object? arg) => DocList.Add(new AboutViewModel());
 
-    private void MainViewModel_CurrentChanged(object? sender, EventArgs e) =>
-        ActiveDocument = CollectionViewSource.GetDefaultView(DocList).CurrentItem as QDocument;
-
     private void DocList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
@@ -309,7 +308,6 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                     item.Closed += Item_Closed;
                 }
 
-                CollectionViewSource.GetDefaultView(DocList).MoveCurrentToLast();
                 CheckSaveAllCanBeExecuted(this, EventArgs.Empty);
                 break;
 
@@ -351,10 +349,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// <summary>
     /// Новый
     /// </summary>
-    private void New_Executed(object? sender, ExecutedRoutedEventArgs e)
-    {
-        DocList.Add(new NewViewModel(_storageContextViewModel, _serviceProvider.GetRequiredService<IPackageTemplatesRepository>(), _appOptions, _loggerFactory));
-    }
+    private void New_Executed(object? arg) =>
+        DocList.Add(new NewViewModel(_serviceProvider.GetRequiredService<IPackageTemplatesRepository>(), _appOptions, _documentViewModelFactory, _loggerFactory));
 
     /// <summary>
     /// Открыть существующий пакет
@@ -426,11 +422,8 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
 
                 _logger.LogInformation("Document has been successfully opened. Path: {path}", path);
 
-                var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
-                {
-                    Path = path,
-                    FileName = Path.GetFileNameWithoutExtension(path)
-                };
+                var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(path));
+                docViewModel.Path = path;
 
                 docViewModel.CheckFileSize();
 
@@ -522,7 +515,7 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 _ => throw new InvalidOperationException($"Incorrect text source: {arg}"),
             };
 
-            var model = new ImportTextViewModel(_storageContextViewModel, _appOptions, _clipboardService, _loggerFactory);
+            var model = new ImportTextViewModel(_appOptions, _clipboardService, _documentViewModelFactory);
             DocList.Add(model);
 
             if (textSource != null)
@@ -550,12 +543,10 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
             using var stream = File.OpenRead(file);
             var doc = SIDocument.LoadXml(stream);
 
-            var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
-            {
-                Path = "",
-                Changed = true,
-                FileName = Path.GetFileNameWithoutExtension(file)
-            };
+            var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(file));
+
+            docViewModel.Path = "";
+            docViewModel.Changed = true;
 
             var mediaFolder = Path.GetDirectoryName(file);
 
@@ -597,12 +588,9 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
                 doc.Upgrade();
             }
 
-            var docViewModel = new QDocument(doc, _storageContextViewModel, _loggerFactory)
-            {
-                Path = "",
-                Changed = true,
-                FileName = Path.GetFileNameWithoutExtension(file)
-            };
+            var docViewModel = _documentViewModelFactory.CreateViewModelFor(doc, Path.GetFileNameWithoutExtension(file));
+            docViewModel.Path = "";
+            docViewModel.Changed = true;
 
             var mediaFolder = Path.GetDirectoryName(file);
 
@@ -624,10 +612,9 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     /// </summary>
     private void ImportBase_Executed(object? arg) =>
         DocList.Add(new ImportDBStorageViewModel(
-            _storageContextViewModel,
+            _documentViewModelFactory,
             _serviceProvider.GetRequiredService<IChgkDbClient>(),
-            _appOptions,
-            _loggerFactory));
+            _appOptions));
 
     /// <summary>
     /// Imports package from SI Storage.
@@ -635,10 +622,9 @@ public sealed class MainViewModel : ModelViewBase, INotifyPropertyChanged
     private async void ImportFromSIStore_Executed(object? arg)
     {
         var importViewModel = new ImportSIStorageViewModel(
-            _storageContextViewModel,
             _serviceProvider.GetRequiredService<StorageViewModel>(),
             _appOptions,
-            _loggerFactory);
+            _documentViewModelFactory);
 
         DocList.Add(importViewModel);
 

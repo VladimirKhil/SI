@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace SIQuester.ViewModel.Services;
 
-/// <inheritdoc />
+/// <inheritdoc cref="IPackageTemplatesRepository" />
 public sealed class PackageTemplatesRepository : IPackageTemplatesRepository
 {
     /// <summary>

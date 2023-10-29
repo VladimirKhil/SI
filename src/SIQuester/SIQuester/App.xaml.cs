@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NLog.Web;
 using SIPackages;
+using SIQuester.Helpers;
 using SIQuester.Model;
 using SIQuester.Services.Host;
 using SIQuester.ViewModel;
@@ -30,6 +31,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
 using System.Xaml;
 #if !DEBUG
@@ -166,9 +168,14 @@ public partial class App : Application
             var siStorageClient = _host.Services.GetRequiredService<ISIStorageServiceClient>();
             var clipboardService = _host.Services.GetRequiredService<IClipboardService>();
             var options = _host.Services.GetRequiredService<IOptions<AppOptions>>();
+            var documentViewModelFactory = _host.Services.GetRequiredService<IDocumentViewModelFactory>();
             var loggerFactory = _host.Services.GetRequiredService<ILoggerFactory>();
 
-            _mainViewModel = new MainViewModel(e.Args, options.Value, siStorageClient, clipboardService, _host.Services, loggerFactory);
+            _mainViewModel = new MainViewModel(e.Args, options.Value, clipboardService, _host.Services, documentViewModelFactory, loggerFactory);
+            DocumentCollectionController.AttachTo(_mainViewModel);
+
+            var storageContextViewModel = _host.Services.GetRequiredService<StorageContextViewModel>();
+            storageContextViewModel.Load();
 
             MainWindow = new MainWindow { DataContext = _mainViewModel };
             MainWindow.Show();
@@ -197,11 +204,13 @@ public partial class App : Application
         services.AddAppServiceClient(ctx.Configuration);
         services.AddSIStorageServiceClient(ctx.Configuration);
         services.AddChgkServiceClient(ctx.Configuration);
+
         services.AddSingleton(AppSettings.Default);
-        services.AddSingleton<IPackageTemplatesRepository, PackageTemplatesRepository>();
-        services.AddSingleton<IClipboardService, ClipboardService>();
-        services.AddSingleton<StorageViewModel>();
         services.Configure<AppOptions>(ctx.Configuration.GetSection(AppOptions.ConfigurationSectionName));
+
+        services.AddSingleton<IClipboardService, ClipboardService>();
+
+        services.AddSIQuester();
     }
 
     /// <summary>
