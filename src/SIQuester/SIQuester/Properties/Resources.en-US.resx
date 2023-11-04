@@ -423,6 +423,9 @@
   <data name="CutTemplate" xml:space="preserve">
     <value>Cut template</value>
   </data>
+  <data name="DataCopyError" xml:space="preserve">
+    <value>Data copy error</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
@@ -518,6 +521,9 @@
   </data>
   <data name="FileImport" xml:space="preserve">
     <value>Import file</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>too large data</value>
   </data>
   <data name="FillPrices" xml:space="preserve">
     <value>Set costs</value>

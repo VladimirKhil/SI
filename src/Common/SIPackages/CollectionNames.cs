@@ -33,16 +33,30 @@ public static class CollectionNames
     public const string HtmlStorageName = "Html";
 
     /// <summary>
-    /// Tries to get media collection by media type.
+    /// Tries to get collection name by media type.
     /// </summary>
     /// <param name="mediaType">Collection media type.</param>
-    /// <returns>Found collection or null.</returns>
+    /// <returns>Found collection name or null.</returns>
     public static string? TryGetCollectionName(string mediaType) => mediaType switch
     {
         AtomTypes.Image => ImagesStorageName,
         AtomTypes.Audio or AtomTypes.AudioNew => AudioStorageName,
         AtomTypes.Video => VideoStorageName,
         AtomTypes.Html => HtmlStorageName,
+        _ => null,
+    };
+
+    /// <summary>
+    /// Tries to get media type by collection name.
+    /// </summary>
+    /// <param name="collectionName">Collection name.</param>
+    /// <returns>Found media type or null.</returns>
+    public static string? TryGetContentType(string collectionName) => collectionName switch
+    {
+        ImagesStorageName => ContentTypes.Image,
+        AudioStorageName => ContentTypes.Audio,
+        VideoStorageName => ContentTypes.Video,
+        HtmlStorageName => ContentTypes.Html,
         _ => null,
     };
 

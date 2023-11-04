@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIQuester.Contracts;
+using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
@@ -55,7 +56,7 @@ public partial class FlatDocView : UserControl
             return;
         }
 
-        var host = FindAncestor<Border>((DependencyObject)e.OriginalSource);
+        var host = VisualHelper.TryFindAncestor<Border>((DependencyObject)e.OriginalSource);
 
         if (host != null)
         {
@@ -150,11 +151,11 @@ public partial class FlatDocView : UserControl
 
             if (AppSettings.Default.View == ViewMode.TreeFull)
             {
-                host = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+                host = VisualHelper.TryFindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
             }
             else
             {
-                host = FindAncestor<Border>((DependencyObject)e.OriginalSource);
+                host = VisualHelper.TryFindAncestor<Border>((DependencyObject)e.OriginalSource);
             }
 
             if (host == null || host.DataContext == null || host.DataContext is PackageViewModel || host.DataContext is not IItemViewModel)
@@ -247,11 +248,11 @@ public partial class FlatDocView : UserControl
                 return;
             }
 
-            var panel = FindAncestor<StackPanel>((DependencyObject)e.OriginalSource);
+            var panel = VisualHelper.TryFindAncestor<StackPanel>((DependencyObject)e.OriginalSource);
 
             if (panel != null && AppSettings.Default.FlatLayoutMode == FlatLayoutMode.Table)
             {
-                panel = FindAncestor<StackPanel>(VisualTreeHelper.GetParent(panel));
+                panel = VisualHelper.TryFindAncestor<StackPanel>(VisualTreeHelper.GetParent(panel));
             }
 
             if (panel == null)
@@ -408,14 +409,28 @@ public partial class FlatDocView : UserControl
                 foreach (var file in files)
                 {
                     var longPathString = FileHelper.GetLongPathName(file);
+                    var fileExtension = Path.GetExtension(longPathString);
 
-                    if (Path.GetExtension(longPathString) == ".txt")
+                    switch (fileExtension)
                     {
-                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
-                    }
-                    else
-                    {
-                        ApplicationCommands.Open.Execute(longPathString, this);
+                        case ".txt":
+                            ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
+                            break;
+
+                        case ".siq":
+                            ApplicationCommands.Open.Execute(longPathString, this);
+                            break;
+
+                        default:
+                            foreach (var item in MediaOwnerViewModel.RecommenedExtensions)
+                            {
+                                if (item.Value.Contains(fileExtension))
+                                {
+                                    TryImportMedia(e, longPathString, item.Key);
+                                    break;
+                                }
+                            }
+                            break;
                     }
                 }
 
@@ -499,21 +514,40 @@ public partial class FlatDocView : UserControl
         }
     }
 
-    internal static T FindAncestor<T>(DependencyObject descendant)
-        where T : class
+    private void TryImportMedia(DragEventArgs e, string filePath, string mediaType)
     {
-        do
+        var contentType = CollectionNames.TryGetContentType(mediaType);
+
+        if (contentType == null)
         {
-            if (descendant is T item)
-                return item;
+            return;
+        }
 
-            if (descendant is not Visual)
-                return null;
+        var itemsControl = VisualHelper.TryFindAncestor<ItemsControl>((DependencyObject)e.OriginalSource);
 
-            descendant = VisualTreeHelper.GetParent(descendant);
-        } while (descendant != null);
+        if (itemsControl == null)
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
 
-        return null;
+        if (itemsControl.DataContext is not ContentItemsViewModel contentItemsViewModel)
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+
+        var document = (QDocument)DataContext;
+
+        var collection = document.GetCollection(mediaType);
+        var item = collection.AddFile(filePath);
+
+        if (contentItemsViewModel.Count > 0 && string.IsNullOrWhiteSpace(contentItemsViewModel[^1].Model.Value))
+        {
+            contentItemsViewModel.RemoveAt(contentItemsViewModel.Count - 1);
+        }
+
+        contentItemsViewModel.Add(new ContentItemViewModel(new ContentItem { Type = contentType, IsRef = true, Value = item.Model.Name }));
     }
 
     internal static void RecountPrices(Theme theme, int pos, bool down)

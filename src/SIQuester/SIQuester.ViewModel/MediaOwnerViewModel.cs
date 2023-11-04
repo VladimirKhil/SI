@@ -23,7 +23,7 @@ public abstract class MediaOwnerViewModel : ModelViewBase, IMediaOwner
         [CollectionNames.HtmlStorageName] = 1,
     };
 
-    private static readonly Dictionary<string, string[]> RecommenedExtensions = new()
+    public static readonly IReadOnlyDictionary<string, string[]> RecommenedExtensions = new Dictionary<string, string[]>()
     {
         [CollectionNames.ImagesStorageName] = new[] { ".jpg", ".jpeg", ".png", ".gif" },
         [CollectionNames.AudioStorageName] = new[] { ".mp3" },

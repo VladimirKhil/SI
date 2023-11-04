@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIQuester.Contracts;
+using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
@@ -65,8 +66,8 @@ public partial class TreeDocView : UserControl
             }
 
             host = AppSettings.Default.View == ViewMode.TreeFull
-                ? FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource)
-                : FlatDocView.FindAncestor<Border>((DependencyObject)e.OriginalSource);
+                ? VisualHelper.TryFindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource)
+                : VisualHelper.TryFindAncestor<Border>((DependencyObject)e.OriginalSource);
 
             if (host == null || host.DataContext == null || host.DataContext is PackageViewModel || host.DataContext is not IItemViewModel)
             {
@@ -90,7 +91,7 @@ public partial class TreeDocView : UserControl
 
         var item = ((IItemViewModel)host.DataContext).GetModel();
 
-        InfoOwnerData itemData = null;
+        InfoOwnerData itemData;
 
         try
         {
@@ -100,7 +101,7 @@ public partial class TreeDocView : UserControl
         catch (OutOfMemoryException)
         {
             MessageBox.Show(
-                "Ошибка копирования данных: слишком большой объём",
+                $"{Properties.Resources.DataCopyError}: {Properties.Resources.FileTooLarge}",
                 App.ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Exclamation);
@@ -112,7 +113,7 @@ public partial class TreeDocView : UserControl
         catch (Exception exc)
         {
             MessageBox.Show(
-                string.Format("Ошибка копирования данных: {0}", exc.Message),
+                $"{Properties.Resources.DataCopyError}: {exc.Message}",
                 App.ProductName,
                 MessageBoxButton.OK,
                 MessageBoxImage.Exclamation);
@@ -156,7 +157,7 @@ public partial class TreeDocView : UserControl
 
     internal void SetEffect(DragEventArgs e)
     {
-        var treeViewItem = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+        var treeViewItem = VisualHelper.TryFindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
 
         if (treeViewItem == null)
         {
@@ -208,19 +209,36 @@ public partial class TreeDocView : UserControl
 
             if (e.Data.GetDataPresent(WellKnownDragFormats.FileName))
             {
-                var files = e.Data.GetData(WellKnownDragFormats.FileName) as string[];
+                if (e.Data.GetData(WellKnownDragFormats.FileName) is not string[] files)
+                {
+                    return;
+                }
 
                 foreach (var file in files)
                 {
                     var longPathString = FileHelper.GetLongPathName(file);
+                    var fileExtension = Path.GetExtension(longPathString);
 
-                    if (Path.GetExtension(longPathString) == ".txt")
+                    switch (fileExtension)
                     {
-                        ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
-                    }
-                    else
-                    {
-                        ApplicationCommands.Open.Execute(longPathString, this);
+                        case ".txt":
+                            ((MainViewModel)Application.Current.MainWindow.DataContext).ImportTxt.Execute(longPathString);
+                            break;
+
+                        case ".siq":
+                            ApplicationCommands.Open.Execute(longPathString, this);
+                            break;
+
+                        default:
+                            foreach (var item in MediaOwnerViewModel.RecommenedExtensions)
+                            {
+                                if (item.Value.Contains(fileExtension))
+                                {
+                                    TryImportMedia(e, longPathString, item.Key);
+                                    break;
+                                }
+                            }
+                            break;
                     }
                 }
 
@@ -239,7 +257,7 @@ public partial class TreeDocView : UserControl
                 return;
             }
 
-            var treeViewItem = FlatDocView.FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+            var treeViewItem = VisualHelper.TryFindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
 
             if (treeViewItem == null)
             {
@@ -249,7 +267,7 @@ public partial class TreeDocView : UserControl
 
             var format = WellKnownDragFormats.GetDragFormat(e);
 
-            InfoOwnerData dragData = null;
+            InfoOwnerData dragData;
 
             try
             {
@@ -275,7 +293,7 @@ public partial class TreeDocView : UserControl
 
             if (format == WellKnownDragFormats.Round)
             {
-                Round round = null;
+                Round round;
 
                 if (dragData != null)
                 {
@@ -291,9 +309,8 @@ public partial class TreeDocView : UserControl
                     round.ReadXml(reader);
                 }
 
-                if (treeViewItem.DataContext is PackageViewModel)
+                if (treeViewItem.DataContext is PackageViewModel package)
                 {
-                    var package = treeViewItem.DataContext as PackageViewModel;
                     package.Rounds.Add(new RoundViewModel(round) { IsSelected = true });
                     document.ApplyData(dragData);
 
@@ -312,7 +329,7 @@ public partial class TreeDocView : UserControl
             }
             else if (format == WellKnownDragFormats.Theme)
             {
-                Theme theme = null;
+                Theme theme;
 
                 if (dragData != null)
                 {
@@ -327,18 +344,15 @@ public partial class TreeDocView : UserControl
                     theme.ReadXml(reader);
                 }
 
-                if (treeViewItem.DataContext is RoundViewModel)
+                if (treeViewItem.DataContext is RoundViewModel docRound)
                 {
-                    var docRound = treeViewItem.DataContext as RoundViewModel;
                     docRound.Themes.Add(new ThemeViewModel(theme) { IsSelected = true });
                     document.ApplyData(dragData);
 
                     docRound.IsExpanded = true;
                 }
-                else if (treeViewItem.DataContext is ThemeViewModel)
+                else if (treeViewItem.DataContext is ThemeViewModel docTheme)
                 {
-                    var docTheme = treeViewItem.DataContext as ThemeViewModel;
-
                     docTheme.OwnerRound.Themes.Insert(
                         docTheme.OwnerRound.Themes.IndexOf(docTheme),
                         new ThemeViewModel(theme) { IsSelected = true });
@@ -348,7 +362,7 @@ public partial class TreeDocView : UserControl
             }
             else if (format == WellKnownDragFormats.Question)
             {
-                Question question = null;
+                Question question;
 
                 if (dragData != null)
                 {
@@ -363,10 +377,8 @@ public partial class TreeDocView : UserControl
                     question.ReadXml(reader);
                 }
 
-                if (treeViewItem.DataContext is ThemeViewModel)
+                if (treeViewItem.DataContext is ThemeViewModel docTheme)
                 {
-                    var docTheme = treeViewItem.DataContext as ThemeViewModel;
-
                     if (docTheme.Questions.Any(questionViewModel => questionViewModel.Model == question))
                     {
                         question = question.Clone();
@@ -383,10 +395,8 @@ public partial class TreeDocView : UserControl
 
                     document.ApplyData(dragData);
                 }
-                else if (treeViewItem.DataContext is QuestionViewModel)
+                else if (treeViewItem.DataContext is QuestionViewModel docQuestion)
                 {
-                    var docQuestion = treeViewItem.DataContext as QuestionViewModel;
-
                     if (AreEqual(docQuestion.Model, question))
                     {
                         e.Effects = DragDropEffects.None;
@@ -418,6 +428,42 @@ public partial class TreeDocView : UserControl
         {
             Trace.TraceError($"Main_Drop error: {ex}");
         }
+    }
+
+    private void TryImportMedia(DragEventArgs e, string filePath, string mediaType)
+    {
+        var contentType = CollectionNames.TryGetContentType(mediaType);
+
+        if (contentType == null)
+        {
+            return;
+        }
+
+        var itemsControl = VisualHelper.TryFindAncestor<ItemsControl>((DependencyObject)e.OriginalSource);
+
+        if (itemsControl == null)
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+
+        if (itemsControl.DataContext is not ContentItemsViewModel contentItemsViewModel)
+        {
+            e.Effects = DragDropEffects.None;
+            return;
+        }
+
+        var document = (QDocument)DataContext;
+
+        var collection = document.GetCollection(mediaType);
+        var item = collection.AddFile(filePath);
+
+        if (contentItemsViewModel.Count > 0 && string.IsNullOrWhiteSpace(contentItemsViewModel[^1].Model.Value))
+        {
+            contentItemsViewModel.RemoveAt(contentItemsViewModel.Count - 1);
+        }
+
+        contentItemsViewModel.Add(new ContentItemViewModel(new ContentItem { Type = contentType, IsRef = true, Value = item.Model.Name }));
     }
 
     private static bool AreEqual(Question question1, Question question2)

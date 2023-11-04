@@ -6,7 +6,7 @@
     xmlns:siqcv="clr-namespace:SIQuester.Converters"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:SIQuester.ViewModel;assembly=SIQuester.ViewModel"
-    xmlns:vm1="clr-namespace:SIQuester.ViewModel"
+    xmlns:st="clr-namespace:System.Threading;assembly=mscorlib"
     xmlns:metro="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:lp="clr-namespace:SIQuester.Properties"
@@ -361,7 +361,27 @@
 
                         <MenuItem Header="{x:Static lp:Resources.ImportXml}" Command="{Binding ImportXml}" />
                         <MenuItem Header="YAML…" Command="{Binding ImportYaml}" />
-                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" Command="{Binding ImportBase}" />
+                        
+                        <MenuItem Header="{x:Static lp:Resources.ImportDB}" Command="{Binding ImportBase}">
+                            <MenuItem.Style>
+                                <Style TargetType="MenuItem">
+                                    <Setter Property="HeaderTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" Margin="4,0,0,0" />
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CurrentUICulture.Name, Source={x:Static st:Thread.CurrentThread}}" Value="en-US">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </MenuItem.Style>
+                        </MenuItem>
+                        
                         <MenuItem Header="{x:Static lp:Resources.ImportSIStorage}" Command="{Binding ImportFromSIStore}" />
                     </ContextMenu>
                 </siq:DropDownButton.DropDown>

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SIQuester.Helpers;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,9 +8,9 @@ internal static class ScrollHelper
 {
     private const double ScrollAreaHeight = 40.0;
 
-    internal static void ScrollView(DragEventArgs e, ScrollViewer scrollViewer = null)
+    internal static void ScrollView(DragEventArgs e, ScrollViewer? scrollViewer = null)
     {
-        var scroller = scrollViewer ?? FlatDocView.FindAncestor<ScrollViewer>((DependencyObject)e.OriginalSource);
+        var scroller = scrollViewer ?? VisualHelper.TryFindAncestor<ScrollViewer>((DependencyObject)e.OriginalSource);
 
         if (scroller == null)
         {

@@ -154,6 +154,7 @@ public sealed class ExportViewModel : WorkspaceViewModel
     private async Task ExportMediaAsync(string filename)
     {
         var extMedia = new List<IMedia>();
+        var extMediaNew = new List<(MediaInfo, string)>();
 
         foreach (var round in _source.Package.Rounds)
         {
@@ -178,6 +179,19 @@ public sealed class ExportViewModel : WorkspaceViewModel
                             }
                         }
                     }
+
+                    foreach (var content in quest.Model.GetContent())
+                    {
+                        if (content.IsRef)
+                        {
+                            var mediaInfo = _source.Document.TryGetMedia(content);
+
+                            if (mediaInfo.HasValue && mediaInfo.Value.HasStream)
+                            {
+                                extMediaNew.Add((mediaInfo.Value, content.Value));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -194,6 +208,30 @@ public sealed class ExportViewModel : WorkspaceViewModel
                 var file = Path.Combine(folder, media.Uri);
                 using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
                 await stream.CopyToAsync(fs);
+            }
+        }
+
+        if (extMediaNew.Any())
+        {
+            var name = Path.GetFileNameWithoutExtension(filename);
+            var folder = Path.Combine(Path.GetDirectoryName(filename), name + "_Media");
+            Directory.CreateDirectory(folder);
+
+            foreach (var (media, fileName) in extMediaNew)
+            {
+                var stream = media.Stream;
+
+                if (stream == null)
+                {
+                    continue;
+                }
+
+                using (stream)
+                {
+                    var file = Path.Combine(folder, fileName);
+                    using var fs = File.Open(file, FileMode.Create, FileAccess.Write);
+                    await stream.CopyToAsync(fs);
+                }
             }
         }
     }

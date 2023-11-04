@@ -979,6 +979,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка копирования данных.
+        /// </summary>
+        public static string DataCopyError {
+            get {
+                return ResourceManager.GetString("DataCopyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Удалить.
         /// </summary>
         public static string Delete {
@@ -1263,6 +1272,15 @@ namespace SIQuester.Properties {
         public static string FileImport {
             get {
                 return ResourceManager.GetString("FileImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на слишком большой объём.
+        /// </summary>
+        public static string FileTooLarge {
+            get {
+                return ResourceManager.GetString("FileTooLarge", resourceCulture);
             }
         }
         

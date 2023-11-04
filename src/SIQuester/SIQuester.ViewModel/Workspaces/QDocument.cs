@@ -22,7 +22,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using System.Windows;
 using System.Windows.Input;
 using System.Xml;
 using System.Xml.Xsl;
@@ -469,13 +468,23 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    internal DataCollection GetCollection(string name) =>
+    internal DataCollection GetInternalCollection(string name) =>
         name switch
         {
             CollectionNames.ImagesStorageName => Document.Images,
             CollectionNames.AudioStorageName => Document.Audio,
             CollectionNames.VideoStorageName => Document.Video,
             CollectionNames.HtmlStorageName => Document.Html,
+            _ => throw new ArgumentException($"Invalid collection name {name}", nameof(name))
+        };
+
+    public MediaStorageViewModel GetCollection(string name) =>
+        name switch
+        {
+            CollectionNames.ImagesStorageName => Images,
+            CollectionNames.AudioStorageName => Audio,
+            CollectionNames.VideoStorageName => Video,
+            CollectionNames.HtmlStorageName => Html,
             _ => throw new ArgumentException($"Invalid collection name {name}", nameof(name))
         };
 

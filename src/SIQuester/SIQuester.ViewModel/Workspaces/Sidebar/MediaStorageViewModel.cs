@@ -367,7 +367,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         HasPendingChanges = IsChanged();
     }
 
-    internal void AddFile(string file, string? name = null)
+    public MediaItemViewModel AddFile(string file, string? name = null)
     {
         var localName = name ?? Path.GetFileName(file).Replace("%", "");
 
@@ -400,6 +400,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 PreviewAdd(item, file);
                 HasPendingChanges = IsChanged();
             }));
+
+        return item;
     }
 
     private void PreviewAdd(MediaItemViewModel item, string path)
@@ -437,7 +439,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         _document.Lock.WithLock(
             () =>
             {
-                var collection = _document.GetCollection(_name);
+                var collection = _document.GetInternalCollection(_name);
                 return collection.GetFileLength(link);
             });
 
@@ -453,7 +455,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         return _document.Lock.WithLock(
             () =>
             {
-                var collection = _document.GetCollection(_name);
+                var collection = _document.GetInternalCollection(_name);
 
                 return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
                     new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
@@ -484,7 +486,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     /// <param name="mediaItem">Media file.</param>
     internal Stream? TryGetStream(MediaItemViewModel mediaItem)
     {
-        var collection = _document.GetCollection(_name);
+        var collection = _document.GetInternalCollection(_name);
         var streamInfo = collection.GetFile(mediaItem.Model.Name);
         return streamInfo?.Stream;
     }

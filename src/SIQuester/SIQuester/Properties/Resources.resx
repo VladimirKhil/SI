@@ -423,6 +423,9 @@
   <data name="CutTemplate" xml:space="preserve">
     <value>Вырезать шаблон</value>
   </data>
+  <data name="DataCopyError" xml:space="preserve">
+    <value>Ошибка копирования данных</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>
@@ -518,6 +521,9 @@
   </data>
   <data name="FileImport" xml:space="preserve">
     <value>Импорт файла</value>
+  </data>
+  <data name="FileTooLarge" xml:space="preserve">
+    <value>слишком большой объём</value>
   </data>
   <data name="FillPrices" xml:space="preserve">
     <value>Задать стоимости</value>
