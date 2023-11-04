@@ -815,6 +815,11 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                     _logic.OnContent(mparams);
                     break;
 
+                case Messages.ContentAppend:
+                    _ignoreAtoms = true;
+                    _logic.OnContentAppend(mparams);
+                    break;
+
                 case Messages.Atom_Hint:
                     if (mparams.Length > 1)
                     {
@@ -985,9 +990,6 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                             ClientData.Players[i].InGame = i + 1 < mparams.Length && mparams[i + 1] == "+";
                         }
 
-                        ClientData.AtomIndex = -1;
-                        ClientData.IsPartial = false;
-
                         #endregion
                         break;
                     }
@@ -1112,11 +1114,9 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
     private void OnQuestionType(string[] mparams)
     {
         ClientData.AtomType = AtomTypes.Text;
-        ClientData.AtomIndex = -1;
-        ClientData.IsPartial = false;
         ClientData.QuestionType = mparams[1];
 
-        _logic.OnQuestionType();
+        _logic.OnQuestionStart();
     }
 
     private void OnChoice(string[] mparams)

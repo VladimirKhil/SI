@@ -209,14 +209,7 @@ public sealed class ViewerData : Data
     /// </summary>
     public string QuestionType { get; set; }
 
-    public bool IsPartial { get; set; }
-
     public string AtomType { get; set; } = "";
-
-    /// <summary>
-    /// Номер текущего атома сценария вопроса
-    /// </summary>
-    public int AtomIndex { get; set; }
 
     internal int Winner { get; set; }
 
@@ -615,9 +608,9 @@ public sealed class ViewerData : Data
     }
 
     /// <summary>
-    /// External media uri.
+    /// External content that can be loaded only after user approval.
     /// </summary>
-    public string ExternalUri { get; internal set; }
+    public List<(string ContentType, string Uri)> ExternalContent { get; } = new();
 
     private string[] _roundNames = Array.Empty<string>();
 

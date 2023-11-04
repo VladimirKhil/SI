@@ -347,7 +347,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
         try
         {
-            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.OnlineGameUrl}{Host.Connector?.GameId}&invite=true");
+            Host.AddLog($"{Resources.OnlineGameAddress}: {CommonSettings.NewOnlineGameUrl}{Host.Connector?.GameId}&invite=true");
         }
         catch (Exception exc)
         {

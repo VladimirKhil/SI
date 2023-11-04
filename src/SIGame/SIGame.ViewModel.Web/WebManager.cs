@@ -70,6 +70,17 @@ public sealed class WebManager : IFileShare
             });
         }
 
+        var htmlFolder = Path.Combine(packageFolder, CollectionNames.HtmlStorageName);
+
+        if (Directory.Exists(htmlFolder))
+        {
+            _webApplication.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(htmlFolder),
+                RequestPath = "/package/Html",
+            });
+        }
+
         _webApplication.RunAsync($"http://+:{port}");
     }
 

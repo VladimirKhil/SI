@@ -72,7 +72,7 @@ public class MainTest
 
         Assert.IsNotNull(siOnline);
 
-        await siOnline.InitAsync();
+        await siOnline!.InitAsync();
 
         siOnline.NewGame.Execute(null);
 
@@ -81,7 +81,9 @@ public class MainTest
         gameSettings.NetworkGamePassword = "testpass";
         gameSettings.Role = gameRole;
 
-        gameSettings.SelectPackage.Execute(packageSourceType);
+        gameSettings.StorageInfo.Model.DefaultRestriction = null;
+
+        await gameSettings.SelectPackage.ExecuteAsync(packageSourceType);
 
         if (packageSourceType == PackageSourceTypes.SIStorage)
         {
@@ -96,14 +98,14 @@ public class MainTest
             if (gameSettings.StorageInfo.Model.Packages == null)
             {
                 Assert.Fail("Could not load storage packages");
+                return;
             }
 
             var packageId = Guid.Parse("d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6");
 
-            var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(
-                p => p.Model.Id == packageId);
+            var package = gameSettings.StorageInfo.Model.Packages.FirstOrDefault(p => p.Model.Id == packageId);
 
-            Assert.IsNotNull(package);
+            Assert.IsNotNull(package, "Package not found");
 
             var storage = gameSettings.StorageInfo.Model.CurrentPackage = package;
 
@@ -147,7 +149,7 @@ public class MainTest
         Assert.IsNull(contentBox2, ((LoginViewModel?)contentBox2?.Data)?.Error);
 
         var siOnline2 = (SIOnlineViewModel?)mainViewModel.ActiveView;
-        siOnline2.Cancel.Execute(null);
+        siOnline2?.Cancel.Execute(null);
     }
 
     private static async void TInfo_PropertyChanged(object? sender, PropertyChangedEventArgs e)

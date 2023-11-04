@@ -124,7 +124,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void OnQuestionType()
+    public void OnQuestionStart()
     {
 
     }

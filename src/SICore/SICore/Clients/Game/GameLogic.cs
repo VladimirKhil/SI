@@ -433,7 +433,9 @@ public sealed class GameLogic : Logic<GameData>
             // Real question text is sent later and it sequentially replaces test shape
             // Text shape is required to display partial question on the screen correctly
             // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
-            _gameActions.SendMessageWithArgs(Messages.TextShape, Regex.Replace(text, "[^\r\n\t\f ]", "и"));
+            var shape = Regex.Replace(text, "[^\r\n\t\f ]", "и");
+            _gameActions.SendMessageWithArgs(Messages.TextShape, shape);
+            _gameActions.SendMessageWithArgs(Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape);
 
             _data.Text = text;
             _data.TextLength = 0;
@@ -2727,7 +2729,7 @@ public sealed class GameLogic : Logic<GameData>
 
         var subText = text.Substring(_data.TextLength, printingLength);
 
-        _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, Constants.PartialText, subText.EscapeNewLines());
+        _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
         _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
         _gameActions.SystemReplic(subText);
 

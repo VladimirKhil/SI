@@ -241,10 +241,12 @@ public sealed class StorageViewModel : INotifyPropertyChanged
             IsLoading = false;
         }
 
-        LoadPackages(cancellationToken);
+        await LoadPackagesAsync(cancellationToken);
     }
 
-    private async void LoadPackages(CancellationToken cancellationToken = default)
+    private async void LoadPackages(CancellationToken cancellationToken = default) => await LoadPackagesAsync(cancellationToken);
+
+    private async Task LoadPackagesAsync(CancellationToken cancellationToken = default)
     {
         IsLoadingPackages = true;
 

@@ -345,9 +345,9 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         Content = null;
     }
 
-    private readonly ExtendedCommand _selectPackage;
+    private readonly AsyncContextCommand _selectPackage;
 
-    public ICommand SelectPackage => _selectPackage;
+    public AsyncContextCommand SelectPackage => _selectPackage;
 
     private ICommand _closeNewShowman;
 
@@ -399,32 +399,32 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
 
         _maxPackageSize = maxPackageSize;
 
-        _selectPackage = new ExtendedCommand(SelectPackage_Executed);
+        _selectPackage = new AsyncContextCommand(SelectPackage_Executed);
 
-        _selectPackage.ExecutionArea.Add(PackageSourceTypes.Local);
-        _selectPackage.ExecutionArea.Add(PackageSourceTypes.SIStorage);
-        _selectPackage.ExecutionArea.Add(PackageSourceTypes.VK);
+        _selectPackage.ExecutionContext.Add(PackageSourceTypes.Local);
+        _selectPackage.ExecutionContext.Add(PackageSourceTypes.SIStorage);
+        _selectPackage.ExecutionContext.Add(PackageSourceTypes.VK);
 
         var packageDirExists = Directory.Exists(Global.PackagesUri);
 
         if (packageDirExists)
         {
-            _selectPackage.ExecutionArea.Add(PackageSourceTypes.Random);
+            _selectPackage.ExecutionContext.Add(PackageSourceTypes.Random);
         }
 
         if (NetworkGame && NetworkGameType == NetworkGameType.GameServer)
         {
-            _selectPackage.ExecutionArea.Add(PackageSourceTypes.RandomServer);
+            _selectPackage.ExecutionContext.Add(PackageSourceTypes.RandomServer);
         }
 
         if (packageDirExists)
         {
-            _selectPackage.ExecutionArea.Add(PackageSourceTypes.Next);
+            _selectPackage.ExecutionContext.Add(PackageSourceTypes.Next);
         }
 
         if (_package == null)
         {
-            if (_model.PackageKey != null && _selectPackage.ExecutionArea.Contains(_model.PackageKey.Type))
+            if (_model.PackageKey != null && _selectPackage.ExecutionContext.Contains(_model.PackageKey.Type))
             {
                 switch (_model.PackageKey.Type)
                 {
@@ -501,8 +501,13 @@ public sealed class GameSettingsViewModel : ViewModelWithNewAccount<GameSettings
         _closeContent.Execute(arg);
     }
 
-    private async void SelectPackage_Executed(object? arg)
+    private async Task SelectPackage_Executed(object? arg)
     {
+        if (arg == null)
+        {
+            return;
+        }
+
         var code = (PackageSourceTypes)arg;
 
         switch (code)

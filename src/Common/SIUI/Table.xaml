@@ -441,7 +441,7 @@
                                     Style="{StaticResource QuestionText}"
                                     Margin="10"
                                     TextOptions.TextFormattingMode="Ideal"
-                                    lb:QuestionReading.IsAttached="True">
+                                    lb:QuestionReading.TextSpeed="{Binding TextSpeed}">
                                     <TextBlock.CacheMode>
                                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                     </TextBlock.CacheMode>
@@ -463,8 +463,7 @@
                                     TextWrapping="Wrap"
                                     HorizontalAlignment="Left"
                                     TextAlignment="Left"
-                                    lb:QuestionReading.IsAttachedPartial="True">
-                                    
+                                    lb:QuestionReading.IsAttachedPartial="True">                                    
                                     <TextBlock.CacheMode>
                                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                     </TextBlock.CacheMode>
@@ -496,7 +495,7 @@
                                                 Style="{StaticResource QuestionText}"
                                                 Margin="10"
                                                 TextOptions.TextFormattingMode="Ideal"
-                                                lb:QuestionReading.IsAttached="True">
+                                                lb:QuestionReading.TextSpeed="{Binding DataContext.TextSpeed, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
                                                 <TextBlock.CacheMode>
                                                     <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                                 </TextBlock.CacheMode>
@@ -523,7 +522,6 @@
                                                 HorizontalAlignment="Left"
                                                 TextAlignment="Left"
                                                 lb:QuestionReading.IsAttachedPartial="True">
-
                                                 <TextBlock.CacheMode>
                                                     <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                                 </TextBlock.CacheMode>

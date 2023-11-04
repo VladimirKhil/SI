@@ -130,6 +130,16 @@ public static class Messages
     public const string Content = "CONTENT";
 
     /// <summary>
+    /// Appends content to existing table content.
+    /// </summary>
+    public const string ContentAppend = "CONTENT_APPEND";
+
+    /// <summary>
+    /// Defines content shape without providing real content.
+    /// </summary>
+    public const string ContentShape = "CONTENT_SHAPE";
+
+    /// <summary>
     /// Удаление темы
     /// </summary>
     public const string Delete = "DELETE";

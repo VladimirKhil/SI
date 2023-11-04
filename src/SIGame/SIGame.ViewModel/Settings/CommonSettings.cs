@@ -1,6 +1,5 @@
 ﻿using SIData;
 using SIGame.ViewModel;
-using SIStatisticsService.Contract.Models;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 
@@ -28,6 +27,8 @@ public sealed class CommonSettings
     public const string LogsFolderName = "Logs";
 
     internal const string OnlineGameUrl = "https://vladimirkhil.com/si/online/?gameId=";
+    
+    internal const string NewOnlineGameUrl = "https://sigame.vladimirkhil.com/?gameId=";
 
     /// <summary>
     /// Экземпляр общих настроек

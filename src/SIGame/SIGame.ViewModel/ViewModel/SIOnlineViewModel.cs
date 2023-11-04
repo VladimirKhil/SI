@@ -503,12 +503,15 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     }
 
     private bool FilteredOk(GameInfo game) =>
-        string.IsNullOrWhiteSpace(SearchFilter) ||
-            !SearchFilter.StartsWith(CommonSettings.OnlineGameUrl) &&
-                CultureInfo.CurrentUICulture.CompareInfo.IndexOf(game.GameName, SearchFilter.Trim(), CompareOptions.IgnoreCase) >= 0 ||
-            SearchFilter.StartsWith(CommonSettings.OnlineGameUrl) &&
-                int.TryParse(SearchFilter.AsSpan(CommonSettings.OnlineGameUrl.Length), out int gameId) &&
-                game.GameID == gameId;
+        string.IsNullOrWhiteSpace(SearchFilter)
+        || !SearchFilter.StartsWith(CommonSettings.OnlineGameUrl)
+            && CultureInfo.CurrentUICulture.CompareInfo.IndexOf(game.GameName, SearchFilter.Trim(), CompareOptions.IgnoreCase) >= 0
+        || SearchFilter.StartsWith(CommonSettings.OnlineGameUrl)
+            && int.TryParse(SearchFilter.AsSpan(CommonSettings.OnlineGameUrl.Length), out int gameId)
+            && game.GameID == gameId
+        || SearchFilter.StartsWith(CommonSettings.NewOnlineGameUrl)
+            && int.TryParse(SearchFilter.AsSpan(CommonSettings.NewOnlineGameUrl.Length), out int gameId2)
+            && game.GameID == gameId2;
 
     private bool FilterGame(GameInfo gameInfo)
     {

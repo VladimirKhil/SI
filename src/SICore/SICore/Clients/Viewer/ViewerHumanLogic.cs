@@ -557,6 +557,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         var contentType = mparams[3];
         var contentValue = mparams[4];
 
+        _data.ExternalContent.Clear();
+
         switch (placement)
         {
             case ContentPlacements.Screen:
@@ -582,6 +584,44 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
+    public void OnContentAppend(string[] mparams)
+    {
+        if (mparams.Length < 5)
+        {
+            return;
+        }
+
+        var placement = mparams[1]; // Screen only
+        var layoutId = mparams[2]; // 0 only
+        var contentType = mparams[3];
+        var contentValue = mparams[4]; // Text only
+
+        if (placement != ContentPlacements.Screen || layoutId != "0" || contentType != ContentTypes.Text)
+        {
+            return;
+        }
+
+        if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
+        {
+            _data.Speaker.Replic = "";
+        }
+
+        _data.AtomType = contentType;
+
+        var text = contentValue.UnescapeNewLines();
+
+        var currentText = TInfo.Text ?? "";
+        var newTextLength = text.Length;
+
+        var tailIndex = TInfo.TextLength + newTextLength;
+
+        TInfo.Text = currentText[..TInfo.TextLength]
+            + text
+            + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
+
+        TInfo.TextLength += newTextLength;
+    }
+
     private void OnScreenContent(string contentType, string contentValue)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
@@ -591,77 +631,30 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         _data.AtomType = contentType;
 
-        var isPartial = _data.AtomType == Constants.PartialText;
-
-        if (isPartial)
-        {
-            if (!_data.IsPartial)
-            {
-                _data.IsPartial = true;
-                _data.AtomIndex++;
-            }
-        }
-        else
-        {
-            _data.IsPartial = false;
-            _data.AtomIndex++;
-            TInfo.Text = "";
-            TInfo.PartialText = false;
-        }
-
         TInfo.TStage = TableStage.Question;
-        TInfo.IsMediaStopped = false;
 
-        _data.EnableMediaLoadButton = false;
+        var content = new List<ContentViewModel>();
 
-        switch (_data.AtomType)
+        switch (contentType)
         {
             case ContentTypes.Text:
-            case Constants.PartialText:
                 var text = contentValue.UnescapeNewLines();
-
-                if (isPartial)
-                {
-                    var currentText = TInfo.Text ?? "";
-                    var newTextLength = text.Length;
-
-                    var tailIndex = TInfo.TextLength + newTextLength;
-
-                    TInfo.Text = currentText[..TInfo.TextLength]
-                        + text
-                        + (currentText.Length > tailIndex ? currentText[tailIndex..] : "");
-
-                    TInfo.TextLength += newTextLength;
-                }
-                else
-                {
-                    TInfo.Text = text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…");
-                }
-
-                TInfo.QuestionContentType = QuestionContentType.Text;
-                TInfo.Sound = false;
-                _data.EnableMediaLoadButton = false;
+                content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…")));
                 break;
 
             case ContentTypes.Video:
-            case ContentTypes.Audio:
             case ContentTypes.Image:
             case ContentTypes.Html:
-                string uri;
+                var uri = contentValue;
 
-                uri = contentValue;
-
-                if (_data.AtomType != AtomTypes.Html
+                if (contentType != ContentTypes.Html
                     && !uri.StartsWith("http://localhost")
                     && !Data.Host.LoadExternalMedia
                     && !ExternalUrlOk(uri))
                 {
-                    TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
-                    TInfo.QuestionContentType = QuestionContentType.SpecialText;
-                    TInfo.Sound = false;
-
+                    content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri), 3.0));
                     _data.EnableMediaLoadButton = true;
-                    _data.ExternalUri = uri;
+                    _data.ExternalContent.Add((contentType, uri));
                     return;
                 }
 
@@ -672,34 +665,16 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
                 uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
 
-                if (_data.AtomType == ContentTypes.Image)
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Image;
-                    TInfo.Sound = false;
-                }
-                else if (_data.AtomType == ContentTypes.Audio)
-                {
-                    TInfo.SoundSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Clef;
-                    TInfo.Sound = true;
-                }
-                else if (_data.AtomType == ContentTypes.Video)
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Video;
-                    TInfo.Sound = false;
-                }
-                else // ContentTypes.Html
-                {
-                    TInfo.MediaSource = new MediaSource(uri);
-                    TInfo.QuestionContentType = QuestionContentType.Html;
-                    TInfo.Sound = false;
-                }
+                var tableContentType = contentType == ContentTypes.Image
+                    ? ContentType.Image
+                    : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
-                _data.EnableMediaLoadButton = false;
+                content.Add(new ContentViewModel(tableContentType, uri, 3.0));
                 break;
         }
+
+        TInfo.Content = content;
+        TInfo.QuestionContentType = QuestionContentType.Collection;
     }
 
     private void OnReplicText(string text) => OnReplic(ReplicCodes.Showman.ToString(), text.UnescapeNewLines());
@@ -716,10 +691,9 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             TInfo.Text = string.Format(_localizer[nameof(R.ExternalLink)], uri);
             TInfo.QuestionContentType = QuestionContentType.SpecialText;
-            TInfo.Sound = false;
-
             _data.EnableMediaLoadButton = true;
-            _data.ExternalUri = uri;
+            _data.ExternalContent.Add((ContentTypes.Audio, uri));
+            return;
         }
 
         if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
@@ -738,6 +712,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
+    [Obsolete]
     public void OnScreenContent(string[] mparams)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
@@ -749,19 +724,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         var isPartial = _data.AtomType == Constants.PartialText;
 
-        if (isPartial)
+        if (!isPartial)
         {
-            if (!_data.IsPartial)
-            {
-                _data.IsPartial = true;
-                _data.AtomIndex++;
-            }
-        }
-        else
-        {
-            _data.IsPartial = false;
-            _data.AtomIndex++;
-
             if (_data.AtomType != AtomTypes.Oral)
             {
                 TInfo.Text = "";
@@ -852,7 +816,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                             TInfo.Sound = false;
 
                             _data.EnableMediaLoadButton = true;
-                            _data.ExternalUri = uri;
+                            _data.ExternalContent.Add((_data.AtomType, uri));
                             return;
                         }
 
@@ -903,23 +867,29 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     {
         _data.EnableMediaLoadButton = false;
 
-        switch (_data.AtomType)
+        var externalContent = _data.ExternalContent.FirstOrDefault();
+
+        if (externalContent == default)
+        {
+            return;
+        }
+
+        TInfo.MediaSource = new MediaSource(externalContent.Uri);
+
+        switch (externalContent.ContentType)
         {
             case AtomTypes.Image:
-                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
                 TInfo.QuestionContentType = QuestionContentType.Image;
                 TInfo.Sound = false;
                 break;
 
             case AtomTypes.Audio:
             case AtomTypes.AudioNew:
-                TInfo.SoundSource = new MediaSource(_data.ExternalUri);
                 TInfo.QuestionContentType = QuestionContentType.Clef;
                 TInfo.Sound = true;
                 break;
 
             case AtomTypes.Video:
-                TInfo.MediaSource = new MediaSource(_data.ExternalUri);
                 TInfo.QuestionContentType = QuestionContentType.Video;
                 TInfo.Sound = false;
                 break;
@@ -973,7 +943,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                             TInfo.Sound = false;
 
                             _data.EnableMediaLoadButton = true;
-                            _data.ExternalUri = uri;
+                            _data.ExternalContent.Add((atomType, uri));
                         }
 
                         break;
@@ -1045,11 +1015,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
     virtual public void EndTry(string text)
     {
         TInfo.QuestionStyle = QuestionStyle.Normal;
-
-        if (_data.AtomType == AtomTypes.Audio || _data.AtomType == AtomTypes.AudioNew || _data.AtomType == AtomTypes.Video)
-        {
-            TInfo.IsMediaStopped = true;
-        }
+        TInfo.IsMediaStopped = true;
 
         if (!int.TryParse(text, out int number))
         {
@@ -1117,15 +1083,19 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         _data.Players[playerIndex].State = PlayerState.HasAnswered;
     }
 
-    public void OnQuestionType()
+    public void OnQuestionStart()
     {
         TInfo.QuestionContentType = QuestionContentType.Text;
         TInfo.Sound = false;
         TInfo.LayoutMode = LayoutMode.Simple;
+        TInfo.PartialText = false;
+        TInfo.IsMediaStopped = false;
+        _data.EnableMediaLoadButton = false;
+        _data.ExternalContent.Clear();
 
         switch (_data.QuestionType)
         {
-            case QuestionTypes.Auction:
+            case QuestionTypes.Auction: // deprecated
             case QuestionTypes.Stake:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Auction)];
@@ -1143,8 +1113,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     break;
                 }
 
-            case QuestionTypes.Cat:
-            case QuestionTypes.BagCat:
+            case QuestionTypes.Cat: // deprecated
+            case QuestionTypes.BagCat: // deprecated
             case QuestionTypes.Secret:
             case QuestionTypes.SecretNoQuestion:
             case QuestionTypes.SecretPublicPrice:
@@ -1164,7 +1134,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                     break;
                 }
 
-            case QuestionTypes.Sponsored:
+            case QuestionTypes.Sponsored: // deprecated
             case QuestionTypes.NoRisk:
                 {
                     TInfo.Text = _localizer[nameof(R.Label_Sponsored)];

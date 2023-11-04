@@ -41,8 +41,7 @@ public sealed class AsyncCommand : IAsyncCommand
 
     public bool CanExecute(object? parameter) => _canBeExecuted;
 
-    [Obsolete("Use ExecuteAsync instead")]
-    public async void Execute(object? parameter) => await _execute(parameter); // TODO: throw NotSupported because `async void` is a bad practice
+    public void Execute(object? parameter) => _execute(parameter);
 
     public Task ExecuteAsync(object? parameter) => _execute(parameter);
 }

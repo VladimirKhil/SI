@@ -16,26 +16,19 @@ public static class QuestionReading
         TextBlock.TextProperty,
         typeof(TextBlock));
 
-    public static bool GetIsAttached(DependencyObject obj) => (bool)obj.GetValue(IsAttachedProperty);
+    public static double GetTextSpeed(DependencyObject obj) => (double)obj.GetValue(TextSpeedProperty);
 
-    public static void SetIsAttached(DependencyObject obj, bool value) => obj.SetValue(IsAttachedProperty, value);
+    public static void SetTextSpeed(DependencyObject obj, double value) => obj.SetValue(TextSpeedProperty, value);
 
-    // Using a DependencyProperty as the backing store for IsAttached.  This enables animation, styling, binding, etc...
-    public static readonly DependencyProperty IsAttachedProperty =
-        DependencyProperty.RegisterAttached("IsAttached", typeof(bool), typeof(QuestionReading), new PropertyMetadata(false, OnIsAttachedChanged));
+    public static readonly DependencyProperty TextSpeedProperty =
+        DependencyProperty.RegisterAttached("TextSpeed", typeof(double), typeof(QuestionReading), new PropertyMetadata(0.0, OnTextSpeedChanged));
 
-    public static void OnIsAttachedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public static void OnTextSpeedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         var textBlock = (TextBlock)d;
-        var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
 
-        if ((bool)e.NewValue)
+        if ((double)e.NewValue > 0)
         {
-            if (tableInfoViewModel.TextSpeed < double.Epsilon)
-            {
-                return;
-            }
-
             textBlock.Loaded += OnLoaded;
             textBlock.DataContextChanged += TextBlock_DataContextChanged;
             TextProperty.AddValueChanged(textBlock, TextBlock_TextChanged);
@@ -73,15 +66,15 @@ public static class QuestionReading
 
     private static void AnimateTextReading(TextBlock textBlock)
     {
-        var tableInfoViewModel = (TableInfoViewModel)textBlock.DataContext;
+        var textSpeed = GetTextSpeed(textBlock);
 
         textBlock.TextEffects[0].BeginAnimation(
             TextEffect.PositionCountProperty,
             new Int32Animation
             {
                 From = 0,
-                To = tableInfoViewModel.Text.Length,
-                Duration = new Duration(TimeSpan.FromSeconds(tableInfoViewModel.Text.Length * tableInfoViewModel.TextSpeed))
+                To = textBlock.Text.Length,
+                Duration = new Duration(TimeSpan.FromSeconds(textBlock.Text.Length * textSpeed))
             });
     }
 

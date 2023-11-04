@@ -51,11 +51,13 @@ public interface IViewerLogic : ILogic
     /// <summary>
     /// Question fragment received.
     /// </summary>
+    [Obsolete]
     void OnScreenContent(string[] mparams);
 
     /// <summary>
     /// Question background fragment received.
     /// </summary>
+    [Obsolete]
     void OnBackgroundContent(string[] mparams);
 
     void SetRight(string answer);
@@ -83,9 +85,9 @@ public interface IViewerLogic : ILogic
     void Person(int playerIndex, bool isRight);
 
     /// <summary>
-    /// Известен тип вопроса
+    /// Handles question start.
     /// </summary>
-    void OnQuestionType();
+    void OnQuestionStart();
 
     /// <summary>
     /// Завершение раунда
@@ -177,4 +179,6 @@ public interface IViewerLogic : ILogic
     void OnAnswerOptions(int optionCount) { }
 
     void OnContent(string[] mparams) { }
+
+    void OnContentAppend(string[] mparams) { }
 }
