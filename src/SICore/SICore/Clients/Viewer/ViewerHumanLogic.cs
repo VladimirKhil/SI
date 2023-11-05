@@ -18,6 +18,8 @@ namespace SICore;
 /// </summary>
 public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 {
+    private record struct ContentInfo(string Type, string Uri);
+
     private static readonly TimeSpan HintLifetime = TimeSpan.FromSeconds(6);
 
     private bool _disposed = false;
@@ -553,19 +555,29 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
 
         var placement = mparams[1];
-        var layoutId = mparams[2]; // Not used for now
-        var contentType = mparams[3];
-        var contentValue = mparams[4];
+
+        var content = new List<ContentInfo>();
+
+        for (var i = 2; i + 2 < mparams.Length; i++)
+        {
+            var layoutId = mparams[i]; // Not used for now
+            var contentType = mparams[i + 1];
+            var contentValue = mparams[i + 2];
+
+            content.Add(new ContentInfo(contentType, contentValue));
+        }
 
         _data.ExternalContent.Clear();
 
         switch (placement)
         {
             case ContentPlacements.Screen:
-                OnScreenContent(contentType, contentValue);
+                OnScreenContent(content);
                 break;
 
             case ContentPlacements.Replic:
+                var (contentType, contentValue) = content.LastOrDefault();
+
                 if (contentType == ContentTypes.Audio)
                 {
                     OnReplicText(contentValue);
@@ -573,9 +585,11 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                 break;
 
             case ContentPlacements.Background:
-                if (contentType == ContentTypes.Audio)
+                var (contentType2, contentValue2) = content.LastOrDefault();
+
+                if (contentType2 == ContentTypes.Audio)
                 {
-                    OnBackgroundAudio(contentValue);
+                    OnBackgroundAudio(contentValue2);
                 }
                 break;
 
@@ -622,55 +636,58 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.TextLength += newTextLength;
     }
 
-    private void OnScreenContent(string contentType, string contentValue)
+    private void OnScreenContent(IEnumerable<ContentInfo> contentInfo)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
         {
             _data.Speaker.Replic = "";
         }
 
-        _data.AtomType = contentType;
-
         TInfo.TStage = TableStage.Question;
 
         var content = new List<ContentViewModel>();
 
-        switch (contentType)
+        foreach (var (contentType, contentValue) in contentInfo)
         {
-            case ContentTypes.Text:
-                var text = contentValue.UnescapeNewLines();
-                content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…")));
-                break;
+            _data.AtomType = contentType;
 
-            case ContentTypes.Video:
-            case ContentTypes.Image:
-            case ContentTypes.Html:
-                var uri = contentValue;
+            switch (contentType)
+            {
+                case ContentTypes.Text:
+                    var text = contentValue.UnescapeNewLines();
+                    content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…"), TextSpeed: content.Count == 0 ? TInfo.TextSpeed : 0.0));
+                    break;
 
-                if (contentType != ContentTypes.Html
-                    && !uri.StartsWith("http://localhost")
-                    && !Data.Host.LoadExternalMedia
-                    && !ExternalUrlOk(uri))
-                {
-                    content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri), 3.0));
-                    _data.EnableMediaLoadButton = true;
-                    _data.ExternalContent.Add((contentType, uri));
-                    return;
-                }
+                case ContentTypes.Video:
+                case ContentTypes.Image:
+                case ContentTypes.Html:
+                    var uri = contentValue;
 
-                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
-                {
-                    return;
-                }
+                    if (contentType != ContentTypes.Html
+                        && !uri.StartsWith("http://localhost")
+                        && !Data.Host.LoadExternalMedia
+                        && !ExternalUrlOk(uri))
+                    {
+                        content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri), 3.0));
+                        _data.EnableMediaLoadButton = true;
+                        _data.ExternalContent.Add((contentType, uri));
+                        return;
+                    }
 
-                uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
+                    if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var mediaUri))
+                    {
+                        return;
+                    }
 
-                var tableContentType = contentType == ContentTypes.Image
-                    ? ContentType.Image
-                    : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
+                    uri = _localFileManager.TryGetFile(mediaUri) ?? uri;
 
-                content.Add(new ContentViewModel(tableContentType, uri, 3.0));
-                break;
+                    var tableContentType = contentType == ContentTypes.Image
+                        ? ContentType.Image
+                        : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
+
+                    content.Add(new ContentViewModel(tableContentType, uri, 3.0));
+                    break;
+            }
         }
 
         TInfo.Content = content;

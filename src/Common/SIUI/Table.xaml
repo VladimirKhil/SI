@@ -495,7 +495,7 @@
                                                 Style="{StaticResource QuestionText}"
                                                 Margin="10"
                                                 TextOptions.TextFormattingMode="Ideal"
-                                                lb:QuestionReading.TextSpeed="{Binding DataContext.TextSpeed, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
+                                                lb:QuestionReading.TextSpeed="{Binding TextSpeed}">
                                                 <TextBlock.CacheMode>
                                                     <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                                 </TextBlock.CacheMode>
