@@ -423,7 +423,8 @@ public partial class App : Application
         }
         else if (e.Exception is COMException
             || e.Exception.ToString().Contains("UpdateTaskbarProgressState")
-            || e.Exception.ToString().Contains("FindNameInTemplateContent"))
+            || e.Exception.ToString().Contains("FindNameInTemplateContent")
+            || e.Exception is UnauthorizedAccessException)
         {
             MessageBox.Show(
                 string.Format("{0}: {1}", SIQuester.Properties.Resources.CommonAppError, e.ToString()),

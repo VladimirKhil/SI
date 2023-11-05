@@ -17,9 +17,13 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
 {
     private const string RootNodeName = "SVOYAK";
 
+    private static DBNode[] FakeChildren => new[] { new DBNode() };
+
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public override string Header => Resources.DBStorage;
+
+    private readonly SemaphoreSlim _loadLock = new(1, 1);
 
     private DBNode[]? _tours = null;
 
@@ -113,6 +117,8 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         _cancellationTokenSource.Cancel();
         // TODO: await tasks cancellation to finish
         _cancellationTokenSource.Dispose();
+
+        _loadLock.Dispose();
 
         base.Dispose(disposing);
     }
@@ -407,11 +413,16 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
     public async void LoadChildren(DBNode node)
     {
         IsProgress = true;
-        node.Children = null;
+
+        await _loadLock.WaitAsync();
 
         try
         {
-            node.Children = await LoadNodesAsync(node.Key, _cancellationTokenSource.Token);
+            if (!node.ChildrenLoaded)
+            {
+                node.Children = await LoadNodesAsync(node.Key, _cancellationTokenSource.Token);
+                node.ChildrenLoaded = true;
+            }
         }
         catch (Exception exc)
         {
@@ -419,6 +430,7 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
         }
         finally
         {
+            _loadLock.Release();
             IsProgress = false;
         }
 
@@ -447,7 +459,8 @@ public sealed class ImportDBStorageViewModel : WorkspaceViewModel
             {
                 Name = $"{node["Title"].InnerText} {node["PlayedAt"].InnerText} ({Resources.OfThemes}: {node["QuestionsNum"].InnerText})",
                 Key = trim ? Path.GetFileNameWithoutExtension(node["FileName"].InnerText) : node["FileName"].InnerText,
-                Children = isLeaf ? Array.Empty<DBNode>() : new DBNode[] { null }
+                ChildrenLoaded = isLeaf,
+                Children = isLeaf ? Array.Empty<DBNode>() : FakeChildren
             });
         }
 

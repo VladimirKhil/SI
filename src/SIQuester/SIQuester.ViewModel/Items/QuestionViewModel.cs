@@ -321,10 +321,10 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
     private void SwitchEmpty_Executed(object? arg)
     {
-        var document = OwnerTheme.OwnerRound.OwnerPackage.Document;
-
         try
         {
+            var document = OwnerTheme?.OwnerRound?.OwnerPackage?.Document ?? throw new InvalidOperationException("document is undefined");
+
             using var change = document.OperationsManager.BeginComplexChange();
 
             if (Model.Price == Question.InvalidPrice)

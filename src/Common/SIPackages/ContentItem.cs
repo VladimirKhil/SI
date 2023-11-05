@@ -97,7 +97,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     /// </summary>
     public string Placement
     {
-        get => _placement ?? (_type == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen);
+        get => _placement ?? ((_type == ContentTypes.Audio || _type == AtomTypes.Audio) ? ContentPlacements.Background : ContentPlacements.Screen);
         set
         {
             if (_placement != value)

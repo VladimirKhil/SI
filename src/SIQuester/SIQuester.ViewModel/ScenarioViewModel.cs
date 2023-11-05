@@ -324,6 +324,8 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
 
     private void LinkAtomObject(string mediaType, bool asAnswer)
     {
+        var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
+
         var index = CurrentPosition;
 
         if (index == -1 || index >= Count)
@@ -345,7 +347,7 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
 
         try
         {
-            using var change = OwnerDocument.OperationsManager.BeginComplexChange();
+            using var change = document.OperationsManager.BeginComplexChange();
 
             if (asAnswer)
             {
@@ -363,13 +365,13 @@ public sealed class ScenarioViewModel : ItemsViewModel<AtomViewModel>
             var atom = new AtomViewModel(new Atom { Type = mediaType, Text = uri });
             QDocument.ActivatedObject = atom;
             Insert(index + 1, atom);
-            OwnerDocument.ActiveItem = null;
+            document.ActiveItem = null;
 
             change.Commit();
         }
         catch (Exception exc)
         {
-            OwnerDocument.OnError(exc);
+            document.OnError(exc);
         }
     }
 

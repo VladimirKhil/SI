@@ -152,11 +152,17 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             return;
         }
 
+        if (!_questionEngine.CanNext)
+        {
+            _isFinished = true;
+            Play.CanBeExecuted = false;
+            Sound = null;
+            ContentType = Dialogs.Play.ContentTypes.None;
+            return;
+        }
+
         IsAnswer = false;
-
         _isFinished = !_questionEngine.PlayNext();
-
-        Play.CanBeExecuted = _questionEngine.CanNext;
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)

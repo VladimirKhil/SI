@@ -287,6 +287,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         var media = data.Item1;
         var mediaType = data.Item2.ToString() ?? "";
 
+        if (mediaType == AtomTypes.Audio)
+        {
+            mediaType = ContentTypes.Audio;
+        }
+
         if (media is MediaItemViewModel file)
         {
             SelectAtomObject_Do(mediaType, file);
@@ -310,6 +315,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     private bool LinkAtomObject(string mediaType)
     {
+        var document = OwnerDocument ?? throw new InvalidOperationException("document is undefined");
         var index = CurrentPosition;
 
         if (index == -1 || index >= Count)
@@ -331,7 +337,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         try
         {
-            using var change = OwnerDocument.OperationsManager.BeginComplexChange();
+            using var change = document.OperationsManager.BeginComplexChange();
 
             if (string.IsNullOrWhiteSpace(this[index].Model.Value))
             {
@@ -347,14 +353,14 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
             QDocument.ActivatedObject = atom;
             Insert(index + 1, atom);
-            OwnerDocument.ActiveItem = null;
+            document.ActiveItem = null;
 
             change.Commit();
             return true;
         }
         catch (Exception exc)
         {
-            OwnerDocument.OnError(exc);
+            document.OnError(exc);
             return false;
         }
     }

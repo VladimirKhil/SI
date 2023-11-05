@@ -12,7 +12,9 @@ public sealed class DBNode : INotifyPropertyChanged
 
     public string Key { get; set; }
 
-    private DBNode[] _children;
+    public bool ChildrenLoaded { get; set; }
+
+    private DBNode[] _children = Array.Empty<DBNode>();
 
     public DBNode[] Children
     {

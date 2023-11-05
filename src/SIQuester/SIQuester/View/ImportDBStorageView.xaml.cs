@@ -17,34 +17,6 @@ public partial class ImportDBStorageView : UserControl
 
     private void TreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e) => Import();
 
-    private void Import()
-    {
-        if (tree.SelectedItem is not DBNode item)
-        {
-            return;
-        }
-
-        if (item.Children == null)
-        {
-            item.PropertyChanged += (sender2, e2) =>
-            {
-                var item2 = (DBNode?)sender2;
-
-                if (item2.Children.Length == 0)
-                {
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        ((ImportDBStorageViewModel)DataContext).SelectNodeAsync(item2);
-                    }));
-                }
-            };
-        }
-        else if (item.Children.Length == 0)
-        {
-            ((ImportDBStorageViewModel)DataContext).SelectNodeAsync(item);
-        }
-    }
-
     private void Tree_Expanded(object sender, RoutedEventArgs e)
     {
         if (_blockFlag)
@@ -59,7 +31,7 @@ public partial class ImportDBStorageView : UserControl
             return;
         }
 
-        if (node.Children.Length == 1 && node.Children[0] == null)
+        if (!node.ChildrenLoaded)
         {
             ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
         }
@@ -69,7 +41,7 @@ public partial class ImportDBStorageView : UserControl
     {
         if (tree.SelectedItem is DBNode node)
         {
-            if (node.Children.Length == 1 && node.Children[0] == null)
+            if (!node.ChildrenLoaded)
             {
                 ((ImportDBStorageViewModel)DataContext).LoadChildren(node);
             }
@@ -87,5 +59,18 @@ public partial class ImportDBStorageView : UserControl
         }
 
         Import();
+    }
+
+    private void Import()
+    {
+        if (tree.SelectedItem is not DBNode node)
+        {
+            return;
+        }
+
+        if (node.ChildrenLoaded && node.Children.Length == 0)
+        {
+            ((ImportDBStorageViewModel)DataContext).SelectNodeAsync(node);
+        }
     }
 }
