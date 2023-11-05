@@ -680,4 +680,7 @@ theme - тема Кота</value>
   <data name="Played" xml:space="preserve">
     <value>Играно</value>
   </data>
+  <data name="AudioIsNotOnBackground" xml:space="preserve">
+    <value>Аудио файл {0} не указан как фоновый</value>
+  </data>
 </root>

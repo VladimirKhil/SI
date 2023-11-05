@@ -124,6 +124,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Аудио файл {0} не указан как фоновый.
+        /// </summary>
+        public static string AudioIsNotOnBackground {
+            get {
+                return ResourceManager.GetString("AudioIsNotOnBackground", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Автор.
         /// </summary>
         public static string Author {

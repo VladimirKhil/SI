@@ -338,7 +338,13 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 RemoveAt(index--);
             }
 
-            var atom = new ContentItemViewModel(new ContentItem { Type = mediaType, Value = uri });
+            var atom = new ContentItemViewModel(new ContentItem
+            {
+                Type = mediaType,
+                Value = uri,
+                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+            });
+
             QDocument.ActivatedObject = atom;
             Insert(index + 1, atom);
             OwnerDocument.ActiveItem = null;
@@ -371,7 +377,13 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 RemoveAt(index--);
             }
 
-            var atom = new ContentItemViewModel(new ContentItem { Type = mediaType, Value = "" });
+            var atom = new ContentItemViewModel(new ContentItem
+            { 
+                Type = mediaType,
+                Value = "",
+                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+            });
+
             Insert(index + 1, atom);
 
             atom.Model.IsRef = true;
@@ -448,7 +460,13 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 index = -1;
             }
 
-            var atom = new ContentItemViewModel(new ContentItem { Type = mediaType, Value = "" });
+            var atom = new ContentItemViewModel(new ContentItem 
+            {
+                Type = mediaType,
+                Value = "",
+                Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+            });
+
             Insert(index + 1, atom);
 
             var last = collection.Files.LastOrDefault();

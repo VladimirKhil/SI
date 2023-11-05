@@ -1,7 +1,6 @@
 ﻿using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
-using SIQuester.ViewModel.Workspaces.Dialogs.Play;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
@@ -49,7 +48,15 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             if (_content != value)
             {
                 _content = value;
-                OnPropertyChanged();
+
+                try
+                {
+                    OnPropertyChanged();
+                }
+                catch (NotImplementedException exc) when (exc.Message.Contains("The Source property cannot be set to null"))
+                {
+                    // https://github.com/MicrosoftEdge/WebView2Feedback/issues/1136
+                }
             }
         }
     }
@@ -171,23 +178,23 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             case ContentPlacements.Screen:
                 switch (contentItem.Type)
                 {
-                    case AtomTypes.Text:
+                    case ContentTypes.Text:
                         Content = contentItem.Value;
                         ContentType = Dialogs.Play.ContentTypes.Text;
                         break;
 
-                    case AtomTypes.Image:
+                    case ContentTypes.Image:
                         Content = contentItem.IsRef ? _qDocument.Images.Wrap(contentItem.Value).Uri : contentItem.Value;
                         ContentType = Dialogs.Play.ContentTypes.Image;
                         break;
 
-                    case AtomTypes.Video:
+                    case ContentTypes.Video:
                         Content = contentItem.IsRef ? _qDocument.Video.Wrap(contentItem.Value).Uri : contentItem.Value;
                         ContentType = Dialogs.Play.ContentTypes.Video;
                         break;
 
-                    case AtomTypes.Html:
-                        Content = contentItem.Value;
+                    case ContentTypes.Html:
+                        Content = contentItem.IsRef ? _qDocument.Html.Wrap(contentItem.Value).Uri : contentItem.Value;
                         ContentType = Dialogs.Play.ContentTypes.Html;
                         break;
 
@@ -213,6 +220,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
     public void OnAskAnswer(string mode)
     {
         IsAnswer = true;
+        Sound = null;
     }
 
     public void OnButtonPressStart()

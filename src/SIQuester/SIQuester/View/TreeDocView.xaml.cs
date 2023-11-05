@@ -1,4 +1,5 @@
 ﻿using SIPackages;
+using SIPackages.Core;
 using SIQuester.Contracts;
 using SIQuester.Helpers;
 using SIQuester.Implementation;
@@ -463,7 +464,13 @@ public partial class TreeDocView : UserControl
             contentItemsViewModel.RemoveAt(contentItemsViewModel.Count - 1);
         }
 
-        contentItemsViewModel.Add(new ContentItemViewModel(new ContentItem { Type = contentType, IsRef = true, Value = item.Model.Name }));
+        contentItemsViewModel.Add(new ContentItemViewModel(new ContentItem
+        {
+            Type = contentType,
+            IsRef = true,
+            Value = item.Model.Name,
+            Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
+        }));
     }
 
     private static bool AreEqual(Question question1, Question question2)

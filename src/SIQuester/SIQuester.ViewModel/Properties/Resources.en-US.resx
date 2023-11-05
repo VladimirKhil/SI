@@ -138,6 +138,9 @@
   <data name="Answer" xml:space="preserve">
     <value>Answer</value>
   </data>
+  <data name="AudioIsNotOnBackground" xml:space="preserve">
+    <value>Audio file {0} is not set as a background</value>
+  </data>
   <data name="Author" xml:space="preserve">
     <value>Author</value>
   </data>

@@ -13,9 +13,8 @@ namespace SIPackages;
 /// </summary>
 public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<ContentItem>
 {
-    private const string DefaultType = AtomTypes.Text;
+    private const string DefaultType = ContentTypes.Text;
     private const bool DefaultIsRef = false;
-    private const string DefaultPlacement = ContentPlacements.Screen;
     private static readonly TimeSpan DefaultDuration = TimeSpan.Zero;
     private const bool DefaultWaitForFinish = true;
 
@@ -29,7 +28,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     private bool _isRef = DefaultIsRef;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    private string _placement = DefaultPlacement;
+    private string? _placement;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private TimeSpan _duration = DefaultDuration;
@@ -96,10 +95,9 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     /// <summary>
     /// Content placement.
     /// </summary>
-    [DefaultValue(DefaultPlacement)]
     public string Placement
     {
-        get => _placement;
+        get => _placement ?? (_type == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen);
         set
         {
             if (_placement != value)
@@ -231,7 +229,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
             writer.WriteAttributeString("isRef", _isRef.ToString());
         }
 
-        if (_placement != DefaultPlacement)
+        if (_placement != null)
         {
             writer.WriteAttributeString("placement", _placement);
         }

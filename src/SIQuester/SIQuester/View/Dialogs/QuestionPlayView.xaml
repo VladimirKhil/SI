@@ -6,13 +6,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:vm="clr-namespace:SIQuester.ViewModel.Workspaces.Dialogs;assembly=SIQuester.ViewModel"
     xmlns:vmp="clr-namespace:SIQuester.ViewModel.Workspaces.Dialogs.Play;assembly=SIQuester.ViewModel"
+    xmlns:lb="clr-namespace:SIQuester.Behaviors"
     xmlns:lc="clr-namespace:SIQuester.Converters"
     xmlns:lp="clr-namespace:SIQuester.Properties"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     mc:Ignorable="d" 
     d:DesignHeight="450"
     d:DesignWidth="800"
     d:DataContext="{d:DesignInstance vm:QuestionPlayViewModel}">
     <UserControl.Resources>
+        <lb:WebView2Behavior x:Key="WebView2Behavior" />
+
         <lc:TemplateConverter x:Key="AtomContentSelector">
             <lc:TemplateConverter.Templates>
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.None}" />
@@ -45,7 +49,7 @@
                 </DataTemplate>
 
                 <DataTemplate x:Key="{x:Static vmp:ContentTypes.Html}">
-                    <TextBlock Text="{Binding Content}" />
+                    <wv2:WebView2 Source="{Binding Content}" lb:WebView2Behavior.IsAttached="True" />
                 </DataTemplate>
             </lc:TemplateConverter.Templates>
         </lc:TemplateConverter>
@@ -80,6 +84,7 @@
                 ContentTemplate="{Binding ContentType, Converter={StaticResource AtomContentSelector}}"
                 HorizontalContentAlignment="Center"
                 VerticalContentAlignment="Center" />
+
             <Border.Style>
                 <Style TargetType="Border">
                     <Style.Triggers>

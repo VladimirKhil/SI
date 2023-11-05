@@ -241,6 +241,14 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                     {
                         themeData.Append(bracketsData);
                     }
+
+                    foreach (var content in quest.GetContent())
+                    {
+                        if (content.Type == ContentTypes.Audio && content.Placement != ContentPlacements.Background)
+                        {
+                            themeData.AppendLine($"{quest.Price}: {string.Format(Resources.AudioIsNotOnBackground, content.Value)}");
+                        }
+                    }
                 }
 
                 if (themeData.Length > 0)
