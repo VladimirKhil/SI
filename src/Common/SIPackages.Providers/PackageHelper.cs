@@ -22,7 +22,7 @@ public static class PackageHelper
         int roundsCount = 3,
         int themesCount = 6,
         int baseCost = 100,
-        Stream stream = null,
+        Stream? stream = null,
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, stream);
