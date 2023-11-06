@@ -116,8 +116,15 @@ public sealed class SportEngine : EngineBase
                 }
 
                 break;
-                #endregion
+            #endregion
 
+            case GameStage.AfterFinalThink:
+                Stage = GameStage.NextQuestion;
+                UpdateCanNext();
+                OnNextQuestion();
+                AutoNext(3000);
+                break;
+            
             case GameStage.End:
                 break;
         }

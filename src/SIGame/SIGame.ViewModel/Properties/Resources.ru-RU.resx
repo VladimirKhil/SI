@@ -424,10 +424,10 @@
     <value>Не удалось загрузить аватар по адресу</value>
   </data>
   <data name="GameModes_Sport_Hint" xml:space="preserve">
-    <value>Вопросы задаются по очереди</value>
+    <value>Вопросы играются по очереди</value>
   </data>
   <data name="GameModes_Tv_Hint" xml:space="preserve">
-    <value>Выбор вопросов из таблицы, спецвопросы и финал</value>
+    <value>Вопросы выбираются игроками</value>
   </data>
   <data name="OnlineGameAddress" xml:space="preserve">
     <value>Адрес игры</value>

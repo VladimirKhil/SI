@@ -412,10 +412,10 @@
     <value>Cannot upload avatar to address</value>
   </data>
   <data name="GameModes_Sport_Hint" xml:space="preserve">
-    <value>Questions are following one another</value>
+    <value>Questions are played sequentially</value>
   </data>
   <data name="GameModes_Tv_Hint" xml:space="preserve">
-    <value>Selecting questions from table, special questions and final</value>
+    <value>Questions are selected by players</value>
   </data>
   <data name="OnlineGameAddress" xml:space="preserve">
     <value>Game address</value>

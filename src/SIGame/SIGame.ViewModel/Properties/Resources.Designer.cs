@@ -385,7 +385,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Questions are following one another.
+        ///   Ищет локализованную строку, похожую на Questions are played sequentially.
         /// </summary>
         public static string GameModes_Sport_Hint {
             get {
@@ -394,7 +394,7 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Selecting questions from table, special questions and final.
+        ///   Ищет локализованную строку, похожую на Questions are selected by players.
         /// </summary>
         public static string GameModes_Tv_Hint {
             get {
