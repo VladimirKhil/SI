@@ -1382,6 +1382,8 @@ public sealed class GameLogic : Logic<GameData>
             return;
         }
 
+        _data.PendingAnswererIndicies.Clear();
+
         if (!ClientData.Settings.AppSettings.FalseStart)
         {
             _gameActions.SendMessageWithArgs(Messages.Try, MessageParams.Try_NotFinished);
@@ -2848,6 +2850,16 @@ public sealed class GameLogic : Logic<GameData>
 
             var index = ClientData.PendingAnswererIndicies.Count == 1 ? 0 : Random.Shared.Next(ClientData.PendingAnswererIndicies.Count);
             ClientData.PendingAnswererIndex = ClientData.PendingAnswererIndicies[index];
+
+            for (var i = 0; i < ClientData.PendingAnswererIndicies.Count; i++)
+            {
+                if (i == index)
+                {
+                    continue;
+                }
+
+                _gameActions.SendMessageWithArgs(Messages.WrongTry, i);
+            }
         }
 
         if (ClientData.PendingAnswererIndex < 0 || ClientData.PendingAnswererIndex >= ClientData.Players.Count)

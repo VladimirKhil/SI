@@ -13,6 +13,7 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
 
     private readonly ISIStorageServiceClient _siStorageServiceClient;
     private readonly Dictionary<string, PackageEntry> _packageCache = new();
+    private readonly SemaphoreSlim _packageSemaphore = new(1, 1);
 
     public SIStoragePackageProvider(ISIStorageServiceClient siStorageServiceClient) =>
         _siStorageServiceClient = siStorageServiceClient;
@@ -21,19 +22,31 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     {
         if (_packageCache.Count == 0)
         {
-            var packages = await _siStorageServiceClient.Packages.GetPackagesAsync(
-                new PackageFilters { TagIds = new[] { -1 } },
-                new PackageSelectionParameters { Count = 1000 },
-                cancellationToken);
+            await _packageSemaphore.WaitAsync(cancellationToken);
 
-            foreach (var package in packages.Packages)
+            try
             {
-                if (package.DirectContentUri == null)
+                if (_packageCache.Count == 0)
                 {
-                    continue;
-                }
+                    var packages = await _siStorageServiceClient.Packages.GetPackagesAsync(
+                    new PackageFilters { TagIds = new[] { -1 } },
+                    new PackageSelectionParameters { Count = 1000 },
+                    cancellationToken);
 
-                _packageCache[package.Id.ToString()] = new PackageEntry { Uri = package.DirectContentUri };
+                    foreach (var package in packages.Packages)
+                    {
+                        if (package.DirectContentUri == null)
+                        {
+                            continue;
+                        }
+
+                        _packageCache[package.Id.ToString()] = new PackageEntry { Uri = package.DirectContentUri };
+                    }
+                }
+            }
+            finally
+            {
+                _packageSemaphore.Release();
             }
         }
 
