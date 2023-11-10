@@ -34,6 +34,7 @@ public sealed class ImportSIStorageViewModel : WorkspaceViewModel
         _documentViewModelFactory = documentViewModelFactory;
 
         Storage = siStorage;
+        Storage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
         Storage.Error += OnError;
         Storage.PropertyChanged += Storage_PropertyChanged;

@@ -17,6 +17,8 @@ public sealed class MediaItemViewModel : MediaOwnerViewModel
     /// </summary>
     public Named Model { get; }
 
+    public string Name => Model.Name;
+
     private readonly Func<IMedia> _mediaGetter;
 
     public MediaItemViewModel(Named named, string type, Func<IMedia> mediaGetter)

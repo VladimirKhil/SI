@@ -363,6 +363,9 @@
   <data name="CommonAppError" xml:space="preserve">
     <value>Program execution error</value>
   </data>
+  <data name="Compress" xml:space="preserve">
+    <value>Compress</value>
+  </data>
   <data name="ContactAuthor" xml:space="preserve">
     <value>Write remarks to the author…</value>
   </data>
@@ -560,6 +563,9 @@
   </data>
   <data name="FullUpdates" xml:space="preserve">
     <value>Program update to version {0} detected. Additional installation will be performed. Install the update now?</value>
+  </data>
+  <data name="Goto" xml:space="preserve">
+    <value>Go to</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Help</value>

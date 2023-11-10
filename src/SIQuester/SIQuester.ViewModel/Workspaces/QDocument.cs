@@ -16,6 +16,7 @@ using SIQuester.ViewModel.Properties;
 using SIQuester.ViewModel.Serializers;
 using SIQuester.ViewModel.Services;
 using SIQuester.ViewModel.Workspaces.Dialogs;
+using SIQuester.ViewModel.Workspaces.Sidebar;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -675,6 +676,21 @@ public sealed class QDocument : WorkspaceViewModel
             }
 
             return _sources;
+        }
+    }
+
+    private int _sideIndex = 0;
+
+    public int SideIndex
+    {
+        get => _sideIndex;
+        set
+        {
+            if (_sideIndex != value)
+            {
+                _sideIndex = value;
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -1340,9 +1356,9 @@ public sealed class QDocument : WorkspaceViewModel
 
             var checkResult = Validate();
 
-            if (!string.IsNullOrWhiteSpace(checkResult))
+            if (!string.IsNullOrWhiteSpace(checkResult.Item2))
             {
-                PlatformManager.Instance.Inform(checkResult, true);
+                PlatformManager.Instance.Inform(checkResult.Item2, true);
                 return;
             }
 
@@ -1354,7 +1370,7 @@ public sealed class QDocument : WorkspaceViewModel
         }
     }
 
-    public string Validate()
+    public (IEnumerable<WarningViewModel>, string) Validate()
     {
         if (string.IsNullOrWhiteSpace(Package.Model.ID))
         {
@@ -1364,7 +1380,7 @@ public sealed class QDocument : WorkspaceViewModel
         return CheckLinks();
     }
 
-    private static ICollection<string> FillFiles(MediaStorageViewModel mediaStorage, int maxFileSize, List<string> errors)
+    private ICollection<string> FillFiles(MediaStorageViewModel mediaStorage, int maxFileSize, List<WarningViewModel> warnings)
     {
         var files = new List<string>();
 
@@ -1374,12 +1390,12 @@ public sealed class QDocument : WorkspaceViewModel
 
             if (files.Contains(name))
             {
-                errors.Add(string.Format(Resources.FileIsDuplicated, name));
+                warnings.Add(new WarningViewModel(string.Format(Resources.FileIsDuplicated, name), () => NavigateToStorageItem(mediaStorage, item)));
             }
             
             if (AppSettings.Default.CheckFileSize && mediaStorage.GetLength(item.Model.Name) > maxFileSize * 1024)
             {
-                errors.Add(string.Format(Resources.MediaFileTooLarge, name, maxFileSize));
+                warnings.Add(new WarningViewModel(string.Format(Resources.MediaFileTooLarge, name, maxFileSize), () => NavigateToStorageItem(mediaStorage, item)));
             }
 
             files.Add(name);
@@ -1388,37 +1404,59 @@ public sealed class QDocument : WorkspaceViewModel
         return files;
     }
 
+    private void NavigateToStorageItem(MediaStorageViewModel mediaStorage, MediaItemViewModel? item)
+    {
+        SideIndex = mediaStorage == Images ? 2 : (mediaStorage == Audio ? 3 : (mediaStorage == Video ? 4 : 5));
+        mediaStorage.CurrentFile = item;
+    }
+
     /// <summary>
     /// Checks missing and unused files in document.
     /// </summary>
-    internal string CheckLinks(bool allowExternal = false)
+    /// <param name="allowExternal">Allow external files to be used.</param>
+    internal (IEnumerable<WarningViewModel>,string) CheckLinks(bool allowExternal = false)
     {
+        var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
 
-        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, errors);
-        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, errors);
-        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, errors);
-        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, errors);
+        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, warnings);
+        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, warnings);
+        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, warnings);
+        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, warnings);
 
         CheckCommonFiles(images, audio, video, html, errors);
 
         var (usedImages, usedAudio, usedVideo, usedHtml) = CollectUsedFiles(allowExternal, images, audio, video, html, errors);
 
-        var extraFiles = images.Except(usedImages)
-            .Union(audio).Except(usedAudio)
-            .Union(video).Except(usedVideo)
-            .Union(html).Except(usedHtml)
-            .ToArray();
-
-        if (extraFiles.Length > 0)
+        foreach (var item in images.Except(usedImages))
         {
-            foreach (var item in extraFiles)
-            {
-                errors.Add(string.Format(Resources.UnusedFile, item));
-            }
+            warnings.Add(
+                new WarningViewModel(string.Format(Resources.UnusedFile, item), 
+                () => NavigateToStorageItem(Images, Images.Files.FirstOrDefault(f => f.Model.Name == item))));
         }
 
-        return string.Join(Environment.NewLine, errors);
+        foreach (var item in audio.Except(usedAudio))
+        {
+            warnings.Add(
+                new WarningViewModel(string.Format(Resources.UnusedFile, item),
+                () => NavigateToStorageItem(Audio, Images.Files.FirstOrDefault(f => f.Model.Name == item))));
+        }
+
+        foreach (var item in video.Except(usedVideo))
+        {
+            warnings.Add(
+                new WarningViewModel(string.Format(Resources.UnusedFile, item),
+                () => NavigateToStorageItem(Video, Images.Files.FirstOrDefault(f => f.Model.Name == item))));
+        }
+
+        foreach (var item in html.Except(usedHtml))
+        {
+            warnings.Add(
+                new WarningViewModel(string.Format(Resources.UnusedFile, item),
+                () => NavigateToStorageItem(Html, Images.Files.FirstOrDefault(f => f.Model.Name == item))));
+        }
+
+        return (warnings, string.Join(Environment.NewLine, errors));
     }
 
     private (ICollection<string> usedImages, ICollection<string> usedAudio, ICollection<string> usedVideo, ICollection<string> usedHtml) CollectUsedFiles(
@@ -1494,7 +1532,7 @@ public sealed class QDocument : WorkspaceViewModel
                         }
                         else if (allowExternal && !contentItem.IsRef)
                         {
-                            continue;
+                            continue; // External file
                         }
                         else
                         {
@@ -3644,14 +3682,18 @@ public sealed class QDocument : WorkspaceViewModel
             });
     }
 
+    /// <summary>
+    /// Confirms and removes unused files from document.
+    /// </summary>
     internal void RemoveUnusedFiles()
     {
+        var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
 
-        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, errors);
-        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, errors);
-        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, errors);
-        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, errors);
+        var images = FillFiles(Images, AppSettings.Default.MaxImageSizeKb, warnings);
+        var audio = FillFiles(Audio, AppSettings.Default.MaxAudioSizeKb, warnings);
+        var video = FillFiles(Video, AppSettings.Default.MaxVideoSizeKb, warnings);
+        var html = FillFiles(Html, AppSettings.Default.MaxHtmlSizeKb, warnings);
 
         CheckCommonFiles(images, audio, video, html, errors);
 
@@ -3662,7 +3704,47 @@ public sealed class QDocument : WorkspaceViewModel
         var unusedVideo = video.Except(usedVideo);
         var unusedHtml = html.Except(usedHtml);
 
-        var unusedFiles = unusedImages.Union(unusedAudio).Union(unusedVideo).Union(unusedHtml).ToArray();
+        var unusedFiles = new StringBuilder();
+
+        foreach (var file in unusedImages)
+        {
+            if (unusedFiles.Length > 0)
+            {
+                unusedFiles.Append(", ");
+            }
+
+            unusedFiles.Append($"{SIPackages.Properties.Resources.Image}: {file}");
+        }
+
+        foreach (var file in unusedAudio)
+        {
+            if (unusedFiles.Length > 0)
+            {
+                unusedFiles.Append(", ");
+            }
+
+            unusedFiles.Append($"{SIPackages.Properties.Resources.Audio}: {file}");
+        }
+
+        foreach (var file in unusedVideo)
+        {
+            if (unusedFiles.Length > 0)
+            {
+                unusedFiles.Append(", ");
+            }
+
+            unusedFiles.Append($"{SIPackages.Properties.Resources.Video}: {file}");
+        }
+
+        foreach (var file in unusedHtml)
+        {
+            if (unusedFiles.Length > 0)
+            {
+                unusedFiles.Append(", ");
+            }
+
+            unusedFiles.Append($"{SIPackages.Properties.Resources.Html}: {file}");
+        }
 
         if (unusedFiles.Length == 0)
         {

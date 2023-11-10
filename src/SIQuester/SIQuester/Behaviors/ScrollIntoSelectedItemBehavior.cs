@@ -40,6 +40,21 @@ public static class ScrollIntoSelectedItemBehavior
     private static void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var listBox = (ListBox)sender;
-        listBox.ScrollIntoView(listBox.SelectedItem);
+
+        if (listBox.IsLoaded)
+        {
+            listBox.ScrollIntoView(listBox.SelectedItem);
+        }
+        else
+        {
+            async void handler(object? s, RoutedEventArgs e2)
+            {
+                await Task.Delay(3000);
+                listBox.ScrollIntoView(listBox.SelectedItem);
+                listBox.Loaded -= handler;
+            }
+
+            listBox.Loaded += handler;
+        }
     }
 }

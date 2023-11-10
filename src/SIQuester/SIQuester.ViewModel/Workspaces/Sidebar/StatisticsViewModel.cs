@@ -1,6 +1,7 @@
 ﻿using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Properties;
+using SIQuester.ViewModel.Workspaces.Sidebar;
 using System.Text;
 using System.Windows.Input;
 using Utils.Commands;
@@ -63,10 +64,31 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
     private string _result = "";
 
+    /// <summary>
+    /// Statistics result.
+    /// </summary>
     public string Result
     {
         get => _result;
         set { _result = value; OnPropertyChanged(); }
+    }
+
+    private WarningViewModel[] _warnings = Array.Empty<WarningViewModel>();
+
+    /// <summary>
+    /// Statistics warnings.
+    /// </summary>
+    public WarningViewModel[] Warnings
+    {
+        get => _warnings;
+        set
+        {
+            if (_warnings != value)
+            {
+                _warnings = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     public ICommand Create { get; private set; }
@@ -84,6 +106,8 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
     private void Create_Executed(object? arg = null)
     {
+        var warnings = new List<WarningViewModel>();
+
         var stats = new StringBuilder();
         stats.Append(Resources.NumOfRounds);
         stats.Append(": ");
@@ -103,9 +127,13 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
 
         CheckText(stats);
 
-        stats.AppendLine(_document.CheckLinks(true));
+        var checkResult = _document.CheckLinks(true);
+
+        warnings.AddRange(checkResult.Item1);
+        stats.Append(checkResult.Item2);
 
         Result = stats.ToString();
+        Warnings = warnings.ToArray();
     }
 
     private void CheckText(StringBuilder stats)
@@ -211,9 +239,9 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         }
                     }
 
-                    bool b4 = bracketsData.Length > 0;
+                    var hasBracketsIssues = bracketsData.Length > 0;
 
-                    if (emptyQuestion || noAnswer || emptySources || b4)
+                    if (emptyQuestion || noAnswer || emptySources || hasBracketsIssues)
                     {
                         if (!here)
                         {
@@ -237,7 +265,7 @@ public sealed class StatisticsViewModel : WorkspaceViewModel
                         themeData.AppendLine(string.Format("{0}: {1}", quest.Price, Resources.NoSource));
                     }
 
-                    if (b4)
+                    if (hasBracketsIssues)
                     {
                         themeData.Append(bracketsData);
                     }

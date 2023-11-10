@@ -363,6 +363,9 @@
   <data name="CommonAppError" xml:space="preserve">
     <value>Ошибка выполнения программы</value>
   </data>
+  <data name="Compress" xml:space="preserve">
+    <value>Сжать</value>
+  </data>
   <data name="ContactAuthor" xml:space="preserve">
     <value>Написать замечания автору…</value>
   </data>
@@ -560,6 +563,9 @@
   </data>
   <data name="FullUpdates" xml:space="preserve">
     <value>Обнаружено обновление программы до версии {0}. Будет произведена дополнительная установка. Установить обновление сейчас?</value>
+  </data>
+  <data name="Goto" xml:space="preserve">
+    <value>Перейти</value>
   </data>
   <data name="Help" xml:space="preserve">
     <value>Помощь</value>

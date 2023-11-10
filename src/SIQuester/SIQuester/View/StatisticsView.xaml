@@ -46,14 +46,38 @@
                     Padding="8,2" />
             </StackPanel>
         </StackPanel>
-        
-        <TextBox
-            Background="#EEEEEE"
-            Padding="3,3,0,0"
-            Margin="0,5,0,0"
-            Text="{Binding Result}"
-            IsReadOnly="True"
-            ScrollViewer.VerticalScrollBarVisibility="Auto"
-            TextWrapping="Wrap" />
+
+        <ScrollViewer Margin="0,5" Padding="0,0,3,0">
+            <StackPanel>
+                <ItemsControl ItemsSource="{Binding Warnings}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,5" Background="#EEEEEE">
+                                <Button
+                                    Command="{Binding NavigateToSource}"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    Width="30"
+                                    Margin="5,0"
+                                    Padding="3"
+                                    DockPanel.Dock="Right"
+                                    ToolTip="{x:Static lp:Resources.Goto}">
+                                    <Image Source="{StaticResource RightImageKey}" />
+                                </Button>
+
+                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" Margin="5" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBox
+                    Background="#EEEEEE"
+                    Padding="3,3,0,0"
+                    Margin="0,5,0,0"
+                    Text="{Binding Result}"
+                    IsReadOnly="True"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+        </ScrollViewer>
     </DockPanel>
 </UserControl>

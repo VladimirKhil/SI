@@ -125,6 +125,34 @@ public sealed class StorageViewModel : INotifyPropertyChanged
         }
     }
 
+    private Language? _currentLanguage;
+
+    public Language? CurrentLanguage
+    {
+        get => _currentLanguage;
+        set
+        {
+            if (_currentLanguage != value)
+            {
+                _currentLanguage = value;
+                OnPropertyChanged();
+                LoadPackages();
+            }
+        }
+    }
+
+    private Language[] _languages = Array.Empty<Language>();
+
+    public Language[] Languages
+    {
+        get => _languages;
+        set
+        {
+            _languages = value;
+            OnPropertyChanged();
+        }
+    }
+
     public PackageSortMode[] SortModes { get; } = new PackageSortMode[] { PackageSortMode.Name, PackageSortMode.CreatedDate };
 
     public PackageSortDirection[] SortDirections { get; } = new[] 
@@ -215,6 +243,8 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
     public string? DefaultRestriction { get; set; }
 
+    public string? DefaultLanguage { get; set; }
+
     public StorageViewModel() => throw new NotImplementedException();
 
     public StorageViewModel(ISIStorageServiceClient sIStorageServiceClient) =>
@@ -226,6 +256,8 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
         try
         {
+            await LoadLanguagesAsync(cancellationToken);
+
             await Task.WhenAll(
                 LoadPublishersAsync(cancellationToken),
                 LoadTagsAsync(cancellationToken),
@@ -261,6 +293,7 @@ public sealed class StorageViewModel : INotifyPropertyChanged
             var packages = await _siStorageServiceClient.Packages.GetPackagesAsync(
                 new PackageFilters
                 {
+                    LanguageId = _currentLanguage?.Id,
                     TagIds = tagId.HasValue ? new[] { tagId.Value } : null,
                     PublisherId = publisherId,
                     RestrictionIds = restrictionId.HasValue ? new[] { restrictionId.Value } : null,
@@ -290,7 +323,7 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
     private async Task LoadPublishersAsync(CancellationToken cancellationToken = default)
     {
-        var publishers = (await _siStorageServiceClient.Facets.GetPublishersAsync(null, cancellationToken)).OrderBy(p => p.Name);
+        var publishers = (await _siStorageServiceClient.Facets.GetPublishersAsync(_currentLanguage?.Id, cancellationToken)).OrderBy(p => p.Name);
         Publishers = new[] { AllPublishers, new Publisher(-1, "") }.Concat(publishers).ToArray();
 
         if (Publishers.Length > 0)
@@ -305,7 +338,7 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
     private async Task LoadTagsAsync(CancellationToken cancellationToken = default)
     {
-        var tags = (await _siStorageServiceClient.Facets.GetTagsAsync(null, cancellationToken)).OrderBy(t => t.Name);
+        var tags = (await _siStorageServiceClient.Facets.GetTagsAsync(_currentLanguage?.Id, cancellationToken)).OrderBy(t => t.Name);
         Tags = new[] { AllTags, new Tag( -1, "") }.Concat(tags).ToArray();
 
         if (Tags.Length > 0)
@@ -332,7 +365,22 @@ public sealed class StorageViewModel : INotifyPropertyChanged
 
     private async Task LoadAuthorsAsync(CancellationToken cancellationToken = default)
     {
-        Authors = await _siStorageServiceClient.Facets.GetAuthorsAsync(null, cancellationToken);
+        Authors = await _siStorageServiceClient.Facets.GetAuthorsAsync(_currentLanguage?.Id, cancellationToken);
+    }
+
+    private async Task LoadLanguagesAsync(CancellationToken cancellationToken = default)
+    {
+        var languages = (await _siStorageServiceClient.Facets.GetLanguagesAsync(cancellationToken)).OrderBy(r => r.Code);
+        Languages = languages.ToArray();
+
+        if (Languages.Length > 0)
+        {
+            _currentLanguage = DefaultLanguage != null
+                ? Languages.FirstOrDefault(p => p.Code == DefaultLanguage) ?? Languages[0]
+                : Languages[0];
+
+            OnPropertyChanged(nameof(CurrentRestriction));
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>

@@ -68,6 +68,24 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     /// </summary>
     public ObservableCollection<MediaItemViewModel> Files { get; } = new();
 
+    private MediaItemViewModel? _currentFile = null;
+
+    /// <summary>
+    /// Current selected file.
+    /// </summary>
+    public MediaItemViewModel? CurrentFile
+    {
+        get => _currentFile;
+        set
+        {
+            if (_currentFile != value)
+            {
+                _currentFile = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public ICommand AddItem { get; private set; }
 
     public ICommand DeleteItem { get; private set; }
@@ -83,6 +101,24 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     public event Action? HasChanged;
 
     private readonly ILogger<MediaStorageViewModel> _logger;
+
+    private string _filter = "";
+
+    /// <summary>
+    /// Storage files names filter.
+    /// </summary>
+    public string Filter
+    {
+        get => _filter;
+        set
+        {
+            if (_filter != value)
+            {
+                _filter = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     public MediaStorageViewModel(QDocument document, DataCollection collection, string header, ILogger<MediaStorageViewModel> logger)
     {

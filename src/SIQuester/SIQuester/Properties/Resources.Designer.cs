@@ -799,6 +799,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Сжать.
+        /// </summary>
+        public static string Compress {
+            get {
+                return ResourceManager.GetString("Compress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Написать замечания автору….
         /// </summary>
         public static string ContactAuthor {
@@ -1389,6 +1398,15 @@ namespace SIQuester.Properties {
         public static string FullUpdates {
             get {
                 return ResourceManager.GetString("FullUpdates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Перейти.
+        /// </summary>
+        public static string Goto {
+            get {
+                return ResourceManager.GetString("Goto", resourceCulture);
             }
         }
         

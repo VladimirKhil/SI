@@ -536,7 +536,7 @@
                                     <DataTemplate>
                                         <Border Background="Lavender">
                                             <Grid>
-                                                <TabControl BorderThickness="0,0,1,0" BorderBrush="LightGray" Margin="1,0,0,1">
+                                                <TabControl BorderThickness="0,0,1,0" BorderBrush="LightGray" Margin="1,0,0,1" SelectedIndex="{Binding SideIndex}">
                                                     <TabControl.Resources>
                                                         <Style TargetType="TabItem">
                                                             <Setter Property="Template">
