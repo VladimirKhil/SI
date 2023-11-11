@@ -1627,6 +1627,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Select answer option on table.
+        /// </summary>
+        public static string SelectAnswerOption {
+            get {
+                return ResourceManager.GetString("SelectAnswerOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на {0} set {1} as active player.
         /// </summary>
         public static string SetChooser {

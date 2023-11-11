@@ -834,4 +834,7 @@
   <data name="SetChooser" xml:space="preserve">
     <value>{0} set {1} as active player</value>
   </data>
+  <data name="SelectAnswerOption" xml:space="preserve">
+    <value>Select answer option on table</value>
+  </data>
 </root>

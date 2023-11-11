@@ -462,7 +462,7 @@
                             
                             <Image Source="/SIGame;component/Theme/logo.png" Margin="25" Grid.Row="1" Grid.Column="1" />
                             
-                            <TextBlock
+                            <!--<TextBlock
                                 Text="{x:Static lp:Resources.MainSubheader}"
                                 Grid.Row="1"
                                 Grid.ColumnSpan="3"
@@ -471,7 +471,7 @@
                                 Foreground="White"
                                 FontSize="20"
                                 FontWeight="Bold"
-                                Margin="0,0,0,-15" />
+                                Margin="0,0,0,-15" />-->
 
                             <Viewbox Grid.Column="1" Grid.Row="2">
                                 <ItemsControl ItemsSource="{Binding MainCommands}" Height="400" Width="667" AlternationCount="2" Margin="0,45,0,0">

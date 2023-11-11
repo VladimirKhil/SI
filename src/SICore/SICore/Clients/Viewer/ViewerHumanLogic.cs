@@ -560,14 +560,42 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         for (var i = 2; i + 2 < mparams.Length; i++)
         {
-            var layoutId = mparams[i]; // Not used for now
-            var contentType = mparams[i + 1];
-            var contentValue = mparams[i + 2];
+            _ = int.TryParse(mparams[i], out var layoutId);
 
-            content.Add(new ContentInfo(contentType, contentValue));
+            if (layoutId == 0)
+            {
+                var contentType = mparams[i + 1];
+                var contentValue = mparams[i + 2];
+
+                content.Add(new ContentInfo(contentType, contentValue));
+
+                i += 2;
+            }
+            else if (TInfo.LayoutMode == LayoutMode.AnswerOptions && i + 3 < mparams.Length && layoutId > 0 && layoutId - 1 < TInfo.AnswerOptions.Options.Length)
+            {
+                var label = mparams[i + 1];
+                var contentType = mparams[i + 2];
+                var contentValue = mparams[i + 3];
+
+                var option = TInfo.AnswerOptions.Options[layoutId - 1];
+
+                if (contentType == ContentTypes.Text || contentType == ContentTypes.Image)
+                {
+                    option.Label = label;
+                    option.Content = new ContentViewModel(contentType == ContentTypes.Text ? ContentType.Text : ContentType.Image, contentValue);
+                    option.IsVisible = true;
+                }
+
+                i += 3;
+            }
         }
 
         _data.ExternalContent.Clear();
+
+        if (content.Count == 0)
+        {
+            return;
+        }
 
         switch (placement)
         {
@@ -578,7 +606,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             case ContentPlacements.Replic:
                 var (contentType, contentValue) = content.LastOrDefault();
 
-                if (contentType == ContentTypes.Audio)
+                if (contentType == ContentTypes.Text)
                 {
                     OnReplicText(contentValue);
                 }
@@ -1008,18 +1036,37 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         });
     }
 
-    public void SetRight(string answer)
+    public void OnRightAnswer(string answer)
     {
-        try
+        if (TInfo.LayoutMode == LayoutMode.Simple)
         {
-            TInfo.TStage = TableStage.Answer;
-            TInfo.Text = answer;
-            _data.EnableMediaLoadButton = false;
+            try
+            {
+                TInfo.TStage = TableStage.Answer;
+                TInfo.Text = answer;
+                _data.EnableMediaLoadButton = false;
+            }
+            catch (NullReferenceException exc)
+            {
+                // Strange error is periodically happened in WPF bindings
+                _data.Host.SendError(exc);
+            }
         }
-        catch (NullReferenceException exc)
+        else
         {
-            // Странная ошибка в привязках WPF иногда возникает
-            _data.Host.SendError(exc);
+            var options = TInfo.AnswerOptions.Options;
+
+            for (int i = 0; i < options.Length; i++)
+            {
+                if (options[i].Label == answer)
+                {
+                    options[i].State = ItemState.Right;
+                }
+                else if (options[i].State == ItemState.Active)
+                {
+                    options[i].State = ItemState.Normal;
+                }
+            }
         }
     }
 
@@ -1599,9 +1646,9 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         },
         ClientData.Host.OnError);
 
-    public void OnAnswerOptions(int optionCount)
+    public void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes)
     {
-        TInfo.AnswerOptions.Options = Enumerable.Range(0, optionCount).Select(i => new ItemViewModel()).ToArray();
+        TInfo.AnswerOptions.Options = optionsTypes.Select(i => new ItemViewModel()).ToArray();
         TInfo.LayoutMode = LayoutMode.AnswerOptions;
     }
 }

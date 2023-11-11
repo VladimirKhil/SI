@@ -839,4 +839,7 @@
   <data name="TypeUsePingPenalty" xml:space="preserve">
     <value>замедление пинга</value>
   </data>
+  <data name="SelectAnswerOption" xml:space="preserve">
+    <value>Выберите вариант ответа на табло</value>
+  </data>
 </root>

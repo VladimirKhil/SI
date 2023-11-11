@@ -520,8 +520,9 @@
                                                 Margin="10"
                                                 TextWrapping="Wrap"
                                                 HorizontalAlignment="Left"
-                                                TextAlignment="Left"
-                                                lb:QuestionReading.IsAttachedPartial="True">
+                                                TextAlignment="Left"><!--
+                                                Not supported yet
+                                                lb:QuestionReading.IsAttachedPartial="True" -->
                                                 <TextBlock.CacheMode>
                                                     <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                                 </TextBlock.CacheMode>
@@ -750,7 +751,7 @@
                     <localc:LogoConverter x:Key="LogoConverter" />
 
                     <DataTemplate x:Key="AnswerOptionsTemplate" DataType="{x:Type vm:AnswerOptionsViewModel}">
-                        <ItemsControl ItemsSource="{Binding Options}">
+                        <ItemsControl x:Name="options" ItemsSource="{Binding Options}" ClipToBounds="True">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <UniformGrid Columns="1" />
@@ -763,6 +764,12 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <DataTemplate.Triggers>
+                            <Trigger Property="lb:SelectionBehavior.IsSelectable" Value="True">
+                                <Setter TargetName="options" Property="Background" Value="#5581BDFF" />
+                            </Trigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
 
                     <localc:TemplateConverter x:Key="TableSelector">
@@ -995,6 +1002,7 @@
                                         Content="{Binding}"
                                         ContentTemplate="{Binding QuestionStyle, Converter={StaticResource DecoratorSelector}}" />
 
+                                    <!-- Answer options -->
                                     <ContentControl
                                         Grid.Column="1"
                                         Grid.Row="1"

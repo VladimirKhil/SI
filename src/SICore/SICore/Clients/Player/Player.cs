@@ -36,7 +36,7 @@ public sealed class Player : Viewer<IPlayerLogic>
         }) { CanBeExecuted = true };
 
         ClientData.PlayerDataExtensions.SendAnswerVersion = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.AnswerVersion, ClientData.PersonDataExtensions.Answer); });
-        ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, ClientData.PersonDataExtensions.Answer); Clear(); });
+        ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, (string?)arg ?? ClientData.PersonDataExtensions.Answer); Clear(); });
         
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
@@ -310,10 +310,6 @@ public sealed class Player : Viewer<IPlayerLogic>
 
                 case Messages.Answer:
                     ClientData.PersonDataExtensions.Answer = "";
-                    ClientData.DialogMode = DialogModes.Answer;
-
-                    ((PlayerAccount)ClientData.Me).IsDeciding = false;
-
                     _logic.Answer();
                     break;
 

@@ -258,7 +258,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
     {
         await Task.Delay(500);
 
-        var siStorage = _serviceProvider.GetRequiredService<SIStorageService.ViewModel.StorageViewModel>();
+        var siStorage = _serviceProvider.GetRequiredService<StorageViewModel>();
+        siStorage.DefaultLanguage = Thread.CurrentThread.CurrentUICulture.Name;
 
         var gameSettings = new GameSettingsViewModel(_userSettings.GameSettings, _commonSettings, _userSettings, siStorage)
         {

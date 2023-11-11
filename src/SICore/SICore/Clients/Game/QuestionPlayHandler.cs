@@ -4,6 +4,7 @@ using SIPackages.Core;
 
 namespace SICore.Clients.Game;
 
+/// <inheritdoc cref="IQuestionEnginePlayHandler" />
 internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 {
     public GameLogic? GameLogic { get; set; }
@@ -18,8 +19,6 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         }
 
         GameData.QuestionPlayState.AnswerOptions = answerOptions;
-        GameLogic.OnAnswerOptions(answerOptions);
-
         return false;
     }
 
@@ -34,6 +33,12 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         if (GameLogic == null || GameData == null)
         {
             return;
+        }
+
+        if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
+        {
+            GameLogic.OnAnswerOptions(false, GameData.QuestionPlayState.AnswerOptions);
+            GameData.QuestionPlayState.LayoutShown = true;
         }
 
         if (GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.AnswerOptionsShown)
@@ -88,6 +93,12 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
         if (GameLogic == null || GameData == null)
         {
             return;
+        }
+
+        if (contentItems.Any(item => item.Placement == ContentPlacements.Screen) && GameData.QuestionPlayState.AnswerOptions != null && !GameData.QuestionPlayState.LayoutShown)
+        {
+            GameLogic.OnAnswerOptions(true, GameData.QuestionPlayState.AnswerOptions);
+            GameData.QuestionPlayState.LayoutShown = true;
         }
 
         if (GameData.IsAnswer && !GameData.IsAnswerSimple)
@@ -355,6 +366,12 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public bool OnRightAnswerOption(string rightOptionLabel)
     {
-        return false;
+        if (GameLogic == null)
+        {
+            return false;
+        }
+
+        GameLogic.OnRightAnswerOption(rightOptionLabel);
+        return true;
     }
 }

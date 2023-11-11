@@ -34,10 +34,13 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
         TInfo.QuestionSelected += PlayerClient_QuestionSelected;
         TInfo.ThemeSelected += PlayerClient_ThemeSelected;
+        TInfo.AnswerSelected += TInfo_AnswerSelected;
 
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
     }
+
+    private void TInfo_AnswerSelected(ItemViewModel item) => ClientData.PlayerDataExtensions.SendAnswer.Execute(item.Label);
 
     #region PlayerInterface Members
 
@@ -70,7 +73,18 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
     {
         _data.Host.OnFlash();
 
-        StartSendingVersion(_cancellationTokenSource.Token);
+        if (TInfo.LayoutMode == LayoutMode.Simple)
+        {
+            ClientData.DialogMode = DialogModes.Answer;
+            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+
+            StartSendingVersion(_cancellationTokenSource.Token);
+        }
+        else
+        {
+            TInfo.Selectable = true;
+            TInfo.SelectAnswer.CanBeExecuted = true;
+        }
     }
 
     /// <summary>
@@ -209,6 +223,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         TInfo.Selectable = false;
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
+        TInfo.SelectAnswer.CanBeExecuted = false;
         _data.Hint = "";
         _data.DialogMode = DialogModes.None;
 

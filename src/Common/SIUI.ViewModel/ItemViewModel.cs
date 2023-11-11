@@ -44,10 +44,23 @@ public sealed class ItemViewModel : INotifyPropertyChanged
         }
     }
 
+    private string _label = "";
+
     /// <summary>
     /// Item label.
     /// </summary>
-    public string Label { get; set; } = "";
+    public string Label
+    {
+        get => _label;
+        set
+        {
+            if (_label != value)
+            {
+                _label = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     private ContentViewModel _content = new(ContentType.Void, "");
 

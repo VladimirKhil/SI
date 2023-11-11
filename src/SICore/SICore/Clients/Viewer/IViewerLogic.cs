@@ -60,7 +60,11 @@ public interface IViewerLogic : ILogic
     [Obsolete]
     void OnBackgroundContent(string[] mparams);
 
-    void SetRight(string answer);
+    /// <summary>
+    /// Handles right answer or label.
+    /// </summary>
+    /// <param name="answer">Right answer or label.</param>
+    void OnRightAnswer(string answer);
 
     void Resume();
 
@@ -176,7 +180,7 @@ public interface IViewerLogic : ILogic
 
     void ResetPlayers() { }
 
-    void OnAnswerOptions(int optionCount) { }
+    void OnAnswerOptions(bool questionHasScreenContent, IEnumerable<string> optionsTypes) { }
 
     void OnContent(string[] mparams) { }
 

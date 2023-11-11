@@ -18,6 +18,11 @@ internal sealed class QuestionPlayState
     internal AnswerOption[]? AnswerOptions { get; set; }
 
     /// <summary>
+    /// Has layout been set.
+    /// </summary>
+    internal bool LayoutShown { get; set; }
+
+    /// <summary>
     /// Are answer options shown.
     /// </summary>
     internal bool AnswerOptionsShown { get; set; }
@@ -26,6 +31,7 @@ internal sealed class QuestionPlayState
     {
         AnswererIndicies.Clear();
         AnswerOptions = null;
+        LayoutShown = false;
         AnswerOptionsShown = false;
     }
 

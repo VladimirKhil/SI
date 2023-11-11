@@ -1682,6 +1682,10 @@ public sealed class GameLogic : Logic<GameData>
                         PrintPartial();
                         break;
 
+                    case Tasks.ShowNextAnswerOption:
+                        ShowNextAnswerOption(arg);
+                        break;
+
                     case Tasks.AskToTry:
                         AskToTry();
                         break;
@@ -3249,7 +3253,9 @@ public sealed class GameLogic : Logic<GameData>
             ? timeSettings.TimeForThinkingOnSpecial * 10
             : timeSettings.TimeForPrintingAnswer * 10;
 
-        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
+        var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
+
+        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman && !useAnswerOptions;
 
         if (_data.IsOralNow)
         {
@@ -3262,7 +3268,8 @@ public sealed class GameLogic : Logic<GameData>
             _gameActions.SendMessage(msg.ToString(), _data.Answerer.Name);
         }
 
-        _gameActions.ShowmanReplic(_data.Answerer.Name + GetRandomString(LO[nameof(R.YourAnswer)]));
+        var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : GetRandomString(LO[nameof(R.YourAnswer)]);
+        _gameActions.ShowmanReplic(_data.Answerer.Name + answerReplic);
 
         _data.Answerer.Answer = "";
 
@@ -4373,6 +4380,27 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
     }
 
+    internal void OnComplexAnswer()
+    {
+        var last = _data.QuestionHistory.LastOrDefault();
+
+        if (last == null || !last.IsRight) // There has been no right answer
+        {
+            var answer = _data.Question.Right.FirstOrDefault();
+            var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
+
+            _gameActions.ShowmanReplic(printedAnswer);
+        }
+    }
+
+    internal void OnRightAnswerOption(string rightOptionLabel)
+    {
+        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
+
+        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
+        ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
+    }
+
     internal void OnAnnouncePrice(NumberSet availableRange)
     {
         var s = new StringBuilder(LO[nameof(R.Cost2)]).Append(": ");
@@ -4550,21 +4578,13 @@ public sealed class GameLogic : Logic<GameData>
         ScheduleExecution(Tasks.MoveNext, 20, 1);
     }
 
-    internal void OnComplexAnswer()
+    internal void OnAnswerOptions(bool questionHasScreenContent, AnswerOption[] answerOptions)
     {
-        var last = _data.QuestionHistory.LastOrDefault();
+        var messageBuilder = new MessageBuilder(Messages.Layout).Add(MessageParams.Layout_AnswerOptions).Add(questionHasScreenContent ? '+' : '-');
+        messageBuilder.AddRange(answerOptions.Select(o => o.Content.Type));
 
-        if (last == null || !last.IsRight) // There has been no right answer
-        {
-            var answer = _data.Question.Right.FirstOrDefault();
-            var printedAnswer = answer != null ? $"{LO[nameof(R.RightAnswer)]}: {answer}" : LO[nameof(R.RightAnswerInOnTheScreen)];
-
-            _gameActions.ShowmanReplic(printedAnswer);
-        }
+        _gameActions.SendMessage(messageBuilder.ToString());
     }
-
-    internal void OnAnswerOptions(AnswerOption[] answerOptions) =>
-        _gameActions.SendMessageWithArgs(Messages.Layout, MessageParams.Layout_AnswerOptions, answerOptions.Length);
 
     internal void ShowAnswerOptions(Action continuation)
     {

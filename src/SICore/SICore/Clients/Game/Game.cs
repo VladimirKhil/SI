@@ -1988,6 +1988,8 @@ public sealed class Game : Actor<GameData, GameLogic>
             }
             else
             {
+                // TODO: set wrong answer option when options are used
+
                 ClientData.Answerer.AnswerIsWrong = true;
 
                 var restwrong = new List<string>();
@@ -2027,7 +2029,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                     wrongCount = 1;
                 }
 
-                int wrongIndex = Random.Shared.Next(wrongCount);
+                var wrongIndex = Random.Shared.Next(wrongCount);
 
                 ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
                 ClientData.Answerer.Answer = args[2].Replace("#", restwrong[wrongIndex]);

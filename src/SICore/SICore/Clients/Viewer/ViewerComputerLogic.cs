@@ -100,7 +100,7 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     }
 
-    public void SetRight(string answer) { }
+    public void OnRightAnswer(string answer) { }
 
     public void Resume() { }
 

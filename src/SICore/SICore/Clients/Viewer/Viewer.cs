@@ -839,7 +839,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                     break;
 
                 case Messages.RightAnswer:
-                    _logic.SetRight(mparams[2]);
+                    _logic.OnRightAnswer(mparams[2]);
                     break;
 
                 case Messages.Resume:
@@ -1083,7 +1083,7 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
 
     private void OnLayout(string[] mparams)
     {
-        if (mparams.Length < 3)
+        if (mparams.Length < 5)
         {
             return;
         }
@@ -1093,12 +1093,16 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
             return;
         }
 
-        if (!int.TryParse(mparams[2], out var optionCount) || optionCount < 2)
+        var questionHasScreenContent = mparams[2] == "+";
+
+        var optionsTypes = new List<string>();
+
+        for (var i = 3; i < mparams.Length; i++)
         {
-            return;
+            optionsTypes.Add(mparams[i]);
         }
 
-        Logic.OnAnswerOptions(optionCount);
+        Logic.OnAnswerOptions(questionHasScreenContent, optionsTypes);
     }
 
     private void OnSetJoinMode(string[] mparams)

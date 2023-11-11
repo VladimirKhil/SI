@@ -11,7 +11,7 @@ public interface IPlayerLogic : IPersonLogic
     void EndThink();
 
     /// <summary>
-    /// Надо отвечать
+    /// Reacts to sending answer request.
     /// </summary>
     void Answer();
 
