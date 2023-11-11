@@ -12,26 +12,55 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     private static readonly HttpClient HttpClient = new() { DefaultRequestVersion = HttpVersion.Version20 };
 
     private readonly ISIStorageServiceClient _siStorageServiceClient;
-    private readonly Dictionary<string, PackageEntry> _packageCache = new();
+    private readonly Dictionary<int, Dictionary<string, PackageEntry>> _packageCache = new();
+    private Dictionary<string, int>? _languageCache = null;
     private readonly SemaphoreSlim _packageSemaphore = new(1, 1);
 
     public SIStoragePackageProvider(ISIStorageServiceClient siStorageServiceClient) =>
         _siStorageServiceClient = siStorageServiceClient;
 
-    public async Task<IEnumerable<string>> GetPackagesAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> GetPackagesAsync(string culture, CancellationToken cancellationToken = default)
     {
-        if (_packageCache.Count == 0)
+        if (_languageCache == null)
         {
             await _packageSemaphore.WaitAsync(cancellationToken);
 
             try
             {
-                if (_packageCache.Count == 0)
+                if (_languageCache == null)
                 {
+                    var languages = await _siStorageServiceClient.Facets.GetLanguagesAsync(cancellationToken);
+                    _languageCache = languages.ToDictionary(l => l.Code, l => l.Id);
+                }
+            }
+            finally
+            {
+                _packageSemaphore.Release();
+            }
+        }
+
+        if (!_languageCache.TryGetValue(culture, out var languageId) || culture == null)
+        {
+            if (!_languageCache.TryGetValue("en-US", out languageId))
+            {
+                languageId = -1;
+            }
+        }
+
+        if (!_packageCache.TryGetValue(languageId, out var localizedCache))
+        {
+            await _packageSemaphore.WaitAsync(cancellationToken);
+
+            try
+            {
+                if (!_packageCache.TryGetValue(languageId, out localizedCache))
+                {
+                    _packageCache[languageId] = localizedCache = new Dictionary<string, PackageEntry>();
+
                     var packages = await _siStorageServiceClient.Packages.GetPackagesAsync(
-                    new PackageFilters { TagIds = new[] { -1 } },
-                    new PackageSelectionParameters { Count = 1000 },
-                    cancellationToken);
+                        new PackageFilters { LanguageId = languageId, TagIds = new[] { -1 } },
+                        new PackageSelectionParameters { Count = 1000 },
+                        cancellationToken);
 
                     foreach (var package in packages.Packages)
                     {
@@ -40,7 +69,7 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
                             continue;
                         }
 
-                        _packageCache[package.Id.ToString()] = new PackageEntry { Uri = package.DirectContentUri };
+                        localizedCache[package.Id.ToString()] = new PackageEntry { Uri = package.DirectContentUri };
                     }
                 }
             }
@@ -50,32 +79,65 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
             }
         }
 
-        return _packageCache.Keys;
+        return localizedCache.Keys;
     }
 
-    public async Task<SIDocument> GetPackageAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<SIDocument> GetPackageAsync(string culture, string name, CancellationToken cancellationToken = default)
     {
-        if (!_packageCache.TryGetValue(name, out var info))
+        ArgumentNullException.ThrowIfNull(name, nameof(name));
+
+        int languageId;
+
+        if (_languageCache == null || culture == null)
+        {
+            languageId = -1;
+        }
+        else if (!_languageCache.TryGetValue(culture, out languageId))
+        {
+            if (!_languageCache.TryGetValue("en-US", out languageId))
+            {
+                languageId = -1;
+            }
+        }
+
+        if (!_packageCache.TryGetValue(languageId, out var localizedCache))
+        {
+            throw new PackageNotFoundException(name);
+        }
+
+        if (!localizedCache.TryGetValue(name, out var info))
         {
             throw new PackageNotFoundException(name);
         }
 
         if (info.LocalPath == null)
         {
-            var fileName = Path.GetTempFileName();
+            await _packageSemaphore.WaitAsync(cancellationToken);
 
-            using var response = await HttpClient.GetAsync(info.Uri, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new Exception(
-                    $"Error while accessing \"{info.Uri}\": {await response.Content.ReadAsStringAsync(cancellationToken)}!");
+                if (info.LocalPath == null)
+                {
+                    var fileName = Path.GetTempFileName();
+
+                    using var response = await HttpClient.GetAsync(info.Uri, cancellationToken);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new Exception(
+                            $"Error while accessing \"{info.Uri}\": {await response.Content.ReadAsStringAsync(cancellationToken)}!");
+                    }
+
+                    using var fs = File.Create(fileName);
+                    await response.Content.CopyToAsync(fs, cancellationToken);
+
+                    info.LocalPath = fileName;
+                }
             }
-
-            using var fs = File.Create(fileName);
-            await response.Content.CopyToAsync(fs, cancellationToken);
-
-            info.LocalPath = fileName;
+            finally
+            {
+                _packageSemaphore.Release();
+            }
         }
 
         return SIDocument.Load(File.OpenRead(info.LocalPath));
@@ -85,18 +147,21 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
     {
         var exceptionsList = new List<Exception>();
 
-        foreach (var package in _packageCache)
+        foreach (var localizedCache in _packageCache.Values)
         {
-            try
+            foreach (var package in localizedCache.Values)
             {
-                if (package.Value.LocalPath != null)
+                try
                 {
-                    File.Delete(package.Value.LocalPath);
+                    if (package.LocalPath != null)
+                    {
+                        File.Delete(package.LocalPath);
+                    }
                 }
-            }
-            catch (Exception exc)
-            {
-                exceptionsList.Add(exc);
+                catch (Exception exc)
+                {
+                    exceptionsList.Add(exc);
+                }
             }
         }
 
@@ -106,7 +171,7 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
         }
     }
 
-    private record struct PackageEntry
+    private record PackageEntry
     {
         public Uri Uri { get; set; }
 

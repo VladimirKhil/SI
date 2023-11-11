@@ -26,7 +26,7 @@ public static class PackageHelper
         CancellationToken cancellationToken = default)
     {
         var doc = SIDocument.Create(name, author, stream);
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, int.MaxValue, cancellationToken);
+        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, "", int.MaxValue, cancellationToken);
     }
 
     public static Task<SIDocument> GenerateRandomPackageAsync(
@@ -36,6 +36,7 @@ public static class PackageHelper
         string author,
         string roundNameFormat,
         string finalName,
+        string culture,
         int roundsCount = 3,
         int themesCount = 6,
         int baseCost = 100,
@@ -44,7 +45,7 @@ public static class PackageHelper
     {
         var doc = SIDocument.Create(name, author, folder);
 
-        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, maxPackageCount, cancellationToken);
+        return GenerateCoreAsync(provider, roundsCount, themesCount, baseCost, doc, roundNameFormat, finalName, culture, maxPackageCount, cancellationToken);
     }
 
     private static async Task<SIDocument> GenerateCoreAsync(
@@ -55,10 +56,11 @@ public static class PackageHelper
         SIDocument doc,
         string roundNameFormat,
         string finalName,
+        string culture,
         int maxPackageCount = int.MaxValue,
         CancellationToken cancellationToken = default)
     {
-        var files = (await provider.GetPackagesAsync(cancellationToken)).ToList();
+        var files = (await provider.GetPackagesAsync(culture, cancellationToken)).ToList();
 
         if (maxPackageCount < int.MaxValue)
         {
@@ -86,6 +88,7 @@ public static class PackageHelper
                     round => round.Type == RoundTypes.Standart && round.Themes.Count > 0,
                     packageComments,
                     baseCost,
+                    culture,
                     cancellationToken))
                 {
                     j--;
@@ -116,6 +119,7 @@ public static class PackageHelper
                 round => round.Type == RoundTypes.Final && round.Themes.Count > 0,
                 packageComments,
                 0,
+                culture,
                 cancellationToken))
             {
                 j--;
@@ -141,10 +145,11 @@ public static class PackageHelper
         Func<Round, bool> predicate,
         StringBuilder packageComments,
         int baseCost,
+        string culture,
         CancellationToken cancellationToken = default)
     {
         var fIndex = Random.Shared.Next(files.Count);
-        var doc2 = await provider.GetPackageAsync(files[fIndex], cancellationToken) ?? throw new PackageNotFoundException(files[fIndex]);
+        var doc2 = await provider.GetPackageAsync(culture, files[fIndex], cancellationToken) ?? throw new PackageNotFoundException(files[fIndex]);
 
         using (doc2)
         {
@@ -242,6 +247,27 @@ public static class PackageHelper
             if (link.GetStream != null)
             {
                 var collection = doc.TryGetCollection(contentItem.Type);
+
+                if (collection != null)
+                {
+                    using var stream = link.GetStream().Stream;
+                    await collection.AddFileAsync(link.Uri, stream, cancellationToken);
+                }
+            }
+        }
+
+        foreach (var atom in question.Scenario)
+        {
+            if (atom.Type == AtomTypes.Text || atom.Type == AtomTypes.Oral)
+            {
+                continue;
+            }
+
+            var link = doc2.GetLink(atom);
+
+            if (link.GetStream != null)
+            {
+                var collection = doc.TryGetCollection(atom.Type);
 
                 if (collection != null)
                 {
