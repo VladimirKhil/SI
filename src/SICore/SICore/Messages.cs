@@ -140,6 +140,11 @@ public static class Messages
     public const string ContentShape = "CONTENT_SHAPE";
 
     /// <summary>
+    /// Updates content state.
+    /// </summary>
+    public const string ContentState = "CONTENT_STATE";
+
+    /// <summary>
     /// Удаление темы
     /// </summary>
     public const string Delete = "DELETE";

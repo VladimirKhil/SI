@@ -1983,13 +1983,31 @@ public sealed class Game : Actor<GameData, GameLogic>
         {
             if (args[1] == MessageParams.Answer_Right)
             {
-                ClientData.Answerer.Answer = args[2].Replace(Constants.AnswerPlaceholder, ClientData.Question.Right.FirstOrDefault() ?? "(...)");
-                ClientData.Answerer.AnswerIsWrong = false;
+                if (ClientData.QuestionPlayState.AnswerOptions != null)
+                {
+                    var rightLabel = ClientData.Question.Right.FirstOrDefault();
+                    var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
+
+                    ClientData.Answerer.Answer = rightIndex.ToString();
+                }
+                else
+                {
+                    ClientData.Answerer.Answer = args[2].Replace(Constants.AnswerPlaceholder, ClientData.Question.Right.FirstOrDefault() ?? "(...)").GrowFirstLetter();
+                    ClientData.Answerer.AnswerIsWrong = false;
+                }
+            }
+            else if (ClientData.QuestionPlayState.AnswerOptions != null)
+            {
+                var rightLabel = ClientData.Question.Right.FirstOrDefault();
+                var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
+
+                var leftIndicies = Enumerable.Range(0, ClientData.QuestionPlayState.AnswerOptions.Length).Except(ClientData.QuestionPlayState.UsedAnswerOptionsIndicies).Except(new int[] { rightIndex }).ToArray();
+                var wrongIndex = leftIndicies[Random.Shared.Next(leftIndicies.Length)];
+
+                ClientData.Answerer.Answer = wrongIndex.ToString();
             }
             else
             {
-                // TODO: set wrong answer option when options are used
-
                 ClientData.Answerer.AnswerIsWrong = true;
 
                 var restwrong = new List<string>();
@@ -2031,11 +2049,13 @@ public sealed class Game : Actor<GameData, GameLogic>
 
                 var wrongIndex = Random.Shared.Next(wrongCount);
 
-                ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
-                ClientData.Answerer.Answer = args[2].Replace("#", restwrong[wrongIndex]);
-            }
+                if (ClientData.Round.Type != RoundTypes.Final)
+                {
+                    ClientData.UsedWrongVersions.Add(restwrong[wrongIndex]);
+                }
 
-            ClientData.Answerer.Answer = ClientData.Answerer.Answer.GrowFirstLetter();
+                ClientData.Answerer.Answer = args[2].Replace("#", restwrong[wrongIndex]).GrowFirstLetter();
+            }
         }
         else
         {

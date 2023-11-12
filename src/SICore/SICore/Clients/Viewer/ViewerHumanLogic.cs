@@ -664,6 +664,26 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.TextLength += newTextLength;
     }
 
+    public void OnContentState(string[] mparams)
+    {
+        if (mparams.Length < 4)
+        {
+            return;
+        }
+
+        var placement = mparams[1];
+
+        if (TInfo.LayoutMode == LayoutMode.AnswerOptions
+            && placement == ContentPlacements.Screen
+            && int.TryParse(mparams[2], out var layoutId)
+            && layoutId > 0
+            && layoutId <= TInfo.AnswerOptions.Options.Length
+            && Enum.TryParse<ItemState>(mparams[3], out var state))
+        {
+            TInfo.AnswerOptions.Options[layoutId - 1].State = state;
+        }
+    }
+
     private void OnScreenContent(IEnumerable<ContentInfo> contentInfo)
     {
         if (TInfo.TStage != TableStage.Answer && _data.Speaker != null && !_data.Speaker.IsShowman)
@@ -1056,9 +1076,14 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             var options = TInfo.AnswerOptions.Options;
 
+            if (!int.TryParse(answer, out var answerIndex))
+            {
+                answerIndex = -1;
+            }
+
             for (int i = 0; i < options.Length; i++)
             {
-                if (options[i].Label == answer)
+                if (i == answerIndex)
                 {
                     options[i].State = ItemState.Right;
                 }

@@ -820,6 +820,10 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
                     _logic.OnContentAppend(mparams);
                     break;
 
+                case Messages.ContentState:
+                    _logic.OnContentState(mparams);
+                    break;
+
                 case Messages.Atom_Hint:
                     if (mparams.Length > 1)
                     {

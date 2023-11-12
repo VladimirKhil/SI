@@ -11,6 +11,7 @@ using SIPackages;
 using SIPackages.Core;
 using SIPackages.Providers;
 using SIUI.Model;
+using SIUI.ViewModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using R = SICore.Properties.Resources;
@@ -1345,6 +1346,12 @@ public sealed class GameLogic : Logic<GameData>
 
                 _gameActions.SendMessage(s.ToString());
 
+                if (_data.QuestionPlayState.AnswerOptions != null && int.TryParse(_data.Answerer.Answer, out var answerIndex))
+                {
+                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
+                    _data.QuestionPlayState.UsedAnswerOptionsIndicies.Add(answerIndex);
+                }
+
                 _data.Answerer.Sum -= _data.CurPriceWrong;
                 _data.Answerer.CanPress = false;
                 _gameActions.InformSums();
@@ -1390,6 +1397,17 @@ public sealed class GameLogic : Logic<GameData>
         {
             ScheduleExecution(Tasks.WaitTry, 20, force: true);
             return;
+        }
+
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            var oneOptionLeft = _data.QuestionPlayState.UsedAnswerOptionsIndicies.Count + 1 == _data.QuestionPlayState.AnswerOptions.Length;
+
+            if (oneOptionLeft)
+            {
+                ScheduleExecution(Tasks.WaitTry, 20, force: true);
+                return;
+            }
         }
 
         _data.PendingAnswererIndicies.Clear();
@@ -1506,7 +1524,20 @@ public sealed class GameLogic : Logic<GameData>
 
             StopWaiting();
 
-            _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
+            if (_data.QuestionPlayState.AnswerOptions != null)
+            {
+                if (int.TryParse(_data.Answerer.Answer, out var answerIndex))
+                {
+                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
+                }
+
+                ScheduleExecution(Tasks.AskRight, 15, force: true);
+                return true;
+            }
+            else
+            {
+                _gameActions.PlayerReplic(_data.AnswererIndex, _data.Answerer.Answer);
+            }
 
             if (_data.IsOralNow)
             {
@@ -3162,7 +3193,21 @@ public sealed class GameLogic : Logic<GameData>
     {
         _data.ShowmanDecision = false;
 
-        if (!_data.Answerer.IsHuman)
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            _data.IsWaiting = true;
+            _data.Decision = DecisionType.AnswerValidating;
+
+            var rightLabel = ClientData.Question.Right.FirstOrDefault();
+            var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
+
+            _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightIndex.ToString();
+            _data.Answerer.AnswerIsRightFactor = 1.0;
+            _data.ShowmanDecision = true;
+
+            OnDecision();
+        }
+        else if (!_data.Answerer.IsHuman)
         {
             _data.IsWaiting = true;
             _data.Decision = DecisionType.AnswerValidating;
@@ -4405,7 +4450,19 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
+        var rightIndex = ClientData.QuestionPlayState.AnswerOptions != null
+            ? Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightOptionLabel)
+            : -1;
+
+        if (rightIndex > -1)
+        {
+            _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightIndex);
+        }
+        else
+        {
+            var printedAnswer = $"{LO[nameof(R.RightAnswer)]}: {rightOptionLabel}";
+            _gameActions.ShowmanReplic(printedAnswer);
+        }
 
         var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
         ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);

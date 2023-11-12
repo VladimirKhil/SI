@@ -185,4 +185,6 @@ public interface IViewerLogic : ILogic
     void OnContent(string[] mparams) { }
 
     void OnContentAppend(string[] mparams) { }
+
+    void OnContentState(string[] mparams) { }
 }

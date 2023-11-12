@@ -40,7 +40,15 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         TInfo.SelectTheme.CanBeExecuted = false;
     }
 
-    private void TInfo_AnswerSelected(ItemViewModel item) => ClientData.PlayerDataExtensions.SendAnswer.Execute(item.Label);
+    private void TInfo_AnswerSelected(ItemViewModel item)
+    {
+        var optionIndex = Array.IndexOf(TInfo.AnswerOptions.Options, item);
+
+        if (optionIndex > -1)
+        {
+            ClientData.PlayerDataExtensions.SendAnswer.Execute(optionIndex.ToString());
+        }
+    }
 
     #region PlayerInterface Members
 

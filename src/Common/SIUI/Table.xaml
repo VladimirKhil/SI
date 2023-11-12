@@ -275,6 +275,10 @@
                                 <Setter Property="Foreground" Value="DarkBlue" />
                                 <Setter Property="BorderBrush" Value="LightYellow" />
                             </DataTrigger>
+                            
+                            <DataTrigger Binding="{Binding State}" Value="{x:Static vm:ItemState.Wrong}">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
 
