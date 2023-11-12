@@ -4686,7 +4686,7 @@ public sealed class GameLogic : Logic<GameData>
                     }
                     else
                     {
-                        messageBuilder.Add(contentItem.Type).Add(globalUri);
+                        messageBuilder.Add(contentItem.Type).Add(MessageParams.Atom_Uri).Add(globalUri);
                         legacyBuilder.Add(contentItem.Type == ContentTypes.Audio ? AtomTypes.Audio : contentItem.Type).Add(globalUri);
 
                         if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
