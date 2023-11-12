@@ -15,12 +15,12 @@ public sealed class PackageProvider : IPackagesProvider
         _folder = folder;
     }
 
-    public Task<IEnumerable<string>> GetPackagesAsync(CancellationToken cancellationToken = default)
+    public Task<IEnumerable<string>> GetPackagesAsync(string culture, CancellationToken cancellationToken = default)
     {
         var dir = new DirectoryInfo(_folder);
         return Task.FromResult(dir.EnumerateFiles("*.siq").Select(file => file.Name));
     }
 
-    public Task<SIDocument> GetPackageAsync(string name, CancellationToken cancellationToken = default) =>
+    public Task<SIDocument> GetPackageAsync(string culture, string name, CancellationToken cancellationToken = default) =>
         Task.FromResult(SIDocument.Load(File.OpenRead(Path.Combine(_folder, name))));
 }
