@@ -4649,6 +4649,8 @@ public sealed class GameLogic : Logic<GameData>
 
             foreach (var contentItem in contentList)
             {
+                var legacyBuilder = new MessageBuilder(placement == ContentPlacements.Background && contentTable.Keys.Count > 1 ? Messages.Atom_Second : Messages.Atom);
+
                 messageBuilder.Add(0); // LayoutId = 0 for this content
 
                 int duration;
@@ -4656,6 +4658,7 @@ public sealed class GameLogic : Logic<GameData>
                 if (contentItem.Type == ContentTypes.Text)
                 {
                     messageBuilder.Add(contentItem.Type).Add(contentItem.Value.EscapeNewLines());
+                    legacyBuilder.Add(contentItem.Type).Add(contentItem.Value);
 
                     duration = contentItem.Duration > TimeSpan.Zero
                         ? (int)(contentItem.Duration.TotalMilliseconds / 100)
@@ -4668,11 +4671,13 @@ public sealed class GameLogic : Logic<GameData>
                     if (!success || globalUri == null)
                     {
                         messageBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
+                        legacyBuilder.Add(ContentTypes.Text).Add(string.Format(LO[nameof(R.MediaNotFound)], globalUri));
                         duration = DefaultImageTime + _data.Settings.AppSettings.TimeSettings.TimeForMediaDelay * 10;
                     }
                     else
                     {
                         messageBuilder.Add(contentItem.Type).Add(globalUri);
+                        legacyBuilder.Add(contentItem.Type == ContentTypes.Audio ? AtomTypes.Audio : contentItem.Type).Add(globalUri);
 
                         if ((contentItem.Type == ContentTypes.Audio || contentItem.Type == ContentTypes.Video) && !registeredMediaPlay)
                         {
@@ -4692,6 +4697,8 @@ public sealed class GameLogic : Logic<GameData>
                 }
 
                 contentListDuration += duration;
+
+                _gameActions.SendMessage(legacyBuilder.ToString());
             }
 
             _gameActions.SendMessage(messageBuilder.ToString());
