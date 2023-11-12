@@ -2537,6 +2537,15 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Задавать правильный ответ по имени файла, добавляемого в вопрос.
+        /// </summary>
+        public static string SetRightAnswerFromFileName {
+            get {
+                return ResourceManager.GetString("SetRightAnswerFromFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Задать теги.
         /// </summary>
         public static string SetTags {

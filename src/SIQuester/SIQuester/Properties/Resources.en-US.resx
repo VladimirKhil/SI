@@ -939,6 +939,9 @@
   <data name="SetLogo" xml:space="preserve">
     <value>Set logo</value>
   </data>
+  <data name="SetRightAnswerFromFileName" xml:space="preserve">
+    <value>Set right answer by name of file which is added to question</value>
+  </data>
   <data name="SetTags" xml:space="preserve">
     <value>Set tags</value>
   </data>

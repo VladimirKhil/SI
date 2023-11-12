@@ -1,5 +1,6 @@
 ﻿using SIPackages;
 using SIPackages.Core;
+using SIQuester.Model;
 using SIQuester.ViewModel.PlatformSpecific;
 using SIQuester.ViewModel.Properties;
 using System.Collections.Specialized;
@@ -466,21 +467,33 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
                 index = -1;
             }
 
-            var atom = new ContentItemViewModel(new ContentItem 
+            var contentItem = new ContentItemViewModel(new ContentItem 
             {
                 Type = mediaType,
                 Value = "",
                 Placement = mediaType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
             });
 
-            Insert(index + 1, atom);
+            Insert(index + 1, contentItem);
 
             var last = collection.Files.LastOrDefault();
 
             if (last != null)
             {
-                atom.Model.IsRef = true;
-                atom.Model.Value = last.Model.Name;
+                contentItem.Model.IsRef = true;
+                contentItem.Model.Value = last.Model.Name;
+
+                if (AppSettings.Default.SetRightAnswerFromFileName)
+                {
+                    var question = Owner;
+
+                    if (question.Right.Last().Length == 0)
+                    {
+                        question.Right.RemoveAt(question.Right.Count - 1);
+                    }
+
+                    question.Right.Add(Path.GetFileNameWithoutExtension(last.Model.Name));
+                }
             }
 
             document.ActiveItem = null;

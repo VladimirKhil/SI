@@ -63,6 +63,7 @@
             <CheckBox Content="{x:Static lp:Resources.SpellChecking}" IsChecked="{Binding Model.SpellChecking}" IsEnabled="{Binding SpellCheckingEnabled}" />
             <CheckBox Content="{x:Static lp:Resources.RemoveUnusedMedia}" IsChecked="{Binding Model.RemoveLinks}" />
             <CheckBox Content="{x:Static lp:Resources.CheckFileSize}" IsChecked="{Binding Model.CheckFileSize}" />
+            <CheckBox Content="{x:Static lp:Resources.SetRightAnswerFromFileName}" IsChecked="{Binding Model.SetRightAnswerFromFileName}" />
 
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <TextBlock VerticalAlignment="Center"><Run Text="{x:Static lp:Resources.SelectOptionCount}" /></TextBlock>

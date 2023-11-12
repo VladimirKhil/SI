@@ -555,6 +555,18 @@ public partial class FlatDocView : UserControl
             Value = item.Model.Name,
             Placement = contentType == ContentTypes.Audio ? ContentPlacements.Background : ContentPlacements.Screen
         }));
+
+        if (AppSettings.Default.SetRightAnswerFromFileName)
+        {
+            var question = contentItemsViewModel.Owner;
+
+            if (question.Right.Last().Length == 0)
+            {
+                question.Right.RemoveAt(question.Right.Count - 1);
+            }
+
+            question.Right.Add(Path.GetFileNameWithoutExtension(item.Model.Name));
+        }
     }
 
     internal static void RecountPrices(Theme theme, int pos, bool down)

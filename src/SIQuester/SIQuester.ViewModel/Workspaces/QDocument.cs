@@ -1326,7 +1326,7 @@ public sealed class QDocument : WorkspaceViewModel
 
         var msvmLogger = loggerFactory.CreateLogger<MediaStorageViewModel>();
 
-        Images = new MediaStorageViewModel(this, Document.Images, Resources.Images, msvmLogger);
+        Images = new MediaStorageViewModel(this, Document.Images, Resources.Images, msvmLogger, true);
         Audio = new MediaStorageViewModel(this, Document.Audio, SIPackages.Properties.Resources.Audio, msvmLogger);
         Video = new MediaStorageViewModel(this, Document.Video, SIPackages.Properties.Resources.Video, msvmLogger);
         Html = new MediaStorageViewModel(this, Document.Html, SIPackages.Properties.Resources.Html, msvmLogger);

@@ -2,6 +2,7 @@
 using SIPackages;
 using SIPackages.Core;
 using SIQuester.ViewModel.Model;
+using SIQuester.ViewModel.PlatformSpecific;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -90,6 +91,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     public ICommand DeleteItem { get; private set; }
 
+    /// <summary>
+    /// Compresses media item.
+    /// </summary>
+    public ICommand CompressItem { get; private set; }
+
     private readonly string _header;
 
     private readonly string _name;
@@ -120,7 +126,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         }
     }
 
-    public MediaStorageViewModel(QDocument document, DataCollection collection, string header, ILogger<MediaStorageViewModel> logger)
+    public MediaStorageViewModel(QDocument document, DataCollection collection, string header, ILogger<MediaStorageViewModel> logger, bool canCompress = false)
     {
         _document = document;
         _header = header;
@@ -131,6 +137,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
         AddItem = new SimpleCommand(AddItem_Executed);
         DeleteItem = new SimpleCommand(Delete_Executed);
+        CompressItem = new SimpleCommand(CompressItem_Executed) { CanBeExecuted = canCompress };
     }
 
     private void FillFiles(DataCollection collection)
@@ -167,7 +174,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
         var newValue = item.Name;
         var renamedExisting = !_added.Any(mi => mi.Model == item);
-        Tuple<string, string> tuple = null;
+        Tuple<string, string>? tuple = null;
 
         if (renamedExisting)
         {
@@ -286,25 +293,88 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         }
     }
 
-    private void PreviewRemove(MediaItemViewModel name)
+    private void CompressItem_Executed(object? arg)
     {
-        if (!Files.Contains(name))
+        if (arg == null)
         {
             return;
         }
 
-        if (_added.Contains(name))
+        var item = (MediaItemViewModel)arg;
+
+        if (item.MediaSource == null)
         {
-            _added.Remove(name);
-            _removedStreams.Add(name, _streams[name]);
-            _streams.Remove(name);
+            return;
+        }
+
+        var sourceUri = item.MediaSource.Uri;
+        var newUri = PlatformManager.Instance.CompressImage(sourceUri);
+
+        if (newUri != sourceUri)
+        {
+            var newItem = CreateItem(item.Name);
+            var currentIndex = Files.IndexOf(item);
+
+            var returnToCurrent = CurrentFile == item;
+
+            PreviewRemove(item);
+            PreviewAdd(newItem, newUri, currentIndex);
+            HasPendingChanges = IsChanged();
+
+            if (returnToCurrent)
+            {
+                CurrentFile = newItem;
+            }
+
+            OnChanged(new CustomChange(
+                () =>
+                {
+                    var returnToCurrent = CurrentFile == newItem;
+
+                    PreviewRemove(newItem);
+                    PreviewAdd(item, sourceUri);
+                    HasPendingChanges = IsChanged();
+
+                    if (returnToCurrent)
+                    {
+                        CurrentFile = item;
+                    }
+                },
+                () =>
+                {
+                    var returnToCurrent = CurrentFile == item;
+
+                    PreviewRemove(item);
+                    PreviewAdd(newItem, newUri);
+                    HasPendingChanges = IsChanged();
+
+                    if (returnToCurrent)
+                    {
+                        CurrentFile = newItem;
+                    }
+                }));
+        }
+    }
+
+    private void PreviewRemove(MediaItemViewModel item)
+    {
+        if (!Files.Contains(item))
+        {
+            return;
+        }
+
+        if (_added.Contains(item))
+        {
+            _added.Remove(item);
+            _removedStreams.Add(item, _streams[item]);
+            _streams.Remove(item);
         }
         else
         {
-            _removed.Add(name);
+            _removed.Add(item);
         }
 
-        Files.Remove(name);
+        Files.Remove(item);
         OnPropertyChanged(nameof(Files));
     }
 
@@ -388,7 +458,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
     private void AddItem_Executed(object? arg)
     {
-        var files = PlatformSpecific.PlatformManager.Instance.ShowMediaOpenUI(_name);
+        var files = PlatformManager.Instance.ShowMediaOpenUI(_name);
 
         if (files == null)
         {
@@ -440,7 +510,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         return item;
     }
 
-    private void PreviewAdd(MediaItemViewModel item, string path)
+    private void PreviewAdd(MediaItemViewModel item, string path, int index = -1)
     {
         if (_removed.Contains(item))
         {
@@ -463,9 +533,22 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 
             _added.Add(item);
             _streams[item] = Tuple.Create(path, fileStream);
+
+            if (_removedStreams.ContainsKey(item))
+            {
+                _removedStreams.Remove(item);
+            }
         }
 
-        Files.Add(item);
+        if (index == -1)
+        {
+            Files.Add(item);
+        }
+        else
+        {
+            Files.Insert(index, item);
+        }
+
         OnPropertyChanged(nameof(Files));
 
         HasPendingChanges = IsChanged();

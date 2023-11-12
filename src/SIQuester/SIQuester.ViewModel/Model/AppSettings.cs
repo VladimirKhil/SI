@@ -432,6 +432,25 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _setRightAnswerFromFileName = false;
+
+    /// <summary>
+    /// Sets right answer when media file is added to question.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool SetRightAnswerFromFileName
+    {
+        get => _setRightAnswerFromFileName;
+        set
+        {
+            if (_setRightAnswerFromFileName != value)
+            {
+                _setRightAnswerFromFileName = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private string? _language = null;
 
     /// <summary>
@@ -559,5 +578,7 @@ public sealed class AppSettings : INotifyPropertyChanged
         _flatScale = defaultSettings._flatScale;
         FlatLayoutMode = defaultSettings.FlatLayoutMode;
         SelectOptionCount = DefaultSelectOptionCount;
+        CheckFileSize = defaultSettings.CheckFileSize;
+        SetRightAnswerFromFileName = defaultSettings.SetRightAnswerFromFileName;
     }
 }

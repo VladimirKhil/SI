@@ -214,10 +214,9 @@
                                     Data="{Binding Source={StaticResource app_delete},Path=Data}" />
                             </Button>
                             
-                            <!--<Button
+                            <Button
                                 Grid.Column="1"
                                 VerticalAlignment="Top"
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 Margin="5,0,0,0" Command="{Binding ElementName=root,Path=DataContext.CompressItem}"
                                 CommandParameter="{Binding}"
                                 Width="25"
@@ -229,7 +228,17 @@
                                     StrokeThickness="2"
                                     Margin="3"
                                     Data="{Binding Source={StaticResource app_lightning},Path=Data}" />
-                            </Button>-->
+
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
 
                         <ToggleButton

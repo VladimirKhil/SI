@@ -943,6 +943,9 @@
   <data name="SetLogo" xml:space="preserve">
     <value>Задать логотип</value>
   </data>
+  <data name="SetRightAnswerFromFileName" xml:space="preserve">
+    <value>Задавать правильный ответ по имени файла, добавляемого в вопрос</value>
+  </data>
   <data name="SetTags" xml:space="preserve">
     <value>Задать теги</value>
   </data>

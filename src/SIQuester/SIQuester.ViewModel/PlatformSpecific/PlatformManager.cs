@@ -73,4 +73,6 @@ public abstract class PlatformManager
     public abstract bool ConfirmExclWithWindow(string message);
 
     public abstract void Exit();
+
+    public abstract string CompressImage(string imageUri);
 }

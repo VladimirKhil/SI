@@ -14,6 +14,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 using System.Windows.Xps.Packaging;
 using System.Windows.Xps.Serialization;
@@ -1023,6 +1024,55 @@ internal sealed class DesktopManager : PlatformManager, IDisposable
     }
 
     public override void Exit() => Application.Current.MainWindow?.Close();
+
+    public override string CompressImage(string imageUri)
+    {
+        var extension = Path.GetExtension(imageUri);
+
+        if (extension != ".jpg" && extension != ".png")
+        {
+            return imageUri;
+        }
+
+        var bitmapImage = new BitmapImage(new Uri(imageUri));
+
+        var width = bitmapImage.PixelWidth;
+        var height = bitmapImage.PixelHeight;
+
+        const double TargetPixelSize = 800.0;
+        const int TargetQualityLevel = 90;
+
+        if (width <= TargetPixelSize && height <= TargetPixelSize)
+        {
+            return imageUri;
+        }
+
+        var widthScale = TargetPixelSize / width;
+        var heightScale = TargetPixelSize / height;
+
+        var scale = Math.Min(widthScale, heightScale);
+
+        var resizedImage = new TransformedBitmap(bitmapImage, new ScaleTransform(scale, scale));
+
+        BitmapEncoder encoder = extension == ".jpg" ? new JpegBitmapEncoder
+        {
+            QualityLevel = TargetQualityLevel
+        } : new PngBitmapEncoder();
+
+        encoder.Frames.Add(BitmapFrame.Create(resizedImage));
+
+        var fileName = Path.GetFileName(imageUri);
+        var outputDir = Path.Combine(Path.GetTempPath(), AppSettings.ProductName, AppSettings.MediaFolderName, Guid.NewGuid().ToString());
+        Directory.CreateDirectory(outputDir);
+        var outputPath = Path.Combine(outputDir, fileName);
+
+        using (var fileStream = new FileStream(outputPath, FileMode.Create))
+        {
+            encoder.Save(fileStream);
+        }
+
+        return outputPath;
+    }
 
     public void Dispose()
     {
