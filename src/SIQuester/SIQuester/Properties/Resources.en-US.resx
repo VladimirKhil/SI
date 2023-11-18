@@ -651,6 +651,12 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="NavigateToFile" xml:space="preserve">
+    <value>Navigate to file</value>
+  </data>
+  <data name="NavigateToUsage" xml:space="preserve">
+    <value>Navigate to usage</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Next</value>
   </data>

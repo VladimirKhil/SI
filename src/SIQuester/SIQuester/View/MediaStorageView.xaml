@@ -239,6 +239,21 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
+                            
+                            <Button
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                Margin="5,0,0,0" Command="{Binding ElementName=root,Path=DataContext.NavigateToUsage}"
+                                CommandParameter="{Binding}"
+                                Width="25"
+                                Height="25"
+                                ToolTip="{x:Static lp:Resources.NavigateToUsage}">
+                                <Path
+                                    Stretch="Uniform"
+                                    Stroke="#FF555555"
+                                    StrokeThickness="2"
+                                    Margin="3"
+                                    Data="{Binding Source={StaticResource app_right},Path=Data}" />
+                            </Button>
                         </StackPanel>
 
                         <ToggleButton

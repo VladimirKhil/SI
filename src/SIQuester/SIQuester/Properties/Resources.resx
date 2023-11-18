@@ -655,6 +655,12 @@
   <data name="Name" xml:space="preserve">
     <value>Имя</value>
   </data>
+  <data name="NavigateToFile" xml:space="preserve">
+    <value>Перейти к файлу</value>
+  </data>
+  <data name="NavigateToUsage" xml:space="preserve">
+    <value>Перейти к использованию</value>
+  </data>
   <data name="Next" xml:space="preserve">
     <value>Дальше</value>
   </data>

@@ -207,6 +207,12 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <DrawingImage x:Key="RightImageGrayKey">
+        <DrawingImage.Drawing>
+            <GeometryDrawing Brush="Gray" Geometry="{Binding Source={StaticResource app_right},Path=Data}" />
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <DrawingImage x:Key="WikifyImage">
         <DrawingImage.Drawing>
             <GeometryDrawing Brush="Black" Geometry="{Binding Source={StaticResource app_wiki},Path=Data}" />

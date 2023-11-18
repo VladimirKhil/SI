@@ -96,6 +96,11 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     /// </summary>
     public ICommand CompressItem { get; private set; }
 
+    /// <summary>
+    /// Navigates to media item usage.
+    /// </summary>
+    public ICommand NavigateToUsage { get; }
+
     private readonly string _header;
 
     private readonly string _name;
@@ -138,6 +143,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         AddItem = new SimpleCommand(AddItem_Executed);
         DeleteItem = new SimpleCommand(Delete_Executed);
         CompressItem = new SimpleCommand(CompressItem_Executed) { CanBeExecuted = canCompress };
+        NavigateToUsage = new SimpleCommand(NavigateToUsage_Executed);
     }
 
     private void FillFiles(DataCollection collection)
@@ -353,6 +359,50 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                         CurrentFile = newItem;
                     }
                 }));
+        }
+    }
+
+    private void NavigateToUsage_Executed(object? arg)
+    {
+        if (arg == null)
+        {
+            return;
+        }
+
+        var item = (MediaItemViewModel)arg;
+        var logo = _document.Package.Model.LogoItem;
+
+        if (logo != null && item.Name == logo.Value)
+        {
+            _document.Navigate.Execute(_document.Package);
+            return;
+        }
+
+        foreach (var round in _document.Package.Rounds)
+        {
+            foreach (var theme in round.Themes)
+            {
+                foreach (var question in theme.Questions)
+                {
+                    foreach (var content in question.Model.GetContent())
+                    {
+                        if (content.Value == item.Name)
+                        {
+                            _document.Navigate.Execute(question);
+                            return;
+                        }
+                    }
+
+                    foreach (var atom in question.Model.Scenario)
+                    {
+                        if (atom.IsLink && atom.Text.ExtractLink() == item.Name)
+                        {
+                            _document.Navigate.Execute(question);
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 

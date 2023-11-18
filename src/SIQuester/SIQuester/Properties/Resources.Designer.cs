@@ -1673,6 +1673,24 @@ namespace SIQuester.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Перейти к файлу.
+        /// </summary>
+        public static string NavigateToFile {
+            get {
+                return ResourceManager.GetString("NavigateToFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Перейти к использованию.
+        /// </summary>
+        public static string NavigateToUsage {
+            get {
+                return ResourceManager.GetString("NavigateToUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Дальше.
         /// </summary>
         public static string Next {

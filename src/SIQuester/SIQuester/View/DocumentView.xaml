@@ -119,7 +119,7 @@
                     </Style>
                 </StackPanel.Resources>
 
-                <ToggleButton Name="bSidebar" ToolTip="{x:Static lp:Resources.SidePanel}">
+                <ToggleButton Name="bSidebar" ToolTip="{x:Static lp:Resources.SidePanel}" IsChecked="{Binding IsSideOpened}">
                     <Path Stretch="Uniform" Margin="3" Fill="#FF806830" Data="{Binding Source={StaticResource app_sidebar},Path=Data}" />
                 </ToggleButton>
                 
@@ -530,7 +530,7 @@
                     </Setter>
                     
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=bSidebar}" Value="True">
+                        <DataTrigger Binding="{Binding IsSideOpened}" Value="True">
                             <Setter Property="ContentTemplate">
                                 <Setter.Value>
                                     <DataTemplate>
@@ -706,7 +706,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             Width="3"
-            Visibility="{Binding IsChecked, ElementName=bSidebar,Converter={StaticResource VisibilityConverter}}" />
+            Visibility="{Binding IsSideOpened, Converter={StaticResource VisibilityConverter}}" />
         
         <ContentControl
             Grid.Row="1"
@@ -718,7 +718,7 @@
                     <Setter Property="Grid.ColumnSpan" Value="3" />
                     
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsChecked, ElementName=bSidebar}" Value="True">
+                        <DataTrigger Binding="{Binding IsSideOpened}" Value="True">
                             <Setter Property="Grid.Column" Value="2" />
                         </DataTrigger>
                     </Style.Triggers>

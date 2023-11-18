@@ -40,6 +40,11 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
     public SimpleCommand ExportMedia { get; private set; }
 
+    /// <summary>
+    /// Navigates to media file in media collection.
+    /// </summary>
+    public SimpleCommand NavigateToFile { get; private set; }
+
     public ICommand SelectAtomObject { get; private set; }
 
     public bool IsTopLevel { get; private set; }
@@ -68,6 +73,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         CollapseMedia = new SimpleCommand(CollapseMedia_Executed);
         ExpandMedia = new SimpleCommand(ExpandMedia_Executed);
         ExportMedia = new SimpleCommand(ExportMedia_Executed);
+        NavigateToFile = new SimpleCommand(NavigateToFile_Executed);
 
         SelectAtomObject = new SimpleCommand(SelectAtomObject_Executed);
         IsTopLevel = isTopLevel;
@@ -221,6 +227,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         CollapseMedia.CanBeExecuted = contentItem != null && isMedia && contentItem.IsExpanded;
         ExpandMedia.CanBeExecuted = contentItem != null && isMedia && !contentItem.IsExpanded;
         ExportMedia.CanBeExecuted = contentItem != null && isMedia;
+        NavigateToFile.CanBeExecuted = contentItem != null && isMedia;
     }
 
     private void SetTime_Executed(object? arg)
@@ -277,6 +284,33 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         catch (Exception exc)
         {
             PlatformManager.Instance.ShowExclamationMessage($"{Resources.ExportMediaError}: {exc}");
+        }
+    }
+
+    private void NavigateToFile_Executed(object? arg)
+    {
+        try
+        {
+            var document = (Owner.OwnerTheme.OwnerRound?.OwnerPackage?.Document) ?? throw new InvalidOperationException("document is undefined");
+            var collection = document.TryGetCollectionByMediaType(CurrentItem.Model.Type);
+
+            if (collection == null)
+            {
+                return;
+            }
+
+            foreach (var file in collection.Files)
+            {
+                if (file.Name == CurrentItem.Model.Value)
+                {
+                    document.NavigateToStorageItem(collection, file);
+                    return;
+                }
+            }
+        }
+        catch (Exception exc)
+        {
+            PlatformManager.Instance.ShowExclamationMessage(exc.Message);
         }
     }
 

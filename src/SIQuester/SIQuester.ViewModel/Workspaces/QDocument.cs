@@ -437,6 +437,25 @@ public sealed class QDocument : WorkspaceViewModel
 
     #endregion
 
+    private bool _isSideOpened;
+
+    /// <summary>
+    /// Is side panel opened.
+    /// </summary>
+    public bool IsSideOpened
+    {
+        get => _isSideOpened;
+        set
+        {
+            if (_isSideOpened != value)
+            {
+                _isSideOpened = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+
     /// <summary>
     /// Полный путь к текущему узлу
     /// </summary>
@@ -1404,8 +1423,9 @@ public sealed class QDocument : WorkspaceViewModel
         return files;
     }
 
-    private void NavigateToStorageItem(MediaStorageViewModel mediaStorage, MediaItemViewModel? item)
+    internal void NavigateToStorageItem(MediaStorageViewModel mediaStorage, MediaItemViewModel? item)
     {
+        IsSideOpened = true;
         SideIndex = mediaStorage == Images ? 2 : (mediaStorage == Audio ? 3 : (mediaStorage == Video ? 4 : 5));
         mediaStorage.CurrentFile = item;
     }
@@ -2474,7 +2494,7 @@ public sealed class QDocument : WorkspaceViewModel
 
     #endregion
 
-    private void Navigate_Executed(object? arg)
+    private async void Navigate_Executed(object? arg)
     {
         if (_activeNode != null)
         {
@@ -2492,10 +2512,18 @@ public sealed class QDocument : WorkspaceViewModel
         var infoOwner = (IItemViewModel)arg;
         var parent = infoOwner.Owner;
 
+        var expanded = false;
+
         while (parent != null) // Expanding to leaf
         {
+            expanded |= !parent.IsExpanded;
             parent.IsExpanded = true;
             parent = parent.Owner;
+        }
+
+        if (expanded)
+        {
+            await Task.Delay(400);
         }
 
         infoOwner.IsSelected = true;

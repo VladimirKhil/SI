@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace SIQuester.ViewModel;
 
+/// <summary>
+/// Scrolls <see cref="TreeView" /> to item when it is selected.
+/// </summary>
 public static class TreeViewHelper
 {
     public static object GetSelectedItem(DependencyObject obj) => obj.GetValue(SelectedItemProperty);

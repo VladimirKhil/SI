@@ -1853,6 +1853,12 @@
                                                         Style="{StaticResource MenuButton}" />
 
                                                     <Button
+                                                        ToolTip="{x:Static lp:Resources.NavigateToFile}"
+                                                        Content="{StaticResource RightImageGrayKey}"
+                                                        Command="{Binding NavigateToFile}"
+                                                        Style="{StaticResource MenuButton}" />
+
+                                                    <Button
                                                         ToolTip="{x:Static lp:Resources.MoveDown}"
                                                         Content="{StaticResource DownImage}"
                                                         Command="{Binding MoveRight}"
