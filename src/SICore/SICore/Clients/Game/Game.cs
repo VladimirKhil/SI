@@ -1164,10 +1164,10 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
         else if (ClientData.StakeType == StakeMode.Sum)
         {
-            var minimum = ClientData.Stake != -1 ? ClientData.Stake + 100 : ClientData.CurPriceRight + 100;
+            var minimum = ClientData.Stake != -1 ? ClientData.Stake + ClientData.StakeStep : ClientData.CurPriceRight + ClientData.StakeStep;
             
             // TODO: optimize
-            while (minimum % 100 != 0)
+            while (minimum % ClientData.StakeStep != 0)
             {
                 minimum++;
             }
@@ -1178,7 +1178,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 return;
             }
 
-            if (stakeSum < minimum || stakeSum > ClientData.ActivePlayer.Sum || stakeSum % 100 != 0)
+            if (stakeSum < minimum || stakeSum > ClientData.ActivePlayer.Sum || stakeSum % ClientData.StakeStep != 0)
             {
                 ClientData.StakeType = null;
                 return;
@@ -1986,9 +1986,7 @@ public sealed class Game : Actor<GameData, GameLogic>
                 if (ClientData.QuestionPlayState.AnswerOptions != null)
                 {
                     var rightLabel = ClientData.Question.Right.FirstOrDefault();
-                    var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
-
-                    ClientData.Answerer.Answer = rightIndex.ToString();
+                    ClientData.Answerer.Answer = rightLabel;
                 }
                 else
                 {
@@ -1999,12 +1997,10 @@ public sealed class Game : Actor<GameData, GameLogic>
             else if (ClientData.QuestionPlayState.AnswerOptions != null)
             {
                 var rightLabel = ClientData.Question.Right.FirstOrDefault();
-                var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
+                var wrongOptions = ClientData.QuestionPlayState.AnswerOptions.Where(o => o.Label != rightLabel && !ClientData.QuestionPlayState.UsedAnswerOptions.Contains(o.Label)).ToArray();
+                var wrong = wrongOptions[Random.Shared.Next(wrongOptions.Length)];
 
-                var leftIndicies = Enumerable.Range(0, ClientData.QuestionPlayState.AnswerOptions.Length).Except(ClientData.QuestionPlayState.UsedAnswerOptionsIndicies).Except(new int[] { rightIndex }).ToArray();
-                var wrongIndex = leftIndicies[Random.Shared.Next(leftIndicies.Length)];
-
-                ClientData.Answerer.Answer = wrongIndex.ToString();
+                ClientData.Answerer.Answer = wrong.Label;
             }
             else
             {

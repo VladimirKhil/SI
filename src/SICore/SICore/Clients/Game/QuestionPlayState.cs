@@ -20,7 +20,7 @@ internal sealed class QuestionPlayState
     /// <summary>
     /// Used answer options indicies.
     /// </summary>
-    internal HashSet<int> UsedAnswerOptionsIndicies { get; } = new();
+    internal HashSet<string> UsedAnswerOptions { get; } = new();
 
     /// <summary>
     /// Has layout been set.
@@ -36,7 +36,7 @@ internal sealed class QuestionPlayState
     {
         AnswererIndicies.Clear();
         AnswerOptions = null;
-        UsedAnswerOptionsIndicies.Clear();
+        UsedAnswerOptions.Clear();
         LayoutShown = false;
         AnswerOptionsShown = false;
     }

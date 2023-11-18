@@ -439,6 +439,11 @@ public static class Messages
     public const string Stake = "STAKE";
 
     /// <summary>
+    /// Stake info.
+    /// </summary>
+    public const string Stake2 = "STAKE2";
+
+    /// <summary>
     /// Начать игру
     /// </summary>
     public const string Start = "START";

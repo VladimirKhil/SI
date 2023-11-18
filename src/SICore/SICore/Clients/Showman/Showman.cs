@@ -1,4 +1,5 @@
 ﻿using SICore.BusinessLogic;
+using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
 using R = SICore.Properties.Resources;
@@ -344,6 +345,38 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         Step = 100,
                         Stake = int.Parse(mparams[5]),
                         PlayerName = mparams.Length >= 8 ? mparams[7] : null,
+                    };
+
+                    _logic.Stake();
+                    break;
+
+                case Messages.Stake2:
+                    if (mparams.Length < 6
+                        || !Enum.TryParse<StakeTypes>(mparams[1], out var stakeTypes)
+                        || !int.TryParse(mparams[2], out var minimumStake)
+                        || !int.TryParse(mparams[3], out var step)
+                        || !int.TryParse(mparams[4], out var maximumStake))
+                    {
+                        break;
+                    }
+
+                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Nominal);
+                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Stake);
+                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Pass);
+                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.AllIn);
+
+                    ClientData.PersonDataExtensions.Var[0] = stakeTypes.HasFlag(StakeTypes.Nominal);
+                    ClientData.PersonDataExtensions.Var[1] = stakeTypes.HasFlag(StakeTypes.Stake);
+                    ClientData.PersonDataExtensions.Var[2] = stakeTypes.HasFlag(StakeTypes.Pass);
+                    ClientData.PersonDataExtensions.Var[3] = stakeTypes.HasFlag(StakeTypes.AllIn);
+
+                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
+                    {
+                        Minimum = minimumStake,
+                        Maximum = maximumStake,
+                        Step = step,
+                        Stake = minimumStake,
+                        PlayerName = mparams[5],
                     };
 
                     _logic.Stake();

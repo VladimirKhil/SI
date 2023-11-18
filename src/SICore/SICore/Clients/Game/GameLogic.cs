@@ -3,6 +3,7 @@ using SICore.BusinessLogic;
 using SICore.Clients;
 using SICore.Clients.Game;
 using SICore.Contracts;
+using SICore.Models;
 using SICore.Results;
 using SICore.Utils;
 using SIData;
@@ -70,11 +71,6 @@ public sealed class GameLogic : Logic<GameData>
     /// Maximum price in round.
     /// </summary>
     private int _maxRoundPrice = 1;
-
-    /// <summary>
-    /// Minimum stake step value in current round.
-    /// </summary>
-    private int _stakeStep = 100;
 
     public object? UserState { get; set; }
 
@@ -277,7 +273,8 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _minRoundPrice = Math.Max(1, _minRoundPrice);
-        _stakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
+        // Uncomment after client update
+        // ClientData.StakeStep = (int)Math.Pow(10, Math.Floor(Math.Log10(_minRoundPrice))); // Maximum power of 10 <= _minRoundPrice
     }
 
     private void InitThemes(Theme[] themes, bool willPlayAllThemes, bool isFirstPlay)
@@ -1346,10 +1343,16 @@ public sealed class GameLogic : Logic<GameData>
 
                 _gameActions.SendMessage(s.ToString());
 
-                if (_data.QuestionPlayState.AnswerOptions != null && int.TryParse(_data.Answerer.Answer, out var answerIndex))
+                if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
                 {
-                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
-                    _data.QuestionPlayState.UsedAnswerOptionsIndicies.Add(answerIndex);
+                    var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+
+                    if (answerIndex > -1)
+                    {
+                        _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
+                    }
+
+                    _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
                 }
 
                 _data.Answerer.Sum -= _data.CurPriceWrong;
@@ -1401,7 +1404,7 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.QuestionPlayState.AnswerOptions != null)
         {
-            var oneOptionLeft = _data.QuestionPlayState.UsedAnswerOptionsIndicies.Count + 1 == _data.QuestionPlayState.AnswerOptions.Length;
+            var oneOptionLeft = _data.QuestionPlayState.UsedAnswerOptions.Count + 1 == _data.QuestionPlayState.AnswerOptions.Length;
 
             if (oneOptionLeft)
             {
@@ -1526,7 +1529,9 @@ public sealed class GameLogic : Logic<GameData>
 
             if (_data.QuestionPlayState.AnswerOptions != null)
             {
-                if (int.TryParse(_data.Answerer.Answer, out var answerIndex))
+                var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+
+                if (answerIndex > -1)
                 {
                     _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
                 }
@@ -3199,9 +3204,8 @@ public sealed class GameLogic : Logic<GameData>
             _data.Decision = DecisionType.AnswerValidating;
 
             var rightLabel = ClientData.Question.Right.FirstOrDefault();
-            var rightIndex = Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightLabel);
 
-            _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightIndex.ToString();
+            _data.Answerer.AnswerIsRight = _data.Answerer.Answer == rightLabel;
             _data.Answerer.AnswerIsRightFactor = 1.0;
             _data.ShowmanDecision = true;
 
@@ -3685,9 +3689,18 @@ public sealed class GameLogic : Logic<GameData>
                 return;
             }
 
-            // TODO: enum StakeMode, StakeVariants -> HashSet<StakeMode> ?
+            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + ClientData.StakeStep;
+            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / ClientData.StakeStep) * ClientData.StakeStep;
+
+            _data.StakeTypes = StakeTypes.AllIn | (_data.StakerIndex == -1 ? StakeTypes.Nominal : StakeTypes.Pass);
+
+            if (!_data.AllIn && playerMoney >= minimumStakeAligned)
+            {
+                _data.StakeTypes |= StakeTypes.Stake;
+            }
+
             _data.StakeVariants[0] = _data.StakerIndex == -1;
-            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + _stakeStep;
+            _data.StakeVariants[1] = !_data.AllIn && playerMoney != cost && playerMoney > _data.Stake + ClientData.StakeStep;
             _data.StakeVariants[2] = !_data.StakeVariants[0];
             _data.StakeVariants[3] = true;
 
@@ -3702,22 +3715,25 @@ public sealed class GameLogic : Logic<GameData>
             _data.IsOralNow = _data.IsOral && _data.ActivePlayer.IsHuman;
 
             var stakeMsg = new MessageBuilder(Messages.Stake);
+            var stakeMsg2 = new MessageBuilder(Messages.Stake2);
 
             for (var i = 0; i < _data.StakeVariants.Length; i++)
             {
                 stakeMsg.Add(_data.StakeVariants[i] ? '+' : '-');
             }
 
-            var minimumStake = (_data.Stake != -1 ? _data.Stake : cost) + _stakeStep;
-            var minimumStakeAligned = (int)Math.Ceiling((double)minimumStake / _stakeStep) * _stakeStep;
+            stakeMsg2.Add(_data.StakeTypes);
 
             stakeMsg.Add(minimumStakeAligned);
+            stakeMsg2.Add(minimumStakeAligned);
+            stakeMsg2.Add(ClientData.StakeStep);
 
             var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
             if (CanPlayerAct())
             {
                 _gameActions.SendMessage(stakeMsg.Build(), _data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg2.Build(), _data.ActivePlayer.Name);
 
                 if (!_data.ActivePlayer.IsConnected)
                 {
@@ -3730,6 +3746,10 @@ public sealed class GameLogic : Logic<GameData>
                 stakeMsg.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
                 stakeMsg.Add(_data.ActivePlayer.Name);
                 _gameActions.SendMessage(stakeMsg.Build(), _data.ShowMan.Name);
+
+                stakeMsg2.Add(_data.ActivePlayer.Sum); // Send maximum possible value to showman
+                stakeMsg2.Add(_data.ActivePlayer.Name);
+                _gameActions.SendMessage(stakeMsg2.Build(), _data.ShowMan.Name);
             }
 
             _data.StakeType = null;

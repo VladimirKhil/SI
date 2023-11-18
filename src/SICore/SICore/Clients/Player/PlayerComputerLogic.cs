@@ -153,6 +153,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
                 _account.B5,
                 isCritical,
                 _data.PersonDataExtensions.StakeInfo.Minimum,
+                _data.PersonDataExtensions.StakeInfo.Step,
                 out stakeSum);
 
             var msg = new StringBuilder(Messages.Stake).Append(Message.ArgsSeparatorChar).Append((int)stakeMode);
@@ -586,7 +587,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
         if (style != PlayerStyle.Normal && Random.Shared.Next(100) >= 20)
         {
-            stake = style == PlayerStyle.Agressive ? res[res.Count - 1].Max : res[0].Min;
+            stake = style == PlayerStyle.Agressive ? res[^1].Max : res[0].Min;
         }
         else
         {
@@ -618,6 +619,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
         int B5,
         bool isCritical,
         int minCost,
+        int stakeStep,
         out int stakeSum)
     {
         int i = 0;
@@ -642,13 +644,40 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
         }
 
         var pass = new List<Interval>();
-        var plus100 = new List<Interval>();
+        var min = new List<Interval>();
         var max = new List<Interval>();
         var result = new List<IntervalProbability>();
 
         // Сначала просчитаем оптимальную реакцию нашего противника на все возможные наши ставки
-        StakeDecisions(style, bestSum, mySum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, true /*т.к. он второй, то он всегда может спасовать*/, vars[2] ? sums[lastStakerIndex] : 0, ref result);
-        StakeDecisions(style, mySum, bestSum, vars[1] ? (minCost - (vars[0] ? 100 : 0)) : mySum, mySum, p, ref pass, ref plus100, ref max, vars[2], vars[2] ? sums[lastStakerIndex] : 0, ref result);
+        StakeDecisions(
+            style, 
+            bestSum, 
+            mySum, 
+            vars[1] ? (minCost - (vars[0] ? stakeStep : 0)) : mySum,
+            mySum, 
+            p, 
+            ref pass,
+            ref min,
+            ref max,
+            true /*т.к. он второй, то он всегда может спасовать*/,
+            vars[2] ? sums[lastStakerIndex] : 0,
+            stakeStep, 
+            ref result);
+        
+        StakeDecisions(
+            style,
+            mySum,
+            bestSum,
+            vars[1] ? (minCost - (vars[0] ? stakeStep : 0)) : mySum,
+            mySum, 
+            p, 
+            ref pass,
+            ref min, 
+            ref max,
+            vars[2],
+            vars[2] ? sums[lastStakerIndex] : 0,
+            stakeStep, 
+            ref result);
 
         int maxL = result[0].Probabilities.Count;
         int li;
@@ -846,13 +875,13 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
         int round = 0;
         i = 0;
-        while (stake % 100 != 0 && i < 2)
+        while (stake % stakeStep != 0 && i < 2)
         {
             round = style == PlayerStyle.Careful && i == 1
                 || style == PlayerStyle.Agressive && i == 0
-                || style == PlayerStyle.Normal && (i == 0 && stake % 100 >= 50 || i == 1 && stake % 100 < 50)
-                ? (int)Math.Ceiling(stake / 100.0) * 100
-                : (int)Math.Floor(stake / 100.0) * 100;
+                || style == PlayerStyle.Normal && (i == 0 && stake % stakeStep >= 50 || i == 1 && stake % stakeStep < 50)
+                ? (int)Math.Ceiling(stake / (double)stakeStep) * stakeStep
+                : (int)Math.Floor(stake / (double)stakeStep) * stakeStep;
 
             foreach (Interval interval in result)
             {
@@ -868,7 +897,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
         if (stake == 0)
             stakeMode = StakeMode.Pass;
-        else if (stake == minCost - 100 && vars[0])
+        else if (stake == minCost - stakeStep && vars[0])
             stakeMode = StakeMode.Nominal;
         else if (stake == mySum)
             stakeMode = StakeMode.AllIn;
@@ -1173,16 +1202,22 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
         paretoStakes.Clear();
         int optI = 0, pessI = 0;
+
         while (optI < opt.Count || pessI < pess.Count)
         {
             if (opt[optI].Max >= pess[pessI].Max)
             {
                 paretoStakes.Add(pess[pessI]);
                 optI++;
+
                 if (optI < opt.Count)
                 {
                     int val = opt[optI].Min;
-                    do pessI++; while (!(pess[pessI].Min <= val && pess[pessI].Max >= val));
+
+                    do
+                    {
+                        pessI++;
+                    } while (!(pess[pessI].Min <= val && pess[pessI].Max >= val));
                 }
                 else
                 {
@@ -1190,14 +1225,20 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
                     // Уберём слишком большие ставки для лидера
                     int bestOpponentSum = opponentsSums[0];
+
                     for (int j = 1; j < opponentsSums.Length; j++)
+                    {
                         if (opponentsSums[j] > bestOpponentSum)
                             bestOpponentSum = opponentsSums[j];
+                    }
+
                     if (mySum > bestOpponentSum)
+                    {
                         if (mySum > bestOpponentSum + 200 && 2 * bestOpponentSum + 100 > mySum)
-                            paretoStakes[paretoStakes.Count - 1].Max = 2 * bestOpponentSum - mySum + 100;
+                            paretoStakes[^1].Max = 2 * bestOpponentSum - mySum + 100;
                         else if (2 * bestOpponentSum + 1 > mySum)
-                            paretoStakes[paretoStakes.Count - 1].Max = 2 * bestOpponentSum - mySum + 1;
+                            paretoStakes[^1].Max = 2 * bestOpponentSum - mySum + 1;
+                    }
                 }
             }
             else
@@ -1215,7 +1256,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
     /// <summary>
     /// Интеллектуальное вычисление ставок на Аукционе
     /// Работает в двух режимах:
-    /// 1. Для каждой своей ставки предсказывается оптимальная реакция для оппонента (пас, увеличение ставки на 100 или Ва-Банк).
+    /// 1. Для каждой своей ставки предсказывается оптимальная реакция для оппонента (пас, увеличение ставки или Ва-Банк).
     /// 2. После определения наиболее ожидаемой реакции вычисляется оптимальный по Парето интервал ставок
     /// </summary>
     /// <param name="style">Стиль игрока</param>
@@ -1225,10 +1266,11 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
     /// <param name="maxStake">Максимальная возникающая ставка</param>
     /// <param name="p">Вероятность ответа на вопрос</param>
     /// <param name="pass">Интервалы ставок, на которых игрок спасует</param>
-    /// <param name="plus100">Интервалы ставок, на которых игрок перекупит за сумму ставки + 100</param>
+    /// <param name="min">Интервалы ставок, на которых игрок перекупит за минммальную сумму ставки</param>
     /// <param name="max">Интервалы ставок, на которых игрок сделает максимальную разумную ставку</param>
     /// <param name="canPass">Возможен ли пас в качестве варианта ставок</param>
     /// <param name="stakerSum">Сумма на счёте ставящего при возможности паса (иначе 0)</param>
+    /// <param name="stakeStep">Minimum stake step value.</param>
     /// <param name="result">Паретооптимальное множество ставок</param>
     internal static void StakeDecisions(
         PlayerStyle style,
@@ -1238,10 +1280,11 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
         int maxStake,
         double p,
         ref List<Interval> pass,
-        ref List<Interval> plus100,
+        ref List<Interval> min,
         ref List<Interval> max,
         bool canPass,
         int stakerSum,
+        int stakeStep,
         ref List<IntervalProbability> result)
     {
         // Для всех возможных ставок определим наиболее вероятные ответы соперника
@@ -1259,7 +1302,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
         // Является ли игрок лидером
         bool leader = mySum > bestSum;
         // Вторая итерация анализа, более умный просчёт
-        bool smart = pass.Count + plus100.Count + max.Count > 0;
+        bool smart = pass.Count + min.Count + max.Count > 0;
 
         if (!leader)
         {
@@ -1306,8 +1349,8 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
             points.Add(new DirPoint(sum1 / l - sum2 - (leader ? 1 : 0) * (smart ? -1 : 1), smart));
             points.Add(new DirPoint(sum2 - sum1 / l + (leader ? 1 : 0) * (smart ? -1 : 1), !smart));
-            points.Add(new DirPoint(l * sum2 - sum1 - 100 + (leader ? 1 : 0) * (smart ? -1 : 1), !smart));
-            points.Add(new DirPoint(sum1 - l * sum2 - 100 - (leader ? 1 : 0) * (smart ? -1 : 1), smart));
+            points.Add(new DirPoint(l * sum2 - sum1 - stakeStep + (leader ? 1 : 0) * (smart ? -1 : 1), !smart));
+            points.Add(new DirPoint(sum1 - l * sum2 - stakeStep - (leader ? 1 : 0) * (smart ? -1 : 1), smart));
         }
 
         points.Add(new DirPoint(maxStake, false));
@@ -1331,7 +1374,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
         for (int i = 0; i < pCount - 1; i++)
         {
-            int minI = i == 0 ? points[0].Value : intervals[intervals.Count - 1].Max + 100;
+            int minI = i == 0 ? points[0].Value : intervals[^1].Max + stakeStep;
 
             if (minI > maxStake)
             {
@@ -1340,13 +1383,13 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
             int maxI = points[i + 1].Direction || i < points.Count - 2 
                 && points[i + 2].Value == points[i + 1].Value
-                ? Math.Max(points[i + 1].Value - 100, minI)
+                ? Math.Max(points[i + 1].Value - stakeStep, minI)
                 : points[i + 1].Value;
 
             intervals.Add(new Interval(minI, maxI));
         }
 
-        if ((smart ? mySum : bestSum) == maxStake && maxStake % 100 != 0)
+        if ((smart ? mySum : bestSum) == maxStake && maxStake % stakeStep != 0)
         {
             intervals.Add(new Interval(maxStake, maxStake));
         }
@@ -1357,7 +1400,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
             // Дробим интервалы в соответствии с предполагаемой стратегией противника
             Interval.SplitBy(ref intervals, pass);
-            Interval.SplitBy(ref intervals, plus100);
+            Interval.SplitBy(ref intervals, min);
             Interval.SplitBy(ref intervals, max);
 
             result.Clear();
@@ -1378,7 +1421,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
                 if (type == 2)
                 {
-                    foreach (var part in plus100)
+                    foreach (var part in min)
                     {
                         if (part.Min <= interval.Min && part.Max >= interval.Max)
                         {
@@ -1399,7 +1442,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
                     {
                         case 0:
                             if (val == 0)
-                                prob.Probabilities.Add(((mySum / l >= Math.Max(stakerSum + Math.Min(minStake - 100, stakerSum), bestSum) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= Math.Max(stakerSum - Math.Min(minStake - 100, stakerSum), bestSum) + (leader ? 1 : 0)) ? 1 - p : 0));
+                                prob.Probabilities.Add(((mySum / l >= Math.Max(stakerSum + Math.Min(minStake - stakeStep, stakerSum), bestSum) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= Math.Max(stakerSum - Math.Min(minStake - stakeStep, stakerSum), bestSum) + (leader ? 1 : 0)) ? 1 - p : 0));
                             else
                                 prob.Probabilities.Add(((val >= l * bestSum - mySum + (leader ? 1 : 0)) ? 1 : 0) * p + ((val <= mySum - l * bestSum - (leader ? 1 : 0)) ? 1 : 0) * (1 - p));
                             break;
@@ -1408,12 +1451,12 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
                             if (val == 0)
                                 prob.Probabilities.Add(((mySum / l >= bestSum + Math.Min(minStake, bestSum) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= bestSum - Math.Min(minStake, bestSum) + (leader ? 1 : 0)) ? 1 - p : 0));
                             else
-                                prob.Probabilities.Add(((mySum / l >= bestSum + Math.Min(val + 100, bestSum) + (leader ? 1 : 0)) ? 1 : 0) * p + ((mySum / l >= bestSum - Math.Min(val + 100, bestSum) + (leader ? 1 : 0)) ? 1 : 0) * (1 - p));
+                                prob.Probabilities.Add(((mySum / l >= bestSum + Math.Min(val + stakeStep, bestSum) + (leader ? 1 : 0)) ? 1 : 0) * p + ((mySum / l >= bestSum - Math.Min(val + stakeStep, bestSum) + (leader ? 1 : 0)) ? 1 : 0) * (1 - p));
                             break;
 
                         default:
                             if (!leader && val < mySum)
-                                prob.Probabilities.Add(((mySum / l >= bestSum + mySum + 100) ? 1 : 0) * p + ((mySum / l >= bestSum - mySum - 100) ? 1 : 0) * (1 - p));
+                                prob.Probabilities.Add(((mySum / l >= bestSum + mySum + stakeStep) ? 1 : 0) * p + ((mySum / l >= bestSum - mySum - stakeStep) ? 1 : 0) * (1 - p));
                             else
                                 prob.Probabilities.Add(((mySum / l > 2 * bestSum) ? 1 : 0) * p + ((mySum / l > 0) ? 1 : 0) * (1 - p));
 
@@ -1423,7 +1466,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
             }
 
             // Склеиваем соседние участки с равными весами
-            IntervalProbability.Join(ref result, 100);
+            IntervalProbability.Join(ref result, stakeStep);
 
             // Выделяем паретооптимальные решения
             int i = 0;
@@ -1476,29 +1519,29 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
 
                     if (val == 0)
                     {
-                        a[j][0] = ((mySum / l >= Math.Max(bestSum, stakerSum + Math.Min(minStake - 100, stakerSum)) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= Math.Max(bestSum, stakerSum - Math.Min(minStake - 100, stakerSum)) + (leader ? 1 : 0)) ? 1 - p : 0);
+                        a[j][0] = ((mySum / l >= Math.Max(bestSum, stakerSum + Math.Min(minStake - stakeStep, stakerSum)) + (leader ? 1 : 0)) ? p : 0) + ((mySum / l >= Math.Max(bestSum, stakerSum - Math.Min(minStake - stakeStep, stakerSum)) + (leader ? 1 : 0)) ? 1 - p : 0);
                         a[j][1] = (((mySum + Math.Min(minStake, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? p : 0) + (((mySum - Math.Min(minStake, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? 1 - p : 0);
                         if (!leader || val == maxStake)
                             a[j][2] = ((2 * mySum / l >= bestSum) ? p : 0) + (((mySum - Math.Min(minStake, mySum)) / l >= bestSum) ? 1 - p : 0);
                         else
-                            a[j][2] = (((mySum + bestSum + 100) / l > bestSum) ? p : 0) + (((mySum - bestSum - 100) / l > bestSum) ? 1 - p : 0);
+                            a[j][2] = (((mySum + bestSum + stakeStep) / l > bestSum) ? p : 0) + (((mySum - bestSum - stakeStep) / l > bestSum) ? 1 - p : 0);
                     }
                     else
                     {
                         a[j][0] = ((val <= mySum / l - bestSum - (leader ? 1 : 0)) ? 1 : 0) * p + ((val >= bestSum - mySum / l + (leader ? 1 : 0)) ? 1 : 0) * (1 - p);
-                        a[j][1] = (((mySum + Math.Min(val + 100, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? 1 : 0) * p + (((mySum - Math.Min(val + 100, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? 1 : 0) * (1 - p);
+                        a[j][1] = (((mySum + Math.Min(val + stakeStep, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? 1 : 0) * p + (((mySum - Math.Min(val + stakeStep, mySum)) / l >= bestSum + (leader ? 1 : 0)) ? 1 : 0) * (1 - p);
                         if (!leader || val == maxStake)
                             a[j][2] = ((2 * mySum / l >= bestSum) ? 1 : 0) * p;
                         else
-                            a[j][2] = (((mySum + bestSum + 100) / l > bestSum) ? 1 : 0) * p + (((mySum - bestSum - 100) / l > bestSum) ? 1 : 0) * (1 - p);
+                            a[j][2] = (((mySum + bestSum + stakeStep) / l > bestSum) ? 1 : 0) * p + (((mySum - bestSum - stakeStep) / l > bestSum) ? 1 : 0) * (1 - p);
                     }
                 }
 
                 var candidates = new List<int> { 0 };
 
-                if (val != 0 && val < mySum && val != maxStake || val == 0 && stakerSum != minStake - 100 && minStake - 100 < mySum)
+                if (val != 0 && val < mySum && val != maxStake || val == 0 && stakerSum != minStake - stakeStep && minStake - stakeStep < mySum)
                     candidates.Add(1);
-                if (val != 0 && val <= mySum || val == 0 && minStake - 100 <= mySum && mySum > 0)
+                if (val != 0 && val <= mySum || val == 0 && minStake - stakeStep <= mySum && mySum > 0)
                     candidates.Add(2);
 
                 int i = -1;
@@ -1580,7 +1623,7 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
                         break;
 
                     case 1:
-                        plus100.Add(interval);
+                        min.Add(interval);
                         break;
 
                     default:
@@ -1589,9 +1632,9 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
                 }
             }
 
-            Interval.Join(ref pass, 100);
-            Interval.Join(ref plus100, 100);
-            Interval.Join(ref max, 100);
+            Interval.Join(ref pass, stakeStep);
+            Interval.Join(ref min, stakeStep);
+            Interval.Join(ref max, stakeStep);
 
             #endregion
         }

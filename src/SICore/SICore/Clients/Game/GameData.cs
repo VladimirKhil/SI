@@ -324,7 +324,18 @@ public sealed class GameData : Data
     /// - пас
     /// - ва-банк
     /// </summary>
+    [Obsolete]
     internal bool[] StakeVariants { get; set; } = new bool[4];
+
+    /// <summary>
+    /// Possible stake types.
+    /// </summary>
+    internal StakeTypes StakeTypes { get; set; }
+
+    /// <summary>
+    /// Minimum stake step value in current round.
+    /// </summary>
+    internal int StakeStep { get; set; } = 100;
 
     /// <summary>
     /// Тип ставки

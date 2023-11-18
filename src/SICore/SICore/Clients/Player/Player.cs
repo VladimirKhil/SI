@@ -1,4 +1,5 @@
 ﻿using SICore.BusinessLogic;
+using SICore.Models;
 using SICore.Network.Clients;
 using SIData;
 using SIPackages.Core;
@@ -355,6 +356,36 @@ public sealed class Player : Viewer<IPlayerLogic>
                         Maximum = ((PlayerAccount)ClientData.Me).Sum,
                         Step = 100,
                         Stake = int.Parse(mparams[5])
+                    };
+
+                    _logic.Stake();
+                    break;
+
+                case Messages.Stake2:
+                    if (mparams.Length < 4
+                        || !Enum.TryParse<StakeTypes>(mparams[1], out var stakeTypes)
+                        || !int.TryParse(mparams[2], out var minimumStake)
+                        || !int.TryParse(mparams[3], out var step))
+                    {
+                        break;
+                    }
+
+                    ClientData.PersonDataExtensions.SendNominal.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Nominal);
+                    ClientData.PersonDataExtensions.SendStake.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Stake);
+                    ClientData.PersonDataExtensions.SendPass.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.Pass);
+                    ClientData.PersonDataExtensions.SendVabank.CanBeExecuted = stakeTypes.HasFlag(StakeTypes.AllIn);
+
+                    ClientData.PersonDataExtensions.Var[0] = stakeTypes.HasFlag(StakeTypes.Nominal);
+                    ClientData.PersonDataExtensions.Var[1] = stakeTypes.HasFlag(StakeTypes.Stake);
+                    ClientData.PersonDataExtensions.Var[2] = stakeTypes.HasFlag(StakeTypes.Pass);
+                    ClientData.PersonDataExtensions.Var[3] = stakeTypes.HasFlag(StakeTypes.AllIn);
+
+                    ClientData.PersonDataExtensions.StakeInfo = new StakeInfo
+                    {
+                        Minimum = minimumStake,
+                        Maximum = ((PlayerAccount)ClientData.Me).Sum,
+                        Step = step,
+                        Stake = minimumStake
                     };
 
                     _logic.Stake();
