@@ -88,7 +88,7 @@ public sealed class QConverter
                 {
                     if (match is not TupleValue tupleValue) // Head
                     {
-                        list.Add(new SIPart[] { new SIPart() { Value = match.ToString() ?? "" } });
+                        list.Add(new SIPart[] { new() { Value = match.ToString() ?? "" } });
                     }
                     else
                     {

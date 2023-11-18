@@ -301,7 +301,7 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
                 Type = StepParameterTypes.Content,
                 ContentValue = new List<ContentItem>
                 {
-                    new ContentItem { Type = AtomTypes.Text, Value = "" },
+                    new() { Type = ContentTypes.Text, Value = "" },
                 }
             };
 
@@ -333,28 +333,27 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
                 if (IsUpgraded)
                 {
-                    Model.Parameters = new StepParameters
+                    Parameters!.ClearOneByOne();
+
+                    Parameters.AddParameter(QuestionParameterNames.Question, new StepParameterViewModel(this, new StepParameter
                     {
-                        [QuestionParameterNames.Question] = new StepParameter
+                        Type = StepParameterTypes.Content,
+                        ContentValue = new List<ContentItem>
                         {
-                            Type = StepParameterTypes.Content,
-                            ContentValue = new List<ContentItem>
-                            {
-                                new ContentItem { Type = AtomTypes.Text, Value = "" },
-                            }
+                            new() { Type = ContentTypes.Text, Value = "" },
                         }
-                    };
+                    }));
                 }
                 else
                 {
-                    Model.Scenario.Clear();
-                    Model.Scenario.Add(new Atom());
-                    Model.Type.Params.Clear();
+                    Scenario.ClearOneByOne();
+                    Scenario.AddText_Executed(null);
+                    Type.Params.ClearOneByOne();
                 }
 
-                Model.Right.Clear();
-                Model.Right.Add("");
-                Model.Wrong.Clear();
+                Right.ClearOneByOne();
+                Right.Add("");
+                Wrong.ClearOneByOne();
 
                 change.Commit();
                 return;
@@ -364,16 +363,18 @@ public sealed class QuestionViewModel : ItemViewModel<Question>
 
             if (IsUpgraded)
             {
-                Model.Parameters?.Clear();
+                Parameters?.ClearOneByOne();
+                TypeName = QuestionTypes.Default;
             }
             else
             {
-                Model.Scenario.Clear();
-                Model.Type.Params.Clear();
+                Scenario.ClearOneByOne();
+                Type.Params.ClearOneByOne();
+                Type.Name = QuestionTypes.Simple;
             }
 
-            Model.Right.Clear();
-            Model.Wrong.Clear();
+            Right.ClearOneByOne();
+            Wrong.ClearOneByOne();
 
             change.Commit();
         }

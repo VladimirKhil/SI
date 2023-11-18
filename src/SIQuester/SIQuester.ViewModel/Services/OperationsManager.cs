@@ -42,6 +42,19 @@ public sealed class OperationsManager
 
     public void CanRedoChanged() => Redo.CanBeExecuted = _redoList.Any();
 
+    public void RecordComplexChange(Action changeAction)
+    {
+        if (_changeGroup != null)
+        {
+            changeAction();
+            return;
+        }
+
+        using var change = BeginComplexChange();
+        changeAction();
+        change.Commit();
+    }
+
     internal void AddChange(IChange change)
     {
         if (IsMakingUndo)

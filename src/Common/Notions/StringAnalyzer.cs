@@ -5,8 +5,8 @@
 /// </summary>
 public static class StringAnalyzer
 {
-    private const int MaxQueueLength = 100;
-    private const int MaxIterationsCount = 100_000;
+    private const int MaxQueueLength = 10000;
+    private const int MaxIterationsCount = 1_000_000;
 
     /// <summary>
     /// Searches for the longest common substring of provided source strings. Common substring could be sparse.
@@ -25,7 +25,7 @@ public static class StringAnalyzer
             return new SubstringMatch(new int[][] { Enumerable.Range(0, values[0].Length).ToArray() }, values[0]);
         }
 
-        var matches = new Queue<SubstringSubmatch>(new[] { new SubstringSubmatch(null, 0, null) });
+        var matches = new Queue<SubstringSubmatch>(new[] { new SubstringSubmatch(null, 0, null, false) });
 
         SubstringSubmatch? bestHypotesis = null;
         var iterationsCounter = 0;
@@ -33,40 +33,47 @@ public static class StringAnalyzer
         while (matches.Count > 0 && iterationsCounter < MaxIterationsCount)
         {
             var match = matches.Dequeue();
-
             var originalPositions = match.Positions ?? Enumerable.Repeat(-1, values.Length).ToArray();
-
             var hypotesisStart = originalPositions;
-
             var currentHypotises = new List<int[]>();
 
             do
             {
-                var nextPositions = TryMove(hypotesisStart, values);
+                var nextPositions = TryMove(hypotesisStart, values, match.HasHop);
 
                 if (nextPositions == null)
                 {
                     break;
                 }
 
-                var newHypotesis = new SubstringSubmatch(nextPositions, match.Length + 1, match);
+                var hasHop = false;
 
+                for (var i = 0; i < originalPositions.Length; i++)
+                {
+                    if (nextPositions[i] - originalPositions[i] > 1)
+                    {
+                        hasHop = true;
+                        break;
+                    }
+                }
+
+                var newHypotesis = new SubstringSubmatch(nextPositions, match.Length + 1, match, hasHop);
                 var isSuitable = true;
 
                 for (int i = 0; i < currentHypotises.Count; i++)
                 {
-                    var accepatble = false;
+                    var acceptable = false;
 
                     for (int j = 0; j < currentHypotises[i].Length; j++)
                     {
                         if (newHypotesis.Positions![j] < currentHypotises[i][j])
                         {
-                            accepatble = true;
+                            acceptable = true;
                             break;
                         }
                     }
 
-                    if (!accepatble)
+                    if (!acceptable)
                     {
                         isSuitable = false;
                         break;
@@ -85,6 +92,11 @@ public static class StringAnalyzer
                     bestHypotesis = bestHypotesis == null
                         ? newHypotesis
                         : (bestHypotesis.Length < newHypotesis.Length ? newHypotesis : bestHypotesis);
+                }
+
+                if (!hasHop)
+                {
+                    break;
                 }
 
                 hypotesisStart = (int[])originalPositions.Clone();
@@ -116,18 +128,29 @@ public static class StringAnalyzer
         return new SubstringMatch(resultPositions.ToArray(), new string(resultString.ToArray()));
     }
 
-    private static int[]? TryMove(int[] positions, string[] values)
+    private static int[]? TryMove(int[] positions, string[] values, bool disableHops)
     {
+        var result = new int[values.Length];
+        var originalValue = positions[0] > -1 && positions[0] < values[0].Length ? values[0][positions[0]] : (char?)null;
+
         var firstPos = positions[0] + 1;
-        var result = Enumerable.Repeat(0, values.Length).ToArray();
 
         while (firstPos < values[0].Length)
         {
             result[0] = firstPos;
 
+            if (disableHops && originalValue.HasValue)
+            {
+                if (values[0][firstPos - 1] != originalValue.Value)
+                {
+                    firstPos++;
+                    continue;
+                }
+            }
+
             var matched = true;
 
-            for (int i = 1; i < values.Length; i++)
+            for (var i = 1; i < values.Length; i++)
             {
                 var found = false;
 
@@ -135,6 +158,14 @@ public static class StringAnalyzer
                 {
                     if (values[0][firstPos] == values[i][j])
                     {
+                        if (disableHops && originalValue.HasValue)
+                        {
+                            if (values[i][j - 1] != originalValue.Value)
+                            {
+                                continue;
+                            }
+                        }
+
                         found = true;
                         result[i] = j;
                         break;
@@ -160,7 +191,7 @@ public static class StringAnalyzer
         return null;
     }
 
-    public record SubstringSubmatch(int[]? Positions, int Length, SubstringSubmatch? PreviousMatch);
+    public record SubstringSubmatch(int[]? Positions, int Length, SubstringSubmatch? PreviousMatch, bool HasHop);
 
     public record struct SubstringMatch(int[][] PositionsHistory, string Substring);
 }

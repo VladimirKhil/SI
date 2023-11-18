@@ -470,42 +470,44 @@
                                     <Label Content="{x:Static lp:Resources.Template}" HorizontalAlignment="Center" FontWeight="Bold" />
                                 </DockPanel>
 
-                                <ItemsControl ItemsSource="{Binding Templates}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <UniformGrid Columns="1" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
+                                <ScrollViewer>
+                                    <ItemsControl ItemsSource="{Binding Templates}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Columns="1" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
 
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <DockPanel IsEnabled="{Binding Enabled}">
-                                                <Menu Width="100" Margin="5" DockPanel.Dock="Left">
-                                                    <Menu.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <Grid />
-                                                        </ItemsPanelTemplate>
-                                                    </Menu.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <DockPanel IsEnabled="{Binding Enabled}" MinHeight="100">
+                                                    <Menu Width="100" Margin="5" DockPanel.Dock="Left">
+                                                        <Menu.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <Grid />
+                                                            </ItemsPanelTemplate>
+                                                        </Menu.ItemsPanel>
 
-                                                    <MenuItem
-                                                        Style="{StaticResource TemplateSelector}"
-                                                        ItemContainerStyle="{StaticResource TemplateContainer}"
-                                                        Header="{Binding Name}"
-                                                        ItemsSource="{Binding Variants}"
-                                                        FontSize="16">
-                                                        <MenuItem.HeaderTemplate>
-                                                            <DataTemplate>
-                                                                <TextBlock Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                                            </DataTemplate>
-                                                        </MenuItem.HeaderTemplate>
-                                                    </MenuItem>
-                                                </Menu>
-                                                
-                                                <my:SpardEditorView FontSize="15" />
-                                            </DockPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                                        <MenuItem
+                                                            Style="{StaticResource TemplateSelector}"
+                                                            ItemContainerStyle="{StaticResource TemplateContainer}"
+                                                            Header="{Binding Name}"
+                                                            ItemsSource="{Binding Variants}"
+                                                            FontSize="16">
+                                                            <MenuItem.HeaderTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                                </DataTemplate>
+                                                            </MenuItem.HeaderTemplate>
+                                                        </MenuItem>
+                                                    </Menu>
+
+                                                    <my:SpardEditorView FontSize="15" />
+                                                </DockPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
                             </DockPanel>
 
                             <StackPanel Grid.ColumnSpan="2" Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,4">

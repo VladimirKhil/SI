@@ -97,7 +97,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
     /// </summary>
     public string Placement
     {
-        get => _placement ?? ((_type == ContentTypes.Audio || _type == AtomTypes.Audio) ? ContentPlacements.Background : ContentPlacements.Screen);
+        get => _placement ?? GetDefaultPlacement();
         set
         {
             if (_placement != value)
@@ -108,6 +108,8 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
             }
         }
     }
+
+    private string GetDefaultPlacement() => (_type == ContentTypes.Audio || _type == AtomTypes.Audio) ? ContentPlacements.Background : ContentPlacements.Screen;
 
     /// <summary>
     /// Content play duration.
@@ -229,7 +231,7 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
             writer.WriteAttributeString("isRef", _isRef.ToString());
         }
 
-        if (_placement != null)
+        if (_placement != null && _placement != GetDefaultPlacement())
         {
             writer.WriteAttributeString("placement", _placement);
         }

@@ -365,7 +365,7 @@ public sealed class Package : InfoOwner, IEquatable<Package>
     /// <param name="writer">XML writer.</param>
     public override void WriteXml(XmlWriter writer)
     {
-        writer.WriteStartElement("package", "http://vladimirkhil.com/ygpackage3.0.xsd");
+        writer.WriteStartElement("package", "https://github.com/VladimirKhil/SI/blob/master/assets/siq_5.xsd");
         writer.WriteAttributeString("name", Name);
         writer.WriteAttributeString("version", Math.Max(DefaultVersion, Version).ToString());
 

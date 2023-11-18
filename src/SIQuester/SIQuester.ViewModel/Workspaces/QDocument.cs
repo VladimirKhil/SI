@@ -825,8 +825,11 @@ public sealed class QDocument : WorkspaceViewModel
             return;
         }
 
-        using var change = OperationsManager.BeginComplexChange();
+        OperationsManager.RecordComplexChange(() => OnTypeNameChanged(question, oldValue));
+    }
 
+    private void OnTypeNameChanged(QuestionViewModel question, string oldValue)
+    {
         OperationsManager.AddChange(new SimplePropertyValueChange
         {
             Element = question,
@@ -890,8 +893,6 @@ public sealed class QDocument : WorkspaceViewModel
         {
             question.Parameters.Insert(0, new StepParameterRecord(parameter.Item1, new StepParameterViewModel(question, parameter.Item2)));
         }
-
-        change.Commit();
     }
 
     private void Object_PropertyValueChanged(object? sender, PropertyChangedEventArgs e)
@@ -972,52 +973,7 @@ public sealed class QDocument : WorkspaceViewModel
 
             if (sender is QuestionTypeViewModel questionType)
             {
-                using var change = OperationsManager.BeginComplexChange();
-
-                OperationsManager.AddChange(new SimplePropertyValueChange
-                {
-                    Element = sender,
-                    PropertyName = e.PropertyName,
-                    Value = ext.OldValue
-                });
-
-                foreach (var param in questionType.Params)
-                {
-                    param.PropertyChanged -= Object_PropertyValueChanged;
-                }
-
-                var typeName = questionType.Model.Name;
-
-                if (typeName == QuestionTypes.Cat ||
-                    typeName == QuestionTypes.BagCat ||
-                    typeName == QuestionTypes.Auction ||
-                    typeName == QuestionTypes.Simple ||
-                    typeName == QuestionTypes.Sponsored)
-                {
-                    while (questionType.Params.Count > 0) // Delete one be one to support undo operation (Undo reset does not work)
-                    {
-                        questionType.Params.RemoveAt(0);
-                    }
-                }
-
-                if (typeName == QuestionTypes.Cat || typeName == QuestionTypes.BagCat)
-                {
-                    questionType.AddParam(QuestionTypeParams.Cat_Theme, "");
-                    questionType.AddParam(QuestionTypeParams.Cat_Cost, "0");
-
-                    if (typeName == QuestionTypes.BagCat)
-                    {
-                        questionType.AddParam(QuestionTypeParams.BagCat_Self, QuestionTypeParams.BagCat_Self_Value_False);
-                        questionType.AddParam(QuestionTypeParams.BagCat_Knows, QuestionTypeParams.BagCat_Knows_Value_After);
-                    }
-                }
-
-                foreach (var param in questionType.Params)
-                {
-                    param.PropertyChanged += Object_PropertyValueChanged;
-                }
-
-                change.Commit();
+                OperationsManager.RecordComplexChange(() => OnQuestionTypeChanged(sender, e, ext, questionType));
             }
             else
             {
@@ -1029,6 +985,52 @@ public sealed class QDocument : WorkspaceViewModel
                         Value = ext.OldValue
                     });
             }
+        }
+    }
+
+    private void OnQuestionTypeChanged(object? sender, PropertyChangedEventArgs e, ExtendedPropertyChangedEventArgs<string> ext, QuestionTypeViewModel questionType)
+    {
+        OperationsManager.AddChange(new SimplePropertyValueChange
+        {
+            Element = sender,
+            PropertyName = e.PropertyName,
+            Value = ext.OldValue
+        });
+
+        foreach (var param in questionType.Params)
+        {
+            param.PropertyChanged -= Object_PropertyValueChanged;
+        }
+
+        var typeName = questionType.Model.Name;
+
+        if (typeName == QuestionTypes.Cat ||
+            typeName == QuestionTypes.BagCat ||
+            typeName == QuestionTypes.Auction ||
+            typeName == QuestionTypes.Simple ||
+            typeName == QuestionTypes.Sponsored)
+        {
+            while (questionType.Params.Count > 0) // Delete one be one to support undo operation (Undo reset does not work)
+            {
+                questionType.Params.RemoveAt(0);
+            }
+        }
+
+        if (typeName == QuestionTypes.Cat || typeName == QuestionTypes.BagCat)
+        {
+            questionType.AddParam(QuestionTypeParams.Cat_Theme, "");
+            questionType.AddParam(QuestionTypeParams.Cat_Cost, "0");
+
+            if (typeName == QuestionTypes.BagCat)
+            {
+                questionType.AddParam(QuestionTypeParams.BagCat_Self, QuestionTypeParams.BagCat_Self_Value_False);
+                questionType.AddParam(QuestionTypeParams.BagCat_Knows, QuestionTypeParams.BagCat_Knows_Value_After);
+            }
+        }
+
+        foreach (var param in questionType.Params)
+        {
+            param.PropertyChanged += Object_PropertyValueChanged;
         }
     }
 

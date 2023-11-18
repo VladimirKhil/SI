@@ -830,8 +830,27 @@ public sealed class SimpleSpardEditor : RichTextBox
             }
         }
 
-        // Склеивание двух строк
-        var newOps = sequence.OperandsArray.Where(ex => !exprs.Contains(ex));
+        var newOps = new List<Expression>();
+
+        for (var i = 0; i < sequence.OperandsArray.Length; i++)
+        {
+            var remove = false;
+
+            for (var j = 0; j < exprs.Count; j++)
+            {
+                if (sequence.OperandsArray[i] == exprs[j]) // Do not use Contains here as Expression overrides Equals
+                {
+                    remove = true;
+                    break;
+                }
+            }
+
+            if (!remove)
+            {
+                newOps.Add(sequence.OperandsArray[i]);
+            }
+        }
+
         var first = inlines[0];
         var last = inlines[^1];
 
@@ -841,7 +860,7 @@ public sealed class SimpleSpardEditor : RichTextBox
 
             ((StringValue)((Instruction)prev).Argument).Value += run2.Text;
 
-            newOps = newOps.Where(ex => ex != GetExpression(last.NextInline)).ToArray();
+            newOps = newOps.Where(ex => ex != GetExpression(last.NextInline)).ToList();
             _indexTable.Remove(last.NextInline);
         }
 
