@@ -20,8 +20,7 @@ namespace SICore;
 /// <summary>
 /// Implements a game viewer.
 /// </summary>
-public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPropertyChanged
-    where L : class, IViewerLogic
+public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, INotifyPropertyChanged
 {
     private bool _ignoreAtoms = false;
 
@@ -221,7 +220,10 @@ public abstract class Viewer<L> : Actor<ViewerData, L>, IViewerClient, INotifyPr
         ClientData.Picture = personData.Picture;
     }
 
-    protected abstract L CreateLogic(Account personData);
+    protected IViewerLogic CreateLogic(Account personData) =>
+        personData.IsHuman ?
+            new ViewerHumanLogic(ClientData, _viewerActions, LO) :
+            new ViewerComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
 
     public void Move(object arg) => _viewerActions.SendMessageWithArgs(Messages.Move, arg);
 

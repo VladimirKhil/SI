@@ -10,13 +10,13 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-человека
 /// </summary>
-internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
+internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 {
-    //private readonly ViewerActions _viewerActions;
-    //private readonly ViewerData _data;
-    //private readonly ILocalizer _localizer;
+    private readonly ViewerActions _viewerActions;
+    private readonly ViewerData _data;
+    private readonly ILocalizer _localizer;
 
-    //public TableInfoViewModel TInfo { get; }
+    public TableInfoViewModel TInfo { get; }
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
@@ -25,12 +25,11 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         TableInfoViewModel tableInfoViewModel,
         ViewerActions viewerActions,
         ILocalizer localizer)
-        : base(data, viewerActions, localizer)
     {
-        //_viewerActions = viewerActions;
-        //_data = data;
-        //_localizer = localizer;
-        //TInfo = tableInfoViewModel;
+        _viewerActions = viewerActions;
+        _data = data;
+        _localizer = localizer;
+        TInfo = tableInfoViewModel;
 
         TInfo.QuestionSelected += PlayerClient_QuestionSelected;
         TInfo.ThemeSelected += PlayerClient_ThemeSelected;
@@ -40,7 +39,7 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         TInfo.SelectTheme.CanBeExecuted = false;
     }
 
-    private void TInfo_AnswerSelected(ItemViewModel item) => ClientData.PlayerDataExtensions.SendAnswer.Execute(item.Label);
+    private void TInfo_AnswerSelected(ItemViewModel item) => _data.PlayerDataExtensions.SendAnswer.Execute(item.Label);
 
     #region PlayerInterface Members
 
@@ -75,8 +74,8 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
 
         if (TInfo.LayoutMode == LayoutMode.Simple)
         {
-            ClientData.DialogMode = DialogModes.Answer;
-            ((PlayerAccount)ClientData.Me).IsDeciding = false;
+            _data.DialogMode = DialogModes.Answer;
+            ((PlayerAccount)_data.Me).IsDeciding = false;
 
             StartSendingVersion(_cancellationTokenSource.Token);
         }
@@ -165,8 +164,8 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         {
             await Task.Delay(2000);
 
-            AddLog(string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey));
-            AddLog(_viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine);
+            _data.OnAddString(null, string.Format(_viewerActions.LO[nameof(R.Hint)], _data.Host.GameButtonKey), LogMode.Log);
+            _data.OnAddString(null, _viewerActions.LO[nameof(R.PressButton)] + Environment.NewLine, LogMode.Log);
         }
         catch (ObjectDisposedException)
         {
@@ -245,11 +244,9 @@ internal sealed class PlayerHumanLogic : ViewerHumanLogic, IPlayerLogic
         
     }
 
-    protected override ValueTask DisposeAsync(bool disposing)
+    public void Dispose()
     {
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
-
-        return base.DisposeAsync(disposing);
     }
 }

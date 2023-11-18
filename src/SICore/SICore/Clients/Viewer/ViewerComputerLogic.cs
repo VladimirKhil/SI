@@ -1,4 +1,5 @@
-﻿using SIData;
+﻿using SICore.Models;
+using SIData;
 using SIPackages;
 using SIUI.ViewModel;
 
@@ -17,43 +18,17 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
 
     public IShowmanLogic ShowmanLogic { get; }
 
-    protected sealed class TimerInfo
-    {
-        public bool IsEnabled { get; set; }
 
-        public bool IsUserEnabled { get; set; } = true;
-
-        public DateTime StartTime { get; set; }
-
-        public DateTime EndTime { get; set; }
-
-        public int MaxTime { get; set; }
-
-        public int PauseTime { get; set; } = -1;
-    }
 
     private readonly TimerInfo[] _timersInfo = new TimerInfo[] { new TimerInfo(), new TimerInfo(), new TimerInfo() };
-
-    protected int GetTimePercentage(int timerIndex)
-    {
-        var now = DateTime.UtcNow;
-        var timer = _timersInfo[timerIndex];
-
-        if (!timer.IsEnabled)
-        {
-            return timer.PauseTime > -1 ? 100 * timer.PauseTime / timer.MaxTime : 0;
-        }
-
-        return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
-    }
 
     internal ViewerComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
         : base(data)
     {
         _viewerActions = viewerActions;
 
-        //PlayerLogic = new PlayerComputerLogic(data, computerAccount, viewerActions);
-        //ShowmanLogic = new ShowmanComputerLogic(data, viewerActions, computerAccount);
+        PlayerLogic = new PlayerComputerLogic(data, computerAccount, viewerActions, _timersInfo);
+        ShowmanLogic = new ShowmanComputerLogic(data, viewerActions, computerAccount);
     }
 
     public void ReceiveText(Message m)

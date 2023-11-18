@@ -5,63 +5,65 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 
-namespace SIGame
+namespace SIGame;
+
+/// <summary>
+/// Логика взаимодействия для StudiaCommandPanel.xaml
+/// </summary>
+public partial class StudiaCommandPanel : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для StudiaCommandPanel.xaml
-    /// </summary>
-    public partial class StudiaCommandPanel : UserControl
+    private readonly Storyboard _sb;
+
+    public StudiaCommandPanel()
     {
-        private readonly Storyboard _sb;
+        InitializeComponent();
 
-        public StudiaCommandPanel()
+        _sb = (Storyboard)Resources["gameSB"];
+        _sb.Completed += Sb_Completed;
+
+        DataContextChanged += Studia_DataContextChanged;
+    }
+
+    private void Sb_Completed(object? sender, EventArgs e)
+    {
+        gameBorder.Visibility = Visibility.Hidden;
+    }
+
+    private void RaiseButtonClick()
+    {
+        if (gameButton.IsEnabled)
         {
-            InitializeComponent();
+            gameBorder.Visibility = Visibility.Visible;
+            BeginStoryboard(_sb);
+        }
+    }
 
-            _sb = (Storyboard)Resources["gameSB"];
-            _sb.Completed += Sb_Completed;
-
-            DataContextChanged += Studia_DataContextChanged;
+    private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (DataContext is not GameViewModel game)
+        {
+            return;
         }
 
-        private void Sb_Completed(object sender, EventArgs e)
+        if (game.Host.MyLogic is IViewerLogic logic)
         {
-            gameBorder.Visibility = Visibility.Hidden;
+            ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
+        }
+    }
+
+    public void OnMouseRightButtonDown()
+    {
+        if (((GameViewModel)DataContext)?.Host?.MyLogic is not IViewerLogic logic)
+        {
+            return;
         }
 
-        private void RaiseButtonClick()
-        {
-            if (gameButton.IsEnabled)
-            {
-                gameBorder.Visibility = Visibility.Visible;
-                BeginStoryboard(_sb);
-            }
-        }
+        var pressCmd = ((ViewerData)logic.Data).PlayerDataExtensions.PressGameButton;
 
-        private void Studia_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        if (pressCmd != null && pressCmd.CanBeExecuted)
         {
-            if (!(DataContext is GameViewModel game))
-            {
-                return;
-            }
-
-            if (game.Host.MyLogic is IPlayerLogic logic)
-            {
-                ((ViewerData)logic.Data).PlayerDataExtensions.PressButton += RaiseButtonClick;
-            }
-        }
-
-        public void OnMouseRightButtonDown()
-        {
-            if (((GameViewModel)DataContext)?.Host?.MyLogic is IPlayerLogic logic)
-            {
-                var pressCmd = ((ViewerData)logic.Data).PlayerDataExtensions.PressGameButton;
-                if (pressCmd != null && pressCmd.CanBeExecuted)
-                {
-                    RaiseButtonClick();
-                    pressCmd.Execute(null);
-                }
-            }
+            RaiseButtonClick();
+            pressCmd.Execute(null);
         }
     }
 }

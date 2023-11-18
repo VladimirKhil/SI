@@ -11,7 +11,7 @@ namespace SICore;
 /// <summary>
 /// Represents a game player.
 /// </summary>
-public sealed class Player : Viewer<IPlayerLogic>
+public sealed class Player : Viewer
 {
     private readonly object _readyLock = new();
 
@@ -109,11 +109,6 @@ public sealed class Player : Viewer<IPlayerLogic>
         ClientData.AutoReadyChanged += ClientData_AutoReadyChanged;
     }
 
-    protected override IPlayerLogic CreateLogic(Account personData) =>
-        personData.IsHuman ?
-            new PlayerHumanLogic(ClientData, null, _viewerActions, LO) :
-            new PlayerComputerLogic(ClientData, (ComputerAccount)personData, _viewerActions);
-
     public override ValueTask DisposeAsync(bool disposing)
     {
         ClientData.AutoReadyChanged -= ClientData_AutoReadyChanged;
@@ -131,6 +126,7 @@ public sealed class Player : Viewer<IPlayerLogic>
             }
 
             var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand;
+
             if (ClientData.AutoReady && readyCommand != null)
             {
                 readyCommand.Execute(null);
@@ -152,7 +148,7 @@ public sealed class Player : Viewer<IPlayerLogic>
         }
     }
 
-    private void Clear() => _logic.Clear();
+    private void Clear() => _logic.PlayerLogic.Clear();
 
     public override void Init()
     {
@@ -166,7 +162,7 @@ public sealed class Player : Viewer<IPlayerLogic>
             {
                 var readyCommand = personAccount.BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
                 personAccount.BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
-                _logic.OnInitialized();
+                _logic.PlayerLogic.OnInitialized();
 
                 if (ClientData.AutoReady)
                 {
@@ -232,12 +228,12 @@ public sealed class Player : Viewer<IPlayerLogic>
 
                     if (mparams[1] == "1")
                     {
-                        _logic.ChooseQuest();
+                        _logic.PlayerLogic.ChooseQuest();
                         ClientData.Hint = LO[nameof(R.HintSelectQuestion)];
                     }
                     else
                     {
-                        _logic.ChooseFinalTheme();
+                        _logic.PlayerLogic.ChooseFinalTheme();
                         ClientData.Hint = LO[nameof(R.HintSelectTheme)];
                     }
 
@@ -259,7 +255,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     break;
 
                 case Messages.Atom: // deprecated
-                    _logic.OnPlayerAtom(mparams);
+                    _logic.PlayerLogic.OnPlayerAtom(mparams);
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
@@ -272,7 +268,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     break;
 
                 case Messages.Content:
-                    _logic.OnPlayerAtom(mparams);
+                    _logic.PlayerLogic.OnPlayerAtom(mparams);
 
                     if (ClientData.QuestionType == QuestionTypes.Simple)
                     {
@@ -293,7 +289,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     ClientData.PlayerDataExtensions.MyTry = true;
                     _buttonDisabledByGame = false;
                     EnableGameButton();
-                    _logic.StartThink();
+                    _logic.PlayerLogic.StartThink();
                     break;
 
                 case Messages.EndTry:
@@ -302,7 +298,7 @@ public sealed class Player : Viewer<IPlayerLogic>
 
                     if (mparams[1] == MessageParams.EndTry_All)
                     {
-                        _logic.EndThink();
+                        _logic.PlayerLogic.EndThink();
 
                         ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = ClientData.PlayerDataExtensions.ApellationCount > 0;
                         ClientData.PlayerDataExtensions.Pass.CanBeExecuted = false;
@@ -311,7 +307,7 @@ public sealed class Player : Viewer<IPlayerLogic>
 
                 case Messages.Answer:
                     ClientData.PersonDataExtensions.Answer = "";
-                    _logic.Answer();
+                    _logic.PlayerLogic.Answer();
                     break;
 
                 case Messages.Cat:
@@ -324,7 +320,7 @@ public sealed class Player : Viewer<IPlayerLogic>
 
                     ClientData.Hint = LO[nameof(R.HintSelectCatPlayer)];
 
-                    _logic.Cat();
+                    _logic.PlayerLogic.Cat();
                     break;
 
                 case Messages.CatCost:
@@ -336,7 +332,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                         Stake = int.Parse(mparams[1])
                     };
 
-                    _logic.CatCost();
+                    _logic.PlayerLogic.CatCost();
                     break;
 
                 case Messages.Stake:
@@ -358,7 +354,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                         Stake = int.Parse(mparams[5])
                     };
 
-                    _logic.Stake();
+                    _logic.PlayerLogic.Stake();
                     break;
 
                 case Messages.Stake2:
@@ -388,7 +384,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                         Stake = minimumStake
                     };
 
-                    _logic.Stake();
+                    _logic.PlayerLogic.Stake();
                     break;
 
                 case Messages.FinalStake:
@@ -404,7 +400,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     ClientData.DialogMode = DialogModes.FinalStake;
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
 
-                    _logic.FinalStake();
+                    _logic.PlayerLogic.FinalStake();
                     break;
 
                 case Messages.Validation:
@@ -430,7 +426,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                         break;
                     }
 
-                    _logic.PersonAnswered(playerIndex, isRight);
+                    _logic.PlayerLogic.PersonAnswered(playerIndex, isRight);
                     break;
 
                 case Messages.Report:
@@ -450,7 +446,7 @@ public sealed class Player : Viewer<IPlayerLogic>
                     ClientData.PlayerDataExtensions.Report.Report = report.ToString();
                     ClientData.DialogMode = DialogModes.Report;
                     ((PlayerAccount)ClientData.Me).IsDeciding = false;
-                    _logic.Report();
+                    _logic.PlayerLogic.Report();
                     break;
             }
         }
@@ -464,7 +460,7 @@ public sealed class Player : Viewer<IPlayerLogic>
     {
         ClientData.PersonDataExtensions.ValidatorName = mparams[1];
         ClientData.PersonDataExtensions.Answer = mparams[2];
-        _logic.IsRight(mparams[3] == "+");
+        _logic.PlayerLogic.IsRight(mparams[3] == "+");
         _ = int.TryParse(mparams[4], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
 
@@ -494,7 +490,7 @@ public sealed class Player : Viewer<IPlayerLogic>
     {
         ClientData.PersonDataExtensions.ValidatorName = mparams[1];
         ClientData.PersonDataExtensions.Answer = mparams[2];
-        _logic.IsRight(mparams[3] == "+");
+        _logic.PlayerLogic.IsRight(mparams[3] == "+");
         _ = int.TryParse(mparams[5], out var rightAnswersCount);
         rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 6);
 

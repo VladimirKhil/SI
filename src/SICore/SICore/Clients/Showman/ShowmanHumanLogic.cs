@@ -7,25 +7,24 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-человека
 /// </summary>
-internal sealed class ShowmanHumanLogic : ViewerHumanLogic, IShowmanLogic
+internal sealed class ShowmanHumanLogic : IShowmanLogic
 {
-    //private readonly ViewerActions _viewerActions;
-    //private readonly ViewerData _data;
-    //private readonly ILocalizer _localizer;
+    private readonly ViewerActions _viewerActions;
+    private readonly ViewerData _data;
+    private readonly ILocalizer _localizer;
 
-    //public TableInfoViewModel TInfo { get; }
+    public TableInfoViewModel TInfo { get; }
 
     public ShowmanHumanLogic(
         ViewerData data,
         TableInfoViewModel tableInfoViewModel,
         ViewerActions viewerActions,
         ILocalizer localizer)
-        : base(data, viewerActions, localizer)
     {
-        //_viewerActions = viewerActions;
-        //_data = data;
-        //_localizer = localizer;
-        //TInfo = tableInfoViewModel;
+        _viewerActions = viewerActions;
+        _data = data;
+        _localizer = localizer;
+        TInfo = tableInfoViewModel;
 
         TInfo.QuestionSelected += PlayerClient_QuestionSelected;
         TInfo.ThemeSelected += PlayerClient_ThemeSelected;

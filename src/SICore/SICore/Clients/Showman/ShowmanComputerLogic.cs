@@ -6,26 +6,35 @@ namespace SICore;
 /// <summary>
 /// Логика ведущего-компьютера
 /// </summary>
-internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowmanLogic
+internal sealed class ShowmanComputerLogic : IShowmanLogic
 {
-    //private readonly ViewerActions _viewerActions;
-    //private readonly ViewerData _data;
+    private readonly ViewerActions _viewerActions;
+    private readonly ViewerData _data;
 
     public ShowmanComputerLogic(ViewerData data, ViewerActions viewerActions, ComputerAccount computerAccount)
-        : base(data, viewerActions, computerAccount)
     {
-        //_viewerActions = viewerActions;
-        //_data = data;
+        _viewerActions = viewerActions;
+        _data = data;
     }
 
-    internal void ScheduleExecution(ShowmanTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
-
-    protected override void ExecuteTask(int taskId, int arg)
+    private async void ScheduleExecution(ShowmanTasks task, double taskTime)
     {
-        var task = (ShowmanTasks)taskId;
+        await Task.Delay((int)taskTime * 100);
+
+        try
+        {
+            ExecuteTask(task);
+        }
+        catch (Exception exc)
+        {
+            _data.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
+        }
+    }
+
+    private void ExecuteTask(ShowmanTasks task)
+    {
         switch (task)
         {
-
             case ShowmanTasks.Ready:
                 Ready();
                 break;
@@ -94,11 +103,6 @@ internal sealed class ShowmanComputerLogic : ViewerComputerLogic, IShowmanLogic
     public void IsRight() => ScheduleExecution(ShowmanTasks.AnswerRight, 10 + Random.Shared.Next(10));
 
     public void FirstDelete() => ScheduleExecution(ShowmanTasks.AnswerNextToDelete, 10 + Random.Shared.Next(10));
-
-    public void ChangeSum()
-    {
-
-    }
 
     public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 

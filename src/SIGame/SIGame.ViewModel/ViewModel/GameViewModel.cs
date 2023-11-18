@@ -313,7 +313,7 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     private void Cancel_Executed(object? arg)
     {
-        if (Host.MyLogic is IPersonLogic logic)
+        if (Host.MyLogic is IViewerLogic logic)
         {
             ((ViewerData)logic.Data).DialogMode = DialogModes.None;
             ((ViewerData)logic.Data).Hint = "";

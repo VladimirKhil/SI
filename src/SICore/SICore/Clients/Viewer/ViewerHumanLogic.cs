@@ -53,8 +53,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.MediaLoad += TInfo_MediaLoad;
         TInfo.MediaLoadError += TInfo_MediaLoadError;
 
-        //PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
-        //ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
+        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
+        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
 
         _localFileManager.Error += LocalFileManager_Error;
         _localFileManagerTask = _localFileManager.StartAsync(_cancellation.Token);

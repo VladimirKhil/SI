@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides common behavior for player and showman.
 /// </summary>
-public interface IPersonLogic : IViewerLogic
+public interface IPersonLogic
 {
     void OnInitialized();
 

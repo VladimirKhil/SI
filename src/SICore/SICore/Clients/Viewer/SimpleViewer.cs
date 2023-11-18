@@ -4,7 +4,7 @@ using SIData;
 
 namespace SICore;
 
-public sealed class SimpleViewer : Viewer<IViewerLogic>
+public sealed class SimpleViewer : Viewer
 {
     /// <summary>
     /// Запуск клиента
@@ -13,17 +13,5 @@ public sealed class SimpleViewer : Viewer<IViewerLogic>
         : base(client, personData, isHost, localizer, data)
     {
         
-    }
-
-    protected override IViewerLogic CreateLogic(Account personData)
-    {
-        if (personData == null)
-        {
-            throw new ArgumentNullException(nameof(personData));
-        }
-
-        return personData.IsHuman ?
-            new ViewerHumanLogic(ClientData, _viewerActions, LO) :
-            new ViewerComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
     }
 }

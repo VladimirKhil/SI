@@ -9,7 +9,7 @@ namespace SICore;
 /// <summary>
 /// Defines a showman message processor.
 /// </summary>
-public sealed class Showman : Viewer<IShowmanLogic>
+public sealed class Showman : Viewer
 {
     private readonly object _readyLock = new();
 
@@ -118,11 +118,6 @@ public sealed class Showman : Viewer<IShowmanLogic>
         });
     }
 
-    protected override IShowmanLogic CreateLogic(Account personData) =>
-        personData.IsHuman ?
-            new ShowmanHumanLogic(ClientData, null, _viewerActions, LO) :
-            new ShowmanComputerLogic(ClientData, _viewerActions, (ComputerAccount)personData);
-
     private void ClientData_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(PersonData.AreAnswersShown))
@@ -136,7 +131,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
         ClientData.DialogMode = DialogModes.Manage;
     }
 
-    private void ManageTable_Executed(object? arg) => _logic.ManageTable();
+    private void ManageTable_Executed(object? arg) => _logic.ShowmanLogic.ManageTable();
 
     void ClientData_AutoReadyChanged()
     {
@@ -164,7 +159,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
         {
             var readyCommand = ((PersonAccount)ClientData.Me).BeReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready));
             ((PersonAccount)ClientData.Me).BeUnReadyCommand = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Ready, "-"));
-            _logic.OnInitialized();
+            _logic.ShowmanLogic.OnInitialized();
 
             if (ClientData.AutoReady)
             {
@@ -210,7 +205,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
                         ClientData.Hint = LO[nameof(R.HintSelectStarter)];
 
-                        _logic.StarterChoose();
+                        _logic.ShowmanLogic.StarterChoose();
                         break;
 
                         #endregion
@@ -231,7 +226,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         
                         ClientData.Hint = LO[nameof(R.HintSelectStaker)];
 
-                        _logic.FirstStake();
+                        _logic.ShowmanLogic.FirstStake();
                         break;
 
                         #endregion
@@ -263,7 +258,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
                         ClientData.Hint = LO[nameof(R.HintThemeDeleter)];
 
-                        _logic.FirstDelete();
+                        _logic.ShowmanLogic.FirstDelete();
                         break;
 
                         #endregion
@@ -290,12 +285,12 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
                     if (mparams[1] == "1")
                     {
-                        _logic.ChooseQuest();
+                        _logic.ShowmanLogic.ChooseQuest();
                         ClientData.Hint = LO[nameof(R.HintSelectQuestion)];
                     }
                     else
                     {
-                        _logic.ChooseFinalTheme();
+                        _logic.ShowmanLogic.ChooseFinalTheme();
                         ClientData.Hint = LO[nameof(R.HintSelectTheme)];
                     }
 
@@ -312,7 +307,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
                     ClientData.Hint = LO[nameof(R.HintSelectCatPlayerForPlayer)];
 
-                    _logic.Cat();
+                    _logic.ShowmanLogic.Cat();
                     break;
 
                 case Messages.CatCost:
@@ -324,7 +319,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         Stake = int.Parse(mparams[1])
                     };
 
-                    _logic.CatCost();
+                    _logic.ShowmanLogic.CatCost();
                     break;
 
                 case Messages.Stake:
@@ -347,7 +342,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         PlayerName = mparams.Length >= 8 ? mparams[7] : null,
                     };
 
-                    _logic.Stake();
+                    _logic.ShowmanLogic.Stake();
                     break;
 
                 case Messages.Stake2:
@@ -379,7 +374,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
                         PlayerName = mparams[5],
                     };
 
-                    _logic.Stake();
+                    _logic.ShowmanLogic.Stake();
                     break;
 
                 case Messages.Pause:
@@ -405,7 +400,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
 
         if (!isPaused)
         {
-            _logic.ManageTable(false);
+            _logic.ShowmanLogic.ManageTable(false);
         }
     }
 
@@ -436,7 +431,7 @@ public sealed class Showman : Viewer<IShowmanLogic>
         ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
         ClientData.DialogMode = DialogModes.AnswerValidation;
         ((PersonAccount)ClientData.Me).IsDeciding = false;
-        _logic.IsRight();
+        _logic.ShowmanLogic.IsRight();
     }
 
     private void OnValidation2(string[] mparams)
@@ -468,8 +463,8 @@ public sealed class Showman : Viewer<IShowmanLogic>
         ClientData.DialogMode = DialogModes.AnswerValidation;
         ((PersonAccount)ClientData.Me).IsDeciding = false;
 
-        _logic.IsRight();
+        _logic.ShowmanLogic.IsRight();
     }
 
-    private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
+    private void ClearSelections(bool full = false) => _logic.ShowmanLogic.ClearSelections(full);
 }

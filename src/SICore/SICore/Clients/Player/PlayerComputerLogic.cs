@@ -1,5 +1,6 @@
 ﻿using SICore.Clients.Player;
 using SICore.Extensions;
+using SICore.Models;
 using SICore.Utils;
 using SIData;
 using SIPackages.Core;
@@ -11,30 +12,42 @@ namespace SICore;
 /// <summary>
 /// Логика игрока-компьютера
 /// </summary>
-internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
+internal sealed class PlayerComputerLogic : IPlayerLogic
 {
     private ComputerAccount _account;
-    //private readonly ViewerActions _viewerActions;
-    //private readonly ViewerData _data;
+    private readonly ViewerActions _viewerActions;
+    private readonly ViewerData _data;
+
+    private readonly TimerInfo[] _timersInfo;
 
     /// <summary>
     /// Создание логики
     /// </summary>
     /// <param name="client">Текущий клиент</param>
-    public PlayerComputerLogic(ViewerData data, ComputerAccount account, ViewerActions viewerActions)
-        : base(data, viewerActions, account)
+    public PlayerComputerLogic(ViewerData data, ComputerAccount account, ViewerActions viewerActions, TimerInfo[] timerInfos)
     {
         _account = account;
-        //_viewerActions = viewerActions;
-        //_data = data;
+        _viewerActions = viewerActions;
+        _data = data;
+        _timersInfo = timerInfos;
     }
 
-    internal void ScheduleExecution(PlayerTasks task, double taskTime) => ScheduleExecution((int)task, 0, taskTime);
-
-    protected override void ExecuteTask(int taskId, int arg)
+    private async void ScheduleExecution(PlayerTasks task, double taskTime)
     {
-        var task = (PlayerTasks)taskId;
+        await Task.Delay((int)taskTime * 100);
 
+        try
+        {
+            ExecuteTask(task);
+        }
+        catch (Exception exc)
+        {
+            _data.SystemLog.AppendFormat("Execution error: {0}", exc.ToString()).AppendLine();
+        }
+    }
+
+    private void ExecuteTask(PlayerTasks task)
+    {
         switch (task)
         {
             case PlayerTasks.Ready:
@@ -84,6 +97,19 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
             default:
                 break;
         }
+    }
+
+    private int GetTimePercentage(int timerIndex)
+    {
+        var now = DateTime.UtcNow;
+        var timer = _timersInfo[timerIndex];
+
+        if (!timer.IsEnabled)
+        {
+            return timer.PauseTime > -1 ? 100 * timer.PauseTime / timer.MaxTime : 0;
+        }
+
+        return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
     }
 
     private void PressButton() => _viewerActions.PressGameButton();
@@ -911,9 +937,8 @@ internal sealed class PlayerComputerLogic : ViewerComputerLogic, IPlayerLogic
     }
 
     /// <summary>
-    /// Является ли ситуация критической
+    /// Checks if situation is critical.
     /// </summary>
-    /// <returns></returns>
     private bool IsCritical()
     {
         int numQu;
