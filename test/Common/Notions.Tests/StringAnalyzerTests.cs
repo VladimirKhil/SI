@@ -8,7 +8,7 @@ internal sealed class StringAnalyzerTests
     [Test]
     public void LongestCommonSubstring_Ok()
     {
-        var match = StringAnalyzer.LongestCommonSubstring("abc", "dabe", "panb0");
+        var match = StringAnalyzer.LongestCommonSubstring("abc", "dabe", "pab0");
 
         Assert.That(match, Is.Not.Null);
 
@@ -21,7 +21,7 @@ internal sealed class StringAnalyzerTests
         Assert.Multiple(() =>
         {
             Assert.That(match!.Value.PositionsHistory[0], Is.EqualTo(new int[] { 0, 1, 1 }));
-            Assert.That(match!.Value.PositionsHistory[1], Is.EqualTo(new int[] { 1, 2, 3 }));
+            Assert.That(match!.Value.PositionsHistory[1], Is.EqualTo(new int[] { 1, 2, 2 }));
         });
     }
 
@@ -37,6 +37,6 @@ internal sealed class StringAnalyzerTests
 
         Assert.That(match, Is.Not.Null);
 
-        Assert.That(match!.Value.Substring, Is.EqualTo("0. te. Answer: s"));
+        Assert.That(match!.Value.Substring, Is.EqualTo("0. Answer: s"));
     }
 }

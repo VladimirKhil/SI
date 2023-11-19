@@ -3,7 +3,7 @@
 /// <summary>
 /// Defines question table content types.
 /// </summary>
-public enum ContentTypes
+public enum ContentType
 {
     /// <summary>
     /// Empty content.

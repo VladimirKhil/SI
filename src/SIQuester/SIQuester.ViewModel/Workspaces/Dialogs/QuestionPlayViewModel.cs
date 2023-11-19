@@ -1,6 +1,7 @@
 ﻿using SIEngine.Core;
 using SIPackages;
 using SIPackages.Core;
+using SIQuester.ViewModel.Workspaces.Dialogs.Play;
 using Utils.Commands;
 
 namespace SIQuester.ViewModel.Workspaces.Dialogs;
@@ -17,30 +18,12 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public override string Header => Properties.Resources.QuestionPlay;
 
-    private Play.ContentTypes _contentType = Dialogs.Play.ContentTypes.None;
-
-    /// <summary>
-    /// Current question content type.
-    /// </summary>
-    public Play.ContentTypes ContentType
-    {
-        get => _contentType;
-        set
-        {
-            if (_contentType != value)
-            {
-                _contentType = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private string? _content;
+    private ContentInfo[] _content = Array.Empty<ContentInfo>();
 
     /// <summary>
     /// Current question content.
     /// </summary>
-    public string? Content
+    public ContentInfo[] Content
     {
         get => _content;
         set
@@ -92,6 +75,24 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             if (_oral != value)
             {
                 _oral = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private AnswerOptionViewModel[] _answerOptions = Array.Empty<AnswerOptionViewModel>();
+
+    /// <summary>
+    /// Answer options.
+    /// </summary>
+    public AnswerOptionViewModel[] AnswerOptions
+    {
+        get => _answerOptions;
+        set 
+        {
+            if (_answerOptions != value)
+            {
+                _answerOptions = value;
                 OnPropertyChanged();
             }
         }
@@ -157,7 +158,8 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
             _isFinished = true;
             Play.CanBeExecuted = false;
             Sound = null;
-            ContentType = Dialogs.Play.ContentTypes.None;
+            Content = Array.Empty<ContentInfo>();
+            AnswerOptions = Array.Empty<AnswerOptionViewModel>();
             return;
         }
 
@@ -167,59 +169,52 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)
     {
+        var screenContent = new List<ContentInfo>();
+
         foreach (var contentItem in content)
         {
-            OnQuestionContentItem(contentItem);
+            switch (contentItem.Placement)
+            {
+                case ContentPlacements.Replic:
+                    Oral = contentItem.Value;
+                    break;
+
+                case ContentPlacements.Screen:
+                    switch (contentItem.Type)
+                    {
+                        case ContentTypes.Text:
+                            screenContent.Add(new ContentInfo(ContentType.Text, contentItem.Value));
+                            break;
+
+                        case ContentTypes.Image:
+                            screenContent.Add(new ContentInfo(ContentType.Image, contentItem.IsRef ? _qDocument.Images.Wrap(contentItem.Value).Uri : contentItem.Value));
+                            break;
+
+                        case ContentTypes.Video:
+                            screenContent.Add(new ContentInfo(ContentType.Video, contentItem.IsRef ? _qDocument.Video.Wrap(contentItem.Value).Uri : contentItem.Value));
+                            break;
+
+                        case ContentTypes.Html:
+                            screenContent.Add(new ContentInfo(ContentType.Html, contentItem.IsRef ? _qDocument.Html.Wrap(contentItem.Value).Uri : contentItem.Value));
+                            break;
+
+                        default:
+                            break;
+                    }
+                    break;
+
+                case ContentPlacements.Background:
+                    Sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
+                    break;
+
+                default:
+                    break;
+            }
         }
-    }
 
-    public void OnQuestionContentItem(ContentItem contentItem)
-    {
-        switch (contentItem.Placement)
+        if (screenContent.Count > 0)
         {
-            case ContentPlacements.Replic:
-                Oral = contentItem.Value;
-                break;
-
-            case ContentPlacements.Screen:
-                switch (contentItem.Type)
-                {
-                    case ContentTypes.Text:
-                        Content = contentItem.Value;
-                        ContentType = Dialogs.Play.ContentTypes.Text;
-                        break;
-
-                    case ContentTypes.Image:
-                        Content = contentItem.IsRef ? _qDocument.Images.Wrap(contentItem.Value).Uri : contentItem.Value;
-                        ContentType = Dialogs.Play.ContentTypes.Image;
-                        break;
-
-                    case ContentTypes.Video:
-                        Content = contentItem.IsRef ? _qDocument.Video.Wrap(contentItem.Value).Uri : contentItem.Value;
-                        ContentType = Dialogs.Play.ContentTypes.Video;
-                        break;
-
-                    case ContentTypes.Html:
-                        Content = contentItem.IsRef ? _qDocument.Html.Wrap(contentItem.Value).Uri : contentItem.Value;
-                        ContentType = Dialogs.Play.ContentTypes.Html;
-                        break;
-
-                    default:
-                        break;
-                }
-                break;
-
-            case ContentPlacements.Background:
-                Sound = contentItem.IsRef ? _qDocument.Audio.Wrap(contentItem.Value).Uri : contentItem.Value;
-
-                if (ContentType == Dialogs.Play.ContentTypes.None)
-                {
-                    ContentType = Dialogs.Play.ContentTypes.Audio;
-                }
-                break;
-
-            default:
-                break;
+            Content = screenContent.ToArray();
         }
     }
 
@@ -264,7 +259,42 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
 
     public bool OnAnnouncePrice(NumberSet? availableRange) => false;
 
-    public bool OnAnswerOptions(AnswerOption[] answerOptions) => false;
+    public bool OnAnswerOptions(AnswerOption[] answerOptions)
+    {
+        var options = new List<AnswerOptionViewModel>();
 
-    public bool OnRightAnswerOption(string rightOptionLabel) => false;
+        foreach (var option in answerOptions)
+        {
+            switch (option.Content.Type)
+            {
+                case ContentTypes.Text:
+                    options.Add(new AnswerOptionViewModel(option.Label, new ContentInfo(ContentType.Text, option.Content.Value)));
+                    break;
+
+                case ContentTypes.Image:
+                    options.Add(new AnswerOptionViewModel(option.Label, new ContentInfo(ContentType.Image, option.Content.IsRef ? _qDocument.Images.Wrap(option.Content.Value).Uri : option.Content.Value)));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        AnswerOptions = options.ToArray();
+        return false;
+    }
+
+    public bool OnRightAnswerOption(string rightOptionLabel)
+    {
+        foreach (var option in AnswerOptions)
+        {
+            if (option.Label == rightOptionLabel)
+            {
+                option.IsSelected = true;
+                break;
+            }
+        }
+
+        return true;
+    }
 }
