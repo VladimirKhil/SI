@@ -3,4 +3,4 @@ param (
 	[string]$platform = "x64"
 )
 
-dotnet publish src\SIGame\SIGame\SIGame.csproj -c Release -p:PublishSingleFile=true -r win-$platform --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=$version
+dotnet publish ..\src\SIGame\SIGame\SIGame.csproj -c Release -p:PublishSingleFile=true -r win-$platform --self-contained true -p:EnableCompressionInSingleFile=true /property:Version=$version
