@@ -39,7 +39,7 @@ public sealed class SIStoragePackageProvider : IPackagesProvider, IDisposable
             }
         }
 
-        if (!_languageCache.TryGetValue(culture, out var languageId) || culture == null)
+        if (!_languageCache.TryGetValue(culture, out var languageId))
         {
             if (!_languageCache.TryGetValue("en-US", out languageId))
             {
