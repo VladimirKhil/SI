@@ -10,7 +10,7 @@ namespace SI.GameServer.Client;
 /// <summary>
 /// Provides a client to SIGame server.
 /// </summary>
-public interface IGameServerClient : IAsyncDisposable
+public interface IGameServerClient : IGameClient
 {
     string ServiceUri { get; }
 
@@ -22,13 +22,7 @@ public interface IGameServerClient : IAsyncDisposable
     event Action<string> Leaved;
     event Action<string, string> Receieve;
 
-    event Func<Exception?, Task> Reconnecting;
-    event Func<string?, Task> Reconnected;
-
-    event Func<Exception?, Task> Closed;
-
     event Action<int> UploadProgress;
-    event Action<Message> IncomingMessage;
 
     Task OpenAsync(string userName, CancellationToken token = default);
 
@@ -37,6 +31,18 @@ public interface IGameServerClient : IAsyncDisposable
     /// </summary>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<HostInfo> GetGamesHostInfoAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Joins game lobby.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task JoinLobbyAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Leaves game lobby.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task LeaveLobbyAsync(CancellationToken cancellationToken = default);
 
     Task<string> GetNewsAsync(CancellationToken cancellationToken = default);
 

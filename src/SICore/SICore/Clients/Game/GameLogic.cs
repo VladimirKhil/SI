@@ -195,6 +195,8 @@ public sealed class GameLogic : Logic<GameData>
         _data.AllowAppellation = _data.Settings.AppSettings.UseApellations;
         _data.IsPlayingMedia = false;
 
+        _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
+
         ScheduleExecution(Tasks.QuestSourComm, 10, 1, force: true);
     }
 
@@ -4470,20 +4472,7 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void OnRightAnswerOption(string rightOptionLabel)
     {
-        var rightIndex = ClientData.QuestionPlayState.AnswerOptions != null
-            ? Array.FindIndex(ClientData.QuestionPlayState.AnswerOptions, o => o.Label == rightOptionLabel)
-            : -1;
-
-        if (rightIndex > -1)
-        {
-            _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightIndex);
-        }
-        else
-        {
-            var printedAnswer = $"{LO[nameof(R.RightAnswer)]}: {rightOptionLabel}";
-            _gameActions.ShowmanReplic(printedAnswer);
-        }
-
+        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, rightOptionLabel);
         var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
         ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
     }

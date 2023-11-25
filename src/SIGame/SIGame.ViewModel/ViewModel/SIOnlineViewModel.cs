@@ -597,6 +597,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             OnPropertyChanged(nameof(ServerName));
 
+            await _gameServerClient.JoinLobbyAsync(_cancellationTokenSource.Token);
+
             await ReloadGamesAsync(_cancellationTokenSource.Token);
             await ReloadUsersAsync(_cancellationTokenSource.Token);
 
@@ -840,7 +842,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 throw new Exception(GetMessage(gameCreatingResult2.Code) + errorDetail);
             }
 
-            await InitNodeAndClientNewAsync(cancellationTokenSource.Token);
+            await InitNodeAndClientNewAsync(_gameServerClient, cancellationTokenSource.Token);
             await JoinGameCompletedAsync(settings.Role, true, cancellationTokenSource.Token);
 
             if (_host == null)
@@ -932,7 +934,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
                 throw new Exception(GetMessage(gameCreatingResult2.Code) + errorDetail);
             }
 
-            await InitNodeAndClientNewAsync(cancellationToken);
+            await InitNodeAndClientNewAsync(_gameServerClient, cancellationToken);
             await JoinGameCompletedAsync(settings.Role, true, cancellationToken);
 
             if (_host == null)
@@ -1078,13 +1080,13 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         return true;
     }
 
-    private async Task InitNodeAndClientNewAsync(CancellationToken cancellationToken = default)
+    private async Task InitNodeAndClientNewAsync(IGameClient gameClient, CancellationToken cancellationToken = default)
     {
         _node = new GameServerSlave(
             NodeConfiguration.Default,
             new NetworkLocalizer(Thread.CurrentThread.CurrentUICulture.Name));
 
-        await _node.AddConnectionAsync(new GameServerConnection(_gameServerClient) { IsAuthenticated = true }, cancellationToken);
+        await _node.AddConnectionAsync(new GameServerConnection(gameClient) { IsAuthenticated = true }, cancellationToken);
 
         _client = new Client(Human.Name);
         _client.ConnectTo(_node);
@@ -1232,11 +1234,16 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             return;
         }
 
+        if (gameInfo == null)
+        {
+            return;
+        }
+
         if (!isHost)
         {
             lock (_serverGamesLock)
             {
-                var passwordRequired = gameInfo != null && gameInfo.PasswordRequired;
+                var passwordRequired = gameInfo.PasswordRequired;
 
                 if (passwordRequired && string.IsNullOrEmpty(_password))
                 {
@@ -1252,16 +1259,40 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
 
             if (_userSettings.UseSignalRConnection)
             {
-                var result = await _gameServerClient.JoinGameAsync(gameInfo.GameID, role, Human.IsMale, _password, cancellationToken);
-                
-                if (result.ErrorMessage != null)
+                var siHostClient = await SIHostClient.CreateAsync(
+                    new SIHostClientOptions { ServiceUri = gameInfo.HostUri },
+                    cancellationToken);
+
+                var result = await siHostClient.JoinGameAsync(
+                    new SI.GameServer.Contract.JoinGameRequest(
+                        gameInfo.GameID,
+                        Human.Name,
+                        role,
+                        Human.IsMale ? SI.GameServer.Contract.Sex.Male : SI.GameServer.Contract.Sex.Female,
+                        _password),
+                    cancellationToken);
+
+                if (!result.IsSuccess)
                 {
-                    Error = result.ErrorMessage;
+                    Error = result.ErrorType switch
+                    {
+                        SI.GameServer.Contract.JoinGameErrorType.GameNotFound => Resources.GameNotFound,
+                        SI.GameServer.Contract.JoinGameErrorType.CommonJoinError => Resources.CommonJoinError,
+                        SI.GameServer.Contract.JoinGameErrorType.InvalidRole => Resources.InvalidRole,
+                        SI.GameServer.Contract.JoinGameErrorType.InternalServerError => Resources.InternalServerError,
+                        SI.GameServer.Contract.JoinGameErrorType.Forbidden => Resources.JoinForbidden,
+                        _ => Resources.UnknownError
+                    } + ' ' + result.Message;
+
+                    await siHostClient.DisposeAsync();
+
                     return;
                 }
 
-                await InitNodeAndClientNewAsync(cancellationToken);
+                await InitNodeAndClientNewAsync(siHostClient, cancellationToken);
                 await JoinGameCompletedAsync(role, isHost, cancellationToken);
+
+                await _gameServerClient.DisposeAsync();
             }
             else
             {
@@ -1316,6 +1347,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
         GameSettings?.CancellationTokenSource?.Cancel();
         base.CloseContent_Executed(arg);
     }
+
     private static GameInfo ToSICoreGame(SI.GameServer.Contract.GameInfo gameInfo) =>
         new()
         {
@@ -1331,7 +1363,8 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
             Stage = BuildStage(gameInfo),
             Started = gameInfo.Started,
             StartTime = gameInfo.StartTime.ToLocalTime(),
-            MinimumClientProtocolVersion = gameInfo.MinimumClientProtocolVersion
+            MinimumClientProtocolVersion = gameInfo.MinimumClientProtocolVersion,
+            HostUri = gameInfo.HostUri,
         };
 
     private static string BuildStage(SI.GameServer.Contract.GameInfo gameInfo) => gameInfo.Stage switch

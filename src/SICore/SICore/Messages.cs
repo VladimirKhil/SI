@@ -387,6 +387,11 @@ public static class Messages
     public const string QuestionCaption = "QUESTIONCAPTION";
 
     /// <summary>
+    /// Question has ended.
+    /// </summary>
+    public const string QuestionEnd = "QUESTION_END";
+
+    /// <summary>
     /// Реплика игры/участника
     /// </summary>
     public const string Replic = "REPLIC";

@@ -47,4 +47,9 @@ public sealed class HostInfo
     /// Maximum allowed package size in MB.
     /// </summary>
     public int MaxPackageSizeMb { get; set; } = 100;
+
+    /// <summary>
+    /// Base uri for game links.
+    /// </summary>
+    public Uri? BaseGameLinkUri { get; set; }
 }

@@ -5,7 +5,7 @@ using Utils;
 namespace SICore.Network.Contracts;
 
 /// <summary>
-/// Represent a SI network node. Nodes could be connected to each other.
+/// Represents a SI network node. Nodes could be connected to each other.
 /// Clients connect to some node and communicate with other client via it.
 /// </summary>
 public interface INode : IAsyncDisposable

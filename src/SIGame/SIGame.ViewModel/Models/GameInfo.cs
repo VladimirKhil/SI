@@ -47,4 +47,9 @@ public sealed class GameInfo
     /// Minimum client protocol version required to join this game.
     /// </summary>
     public int MinimumClientProtocolVersion { get; set; }
+
+    /// <summary>
+    /// Game host uri.
+    /// </summary>
+    public Uri? HostUri { get; internal set; }
 }

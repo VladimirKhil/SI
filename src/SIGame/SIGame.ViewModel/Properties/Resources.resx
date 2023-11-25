@@ -507,4 +507,22 @@
   <data name="YouNeedToUpgradeClientToJoinGame" xml:space="preserve">
     <value>You need to upgrade application to join this game</value>
   </data>
+  <data name="CommonJoinError" xml:space="preserve">
+    <value>Common error</value>
+  </data>
+  <data name="GameNotFound" xml:space="preserve">
+    <value>Game not found</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Internal server error</value>
+  </data>
+  <data name="InvalidRole" xml:space="preserve">
+    <value>Invalid role</value>
+  </data>
+  <data name="JoinForbidden" xml:space="preserve">
+    <value>Forbidden to join (you are banned)</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
 </root>

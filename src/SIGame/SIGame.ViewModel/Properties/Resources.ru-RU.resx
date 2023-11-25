@@ -504,4 +504,22 @@
   <data name="YouNeedToUpgradeClientToJoinGame" xml:space="preserve">
     <value>Необходимо обновить приложение для входа в эту игру</value>
   </data>
+  <data name="CommonJoinError" xml:space="preserve">
+    <value>Ошибка общего вида</value>
+  </data>
+  <data name="GameNotFound" xml:space="preserve">
+    <value>Игра не найдена</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>Внутренняя ошибка сервера</value>
+  </data>
+  <data name="InvalidRole" xml:space="preserve">
+    <value>Неверная роль</value>
+  </data>
+  <data name="JoinForbidden" xml:space="preserve">
+    <value>Вам запрещён вход в эту игру</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>Неизвестная ошибка</value>
+  </data>
 </root>

@@ -167,7 +167,7 @@ public sealed class GameServerClient : IGameServerClient
     }
 
     public Task JoinLobbyAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("JoinLobby", cancellationToken);
+        _connection.InvokeAsync("JoinLobby2", Thread.CurrentThread.CurrentUICulture.Name, cancellationToken);
 
     public Task LeaveLobbyAsync(CancellationToken cancellationToken = default) =>
         _connection.InvokeAsync("LeaveLobby", cancellationToken);

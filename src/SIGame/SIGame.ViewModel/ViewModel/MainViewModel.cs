@@ -217,7 +217,12 @@ public sealed class MainViewModel : INotifyPropertyChanged, IDisposable
             throw new ArgumentNullException(nameof(host));
         }
 
-        var game = new GameViewModel(node, host, _userSettings, fileShare, _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
+        var game = new GameViewModel(
+            node,
+            host,
+            _userSettings,
+            fileShare,
+            _serviceProvider.GetRequiredService<ILogger<GameViewModel>>())
         {
             NetworkGame = isNetworkGame && node.IsMain,
             NetworkGamePort = networkGamePort,

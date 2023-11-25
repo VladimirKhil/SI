@@ -1076,14 +1076,22 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         {
             var options = TInfo.AnswerOptions.Options;
 
-            if (!int.TryParse(answer, out var answerIndex))
+            if (options == null)
             {
-                answerIndex = -1;
+                return;
+            }
+
+            var rightIndex = Array.FindIndex(options, o => o.Label == answer);
+
+            if (rightIndex == -1)
+            {
+                OnReplic(ReplicCodes.Showman.ToString(), $"{_localizer[nameof(R.RightAnswer)]}: {answer}");
+                return;
             }
 
             for (int i = 0; i < options.Length; i++)
             {
-                if (i == answerIndex)
+                if (i == rightIndex)
                 {
                     options[i].State = ItemState.Right;
                 }

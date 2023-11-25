@@ -151,6 +151,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Common error.
+        /// </summary>
+        public static string CommonJoinError {
+            get {
+                return ResourceManager.GetString("CommonJoinError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Computer player.
         /// </summary>
         public static string ComputerPlayer {
@@ -412,6 +421,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Game not found.
+        /// </summary>
+        public static string GameNotFound {
+            get {
+                return ResourceManager.GetString("GameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на classic.
         /// </summary>
         public static string GameRule_Classic {
@@ -574,6 +592,15 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Internal server error.
+        /// </summary>
+        public static string InternalServerError {
+            get {
+                return ResourceManager.GetString("InternalServerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Invalid avatar data.
         /// </summary>
         public static string InvalidAvatarData {
@@ -583,11 +610,29 @@ namespace SIGame.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Invalid role.
+        /// </summary>
+        public static string InvalidRole {
+            get {
+                return ResourceManager.GetString("InvalidRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на {0} is found at least twice.
         /// </summary>
         public static string IsDouble {
             get {
                 return ResourceManager.GetString("IsDouble", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Forbidden to join (you are banned).
+        /// </summary>
+        public static string JoinForbidden {
+            get {
+                return ResourceManager.GetString("JoinForbidden", resourceCulture);
             }
         }
         
@@ -1182,6 +1227,15 @@ namespace SIGame.ViewModel.Properties {
         public static string TooManyGames {
             get {
                 return ResourceManager.GetString("TooManyGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Unknown error.
+        /// </summary>
+        public static string UnknownError {
+            get {
+                return ResourceManager.GetString("UnknownError", resourceCulture);
             }
         }
         

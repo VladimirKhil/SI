@@ -7,16 +7,16 @@ namespace SIGame.ViewModel.Implementation;
 
 internal sealed class GameServerConnection : ConnectionBase
 {
-    private readonly IGameServerClient _gameServerClient;
+    private readonly IGameClient _gameClient;
     private bool _isDisposed;
 
-    public GameServerConnection(IGameServerClient gameServerClient)
+    public GameServerConnection(IGameClient gameClient)
     {
-        _gameServerClient = gameServerClient;
-        _gameServerClient.IncomingMessage += OnMessageReceived;
-        _gameServerClient.Reconnecting += GameServerClient_Reconnecting;
-        _gameServerClient.Reconnected += GameServerClient_Reconnected;
-        _gameServerClient.Closed += GameServerClient_Closed;
+        _gameClient = gameClient;
+        _gameClient.IncomingMessage += OnMessageReceived;
+        _gameClient.Reconnecting += GameServerClient_Reconnecting;
+        _gameClient.Reconnected += GameServerClient_Reconnected;
+        _gameClient.Closed += GameServerClient_Closed;
     }
 
     private Task GameServerClient_Closed(Exception? arg)
@@ -49,7 +49,7 @@ internal sealed class GameServerConnection : ConnectionBase
 
         try
         {
-            return new ValueTask(_gameServerClient.SendMessageAsync(m));
+            return new ValueTask(_gameClient.SendMessageAsync(m));
         }
         catch (TaskCanceledException exc)
         {
@@ -69,13 +69,13 @@ internal sealed class GameServerConnection : ConnectionBase
 
     protected override ValueTask DisposeAsync(bool disposing)
     {
-        _gameServerClient.IncomingMessage -= OnMessageReceived;
-        _gameServerClient.Reconnecting -= GameServerClient_Reconnecting;
-        _gameServerClient.Reconnected -= GameServerClient_Reconnected;
-        _gameServerClient.Closed -= GameServerClient_Closed;
+        _gameClient.IncomingMessage -= OnMessageReceived;
+        _gameClient.Reconnecting -= GameServerClient_Reconnecting;
+        _gameClient.Reconnected -= GameServerClient_Reconnected;
+        _gameClient.Closed -= GameServerClient_Closed;
 
         _isDisposed = true;
 
-        return _gameServerClient.DisposeAsync();
+        return _gameClient.DisposeAsync();
     }
 }

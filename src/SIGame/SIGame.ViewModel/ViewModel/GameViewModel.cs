@@ -132,7 +132,12 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         }
     }
 
-    public GameViewModel(Node node, IViewerClient host, UserSettings userSettings, IFileShare? fileShare, ILogger<GameViewModel> logger)
+    public GameViewModel(
+        Node node,
+        IViewerClient host,
+        UserSettings userSettings,
+        IFileShare? fileShare,
+        ILogger<GameViewModel> logger)
     {
         _node = node;
         _fileShare = fileShare;
