@@ -1674,9 +1674,36 @@ public sealed class QDocument : WorkspaceViewModel
             var itemData = (InfoOwnerData)_clipboardService.GetData(ClipboardKey);
             var level = itemData.ItemLevel;
 
+            var isUpgraded = Package.IsUpgraded;
+
             if (level == InfoOwnerData.Level.Round)
             {
                 var round = (Round)itemData.GetItem();
+
+                if (isUpgraded)
+                {
+                    foreach (var theme in round.Themes)
+                    {
+                        foreach (var question in theme.Questions)
+                        {
+                            question.Upgrade();
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var theme in round.Themes)
+                    {
+                        foreach (var question in theme.Questions)
+                        {
+                            if (question.Parameters != null)
+                            {
+                                PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
+                                return;
+                            }
+                        }
+                    }
+                }
 
                 if (_activeNode is PackageViewModel myPackage)
                 {
@@ -1697,6 +1724,25 @@ public sealed class QDocument : WorkspaceViewModel
             else if (level == InfoOwnerData.Level.Theme)
             {
                 var theme = (Theme)itemData.GetItem();
+
+                if (isUpgraded)
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        question.Upgrade();
+                    }
+                }
+                else
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        if (question.Parameters != null)
+                        {
+                            PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
+                            return;
+                        }
+                    }
+                }
 
                 if (_activeNode is RoundViewModel myRound)
                 {
@@ -1719,6 +1765,16 @@ public sealed class QDocument : WorkspaceViewModel
             else if (level == InfoOwnerData.Level.Question)
             {
                 var question = (Question)itemData.GetItem();
+
+                if (isUpgraded)
+                {
+                    question.Upgrade();
+                }
+                else if (question.Parameters != null)
+                {
+                    PlatformManager.Instance.ShowExclamationMessage(Resources.ObjectInNewFormat);
+                    return;
+                }
 
                 if (_activeNode is ThemeViewModel myTheme)
                 {
@@ -1875,6 +1931,16 @@ public sealed class QDocument : WorkspaceViewModel
                 using var stream = File.OpenRead(file);
                 using var doc = SIDocument.Load(stream);
 
+                if (Package.IsUpgraded)
+                {
+                    doc.Upgrade();
+                }
+                else if (doc.Package.Version >= 5.0)
+                {
+                    PlatformManager.Instance.ShowExclamationMessage(Resources.PackageInNewFormat);
+                    return;
+                }
+
                 CopyAuthorsAndSources(doc, doc.Package);
 
                 foreach (var round in doc.Package.Rounds)
@@ -1899,14 +1965,17 @@ public sealed class QDocument : WorkspaceViewModel
                                 await ImportContentItemAsync(doc, item, contentImportTable);
                             }
 
-                            foreach (var atom in question.Scenario)
+                            if (!Package.IsUpgraded)
                             {
-                                if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video && atom.Type != AtomTypes.Html)
+                                foreach (var atom in question.Scenario)
                                 {
-                                    continue;
-                                }
+                                    if (atom.Type != AtomTypes.Image && atom.Type != AtomTypes.Audio && atom.Type != AtomTypes.AudioNew && atom.Type != AtomTypes.Video && atom.Type != AtomTypes.Html)
+                                    {
+                                        continue;
+                                    }
 
-                                await ImportAtomAsync(doc, atom, scenarioImportTable);
+                                    await ImportAtomAsync(doc, atom, scenarioImportTable);
+                                }
                             }
                         }
                     }

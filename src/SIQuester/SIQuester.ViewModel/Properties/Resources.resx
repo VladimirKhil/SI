@@ -684,4 +684,10 @@ theme - тема Кота</value>
   <data name="AudioIsNotOnBackground" xml:space="preserve">
     <value>Аудио файл {0} не указан как фоновый</value>
   </data>
+  <data name="PackageInNewFormat" xml:space="preserve">
+    <value>Пакет создан в новом формате и не может быть присоединён к данному</value>
+  </data>
+  <data name="ObjectInNewFormat" xml:space="preserve">
+    <value>Объект создан в новом формате и не может быть присоединён к данному пакету</value>
+  </data>
 </root>

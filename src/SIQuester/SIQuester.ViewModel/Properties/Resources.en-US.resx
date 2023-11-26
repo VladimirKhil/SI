@@ -399,6 +399,9 @@
   <data name="NumOfThemes" xml:space="preserve">
     <value>Theme count</value>
   </data>
+  <data name="ObjectInNewFormat" xml:space="preserve">
+    <value>Object is created in new format and could not be added to current package</value>
+  </data>
   <data name="ObjectNotFound" xml:space="preserve">
     <value>The next object was not found: {0}</value>
   </data>
@@ -437,6 +440,9 @@
   </data>
   <data name="PackageEmptyName" xml:space="preserve">
     <value>Empty package</value>
+  </data>
+  <data name="PackageInNewFormat" xml:space="preserve">
+    <value>Package is created in new format and could not be added to current</value>
   </data>
   <data name="PackageServerFull" xml:space="preserve">
     <value>currently, there is no space on the server to accept new packages</value>

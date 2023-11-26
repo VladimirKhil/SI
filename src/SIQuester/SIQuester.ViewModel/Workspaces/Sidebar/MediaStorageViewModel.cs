@@ -626,8 +626,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             {
                 var collection = _document.GetInternalCollection(_name);
 
-                return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
+                return PlatformManager.Instance.PrepareMedia(
+                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), Uri.EscapeDataString(_document.Path) + _document.Package.Model.ID + link),
                     collection.Name);
             });
     }
@@ -650,7 +650,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     }
 
     /// <summary>
-    /// Tries to get strea for a media file.
+    /// Tries to get stream for a media file.
     /// </summary>
     /// <param name="mediaItem">Media file.</param>
     internal Stream? TryGetStream(MediaItemViewModel mediaItem)

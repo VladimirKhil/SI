@@ -5,6 +5,7 @@ using SIQuester.Helpers;
 using SIQuester.Implementation;
 using SIQuester.Model;
 using SIQuester.ViewModel;
+using SIQuester.ViewModel.PlatformSpecific;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
@@ -292,6 +293,8 @@ public partial class TreeDocView : UserControl
 
             e.Effects = DragDropEffects.Move;
 
+            var isUpgraded = document.Package.IsUpgraded;
+
             if (format == WellKnownDragFormats.Round)
             {
                 Round round;
@@ -308,6 +311,31 @@ public partial class TreeDocView : UserControl
                     using var reader = XmlReader.Create(stringReader);
                     round = new Round();
                     round.ReadXml(reader);
+                }
+
+                if (isUpgraded)
+                {
+                    foreach (var theme in round.Themes)
+                    {
+                        foreach (var question in theme.Questions)
+                        {
+                            question.Upgrade();
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var theme in round.Themes)
+                    {
+                        foreach (var question in theme.Questions)
+                        {
+                            if (question.Parameters != null)
+                            {
+                                PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
+                                return;
+                            }
+                        }
+                    }
                 }
 
                 if (treeViewItem.DataContext is PackageViewModel package)
@@ -345,6 +373,25 @@ public partial class TreeDocView : UserControl
                     theme.ReadXml(reader);
                 }
 
+                if (isUpgraded)
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        question.Upgrade();
+                    }
+                }
+                else
+                {
+                    foreach (var question in theme.Questions)
+                    {
+                        if (question.Parameters != null)
+                        {
+                            PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
+                            return;
+                        }
+                    }
+                }
+
                 if (treeViewItem.DataContext is RoundViewModel docRound)
                 {
                     docRound.Themes.Add(new ThemeViewModel(theme) { IsSelected = true });
@@ -376,6 +423,16 @@ public partial class TreeDocView : UserControl
                     using var reader = XmlReader.Create(stringReader);
                     question = new Question();
                     question.ReadXml(reader);
+                }
+
+                if (isUpgraded)
+                {
+                    question.Upgrade();
+                }
+                else if (question.Parameters != null)
+                {
+                    PlatformManager.Instance.ShowExclamationMessage(ViewModel.Properties.Resources.ObjectInNewFormat);
+                    return;
                 }
 
                 if (treeViewItem.DataContext is ThemeViewModel docTheme)
