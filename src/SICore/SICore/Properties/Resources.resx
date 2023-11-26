@@ -837,4 +837,10 @@
   <data name="SelectAnswerOption" xml:space="preserve">
     <value>Select answer option on table</value>
   </data>
+  <data name="FemaleEnding" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ScoreChanged" xml:space="preserve">
+    <value>{0} changed {1} score from {2} to {3}</value>
+  </data>
 </root>
