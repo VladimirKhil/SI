@@ -1,6 +1,6 @@
 SIGame projects set
 
-.NET 6 SDK is required to compile the solutions. Visual Studio 2022 is required to publish SImulator ClickOnce application.
+.NET 6 SDK is required to compile solutions. Visual Studio 2022 is required to publish SImulator ClickOnce application.
 
 WiX Toolset is required to build app installers.
 
@@ -37,14 +37,14 @@ WiX Toolset is required to build app installers.
 
 # Scripts
 
-* *sigame-build.ps1* - builds a SIGame project in Release configuration and sets provided version number;
-* *sigame-build-msi.ps1* - builds a SIGame msi for provided platform;
-* *sigame-build-setup.ps1* - builds a SIGame installer;
-* *sigame-publish.ps1* - publishes a SIGame and sets provided version number;
+* *tools/sigame-build.ps1* - builds a SIGame project in Release configuration and sets provided version number;
+* *tools/sigame-build-msi.ps1* - builds a SIGame msi for provided platform;
+* *tools/sigame-build-setup.ps1* - builds a SIGame installer;
+* *tools/sigame-publish.ps1* - publishes a SIGame and sets provided version number;
 
-* *siquester-build.ps1* - builds a SIQuester project in Release configuration;
-* *siquester-build-msi.ps1* - builds a SIQuester msi for win-x86 and win-x64;
-* *siquester-publish.ps1* - publishes a SIQuester;
+* *tools/siquester-build.ps1* - builds a SIQuester project in Release configuration;
+* *tools/siquester-build-msi.ps1* - builds a SIQuester msi for win-x86 and win-x64;
+* *tools/siquester-publish.ps1* - publishes a SIQuester;
 
-* *simulator-build.ps1* - builds a SImulator project in Release configuration;
-* *simulator-publish.ps1* - publishes a SImulator project in Release configuration for win-x86 architecture as a compressed single file;
+* *tools/simulator-build.ps1* - builds a SImulator project in Release configuration;
+* *tools/simulator-publish.ps1* - publishes a SImulator project in Release configuration for win-x86 architecture as a compressed single file;

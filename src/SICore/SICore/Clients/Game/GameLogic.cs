@@ -4428,6 +4428,11 @@ public sealed class GameLogic : Logic<GameData>
 
     internal void OnSetTheme(string themeName)
     {
+        if (string.IsNullOrWhiteSpace(themeName))
+        {
+            themeName = _data.Theme?.Name ?? "";
+        }
+
         _gameActions.SendMessageWithArgs(Messages.QuestionCaption, themeName);
 
         var s = new StringBuilder(LO[nameof(R.Theme)]).Append(": ").Append(themeName);

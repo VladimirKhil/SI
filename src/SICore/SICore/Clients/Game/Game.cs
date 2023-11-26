@@ -1657,9 +1657,12 @@ public sealed class Game : Actor<GameData, GameLogic>
         }
 
         var player = ClientData.Players[playerIndex - 1];
+        var oldSum = player.Sum;
         player.Sum = sum;
 
-        _gameActions.SpecialReplic($"{ClientData.ShowMan.Name} {LO[nameof(R.Change1)]} {player.Name}{LO[nameof(R.Change3)]} {Notion.FormatNumber(player.Sum)}");
+        var verbEnding = ClientData.ShowMan.IsMale ? "" : LO[nameof(R.FemaleEnding)];
+
+        _gameActions.SpecialReplic(string.Format(LO[nameof(R.ScoreChanged)], ClientData.ShowMan.Name, player.Name, oldSum, sum, verbEnding));
         _gameActions.InformSums();
 
         _logic.AddHistory($"Sum change: {playerIndex - 1} = {sum}");

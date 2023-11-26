@@ -403,10 +403,6 @@ public sealed class Player : Viewer
                     _logic.PlayerLogic.FinalStake();
                     break;
 
-                case Messages.Validation:
-                    OnValidation(mparams);
-                    break;
-
                 case Messages.Validation2:
                     OnValidation2(mparams);
                     break;
@@ -454,36 +450,6 @@ public sealed class Player : Viewer
         {
             throw new Exception(string.Join("\n", mparams), exc);
         }
-    }
-
-    private void OnValidation(string[] mparams)
-    {
-        ClientData.PersonDataExtensions.ValidatorName = mparams[1];
-        ClientData.PersonDataExtensions.Answer = mparams[2];
-        _logic.PlayerLogic.IsRight(mparams[3] == "+");
-        _ = int.TryParse(mparams[4], out var rightAnswersCount);
-        rightAnswersCount = Math.Min(rightAnswersCount, mparams.Length - 5);
-
-        var right = new List<string>();
-
-        for (int i = 0; i < rightAnswersCount; i++)
-        {
-            right.Add(mparams[5 + i]);
-        }
-
-        var wrong = new List<string>();
-
-        for (int i = 5 + rightAnswersCount; i < mparams.Length; i++)
-        {
-            wrong.Add(mparams[i]);
-        }
-
-        ClientData.PersonDataExtensions.Right = right.ToArray();
-        ClientData.PersonDataExtensions.Wrong = wrong.ToArray();
-
-        ClientData.Hint = LO[nameof(R.HintCheckAnswer)];
-        ClientData.DialogMode = DialogModes.AnswerValidation;
-        ((PersonAccount)ClientData.Me).IsDeciding = false;
     }
 
     private void OnValidation2(string[] mparams)

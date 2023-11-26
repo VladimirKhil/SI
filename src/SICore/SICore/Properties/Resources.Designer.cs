@@ -502,6 +502,15 @@ namespace SICore.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на .
+        /// </summary>
+        public static string FemaleEnding {
+            get {
+                return ResourceManager.GetString("FemaleEnding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на File.
         /// </summary>
         public static string File {
@@ -1623,6 +1632,15 @@ namespace SICore.Properties {
         public static string Score {
             get {
                 return ResourceManager.GetString("Score", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на {0} changed {1} score from {2} to {3}.
+        /// </summary>
+        public static string ScoreChanged {
+            get {
+                return ResourceManager.GetString("ScoreChanged", resourceCulture);
             }
         }
         

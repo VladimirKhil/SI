@@ -85,7 +85,13 @@ internal sealed class QuestionPlayHandler : IQuestionEnginePlayHandler
 
     public void OnButtonPressStart()
     {
-        GameLogic?.OnButtonPressStart();
+        if (GameLogic == null || GameData == null)
+        {
+            return;
+        }
+
+        GameData.AnswerMode = StepParameterValues.AskAnswerMode_Button;
+        GameLogic.OnButtonPressStart(); // TODO: merge somehow with GameLogic.AskToPress()
     }
 
     public void OnContentStart(IEnumerable<ContentItem> contentItems)

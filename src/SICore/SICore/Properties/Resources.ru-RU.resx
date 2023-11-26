@@ -842,4 +842,10 @@
   <data name="SelectAnswerOption" xml:space="preserve">
     <value>Выберите вариант ответа на табло</value>
   </data>
+  <data name="FemaleEnding" xml:space="preserve">
+    <value>а</value>
+  </data>
+  <data name="ScoreChanged" xml:space="preserve">
+    <value>{0} изменил{4} сумму на счёте {1} с {2} на {3}</value>
+  </data>
 </root>
