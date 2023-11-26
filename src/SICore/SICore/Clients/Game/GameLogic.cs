@@ -553,17 +553,7 @@ public sealed class GameLogic : Logic<GameData>
                 return false;
             }
 
-            // For backward compatibility; remove later
-            // {
-            var contentType2 = contentItem.Type;
-
-            if (contentType2 == AtomTypes.AudioNew)
-            {
-                contentType2 = AtomTypes.Audio; 
-            }
-            // }
-
-            _gameActions.SendMessageWithArgs(Messages.Content, contentItem.Placement, 0, contentType2, globalUri);
+            _gameActions.SendMessageWithArgs(Messages.Content, contentItem.Placement, 0, contentItem.Type, globalUri);
 
             // TODO: remove after complete switching to Content message
             // {
