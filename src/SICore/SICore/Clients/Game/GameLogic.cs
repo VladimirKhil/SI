@@ -3227,10 +3227,25 @@ public sealed class GameLogic : Logic<GameData>
         }
     }
 
-    private void SendAnswersInfoToShowman(string answer) =>
+    private void SendAnswersInfoToShowman(string answer)
+    {
+        _gameActions.SendMessage(BuildValidationMessage(_data.Answerer.Name, answer), _data.ShowMan.Name);
+
         _gameActions.SendMessage(
             BuildValidation2Message(_data.Answerer.Name, answer, _data.AnswerMode == StepParameterValues.AskAnswerMode_Button),
             _data.ShowMan.Name);
+    }
+
+    private string BuildValidationMessage(string name, string answer, bool isCheckingForTheRight = true)
+    {
+        var rightAnswers = _data.Question.Right;
+        var wrongAnswers = _data.Question.Wrong;
+
+        return new MessageBuilder(Messages.Validation, name, answer, isCheckingForTheRight ? '+' : '-', rightAnswers.Count)
+            .AddRange(rightAnswers)
+            .AddRange(wrongAnswers)
+            .Build();
+    }
 
     private string BuildValidation2Message(string name, string answer, bool allowPriceModifications, bool isCheckingForTheRight = true)
     {
@@ -3797,6 +3812,7 @@ public sealed class GameLogic : Logic<GameData>
 
         _gameActions.ShowmanReplic($"{_data.AppellationSource} {origin}. {apellationReplic}");
 
+        var validationMessage = BuildValidationMessage(appelaer.Name, appelaer.Answer, _data.IsAppelationForRightAnswer);
         var validation2Message = BuildValidation2Message(appelaer.Name, appelaer.Answer, false, _data.IsAppelationForRightAnswer);
 
         _data.AppellationAwaitedVoteCount = 0;
@@ -3831,6 +3847,7 @@ public sealed class GameLogic : Logic<GameData>
             {
                 _data.AppellationAwaitedVoteCount++;
                 _data.Players[i].Flag = true;
+                _gameActions.SendMessage(validationMessage, _data.Players[i].Name);
                 _gameActions.SendMessage(validation2Message, _data.Players[i].Name);
             }
         }
