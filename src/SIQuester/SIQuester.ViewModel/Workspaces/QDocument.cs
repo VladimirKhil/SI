@@ -248,6 +248,11 @@ public sealed class QDocument : WorkspaceViewModel
         {
             ClearLinks(atom);
         }
+
+        foreach (var content in question.Model.GetContent())
+        {
+            ClearLinks(content);
+        }
     }
 
     internal void ClearLinks(AtomViewModel atom)
@@ -1285,7 +1290,7 @@ public sealed class QDocument : WorkspaceViewModel
         StorageContext = storageContextViewModel;
 
         ImportSiq = new SimpleCommand(ImportSiq_Executed);
-        
+
         Save = new AsyncCommand(Save_Executed);
         SaveAs = new AsyncCommand(SaveAs_Executed);
         SaveAsTemplate = new AsyncCommand(SaveAsTemplate_Executed);
@@ -1306,7 +1311,7 @@ public sealed class QDocument : WorkspaceViewModel
         ConvertToMillionaire = new SimpleCommand(ConvertToMillionaire_Executed);
         ConvertToSportSI = new SimpleCommand(ConvertToSportSI_Executed);
 
-        Wikify = new SimpleCommand(Wikify_Executed);          
+        Wikify = new SimpleCommand(Wikify_Executed);
 
         Navigate = new SimpleCommand(Navigate_Executed);
 
@@ -1413,7 +1418,7 @@ public sealed class QDocument : WorkspaceViewModel
             {
                 warnings.Add(new WarningViewModel(string.Format(Resources.FileIsDuplicated, name), () => NavigateToStorageItem(mediaStorage, item)));
             }
-            
+
             if (AppSettings.Default.CheckFileSize && mediaStorage.GetLength(item.Model.Name) > maxFileSize * 1024)
             {
                 warnings.Add(new WarningViewModel(string.Format(Resources.MediaFileTooLarge, name, maxFileSize), () => NavigateToStorageItem(mediaStorage, item)));
@@ -1436,7 +1441,7 @@ public sealed class QDocument : WorkspaceViewModel
     /// Checks missing and unused files in document.
     /// </summary>
     /// <param name="allowExternal">Allow external files to be used.</param>
-    internal (IEnumerable<WarningViewModel>,string) CheckLinks(bool allowExternal = false)
+    internal (IEnumerable<WarningViewModel>, string) CheckLinks(bool allowExternal = false)
     {
         var warnings = new List<WarningViewModel>();
         var errors = new List<string>();
@@ -1453,7 +1458,7 @@ public sealed class QDocument : WorkspaceViewModel
         foreach (var item in images.Except(usedImages))
         {
             warnings.Add(
-                new WarningViewModel(string.Format(Resources.UnusedFile, item), 
+                new WarningViewModel(string.Format(Resources.UnusedFile, item),
                 () => NavigateToStorageItem(Images, Images.Files.FirstOrDefault(f => f.Model.Name == item))));
         }
 
@@ -2963,6 +2968,14 @@ public sealed class QDocument : WorkspaceViewModel
                         }
                     }
 
+                    foreach (var item in quest.Model.GetContent())
+                    {
+                        if (item.Type == ContentTypes.Text)
+                        {
+                            item.Value = item.Value.Wikify();
+                        }
+                    }
+
                     for (int i = 0; i < quest.Right.Count; i++)
                     {
                         var value = quest.Right[i];
@@ -3044,7 +3057,7 @@ public sealed class QDocument : WorkspaceViewModel
                     allthemes.Add(theme);
                 }
             }
-            
+
             while (Package.Rounds.Count > 0)
             {
                 Package.Rounds.RemoveAt(0);
@@ -3685,7 +3698,7 @@ public sealed class QDocument : WorkspaceViewModel
                 Package.Tags.Merge(package.Tags);
 
                 Package.Model.Language = package.Language;
-                Package.Model.Publisher= package.Publisher;
+                Package.Model.Publisher = package.Publisher;
                 Package.Model.Date = package.Date;
                 Package.Model.Difficulty = package.Difficulty;
                 Package.Model.Name = package.Name;

@@ -183,7 +183,10 @@ public sealed class ThemeViewModel : ItemViewModel<Theme>
             var questionViewModel = new QuestionViewModel(question);
             Questions.Add(questionViewModel);
 
-            QDocument.ActivatedObject = questionViewModel.Scenario.FirstOrDefault();
+            QDocument.ActivatedObject = IsUpgraded
+                ? questionViewModel.Parameters?.FirstOrDefault().Value.ContentValue?.FirstOrDefault()
+                : questionViewModel.Scenario.FirstOrDefault();
+
             document.Navigate.Execute(questionViewModel);
         }
         catch (Exception exc)

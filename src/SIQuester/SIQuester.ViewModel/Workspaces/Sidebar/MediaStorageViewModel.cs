@@ -17,6 +17,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
 
+    private readonly int _internalId = Random.Shared.Next();
+
     /// <summary>
     /// Добавленные файлы
     /// </summary>
@@ -619,6 +621,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 return collection.GetFileLength(link);
             });
 
+    // TODO: switch from IMedia to MediaInfo struct
     internal IMedia Wrap(string link)
     {
         var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
@@ -631,10 +634,10 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         return _document.Lock.WithLock(
             () =>
             {
-                var collection = _document.GetInternalCollection(_name);
-
+                var collection = _document.GetInternalCollection(_name); // This value cannot be cached as internal collection link can eventually change 
+                
                 return PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), /*Uri.EscapeDataString(_document.Path) + _document.Package.Model.ID +*/ link),
+                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), _internalId + link),
                     collection.Name);
             });
     }
