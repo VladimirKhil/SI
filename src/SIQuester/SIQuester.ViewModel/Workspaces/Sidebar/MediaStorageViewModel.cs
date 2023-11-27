@@ -313,52 +313,59 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             return;
         }
 
-        var sourceUri = item.MediaSource.Uri;
-        var newUri = PlatformManager.Instance.CompressImage(sourceUri);
-
-        if (newUri != sourceUri)
+        try
         {
-            var newItem = CreateItem(item.Name);
-            var currentIndex = Files.IndexOf(item);
+            var sourceUri = item.MediaSource.Uri;
+            var newUri = PlatformManager.Instance.CompressImage(sourceUri);
 
-            var returnToCurrent = CurrentFile == item;
-
-            PreviewRemove(item);
-            PreviewAdd(newItem, newUri, currentIndex);
-            HasPendingChanges = IsChanged();
-
-            if (returnToCurrent)
+            if (newUri != sourceUri)
             {
-                CurrentFile = newItem;
+                var newItem = CreateItem(item.Name);
+                var currentIndex = Files.IndexOf(item);
+
+                var returnToCurrent = CurrentFile == item;
+
+                PreviewRemove(item);
+                PreviewAdd(newItem, newUri, currentIndex);
+                HasPendingChanges = IsChanged();
+
+                if (returnToCurrent)
+                {
+                    CurrentFile = newItem;
+                }
+
+                OnChanged(new CustomChange(
+                    () =>
+                    {
+                        var returnToCurrent = CurrentFile == newItem;
+
+                        PreviewRemove(newItem);
+                        PreviewAdd(item, sourceUri);
+                        HasPendingChanges = IsChanged();
+
+                        if (returnToCurrent)
+                        {
+                            CurrentFile = item;
+                        }
+                    },
+                    () =>
+                    {
+                        var returnToCurrent = CurrentFile == item;
+
+                        PreviewRemove(item);
+                        PreviewAdd(newItem, newUri);
+                        HasPendingChanges = IsChanged();
+
+                        if (returnToCurrent)
+                        {
+                            CurrentFile = newItem;
+                        }
+                    }));
             }
-
-            OnChanged(new CustomChange(
-                () =>
-                {
-                    var returnToCurrent = CurrentFile == newItem;
-
-                    PreviewRemove(newItem);
-                    PreviewAdd(item, sourceUri);
-                    HasPendingChanges = IsChanged();
-
-                    if (returnToCurrent)
-                    {
-                        CurrentFile = item;
-                    }
-                },
-                () =>
-                {
-                    var returnToCurrent = CurrentFile == item;
-
-                    PreviewRemove(item);
-                    PreviewAdd(newItem, newUri);
-                    HasPendingChanges = IsChanged();
-
-                    if (returnToCurrent)
-                    {
-                        CurrentFile = newItem;
-                    }
-                }));
+        }
+        catch (Exception ex)
+        {
+            OnError(ex);
         }
     }
 
@@ -627,7 +634,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 var collection = _document.GetInternalCollection(_name);
 
                 return PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), Uri.EscapeDataString(_document.Path) + _document.Package.Model.ID + link),
+                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), /*Uri.EscapeDataString(_document.Path) + _document.Package.Model.ID +*/ link),
                     collection.Name);
             });
     }
