@@ -1438,15 +1438,6 @@ namespace SICore.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на choose the cost of the question, please.
-        /// </summary>
-        public static string PleaseChooseCatCost {
-            get {
-                return ResourceManager.GetString("PleaseChooseCatCost", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string PName {
@@ -1650,6 +1641,15 @@ namespace SICore.Properties {
         public static string SelectAnswerOption {
             get {
                 return ResourceManager.GetString("SelectAnswerOption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на choose the cost of the question, please.
+        /// </summary>
+        public static string SelectQuestionPrice {
+            get {
+                return ResourceManager.GetString("SelectQuestionPrice", resourceCulture);
             }
         }
         

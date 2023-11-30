@@ -440,7 +440,7 @@
   <data name="PleaseCheckApellation" xml:space="preserve">
     <value>Уважаемые игроки, прошу вас определить, правилен ли ответ {0} на прозвучавший вопрос</value>
   </data>
-  <data name="PleaseChooseCatCost" xml:space="preserve">
+  <data name="SelectQuestionPrice" xml:space="preserve">
     <value>выберите стоимость вопроса, пожалуйста</value>
   </data>
   <data name="Round" xml:space="preserve">

@@ -2230,24 +2230,21 @@ public sealed class GameLogic : Logic<GameData>
         }
 
         _gameActions.SendMessageWithArgs(Messages.Timer, 2, MessageParams.Timer_Stop);
-        _data.StakeType = _data.StakeVariants[0] ? StakeMode.Nominal : StakeMode.Pass;
+        _data.StakeType = _data.StakeTypes.HasFlag(StakeTypes.Nominal) ? StakeMode.Nominal : StakeMode.Pass;
 
         OnDecision();
     }
 
     private void AskToSelectQuestionPrice()
     {
-        if (_data.AnswererIndex == -1)
-        {
-            throw new ArgumentException($"{nameof(_data.AnswererIndex)} == -1", nameof(_data.AnswererIndex));
-        }
+        var answerer = _data.Answerer ?? throw new InvalidOperationException("Answerer not defined");
 
-        _gameActions.ShowmanReplic($"{_data.Answerer.Name}, {LO[nameof(R.PleaseChooseCatCost)]}");
+        _gameActions.ShowmanReplic($"{answerer.Name}, {LO[nameof(R.SelectQuestionPrice)]}");
         var s = string.Join(Message.ArgsSeparator, Messages.CatCost, _data.CatInfo.Minimum, _data.CatInfo.Maximum, _data.CatInfo.Step);
 
-        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForShowmanDecisions * 10;
+        var waitTime = _data.Settings.AppSettings.TimeSettings.TimeForMakingStake * 10;
 
-        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
+        _data.IsOralNow = _data.IsOral && answerer.IsHuman;
 
         if (_data.IsOralNow)
         {
@@ -2256,9 +2253,9 @@ public sealed class GameLogic : Logic<GameData>
         
         if (CanPlayerAct())
         {
-            _gameActions.SendMessage(s, _data.Answerer.Name);
+            _gameActions.SendMessage(s, answerer.Name);
 
-            if (!_data.Answerer.IsConnected)
+            if (!answerer.IsConnected)
             {
                 waitTime = 20;
             }
@@ -4542,9 +4539,9 @@ public sealed class GameLogic : Logic<GameData>
         }
         else
         {
-            if (_data.CatInfo.Step == 0)
+            if (availableRange.Step == 0)
             {
-                _data.CurPriceRight = _data.CatInfo.Maximum;
+                _data.CurPriceRight = availableRange.Maximum;
                 _data.CurPriceWrong = _data.CurPriceRight;
                 _gameActions.SendMessageWithArgs(Messages.PersonStake, _data.AnswererIndex, 1, _data.CurPriceRight);
                 ScheduleExecution(Tasks.MoveNext, 1);

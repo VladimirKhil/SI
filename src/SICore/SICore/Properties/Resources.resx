@@ -444,7 +444,7 @@
   <data name="PleaseCheckApellation" xml:space="preserve">
     <value>Dear players, please, check whether the answer of {0} was correct</value>
   </data>
-  <data name="PleaseChooseCatCost" xml:space="preserve">
+  <data name="SelectQuestionPrice" xml:space="preserve">
     <value>choose the cost of the question, please</value>
   </data>
   <data name="PName" xml:space="preserve">

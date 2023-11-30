@@ -63,15 +63,15 @@ public sealed class TimeSettings
     }
 
     /// <summary>
-    /// Время на размышление над ставкой в Вопросе со ставкой и в финале
+    /// Defines time in 0.1 s for making stakes.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(30)]
     [DataMember]
     public int TimeForMakingStake
     {
-        get { return All[TimeSettingsTypes.MakingStake]; }
-        set { All[TimeSettingsTypes.MakingStake] = value; }
+        get => All[TimeSettingsTypes.MakingStake];
+        set => All[TimeSettingsTypes.MakingStake] = value;
     }
 
     /// <summary>
