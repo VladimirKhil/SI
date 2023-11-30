@@ -17,6 +17,8 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
 {
     private readonly QDocument _document;
 
+    private readonly int _internalId = Random.Shared.Next();
+
     /// <summary>
     /// Добавленные файлы
     /// </summary>
@@ -313,52 +315,59 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
             return;
         }
 
-        var sourceUri = item.MediaSource.Uri;
-        var newUri = PlatformManager.Instance.CompressImage(sourceUri);
-
-        if (newUri != sourceUri)
+        try
         {
-            var newItem = CreateItem(item.Name);
-            var currentIndex = Files.IndexOf(item);
+            var sourceUri = item.MediaSource.Uri;
+            var newUri = PlatformManager.Instance.CompressImage(sourceUri);
 
-            var returnToCurrent = CurrentFile == item;
-
-            PreviewRemove(item);
-            PreviewAdd(newItem, newUri, currentIndex);
-            HasPendingChanges = IsChanged();
-
-            if (returnToCurrent)
+            if (newUri != sourceUri)
             {
-                CurrentFile = newItem;
+                var newItem = CreateItem(item.Name);
+                var currentIndex = Files.IndexOf(item);
+
+                var returnToCurrent = CurrentFile == item;
+
+                PreviewRemove(item);
+                PreviewAdd(newItem, newUri, currentIndex);
+                HasPendingChanges = IsChanged();
+
+                if (returnToCurrent)
+                {
+                    CurrentFile = newItem;
+                }
+
+                OnChanged(new CustomChange(
+                    () =>
+                    {
+                        var returnToCurrent = CurrentFile == newItem;
+
+                        PreviewRemove(newItem);
+                        PreviewAdd(item, sourceUri);
+                        HasPendingChanges = IsChanged();
+
+                        if (returnToCurrent)
+                        {
+                            CurrentFile = item;
+                        }
+                    },
+                    () =>
+                    {
+                        var returnToCurrent = CurrentFile == item;
+
+                        PreviewRemove(item);
+                        PreviewAdd(newItem, newUri);
+                        HasPendingChanges = IsChanged();
+
+                        if (returnToCurrent)
+                        {
+                            CurrentFile = newItem;
+                        }
+                    }));
             }
-
-            OnChanged(new CustomChange(
-                () =>
-                {
-                    var returnToCurrent = CurrentFile == newItem;
-
-                    PreviewRemove(newItem);
-                    PreviewAdd(item, sourceUri);
-                    HasPendingChanges = IsChanged();
-
-                    if (returnToCurrent)
-                    {
-                        CurrentFile = item;
-                    }
-                },
-                () =>
-                {
-                    var returnToCurrent = CurrentFile == item;
-
-                    PreviewRemove(item);
-                    PreviewAdd(newItem, newUri);
-                    HasPendingChanges = IsChanged();
-
-                    if (returnToCurrent)
-                    {
-                        CurrentFile = newItem;
-                    }
-                }));
+        }
+        catch (Exception ex)
+        {
+            OnError(ex);
         }
     }
 
@@ -612,6 +621,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
                 return collection.GetFileLength(link);
             });
 
+    // TODO: switch from IMedia to MediaInfo struct
     internal IMedia Wrap(string link)
     {
         var pendingStream = _streams.FirstOrDefault(n => n.Key.Model.Name == link);
@@ -624,10 +634,10 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
         return _document.Lock.WithLock(
             () =>
             {
-                var collection = _document.GetInternalCollection(_name);
-
-                return PlatformSpecific.PlatformManager.Instance.PrepareMedia(
-                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), link),
+                var collection = _document.GetInternalCollection(_name); // This value cannot be cached as internal collection link can eventually change 
+                
+                return PlatformManager.Instance.PrepareMedia(
+                    new Media(() => collection.GetFile(link), () => collection.GetFileLength(link), _internalId + link),
                     collection.Name);
             });
     }
@@ -650,7 +660,7 @@ public sealed class MediaStorageViewModel : WorkspaceViewModel
     }
 
     /// <summary>
-    /// Tries to get strea for a media file.
+    /// Tries to get stream for a media file.
     /// </summary>
     /// <param name="mediaItem">Media file.</param>
     internal Stream? TryGetStream(MediaItemViewModel mediaItem)

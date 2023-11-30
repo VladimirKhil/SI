@@ -16,11 +16,9 @@ using SIQuester.ViewModel.Configuration;
 using SIQuester.ViewModel.Contracts;
 using SIQuester.ViewModel.Contracts.Host;
 using SIQuester.ViewModel.Helpers;
-using SIQuester.ViewModel.Services;
 using SIStorage.Service.Client;
 using SIStorage.Service.Contract;
 using SIStorage.Service.Contract.Requests;
-using SIStorageService.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -30,8 +28,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Threading;
 using System.Xaml;
 #if !DEBUG
@@ -47,6 +45,19 @@ public partial class App : Application
 {
     private IHost? _host;
     private bool _useAppService;
+
+    public const string SettingsFolderName = "Settings";
+
+    private static readonly string SettingsFolder = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        AppSettings.ManufacturerName,
+        AppSettings.ProductName,
+        SettingsFolderName);
+
+    /// <summary>
+    /// User settings file name.
+    /// </summary>
+    internal const string UserSettingsFileName = "usersettings.json";
 
     /// <summary>
     /// Имя конфигурационного файла пользовательских настроек
@@ -78,7 +89,7 @@ public partial class App : Application
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
-        AppSettings.Default = LoadSettings();
+        AppSettings.Default = LoadUserSettings() ?? LoadSettings();
 
         if (!IsWindows8_1OrLater)
         {
@@ -566,7 +577,7 @@ public partial class App : Application
 
             if (AppSettings.Default != null)
             {
-                SaveSettings(AppSettings.Default);
+                SaveUserSettings(AppSettings.Default);
             }
 
             _manager.Dispose();
@@ -581,34 +592,6 @@ public partial class App : Application
         }
 
         base.OnExit(e);
-    }
-
-    private static void SaveSettings(AppSettings settings)
-    {
-        try
-        {
-            if (Monitor.TryEnter(ConfigFileName, 2000))
-            {
-                try
-                {
-                    using var file = IsolatedStorageFile.GetUserStoreForAssembly();
-                    using var stream = new IsolatedStorageFileStream(ConfigFileName, FileMode.Create, file);
-                    settings.Save(stream);
-                }
-                finally
-                {
-                    Monitor.Exit(ConfigFileName);
-                }
-            }
-        }
-        catch (Exception exc)
-        {
-            MessageBox.Show(
-                $"{SIQuester.Properties.Resources.SettingsSavingError}: {exc.Message}",
-                AppSettings.ProductName,
-                MessageBoxButton.OK,
-                MessageBoxImage.Exclamation);
-        }
     }
 
     /// <summary>
@@ -637,5 +620,66 @@ public partial class App : Application
         catch { }
 
         return new AppSettings();
+    }
+
+    /// <summary>
+    /// Loads user settings.
+    /// </summary>
+    public static AppSettings? LoadUserSettings()
+    {
+        try
+        {
+            var settingsFile = Path.Combine(SettingsFolder, UserSettingsFileName);
+
+            if (File.Exists(settingsFile) && Monitor.TryEnter(UserSettingsFileName, 2000))
+            {
+                try
+                {
+                    using var stream = File.Open(settingsFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    return JsonSerializer.Deserialize<AppSettings>(stream);
+                }
+                catch { }
+                finally
+                {
+                    Monitor.Exit(UserSettingsFileName);
+                }
+            }
+        }
+        catch { }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Saves user settings.
+    /// </summary>
+    internal static void SaveUserSettings(AppSettings settings)
+    {
+        try
+        {
+            Directory.CreateDirectory(SettingsFolder);
+            var settingsFile = Path.Combine(SettingsFolder, UserSettingsFileName);
+
+            if (Monitor.TryEnter(UserSettingsFileName, 2000))
+            {
+                try
+                {
+                    using var stream = File.Create(settingsFile);
+                    JsonSerializer.Serialize(stream, settings);
+                }
+                finally
+                {
+                    Monitor.Exit(UserSettingsFileName);
+                }
+            }
+        }
+        catch (Exception exc)
+        {
+            MessageBox.Show(
+                $"{SIQuester.Properties.Resources.SettingsSavingError}: {exc.Message}",
+                AppSettings.ProductName,
+                MessageBoxButton.OK,
+                MessageBoxImage.Exclamation);
+        }
     }
 }

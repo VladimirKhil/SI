@@ -12,7 +12,7 @@ namespace SIQuester.ViewModel.PlatformSpecific;
 /// </summary>
 public abstract class PlatformManager
 {
-    internal static PlatformManager Instance;
+    public static PlatformManager Instance;
 
     public IServiceProvider ServiceProvider { get; set; }
 

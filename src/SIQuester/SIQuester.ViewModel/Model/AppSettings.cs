@@ -11,6 +11,11 @@ namespace SIQuester.Model;
 public sealed class AppSettings : INotifyPropertyChanged
 {
     /// <summary>
+    /// Manufacturer name.
+    /// </summary>
+    public const string ManufacturerName = "Khil-soft";
+
+    /// <summary>
     /// Application name.
     /// </summary>
     public const string ProductName = "SIQuester";

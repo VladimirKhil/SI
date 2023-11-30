@@ -908,6 +908,15 @@ namespace SIQuester.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Объект создан в новом формате и не может быть присоединён к данному пакету.
+        /// </summary>
+        public static string ObjectInNewFormat {
+            get {
+                return ResourceManager.GetString("ObjectInNewFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Следующий объект не обнаружен: {0}.
         /// </summary>
         public static string ObjectNotFound {
@@ -1021,6 +1030,15 @@ namespace SIQuester.ViewModel.Properties {
         public static string PackageEmptyName {
             get {
                 return ResourceManager.GetString("PackageEmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Пакет создан в новом формате и не может быть присоединён к данному.
+        /// </summary>
+        public static string PackageInNewFormat {
+            get {
+                return ResourceManager.GetString("PackageInNewFormat", resourceCulture);
             }
         }
         

@@ -235,6 +235,10 @@ public sealed class ContentItem : PropertyChangedNotifier, ITyped, IEquatable<Co
         {
             writer.WriteAttributeString("placement", _placement);
         }
+        else if (_type == ContentTypes.Audio || _type == AtomTypes.Audio) // For backward compatibility; remove later
+        {
+            writer.WriteAttributeString("placement", GetDefaultPlacement());
+        }
 
         if (_duration != DefaultDuration)
         {

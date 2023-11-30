@@ -15,8 +15,15 @@ public partial class MediaStorageView : UserControl
 
     private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
     {
-        var storage = (MediaStorageViewModel)DataContext;
-        e.Accepted = storage.Filter.Length == 0 || ((MediaItemViewModel)e.Item).Model.Name.Contains(storage.Filter);
+        var storage = (MediaStorageViewModel?)DataContext;
+        var item = (MediaItemViewModel?)e.Item;
+
+        if (storage == null || item == null)
+        {
+            return;
+        }
+
+        e.Accepted = storage.Filter.Length == 0 || item.Model.Name.Contains(storage.Filter);
     }
 
     private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
