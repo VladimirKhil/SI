@@ -997,7 +997,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Next.
+        ///   Ищет локализованную строку, похожую на Next (→).
         /// </summary>
         public static string Forward {
             get {

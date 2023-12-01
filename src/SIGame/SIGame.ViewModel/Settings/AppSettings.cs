@@ -12,6 +12,7 @@ namespace SIGame;
 public sealed class AppSettings : AppSettingsCore
 {
     internal const int DefaultGameButtonKey2 = 119; // RightCtrl
+    internal const int DefaultMoveNextKey = 25; // Right
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     private string _logsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CommonSettings.ManufacturerEn, CommonSettings.AppNameEn, CommonSettings.LogsFolderName);
@@ -43,11 +44,11 @@ public sealed class AppSettings : AppSettingsCore
     private ThemeSettings _themeSettings = new();
 
     /// <summary>
-    /// Настройки темы
+    /// Application theme settings.
     /// </summary>
     public ThemeSettings ThemeSettings
     {
-        get { return _themeSettings; }
+        get => _themeSettings;
         set { _themeSettings = value; OnPropertyChanged(); }
     }
 
@@ -55,14 +56,28 @@ public sealed class AppSettings : AppSettingsCore
     private int _gameButtonKey = DefaultGameButtonKey2;
 
     /// <summary>
-    /// Клавиша игровой кнопки
+    /// Game button key.
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultGameButtonKey2)]
     public int GameButtonKey2
     {
-        get { return _gameButtonKey; }
+        get => _gameButtonKey;
         set { _gameButtonKey = value; OnPropertyChanged(); }
+    }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    private int _moveNextKey = DefaultMoveNextKey;
+
+    /// <summary>
+    /// Move next key.
+    /// </summary>
+    [XmlAttribute]
+    [DefaultValue(DefaultMoveNextKey)]
+    public int MoveNextKey
+    {
+        get => _moveNextKey;
+        set { _moveNextKey = value; OnPropertyChanged(); }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

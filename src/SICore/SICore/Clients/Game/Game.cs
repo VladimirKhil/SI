@@ -1972,7 +1972,9 @@ public sealed class Game : Actor<GameData, GameLogic>
                 return;
             }
         }
-        else if (!ClientData.IsWaiting || ClientData.Answerer != null && ClientData.Answerer.Name != message.Sender)
+        else if (!ClientData.IsWaiting || ClientData.Answerer != null
+            && ClientData.Answerer.Name != message.Sender
+            && !(ClientData.IsOralNow && message.Sender == ClientData.ShowMan.Name))
         {
             return;
         }
@@ -2067,6 +2069,21 @@ public sealed class Game : Actor<GameData, GameLogic>
             {
                 ClientData.Answerer.Answer = LO[nameof(R.IDontKnow)];
                 ClientData.Answerer.AnswerIsWrong = true;
+            }
+
+            if (ClientData.IsOralNow)
+            {
+                if (message.Sender == ClientData.ShowMan.Name)
+                {
+                    if (ClientData.ActivePlayer != null)
+                    {
+                        _gameActions.SendMessage(Messages.Cancel, ClientData.ActivePlayer.Name);
+                    }
+                }
+                else
+                {
+                    _gameActions.SendMessage(Messages.Cancel, ClientData.ShowMan.Name);
+                }
             }
         }
 

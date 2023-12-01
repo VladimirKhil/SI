@@ -1,5 +1,4 @@
-﻿using SICore.BusinessLogic;
-using SIData;
+﻿using SIData;
 using SIPackages.Core;
 using SIUI.ViewModel;
 using System.Diagnostics;
@@ -14,7 +13,6 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
 {
     private readonly ViewerActions _viewerActions;
     private readonly ViewerData _data;
-    private readonly ILocalizer _localizer;
 
     public TableInfoViewModel TInfo { get; }
 
@@ -23,23 +21,15 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
     public PlayerHumanLogic(
         ViewerData data,
         TableInfoViewModel tableInfoViewModel,
-        ViewerActions viewerActions,
-        ILocalizer localizer)
+        ViewerActions viewerActions)
     {
         _viewerActions = viewerActions;
         _data = data;
-        _localizer = localizer;
         TInfo = tableInfoViewModel;
-
-        TInfo.QuestionSelected += PlayerClient_QuestionSelected;
-        TInfo.ThemeSelected += PlayerClient_ThemeSelected;
-        TInfo.AnswerSelected += TInfo_AnswerSelected;
 
         TInfo.SelectQuestion.CanBeExecuted = false;
         TInfo.SelectTheme.CanBeExecuted = false;
     }
-
-    private void TInfo_AnswerSelected(ItemViewModel item) => _data.PlayerDataExtensions.SendAnswer.Execute(item.Label);
 
     #region PlayerInterface Members
 
@@ -177,62 +167,6 @@ internal sealed class PlayerHumanLogic : IPlayerLogic, IDisposable
     }
 
     public void OnInitialized() => Greet();
-
-    private void PlayerClient_QuestionSelected(QuestionInfoViewModel question)
-    {
-        var found = false;
-
-        for (var i = 0; i < TInfo.RoundInfo.Count; i++)
-        {
-            for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
-            {
-                if (TInfo.RoundInfo[i].Questions[j] == question)
-                {
-                    found = true;
-                    _viewerActions.SendMessageWithArgs(Messages.Choice, i, j);
-                    break;
-                }
-            }
-
-            if (found)
-            {
-                break;
-            }
-        }
-
-        Clear();
-    }
-
-    private void PlayerClient_ThemeSelected(ThemeInfoViewModel theme)
-    {
-        for (int i = 0; i < TInfo.RoundInfo.Count; i++)
-        {
-            if (TInfo.RoundInfo[i] == theme)
-            {
-                _viewerActions.SendMessageWithArgs(Messages.Delete, i);
-                break;
-            }
-        }
-
-        Clear();
-    }
-
-    public void Clear()
-    {
-        TInfo.Selectable = false;
-        TInfo.SelectQuestion.CanBeExecuted = false;
-        TInfo.SelectTheme.CanBeExecuted = false;
-        TInfo.SelectAnswer.CanBeExecuted = false;
-        _data.Hint = "";
-        _data.DialogMode = DialogModes.None;
-
-        for (int i = 0; i < _data.Players.Count; i++)
-        {
-            _data.Players[i].CanBeSelected = false;
-        }
-
-        _data.Host.OnFlash(false);
-    }
 
     public void StartThink()
     {

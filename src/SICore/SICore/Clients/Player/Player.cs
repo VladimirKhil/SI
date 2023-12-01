@@ -37,7 +37,6 @@ public sealed class Player : Viewer
         }) { CanBeExecuted = true };
 
         ClientData.PlayerDataExtensions.SendAnswerVersion = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.AnswerVersion, ClientData.PersonDataExtensions.Answer); });
-        ClientData.PlayerDataExtensions.SendAnswer = new CustomCommand(arg => { _viewerActions.SendMessage(Messages.Answer, (string?)arg ?? ClientData.PersonDataExtensions.Answer); Clear(); });
         
         ClientData.PersonDataExtensions.SendCatCost = new CustomCommand(arg =>
         {
@@ -148,7 +147,7 @@ public sealed class Player : Viewer
         }
     }
 
-    private void Clear() => _logic.PlayerLogic.Clear();
+    private void Clear() => _logic.ClearSelections(true);
 
     public override void Init()
     {

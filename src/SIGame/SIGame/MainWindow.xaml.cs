@@ -63,34 +63,64 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
-        if (UserSettings.Default.GameSettings.AppSettings.GameButtonKey2 != (int)e.Key)
+        var appSettings = UserSettings.Default.GameSettings.AppSettings;
+        var key = (int)e.Key;
+
+        if (key == appSettings.GameButtonKey2)
         {
-            return;
+            e.Handled = OnGameButtonKeyPressed(e.Key);
+        }
+        else if (key == appSettings.MoveNextKey)
+        {
+            e.Handled = OnMoveNextKeyPressed();
+        }
+    }
+
+    private bool OnMoveNextKeyPressed()
+    {
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
+        {
+            return false;
         }
 
-        if (e.Key == Key.Space || e.Key == Key.Back || e.Key == Key.Delete || e.Key >= Key.A && e.Key <= Key.Z || e.Key >= Key.D0 && e.Key <= Key.D9)
+        if (game.Move.CanBeExecuted)
+        {
+            game.Move.Execute(1);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool OnGameButtonKeyPressed(Key key)
+    {
+        if (key == Key.Space || key == Key.Back || key == Key.Delete || key >= Key.A && key <= Key.Z || key >= Key.D0 && key <= Key.D9)
         {
             if (Keyboard.FocusedElement is TextBox)
             {
-                return;
+                return false;
             }
         }
 
-        if (((MainViewModel)DataContext).ActiveView is GameViewModel game)
+        if (((MainViewModel)DataContext).ActiveView is not GameViewModel game)
         {
-            var data = game.Data;
+            return false;
+        }
 
-            if (data.IsPlayer)
+        var data = game.Data;
+
+        if (data.IsPlayer)
+        {
+            data.PlayerDataExtensions.OnPressButton();
+
+            if (data.PlayerDataExtensions.PressGameButton != null && data.PlayerDataExtensions.PressGameButton.CanExecute(null))
             {
-                data.PlayerDataExtensions.OnPressButton();
-
-                if (data.PlayerDataExtensions.PressGameButton != null && data.PlayerDataExtensions.PressGameButton.CanExecute(null))
-                {
-                    data.PlayerDataExtensions.PressGameButton.Execute(null);
-                    e.Handled = true;
-                }
+                data.PlayerDataExtensions.PressGameButton.Execute(null);
+                return true;
             }
         }
+
+        return false;
     }
 
     public void FlashIfNeeded(bool flash) => Dispatcher.BeginInvoke(() => FlashCore(flash));

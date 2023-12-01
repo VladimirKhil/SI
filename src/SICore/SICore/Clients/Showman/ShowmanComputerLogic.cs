@@ -106,11 +106,6 @@ internal sealed class ShowmanComputerLogic : IShowmanLogic
 
     public void OnInitialized() => ScheduleExecution(ShowmanTasks.Ready, 10);
 
-    public void ClearSelections(bool full = false)
-    {
-
-    }
-
 
     public void ChooseQuest()
     {

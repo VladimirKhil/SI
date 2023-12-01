@@ -1831,9 +1831,4 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
     }
 
     private void Ready() => ((PersonAccount)_data.Me).BeReadyCommand.Execute(null);
-
-    public void Clear()
-    {
-
-    }
 }

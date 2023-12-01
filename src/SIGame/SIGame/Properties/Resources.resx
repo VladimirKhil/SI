@@ -301,7 +301,7 @@
     <value>Force the start</value>
   </data>
   <data name="Forward" xml:space="preserve">
-    <value>Next</value>
+    <value>Next (→)</value>
   </data>
   <data name="Free" xml:space="preserve">
     <value>Free</value>

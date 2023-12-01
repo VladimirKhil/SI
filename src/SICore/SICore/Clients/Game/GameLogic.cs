@@ -197,7 +197,7 @@ public sealed class GameLogic : Logic<GameData>
 
         _gameActions.SendMessageWithArgs(Messages.QuestionEnd);
 
-        ScheduleExecution(Tasks.QuestSourComm, 10, 1, force: true);
+        ScheduleExecution(Tasks.QuestSourComm, 1, 1, force: true);
     }
 
     private void Engine_Package(Package package)
@@ -737,7 +737,7 @@ public sealed class GameLogic : Logic<GameData>
                 throw new Exception($"{nameof(activeQuestionsCount)} == 0! {Engine.LeftQuestionsCount}");
             }
 
-            ScheduleExecution(Tasks.AskToChoose, 4, force: true);
+            ScheduleExecution(Tasks.AskToChoose, 1, force: true);
         }
         else
         {
@@ -1297,6 +1297,16 @@ public sealed class GameLogic : Logic<GameData>
             {
                 _gameActions.ShowmanReplic(s.ToString());
 
+                if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
+                {
+                    var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+
+                    if (answerIndex > -1)
+                    {
+                        _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Right);
+                    }
+                }
+
                 if (isAnswerCanonical)
                 {
                     _data.AnnounceAnswer = false;
@@ -1320,6 +1330,21 @@ public sealed class GameLogic : Logic<GameData>
                 _data.CurPriceWrong = 0;
             }
 
+            if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
+            {
+                var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+
+                if (answerIndex > -1)
+                {
+                    _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
+                }
+
+                if (!IsFinalRound())
+                {
+                    _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
+                }
+            }
+
             if (!IsFinalRound())
             {
                 s.AppendFormat(" (-{0})", Notion.FormatNumber(_data.CurPriceWrong));
@@ -1334,18 +1359,6 @@ public sealed class GameLogic : Logic<GameData>
                     .Append(_data.CurPriceWrong);
 
                 _gameActions.SendMessage(s.ToString());
-
-                if (_data.QuestionPlayState.AnswerOptions != null && _data.Answerer.Answer != null)
-                {
-                    var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
-
-                    if (answerIndex > -1)
-                    {
-                        _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Wrong);
-                    }
-
-                    _data.QuestionPlayState.UsedAnswerOptions.Add(_data.Answerer.Answer);
-                }
 
                 _data.Answerer.Sum -= _data.CurPriceWrong;
                 _data.Answerer.CanPress = false;
@@ -2873,6 +2886,16 @@ public sealed class GameLogic : Logic<GameData>
 
         _gameActions.ShowmanReplic(msg.ToString());
 
+        if (_data.QuestionPlayState.AnswerOptions != null)
+        {
+            var answerIndex = Array.FindIndex(_data.QuestionPlayState.AnswerOptions, o => o.Label == _data.Answerer.Answer);
+
+            if (answerIndex > -1)
+            {
+                _gameActions.SendMessageWithArgs(Messages.ContentState, ContentPlacements.Screen, answerIndex + 1, ItemState.Active);
+            }
+        }
+
         ScheduleExecution(Tasks.AskRight, 20, force: true);
     }
 
@@ -3264,7 +3287,6 @@ public sealed class GameLogic : Logic<GameData>
     private void AskAnswer()
     {
         var timeSettings = _data.Settings.AppSettings.TimeSettings;
-        var msg = new StringBuilder();
 
         if (IsFinalRound())
         {
@@ -3295,25 +3317,37 @@ public sealed class GameLogic : Logic<GameData>
             _gameActions.SendMessageWithArgs(Messages.EndTry, _data.AnswererIndex);
         }
 
-        msg.Append(Messages.Answer);
-
         var time1 = _data.Question.Type.Name != QuestionTypes.Simple
             ? timeSettings.TimeForThinkingOnSpecial * 10
             : timeSettings.TimeForPrintingAnswer * 10;
 
         var useAnswerOptions = _data.QuestionPlayState.AnswerOptions != null;
+        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman;
 
-        _data.IsOralNow = _data.IsOral && _data.Answerer.IsHuman && !useAnswerOptions;
-
-        if (_data.IsOralNow)
+        if (useAnswerOptions)
         {
-            // Showman accepts answer orally
-            SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
+            if (_data.IsOralNow)
+            {
+                _gameActions.SendMessage(Messages.Answer, _data.ShowMan.Name);
+            }
+            
+            if (CanPlayerAct())
+            {
+                _gameActions.SendMessage(Messages.Answer, _data.Answerer.Name);
+            }
         }
-        else // The only place where we do not check CanPlayerAct()
+        else
         {
-            // TODO: Support forced written answers here
-            _gameActions.SendMessage(msg.ToString(), _data.Answerer.Name);
+            if (_data.IsOralNow)
+            {
+                // Showman accepts answer orally
+                SendAnswersInfoToShowman($"({LO[nameof(R.AnswerIsOral)]})");
+            }
+            else // The only place where we do not check CanPlayerAct()
+            {
+                // TODO: Support forced written answers here
+                _gameActions.SendMessage(Messages.Answer, _data.Answerer.Name);
+            }
         }
 
         var answerReplic = useAnswerOptions ? ", " + LO[nameof(R.SelectAnswerOption)] : GetRandomString(LO[nameof(R.YourAnswer)]);

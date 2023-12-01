@@ -53,11 +53,81 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         TInfo.MediaLoad += TInfo_MediaLoad;
         TInfo.MediaLoadError += TInfo_MediaLoadError;
 
-        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions, localizer);
-        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions, localizer);
+        TInfo.QuestionSelected += TInfo_QuestionSelected;
+        TInfo.ThemeSelected += TInfo_ThemeSelected;
+        TInfo.AnswerSelected += TInfo_AnswerSelected;
+
+        PlayerLogic = new PlayerHumanLogic(data, TInfo, viewerActions);
+        ShowmanLogic = new ShowmanHumanLogic(data, TInfo, viewerActions);
 
         _localFileManager.Error += LocalFileManager_Error;
         _localFileManagerTask = _localFileManager.StartAsync(_cancellation.Token);
+    }
+
+    private void TInfo_QuestionSelected(QuestionInfoViewModel question)
+    {
+        var found = false;
+
+        for (var i = 0; i < TInfo.RoundInfo.Count; i++)
+        {
+            for (var j = 0; j < TInfo.RoundInfo[i].Questions.Count; j++)
+            {
+                if (TInfo.RoundInfo[i].Questions[j] == question)
+                {
+                    found = true;
+                    _viewerActions.SendMessageWithArgs(Messages.Choice, i, j);
+                    break;
+                }
+            }
+
+            if (found)
+            {
+                break;
+            }
+        }
+
+        ClearSelections(true);
+    }
+
+    private void TInfo_ThemeSelected(ThemeInfoViewModel theme)
+    {
+        for (int i = 0; i < TInfo.RoundInfo.Count; i++)
+        {
+            if (TInfo.RoundInfo[i] == theme)
+            {
+                _viewerActions.SendMessageWithArgs(Messages.Delete, i);
+                break;
+            }
+        }
+
+        ClearSelections(true);
+    }
+
+    public void ClearSelections(bool full = false)
+    {
+        if (full)
+        {
+            TInfo.Selectable = false;
+            TInfo.SelectQuestion.CanBeExecuted = false;
+            TInfo.SelectTheme.CanBeExecuted = false;
+            TInfo.SelectAnswer.CanBeExecuted = false;
+        }
+
+        _data.Hint = "";
+        _data.DialogMode = DialogModes.None;
+
+        for (int i = 0; i < _data.Players.Count; i++)
+        {
+            _data.Players[i].CanBeSelected = false;
+        }
+
+        _data.Host.OnFlash(false);
+    }
+
+    private void TInfo_AnswerSelected(ItemViewModel item)
+    {
+        _data.PersonDataExtensions.SendAnswer.Execute(item.Label);
+        ClearSelections(true);
     }
 
     private void LocalFileManager_Error(Uri mediaUri, Exception e) =>
@@ -415,6 +485,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             case GameStage.Round:
             case GameStage.Final:
                 TInfo.TStage = TableStage.Round;
+                TInfo.Selectable = false;
                 _data.Sound = Sounds.RoundBegin;
 
                 foreach (var item in _data.Players)

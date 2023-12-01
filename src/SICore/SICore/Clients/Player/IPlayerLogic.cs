@@ -22,8 +22,6 @@ public interface IPlayerLogic : IPersonLogic
 
     void Report();
 
-    void Clear();
-
     /// <summary>
     /// Игрок получил или потерял деньги
     /// </summary>

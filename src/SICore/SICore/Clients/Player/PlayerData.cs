@@ -26,8 +26,6 @@ public sealed class PlayerData : INotifyPropertyChanged
 
     public ICommand SendAnswerVersion { get; set; }
 
-    public ICommand SendAnswer { get; set; }
-
     private CustomCommand _apellate;
 
     public CustomCommand Apellate

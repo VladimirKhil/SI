@@ -373,6 +373,10 @@ public sealed class Showman : Viewer
                     _logic.ShowmanLogic.Stake();
                     break;
 
+                case Messages.Answer:
+                    _logic.ShowmanLogic.Answer();
+                    break;
+
                 case Messages.Pause:
                     OnPause(mparams);
                     break;
@@ -432,5 +436,5 @@ public sealed class Showman : Viewer
         _logic.ShowmanLogic.IsRight();
     }
 
-    private void ClearSelections(bool full = false) => _logic.ShowmanLogic.ClearSelections(full);
+    private void ClearSelections(bool full = false) => _logic.ClearSelections(full);
 }

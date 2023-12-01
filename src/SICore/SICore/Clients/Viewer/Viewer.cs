@@ -120,6 +120,11 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
         ClientData.DeleteTable = new CustomCommand(DeleteTable_Executed) { CanBeExecuted = IsHost };
 
         ClientData.AtomViewed = new CustomCommand(arg => _viewerActions.SendMessage(Messages.Atom));
+
+        ClientData.PersonDataExtensions.SendAnswer = new CustomCommand(arg =>
+        {
+            _viewerActions.SendMessage(Messages.Answer, (string?)arg ?? ClientData.PersonDataExtensions.Answer); Clear();
+        });
     }
 
     private void ClientData_JoinModeChanged(JoinMode joinMode) =>
@@ -1954,7 +1959,6 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
             ClientData.PersonDataExtensions.SendCatCost =
             ClientData.PersonDataExtensions.SendFinalStake =
             ClientData.PlayerDataExtensions.SendAnswerVersion =
-            ClientData.PlayerDataExtensions.SendAnswer =
             ClientData.ShowmanDataExtensions.ChangeSums =
             ClientData.ShowmanDataExtensions.ChangeActivePlayer =
             ClientData.ShowmanDataExtensions.ChangeSums2 =

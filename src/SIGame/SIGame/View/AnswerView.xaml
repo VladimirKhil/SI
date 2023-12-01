@@ -22,7 +22,7 @@
             CommandManager.PreviewExecuted="TextBox_PreviewExecuted"
             ContextMenu="{x:Null}">
             <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{Binding PlayerDataExtensions.SendAnswer}" />
+                <KeyBinding Key="Enter" Command="{Binding PersonDataExtensions.SendAnswer}" />
             </TextBox.InputBindings>
         </TextBox>
         
@@ -32,6 +32,6 @@
             Padding="10,5"
             Margin="0,5,10,5"
             FontSize="25"
-            Command="{Binding PlayerDataExtensions.SendAnswer}" />
+            Command="{Binding PersonDataExtensions.SendAnswer}" />
     </StackPanel>
 </UserControl>

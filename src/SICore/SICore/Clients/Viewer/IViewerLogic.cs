@@ -187,4 +187,10 @@ public interface IViewerLogic : ILogic
     void OnContentAppend(string[] mparams) { }
 
     void OnContentState(string[] mparams) { }
+
+    /// <summary>
+    /// Clears all possible selection options.
+    /// </summary>
+    /// <param name="full">Should game table selection be cleared too.</param>
+    void ClearSelections(bool full = false) { }
 }

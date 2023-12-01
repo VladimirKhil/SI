@@ -21,6 +21,8 @@ public sealed class PersonData : INotifyPropertyChanged
 
     public ICommand SendFinalStake { get; set; }
 
+    public ICommand SendAnswer { get; set; }
+
     private StakeInfo _stakeInfo = null;
 
     public StakeInfo StakeInfo

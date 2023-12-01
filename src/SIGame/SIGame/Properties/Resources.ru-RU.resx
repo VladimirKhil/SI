@@ -574,7 +574,7 @@
     <value>Начать, не дожидаясь готовности участников</value>
   </data>
   <data name="Forward" xml:space="preserve">
-    <value>Дальше</value>
+    <value>Дальше (→)</value>
   </data>
   <data name="Pause" xml:space="preserve">
     <value>Пауза</value>

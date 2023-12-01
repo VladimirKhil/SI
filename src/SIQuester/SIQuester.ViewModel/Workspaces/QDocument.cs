@@ -877,7 +877,10 @@ public sealed class QDocument : WorkspaceViewModel
 
         foreach (var parameter in question.Parameters.ToArray())
         {
-            if (parameter.Key == QuestionParameterNames.Question || parameter.Key == QuestionParameterNames.Answer)
+            if (parameter.Key == QuestionParameterNames.Question
+                || parameter.Key == QuestionParameterNames.Answer
+                || parameter.Key == QuestionParameterNames.AnswerType
+                || parameter.Key == QuestionParameterNames.AnswerOptions)
             {
                 continue;
             }
