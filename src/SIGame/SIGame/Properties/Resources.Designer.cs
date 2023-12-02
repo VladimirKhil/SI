@@ -1177,7 +1177,7 @@ namespace SIGame.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Help_en.xps.
+        ///   Ищет локализованную строку, похожую на Help_en.pdf.
         /// </summary>
         public static string HelpFile {
             get {

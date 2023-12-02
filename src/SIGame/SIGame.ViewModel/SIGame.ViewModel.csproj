@@ -42,10 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Help_en.xps">
+    <None Update="Help_en.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Help_ru.xps">
+    <None Update="Help_ru.pdf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

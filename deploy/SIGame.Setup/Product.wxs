@@ -110,23 +110,23 @@
       <Component Guid="{1627896d-65da-47fa-9802-a3cfe67cb0aa}">
         <File KeyPath="yes" Source="..\dlls\$(var.Platform)\api-ms-win-core-winrt-l1-1-0.dll" />
       </Component>
-		<Component Guid="{4687DB8D-2AA3-46AD-8B85-A8469390E198}">
-			<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
-		</Component>
-	    <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
-		    <File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
-	    </Component>
-	    <Component Guid="{9E128CD4-80CB-4268-832B-C2D07E36E03D}">
-		    <File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
-	    </Component>
-	    <Component Guid="{84D30ED4-930D-436F-8287-A8FDB01860FA}">
-		    <File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
-	    </Component>
+      <Component Guid="{4687DB8D-2AA3-46AD-8B85-A8469390E198}">
+		<File KeyPath="yes" Source="$(var.PublishFolder)runtimes\win-$(var.Platform)\native\WebView2Loader.dll" />
+	  </Component>
+	  <Component Guid="{B6AFAEC8-30A0-4BD9-836A-920D1190DAF9}">
+		<File KeyPath="yes" Source="$(var.PublishFolder)aspnetcorev2_inprocess.dll" />
+	  </Component>
+	  <Component Guid="{9E128CD4-80CB-4268-832B-C2D07E36E03D}">
+		<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.json" />
+	  </Component>
+	  <Component Guid="{84D30ED4-930D-436F-8287-A8FDB01860FA}">
+		<File KeyPath="yes" Source="$(var.PublishFolder)appsettings.Production.json" />
+	  </Component>
       <Component Guid="{10301C79-C85C-4FD5-94D8-A23533BE7D79}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)Help_ru.xps" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)Help_ru.pdf" />
       </Component>
       <Component Guid="{ADDF321D-6B06-412B-8096-3911FF966799}">
-        <File KeyPath="yes" Source="$(var.PublishFolder)Help_en.xps" />
+        <File KeyPath="yes" Source="$(var.PublishFolder)Help_en.pdf" />
       </Component>
       <Component Id="RegistryPath" Guid="{b8ad70bb-c94c-4e11-af70-c6eaf427fb1c}">
         <RegistryValue

@@ -366,7 +366,7 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
     private double _volume = 0.5;
 
     /// <summary>
-    /// Sound volume level.
+    /// Sound volume level (from 0 to 1).
     /// </summary>
     public double Volume
     {

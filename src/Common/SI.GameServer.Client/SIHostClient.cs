@@ -17,6 +17,8 @@ public sealed class SIHostClient : IGameClient
     private readonly HubConnection _connection;
     private readonly SIHostClientOptions _options;
 
+    private JoinGameRequest? _joinGameRequest;
+
     public event Action<Message>? IncomingMessage;
 
     public event Func<Exception?, Task>? Reconnecting;
@@ -28,22 +30,8 @@ public sealed class SIHostClient : IGameClient
         _connection = connection;
         _options = options;
 
-        _connection.Reconnecting += async e =>
-        {
-            if (Reconnecting != null)
-            {
-                await Reconnecting(e);
-            }
-        };
-
-        _connection.Reconnected += async s =>
-        {
-            if (Reconnected != null)
-            {
-                await Reconnected(s);
-            }
-        };
-
+        _connection.Reconnecting += OnReconnecting;
+        _connection.Reconnected += OnReconnected;
         _connection.Closed += OnConnectionClosedAsync;
 
         _connection.On<Message>("Receive", (message) => IncomingMessage?.Invoke(message));
@@ -54,6 +42,22 @@ public sealed class SIHostClient : IGameClient
 
             await _connection.StopAsync();
         });
+    }
+
+    private async Task OnReconnecting(Exception? ex)
+    {
+        if (Reconnecting != null)
+        {
+            await Reconnecting(ex);
+        }
+    }
+
+    private async Task OnReconnected(string? connectionId)
+    {
+        if (Reconnected != null)
+        {
+            await Reconnected(connectionId);
+        }
     }
 
     public static async Task<SIHostClient> CreateAsync(SIHostClientOptions options, CancellationToken cancellationToken)
@@ -67,7 +71,7 @@ public sealed class SIHostClient : IGameClient
 
         var connection = new HubConnectionBuilder()
             .WithUrl($"{serviceUri}sihost")
-                .WithAutomaticReconnect()
+                .WithAutomaticReconnect(new ReconnectPolicy())
                 .AddMessagePackProtocol()
                 .Build();
 
@@ -78,23 +82,70 @@ public sealed class SIHostClient : IGameClient
         return new SIHostClient(connection, options);
     }
 
-    public Task<JoinGameResponse> JoinGameAsync(
+    public async Task<JoinGameResponse> JoinGameAsync(
         JoinGameRequest joinGameRequest,
-        CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync<JoinGameResponse>("JoinGame", joinGameRequest, cancellationToken);
-
-    public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("SendMessage", message, cancellationToken);
-
-    public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
-        _connection.InvokeAsync("LeaveGame", cancellationToken);
-
-    private Task OnConnectionClosedAsync(Exception? exc)
+        CancellationToken cancellationToken = default)
     {
-        // TODO: recreate connection and retry
+        var response = await _connection.InvokeAsync<JoinGameResponse>("JoinGame", joinGameRequest, cancellationToken);
 
-        return Closed != null ? Closed(exc) : Task.CompletedTask;
+        if (response.IsSuccess)
+        {
+            _joinGameRequest = joinGameRequest;
+        }
+
+        return response;
     }
 
-    public ValueTask DisposeAsync() => _connection.DisposeAsync();
+    public Task SendMessageAsync(Message message, CancellationToken cancellationToken = default) =>
+        _connection.SendAsync("SendMessage", message, cancellationToken);
+
+    public Task LeaveGameAsync(CancellationToken cancellationToken = default) =>
+        _connection.SendAsync("LeaveGame", cancellationToken);
+
+    private async Task OnConnectionClosedAsync(Exception? exc)
+    {
+        if (await TryReconnectAsync())
+        {
+            return;
+        }
+
+        if (Closed != null)
+        {
+            await Closed(exc);
+        }
+    }
+
+    private async Task<bool> TryReconnectAsync()
+    {
+        if (_joinGameRequest == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            await Task.Delay(5000);
+            await _connection.StartAsync();
+            await JoinGameAsync(_joinGameRequest);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _connection.Reconnecting -= OnReconnecting;
+        _connection.Reconnected -= OnReconnected;
+        _connection.Closed -= OnConnectionClosedAsync;
+
+        await _connection.DisposeAsync();
+    }
+
+    private sealed class ReconnectPolicy : IRetryPolicy
+    {
+        public TimeSpan? NextRetryDelay(RetryContext retryContext) => TimeSpan.FromSeconds(5);
+    }
 }

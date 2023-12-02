@@ -8,6 +8,26 @@ namespace SIUI.Behaviors;
 
 public static class MediaController
 {
+    /// <summary>
+    /// Current volume level.
+    /// </summary>
+    public static double Volume { get; private set; } = 0.5;
+
+    static MediaController()
+    {
+        if (waveOutGetVolume(IntPtr.Zero, out uint dwVolume) == 0)
+        {
+            // Setting default volume level from mixer (dividing it by half because default volume is 0.5)
+            Volume = ((double)Math.Max(dwVolume >> 16, dwVolume & 0x0000FFFF)) / 0xFFFF / 2;
+        }
+    }
+
+    public static void UpdateVolume(double factor)
+    {
+        Volume *= factor;
+        _ = waveOutSetVolume(IntPtr.Zero, (uint)(0xFFFF * 2 * Volume));
+    }
+
     private static readonly DependencyPropertyDescriptor SourceDescriptor =
         DependencyPropertyDescriptor.FromProperty(MediaElement.SourceProperty, typeof(MediaElement));
 
@@ -29,12 +49,7 @@ public static class MediaController
         }
 
         mediaElement.LoadedBehavior = MediaState.Manual;
-
-        if (waveOutGetVolume(IntPtr.Zero, out uint dwVolume) == 0)
-        {
-            // Setting default volume level from mixer (dividing it by half because default volume is 0.5)
-            mediaElement.Volume = ((double)Math.Max(dwVolume >> 16, dwVolume & 0x0000FFFF)) / 0xFFFF / 2;
-        }
+        mediaElement.Volume = Volume;
 
         void loaded(object? sender, EventArgs e2)
         {
@@ -113,7 +128,6 @@ public static class MediaController
         void volumeChangedHandler(double volume)
         {
             mediaElement.Volume *= volume;
-            waveOutSetVolume(IntPtr.Zero, (uint)(0xFFFF * 2 * mediaElement.Volume));
         }
 
         tableInfo.MediaSeek += seekHandler;

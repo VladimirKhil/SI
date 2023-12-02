@@ -1632,9 +1632,11 @@ public sealed class GameLogic : Logic<GameData>
 
                     if (stop)
                     {
+                        _tasksHistory.AddLogEntry("Execution stopped");
                         return;
                     }
 
+                    _tasksHistory.AddLogEntry($"Execution proceed with task {newTask}");
                     task = newTask;
                 }
 

@@ -235,7 +235,7 @@ public sealed class GameServerClient : IGameServerClient
                 {
                     options.AccessTokenProvider = () => Task.FromResult<string?>(Convert.ToBase64String(Encoding.UTF8.GetBytes(userName)));
                 })
-            .WithAutomaticReconnect()
+            .WithAutomaticReconnect(new ReconnectPolicy())
             .AddMessagePackProtocol()
             .Build();
 
@@ -387,4 +387,9 @@ public sealed class GameServerClient : IGameServerClient
     }
 
     private void MessageHandler_HttpSendProgress(object? sender, HttpProgressEventArgs e) => UploadProgress?.Invoke(e.ProgressPercentage);
+
+    private sealed class ReconnectPolicy : IRetryPolicy
+    {
+        public TimeSpan? NextRetryDelay(RetryContext retryContext) => TimeSpan.FromSeconds(5);
+    }
 }

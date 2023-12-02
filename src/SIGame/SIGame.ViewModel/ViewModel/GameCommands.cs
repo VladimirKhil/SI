@@ -59,11 +59,9 @@ public static class GameCommands
 
     private static void Comment_Executed(object? arg)
     {
-        var commentUri = Uri.EscapeDataString(Resources.FeedbackLink);
-
         try
         {
-            Browser.Open(commentUri);
+            Browser.Open(Resources.FeedbackLink);
         }
         catch (Exception exc)
         {

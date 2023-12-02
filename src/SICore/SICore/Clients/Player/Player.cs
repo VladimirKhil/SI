@@ -31,7 +31,10 @@ public sealed class Player : Viewer
     {
         ClientData.PlayerDataExtensions.PressGameButton = new CustomCommand(arg =>
         {
-            _viewerActions.SendMessage(Messages.I);
+            var tryStartTime = ClientData.PlayerDataExtensions.TryStartTime;
+            var pressDuration = tryStartTime.HasValue ? (int)DateTimeOffset.UtcNow.Subtract(tryStartTime.Value).TotalMilliseconds : -1;
+
+            _viewerActions.SendMessageWithArgs(Messages.I, pressDuration);
             DisableGameButton(false);
             ReleaseGameButton();
         }) { CanBeExecuted = true };
@@ -282,6 +285,7 @@ public sealed class Player : Viewer
                 case Messages.Try:
                     ClientData.PlayerDataExtensions.Pass.CanBeExecuted = true;
                     ClientData.PlayerDataExtensions.Apellate.CanBeExecuted = false;
+                    ClientData.PlayerDataExtensions.TryStartTime = DateTimeOffset.UtcNow;
                     break;
 
                 case Messages.YouTry:

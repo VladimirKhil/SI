@@ -28,9 +28,4 @@ public sealed class ViewerActions
 
     public void SendMessageWithArgs(params object[] args) =>
         Client.SendMessage(string.Join(Message.ArgsSeparator, args), receiver: NetworkConstants.GameName);
-
-    /// <summary>
-    /// Жмёт на игровую кнопку
-    /// </summary>
-    internal void PressGameButton() => SendMessage(Messages.I);
 }

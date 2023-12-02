@@ -117,6 +117,11 @@ public sealed class PlayerData : INotifyPropertyChanged
         set { _myTry = value; OnPropertyChanged(); }
     }
 
+    /// <summary>
+    /// Defines time stamp when game buttons havebeen activated.
+    /// </summary>
+    public DateTimeOffset? TryStartTime { get; set; }
+
     public event Action? PressButton;
 
     public event PropertyChangedEventHandler? PropertyChanged;

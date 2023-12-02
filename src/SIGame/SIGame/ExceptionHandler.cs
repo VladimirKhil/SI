@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System;
 using SIGame.Helpers;
+using System.Security.Cryptography;
 
 namespace SIGame;
 
@@ -65,7 +66,10 @@ internal sealed class ExceptionHandler
                 || inner is NotImplementedException
                 || inner is TypeInitializationException
                 || inner is FileFormatException
-                || inner is SEHException)
+                || inner is SEHException
+                || inner is CryptographicException
+                || inner is InvalidCastException
+                || inner is DivideByZeroException)
             {
                 MessageBox.Show(
                     $"{Properties.Resources.Error_RuntimeBroken}: {inner.Message}",
@@ -126,7 +130,9 @@ internal sealed class ExceptionHandler
                 || message.Contains("IsBadSplitPosition")
                 || message.Contains("IKeyboardInputProvider.AcquireFocus")
                 || message.Contains("ReleaseOnChannel")
-                || message.Contains("ManifestSignedXml2.GetIdElement"))
+                || message.Contains("ManifestSignedXml2.GetIdElement")
+                || message.Contains("LineServicesCallbacks.FetchRunRedefined")
+                || message.Contains("TypefaceMap.GetShapeableText"))
             {
                 MessageBox.Show(
                     Properties.Resources.Error_OSBroken,

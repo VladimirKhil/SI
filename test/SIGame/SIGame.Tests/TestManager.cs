@@ -9,6 +9,8 @@ internal sealed class TestManager : PlatformManager
 {
 	public override ICommand Close { get; } = new CustomCommand((arg) => { });
 
+	public override double Volume => 0.5;
+
 	public override void Activate() { }
 
 	public override bool Ask(string text) => throw new NotImplementedException();
@@ -89,6 +91,11 @@ internal sealed class TestManager : PlatformManager
     }
 
     public override void CloseDialogWindow()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void UpdateVolume(double factor)
     {
         throw new NotImplementedException();
     }

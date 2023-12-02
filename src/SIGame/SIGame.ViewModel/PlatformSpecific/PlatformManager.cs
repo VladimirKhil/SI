@@ -10,6 +10,8 @@ public abstract class PlatformManager : IUIThreadExecutor
 
     public IServiceProvider? ServiceProvider { get; set; }
 
+    public abstract double Volume { get; }
+
     protected PlatformManager()
     {
         Instance = this;
@@ -62,4 +64,6 @@ public abstract class PlatformManager : IUIThreadExecutor
     public abstract void ShowDialogWindow(object dataContext, Action onClose);
 
     public abstract void CloseDialogWindow();
+
+    public abstract void UpdateVolume(double factor);
 }

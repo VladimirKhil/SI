@@ -213,8 +213,15 @@
                         <ContextMenu Placement="Right">
                             <ContextMenu.Template>
                                 <ControlTemplate TargetType="ContextMenu">
-                                    <Border x:Name="Border" Background="#BC000000" Padding="10">
-                                        <Slider Value="{Binding Volume}" Foreground="{StaticResource MainColor}" Maximum="100" Width="180" Height="20" Orientation="Horizontal" IsMoveToPointEnabled="True" />
+                                    <Border x:Name="Border" Background="#BC000000" Padding="10" d:DataContext="{d:DesignInstance Type=lvm:GameViewModel}">
+                                        <Slider
+                                            Value="{Binding Volume}"
+                                            Foreground="{StaticResource MainColor}"
+                                            Maximum="100"
+                                            Width="180"
+                                            Height="20"
+                                            Orientation="Horizontal"
+                                            IsMoveToPointEnabled="True" />
                                     </Border>
 
                                     <ControlTemplate.Triggers>

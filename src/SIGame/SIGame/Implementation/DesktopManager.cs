@@ -6,6 +6,7 @@ using SIGame.Helpers;
 using SIGame.Properties;
 using SIGame.ViewModel;
 using SIGame.ViewModel.PlatformSpecific;
+using SIUI.Behaviors;
 using System;
 using System.IO;
 using System.Windows;
@@ -42,6 +43,8 @@ public sealed class DesktopManager : PlatformManager
 
     public override ICommand Close => ApplicationCommands.Close;
 
+    public override double Volume => MediaController.Volume;
+
     public DesktopManager()
     {
         _element.MediaEnded += Media_Ended;
@@ -50,59 +53,14 @@ public sealed class DesktopManager : PlatformManager
     public override void ShowHelp(bool asDialog)
     {
         var helpUri = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Resources.HelpFile);
-        var document = new System.Windows.Xps.Packaging.XpsDocument(helpUri, FileAccess.Read);
 
-        var helpWindow = new Window
+        try
         {
-            Icon = Application.Current.MainWindow.Icon,
-            Title = CommonSettings.AppName + ": " + Resources.XpsHelp,
-            WindowState = WindowState.Maximized
-        };
-
-        var docViewer = new System.Windows.Controls.DocumentViewer { Document = document.GetFixedDocumentSequence() };
-
-        var frame = new System.Windows.Controls.Frame
-        {
-            NavigationUIVisibility = System.Windows.Navigation.NavigationUIVisibility.Hidden,
-            Content = docViewer
-        };
-
-        helpWindow.Content = frame;
-
-        helpWindow.Closed += (sender, e) =>
-        {
-            document.Close();
-        };
-
-        docViewer.AddHandler(
-            System.Windows.Documents.Hyperlink.RequestNavigateEvent,
-            new System.Windows.Navigation.RequestNavigateEventHandler((sender, e) =>
-            {
-                if (e.Uri.IsAbsoluteUri && e.Uri.Scheme == "http")
-                {
-                    try
-                    {
-                        Browser.Open(e.Uri.ToString());
-                    }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show(
-                            string.Format(Resources.SiteNavigationError + "\r\n{1}", e.Uri, exc.Message),
-                            CommonSettings.AppName);
-                    }
-
-                    e.Handled = true;
-                }
-            }
-        ));
-
-        if (asDialog)
-        {
-            helpWindow.ShowDialog();
+            Browser.Open(helpUri);
         }
-        else
+        catch (Exception exc)
         {
-            helpWindow.Show();
+            MessageBox.Show(exc.ToString(), App.ProductName, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -494,4 +452,6 @@ public sealed class DesktopManager : PlatformManager
         _dialogWindow?.Close();
         _dialogWindow = null;
     }
+
+    public override void UpdateVolume(double factor) => MediaController.UpdateVolume(factor);
 }

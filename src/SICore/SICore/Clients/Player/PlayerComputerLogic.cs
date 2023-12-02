@@ -112,7 +112,7 @@ internal sealed class PlayerComputerLogic : IPlayerLogic
         return (int)(100 * (now - timer.StartTime).TotalMilliseconds / (timer.EndTime - timer.StartTime).TotalMilliseconds);
     }
 
-    private void PressButton() => _viewerActions.PressGameButton();
+    private void PressButton() => _data.PlayerDataExtensions.PressGameButton.Execute(null);
 
     private void AnswerRight() => _viewerActions.SendMessage(Messages.IsRight, "+");
 

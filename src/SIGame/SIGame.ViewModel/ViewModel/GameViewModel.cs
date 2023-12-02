@@ -95,10 +95,18 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
 
     public UserSettings UserSettings { get; }
 
+    /// <summary>
+    /// Sound volume level.
+    /// </summary>
     public double Volume
     {
         get => TInfo.Volume * 100;
-        set { TInfo.Volume = Math.Max(1, value) / 100; }
+        set
+        {
+            var currentValue = TInfo.Volume;
+            TInfo.Volume = Math.Min(100, Math.Max(1, value)) / 100;
+            PlatformManager.Instance.UpdateVolume(TInfo.Volume / currentValue);
+        }
     }
 
     /// <summary>
@@ -156,6 +164,8 @@ public sealed class GameViewModel : IAsyncDisposable, INotifyPropertyChanged
         Host.Timer += Host_Timer;
         Host.Ad += Host_Ad;
         Host.IsPausedChanged += Host_IsPausedChanged;
+
+        TInfo.Volume = PlatformManager.Instance.Volume;
 
         UserSettings = userSettings;
 
