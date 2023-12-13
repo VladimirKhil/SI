@@ -59,14 +59,14 @@ public class AppSettingsCore : IAppSettingsCore, INotifyPropertyChanged
     private int _readingSpeed = DefaultReadingSpeed;
 
     /// <summary>
-    /// Скорость чтения вопроса (символов в секунду)
+    /// Text reading speed (characters per second).
     /// </summary>
     [XmlAttribute]
     [DefaultValue(DefaultReadingSpeed)]
     public int ReadingSpeed
     {
         get => _readingSpeed;
-        set { _readingSpeed = value; OnPropertyChanged(); }
+        set { if (_readingSpeed != value) { _readingSpeed = value; OnPropertyChanged(); } }
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -592,7 +592,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
         }
     }
 
-    public void TextShape(string[] mparams)
+    public void OnTextShape(string[] mparams)
     {
         var text = new StringBuilder();
 
@@ -606,7 +606,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             }
         }
 
-        if (!TInfo.PartialText && TInfo.TStage == TableStage.Question)
+        if (TInfo.TStage == TableStage.Question)
         {
             // Toggle TStage change to reapply QuestionTemplateSelector template
             TInfo.TStage = TableStage.Void;

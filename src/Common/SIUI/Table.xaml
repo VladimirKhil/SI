@@ -466,8 +466,10 @@
                                     Margin="10"
                                     TextWrapping="Wrap"
                                     HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
                                     TextAlignment="Left"
-                                    lb:QuestionReading.IsAttachedPartial="True">                                    
+                                    lb:QuestionReading.IsAttachedPartial="True"
+                                    lb:FillManager.HandleTextChange="False">
                                     <TextBlock.CacheMode>
                                         <BitmapCache EnableClearType="True" SnapsToDevicePixels="False" RenderAtScale="1.5" />
                                     </TextBlock.CacheMode>

@@ -403,7 +403,10 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
 
     private bool _partialText = false;
 
-    public bool PartialText { get => _partialText; set { _partialText = value; OnPropertyChanged(); } }
+    /// <summary>
+    /// Is text displayed partially.
+    /// </summary>
+    public bool PartialText { get => _partialText; set { if (_partialText != value) { _partialText = value; OnPropertyChanged(); } } }
 
     private LayoutMode _layoutMode = LayoutMode.Simple;
 

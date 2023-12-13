@@ -7,24 +7,17 @@ using System.Windows.Media;
 namespace SIUI.Behaviors;
 
 /// <summary>
-/// Поведение, изменяющее размер шрифта текста до максимальной величины, при которой он целиком умещается на экране
+/// Updates text font size dynamically so the text has maximum available font size and fits inside parent.
 /// </summary>
 public static class FillManager
 {
     private static readonly DependencyPropertyDescriptor TextDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
     private static readonly DependencyPropertyDescriptor FontFamilyDescriptor = DependencyPropertyDescriptor.FromProperty(TextBlock.FontFamilyProperty, typeof(TextBlock));
 
-    public static bool GetFill(DependencyObject obj)
-    {
-        return (bool)obj.GetValue(FillProperty);
-    }
+    public static bool GetFill(DependencyObject obj) => (bool)obj.GetValue(FillProperty);
 
-    public static void SetFill(DependencyObject obj, bool value)
-    {
-        obj.SetValue(FillProperty, value);
-    }
+    public static void SetFill(DependencyObject obj, bool value) => obj.SetValue(FillProperty, value);
 
-    // Using a DependencyProperty as the backing store for Fill.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty FillProperty =
         DependencyProperty.RegisterAttached("Fill", typeof(bool), typeof(FillManager), new UIPropertyMetadata(false, OnFillChanged));
 
@@ -61,6 +54,13 @@ public static class FillManager
     public static readonly DependencyProperty HandlerProperty =
         DependencyProperty.RegisterAttached("Handler", typeof(SizeChangedEventHandler), typeof(FillManager), new UIPropertyMetadata(null));
 
+    public static bool GetHandleTextChange(DependencyObject obj) => (bool)obj.GetValue(HandleTextChangeProperty);
+
+    public static void SetHandleTextChange(DependencyObject obj, bool value) => obj.SetValue(HandleTextChangeProperty, value);
+
+    public static readonly DependencyProperty HandleTextChangeProperty =
+        DependencyProperty.RegisterAttached("HandleTextChange", typeof(bool), typeof(FillManager), new PropertyMetadata(true));
+
     private static void TextBlock_Loaded(object sender, RoutedEventArgs e)
     {
         var textBlock = (TextBlock)sender;
@@ -78,7 +78,7 @@ public static class FillManager
         parent.SizeChanged += handler;
         MeasureFontSize(sender, EventArgs.Empty);
 
-        TextDescriptor.AddValueChanged(textBlock, MeasureFontSize);
+        TextDescriptor.AddValueChanged(textBlock, MeasureFontSizeOnTextChange);
         FontFamilyDescriptor.AddValueChanged(textBlock, MeasureFontSize);
     }
 
@@ -95,7 +95,7 @@ public static class FillManager
 
         textBlock.ClearValue(HandlerProperty);
 
-        TextDescriptor.RemoveValueChanged(textBlock, MeasureFontSize);
+        TextDescriptor.RemoveValueChanged(textBlock, MeasureFontSizeOnTextChange);
         FontFamilyDescriptor.RemoveValueChanged(textBlock, MeasureFontSize);
     }
 
@@ -117,6 +117,23 @@ public static class FillManager
 
     public static void OnInterlinyageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => MeasureFontSize(d, EventArgs.Empty);
 
+    private static void MeasureFontSizeOnTextChange(object? sender, EventArgs e)
+    {
+        if (sender is not DependencyObject dependencyObject)
+        {
+            return;
+        }
+
+        var handleTextChange = GetHandleTextChange(dependencyObject);
+
+        if (!handleTextChange)
+        {
+            return;
+        }
+
+        MeasureFontSize(sender, e);
+    }
+
     /// <summary>
     /// Задаёт как можно больший размер шрифта текстового блока исходя из доступной для него области
     /// </summary>
@@ -124,9 +141,8 @@ public static class FillManager
     /// <param name="e"></param>
     private static void MeasureFontSize(object? sender, EventArgs e)
     {
-        var textBlock = sender as TextBlock;
-
-        if (VisualTreeHelper.GetParent(textBlock) is not FrameworkElement parent)
+        if (sender is not TextBlock textBlock
+            || VisualTreeHelper.GetParent(textBlock) is not FrameworkElement parent)
         {
             return;
         }

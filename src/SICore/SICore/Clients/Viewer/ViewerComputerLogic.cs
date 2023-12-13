@@ -173,11 +173,6 @@ internal class ViewerComputerLogic : Logic<ViewerData>, IViewerLogic
         
     }
 
-    public void TextShape(string[] mparams)
-    {
-        
-    }
-
     public void OnTimeChanged()
     {
 

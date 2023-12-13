@@ -807,7 +807,7 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
                     break;
 
                 case Messages.TextShape:
-                    _logic.TextShape(mparams);
+                    _logic.OnTextShape(mparams);
                     break;
 
                 case Messages.Atom: // deprecated

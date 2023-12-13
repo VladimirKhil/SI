@@ -140,7 +140,7 @@ public interface IViewerLogic : ILogic
 
     void PrintGreeting();
 
-    void TextShape(string[] mparams);
+    void OnTextShape(string[] mparams) { }
 
     void OnTimeChanged();
 

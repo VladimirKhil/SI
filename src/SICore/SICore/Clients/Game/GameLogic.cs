@@ -58,6 +58,11 @@ public sealed class GameLogic : Logic<GameData>
     private const double PartialPrintFrequencyPerSecond = 0.5;
 
     /// <summary>
+    /// Represents character used to form content shape.
+    /// </summary>
+    private const string ContentShapeCharacter = "#"; // '%' as an alternative
+
+    /// <summary>
     /// Execution continuation.
     /// </summary>
     private Action? _continuation;
@@ -428,14 +433,13 @@ public sealed class GameLogic : Logic<GameData>
 
         if (_data.IsPartial)
         {
-            // "и" symbol is used as an arbitrary symbol with medium width to define the question text shape
-            // It does not need to be localized
+            // ContentShapeCharacter symbol is used as an arbitrary symbol with medium width to define the question text shape
             // Real question text is sent later and it sequentially replaces test shape
             // Text shape is required to display partial question on the screen correctly
             // (font size and number of lines must be calculated in the beginning to prevent UI flickers on question text growth)
-            var shape = Regex.Replace(text, "[^\r\n\t\f ]", "и");
+            var shape = Regex.Replace(text, "[^\r\n\t\f ]", ContentShapeCharacter);
             _gameActions.SendMessageWithArgs(Messages.TextShape, shape);
-            _gameActions.SendMessageWithArgs(Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape);
+            _gameActions.SendMessageWithArgs(Messages.ContentShape, ContentPlacements.Screen, 0, ContentTypes.Text, shape.EscapeNewLines());
 
             _data.Text = text;
             _data.TextLength = 0;
@@ -2782,6 +2786,12 @@ public sealed class GameLogic : Logic<GameData>
             Math.Min(
                 text.Length - _data.TextLength,
                 (int)(_data.Settings.AppSettings.ReadingSpeed * PartialPrintFrequencyPerSecond)));
+
+        // Align to next space position
+        while (_data.TextLength + printingLength + 1 < text.Length && !char.IsWhiteSpace(text[_data.TextLength + printingLength]))
+        {
+            printingLength++;
+        }
 
         var subText = text.Substring(_data.TextLength, printingLength);
 
