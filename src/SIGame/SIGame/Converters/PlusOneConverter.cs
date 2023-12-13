@@ -4,7 +4,8 @@ using System.Windows.Data;
 
 namespace SIGame.Converters;
 
-public sealed class PlusOneConverter: IValueConverter
+[ValueConversion(typeof(int), typeof(int))]
+public sealed class PlusOneConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
         (int)value + 1;

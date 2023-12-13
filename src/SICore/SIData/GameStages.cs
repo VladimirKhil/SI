@@ -23,6 +23,7 @@ public enum GameStages
     /// <summary>
     /// Final round.
     /// </summary>
+    [Obsolete]
     Final,
 
     /// <summary>

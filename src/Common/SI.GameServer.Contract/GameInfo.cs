@@ -48,6 +48,16 @@ public sealed class GameInfo : SimpleGameInfo
     public string StageName { get; set; } = "";
 
     /// <summary>
+    /// Current game progress value.
+    /// </summary>
+    public int ProgressCurrent { get; set; }
+
+    /// <summary>
+    /// Total game progress value.
+    /// </summary>
+    public int ProgressTotal { get; set; }
+
+    /// <summary>
     /// Game rules.
     /// </summary>
     public GameRules Rules { get; set; }

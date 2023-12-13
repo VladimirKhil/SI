@@ -16,9 +16,7 @@
     xmlns:data="clr-namespace:SIData;assembly=SIData"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=lvm:GameSettingsViewModel, IsDesignTimeCreatable=True}">
-    <UserControl.Resources>
-        <lc:PlusOneConverter x:Key="PlusOneConverter" />
-        
+    <UserControl.Resources>        
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="data:GameRole" />

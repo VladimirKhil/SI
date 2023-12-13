@@ -649,6 +649,7 @@ public abstract class Viewer : Actor<ViewerData, IViewerLogic>, IViewerClient, I
                                 if (roundIndex > -1 && roundIndex < ClientData.RoundNames.Length)
                                 {
                                     ClientData.StageName = ClientData.RoundNames[roundIndex];
+                                    ClientData.RoundIndex = roundIndex;
                                 }
                             }
                         }

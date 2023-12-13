@@ -650,6 +650,24 @@ public sealed class ViewerData : Data
     /// </summary>
     public bool IsNetworkGame { get; set; }
 
+    private int _roundIndex = -1;
+
+    /// <summary>
+    /// Current round index.
+    /// </summary>
+    public int RoundIndex 
+    {
+        get => _roundIndex;
+        set
+        {
+            if (_roundIndex != value)
+            {
+                _roundIndex = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     internal event Action? AutoReadyChanged;
 
     private void OnAutoReadyChanged() => AutoReadyChanged?.Invoke();

@@ -316,6 +316,28 @@
                     LineHeight="18"
                     Margin="73,27,15,0" />
 
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Right"
+                    Foreground="{StaticResource MainColor}"
+                    Margin="0,5,12,0"
+                    FontSize="17"
+                    FontWeight="Bold">
+                    <Run Text="{Binding Data.RoundIndex, Mode=OneWay, Converter={StaticResource PlusOneConverter}}" />
+                    <Run Text="/" />
+                    <Run Text="{Binding Data.RoundNames.Length, Mode=OneWay}" />
+
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Data.RoundIndex}" Value="-1">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
                 <ContentControl Grid.Row="2" Content="{Binding}">
                     <ContentControl.Style>
                         <Style TargetType="ContentControl">

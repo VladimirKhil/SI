@@ -1371,7 +1371,7 @@ public sealed class SIOnlineViewModel : ConnectionDataViewModel
     {
         GameStages.Created => Resources.GameStage_Created,
         GameStages.Started => Resources.GameStage_Started,
-        GameStages.Round => $"{Resources.GameStage_Round}: {gameInfo.StageName}",
+        GameStages.Round => $"{gameInfo.ProgressCurrent}/{gameInfo.ProgressTotal}: {gameInfo.StageName}",
         GameStages.Final => Resources.GameStage_Final,
         _ => Resources.GameStage_Finished,
     };

@@ -108,6 +108,7 @@
             <localc:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter1" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter1" />
             <localc:BooleanToCollapsedConverter x:Key="BooleanToCollapsedConverter" />
+            <localc:PlusOneConverter x:Key="PlusOneConverter" />
 
             <SolidColorBrush x:Key="WindowBorderColor" Color="White" />
 
