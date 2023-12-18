@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<Authors>Vladimir Khil</Authors>
 		<Company>Khil-soft</Company>
-		<SIGameVersion>7.10.0</SIGameVersion>
+		<SIGameVersion>7.11.0</SIGameVersion>
 		<SIQuesterVersion>5.11.3</SIQuesterVersion>
 		<SImulatorVersion>2.14.0</SImulatorVersion>
 	</PropertyGroup>

@@ -28,5 +28,5 @@ public enum ContentType
     /// <summary>
     /// HTML page.
     /// </summary>
-    Html
+    Html,
 }

@@ -33,7 +33,7 @@ public interface IPresentationController : IDisposable
     /// Sets content to display.
     /// </summary>
     /// <param name="content">Content to display.</param>
-    void SetScreenContent(IReadOnlyCollection<ContentViewModel> content);
+    void SetScreenContent(IReadOnlyCollection<ContentGroup> content);
 
     void SetQuestionContentType(QuestionContentType questionContentType);
 

@@ -764,7 +764,8 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
 
         TInfo.TStage = TableStage.Question;
 
-        var content = new List<ContentViewModel>();
+        var groups = new List<ContentGroup>();
+        ContentGroup? currentGroup = null;
 
         foreach (var (contentType, contentValue) in contentInfo)
         {
@@ -773,13 +774,24 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
             switch (contentType)
             {
                 case ContentTypes.Text:
+                    if (currentGroup != null)
+                    {
+                        currentGroup.Init();
+                        groups.Add(currentGroup);
+                        currentGroup = null;
+                    }
+
                     var text = contentValue.UnescapeNewLines();
-                    content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…"), TextSpeed: content.Count == 0 ? TInfo.TextSpeed : 0.0));
+                    var group = new ContentGroup();
+                    group.Content.Add(new ContentViewModel(ContentType.Text, text.ToString().Shorten(_data.Host.MaximumTableTextLength, "…"), groups.Count == 0 ? TInfo.TextSpeed : 0.0));
+                    groups.Add(group);
                     break;
 
                 case ContentTypes.Video:
                 case ContentTypes.Image:
                 case ContentTypes.Html:
+                    currentGroup ??= new ContentGroup { Weight = 3.0 };
+
                     var uri = contentValue;
 
                     if (contentType != ContentTypes.Html
@@ -787,7 +799,7 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         && !Data.Host.LoadExternalMedia
                         && !ExternalUrlOk(uri))
                     {
-                        content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri), 3.0));
+                        currentGroup.Content.Add(new ContentViewModel(ContentType.Text, string.Format(_localizer[nameof(R.ExternalLink)], uri)));
                         _data.EnableMediaLoadButton = true;
                         _data.ExternalContent.Add((contentType, uri));
                         return;
@@ -804,12 +816,18 @@ public class ViewerHumanLogic : Logic<ViewerData>, IViewerLogic
                         ? ContentType.Image
                         : (contentType == ContentTypes.Video ? ContentType.Video : ContentType.Html);
 
-                    content.Add(new ContentViewModel(tableContentType, uri, 3.0));
+                    currentGroup.Content.Add(new ContentViewModel(tableContentType, uri));
                     break;
             }
         }
 
-        TInfo.Content = content;
+        if (currentGroup != null)
+        {
+            currentGroup.Init();
+            groups.Add(currentGroup);
+        }
+
+        TInfo.Content = groups;
         TInfo.QuestionContentType = QuestionContentType.Collection;
     }
 

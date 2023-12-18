@@ -286,12 +286,12 @@ public sealed class TableInfoViewModel : ViewModelBase<TableInfo>
         AnswerSelected?.Invoke(itemViewModel);
     }
 
-    private IReadOnlyCollection<ContentViewModel>? _content;
+    private IReadOnlyCollection<ContentGroup>? _content;
 
     /// <summary>
     /// Table collection content.
     /// </summary>
-    public IReadOnlyCollection<ContentViewModel>? Content
+    public IReadOnlyCollection<ContentGroup>? Content
     {
         get => _content;
         set

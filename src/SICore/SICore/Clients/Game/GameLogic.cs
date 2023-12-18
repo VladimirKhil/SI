@@ -1292,6 +1292,11 @@ public sealed class GameLogic : Logic<GameData>
 
                 if (!ClientData.Settings.AppSettings.FalseStart && !ClientData.IsQuestionFinished)
                 {
+                    if (_data.QuestionPlayState.AnswerOptions != null)
+                    {
+                        _continuation = null; // Erase AskAnswer continuation
+                    }
+
                     Engine.MoveToAnswer();
                 }
 
@@ -1979,7 +1984,7 @@ public sealed class GameLogic : Logic<GameData>
                         {
                             var subText = _data.Text[_data.TextLength..];
 
-                            _gameActions.SendMessageWithArgs(Messages.Content, ContentPlacements.Screen, 0, Constants.PartialText, subText.EscapeNewLines());
+                            _gameActions.SendMessageWithArgs(Messages.ContentAppend, ContentPlacements.Screen, 0, ContentTypes.Text, subText.EscapeNewLines());
                             _gameActions.SendMessageWithArgs(Messages.Atom, Constants.PartialText, subText);
                             _gameActions.SystemReplic(subText);
 

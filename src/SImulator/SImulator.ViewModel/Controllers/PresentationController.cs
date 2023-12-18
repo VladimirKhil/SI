@@ -229,7 +229,7 @@ public sealed class PresentationController : IPresentationController, INotifyPro
 
     public void SetText(string text) => TInfo.Text = text;
 
-    public void SetScreenContent(IReadOnlyCollection<ContentViewModel> content)
+    public void SetScreenContent(IReadOnlyCollection<ContentGroup> content)
     {
         TInfo.Content = content;
         SetQuestionContentType(QuestionContentType.Collection);

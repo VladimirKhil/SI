@@ -633,10 +633,22 @@
 
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <ContentControl
-                                                Margin="10"
-                                                Content="{Binding}"
-                                                ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
+                                            <ItemsControl ItemsSource="{Binding Content}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Rows="{Binding RowCount}" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ContentControl
+                                                            Margin="10"
+                                                            Content="{Binding}"
+                                                            ContentTemplate="{Binding Type, Converter={StaticResource QuestionContentSelector2}}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
 

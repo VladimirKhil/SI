@@ -133,7 +133,8 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
             return;
         }
 
-        var screenContent = new List<ContentViewModel>();
+        var screenContent = new List<ContentGroup>();
+        ContentGroup? currentGroup = null;
 
         foreach (var contentItem in content)
         {
@@ -142,7 +143,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                 case ContentPlacements.Screen:
                     switch (contentItem.Type)
                     {
-                        case AtomTypes.Text:
+                        case ContentTypes.Text:
+                            if (currentGroup != null)
+                            {
+                                currentGroup.Init();
+                                screenContent.Add(currentGroup);
+                                currentGroup = null;
+                            }
+
                             // Show theme name and question price instead of empty text
                             var displayedText =
                                 GameViewModel.Settings.Model.FalseStart
@@ -152,49 +160,54 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                                 : $"{GameViewModel.CurrentTheme}\n{GameViewModel.Price}";
 
                             PresentationController.SetText(displayedText); // For simple answer
-                            screenContent.Add(new ContentViewModel(ContentType.Text, displayedText));
+                            var group = new ContentGroup();
+                            group.Content.Add(new ContentViewModel(ContentType.Text, displayedText));
+                            screenContent.Add(group);
                             break;
 
-                        case AtomTypes.Image:
+                        case ContentTypes.Image:
+                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
                             var imageUri = TryGetMediaUri(contentItem);
 
                             if (imageUri != null)
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Image, imageUri, ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Image, imageUri));
                             }
                             else
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
                             }
                             break;
 
-                        case AtomTypes.Video:
+                        case ContentTypes.Video:
+                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
                             var videoUri = TryGetMediaUri(contentItem);
 
                             if (videoUri != null)
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Video, videoUri, ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Video, videoUri));
                                 PresentationController.SetSound();
                                 GameViewModel.InitMedia();
                             }
                             else
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
                             }
                             break;
 
-                        case AtomTypes.Html:
+                        case ContentTypes.Html:
+                            currentGroup ??= new ContentGroup { Weight = ImageVideoWeight };
                             var htmlUri = TryGetMediaUri(contentItem);
 
                             if (htmlUri != null)
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Html, htmlUri, ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Html, htmlUri));
                                 PresentationController.SetQuestionSound(false);
                                 PresentationController.SetSound();
                             }
                             else
                             {
-                                screenContent.Add(new ContentViewModel(ContentType.Void, "", ImageVideoWeight));
+                                currentGroup.Content.Add(new ContentViewModel(ContentType.Void, ""));
                             }
                             break;
 
@@ -204,14 +217,14 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                     break;
 
                 case ContentPlacements.Replic:
-                    if (contentItem.Type == AtomTypes.Text)
+                    if (contentItem.Type == ContentTypes.Text)
                     {
                         // Show nothing. The text should be read by showman
                     }
                     break;
 
                 case ContentPlacements.Background:
-                    if (contentItem.Type == AtomTypes.AudioNew)
+                    if (contentItem.Type == ContentTypes.Audio)
                     {
                         PresentationController.SetQuestionSound(true);
 
@@ -230,6 +243,12 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
                 default:
                     break;
             }
+        }
+
+        if (currentGroup != null)
+        {
+            currentGroup.Init();
+            screenContent.Add(currentGroup);
         }
 
         if (screenContent.Any())
