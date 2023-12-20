@@ -355,11 +355,6 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
 
         if (index == -1 || index >= Count)
         {
-            if (Count == 0)
-            {
-                return false;
-            }
-
             index = Count - 1;
         }
 
@@ -374,7 +369,7 @@ public sealed class ContentItemsViewModel : ItemsViewModel<ContentItemViewModel>
         {
             using var change = document.OperationsManager.BeginComplexChange();
 
-            if (string.IsNullOrWhiteSpace(this[index].Model.Value))
+            if (index > -1 && index < Count && string.IsNullOrWhiteSpace(this[index].Model.Value))
             {
                 RemoveAt(index--);
             }
