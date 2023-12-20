@@ -91,11 +91,15 @@ public sealed class GameLogic : Logic<GameData>
 
     public bool IsRunning { get; set; }
 
-    public event Action<GameLogic, GameStages, string>? StageChanged;
+    public event Action<GameLogic, GameStages, string, int, int>? StageChanged;
 
     public event Action<string, int, int>? AdShown;
 
-    internal void OnStageChanged(GameStages stage, string stageName) => StageChanged?.Invoke(this, stage, stageName);
+    internal void OnStageChanged(
+        GameStages stage,
+        string stageName,
+        int progressCurrent = 0,
+        int progressTotal = 0) => StageChanged?.Invoke(this, stage, stageName, progressCurrent, progressTotal);
 
     internal void OnAdShown(int adId) =>
         AdShown?.Invoke(LO.Culture.TwoLetterISOLanguageName, adId, ClientData.AllPersons.Values.Count(p => p.IsHuman));
@@ -4250,19 +4254,6 @@ public sealed class GameLogic : Logic<GameData>
             _data.TableInformStage = 0;
             _data.IsRoundEnding = false;
 
-            if (round.Type == RoundTypes.Final)
-            {
-                _data.Stage = GameStage.Final;
-                OnStageChanged(GameStages.Final, LO[nameof(R.Final)]);
-                ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
-                return;
-            }
-            else
-            {
-                _data.Stage = GameStage.Round;
-                OnStageChanged(GameStages.Round, round.Name);
-            }
-
             // TODO: do not rely on strings
             var isRandomPackage = _data.Package.Info.Comments.Text.StartsWith(PackageHelper.RandomIndicator);
 
@@ -4279,6 +4270,19 @@ public sealed class GameLogic : Logic<GameData>
                     roundIndex = i;
                     break;
                 }
+            }
+
+            if (round.Type == RoundTypes.Final)
+            {
+                _data.Stage = GameStage.Final;
+                OnStageChanged(GameStages.Round, round.Name, roundIndex + 1, _data.Rounds.Length);
+                ScheduleExecution(Tasks.PrintFinal, 1, 1, true);
+                return;
+            }
+            else
+            {
+                _data.Stage = GameStage.Round;
+                OnStageChanged(GameStages.Round, round.Name, roundIndex + 1, _data.Rounds.Length);
             }
 
             _gameActions.InformStage(name: skipRoundAnnounce ? "" : round.Name, index: roundIndex);
