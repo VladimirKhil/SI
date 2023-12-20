@@ -318,7 +318,12 @@ public sealed class Player : Viewer
                     {
                         ClientData.Players[i].CanBeSelected = mparams[i + 1] == "+";
                         int num = i;
-                        ClientData.Players[i].SelectionCallback = player => { _viewerActions.SendMessageWithArgs(Messages.Cat, num); Clear(); };
+
+                        ClientData.Players[i].SelectionCallback = player =>
+                        {
+                            _viewerActions.SendMessageWithArgs(Messages.Cat, num);
+                            Clear();
+                        };
                     }
 
                     ClientData.Hint = LO[nameof(R.HintSelectCatPlayer)];

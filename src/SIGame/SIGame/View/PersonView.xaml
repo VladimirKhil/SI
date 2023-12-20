@@ -105,6 +105,10 @@
                     <Setter Property="BorderBrush" Value="Gray" />
                 </DataTrigger>
 
+                <DataTrigger Binding="{Binding CanBeSelected}" Value="False">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+
                 <DataTrigger Binding="{Binding CanBeSelected}" Value="True">
                     <Setter Property="BorderBrush" Value="Cyan" />
                     <Setter Property="Cursor" Value="Hand" />
