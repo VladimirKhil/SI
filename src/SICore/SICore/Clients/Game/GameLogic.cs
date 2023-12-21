@@ -4500,7 +4500,10 @@ public sealed class GameLogic : Logic<GameData>
 
         _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
-        var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length);
+        var answerTime = Math.Max(
+            GetReadingDurationForTextLength(normalizedAnswer.Length),
+            _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer * 10);
+
         ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
