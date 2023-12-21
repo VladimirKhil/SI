@@ -29,7 +29,7 @@ public sealed class GameLogic : Logic<GameData>
 {
     private const string OfObjectPropertyFormat = "{0} {1}: {2}";
 
-    private const int MaxAnswerLength = 250;
+    private const int MaxAnswerLength = 350;
 
     private const int DefaultAudioVideoTime = 1200; // maximum audio/video duration (120 s)
 
@@ -60,7 +60,7 @@ public sealed class GameLogic : Logic<GameData>
     /// <summary>
     /// Represents character used to form content shape.
     /// </summary>
-    private const string ContentShapeCharacter = "#"; // '%' as an alternative
+    private const string ContentShapeCharacter = "&";
 
     /// <summary>
     /// Execution continuation.
@@ -4498,10 +4498,10 @@ public sealed class GameLogic : Logic<GameData>
     {
         var normalizedAnswer = (answer ?? LO[nameof(R.AnswerNotSet)]).LeaveFirst(MaxAnswerLength);
 
-        _gameActions.SendMessageWithArgs(Messages.RightAnswer, AtomTypes.Text, normalizedAnswer);
+        _gameActions.SendMessageWithArgs(Messages.RightAnswer, ContentTypes.Text, normalizedAnswer);
 
-        var answerTime = _data.Settings.AppSettings.TimeSettings.TimeForRightAnswer;
-        ScheduleExecution(Tasks.MoveNext, (answerTime == 0 ? 2 : answerTime) * 10);
+        var answerTime = GetReadingDurationForTextLength(normalizedAnswer.Length);
+        ScheduleExecution(Tasks.MoveNext, answerTime);
     }
 
     internal void OnComplexAnswer()
