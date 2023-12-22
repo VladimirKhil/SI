@@ -121,9 +121,10 @@ internal sealed class GameEngineController : IQuestionEnginePlayHandler, ISIEngi
         }
     }
 
-    public void OnButtonPressStart()
+    public bool OnButtonPressStart()
     {
         GameViewModel?.AskAnswerButton();
+        return false;
     }
 
     public void OnQuestionContent(IReadOnlyCollection<ContentItem> content)

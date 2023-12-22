@@ -224,10 +224,7 @@ public sealed class QuestionPlayViewModel : WorkspaceViewModel, IQuestionEngineP
         Sound = null;
     }
 
-    public void OnButtonPressStart()
-    {
-        
-    }
+    public bool OnButtonPressStart() => false;
 
     public bool OnSetAnswerer(string mode, string? select, string? stakeVisibility) => false;
 
